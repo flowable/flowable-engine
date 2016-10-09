@@ -4,8 +4,8 @@ mvn -T 1C -Pdistro -DskipTests clean install
 STATUS=$?
 if [ $STATUS -eq 0 ] 
 then
-    cd modules/activiti-ui
+    cd modules/flowable-ui
     ./start-jrebel.sh
 else
-    echo "Build failure in dependent project. Cannot boot Activiti UI."
+    echo "Build failure in dependent project. Cannot boot Flowable UI."
 fi    

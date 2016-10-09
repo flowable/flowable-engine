@@ -3,7 +3,7 @@ if [[ -z "$TOMCAT_HOME" ]]
 then
 
 	echo ""
-	echo "Cannot boot Activiti REST web application : TOMCAT_HOME is not set"
+	echo "Cannot boot Flowable REST web application : TOMCAT_HOME is not set"
     echo ""
 	
 else
@@ -17,7 +17,7 @@ else
     cd $TOMCAT_HOME
     rm -rf conf/tomcat-users.xml
     cp $ORIGINAL_FOLDER/tomcat-users.xml conf/
-    rm -r webapps/activiti*    
+    rm -r webapps/flowable*    
     cd bin
 	chmod +x *.sh
     ./catalina.sh run

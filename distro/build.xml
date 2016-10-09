@@ -4,9 +4,9 @@
 
 	<property file="${user.home}/.activiti/build.properties" />
 
-	<property name="activiti.version" value="6.0.0.RC1-SNAPSHOT" />
-	<property name="target.distro.root" value="target/zip/activiti-${activiti.version}" />
-	<property name="activiti.website" value="../../activiti-website" />
+	<property name="flowable.version" value="6.0.0.RC1-SNAPSHOT" />
+	<property name="target.distro.root" value="target/zip/flowable-${activiti.version}" />
+	<property name="flowable.website" value="../../flowable-website" />
 
 	<condition property="mvn.executable" value="mvn.bat" else="mvn">
 		<os family="windows" />
@@ -35,7 +35,7 @@
 	   copy.sql">
 		<zip destfile="${target.distro.root}.zip">
 			<fileset dir="target/zip">
-				<include name="activiti-${activiti.version}/**" />
+				<include name="flowable-${activiti.version}/**" />
 			</fileset>
 		</zip>
 	</target>
@@ -48,7 +48,7 @@
 			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
 			<arg line="-Pdistro${nodocs.profile}${usingJdk8OrHigher} clean install -Dmaven.test.skip=true" />
 		</exec>
-		<exec executable="${mvn.executable}" dir="../modules/activiti-ui/activiti-app" failonerror="true">
+		<exec executable="${mvn.executable}" dir="../modules/flowable-ui/flowable-app" failonerror="true">
 			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
 			<arg line="clean install" />
 		</exec>
@@ -65,149 +65,143 @@
 		<!-- MOVE ALL LIBS TO libs -->
 		<mkdir dir="${target.distro.root}/libs" />
 		<copy todir="${target.distro.root}/libs">
-			<fileset dir="../modules/activiti-engine/target">
-				<include name="activiti-engine-*.jar" />
+			<fileset dir="../modules/flowable-engine/target">
+				<include name="flowable-engine-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-spring/target">
-				<include name="activiti-spring-*.jar" />
+			<fileset dir="../modules/flowable-spring/target">
+				<include name="flowable-spring-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-bpmn-model/target">
-				<include name="activiti-bpmn-model-*.jar" />
+			<fileset dir="../modules/flowable-bpmn-model/target">
+				<include name="flowable-bpmn-model-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-bpmn-converter/target">
-				<include name="activiti-bpmn-converter-*.jar" />
+			<fileset dir="../modules/flowable-bpmn-converter/target">
+				<include name="flowable-bpmn-converter-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-process-validation/target">
-				<include name="activiti-process-validation-*.jar" />
+			<fileset dir="../modules/flowable-process-validation/target">
+				<include name="flowable-process-validation-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-secure-javascript/target">
-				<include name="activiti-secure-javascript-*.jar" />
+			<fileset dir="../modules/flowable-secure-javascript/target">
+				<include name="flowable-secure-javascript-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-dmn-model/target">
-				<include name="activiti-dmn-model-*.jar" />
+			<fileset dir="../modules/flowable-dmn-model/target">
+				<include name="flowable-dmn-model-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-dmn-json-converter/target">
-				<include name="activiti-dmn-json-converter-*.jar" />
+			<fileset dir="../modules/flowable-dmn-json-converter/target">
+				<include name="flowable-dmn-json-converter-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-dmn-xml-converter/target">
-				<include name="activiti-dmn-xml-converter-*.jar" />
+			<fileset dir="../modules/flowable-dmn-xml-converter/target">
+				<include name="flowable-dmn-xml-converter-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-dmn-api/target">
-				<include name="activiti-dmn-api-*.jar" />
+			<fileset dir="../modules/flowable-dmn-api/target">
+				<include name="flowable-dmn-api-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-dmn-engine/target">
-				<include name="activiti-dmn-engine-*.jar" />
+			<fileset dir="../modules/flowable-dmn-engine/target">
+				<include name="flowable-dmn-engine-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-dmn-engine-configurator/target">
-				<include name="activiti-dmn-engine-configurator-*.jar" />
+			<fileset dir="../modules/flowable-dmn-engine-configurator/target">
+				<include name="flowable-dmn-engine-configurator-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-dmn-rest/target">
-				<include name="activiti-dmn-rest-*.jar" />
+			<fileset dir="../modules/flowable-dmn-rest/target">
+				<include name="flowable-dmn-rest-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-form-model/target">
-				<include name="activiti-form-model-*.jar" />
+			<fileset dir="../modules/flowable-form-model/target">
+				<include name="flowable-form-model-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-form-json-converter/target">
-				<include name="activiti-form-json-converter-*.jar" />
+			<fileset dir="../modules/flowable-form-json-converter/target">
+				<include name="flowable-form-json-converter-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-form-api/target">
-				<include name="activiti-form-api-*.jar" />
+			<fileset dir="../modules/flowable-form-api/target">
+				<include name="flowable-form-api-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-form-engine/target">
-				<include name="activiti-form-engine-*.jar" />
+			<fileset dir="../modules/flowable-form-engine/target">
+				<include name="flowable-form-engine-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-form-engine-configurator/target">
-				<include name="activiti-form-engine-configurator-*.jar" />
+			<fileset dir="../modules/flowable-form-engine-configurator/target">
+				<include name="flowable-form-engine-configurator-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti5-compatibility/target">
-				<include name="activiti5-compatibility-*.jar" />
+			<fileset dir="../modules/flowable5-compatibility/target">
+				<include name="flowable5-compatibility-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti5-engine/target">
-				<include name="activiti5-engine-*.jar" />
+			<fileset dir="../modules/flowable5-engine/target">
+				<include name="flowable5-engine-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti5-spring-compatibility/target">
-				<include name="activiti5-spring-compatibility-*.jar" />
+			<fileset dir="../modules/flowable5-spring-compatibility/target">
+				<include name="flowable5-spring-compatibility-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti5-spring/target">
-				<include name="activiti5-spring-*.jar" />
+			<fileset dir="../modules/flowable5-spring/target">
+				<include name="flowable5-spring-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-bpmn-layout/target">
-				<include name="activiti-bpmn-layout-*.jar" />
+			<fileset dir="../modules/flowable-bpmn-layout/target">
+				<include name="flowable-bpmn-layout-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-image-generator/target">
-				<include name="activiti-image-generator-*.jar" />
+			<fileset dir="../modules/flowable-image-generator/target">
+				<include name="flowable-image-generator-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-json-converter/target">
-				<include name="activiti-json-converter-*.jar" />
+			<fileset dir="../modules/flowable-json-converter/target">
+				<include name="flowable-json-converter-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-ldap/target">
-				<include name="activiti-ldap*.jar" />
+			<fileset dir="../modules/flowable-ldap/target">
+				<include name="flowable-ldap*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-common-rest/target">
-				<include name="activiti-common-rest-*.jar" />
+			<fileset dir="../modules/flowable-common-rest/target">
+				<include name="flowable-common-rest-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-rest/target">
-				<include name="activiti-rest-*.jar" />
+			<fileset dir="../modules/flowable-rest/target">
+				<include name="flowable-rest-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-camel/target">
-				<include name="activiti-camel-*.jar" />
+			<fileset dir="../modules/flowable-camel/target">
+				<include name="flowable-camel-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-cdi/target">
-				<include name="activiti-cdi*.jar" />
+			<fileset dir="../modules/flowable-cdi/target">
+				<include name="flowable-cdi*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-cxf/target">
-				<include name="activiti-cxf-*.jar" />
+			<fileset dir="../modules/flowable-cxf/target">
+				<include name="flowable-cxf-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-mule/target">
-				<include name="activiti-mule-*.jar" />
+			<fileset dir="../modules/flowable-mule/target">
+				<include name="flowable-mule-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-spring-boot/spring-boot-starters/activiti-spring-boot-starter-actuator/target">
-				<include name="activiti-spring-boot-starter-actuator-*.jar" />
+			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-actuator/target">
+				<include name="flowable-spring-boot-starter-actuator-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-spring-boot/spring-boot-starters/activiti-spring-boot-starter-basic/target">
-				<include name="activiti-spring-boot-starter-basic-*.jar" />
+			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-basic/target">
+				<include name="flowable-spring-boot-starter-basic-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-spring-boot/spring-boot-starters/activiti-spring-boot-starter-integration/target">
-				<include name="activiti-spring-boot-starter-integration-*.jar" />
+			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-integration/target">
+				<include name="flowable-spring-boot-starter-integration-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-spring-boot/spring-boot-starters/activiti-spring-boot-starter-jpa/target">
-				<include name="activiti-spring-boot-starter-jpa-*.jar" />
+			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-jpa/target">
+				<include name="flowable-spring-boot-starter-jpa-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-spring-boot/spring-boot-starters/activiti-spring-boot-starter-rest-api/target">
-				<include name="activiti-spring-boot-starter-rest-api-*.jar" />
+			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-rest-api/target">
+				<include name="flowable-spring-boot-starter-rest-api-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-spring-boot/spring-boot-starters/activiti-spring-boot-starter-security/target">
-				<include name="activiti-spring-boot-starter-security-*.jar" />
+			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-security/target">
+				<include name="flowable-spring-boot-starter-security-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-ui/activiti-app-data/target">
-				<include name="activiti-app-data-*.jar" />
+			<fileset dir="../modules/flowable-ui/flowable-app-logic/target">
+				<include name="flowable-app-logic-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-ui/activiti-app-logic/target">
-				<include name="activiti-app-logic-*.jar" />
+			<fileset dir="../modules/flowable-ui/flowable-app-model/target">
+				<include name="flowable-app-model-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-ui/activiti-app-model/target">
-				<include name="activiti-app-model-*.jar" />
+			<fileset dir="../modules/flowable-ui/flowable-app-rest/target">
+				<include name="flowable-app-rest-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-ui/activiti-app-rest/target">
-				<include name="activiti-app-rest-*.jar" />
-			</fileset>
-			<fileset dir="../modules/activiti-ui/content-storage-api/target">
+			<fileset dir="../modules/flowable-ui/flowable-content-storage-api/target">
 				<include name="content-storage-api-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-ui/content-storage-fs/target">
+			<fileset dir="../modules/flowable-ui/flowable-content-storage-fs/target">
 				<include name="content-storage-fs-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-ui/editor-image-generator/target">
-				<include name="editor-image-generator-*.jar" />
+			<fileset dir="../modules/flowable-osgi/target">
+				<include name="flowable-osgi-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-osgi/target">
-				<include name="activiti-osgi-*.jar" />
+			<fileset dir="../modules/flowable-jmx/target">
+				<include name="flowable-jmx-*.jar" />
 			</fileset>
-			<fileset dir="../modules/activiti-jmx/target">
-				<include name="activiti-jmx-*.jar" />
-			</fileset>
-			<fileset dir="../modules/activiti-jms-spring-executor/target">
-				<include name="activiti-jms-spring-executor-*.jar" />
+			<fileset dir="../modules/flowable-jms-spring-executor/target">
+				<include name="flowable-jms-spring-executor-*.jar" />
 			</fileset>
 		</copy>
 
@@ -216,25 +210,25 @@
 	<target name="copy.webapps">
 		<mkdir dir="${target.distro.root}/wars" />
 		<copy todir="${target.distro.root}/wars">
-			<fileset dir="../modules/activiti-ui/activiti-app/target">
-				<include name="activiti-app.war" />
+			<fileset dir="../modules/flowable-ui/flowable-app/target">
+				<include name="flowable-app.war" />
 			</fileset>
-			<fileset dir="../modules/activiti-webapp-rest2/target">
-				<include name="activiti-webapp-rest*.war" />
+			<fileset dir="../modules/flowable-webapp-rest2/target">
+				<include name="flowable-webapp-rest*.war" />
 			</fileset>
 		</copy>
-		<move file="${target.distro.root}/wars/activiti-app.war" tofile="${target.distro.root}/wars/activiti-app.war"/>
-		<move file="${target.distro.root}/wars/activiti-webapp-rest2-${activiti.version}.war" tofile="${target.distro.root}/wars/activiti-rest.war"/>
+		<move file="${target.distro.root}/wars/flowable-app.war" tofile="${target.distro.root}/wars/flowable-app.war"/>
+		<move file="${target.distro.root}/wars/flowable-webapp-rest2-${flowable.version}.war" tofile="${target.distro.root}/wars/flowable-rest.war"/>
 	</target>
 
 	<target name="build.docs" unless="nodocs">
 		<!-- JAVADOCS -->
-		<exec executable="${mvn.executable}" dir="../modules/activiti-engine">
+		<exec executable="${mvn.executable}" dir="../modules/flowable-engine">
 			<arg line="-DexcludePackageNames=org.activiti.engine.impl* javadoc:javadoc" />
 		</exec>
 		<mkdir dir="${target.distro.root}/docs/javadocs" />
 		<copy todir="${target.distro.root}/docs/javadocs">
-			<fileset dir="../modules/activiti-engine/target/site/apidocs" />
+			<fileset dir="../modules/flowable-engine/target/site/apidocs" />
 		</copy>
 		<!-- USERGUIDE -->
 		<ant antfile="../userguide/build.xml" inheritall="false" />
@@ -247,22 +241,22 @@
 	<target name="copy.docs" depends="build.docs" unless="nodocs">
 		<!-- COPY XSD -->
 		<copy todir="${target.distro.root}/docs/xsd">
-			<fileset dir="../modules/activiti-bpmn-converter/src/main/resources/org/activiti/impl/bpmn/parser">
+			<fileset dir="../modules/flowable-bpmn-converter/src/main/resources/org/activiti/impl/bpmn/parser">
 				<include name="*.xsd" />
 			</fileset>
 		</copy>
 	</target>
 
 	<target name="publish.docs" depends="build.docs">
-		<mkdir dir="${activiti.website}/javadocs" />
-		<copy todir="${activiti.website}/javadocs" overwrite="true">
-			<fileset dir="../modules/activiti-engine/target/site/apidocs" />
+		<mkdir dir="${flowable.website}/javadocs" />
+		<copy todir="${flowable.website}/javadocs" overwrite="true">
+			<fileset dir="../modules/flowable-engine/target/site/apidocs" />
 		</copy>
-		<mkdir dir="${activiti.website}/userguide" />
-		<copy todir="${activiti.website}/userguide" overwrite="true">
+		<mkdir dir="${flowable.website}/userguide" />
+		<copy todir="${flowable.website}/userguide" overwrite="true">
 			<fileset dir="../userguide/target/html/en" />
 		</copy>
-		<copy todir="${activiti.website}" overwrite="true">
+		<copy todir="${flowable.website}" overwrite="true">
 			<fileset dir="src">
 				<include name="readme.html" />
 			</fileset>
@@ -272,7 +266,7 @@
 	<target name="copy.sql">
 		<!-- COPY SQL -->
 		<copy todir="${target.distro.root}/database">
-			<fileset dir="../modules/activiti-engine/src/main/resources/org/activiti/db">
+			<fileset dir="../modules/flowable-engine/src/main/resources/org/activiti/db">
 				<include name="create/**" />
 				<include name="drop/**" />
 				<include name="upgrade/**" />
