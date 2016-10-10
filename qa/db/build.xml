@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="activiti.qa.db">
+<project name="flowable.qa.db">
 
 	<target name="create.db.schema">
 		<echo message="creating database schema"/>
 		<echo message="  basedir: ${basedir}"/>
 		<echo message="  database: ${database}"/>
-		<property file="${user.home}/.activiti/jdbc/${database}.properties"/>
+		<property file="${user.home}/.flowable/jdbc/${database}.properties"/>
 		<echo message="  jdbc.driver: ${jdbc.driver}"/>
 		<echo message="  jdbc.url: ${jdbc.url}"/>
 		<echo message="  jdbc.username: ${jdbc.username}"/>
@@ -25,7 +25,7 @@
 		<echo message="dropping database schema"/>
 		<echo message="  basedir: ${basedir}"/>
 		<echo message="  database: ${database}"/>
-		<property file="${user.home}/.activiti/jdbc/${database}.properties"/>
+		<property file="${user.home}/.flowable/jdbc/${database}.properties"/>
 		<echo message="  jdbc.driver: ${jdbc.driver}"/>
 		<echo message="  jdbc.url: ${jdbc.url}"/>
 		<echo message="  jdbc.username: ${jdbc.username}"/>
@@ -46,7 +46,7 @@
 		<echo message="  basedir: ${basedir}"/>
 		<echo message="  database: ${database}"/>
 		
-		<property file="${user.home}/.activiti/jdbc/${database}.properties"/>
+		<property file="${user.home}/.flowable/jdbc/${database}.properties"/>
 
 		<echo message="  jdbc.driver: ${jdbc.driver}"/>
 		<echo message="  jdbc.url: ${jdbc.url}"/>
