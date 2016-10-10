@@ -2,10 +2,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <name>Activiti</name>
+  <name>Flowable</name>
   <description>BPM and workflow engine</description>
-  <groupId>org.activiti</groupId>
-  <artifactId>activiti-root</artifactId>
+  <groupId>org.flowable</groupId>
+  <artifactId>flowable-root</artifactId>
 
   <parent>
     <groupId>org.sonatype.oss</groupId>
@@ -188,94 +188,94 @@
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>org.activiti</groupId>
-        <artifactId>activiti-engine</artifactId>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-engine</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti</groupId>
-        <artifactId>activiti-spring</artifactId>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-spring</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti</groupId>
-        <artifactId>activiti-bpmn-model</artifactId>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-bpmn-model</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti</groupId>
-        <artifactId>activiti-bpmn-converter</artifactId>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-bpmn-converter</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti</groupId>
-        <artifactId>activiti-json-converter</artifactId>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-json-converter</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti</groupId>
-        <artifactId>activiti-explorer</artifactId>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-explorer</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti</groupId>
-        <artifactId>activiti-simple-workflow</artifactId>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-simple-workflow</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti</groupId>
-        <artifactId>activiti-modeler</artifactId>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-modeler</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti</groupId>
-        <artifactId>activiti-common-rest</artifactId>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-common-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti</groupId>
-        <artifactId>activiti-diagram-rest</artifactId>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-diagram-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti</groupId>
-        <artifactId>activiti-rest</artifactId>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti</groupId>
-        <artifactId>activiti-crystalball</artifactId>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-crystalball</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti</groupId>
-        <artifactId>activiti-webapp-rest2</artifactId>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-webapp-rest2</artifactId>
         <type>war</type>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti</groupId>
-        <artifactId>activiti-cxf</artifactId>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-cxf</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti</groupId>
-        <artifactId>activiti-bpmn-layout</artifactId>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-bpmn-layout</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti</groupId>
-        <artifactId>activiti-process-validation</artifactId>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-process-validation</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti</groupId>
-        <artifactId>activiti-image-generator</artifactId>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-image-generator</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.activiti</groupId>
-        <artifactId>activiti-jmx</artifactId>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-jmx</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!-- EMAIL -->
@@ -628,12 +628,12 @@
   </dependencyManagement>
 
   <modules>
-    <module>modules/activiti-bpmn-model</module>
-    <module>modules/activiti-process-validation</module>
-    <module>modules/activiti-bpmn-layout</module>
-    <module>modules/activiti-image-generator</module>
-    <module>modules/activiti-bpmn-converter</module>
-    <module>modules/activiti-engine</module>
+    <module>modules/flowable-bpmn-model</module>
+    <module>modules/flowable-process-validation</module>
+    <module>modules/flowable-bpmn-layout</module>
+    <module>modules/flowable-image-generator</module>
+    <module>modules/flowable-bpmn-converter</module>
+    <module>modules/flowable-engine</module>
   </modules>
 
   <build>
@@ -751,33 +751,33 @@
     <profile>
       <id>deploy</id>
       <modules>
-        <module>modules/activiti-bpmn-model</module>
-        <module>modules/activiti-process-validation</module>
-        <module>modules/activiti-image-generator</module>
-        <module>modules/activiti-bpmn-converter</module>
-        <module>modules/activiti-engine</module>
-        <module>modules/activiti-secure-javascript</module>
-        <module>modules/activiti-bpmn-layout</module>
-        <module>modules/activiti-json-converter</module>
-        <module>modules/activiti-simple-workflow</module>
-        <module>modules/activiti-common-rest</module>
-        <module>modules/activiti-modeler</module>
-        <module>modules/activiti-diagram-rest</module>
-        <module>modules/activiti-explorer</module>
-        <module>modules/activiti-webapp-explorer2</module>
-        <module>modules/activiti-rest</module>
-        <module>modules/activiti-webapp-rest2</module>
-        <module>modules/activiti-spring</module>
-        <module>modules/activiti-spring-boot</module>
-        <module>modules/activiti-cxf</module>
-        <module>modules/activiti-mule</module>
-        <module>modules/activiti-camel</module>
-        <module>modules/activiti-cdi</module>
-        <module>modules/activiti-osgi</module>
-        <module>modules/activiti-ldap</module>
-        <module>modules/activiti-jmx</module>
-        <module>modules/activiti-crystalball</module>
-        <module>tooling/archetypes/activiti-archetype-unittest</module>
+        <module>modules/flowable-bpmn-model</module>
+        <module>modules/flowable-process-validation</module>
+        <module>modules/flowable-image-generator</module>
+        <module>modules/flowable-bpmn-converter</module>
+        <module>modules/flowable-engine</module>
+        <module>modules/flowable-secure-javascript</module>
+        <module>modules/flowable-bpmn-layout</module>
+        <module>modules/flowable-json-converter</module>
+        <module>modules/flowable-simple-workflow</module>
+        <module>modules/flowable-common-rest</module>
+        <module>modules/flowable-modeler</module>
+        <module>modules/flowable-diagram-rest</module>
+        <module>modules/flowable-explorer</module>
+        <module>modules/flowable-webapp-explorer2</module>
+        <module>modules/flowable-rest</module>
+        <module>modules/flowable-webapp-rest2</module>
+        <module>modules/flowable-spring</module>
+        <module>modules/flowable-spring-boot</module>
+        <module>modules/flowable-cxf</module>
+        <module>modules/flowable-mule</module>
+        <module>modules/flowable-camel</module>
+        <module>modules/flowable-cdi</module>
+        <module>modules/flowable-osgi</module>
+        <module>modules/flowable-ldap</module>
+        <module>modules/flowable-jmx</module>
+        <module>modules/flowable-crystalball</module>
+        <module>tooling/archetypes/flowable-archetype-unittest</module>
       </modules>
       <build>
         <plugins>
@@ -826,20 +826,20 @@
     <profile>
       <id>check</id>
       <modules>
-        <module>modules/activiti-bpmn-model</module>
-        <module>modules/activiti-process-validation</module>
-        <module>modules/activiti-image-generator</module>
-        <module>modules/activiti-bpmn-converter</module>
-        <module>modules/activiti-bpmn-layout</module>
-        <module>modules/activiti-json-converter</module>
-        <module>modules/activiti-spring</module>
-        <module>modules/activiti-spring-boot</module>
-        <module>modules/activiti-common-rest</module>
-        <module>modules/activiti-simple-workflow</module>
-        <module>modules/activiti-rest</module>
-        <module>modules/activiti-webapp-rest2</module>
-        <module>modules/activiti-cxf</module>
-        <module>modules/activiti-secure-javascript</module>
+        <module>modules/flowable-bpmn-model</module>
+        <module>modules/flowable-process-validation</module>
+        <module>modules/flowable-image-generator</module>
+        <module>modules/flowable-bpmn-converter</module>
+        <module>modules/flowable-bpmn-layout</module>
+        <module>modules/flowable-json-converter</module>
+        <module>modules/flowable-spring</module>
+        <module>modules/flowable-spring-boot</module>
+        <module>modules/flowable-common-rest</module>
+        <module>modules/flowable-simple-workflow</module>
+        <module>modules/flowable-rest</module>
+        <module>modules/flowable-webapp-rest2</module>
+        <module>modules/flowable-cxf</module>
+        <module>modules/flowable-secure-javascript</module>
       </modules>
     </profile>
     <profile>
@@ -849,50 +849,50 @@
       -->
       <id>checkJdk6</id>
       <modules>
-        <module>modules/activiti-bpmn-model</module>
-        <module>modules/activiti-process-validation</module>
-        <module>modules/activiti-image-generator</module>
-        <module>modules/activiti-bpmn-converter</module>
-        <module>modules/activiti-bpmn-layout</module>
-        <module>modules/activiti-json-converter</module>
-        <module>modules/activiti-spring</module>
-        <module>modules/activiti-common-rest</module>
-        <module>modules/activiti-simple-workflow</module>
-        <module>modules/activiti-rest</module>
-        <module>modules/activiti-webapp-rest2</module>
-        <module>modules/activiti-cxf</module>
-        <module>modules/activiti-secure-javascript</module>
+        <module>modules/flowable-bpmn-model</module>
+        <module>modules/flowable-process-validation</module>
+        <module>modules/flowable-image-generator</module>
+        <module>modules/flowable-bpmn-converter</module>
+        <module>modules/flowable-bpmn-layout</module>
+        <module>modules/flowable-json-converter</module>
+        <module>modules/flowable-spring</module>
+        <module>modules/flowable-common-rest</module>
+        <module>modules/flowable-simple-workflow</module>
+        <module>modules/flowable-rest</module>
+        <module>modules/flowable-webapp-rest2</module>
+        <module>modules/flowable-cxf</module>
+        <module>modules/flowable-secure-javascript</module>
       </modules>
     </profile>
     <profile>
       <id>checkmule</id>
       <modules>
-        <module>modules/activiti-cxf</module>
-        <module>modules/activiti-mule</module>
+        <module>modules/flowable-cxf</module>
+        <module>modules/flowable-mule</module>
       </modules>
     </profile>
     <profile>
       <id>checkspring</id> <!-- [Joram] Is this still used?? -->
       <modules>
-        <module>modules/activiti-spring</module>
+        <module>modules/flowable-spring</module>
       </modules>
     </profile>
     <profile>
       <id>checkcdi</id>
       <modules>
-        <module>modules/activiti-cdi</module>
+        <module>modules/flowable-cdi</module>
       </modules>
     </profile>
     <profile>
       <id>checksimpleworkflow</id>
       <modules>
-        <module>modules/activiti-simple-workflow</module>
+        <module>modules/flowable-simple-workflow</module>
       </modules>
     </profile>
     <profile>
       <id>checkosgi</id>
       <modules>
-        <module>modules/activiti-osgi</module>
+        <module>modules/flowable-osgi</module>
       </modules>
     </profile>
     <profile>
@@ -911,32 +911,32 @@
     <profile>
       <id>distro</id>
       <modules>
-        <module>modules/activiti-bpmn-model</module>
-        <module>modules/activiti-process-validation</module>
-        <module>modules/activiti-image-generator</module>
-        <module>modules/activiti-bpmn-converter</module>
-        <module>modules/activiti-bpmn-layout</module>
-        <module>modules/activiti-json-converter</module>
-        <module>modules/activiti-secure-javascript</module>
-        <module>modules/activiti-simple-workflow</module>
-        <module>modules/activiti-spring</module>
-        <module>modules/activiti-spring-boot</module>
-        <module>modules/activiti-common-rest</module>
-        <module>modules/activiti-modeler</module>
-        <module>modules/activiti-diagram-rest</module>
-        <module>modules/activiti-explorer</module>
-        <module>modules/activiti-rest</module>
-        <module>modules/activiti-webapp-rest2</module>
-        <module>modules/activiti-webapp-explorer2</module>
-        <module>modules/activiti-cxf</module>
-        <module>modules/activiti-osgi</module>
-        <module>modules/activiti-camel</module>
-        <module>modules/activiti-mule</module>
-        <module>modules/activiti-cdi</module>
-        <module>modules/activiti-ldap</module>
-        <module>modules/activiti-crystalball</module>
-        <module>modules/activiti-jmx</module>
-        <module>tooling/archetypes/activiti-archetype-unittest</module>
+        <module>modules/flowable-bpmn-model</module>
+        <module>modules/flowable-process-validation</module>
+        <module>modules/flowable-image-generator</module>
+        <module>modules/flowable-bpmn-converter</module>
+        <module>modules/flowable-bpmn-layout</module>
+        <module>modules/flowable-json-converter</module>
+        <module>modules/flowable-secure-javascript</module>
+        <module>modules/flowable-simple-workflow</module>
+        <module>modules/flowable-spring</module>
+        <module>modules/flowable-spring-boot</module>
+        <module>modules/flowable-common-rest</module>
+        <module>modules/flowable-modeler</module>
+        <module>modules/flowable-diagram-rest</module>
+        <module>modules/flowable-explorer</module>
+        <module>modules/flowable-rest</module>
+        <module>modules/flowable-webapp-rest2</module>
+        <module>modules/flowable-webapp-explorer2</module>
+        <module>modules/flowable-cxf</module>
+        <module>modules/flowable-osgi</module>
+        <module>modules/flowable-camel</module>
+        <module>modules/flowable-mule</module>
+        <module>modules/flowable-cdi</module>
+        <module>modules/flowable-ldap</module>
+        <module>modules/flowable-crystalball</module>
+        <module>modules/flowable-jmx</module>
+        <module>tooling/archetypes/flowable-archetype-unittest</module>
       </modules>
 	<build>
 		<plugins>
@@ -966,7 +966,7 @@
         </property>
       </activation>
       <modules>
-        <module>modules/activiti-engine</module>
+        <module>modules/flowable-engine</module>
       </modules>
     </profile>
     <profile>
@@ -974,21 +974,21 @@
         webapp and all its dependencies -->
       <id>buildWebappDependencies</id>
       <modules>
-        <module>modules/activiti-bpmn-model</module>
-        <module>modules/activiti-process-validation</module>
-        <module>modules/activiti-image-generator</module>
-        <module>modules/activiti-json-converter</module>
-        <module>modules/activiti-bpmn-converter</module>
-        <module>modules/activiti-engine</module>
-        <module>modules/activiti-secure-javascript</module>
-        <module>modules/activiti-spring</module>
-        <module>modules/activiti-explorer</module>
-        <module>modules/activiti-common-rest</module>
-        <module>modules/activiti-modeler</module>
-        <module>modules/activiti-diagram-rest</module>
-        <module>modules/activiti-bpmn-layout</module>
-        <module>modules/activiti-simple-workflow</module>
-        <module>modules/activiti-crystalball</module>
+        <module>modules/flowable-bpmn-model</module>
+        <module>modules/flowable-process-validation</module>
+        <module>modules/flowable-image-generator</module>
+        <module>modules/flowable-json-converter</module>
+        <module>modules/flowable-bpmn-converter</module>
+        <module>modules/flowable-engine</module>
+        <module>modules/flowable-secure-javascript</module>
+        <module>modules/flowable-spring</module>
+        <module>modules/flowable-explorer</module>
+        <module>modules/flowable-common-rest</module>
+        <module>modules/flowable-modeler</module>
+        <module>modules/flowable-diagram-rest</module>
+        <module>modules/flowable-bpmn-layout</module>
+        <module>modules/flowable-simple-workflow</module>
+        <module>modules/flowable-crystalball</module>
       </modules>
       <properties>
         <skipTests>true</skipTests>
@@ -1016,16 +1016,16 @@
         webapp and all its dependencies -->
       <id>buildRestappDependencies</id>
       <modules>
-        <module>modules/activiti-bpmn-model</module>
-        <module>modules/activiti-process-validation</module>
-        <module>modules/activiti-image-generator</module>
-        <module>modules/activiti-json-converter</module>
-        <module>modules/activiti-bpmn-converter</module>
-        <module>modules/activiti-engine</module>
-        <module>modules/activiti-secure-javascript</module>
-        <module>modules/activiti-spring</module>
-        <module>modules/activiti-common-rest</module>
-        <module>modules/activiti-rest</module>
+        <module>modules/flowable-bpmn-model</module>
+        <module>modules/flowable-process-validation</module>
+        <module>modules/flowable-image-generator</module>
+        <module>modules/flowable-json-converter</module>
+        <module>modules/flowable-bpmn-converter</module>
+        <module>modules/flowable-engine</module>
+        <module>modules/flowable-secure-javascript</module>
+        <module>modules/flowable-spring</module>
+        <module>modules/flowable-common-rest</module>
+        <module>modules/flowable-rest</module>
       </modules>
       <properties>
         <skipTests>true</skipTests>
@@ -1052,7 +1052,7 @@
 
   <!-- Various information, not used by the build -->
 
-  <url>http://activiti.org</url>
+  <url>http://flowable.github.io</url>
   <licenses>
     <license>
       <name>Apache v2</name>

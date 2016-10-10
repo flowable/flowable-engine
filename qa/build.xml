@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="activiti.qa">
+<project name="flowable.qa">
   	
-  <property file="${user.home}/.activiti/build.properties" />
+  <property file="${user.home}/.flowable/build.properties" />
   <property file="../distro/src/setup/build.properties" />
-  <property name="activiti.version" value="5.16.1" />
-  <property name="activiti.home" value="../distro/target/activiti-${activiti.version}" /> 
+  <property name="flowable.version" value="5.16.1" />
+  <property name="flowable.home" value="../distro/target/flowable-${flowable.version}" /> 
   <property name="macos.browser" value="/usr/bin/open" />
   <property name="windows.browser" value="C:/Program Files/Mozilla Firefox/firefox.exe" />
   <property name="linux.browser" value="firefox" />
-  <property name="tomcat.home" value="${activiti.home}/apps/apache-tomcat-${tomcat.version}" />
-  <property name="downloads.dir" value="${user.home}/.activiti/downloads" />
+  <property name="tomcat.home" value="${flowable.home}/apps/apache-tomcat-${tomcat.version}" />
+  <property name="downloads.dir" value="${user.home}/.flowable/downloads" />
   
   <condition property="mvn.executable" value="mvn.bat" else="mvn">
      <os family="windows"/>
@@ -23,7 +23,7 @@
   </target>
 
   <target name="test.demo.start" depends="build.clean.distro">
-    <ant antfile="../distro/target/activiti-${activiti.version}/setup/build.xml"
+    <ant antfile="../distro/target/activiti-${flowable.version}/setup/build.xml"
          target="demo.start"
          inheritall="false">
     	<property name="nodocs" value="true" />
@@ -31,13 +31,13 @@
   </target>
 	
   <target name="test.demo.stop">
-    <ant antfile="../distro/target/activiti-${activiti.version}/setup/build.xml"
+    <ant antfile="../distro/target/flowable-${flowable.version}/setup/build.xml"
          target="demo.stop"
          inheritall="false" />
   </target>
 	
   <target name="test.upgrade" depends="build.clean.distro">
-    <copy file="../distro/target/activiti-${activiti.version}.zip" todir="${downloads.dir}" />
+    <copy file="../distro/target/flowable-${flowable.version}.zip" todir="${downloads.dir}" />
   	<ant antfile="upgrade/build.xml" target="upgrade" inheritall="false" />
   </target>
   
@@ -52,7 +52,7 @@
   </target>
   
   <target name="test.demo.setup.refresh">
-    <ant antfile="../distro/target/activiti-${activiti.version}/setup/build.xml"
+    <ant antfile="../distro/target/flowable-${flowable.version}/setup/build.xml"
          target="demo.teardown"
          inheritall="false" />
 		<antcall target="test.demo.setup" />
@@ -67,10 +67,10 @@
   </target>
 
   <target name="build.javadocs">
-    <exec executable="${mvn.executable}" dir="../modules/activiti-engine">
+    <exec executable="${mvn.executable}" dir="../modules/flowable-engine">
       <arg line="javadoc:javadoc" />
     </exec>
-  	<property name="url" value="file://${basedir}/../modules/activiti-engine/target/site/apidocs/index.html" />
+  	<property name="url" value="file://${basedir}/../modules/flowable-engine/target/site/apidocs/index.html" />
   	<antcall target="open.html.page"/>
   </target>
 
@@ -91,18 +91,18 @@
   
   <target name="webapp.redeploy">
     <fail message="To use this target, set property webapp.redeploy.module to the chosen module" unless="webapp.redeploy.module"/>
-    <available file="${user.home}/.activiti/tomcat-users.xml" property="tomcat.users.available" />
-  	<fail message="To use this target, a tomcat-users.xml must be in your user home ${user.home}/.activiti with following content:&#10;
+    <available file="${user.home}/.flowable/tomcat-users.xml" property="tomcat.users.available" />
+  	<fail message="To use this target, a tomcat-users.xml must be in your user home ${user.home}/.flowable with following content:&#10;
 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt; &#10;
 &lt;tomcat-users&gt; &#10;
  	&lt;role rolename=&quot;manager&quot;/&gt; &#10;
  	&lt;user username=&quot;activiti&quot; password=&quot;activiti&quot; roles=&quot;manager&quot;/&gt; &#10;
 &lt;/tomcat-users&gt; &#10;
 Then run test.demo.setup to make it get placed inside your tomcat server." unless="tomcat.users.available"/>
-    <exec executable="${mvn.executable}" dir="../modules/activiti-webapp">
+    <exec executable="${mvn.executable}" dir="../modules/flowable-webapp">
       <arg line="clean install" />
     </exec>
-    <exec executable="${mvn.executable}" dir="../modules/activiti-webapp-${webapp.redeploy.module}">
+    <exec executable="${mvn.executable}" dir="../modules/flowable-webapp-${webapp.redeploy.module}">
       <arg line="clean package" />
     </exec>
     <taskdef name="undeploy" classname="org.apache.catalina.ant.UndeployTask">
@@ -128,16 +128,16 @@ Then run test.demo.setup to make it get placed inside your tomcat server." unles
             username="activiti"
             password="activiti"
             path="/activiti-${webapp.redeploy.module}"
-            war="${basedir}/../modules/activiti-webapp-${webapp.redeploy.module}/target/activiti-webapp-${webapp.redeploy.module}-${activiti.version}.war"/>
+            war="${basedir}/../modules/flowable-webapp-${webapp.redeploy.module}/target/flowable-webapp-${webapp.redeploy.module}-${flowable.version}.war"/>
   </target>
 
 
   <target name="webapp.rest.redeploy.resources">
-    <copy todir="${tomcat.home}/webapps/activiti-webapp-rest/WEB-INF/classes/webscripts" verbose="true">
-      <fileset dir="../modules/activiti-webapp-rest/src/main/resources/webscripts" />
+    <copy todir="${tomcat.home}/webapps/flowable-webapp-rest/WEB-INF/classes/webscripts" verbose="true">
+      <fileset dir="../modules/flowable-webapp-rest/src/main/resources/webscripts" />
     </copy>
-    <copy todir="${tomcat.home}/webapps/activiti-webapp-rest" verbose="true">
-      <fileset dir="../modules/activiti-webapp-rest/src/main/webapp/" excludes="WEB-INF/web.xml" />
+    <copy todir="${tomcat.home}/webapps/flowable-webapp-rest" verbose="true">
+      <fileset dir="../modules/flowable-webapp-rest/src/main/webapp/" excludes="WEB-INF/web.xml" />
     </copy>
   </target>
 
@@ -152,11 +152,11 @@ Then run test.demo.setup to make it get placed inside your tomcat server." unles
   </target>
 
   <target name="webapp.redeploy.resources">
-    <copy todir="${tomcat.home}/webapps/activiti-${webapp.redeploy.module}" verbose="true">
-      <fileset dir="../modules/activiti-webapp/src/main/webapp/" excludes="WEB-INF/web.xml" />
+    <copy todir="${tomcat.home}/webapps/flowable-${webapp.redeploy.module}" verbose="true">
+      <fileset dir="../modules/flowable-webapp/src/main/webapp/" excludes="WEB-INF/web.xml" />
     </copy>
-    <copy todir="${tomcat.home}/webapps/activiti-${webapp.redeploy.module}" verbose="true">
-      <fileset dir="../modules/activiti-webapp-${webapp.redeploy.module}/src/main/webapp/" excludes="WEB-INF/web.xml" />
+    <copy todir="${tomcat.home}/webapps/flowable-${webapp.redeploy.module}" verbose="true">
+      <fileset dir="../modules/flowable-webapp-${webapp.redeploy.module}/src/main/webapp/" excludes="WEB-INF/web.xml" />
     </copy>
   </target>
 
@@ -184,11 +184,11 @@ Then run test.demo.setup to make it get placed inside your tomcat server." unles
 		</zip>
 		<taskdef name="deploy-bar" classname="org.activiti.engine.impl.ant.DeployBarTask">
 		  <classpath>
-		    <fileset dir="${activiti.home}/setup/build/">
+		    <fileset dir="${flowable.home}/setup/build/">
 		      <include name="activiti-cfg.jar"/>
 		     </fileset>
-		     <fileset dir="${activiti.home}/examples/activiti-engine-examples/libs-runtime/" />
-         <fileset dir="${activiti.home}/examples/activiti-engine-examples/libs-test/" />
+		     <fileset dir="${flowable.home}/examples/flowable-engine-examples/libs-runtime/" />
+         <fileset dir="${activiti.home}/examples/flowable-engine-examples/libs-test/" />
 		   </classpath>
 		  </taskdef>
 		

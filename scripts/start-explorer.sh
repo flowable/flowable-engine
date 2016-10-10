@@ -5,8 +5,8 @@ mvn -PbuildWebappDependencies clean install
 STATUS=$?
 if [ $STATUS -eq 0 ] 
 then
-    cd modules/activiti-webapp-explorer2
+    cd modules/flowable-webapp-explorer2
     mvn -Dfile.encoding=UTF-8 clean package tomcat7:run
 else
-    echo "Build failure in dependent project. Cannot boot Activiti Explorer."
+    echo "Build failure in dependent project. Cannot boot Flowable Explorer."
 fi    
