@@ -202,7 +202,7 @@
     </dependency>
 
     <!-- Vaadin add-ons -->
-    <!-- Must be defined both in activiti-explorer and activiti-webapp-explorer, 
+    <!-- Must be defined both in flowable-explorer and flowable-webapp-explorer, 
       as otherwise the gwt compiler won't find it -->
     <dependency>
       <groupId>org.vaadin.addons</groupId>
