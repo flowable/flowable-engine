@@ -239,16 +239,7 @@ public abstract class ReflectUtil {
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
   private static <T> Constructor<T> findMatchingConstructor(Class<T> clazz, Object[] args) {
-    for (Constructor constructor : clazz.getDeclaredConstructors()) { // cannot
-                                                                      // use
-                                                                      // <?>
-                                                                      // or
-                                                                      // <T>
-                                                                      // due
-                                                                      // to
-                                                                      // JDK
-                                                                      // 5/6
-                                                                      // incompatibility
+    for (Constructor constructor : clazz.getDeclaredConstructors()) { // cannot use <?> or <T> due to JDK 5/6 incompatibility
       if (matches(constructor.getParameterTypes(), args)) {
         return constructor;
       }

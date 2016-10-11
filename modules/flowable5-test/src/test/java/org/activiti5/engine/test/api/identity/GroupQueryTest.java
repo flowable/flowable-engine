@@ -15,11 +15,10 @@ package org.activiti5.engine.test.api.identity;
 
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.GroupQuery;
-import org.activiti5.engine.impl.persistence.entity.GroupEntity;
+import org.activiti.idm.engine.ActivitiIdmException;
+import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 
 /**
@@ -86,7 +85,7 @@ public class GroupQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createGroupQuery().groupId(null).list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (ActivitiIdmIllegalArgumentException e) {}
   }
   
   public void testQueryByName() {
@@ -104,7 +103,7 @@ public class GroupQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createGroupQuery().groupName(null).list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (ActivitiIdmIllegalArgumentException e) {}
   }
   
   public void testQueryByNameLike() {
@@ -125,7 +124,7 @@ public class GroupQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createGroupQuery().groupNameLike(null).list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (ActivitiIdmIllegalArgumentException e) {}
   }
   
   public void testQueryByType() {
@@ -143,7 +142,7 @@ public class GroupQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createGroupQuery().groupType(null).list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (ActivitiIdmIllegalArgumentException e) {}
   }
   
   public void testQueryByMember() {
@@ -174,7 +173,7 @@ public class GroupQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createGroupQuery().groupMember(null).list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (ActivitiIdmIllegalArgumentException e) {}
   }
   
   public void testQuerySorting() {
@@ -208,12 +207,12 @@ public class GroupQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createGroupQuery().orderByGroupId().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (ActivitiIdmIllegalArgumentException e) {}
     
     try {
       identityService.createGroupQuery().orderByGroupId().orderByGroupName().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (ActivitiIdmIllegalArgumentException e) {}
   }
   
   private void verifyQueryResults(GroupQuery query, int countExpected) {
@@ -233,21 +232,18 @@ public class GroupQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ActivitiException e) {}
+    } catch (ActivitiIdmException e) {}
   }
 
   public void testNativeQuery() {
-    assertEquals("ACT_ID_GROUP", managementService.getTableName(Group.class));
-    assertEquals("ACT_ID_GROUP", managementService.getTableName(GroupEntity.class));
-    String tableName = managementService.getTableName(Group.class);
-    String baseQuerySql = "SELECT * FROM " + tableName;
+    String baseQuerySql = "SELECT * FROM ACT_ID_GROUP";
 
     assertEquals(4, identityService.createNativeGroupQuery().sql(baseQuerySql).list().size());
 
     assertEquals(1, identityService.createNativeGroupQuery().sql(baseQuerySql + " where ID_ = #{id}")
         .parameter("id", "admin").list().size());
 
-    assertEquals(3, identityService.createNativeGroupQuery().sql("SELECT aig.* from " + tableName + " aig"
+    assertEquals(3, identityService.createNativeGroupQuery().sql("SELECT aig.* from ACT_ID_GROUP aig"
         + " inner join ACT_ID_MEMBERSHIP aim on aig.ID_ = aim.GROUP_ID_ "
         + " inner join ACT_ID_USER aiu on aiu.ID_ = aim.USER_ID_ where aiu.ID_ = #{id}")
         .parameter("id", "kermit").list().size());

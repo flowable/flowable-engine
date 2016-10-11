@@ -19,13 +19,14 @@ import java.util.Set;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.identity.Group;
+import org.activiti.engine.IdentityService;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.SuspensionState;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
+import org.activiti.idm.api.Group;
 
 /**
  * @author Tom Baeyens
@@ -275,11 +276,10 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   }
 
   public List<String> getAuthorizationGroups() {
-    // Similar behaviour as the TaskQuery.taskCandidateUser() which
-    // includes the groups the candidate
-    // user is part of
+    // Similar behaviour as the TaskQuery.taskCandidateUser() which includes the groups the candidate user is part of
     if (authorizationUserId != null) {
-      List<Group> groups = Context.getCommandContext().getGroupEntityManager().findGroupsByUser(authorizationUserId);
+      IdentityService identityService = Context.getProcessEngineConfiguration().getIdentityService();
+      List<Group> groups = identityService.createGroupQuery().groupMember(authorizationUserId).list();
       List<String> groupIds = new ArrayList<String>();
       for (Group group : groups) {
         groupIds.add(group.getId());

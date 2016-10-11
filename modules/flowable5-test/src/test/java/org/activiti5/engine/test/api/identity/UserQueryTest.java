@@ -15,11 +15,10 @@ package org.activiti5.engine.test.api.identity;
 
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.idm.api.User;
 import org.activiti.idm.api.UserQuery;
-import org.activiti5.engine.impl.persistence.entity.UserEntity;
+import org.activiti.idm.engine.ActivitiIdmException;
+import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 
 
@@ -82,7 +81,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().userId(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) { }
+    } catch (ActivitiIdmIllegalArgumentException e) { }
   }
   
   public void testQueryByFirstName() {
@@ -100,7 +99,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().userFirstName(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) { }
+    } catch (ActivitiIdmIllegalArgumentException e) { }
   }
   
   public void testQueryByFirstNameLike() {
@@ -118,7 +117,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().userFirstNameLike(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) { }
+    } catch (ActivitiIdmIllegalArgumentException e) { }
   }
   
   public void testQueryByLastName() {
@@ -136,7 +135,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().userLastName(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) { }
+    } catch (ActivitiIdmIllegalArgumentException e) { }
   }
   
   public void testQueryByLastNameLike() {
@@ -165,7 +164,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().userLastNameLike(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) { }
+    } catch (ActivitiIdmIllegalArgumentException e) { }
   }
   
   public void testQueryByEmail() {
@@ -180,7 +179,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().userEmail(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) { }
+    } catch (ActivitiIdmIllegalArgumentException e) { }
   }
   
   public void testQueryByEmailLike() {
@@ -198,7 +197,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().userEmailLike(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) { }
+    } catch (ActivitiIdmIllegalArgumentException e) { }
   }
   
   public void testQuerySorting() {
@@ -226,12 +225,12 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().orderByUserId().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (ActivitiIdmIllegalArgumentException e) {}
     
     try {
       identityService.createUserQuery().orderByUserId().orderByUserEmail().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (ActivitiIdmIllegalArgumentException e) {}
   }
   
   public void testQueryByMemberOf() {
@@ -252,7 +251,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().memberOfGroup(null).list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) { }
+    } catch (ActivitiIdmIllegalArgumentException e) { }
   }
   
   private void verifyQueryResults(UserQuery query, int countExpected) {
@@ -272,14 +271,11 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ActivitiException e) {}
+    } catch (ActivitiIdmException e) {}
   }
 
   public void testNativeQuery() {
-    assertEquals("ACT_ID_USER", managementService.getTableName(User.class));
-    assertEquals("ACT_ID_USER", managementService.getTableName(UserEntity.class));
-    String tableName = managementService.getTableName(User.class);
-    String baseQuerySql = "SELECT * FROM " + tableName;
+    String baseQuerySql = "SELECT * FROM ACT_ID_USER";
 
     assertEquals(3, identityService.createNativeUserQuery().sql(baseQuerySql).list().size());
 

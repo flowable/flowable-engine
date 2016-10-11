@@ -12,10 +12,10 @@
  */
 package org.activiti5.engine.test.api.event;
 
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
 import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.idm.api.User;
+import org.activiti.idm.api.event.ActivitiIdmEntityEvent;
+import org.activiti.idm.api.event.ActivitiIdmEventType;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 
 /**
@@ -25,7 +25,7 @@ import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
  */
 public class UserEventsTest extends PluggableActivitiTestCase {
 
-	private TestActiviti6EntityEventListener listener;
+	private TestActiviti6IdmEntityEventListener listener;
 
 	/**
 	 * Test create, update and delete events of users.
@@ -39,46 +39,37 @@ public class UserEventsTest extends PluggableActivitiTestCase {
 			identityService.saveUser(user);
 
 			assertEquals(2, listener.getEventsReceived().size());
-			ActivitiEntityEvent event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(ActivitiEventType.ENTITY_CREATED, event.getType());
+			ActivitiIdmEntityEvent event = (ActivitiIdmEntityEvent) listener.getEventsReceived().get(0);
+			assertEquals(ActivitiIdmEventType.ENTITY_CREATED, event.getType());
 			assertTrue(event.getEntity() instanceof User);
 			User userFromEvent = (User) event.getEntity();
 			assertEquals("fred", userFromEvent.getId());
-			assertNull(event.getProcessDefinitionId());
-			assertNull(event.getExecutionId());
-			assertNull(event.getProcessInstanceId());
 			
-			event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
-			assertEquals(ActivitiEventType.ENTITY_INITIALIZED, event.getType());
+			event = (ActivitiIdmEntityEvent) listener.getEventsReceived().get(1);
+			assertEquals(ActivitiIdmEventType.ENTITY_INITIALIZED, event.getType());
 			listener.clearEventsReceived();
 
 			// Update user
 			user.setFirstName("Anna");
 			identityService.saveUser(user);
 			assertEquals(1, listener.getEventsReceived().size());
-			event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(ActivitiEventType.ENTITY_UPDATED, event.getType());
+			event = (ActivitiIdmEntityEvent) listener.getEventsReceived().get(0);
+			assertEquals(ActivitiIdmEventType.ENTITY_UPDATED, event.getType());
 			assertTrue(event.getEntity() instanceof User);
 			userFromEvent = (User) event.getEntity();
 			assertEquals("fred", userFromEvent.getId());
 			assertEquals("Anna", userFromEvent.getFirstName());
-			assertNull(event.getProcessDefinitionId());
-			assertNull(event.getExecutionId());
-			assertNull(event.getProcessInstanceId());
 			listener.clearEventsReceived();
 
 			// Delete user
 			identityService.deleteUser(user.getId());
 			
 			assertEquals(1, listener.getEventsReceived().size());
-			event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(ActivitiEventType.ENTITY_DELETED, event.getType());
+			event = (ActivitiIdmEntityEvent) listener.getEventsReceived().get(0);
+			assertEquals(ActivitiIdmEventType.ENTITY_DELETED, event.getType());
 			assertTrue(event.getEntity() instanceof User);
 			userFromEvent = (User) event.getEntity();
 			assertEquals("fred", userFromEvent.getId());
-			assertNull(event.getProcessDefinitionId());
-			assertNull(event.getExecutionId());
-			assertNull(event.getProcessInstanceId());
 			listener.clearEventsReceived();
 
 		} finally {
@@ -92,8 +83,8 @@ public class UserEventsTest extends PluggableActivitiTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		listener = new TestActiviti6EntityEventListener(User.class);
-		processEngineConfiguration.getEventDispatcher().addEventListener(listener);
+		listener = new TestActiviti6IdmEntityEventListener(User.class);
+		processEngineConfiguration.getIdmEventDispatcher().addEventListener(listener);
 	}
 
 	@Override
@@ -101,7 +92,7 @@ public class UserEventsTest extends PluggableActivitiTestCase {
 		super.tearDown();
 
 		if (listener != null) {
-		  processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
+		  processEngineConfiguration.getIdmEventDispatcher().removeEventListener(listener);
 		}
 	}
 }

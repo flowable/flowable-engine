@@ -15,8 +15,9 @@ package org.activiti.idm.engine.impl.persistence.entity;
 import org.activiti.idm.api.event.ActivitiIdmEventDispatcher;
 import org.activiti.idm.api.event.ActivitiIdmEventType;
 import org.activiti.idm.engine.IdmEngineConfiguration;
-import org.activiti.idm.engine.delegate.event.impl.ActivitiEventBuilder;
+import org.activiti.idm.engine.delegate.event.impl.ActivitiIdmEventBuilder;
 import org.activiti.idm.engine.impl.db.Entity;
+import org.activiti.idm.engine.impl.db.HasRevision;
 import org.activiti.idm.engine.impl.persistence.AbstractManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.DataManager;
 
@@ -45,23 +46,31 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
 
   @Override
   public void insert(EntityImpl entity) {
-    getDataManager().insert(entity);
+    insert(entity, true);
   }
   
   @Override
   public void insert(EntityImpl entity, boolean fireCreateEvent) {
+    if (entity instanceof HasRevision) {
+      ((HasRevision) entity).setRevision(((HasRevision) entity).getRevisionNext());
+    }
+    
     getDataManager().insert(entity);
 
     ActivitiIdmEventDispatcher eventDispatcher = getEventDispatcher();
     if (fireCreateEvent && eventDispatcher.isEnabled()) {
-      eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiIdmEventType.ENTITY_CREATED, entity));
-      eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiIdmEventType.ENTITY_INITIALIZED, entity));
+      eventDispatcher.dispatchEvent(ActivitiIdmEventBuilder.createEntityEvent(ActivitiIdmEventType.ENTITY_CREATED, entity));
+      eventDispatcher.dispatchEvent(ActivitiIdmEventBuilder.createEntityEvent(ActivitiIdmEventType.ENTITY_INITIALIZED, entity));
     }
   }
   
   @Override
   public EntityImpl update(EntityImpl entity) {
     EntityImpl updatedEntity = getDataManager().update(entity);
+    
+    if (getEventDispatcher().isEnabled()) {
+      getEventDispatcher().dispatchEvent(ActivitiIdmEventBuilder.createEntityEvent(ActivitiIdmEventType.ENTITY_UPDATED, entity));
+    }
     
     return updatedEntity;
   }
@@ -75,6 +84,10 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
   @Override
   public void delete(EntityImpl entity) {
     getDataManager().delete(entity);
+    
+    if (getEventDispatcher().isEnabled()) {
+      getEventDispatcher().dispatchEvent(ActivitiIdmEventBuilder.createEntityEvent(ActivitiIdmEventType.ENTITY_DELETED, entity));
+    }
   }
 
   protected abstract DataManager<EntityImpl> getDataManager();

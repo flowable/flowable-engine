@@ -19,9 +19,10 @@ import java.util.List;
 import org.activiti.engine.DynamicBpmnConstants;
 import org.activiti.engine.impl.variable.VariableTypes;
 import org.activiti.engine.task.DelegationState;
+import org.activiti.idm.api.Group;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
-import org.activiti5.engine.identity.Group;
+import org.activiti5.engine.IdentityService;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.interceptor.CommandExecutor;
@@ -1122,12 +1123,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
   }
   
   protected List<String> getGroupsForCandidateUser(String candidateUser) {
-    // TODO: Discuss about removing this feature? Or document it properly and maybe recommend to not use it
-    // and explain alternatives
-    List<Group> groups = Context
-      .getCommandContext()
-      .getGroupIdentityManager()
-      .findGroupsByUser(candidateUser);
+    IdentityService identityService = Context.getProcessEngineConfiguration().getIdentityService();
+    List<Group> groups = identityService.createGroupQuery().groupMember(candidateUser).list();
     List<String> groupIds = new ArrayList<String>();
     for (Group group : groups) {
       groupIds.add(group.getId());

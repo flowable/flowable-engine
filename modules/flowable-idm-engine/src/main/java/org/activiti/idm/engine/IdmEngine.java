@@ -20,7 +20,7 @@ public interface IdmEngine {
     /**
      * the version of the activiti idm library
      */
-    public static String VERSION = "1.0.0.0"; // Note the extra .x at the end. To cater for snapshot releases with different database changes
+    public static String VERSION = "6.0.0.0"; // Note the extra .x at the end. To cater for snapshot releases with different database changes
 
     /**
      * The name as specified in 'idm-engine-name' in the activiti.idm.cfg.xml configuration file. The default name for a idm engine is 'default

@@ -36,7 +36,7 @@ import junit.framework.AssertionFailedError;
  */
 public abstract class AbstractActivitiIdmTestCase extends AbstractTestCase {
 
-  private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Collections.singletonList("ACT_GE_PROPERTY");
+  private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Collections.singletonList("ACT_ID_PROPERTY");
 
   protected IdmEngine idmEngine;
 

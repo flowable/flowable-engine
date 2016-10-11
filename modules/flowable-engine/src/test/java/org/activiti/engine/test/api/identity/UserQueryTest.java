@@ -15,11 +15,11 @@ package org.activiti.engine.test.api.identity;
 
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti.idm.api.User;
 import org.activiti.idm.api.UserQuery;
+import org.activiti.idm.engine.ActivitiIdmException;
+import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
 
 /**
  * @author Joram Barrez
@@ -80,7 +80,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().userId(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (ActivitiIdmIllegalArgumentException e) {
     }
   }
 
@@ -99,7 +99,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().userFirstName(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (ActivitiIdmIllegalArgumentException e) {
     }
   }
 
@@ -118,7 +118,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().userFirstNameLike(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (ActivitiIdmIllegalArgumentException e) {
     }
   }
 
@@ -137,7 +137,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().userLastName(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (ActivitiIdmIllegalArgumentException e) {
     }
   }
 
@@ -167,7 +167,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().userLastNameLike(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (ActivitiIdmIllegalArgumentException e) {
     }
   }
 
@@ -183,7 +183,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().userEmail(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (ActivitiIdmIllegalArgumentException e) {
     }
   }
 
@@ -202,7 +202,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().userEmailLike(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (ActivitiIdmIllegalArgumentException e) {
     }
   }
 
@@ -231,13 +231,13 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().orderByUserId().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (ActivitiIdmIllegalArgumentException e) {
     }
 
     try {
       identityService.createUserQuery().orderByUserId().orderByUserEmail().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (ActivitiIdmIllegalArgumentException e) {
     }
   }
 
@@ -259,7 +259,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().memberOfGroup(null).list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (ActivitiIdmIllegalArgumentException e) {
     }
   }
 
@@ -280,7 +280,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ActivitiException e) {
+    } catch (ActivitiIdmException e) {
     }
   }
 

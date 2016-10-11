@@ -142,6 +142,7 @@ public class UserEntityManagerImpl extends AbstractEntityManager<UserEntity> imp
     }
 
     user.setPicture(picture);
+    userDataManager.update(user);
   }
 
   public UserDataManager getUserDataManager() {

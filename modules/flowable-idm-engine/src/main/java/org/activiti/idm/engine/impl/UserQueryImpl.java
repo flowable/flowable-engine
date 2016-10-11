@@ -29,6 +29,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
 
   private static final long serialVersionUID = 1L;
   protected String id;
+  protected List<String> ids;
   protected String firstName;
   protected String firstNameLike;
   protected String lastName;
@@ -37,7 +38,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
   protected String email;
   protected String emailLike;
   protected String groupId;
-  protected String procDefId;
+  protected List<String> groupIds;
 
   public UserQueryImpl() {
   }
@@ -55,6 +56,14 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
       throw new ActivitiIdmIllegalArgumentException("Provided id is null");
     }
     this.id = id;
+    return this;
+  }
+  
+  public UserQuery userIds(List<String> ids) {
+    if (ids == null) {
+      throw new ActivitiIdmIllegalArgumentException("Provided ids is null");
+    }
+    this.ids = ids;
     return this;
   }
 
@@ -116,19 +125,18 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
 
   public UserQuery memberOfGroup(String groupId) {
     if (groupId == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided groupIds is null or empty");
+      throw new ActivitiIdmIllegalArgumentException("Provided groupId is null");
     }
     this.groupId = groupId;
     return this;
   }
-
-  public UserQuery potentialStarter(String procDefId) {
-    if (procDefId == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided processDefinitionId is null or empty");
+  
+  public UserQuery memberOfGroups(List<String> groupIds) {
+    if (groupIds == null) {
+      throw new ActivitiIdmIllegalArgumentException("Provided groupIds is null");
     }
-    this.procDefId = procDefId;
+    this.groupIds = groupIds;
     return this;
-
   }
 
   // sorting //////////////////////////////////////////////////////////
@@ -167,6 +175,10 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
     return id;
   }
 
+  public List<String> getIds() {
+    return ids;
+  }
+
   public String getFirstName() {
     return firstName;
   }
@@ -194,13 +206,13 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
   public String getGroupId() {
     return groupId;
   }
+  
+  public List<String> getGroupIds() {
+    return groupIds;
+  }
 
   public String getFullNameLike() {
     return fullNameLike;
-  }
-
-  public String getProcDefId() {
-    return procDefId;
   }
   
 }

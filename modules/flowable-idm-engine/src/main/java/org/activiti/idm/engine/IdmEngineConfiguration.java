@@ -35,7 +35,7 @@ import org.activiti.idm.api.IdmManagementService;
 import org.activiti.idm.api.event.ActivitiIdmEventDispatcher;
 import org.activiti.idm.api.event.ActivitiIdmEventListener;
 import org.activiti.idm.api.event.ActivitiIdmEventType;
-import org.activiti.idm.engine.delegate.event.impl.ActivitiEventDispatcherImpl;
+import org.activiti.idm.engine.delegate.event.impl.ActivitiIdmEventDispatcherImpl;
 import org.activiti.idm.engine.impl.IdmEngineImpl;
 import org.activiti.idm.engine.impl.IdmIdentityServiceImpl;
 import org.activiti.idm.engine.impl.IdmManagementServiceImpl;
@@ -64,6 +64,8 @@ import org.activiti.idm.engine.impl.persistence.entity.IdentityInfoEntityManager
 import org.activiti.idm.engine.impl.persistence.entity.IdentityInfoEntityManagerImpl;
 import org.activiti.idm.engine.impl.persistence.entity.MembershipEntityManager;
 import org.activiti.idm.engine.impl.persistence.entity.MembershipEntityManagerImpl;
+import org.activiti.idm.engine.impl.persistence.entity.PropertyEntityManager;
+import org.activiti.idm.engine.impl.persistence.entity.PropertyEntityManagerImpl;
 import org.activiti.idm.engine.impl.persistence.entity.TableDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.activiti.idm.engine.impl.persistence.entity.UserEntityManager;
@@ -72,11 +74,13 @@ import org.activiti.idm.engine.impl.persistence.entity.data.ByteArrayDataManager
 import org.activiti.idm.engine.impl.persistence.entity.data.GroupDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.IdentityInfoDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.MembershipDataManager;
+import org.activiti.idm.engine.impl.persistence.entity.data.PropertyDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.UserDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisByteArrayDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisGroupDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisIdentityInfoDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisMembershipDataManager;
+import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisPropertyDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisUserDataManager;
 import org.activiti.idm.engine.impl.util.DefaultClockImpl;
 import org.apache.commons.io.IOUtils;
@@ -113,10 +117,14 @@ public class IdmEngineConfiguration {
    */
   public static final String DB_SCHEMA_UPDATE_FALSE = "false";
 
+  public static final String DB_SCHEMA_UPDATE_CREATE = "create";
+  
+  public static final String DB_SCHEMA_UPDATE_CREATE_DROP = "create-drop";
+  
   /**
    * Creates the schema when the form engine is being created and drops the schema when the form engine is being closed.
    */
-  public static final String DB_SCHEMA_UPDATE_DROP_CREATE = "create-drop";
+  public static final String DB_SCHEMA_UPDATE_DROP_CREATE = "drop-create";
 
   /**
    * Upon building of the process engine, a check is performed and an update of the schema is performed if it is necessary.
@@ -141,7 +149,7 @@ public class IdmEngineConfiguration {
   protected int jdbcDefaultTransactionIsolationLevel;
   protected DataSource dataSource;
   
-  protected String databaseSchemaUpdate = DB_SCHEMA_UPDATE_TRUE;
+  protected String databaseSchemaUpdate = DB_SCHEMA_UPDATE_FALSE;
 
   protected String xmlEncoding = "UTF-8";
 
@@ -164,6 +172,12 @@ public class IdmEngineConfiguration {
 
   /** this will be initialized during the configurationComplete() */
   protected CommandExecutor commandExecutor;
+  
+  protected ClassLoader classLoader;
+  /**
+   * Either use Class.forName or ClassLoader.loadClass for class loading. See http://forums.activiti.org/content/reflectutilloadclass-and-custom- classloader
+   */
+  protected boolean useClassForNameClassLoading = true;
 
   // SERVICES
   // /////////////////////////////////////////////////////////////////
@@ -177,6 +191,7 @@ public class IdmEngineConfiguration {
   protected GroupDataManager groupDataManager;
   protected IdentityInfoDataManager identityInfoDataManager;
   protected MembershipDataManager membershipDataManager;
+  protected PropertyDataManager propertyDataManager;
   protected UserDataManager userDataManager;
 
   // ENTITY MANAGERS /////////////////////////////////////////////////
@@ -184,6 +199,7 @@ public class IdmEngineConfiguration {
   protected GroupEntityManager groupEntityManager;
   protected IdentityInfoEntityManager identityInfoEntityManager;
   protected MembershipEntityManager membershipEntityManager;
+  protected PropertyEntityManager propertyEntityManager;
   protected UserEntityManager userEntityManager;
   protected TableDataManager tableDataManager;
 
@@ -402,6 +418,9 @@ public class IdmEngineConfiguration {
     if (membershipDataManager == null) {
     	membershipDataManager = new MybatisMembershipDataManager(this);
     }
+    if (propertyDataManager == null) {
+      propertyDataManager = new MybatisPropertyDataManager(this);
+    }
     if (userDataManager == null) {
     	userDataManager = new MybatisUserDataManager(this);
     }
@@ -419,6 +438,9 @@ public class IdmEngineConfiguration {
     }
     if (membershipEntityManager == null) {
     	membershipEntityManager = new MembershipEntityManagerImpl(this, membershipDataManager);
+    }
+    if (propertyEntityManager == null) {
+      propertyEntityManager = new PropertyEntityManagerImpl(this, propertyDataManager);
     }
     if (userEntityManager == null) {
     	userEntityManager = new UserEntityManagerImpl(this, userDataManager);
@@ -763,7 +785,7 @@ public class IdmEngineConfiguration {
   
   public void initEventDispatcher() {
     if (this.eventDispatcher == null) {
-      this.eventDispatcher = new ActivitiEventDispatcherImpl();
+      this.eventDispatcher = new ActivitiIdmEventDispatcherImpl();
     }
 
     this.eventDispatcher.setEnabled(enableEventDispatcher);
@@ -796,6 +818,24 @@ public class IdmEngineConfiguration {
 
   public IdmEngineConfiguration setFormEngineName(String formEngineName) {
     this.formEngineName = formEngineName;
+    return this;
+  }
+
+  public ClassLoader getClassLoader() {
+    return classLoader;
+  }
+
+  public IdmEngineConfiguration setClassLoader(ClassLoader classLoader) {
+    this.classLoader = classLoader;
+    return this;
+  }
+
+  public boolean isUseClassForNameClassLoading() {
+    return useClassForNameClassLoading;
+  }
+
+  public IdmEngineConfiguration setUseClassForNameClassLoading(boolean useClassForNameClassLoading) {
+    this.useClassForNameClassLoading = useClassForNameClassLoading;
     return this;
   }
 
@@ -934,6 +974,33 @@ public class IdmEngineConfiguration {
     return this;
   }
 
+  public CommandConfig getSchemaCommandConfig() {
+    return schemaCommandConfig;
+  }
+
+  public IdmEngineConfiguration setSchemaCommandConfig(CommandConfig schemaCommandConfig) {
+    this.schemaCommandConfig = schemaCommandConfig;
+    return this;
+  }
+
+  public boolean isTransactionsExternallyManaged() {
+    return transactionsExternallyManaged;
+  }
+
+  public IdmEngineConfiguration setTransactionsExternallyManaged(boolean transactionsExternallyManaged) {
+    this.transactionsExternallyManaged = transactionsExternallyManaged;
+    return this;
+  }
+
+  public IdGenerator getIdGenerator() {
+    return idGenerator;
+  }
+
+  public IdmEngineConfiguration setIdGenerator(IdGenerator idGenerator) {
+    this.idGenerator = idGenerator;
+    return this;
+  }
+
   public String getXmlEncoding() {
     return xmlEncoding;
   }
@@ -1064,6 +1131,15 @@ public class IdmEngineConfiguration {
     return this;
   }
   
+  public PropertyDataManager getPropertyDataManager() {
+    return propertyDataManager;
+  }
+
+  public IdmEngineConfiguration setPropertyDataManager(PropertyDataManager propertyDataManager) {
+    this.propertyDataManager = propertyDataManager;
+    return this;
+  }
+
   public UserDataManager getUserDataManager() {
     return userDataManager;
   }
@@ -1109,6 +1185,15 @@ public class IdmEngineConfiguration {
     return this;
   }
   
+  public PropertyEntityManager getPropertyEntityManager() {
+    return propertyEntityManager;
+  }
+
+  public IdmEngineConfiguration setPropertyEntityManager(PropertyEntityManager propertyEntityManager) {
+    this.propertyEntityManager = propertyEntityManager;
+    return this;
+  }
+
   public UserEntityManager getUserEntityManager() {
     return userEntityManager;
   }
@@ -1251,6 +1336,10 @@ public class IdmEngineConfiguration {
   public IdmEngineConfiguration setTransactionContextFactory(TransactionContextFactory transactionContextFactory) {
     this.transactionContextFactory = transactionContextFactory;
     return this;
+  }
+  
+  public String getDatabaseSchemaUpdate() {
+    return databaseSchemaUpdate;
   }
   
   public IdmEngineConfiguration setDatabaseSchemaUpdate(String databaseSchemaUpdate) {

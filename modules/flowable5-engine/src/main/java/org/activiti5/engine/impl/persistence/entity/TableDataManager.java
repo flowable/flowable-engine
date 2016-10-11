@@ -33,8 +33,6 @@ import org.activiti5.engine.history.HistoricProcessInstance;
 import org.activiti5.engine.history.HistoricTaskInstance;
 import org.activiti5.engine.history.HistoricVariableInstance;
 import org.activiti5.engine.history.HistoricVariableUpdate;
-import org.activiti5.engine.identity.Group;
-import org.activiti5.engine.identity.User;
 import org.activiti5.engine.impl.TablePageQueryImpl;
 import org.activiti5.engine.impl.db.PersistentObject;
 import org.activiti5.engine.impl.persistence.AbstractManager;
@@ -97,13 +95,6 @@ public class TableDataManager extends AbstractManager {
     persistentObjectToTableNameMap.put(HistoricDetailVariableInstanceUpdateEntity.class, "ACT_HI_DETAIL");
     persistentObjectToTableNameMap.put(HistoricDetailEntity.class, "ACT_HI_DETAIL");
     
-    
-    // Identity module
-    persistentObjectToTableNameMap.put(GroupEntity.class, "ACT_ID_GROUP");
-    persistentObjectToTableNameMap.put(MembershipEntity.class, "ACT_ID_MEMBERSHIP");
-    persistentObjectToTableNameMap.put(UserEntity.class, "ACT_ID_USER");
-    persistentObjectToTableNameMap.put(IdentityInfoEntity.class, "ACT_ID_INFO");
-    
     // general
     persistentObjectToTableNameMap.put(PropertyEntity.class, "ACT_GE_PROPERTY");
     persistentObjectToTableNameMap.put(ByteArrayEntity.class, "ACT_GE_BYTEARRAY");
@@ -126,12 +117,6 @@ public class TableDataManager extends AbstractManager {
     apiTypeToTableNameMap.put(HistoricFormProperty.class, "ACT_HI_DETAIL");
     apiTypeToTableNameMap.put(HistoricTaskInstance.class, "ACT_HI_TASKINST");        
     apiTypeToTableNameMap.put(HistoricVariableInstance.class, "ACT_HI_VARINST");
-
-    // identity
-    apiTypeToTableNameMap.put(Group.class, "ACT_ID_GROUP");
-    apiTypeToTableNameMap.put(User.class, "ACT_ID_USER");
-
-    // TODO: Identity skipped for the moment as no SQL injection is provided here
   }
 
   public Map<String, Long> getTableCount() {

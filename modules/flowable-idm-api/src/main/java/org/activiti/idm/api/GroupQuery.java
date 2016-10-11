@@ -13,6 +13,8 @@
 
 package org.activiti.idm.api;
 
+import java.util.List;
+
 /**
  * Allows to programmatically query for {@link Group}s.
  * 
@@ -22,6 +24,9 @@ public interface GroupQuery extends Query<GroupQuery, Group> {
 
   /** Only select {@link Group}s with the given id. */
   GroupQuery groupId(String groupId);
+  
+  /** Only select {@link Group}s with the given ids. */
+  GroupQuery groupIds(List<String> groupIds);
 
   /** Only select {@link Group}s with the given name. */
   GroupQuery groupName(String groupName);
@@ -36,11 +41,9 @@ public interface GroupQuery extends Query<GroupQuery, Group> {
 
   /** Only selects {@link Group}s where the given user is a member of. */
   GroupQuery groupMember(String groupMemberUserId);
-
-  /**
-   * Only select {@link Group}S that are potential starter for the given process definition.
-   */
-  GroupQuery potentialStarter(String procDefId);
+  
+  /** Only selects {@link Group}s where the given users are a member of. */
+  GroupQuery groupMembers(List<String> groupMemberUserIds);
 
   // sorting ////////////////////////////////////////////////////////
 

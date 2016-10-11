@@ -12,19 +12,20 @@
  */
 package org.activiti5.engine.delegate.event.impl;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
-import org.activiti.engine.delegate.event.ActivitiMembershipEvent;
+import org.activiti.idm.api.event.ActivitiIdmEventType;
+import org.activiti.idm.api.event.ActivitiIdmMembershipEvent;
+import org.activiti.idm.engine.delegate.event.impl.ActivitiIdmEventImpl;
 
 /**
  * Implementation of {@link ActivitiMembershipEvent}.
  * @author Frederik Heremans
  */
-public class ActivitiMembershipEventImpl extends ActivitiEventImpl implements ActivitiMembershipEvent {
+public class ActivitiMembershipEventImpl extends ActivitiIdmEventImpl implements ActivitiIdmMembershipEvent {
 
 	protected String userId;
 	protected String groupId;
 	
-	public ActivitiMembershipEventImpl(ActivitiEventType type) {
+	public ActivitiMembershipEventImpl(ActivitiIdmEventType type) {
 	  super(type);
   }
 	

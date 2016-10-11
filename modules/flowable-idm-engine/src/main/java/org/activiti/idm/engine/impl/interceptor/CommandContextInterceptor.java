@@ -25,14 +25,14 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
   private static final Logger log = LoggerFactory.getLogger(CommandContextInterceptor.class);
 
   protected CommandContextFactory commandContextFactory;
-  protected IdmEngineConfiguration formEngineConfiguration;
+  protected IdmEngineConfiguration idmEngineConfiguration;
 
   public CommandContextInterceptor() {
   }
 
-  public CommandContextInterceptor(CommandContextFactory commandContextFactory, IdmEngineConfiguration formEngineConfiguration) {
+  public CommandContextInterceptor(CommandContextFactory commandContextFactory, IdmEngineConfiguration idmEngineConfiguration) {
     this.commandContextFactory = commandContextFactory;
-    this.formEngineConfiguration = formEngineConfiguration;
+    this.idmEngineConfiguration = idmEngineConfiguration;
   }
 
   public <T> T execute(CommandConfig config, Command<T> command) {
@@ -51,7 +51,7 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
     try {
       // Push on stack
       Context.setCommandContext(context);
-      Context.setFormEngineConfiguration(formEngineConfiguration);
+      Context.setIdmEngineConfiguration(idmEngineConfiguration);
 
       return next.execute(config, command);
 
@@ -68,7 +68,7 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
         
         // Pop from stack
         Context.removeCommandContext();
-        Context.removeFormEngineConfiguration();
+        Context.removeIdmEngineConfiguration();
       }
     }
 
@@ -83,11 +83,11 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
     this.commandContextFactory = commandContextFactory;
   }
 
-  public IdmEngineConfiguration getFormEngineConfiguration() {
-    return formEngineConfiguration;
+  public IdmEngineConfiguration getIdmEngineConfiguration() {
+    return idmEngineConfiguration;
   }
 
-  public void setFormEngineConfiguration(IdmEngineConfiguration formEngineConfiguration) {
-    this.formEngineConfiguration = formEngineConfiguration;
+  public void setIdmEngineConfiguration(IdmEngineConfiguration idmEngineConfiguration) {
+    this.idmEngineConfiguration = idmEngineConfiguration;
   }
 }

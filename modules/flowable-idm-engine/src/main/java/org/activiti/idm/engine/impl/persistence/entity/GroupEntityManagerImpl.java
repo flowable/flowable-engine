@@ -20,7 +20,7 @@ import org.activiti.idm.api.Group;
 import org.activiti.idm.api.GroupQuery;
 import org.activiti.idm.api.event.ActivitiIdmEventType;
 import org.activiti.idm.engine.IdmEngineConfiguration;
-import org.activiti.idm.engine.delegate.event.impl.ActivitiEventBuilder;
+import org.activiti.idm.engine.delegate.event.impl.ActivitiIdmEventBuilder;
 import org.activiti.idm.engine.impl.GroupQueryImpl;
 import org.activiti.idm.engine.impl.Page;
 import org.activiti.idm.engine.impl.persistence.entity.data.DataManager;
@@ -59,7 +59,7 @@ public class GroupEntityManagerImpl extends AbstractEntityManager<GroupEntity> i
       
       getMembershipEntityManager().deleteMembershipByGroupId(groupId);
       if (getEventDispatcher().isEnabled()) {
-        getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createMembershipEvent(ActivitiIdmEventType.MEMBERSHIPS_DELETED, groupId, null));
+        getEventDispatcher().dispatchEvent(ActivitiIdmEventBuilder.createMembershipEvent(ActivitiIdmEventType.MEMBERSHIPS_DELETED, groupId, null));
       }
       
       delete(group);

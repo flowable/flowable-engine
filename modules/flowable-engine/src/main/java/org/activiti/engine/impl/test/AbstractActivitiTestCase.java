@@ -14,7 +14,6 @@
 package org.activiti.engine.impl.test;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -57,7 +56,12 @@ import junit.framework.AssertionFailedError;
  */
 public abstract class AbstractActivitiTestCase extends AbstractTestCase {
 
-  private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Collections.singletonList("ACT_GE_PROPERTY");
+  private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = new ArrayList<String>();
+  
+  static {
+    TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_GE_PROPERTY");
+    TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_ID_PROPERTY");
+  }
 
   protected ProcessEngine processEngine;
 

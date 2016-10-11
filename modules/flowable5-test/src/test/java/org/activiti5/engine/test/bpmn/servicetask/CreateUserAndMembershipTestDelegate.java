@@ -14,9 +14,9 @@ package org.activiti5.engine.test.bpmn.servicetask;
 
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
+import org.activiti.idm.api.Group;
+import org.activiti.idm.api.User;
 import org.activiti5.engine.IdentityService;
-import org.activiti5.engine.identity.Group;
-import org.activiti5.engine.identity.User;
 import org.activiti5.engine.impl.context.Context;
 
 /**

@@ -13,6 +13,8 @@
 
 package org.activiti.examples.bpmn.authorization;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.activiti.engine.IdentityService;
@@ -252,25 +254,44 @@ public class StartAuthorizationTest extends PluggableActivitiTestCase {
 
       // Process 1 has no potential starters
       ProcessDefinition latestProcessDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process1").singleResult();
-      List<User> authorizedUsers = identityService.createUserQuery().potentialStarter(latestProcessDef.getId()).list();
+      List<User> authorizedUsers = identityService.getPotentialStarterUsers(latestProcessDef.getId());
       assertEquals(0, authorizedUsers.size());
 
       // user1 and user2 are potential starters of Process2
       latestProcessDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process2").singleResult();
-      authorizedUsers = identityService.createUserQuery().potentialStarter(latestProcessDef.getId()).orderByUserId().asc().list();
+      authorizedUsers = identityService.getPotentialStarterUsers(latestProcessDef.getId());
       assertEquals(2, authorizedUsers.size());
+      
+      Collections.sort(authorizedUsers, new Comparator<User>() {
+
+        @Override
+        public int compare(User u1, User u2) {
+          return u1.getId().compareTo(u2.getId());
+        }
+        
+      });
       assertEquals("user1", authorizedUsers.get(0).getId());
       assertEquals("user2", authorizedUsers.get(1).getId());
 
       // Process 2 has no potential starter groups
       latestProcessDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process2").singleResult();
-      List<Group> authorizedGroups = identityService.createGroupQuery().potentialStarter(latestProcessDef.getId()).list();
+      List<Group> authorizedGroups = identityService.getPotentialStarterGroups(latestProcessDef.getId());
       assertEquals(0, authorizedGroups.size());
 
       // Process 3 has 3 groups as authorized starter groups
       latestProcessDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process4").singleResult();
-      authorizedGroups = identityService.createGroupQuery().potentialStarter(latestProcessDef.getId()).orderByGroupId().asc().list();
+      authorizedGroups = identityService.getPotentialStarterGroups(latestProcessDef.getId());
       assertEquals(3, authorizedGroups.size());
+      
+      Collections.sort(authorizedGroups, new Comparator<Group>() {
+
+        @Override
+        public int compare(Group g1, Group g2) {
+          return g1.getId().compareTo(g2.getId());
+        }
+        
+      });
+      
       assertEquals("group1", authorizedGroups.get(0).getId());
       assertEquals("group2", authorizedGroups.get(1).getId());
       assertEquals("group3", authorizedGroups.get(2).getId());
@@ -303,14 +324,12 @@ public class StartAuthorizationTest extends PluggableActivitiTestCase {
       processDefinitions = repositoryService.createProcessDefinitionQuery().startableByUser("user4").list();
       assertEquals(0, processDefinitions.size());
 
-      // "userInGroup3" is in "group3" and can start only process4 via
-      // group authorization
+      // "userInGroup3" is in "group3" and can start only process4 via group authorization
       processDefinitions = repositoryService.createProcessDefinitionQuery().startableByUser("userInGroup3").list();
       assertEquals(1, processDefinitions.size());
       assertEquals("process4", processDefinitions.get(0).getKey());
 
-      // "userInGroup2" can start process4, via both user and group
-      // authorizations
+      // "userInGroup2" can start process4, via both user and group authorizations
       // but we have to be sure that process4 appears only once
       processDefinitions = repositoryService.createProcessDefinitionQuery().startableByUser("userInGroup2").list();
       assertEquals(1, processDefinitions.size());

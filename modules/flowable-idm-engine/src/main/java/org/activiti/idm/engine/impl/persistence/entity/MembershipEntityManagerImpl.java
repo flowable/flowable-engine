@@ -15,7 +15,7 @@ package org.activiti.idm.engine.impl.persistence.entity;
 
 import org.activiti.idm.api.event.ActivitiIdmEventType;
 import org.activiti.idm.engine.IdmEngineConfiguration;
-import org.activiti.idm.engine.delegate.event.impl.ActivitiEventBuilder;
+import org.activiti.idm.engine.delegate.event.impl.ActivitiIdmEventBuilder;
 import org.activiti.idm.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.MembershipDataManager;
 
@@ -44,14 +44,14 @@ public class MembershipEntityManagerImpl extends AbstractEntityManager<Membershi
     insert(membershipEntity, false);
 
     if (getEventDispatcher().isEnabled()) {
-      getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createMembershipEvent(ActivitiIdmEventType.MEMBERSHIP_CREATED, groupId, userId));
+      getEventDispatcher().dispatchEvent(ActivitiIdmEventBuilder.createMembershipEvent(ActivitiIdmEventType.MEMBERSHIP_CREATED, groupId, userId));
     }
   }
 
   public void deleteMembership(String userId, String groupId) {
     membershipDataManager.deleteMembership(userId, groupId);  
     if (getEventDispatcher().isEnabled()) {
-      getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createMembershipEvent(ActivitiIdmEventType.MEMBERSHIP_DELETED, groupId, userId));
+      getEventDispatcher().dispatchEvent(ActivitiIdmEventBuilder.createMembershipEvent(ActivitiIdmEventType.MEMBERSHIP_DELETED, groupId, userId));
     }
   }
   

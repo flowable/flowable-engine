@@ -14,6 +14,8 @@
 
 package org.activiti5.examples.bpmn.authorization;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.activiti.engine.IdentityService;
@@ -263,15 +265,25 @@ public class StartAuthorizationTest extends PluggableActivitiTestCase {
       ProcessDefinition latestProcessDef = repositoryService
               .createProcessDefinitionQuery().processDefinitionKey("process1")
               .singleResult();      
-      List<User> authorizedUsers = identityService.createUserQuery().potentialStarter(latestProcessDef.getId()).list();
+      List<User> authorizedUsers = identityService.getPotentialStarterUsers(latestProcessDef.getId());
       assertEquals(0, authorizedUsers.size());
 
       // user1 and user2 are potential Startes of Process2
       latestProcessDef = repositoryService
               .createProcessDefinitionQuery().processDefinitionKey("process2")
               .singleResult();      
-      authorizedUsers =  identityService.createUserQuery().potentialStarter(latestProcessDef.getId()).orderByUserId().asc().list();
+      authorizedUsers =  identityService.getPotentialStarterUsers(latestProcessDef.getId());
       assertEquals(2, authorizedUsers.size());
+      
+      Collections.sort(authorizedUsers, new Comparator<User>() {
+
+        @Override
+        public int compare(User u1, User u2) {
+          return u1.getId().compareTo(u2.getId());
+        }
+        
+      });
+      
       assertEquals("user1", authorizedUsers.get(0).getId());
       assertEquals("user2", authorizedUsers.get(1).getId());
 
@@ -279,15 +291,25 @@ public class StartAuthorizationTest extends PluggableActivitiTestCase {
       latestProcessDef = repositoryService
               .createProcessDefinitionQuery().processDefinitionKey("process2")
               .singleResult();      
-      List<Group> authorizedGroups = identityService.createGroupQuery().potentialStarter(latestProcessDef.getId()).list();
+      List<Group> authorizedGroups = identityService.getPotentialStarterGroups(latestProcessDef.getId());
       assertEquals(0, authorizedGroups.size());
       
       // Process 3 has 3 groups as authorized starter groups
       latestProcessDef = repositoryService
               .createProcessDefinitionQuery().processDefinitionKey("process4")
               .singleResult();      
-      authorizedGroups = identityService.createGroupQuery().potentialStarter(latestProcessDef.getId()).orderByGroupId().asc().list();
+      authorizedGroups = identityService.getPotentialStarterGroups(latestProcessDef.getId());
       assertEquals(3, authorizedGroups.size());
+      
+      Collections.sort(authorizedGroups, new Comparator<Group>() {
+
+        @Override
+        public int compare(Group g1, Group g2) {
+          return g1.getId().compareTo(g2.getId());
+        }
+        
+      });
+      
       assertEquals("group1", authorizedGroups.get(0).getId());
       assertEquals("group2", authorizedGroups.get(1).getId());
       assertEquals("group3", authorizedGroups.get(2).getId());

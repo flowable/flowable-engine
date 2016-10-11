@@ -14,33 +14,16 @@ package org.activiti5.engine.impl;
 
 import java.util.List;
 
+import org.activiti.idm.api.Group;
+import org.activiti.idm.api.GroupQuery;
+import org.activiti.idm.api.NativeGroupQuery;
+import org.activiti.idm.api.NativeUserQuery;
+import org.activiti.idm.api.Picture;
+import org.activiti.idm.api.User;
+import org.activiti.idm.api.UserQuery;
 import org.activiti5.engine.IdentityService;
-import org.activiti5.engine.identity.Group;
-import org.activiti5.engine.identity.GroupQuery;
-import org.activiti5.engine.identity.NativeGroupQuery;
-import org.activiti5.engine.identity.NativeUserQuery;
-import org.activiti5.engine.identity.Picture;
-import org.activiti5.engine.identity.User;
-import org.activiti5.engine.identity.UserQuery;
-import org.activiti5.engine.impl.cmd.CheckPassword;
-import org.activiti5.engine.impl.cmd.CreateGroupCmd;
-import org.activiti5.engine.impl.cmd.CreateGroupQueryCmd;
-import org.activiti5.engine.impl.cmd.CreateMembershipCmd;
-import org.activiti5.engine.impl.cmd.CreateUserCmd;
-import org.activiti5.engine.impl.cmd.CreateUserQueryCmd;
-import org.activiti5.engine.impl.cmd.DeleteGroupCmd;
-import org.activiti5.engine.impl.cmd.DeleteMembershipCmd;
-import org.activiti5.engine.impl.cmd.DeleteUserCmd;
-import org.activiti5.engine.impl.cmd.DeleteUserInfoCmd;
-import org.activiti5.engine.impl.cmd.GetUserInfoCmd;
-import org.activiti5.engine.impl.cmd.GetUserInfoKeysCmd;
-import org.activiti5.engine.impl.cmd.GetUserPictureCmd;
-import org.activiti5.engine.impl.cmd.SaveGroupCmd;
-import org.activiti5.engine.impl.cmd.SaveUserCmd;
-import org.activiti5.engine.impl.cmd.SetUserInfoCmd;
-import org.activiti5.engine.impl.cmd.SetUserPictureCmd;
+import org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti5.engine.impl.identity.Authentication;
-import org.activiti5.engine.impl.persistence.entity.IdentityInfoEntity;
 
 
 /**
@@ -48,66 +31,74 @@ import org.activiti5.engine.impl.persistence.entity.IdentityInfoEntity;
  */
 public class IdentityServiceImpl extends ServiceImpl implements IdentityService {
   
+  public IdentityServiceImpl() {
+    
+  }
+  
+  public IdentityServiceImpl(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    super(processEngineConfiguration);
+  }
+  
   public Group newGroup(String groupId) {
-    return commandExecutor.execute(new CreateGroupCmd(groupId));
+    return processEngineConfiguration.getIdmIdentityService().newGroup(groupId);
   }
 
   public User newUser(String userId) {
-    return commandExecutor.execute(new CreateUserCmd(userId));
+    return processEngineConfiguration.getIdmIdentityService().newUser(userId);
   }
 
   public void saveGroup(Group group) {
-    commandExecutor.execute(new SaveGroupCmd(group));
+    processEngineConfiguration.getIdmIdentityService().saveGroup(group);
   }
 
   public void saveUser(User user) {
-    commandExecutor.execute(new SaveUserCmd(user));
+    processEngineConfiguration.getIdmIdentityService().saveUser(user);
   }
   
   public UserQuery createUserQuery() {
-    return commandExecutor.execute(new CreateUserQueryCmd());
+    return processEngineConfiguration.getIdmIdentityService().createUserQuery();
   }
 
   @Override
   public NativeUserQuery createNativeUserQuery() {
-    return new NativeUserQueryImpl(commandExecutor);
+    return processEngineConfiguration.getIdmIdentityService().createNativeUserQuery();
   }
 
   public GroupQuery createGroupQuery() {
-    return commandExecutor.execute(new CreateGroupQueryCmd());
+    return processEngineConfiguration.getIdmIdentityService().createGroupQuery();
   }
 
   @Override
   public NativeGroupQuery createNativeGroupQuery() {
-    return new NativeGroupQueryImpl(commandExecutor);
+    return processEngineConfiguration.getIdmIdentityService().createNativeGroupQuery();
   }
 
   public void createMembership(String userId, String groupId) {
-    commandExecutor.execute(new CreateMembershipCmd(userId, groupId));
+    processEngineConfiguration.getIdmIdentityService().createMembership(userId, groupId);
   }
 
   public void deleteGroup(String groupId) {
-    commandExecutor.execute(new DeleteGroupCmd(groupId));
+    processEngineConfiguration.getIdmIdentityService().deleteGroup(groupId);
   }
 
   public void deleteMembership(String userId, String groupId) {
-    commandExecutor.execute(new DeleteMembershipCmd(userId, groupId));
+    processEngineConfiguration.getIdmIdentityService().deleteMembership(userId, groupId);
   }
 
   public boolean checkPassword(String userId, String password) {
-    return commandExecutor.execute(new CheckPassword(userId, password));
+    return processEngineConfiguration.getIdmIdentityService().checkPassword(userId, password);
   }
 
   public void deleteUser(String userId) {
-    commandExecutor.execute(new DeleteUserCmd(userId));
+    processEngineConfiguration.getIdmIdentityService().deleteUser(userId);
   }
 
   public void setUserPicture(String userId, Picture picture) {
-    commandExecutor.execute(new SetUserPictureCmd(userId, picture));
+    processEngineConfiguration.getIdmIdentityService().setUserPicture(userId, picture);
   }
 
   public Picture getUserPicture(String userId) {
-    return commandExecutor.execute(new GetUserPictureCmd(userId));
+    return processEngineConfiguration.getIdmIdentityService().getUserPicture(userId);
   }
 
   public void setAuthenticatedUserId(String authenticatedUserId) {
@@ -115,18 +106,18 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   }
 
   public String getUserInfo(String userId, String key) {
-    return commandExecutor.execute(new GetUserInfoCmd(userId, key));
+    return processEngineConfiguration.getIdmIdentityService().getUserInfo(userId, key);
   }
 
   public List<String> getUserInfoKeys(String userId) {
-    return commandExecutor.execute(new GetUserInfoKeysCmd(userId, IdentityInfoEntity.TYPE_USERINFO));
+    return processEngineConfiguration.getIdmIdentityService().getUserInfoKeys(userId);
   }
 
   public void setUserInfo(String userId, String key, String value) {
-    commandExecutor.execute(new SetUserInfoCmd(userId, key, value));
+    processEngineConfiguration.getIdmIdentityService().setUserInfo(userId, key, value);
   }
 
   public void deleteUserInfo(String userId, String key) {
-    commandExecutor.execute(new DeleteUserInfoCmd(userId, key));
+    processEngineConfiguration.getIdmIdentityService().deleteUserInfo(userId, key);
   }
 }

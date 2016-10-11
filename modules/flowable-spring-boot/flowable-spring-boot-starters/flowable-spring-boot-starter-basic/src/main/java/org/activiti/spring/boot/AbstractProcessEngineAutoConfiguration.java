@@ -84,7 +84,6 @@ public abstract class AbstractProcessEngineAutoConfiguration
     conf.setDatabaseSchema(defaultText(activitiProperties.getDatabaseSchema(), conf.getDatabaseSchema()));
     conf.setDatabaseSchemaUpdate(defaultText(activitiProperties.getDatabaseSchemaUpdate(), conf.getDatabaseSchemaUpdate()));
     
-    conf.setDbIdentityUsed(activitiProperties.isDbIdentityUsed());
     conf.setDbHistoryUsed(activitiProperties.isDbHistoryUsed());
     
     conf.setAsyncExecutorActivate(activitiProperties.isAsyncExecutorActivate());

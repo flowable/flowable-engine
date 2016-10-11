@@ -53,7 +53,17 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
   public static Map<Class<? extends Entity>, String> entityToTableNameMap = new HashMap<Class<? extends Entity>, String>();
 
   static {
+    
+    // Identity module
+    entityToTableNameMap.put(GroupEntity.class, "ACT_ID_GROUP");
+    entityToTableNameMap.put(MembershipEntity.class, "ACT_ID_MEMBERSHIP");
+    entityToTableNameMap.put(UserEntity.class, "ACT_ID_USER");
+    entityToTableNameMap.put(IdentityInfoEntity.class, "ACT_ID_INFO");
+    
     // general
+    entityToTableNameMap.put(PropertyEntity.class, "ACT_ID_PROPERTY");
+    entityToTableNameMap.put(ByteArrayEntity.class, "ACT_ID_BYTEARRAY");
+    
     apiTypeToTableNameMap.put(Group.class, "ACT_ID_GROUP");
     apiTypeToTableNameMap.put(User.class, "ACT_ID_USER");
   }

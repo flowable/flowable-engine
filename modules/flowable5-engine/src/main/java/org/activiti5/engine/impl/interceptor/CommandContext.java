@@ -37,17 +37,14 @@ import org.activiti5.engine.impl.persistence.entity.DeploymentEntityManager;
 import org.activiti5.engine.impl.persistence.entity.EventLogEntryEntityManager;
 import org.activiti5.engine.impl.persistence.entity.EventSubscriptionEntityManager;
 import org.activiti5.engine.impl.persistence.entity.ExecutionEntityManager;
-import org.activiti5.engine.impl.persistence.entity.GroupIdentityManager;
 import org.activiti5.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
 import org.activiti5.engine.impl.persistence.entity.HistoricDetailEntityManager;
 import org.activiti5.engine.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.activiti5.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
 import org.activiti5.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
 import org.activiti5.engine.impl.persistence.entity.HistoricVariableInstanceEntityManager;
-import org.activiti5.engine.impl.persistence.entity.IdentityInfoEntityManager;
 import org.activiti5.engine.impl.persistence.entity.IdentityLinkEntityManager;
 import org.activiti5.engine.impl.persistence.entity.JobEntityManager;
-import org.activiti5.engine.impl.persistence.entity.MembershipIdentityManager;
 import org.activiti5.engine.impl.persistence.entity.ModelEntityManager;
 import org.activiti5.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.activiti5.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManager;
@@ -57,7 +54,6 @@ import org.activiti5.engine.impl.persistence.entity.SuspendedJobEntityManager;
 import org.activiti5.engine.impl.persistence.entity.TableDataManager;
 import org.activiti5.engine.impl.persistence.entity.TaskEntityManager;
 import org.activiti5.engine.impl.persistence.entity.TimerJobEntityManager;
-import org.activiti5.engine.impl.persistence.entity.UserIdentityManager;
 import org.activiti5.engine.impl.persistence.entity.VariableInstanceEntityManager;
 import org.activiti5.engine.impl.pvm.runtime.AtomicOperation;
 import org.activiti5.engine.impl.pvm.runtime.InterpretableExecution;
@@ -353,22 +349,6 @@ public class CommandContext {
   
   public DeadLetterJobEntityManager getDeadLetterJobEntityManager() {
     return getSession(DeadLetterJobEntityManager.class);
-  }
-
-  public UserIdentityManager getUserIdentityManager() {
-    return getSession(UserIdentityManager.class);
-  }
-
-  public GroupIdentityManager getGroupIdentityManager() {
-    return getSession(GroupIdentityManager.class);
-  }
-
-  public IdentityInfoEntityManager getIdentityInfoEntityManager() {
-    return getSession(IdentityInfoEntityManager.class);
-  }
-
-  public MembershipIdentityManager getMembershipIdentityManager() {
-    return getSession(MembershipIdentityManager.class);
   }
   
   public AttachmentEntityManager getAttachmentEntityManager() {

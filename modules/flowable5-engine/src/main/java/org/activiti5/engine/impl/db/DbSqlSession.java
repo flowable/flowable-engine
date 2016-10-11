@@ -43,7 +43,6 @@ import org.activiti5.engine.ProcessEngineConfiguration;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.DeploymentQueryImpl;
 import org.activiti5.engine.impl.ExecutionQueryImpl;
-import org.activiti5.engine.impl.GroupQueryImpl;
 import org.activiti5.engine.impl.HistoricActivityInstanceQueryImpl;
 import org.activiti5.engine.impl.HistoricDetailQueryImpl;
 import org.activiti5.engine.impl.HistoricProcessInstanceQueryImpl;
@@ -55,7 +54,6 @@ import org.activiti5.engine.impl.Page;
 import org.activiti5.engine.impl.ProcessDefinitionQueryImpl;
 import org.activiti5.engine.impl.ProcessInstanceQueryImpl;
 import org.activiti5.engine.impl.TaskQueryImpl;
-import org.activiti5.engine.impl.UserQueryImpl;
 import org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.db.upgrade.DbUpgradeStep;
@@ -992,9 +990,6 @@ public class DbSqlSession implements Session {
       if (dbSqlSessionFactory.isDbHistoryUsed() && !isHistoryTablePresent()) {
         errorMessage = addMissingComponent(errorMessage, "history");
       }
-      if (dbSqlSessionFactory.isDbIdentityUsed() && !isIdentityTablePresent()) {
-        errorMessage = addMissingComponent(errorMessage, "identity");
-      }
       
       if (errorMessage!=null) {
         throw new ActivitiException("Activiti database problem: "+errorMessage);
@@ -1040,14 +1035,6 @@ public class DbSqlSession implements Session {
     if (dbSqlSessionFactory.isDbHistoryUsed()) {
       dbSchemaCreateHistory();
     }
-
-    if (dbSqlSessionFactory.isDbIdentityUsed()) {
-      dbSchemaCreateIdentity();
-    }
-  }
-
-  protected void dbSchemaCreateIdentity() {
-    executeMandatorySchemaResource("create", "identity");
   }
 
   protected void dbSchemaCreateHistory() {
@@ -1063,17 +1050,11 @@ public class DbSqlSession implements Session {
     if (dbSqlSessionFactory.isDbHistoryUsed()) {
       executeMandatorySchemaResource("drop", "history");
     }
-    if (dbSqlSessionFactory.isDbIdentityUsed()) {
-      executeMandatorySchemaResource("drop", "identity");
-    }
   }
 
   public void dbSchemaPrune() {
     if (isHistoryTablePresent() && !dbSqlSessionFactory.isDbHistoryUsed()) {
       executeMandatorySchemaResource("drop", "history");
-    }
-    if (isIdentityTablePresent() && dbSqlSessionFactory.isDbIdentityUsed()) {
-      executeMandatorySchemaResource("drop", "identity");
     }
   }
 
@@ -1144,14 +1125,6 @@ public class DbSqlSession implements Session {
 			dbSchemaCreateHistory();
 		}
     
-    if (isIdentityTablePresent()) {
-      if (isUpgradeNeeded) {
-        dbSchemaUpgrade("identity", matchingVersionIndex);
-      }
-    } else if (dbSqlSessionFactory.isDbIdentityUsed()) {
-      dbSchemaCreateIdentity();
-    }
-    
     return feedback;
   }
 
@@ -1160,9 +1133,6 @@ public class DbSqlSession implements Session {
   }
   public boolean isHistoryTablePresent(){
     return isTablePresent("ACT_HI_PROCINST");
-  }
-  public boolean isIdentityTablePresent(){
-    return isTablePresent("ACT_ID_USER");
   }
 
   public boolean isTablePresent(String tableName) {
@@ -1536,12 +1506,6 @@ public class DbSqlSession implements Session {
   }
   public HistoricVariableInstanceQueryImpl createHistoricVariableInstanceQuery() {
     return new HistoricVariableInstanceQueryImpl();
-  }
-  public UserQueryImpl createUserQuery() {
-    return new UserQueryImpl();
-  }
-  public GroupQueryImpl createGroupQuery() {
-    return new GroupQueryImpl();
   }
 
   // getters and setters //////////////////////////////////////////////////////

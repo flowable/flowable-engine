@@ -20,6 +20,7 @@ import org.activiti.idm.api.management.IdmTableMetaData;
 import org.activiti.idm.api.management.IdmTablePageQuery;
 import org.activiti.idm.engine.impl.cmd.CustomSqlExecution;
 import org.activiti.idm.engine.impl.cmd.ExecuteCustomSqlCmd;
+import org.activiti.idm.engine.impl.cmd.GetPropertiesCmd;
 import org.activiti.idm.engine.impl.cmd.GetTableCountCmd;
 import org.activiti.idm.engine.impl.cmd.GetTableMetaDataCmd;
 import org.activiti.idm.engine.impl.cmd.GetTableNameCmd;
@@ -59,7 +60,7 @@ public class IdmManagementServiceImpl extends ServiceImpl implements IdmManageme
     return commandExecutor.execute(config, new Command<String>() {
       public String execute(CommandContext commandContext) {
         DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) commandContext.getSessionFactories().get(DbSqlSession.class);
-        DbSqlSession dbSqlSession = new DbSqlSession(dbSqlSessionFactory, commandContext.getEntityCache(), connection, catalog, schema);
+        DbSqlSession dbSqlSession = new DbSqlSession(dbSqlSessionFactory, connection, catalog, schema);
         commandContext.getSessions().put(DbSqlSession.class, dbSqlSession);
         return dbSqlSession.dbSchemaUpdate();
       }

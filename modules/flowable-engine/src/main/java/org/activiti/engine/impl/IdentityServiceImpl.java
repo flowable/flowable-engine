@@ -15,6 +15,9 @@ package org.activiti.engine.impl;
 import java.util.List;
 
 import org.activiti.engine.IdentityService;
+import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.activiti.engine.impl.cmd.GetPotentialStarterGroupsCmd;
+import org.activiti.engine.impl.cmd.GetPotentialStarterUsersCmd;
 import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.GroupQuery;
@@ -28,6 +31,14 @@ import org.activiti.idm.api.UserQuery;
  * @author Tom Baeyens
  */
 public class IdentityServiceImpl extends ServiceImpl implements IdentityService {
+  
+  public IdentityServiceImpl() {
+
+  }
+
+  public IdentityServiceImpl(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    super(processEngineConfiguration);
+  }
 
   public Group newGroup(String groupId) {
     return processEngineConfiguration.getIdmIdentityService().newGroup(groupId);
@@ -61,6 +72,14 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   @Override
   public NativeGroupQuery createNativeGroupQuery() {
     return processEngineConfiguration.getIdmIdentityService().createNativeGroupQuery();
+  }
+  
+  public List<Group> getPotentialStarterGroups(String processDefinitionId) {
+    return commandExecutor.execute(new GetPotentialStarterGroupsCmd(processDefinitionId));
+  }
+  
+  public List<User> getPotentialStarterUsers(String processDefinitionId) {
+    return commandExecutor.execute(new GetPotentialStarterUsersCmd(processDefinitionId));
   }
 
   public void createMembership(String userId, String groupId) {

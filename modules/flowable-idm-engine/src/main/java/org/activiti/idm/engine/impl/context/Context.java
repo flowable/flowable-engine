@@ -25,7 +25,7 @@ import org.activiti.idm.engine.impl.interceptor.CommandContext;
 public class Context {
 
   protected static ThreadLocal<Stack<CommandContext>> commandContextThreadLocal = new ThreadLocal<Stack<CommandContext>>();
-  protected static ThreadLocal<Stack<IdmEngineConfiguration>> formEngineConfigurationStackThreadLocal = new ThreadLocal<Stack<IdmEngineConfiguration>>();
+  protected static ThreadLocal<Stack<IdmEngineConfiguration>> idmEngineConfigurationStackThreadLocal = new ThreadLocal<Stack<IdmEngineConfiguration>>();
   
   public static CommandContext getCommandContext() {
     Stack<CommandContext> stack = getStack(commandContextThreadLocal);
@@ -43,20 +43,20 @@ public class Context {
     getStack(commandContextThreadLocal).pop();
   }
 
-  public static IdmEngineConfiguration getFormEngineConfiguration() {
-    Stack<IdmEngineConfiguration> stack = getStack(formEngineConfigurationStackThreadLocal);
+  public static IdmEngineConfiguration getIdmEngineConfiguration() {
+    Stack<IdmEngineConfiguration> stack = getStack(idmEngineConfigurationStackThreadLocal);
     if (stack.isEmpty()) {
       return null;
     }
     return stack.peek();
   }
 
-  public static void setFormEngineConfiguration(IdmEngineConfiguration formEngineConfiguration) {
-    getStack(formEngineConfigurationStackThreadLocal).push(formEngineConfiguration);
+  public static void setIdmEngineConfiguration(IdmEngineConfiguration idmEngineConfiguration) {
+    getStack(idmEngineConfigurationStackThreadLocal).push(idmEngineConfiguration);
   }
 
-  public static void removeFormEngineConfiguration() {
-    getStack(formEngineConfigurationStackThreadLocal).pop();
+  public static void removeIdmEngineConfiguration() {
+    getStack(idmEngineConfigurationStackThreadLocal).pop();
   }
   
   protected static <T> Stack<T> getStack(ThreadLocal<Stack<T>> threadLocal) {

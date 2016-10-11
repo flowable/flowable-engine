@@ -26,7 +26,6 @@ import org.activiti.engine.delegate.event.ActivitiErrorEvent;
 import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.engine.delegate.event.ActivitiExceptionEvent;
-import org.activiti.engine.delegate.event.ActivitiMembershipEvent;
 import org.activiti.engine.delegate.event.ActivitiMessageEvent;
 import org.activiti.engine.delegate.event.ActivitiProcessStartedEvent;
 import org.activiti.engine.delegate.event.ActivitiSequenceFlowTakenEvent;
@@ -296,13 +295,6 @@ public class ActivitiEventBuilder {
     newEvent.setExecutionId(executionId);
     newEvent.setProcessDefinitionId(processDefinitionId);
     newEvent.setProcessInstanceId(processInstanceId);
-    return newEvent;
-  }
-
-  public static ActivitiMembershipEvent createMembershipEvent(ActivitiEventType type, String groupId, String userId) {
-    ActivitiMembershipEventImpl newEvent = new ActivitiMembershipEventImpl(type);
-    newEvent.setUserId(userId);
-    newEvent.setGroupId(groupId);
     return newEvent;
   }
 

@@ -32,6 +32,10 @@
 		</dependency>
 		<dependency>
 			<groupId>org.flowable</groupId>
+			<artifactId>flowable-idm-engine</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flowable</groupId>
 			<artifactId>flowable-dmn-api</artifactId>
 		</dependency>
 		<dependency>

@@ -20,6 +20,7 @@ import java.util.List;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.DynamicBpmnConstants;
+import org.activiti.engine.IdentityService;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.impl.context.Context;
@@ -1246,7 +1247,8 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
   }
 
   protected List<String> getGroupsForCandidateUser(String candidateUser) {
-    List<Group> groups = Context.getCommandContext().getGroupEntityManager().findGroupsByUser(candidateUser);
+    IdentityService identityService = Context.getProcessEngineConfiguration().getIdentityService();
+    List<Group> groups = identityService.createGroupQuery().groupMember(candidateUser).list();
     List<String> groupIds = new ArrayList<String>();
     for (Group group : groups) {
       groupIds.add(group.getId());

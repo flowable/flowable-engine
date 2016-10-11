@@ -16,13 +16,13 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="org.activiti.form.engine.db.common">
+<mapper namespace="org.activiti.idm.engine.db.common">
 
   <!-- select By Native Query -->
 
 	<sql id="selectByNativeQuery">
 		<if test="resultType == 'LIST_PAGE'">
-			<include refid="org.activiti.form.engine.db.common.limitBeforeNativeQuerySql"/> 
+			<include refid="org.activiti.idm.engine.db.common.limitBeforeNativeQuerySql"/> 
 		</if>
 		${sql}
 		<if test="resultType == 'LIST_PAGE'">

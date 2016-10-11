@@ -58,6 +58,8 @@ import org.activiti.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.activiti.engine.impl.util.DefaultClockImpl;
 import org.activiti.engine.impl.variable.VariableType;
 import org.activiti.engine.impl.variable.VariableTypes;
+import org.activiti.idm.api.IdmIdentityService;
+import org.activiti.idm.api.event.ActivitiIdmEventDispatcher;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.activiti.validation.ProcessValidator;
 import org.activiti.validation.ProcessValidatorFactory;
@@ -165,9 +167,6 @@ import org.activiti5.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.activiti5.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.activiti5.engine.impl.persistence.DefaultHistoryManagerSessionFactory;
 import org.activiti5.engine.impl.persistence.GenericManagerFactory;
-import org.activiti5.engine.impl.persistence.GroupEntityManagerFactory;
-import org.activiti5.engine.impl.persistence.MembershipEntityManagerFactory;
-import org.activiti5.engine.impl.persistence.UserEntityManagerFactory;
 import org.activiti5.engine.impl.persistence.deploy.Deployer;
 import org.activiti5.engine.impl.persistence.deploy.DeploymentManager;
 import org.activiti5.engine.impl.persistence.deploy.ProcessDefinitionInfoCache;
@@ -185,7 +184,6 @@ import org.activiti5.engine.impl.persistence.entity.HistoricIdentityLinkEntityMa
 import org.activiti5.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
 import org.activiti5.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
 import org.activiti5.engine.impl.persistence.entity.HistoricVariableInstanceEntityManager;
-import org.activiti5.engine.impl.persistence.entity.IdentityInfoEntityManager;
 import org.activiti5.engine.impl.persistence.entity.IdentityLinkEntityManager;
 import org.activiti5.engine.impl.persistence.entity.JobEntityManager;
 import org.activiti5.engine.impl.persistence.entity.ModelEntityManager;
@@ -264,11 +262,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected RepositoryService repositoryService = new RepositoryServiceImpl();
   protected RuntimeService runtimeService = new RuntimeServiceImpl();
   protected HistoryService historyService = new HistoryServiceImpl(this);
-  protected IdentityService identityService = new IdentityServiceImpl();
+  protected IdentityService identityService = new IdentityServiceImpl(this);
   protected TaskService taskService = new TaskServiceImpl(this);
   protected FormService formService = new FormServiceImpl();
   protected ManagementService managementService = new ManagementServiceImpl();
   protected DynamicBpmnService dynamicBpmnService = new DynamicBpmnServiceImpl(this);
+  
+  // IDM ENGINE SERVICES /////////////////////////////////////////////////////
+  protected boolean idmEngineInitialized;
+  protected IdmIdentityService idmIdentityService;
+  protected ActivitiIdmEventDispatcher idmEventDispatcher;
   
   // COMMAND EXECUTORS ////////////////////////////////////////////////////////
   
@@ -997,7 +1000,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       dbSqlSessionFactory.setDatabaseType(databaseType);
       dbSqlSessionFactory.setIdGenerator(idGenerator);
       dbSqlSessionFactory.setSqlSessionFactory(sqlSessionFactory);
-      dbSqlSessionFactory.setDbIdentityUsed(isDbIdentityUsed);
       dbSqlSessionFactory.setDbHistoryUsed(isDbHistoryUsed);
       dbSqlSessionFactory.setDatabaseTablePrefix(databaseTablePrefix);
       dbSqlSessionFactory.setTablePrefixIsSchema(tablePrefixIsSchema);
@@ -1019,7 +1021,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(HistoricVariableInstanceEntityManager.class));
       addSessionFactory(new GenericManagerFactory(HistoricTaskInstanceEntityManager.class));
       addSessionFactory(new GenericManagerFactory(HistoricIdentityLinkEntityManager.class));
-      addSessionFactory(new GenericManagerFactory(IdentityInfoEntityManager.class));
       addSessionFactory(new GenericManagerFactory(IdentityLinkEntityManager.class));
       addSessionFactory(new GenericManagerFactory(JobEntityManager.class));
       addSessionFactory(new GenericManagerFactory(ProcessDefinitionEntityManager.class));
@@ -1036,10 +1037,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(EventLogEntryEntityManager.class));
       
       addSessionFactory(new DefaultHistoryManagerSessionFactory());
-      
-      addSessionFactory(new UserEntityManagerFactory());
-      addSessionFactory(new GroupEntityManagerFactory());
-      addSessionFactory(new MembershipEntityManagerFactory());
     }
     
     if (customSessionFactories!=null) {
@@ -1712,6 +1709,33 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
   
+  public boolean isIdmEngineInitialized() {
+    return idmEngineInitialized;
+  }
+
+  public ProcessEngineConfigurationImpl setIdmEngineInitialized(boolean idmEngineInitialized) {
+    this.idmEngineInitialized = idmEngineInitialized;
+    return this;
+  }
+
+  public IdmIdentityService getIdmIdentityService() {
+    return idmIdentityService;
+  }
+
+  public ProcessEngineConfigurationImpl setIdmIdentityService(IdmIdentityService idmIdentityService) {
+    this.idmIdentityService = idmIdentityService;
+    return this;
+  }
+
+  public ActivitiIdmEventDispatcher getIdmEventDispatcher() {
+    return idmEventDispatcher;
+  }
+
+  public ProcessEngineConfigurationImpl setIdmEventDispatcher(ActivitiIdmEventDispatcher idmEventDispatcher) {
+    this.idmEventDispatcher = idmEventDispatcher;
+    return this;
+  }
+
   public Map<Class< ? >, SessionFactory> getSessionFactories() {
     return sessionFactories;
   }

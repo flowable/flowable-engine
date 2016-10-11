@@ -29,11 +29,12 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
 
   private static final long serialVersionUID = 1L;
   protected String id;
+  protected List<String> ids;
   protected String name;
   protected String nameLike;
   protected String type;
   protected String userId;
-  protected String procDefId;
+  protected List<String> userIds;
 
   public GroupQueryImpl() {
   }
@@ -51,6 +52,14 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
       throw new ActivitiIdmIllegalArgumentException("Provided id is null");
     }
     this.id = id;
+    return this;
+  }
+  
+  public GroupQuery groupIds(List<String> ids) {
+    if (ids == null) {
+      throw new ActivitiIdmIllegalArgumentException("Provided id list is null");
+    }
+    this.ids = ids;
     return this;
   }
 
@@ -86,13 +95,12 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
     return this;
   }
 
-  public GroupQuery potentialStarter(String procDefId) {
-    if (procDefId == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided processDefinitionId is null or empty");
+  public GroupQuery groupMembers(List<String> userIds) {
+    if (userIds == null) {
+      throw new ActivitiIdmIllegalArgumentException("Provided userIds is null");
     }
-    this.procDefId = procDefId;
+    this.userIds = userIds;
     return this;
-
   }
 
   // sorting ////////////////////////////////////////////////////////
@@ -127,6 +135,10 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
     return id;
   }
 
+  public List<String> getIds() {
+    return ids;
+  }
+
   public String getName() {
     return name;
   }
@@ -142,10 +154,9 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
   public String getUserId() {
     return userId;
   }
-
-
-  public String getProcDefId() {
-    return procDefId;
+  
+  public List<String> getUserIds() {
+    return userIds;
   }
   
 }

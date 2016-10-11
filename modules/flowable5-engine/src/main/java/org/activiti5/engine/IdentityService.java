@@ -14,13 +14,13 @@ package org.activiti5.engine;
 
 import java.util.List;
 
-import org.activiti5.engine.identity.Group;
-import org.activiti5.engine.identity.GroupQuery;
-import org.activiti5.engine.identity.NativeGroupQuery;
-import org.activiti5.engine.identity.NativeUserQuery;
-import org.activiti5.engine.identity.Picture;
-import org.activiti5.engine.identity.User;
-import org.activiti5.engine.identity.UserQuery;
+import org.activiti.idm.api.Group;
+import org.activiti.idm.api.GroupQuery;
+import org.activiti.idm.api.NativeGroupQuery;
+import org.activiti.idm.api.NativeUserQuery;
+import org.activiti.idm.api.Picture;
+import org.activiti.idm.api.User;
+import org.activiti.idm.api.UserQuery;
 
 
 /**

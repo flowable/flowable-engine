@@ -87,13 +87,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement("postgres", "selectByteArray", "selectByteArray_postgres");
     addDatabaseSpecificStatement("postgres", "selectResourceByDeploymentIdAndResourceName", "selectResourceByDeploymentIdAndResourceName_postgres");
     addDatabaseSpecificStatement("postgres", "selectResourcesByDeploymentId", "selectResourcesByDeploymentId_postgres");
-    addDatabaseSpecificStatement("postgres", "insertIdentityInfo", "insertIdentityInfo_postgres");
-    addDatabaseSpecificStatement("postgres", "bulkInsertIdentityInfo", "bulkInsertIdentityInfo_postgres");
-    addDatabaseSpecificStatement("postgres", "updateIdentityInfo", "updateIdentityInfo_postgres");
-    addDatabaseSpecificStatement("postgres", "selectIdentityInfoById", "selectIdentityInfoById_postgres");
-    addDatabaseSpecificStatement("postgres", "selectIdentityInfoByUserIdAndKey", "selectIdentityInfoByUserIdAndKey_postgres");
-    addDatabaseSpecificStatement("postgres", "selectIdentityInfoByUserId", "selectIdentityInfoByUserId_postgres");
-    addDatabaseSpecificStatement("postgres", "selectIdentityInfoDetails", "selectIdentityInfoDetails_postgres");
     addDatabaseSpecificStatement("postgres", "insertComment", "insertComment_postgres");
     addDatabaseSpecificStatement("postgres", "bulkInsertComment", "bulkInsertComment_postgres");
     addDatabaseSpecificStatement("postgres", "selectComment", "selectComment_postgres");
@@ -119,20 +112,14 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement("oracle", "selectUnlockedTimersByDuedate", "selectUnlockedTimersByDuedate_oracle");
     addDatabaseSpecificStatement("oracle", "insertEventLogEntry", "insertEventLogEntry_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertVariableInstance", "bulkInsertVariableInstance_oracle");
-    addDatabaseSpecificStatement("oracle", "bulkInsertUser", "bulkInsertUser_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertTask", "bulkInsertTask_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertResource", "bulkInsertResource_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertProperty", "bulkInsertProperty_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertProcessDefinition", "bulkInsertProcessDefinition_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertModel", "bulkInsertModel_oracle");
-    addDatabaseSpecificStatement("oracle", "bulkInsertMembership", "bulkInsertMembership_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertTimer", "bulkInsertTimer_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertMessage", "bulkInsertMessage_oracle");
-    addDatabaseSpecificStatement("oracle", "bulkInsertIdentityInfo", "bulkInsertIdentityInfo_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertIdentityLink", "bulkInsertIdentityLink_oracle");
-    addDatabaseSpecificStatement("oracle", "bulkInsertMembership", "bulkInsertMembership_oracle");
-    addDatabaseSpecificStatement("oracle", "bulkInsertTimer", "bulkInsertTimer_oracle");
-    addDatabaseSpecificStatement("oracle", "bulkInsertMessage", "bulkInsertMessage_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertHistoricVariableInstance", "bulkInsertHistoricVariableInstance_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertHistoricTaskInstance", "bulkInsertHistoricTaskInstance_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertHistoricProcessInstance", "bulkInsertHistoricProcessInstance_oracle");
@@ -140,7 +127,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement("oracle", "bulkInsertHistoricDetailVariableInstanceUpdate", "bulkInsertHistoricDetailVariableInstanceUpdate_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertHistoricFormProperty", "bulkInsertHistoricFormProperty_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertHistoricActivityInstance", "bulkInsertHistoricActivityInstance_oracle");
-    addDatabaseSpecificStatement("oracle", "bulkInsertGroup", "bulkInsertGroup_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertExecution", "bulkInsertExecution_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertMessageEventSubscription", "bulkInsertMessageEventSubscription_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertSignalEventSubscription", "bulkInsertSignalEventSubscription_oracle");
@@ -152,7 +138,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement("oracle", "bulkInsertEventLogEntry", "bulkInsertEventLogEntry_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertDeployment", "bulkInsertDeployment_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertComment", "bulkInsertComment_oracle");
-    addDatabaseSpecificStatement("oracle", "bulkInsertByteArray", "bulkInsertByteArray_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertAttachment", "bulkInsertAttachment_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertJob", "bulkInsertJob_oracle");
     addDatabaseSpecificStatement("oracle", "bulkInsertTimerJob", "bulkInsertTimerJob_oracle");
@@ -174,8 +159,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement("db2", "selectTaskByNativeQuery", "selectTaskByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectProcessDefinitionByNativeQuery", "selectProcessDefinitionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectDeploymentByNativeQuery", "selectDeploymentByNativeQuery_mssql_or_db2");
-    addDatabaseSpecificStatement("db2", "selectGroupByNativeQuery", "selectGroupByNativeQuery_mssql_or_db2");
-    addDatabaseSpecificStatement("db2", "selectUserByNativeQuery", "selectUserByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectModelByNativeQuery", "selectModelByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectHistoricDetailByNativeQuery", "selectHistoricDetailByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectHistoricVariableInstanceByNativeQuery", "selectHistoricVariableInstanceByNativeQuery_mssql_or_db2");
@@ -199,8 +182,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement("mssql", "selectTaskByNativeQuery", "selectTaskByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("mssql", "selectProcessDefinitionByNativeQuery", "selectProcessDefinitionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("mssql", "selectDeploymentByNativeQuery", "selectDeploymentByNativeQuery_mssql_or_db2");
-    addDatabaseSpecificStatement("mssql", "selectGroupByNativeQuery", "selectGroupByNativeQuery_mssql_or_db2");
-    addDatabaseSpecificStatement("mssql", "selectUserByNativeQuery", "selectUserByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("mssql", "selectModelByNativeQuery", "selectModelByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("mssql", "selectHistoricDetailByNativeQuery", "selectHistoricDetailByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("mssql", "selectHistoricVariableInstanceByNativeQuery", "selectHistoricVariableInstanceByNativeQuery_mssql_or_db2");
@@ -231,13 +212,12 @@ public class DbSqlSessionFactory implements SessionFactory {
   protected SqlSessionFactory sqlSessionFactory;
   protected IdGenerator idGenerator;
   protected Map<String, String> statementMappings;
-  protected Map<Class<?>,String>  insertStatements = new ConcurrentHashMap<Class<?>, String>();
-  protected Map<Class<?>,String>  bulkInsertStatements = new ConcurrentHashMap<Class<?>, String>();
-  protected Map<Class<?>,String>  updateStatements = new ConcurrentHashMap<Class<?>, String>();
-  protected Map<Class<?>,String>  deleteStatements = new ConcurrentHashMap<Class<?>, String>();
-  protected Map<Class<?>,String>  bulkDeleteStatements = new ConcurrentHashMap<Class<?>, String>();
-  protected Map<Class<?>,String>  selectStatements = new ConcurrentHashMap<Class<?>, String>();
-  protected boolean isDbIdentityUsed = true;
+  protected Map<Class<?>,String> insertStatements = new ConcurrentHashMap<Class<?>, String>();
+  protected Map<Class<?>,String> bulkInsertStatements = new ConcurrentHashMap<Class<?>, String>();
+  protected Map<Class<?>,String> updateStatements = new ConcurrentHashMap<Class<?>, String>();
+  protected Map<Class<?>,String> deleteStatements = new ConcurrentHashMap<Class<?>, String>();
+  protected Map<Class<?>,String> bulkDeleteStatements = new ConcurrentHashMap<Class<?>, String>();
+  protected Map<Class<?>,String> selectStatements = new ConcurrentHashMap<Class<?>, String>();
   protected boolean isDbHistoryUsed = true;
   protected int maxNrOfStatementsInBulkInsert = 100;
 
@@ -431,14 +411,6 @@ public class DbSqlSessionFactory implements SessionFactory {
   
   public void setSelectStatements(Map<Class< ? >, String> selectStatements) {
     this.selectStatements = selectStatements;
-  }
-
-  public boolean isDbIdentityUsed() {
-    return isDbIdentityUsed;
-  }
-  
-  public void setDbIdentityUsed(boolean isDbIdentityUsed) {
-    this.isDbIdentityUsed = isDbIdentityUsed;
   }
   
   public boolean isDbHistoryUsed() {

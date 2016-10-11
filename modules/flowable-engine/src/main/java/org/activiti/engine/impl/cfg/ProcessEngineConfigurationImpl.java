@@ -321,6 +321,7 @@ import org.activiti.engine.parse.BpmnParseHandler;
 import org.activiti.engine.runtime.Clock;
 import org.activiti.form.api.FormRepositoryService;
 import org.activiti.idm.api.IdmIdentityService;
+import org.activiti.idm.api.event.ActivitiIdmEventDispatcher;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.activiti.validation.ProcessValidator;
 import org.activiti.validation.ProcessValidatorFactory;
@@ -363,15 +364,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected RepositoryService repositoryService = new RepositoryServiceImpl();
   protected RuntimeService runtimeService = new RuntimeServiceImpl();
   protected HistoryService historyService = new HistoryServiceImpl(this);
-  protected IdentityService identityService = new IdentityServiceImpl();
+  protected IdentityService identityService = new IdentityServiceImpl(this);
   protected TaskService taskService = new TaskServiceImpl(this);
   protected FormService formService = new FormServiceImpl();
   protected ManagementService managementService = new ManagementServiceImpl();
   protected DynamicBpmnService dynamicBpmnService = new DynamicBpmnServiceImpl(this);
   
   // IDM ENGINE SERVICES /////////////////////////////////////////////////////
+  protected boolean disableIdmEngine;
   protected boolean idmEngineInitialized;
   protected IdmIdentityService idmIdentityService;
+  protected ActivitiIdmEventDispatcher idmEventDispatcher;
   
   // FORM ENGINE SERVICES /////////////////////////////////////////////////////
   protected boolean formEngineInitialized;
@@ -1535,7 +1538,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     dbSqlSessionFactory.setDatabaseType(databaseType);
     dbSqlSessionFactory.setIdGenerator(idGenerator);
     dbSqlSessionFactory.setSqlSessionFactory(sqlSessionFactory);
-    dbSqlSessionFactory.setDbIdentityUsed(isDbIdentityUsed);
     dbSqlSessionFactory.setDbHistoryUsed(isDbHistoryUsed);
     dbSqlSessionFactory.setDatabaseTablePrefix(databaseTablePrefix);
     dbSqlSessionFactory.setTablePrefixIsSchema(tablePrefixIsSchema);
@@ -1563,6 +1565,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       for (ProcessEngineConfigurator configurator : configurators) {
         allConfigurators.add(configurator);
       }
+    }
+    
+    if (disableIdmEngine == false) {
+      allConfigurators.add(new IdmEngineConfigurator());
     }
 
     // Auto discovery through ServiceLoader
@@ -2388,23 +2394,40 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
   
+  public boolean isDisableIdmEngine() {
+    return disableIdmEngine;
+  }
+
+  public ProcessEngineConfigurationImpl setDisableIdmEngine(boolean disableIdmEngine) {
+    this.disableIdmEngine = disableIdmEngine;
+    return this;
+  }
 
   public boolean isIdmEngineInitialized() {
-	return idmEngineInitialized;
+    return idmEngineInitialized;
   }
 
   public ProcessEngineConfigurationImpl setIdmEngineInitialized(boolean idmEngineInitialized) {
-	this.idmEngineInitialized = idmEngineInitialized;
-	return this;
+    this.idmEngineInitialized = idmEngineInitialized;
+    return this;
   }
 
   public IdmIdentityService getIdmIdentityService() {
-	return idmIdentityService;
+    return idmIdentityService;
   }
 
   public ProcessEngineConfigurationImpl setIdmIdentityService(IdmIdentityService idmIdentityService) {
-	this.idmIdentityService = idmIdentityService;
-	return this;
+    this.idmIdentityService = idmIdentityService;
+    return this;
+  }
+
+  public ActivitiIdmEventDispatcher getIdmEventDispatcher() {
+    return idmEventDispatcher;
+  }
+
+  public ProcessEngineConfigurationImpl setIdmEventDispatcher(ActivitiIdmEventDispatcher idmEventDispatcher) {
+    this.idmEventDispatcher = idmEventDispatcher;
+    return this;
   }
 
   public boolean isFormEngineInitialized() {

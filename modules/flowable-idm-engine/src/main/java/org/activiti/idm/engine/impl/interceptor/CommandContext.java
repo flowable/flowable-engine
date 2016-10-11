@@ -26,6 +26,7 @@ import org.activiti.idm.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.activiti.idm.engine.impl.persistence.entity.GroupEntityManager;
 import org.activiti.idm.engine.impl.persistence.entity.IdentityInfoEntityManager;
 import org.activiti.idm.engine.impl.persistence.entity.MembershipEntityManager;
+import org.activiti.idm.engine.impl.persistence.entity.PropertyEntityManager;
 import org.activiti.idm.engine.impl.persistence.entity.TableDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.UserEntityManager;
 import org.slf4j.Logger;
@@ -220,6 +221,10 @@ public class CommandContext {
   
   public MembershipEntityManager getMembershipEntityManager() {
     return idmEngineConfiguration.getMembershipEntityManager();
+  }
+  
+  public PropertyEntityManager getPropertyEntityManager() {
+    return idmEngineConfiguration.getPropertyEntityManager();
   }
 
   public UserEntityManager getUserEntityManager() {

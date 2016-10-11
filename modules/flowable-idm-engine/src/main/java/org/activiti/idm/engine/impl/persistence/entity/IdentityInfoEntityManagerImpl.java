@@ -61,6 +61,7 @@ public class IdentityInfoEntityManagerImpl extends AbstractEntityManager<Identit
       // update
       identityInfoEntity.setValue(value);
       identityInfoEntity.setPasswordBytes(storedPassword);
+      identityInfoDataManager.update(identityInfoEntity);
 
       if (accountDetails == null) {
         accountDetails = new HashMap<String, String>();

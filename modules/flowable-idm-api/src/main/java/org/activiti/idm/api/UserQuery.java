@@ -13,6 +13,8 @@
 
 package org.activiti.idm.api;
 
+import java.util.List;
+
 /**
  * Allows programmatic querying of {@link User}
  * 
@@ -22,6 +24,9 @@ public interface UserQuery extends Query<UserQuery, User> {
 
   /** Only select {@link User}s with the given id/ */
   UserQuery userId(String id);
+  
+  /** Only select {@link User}s with the given ids/ */
+  UserQuery userIds(List<String> ids);
 
   /** Only select {@link User}s with the given firstName. */
   UserQuery userFirstName(String firstName);
@@ -54,11 +59,9 @@ public interface UserQuery extends Query<UserQuery, User> {
 
   /** Only select {@link User}s that belong to the given group. */
   UserQuery memberOfGroup(String groupId);
-
-  /**
-   * Only select {@link User}S that are potential starter for the given process definition.
-   */
-  public UserQuery potentialStarter(String procDefId);
+  
+  /** Only select {@link User}s that belong to the given groups. */
+  UserQuery memberOfGroups(List<String> groupIds);
 
   // sorting ////////////////////////////////////////////////////////
 

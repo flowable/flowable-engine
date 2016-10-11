@@ -14,8 +14,8 @@
 package org.activiti5.engine.history;
 
 import org.activiti.engine.task.IdentityLink;
-import org.activiti5.engine.identity.GroupQuery;
-import org.activiti5.engine.identity.UserQuery;
+import org.activiti.idm.api.GroupQuery;
+import org.activiti.idm.api.UserQuery;
 import org.activiti5.engine.task.IdentityLinkType;
 
 

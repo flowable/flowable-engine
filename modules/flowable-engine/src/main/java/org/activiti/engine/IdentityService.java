@@ -80,6 +80,24 @@ public interface IdentityService {
    * Returns a new {@link org.activiti.engine.query.NativeQuery} for tasks.
    */
   NativeGroupQuery createNativeGroupQuery();
+  
+  /**
+   * Returns the potential starter groups for a given process definition.
+   * 
+   * @param processDefinitionId
+   *          process definition identifier
+   * @return list of potential starter groups
+   */
+  List<Group> getPotentialStarterGroups(String processDefinitionId);
+  
+  /**
+   * Returns the potential starter users for a given process definition.
+   * 
+   * @param processDefinitionId
+   *          process definition identifier
+   * @return list of potential starter users
+   */
+  List<User> getPotentialStarterUsers(String processDefinitionId);
 
   /**
    * Saves the group. If the group already existed, the group is updated.

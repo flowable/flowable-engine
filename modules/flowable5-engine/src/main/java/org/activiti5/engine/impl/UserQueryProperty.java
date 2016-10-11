@@ -16,7 +16,7 @@ package org.activiti5.engine.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti5.engine.identity.UserQuery;
+import org.activiti.idm.api.UserQuery;
 import org.activiti5.engine.query.QueryProperty;
 
 
