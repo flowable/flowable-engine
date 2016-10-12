@@ -5,20 +5,17 @@
 
 	<target name="clean" description="Cleans up generated files.">
 		<delete dir="target/html" />
+		<delete dir="src/en/output" />
 	</target>
 
-	<target name="build.html">
+	<target name="build.html" depends="clean">
 		<mkdir dir="target/html" />
-		<exec dir="src/en" executable="asciidoctor">
-			<arg value="-a" />
-			<arg value="stylesheet=colony.css" />
-			<arg value="index.adoc" />
-		</exec>
+		<exec dir="src/en" executable="./generate-html.sh" />
 		<copy todir="target/html/en">
-			<fileset dir="src/en">
+			<fileset dir="src/en/output">
 				<include name="index.html" />
 			</fileset>
-			<fileset dir="src/en">
+			<fileset dir="src/en/output">
 				<include name="images/**" />
 			</fileset>
 		</copy>
