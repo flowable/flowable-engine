@@ -1,51 +1,50 @@
-Activiti BPM Platform
-Copyright 2010-2016 Alfresco Software, Ltd.
+Flowable
 
-The following activiti software libraries are distributed under the Apache License Version 2.0 (the License):
- * activiti-bpmn-converter-<version>-sources.jar
- * activiti-bpmn-converter-<version>.jar
- * activiti-bpmn-layout-<version>-sources.jar
- * activiti-bpmn-layout-<version>.jar
- * activiti-bpmn-model-<version>-sources.jar
- * activiti-bpmn-model-<version>.jar
- * activiti-camel-<version>-sources.jar
- * activiti-camel-<version>.jar
- * activiti-cdi-<version>-sources.jar
- * activiti-cdi-<version>.jar
- * activiti-common-rest-<version>-sources.jar
- * activiti-common-rest-<version>.jar
- * activiti-crystalball-<version>-sources.jar
- * activiti-crystalball-<version>.jar
- * activiti-cxf-<version>-sources.jar
- * activiti-cxf-<version>.jar
- * activiti-diagram-rest-<version>-sources.jar
- * activiti-diagram-rest-<version>.jar
- * activiti-engine-<version>-sources.jar
- * activiti-engine-<version>.jar
- * activiti-explorer-<version>-sources.jar
- * activiti-explorer-<version>.jar
- * activiti-image-generator-<version>-sources.jar
- * activiti-image-generator-<version>.jar
- * activiti-jmx-<version>-sources.jar
- * activiti-jmx-<version>.jar
- * activiti-json-converter-<version>-sources.jar
- * activiti-json-converter-<version>.jar
- * activiti-ldap-<version>-sources.jar
- * activiti-ldap-<version>.jar
- * activiti-modeler-<version>-sources.jar
- * activiti-modeler-<version>.jar
- * activiti-mule-<version>-sources.jar
- * activiti-mule-<version>.jar
- * activiti-osgi-<version>-sources.jar
- * activiti-osgi-<version>.jar
- * activiti-process-validation-<version>-sources.jar
- * activiti-process-validation-<version>.jar
- * activiti-rest-<version>-sources.jar
- * activiti-rest-<version>.jar
- * activiti-simple-workflow-<version>-sources.jar
- * activiti-simple-workflow-<version>.jar
- * activiti-spring-<version>-sources.jar
- * activiti-spring-<version>.jar
+The following Flowable software libraries are distributed under the Apache License Version 2.0 (the License):
+ * flowable-bpmn-converter-<version>-sources.jar
+ * flowable-bpmn-converter-<version>.jar
+ * flowable-bpmn-layout-<version>-sources.jar
+ * flowable-bpmn-layout-<version>.jar
+ * flowable-bpmn-model-<version>-sources.jar
+ * flowable-bpmn-model-<version>.jar
+ * flowable-camel-<version>-sources.jar
+ * flowable-camel-<version>.jar
+ * flowable-cdi-<version>-sources.jar
+ * flowable-cdi-<version>.jar
+ * flowable-common-rest-<version>-sources.jar
+ * flowable-common-rest-<version>.jar
+ * flowable-crystalball-<version>-sources.jar
+ * flowable-crystalball-<version>.jar
+ * flowable-cxf-<version>-sources.jar
+ * flowable-cxf-<version>.jar
+ * flowable-diagram-rest-<version>-sources.jar
+ * flowable-diagram-rest-<version>.jar
+ * flowable-engine-<version>-sources.jar
+ * flowable-engine-<version>.jar
+ * flowable-explorer-<version>-sources.jar
+ * flowable-explorer-<version>.jar
+ * flowable-image-generator-<version>-sources.jar
+ * flowable-image-generator-<version>.jar
+ * flowable-jmx-<version>-sources.jar
+ * flowable-jmx-<version>.jar
+ * flowable-json-converter-<version>-sources.jar
+ * flowable-json-converter-<version>.jar
+ * flowable-ldap-<version>-sources.jar
+ * flowable-ldap-<version>.jar
+ * flowable-modeler-<version>-sources.jar
+ * flowable-modeler-<version>.jar
+ * flowable-mule-<version>-sources.jar
+ * flowable-mule-<version>.jar
+ * flowable-osgi-<version>-sources.jar
+ * flowable-osgi-<version>.jar
+ * flowable-process-validation-<version>-sources.jar
+ * flowable-process-validation-<version>.jar
+ * flowable-rest-<version>-sources.jar
+ * flowable-rest-<version>.jar
+ * flowable-simple-workflow-<version>-sources.jar
+ * flowable-simple-workflow-<version>.jar
+ * flowable-spring-<version>-sources.jar
+ * flowable-spring-<version>.jar
 
 You may not use these files except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an AS IS BASIS, WITHOUT WARRANTIES OR CONDITIONS OR ANY KIND, either express or implied.  See the License for the specific language governing permissions and limitations under the License.
@@ -54,17 +53,17 @@ This software package includes changed source code of the following libraries:
 
 JUEL
  * Location: http://juel.sourceforge.net/
- * Included in activiti-engine-<version>.jar in package org.activiti.engine.impl.juel
+ * Included in flowable-engine-<version>.jar in package org.activiti.engine.impl.juel
  * License: Apache V2
  
 Quartz
  * Location: http://www.quartz-scheduler.org/
- * CronExpression is included in activiti-engine-<version>.jar in package org.activiti.engine.impl.calendar
+ * CronExpression is included in flowable-engine-<version>.jar in package org.activiti.engine.impl.calendar
  * License: Apache V2
 
 JSON
  * Location: http://www.JSON.org/java
- * Included in activiti-engine-<version>.jar in package org.activiti.engine.impl.json
+ * Included in flowable-engine-<version>.jar in package org.activiti.engine.impl.json
  * License:
 ===============================================================================
 Copyright (c) 2002 JSON.org
