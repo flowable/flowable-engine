@@ -13,3 +13,5 @@ Homepage: http://flowable.org/
 Flowable issues: https://github.com/flowable/flowable
 
 Flowable QA: http://qa.flowable.org
+
+Flowable forum: http://forum.flowable.org
