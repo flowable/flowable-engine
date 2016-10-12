@@ -1,13 +1,17 @@
-Activiti
+Flowable
 ========
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.activiti/activiti-engine/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.activiti/activiti-engine)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.flowable/flowable-engine/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.flowable/flowable-engine)
 
-Homepage: http://activiti.org/
+Homepage: http://flowable.org/
 
+## flowable / flowəb(ə)l /
+* a compact and highly efficient workflow and Business Process Management (BPM) platform for developers, system admins and business users.
+* a lightning fast, tried and tested BPMN 2 process engine written in Java.  It is Apache 2.0 licensed open source, with a committed community.
+* can run embedded in a Java application, or as a service on a server, a cluster, and in the cloud.  It integrates perfectly with Spring.  With a rich Java and REST API, it is the ideal engine for orchestrating human or system activities.
 
-Activiti is a light-weight workflow and Business Process Management (BPM) Platform targeted at business people, developers and system admins. Its core is a super-fast and rock-solid BPMN 2 process engine for Java. It's open-source and distributed under the Apache license. Activiti runs in any Java application, on a server, on a cluster or in the cloud. It integrates perfectly with Spring, it is extremely lightweight and based on simple concepts. 
+Flowable issues: https://github.com/flowable/flowable
 
-Activiti JIRA: https://activiti.atlassian.net
+Flowable QA: http://qa.flowable.org
 
-Activiti QA: http://ec2-54-217-5-246.eu-west-1.compute.amazonaws.com:8080/jenkins/
+Flowable forum: http://forum.flowable.org
