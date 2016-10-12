@@ -48,6 +48,8 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
   // The cache is used when fetching/setting specific variables
   protected Map<String, VariableInstanceEntity> usedVariablesCache = new HashMap<String, VariableInstanceEntity>();
   
+  protected Map<String, VariableInstance> transientVariabes; 
+  
   protected ELContext cachedElContext;
 
   protected String id = null;
@@ -92,18 +94,22 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
   	Map<String, Object> requestedVariables = new HashMap<String, Object>();
   	Set<String> variableNamesToFetch = new HashSet<String>(variableNames);
   	
-  	// The values in the fetch-cache will be more recent, so they can override any existing ones
-  	for (String variableName : variableNames) {
-  		if (usedVariablesCache.containsKey(variableName)) {
-  			requestedVariables.put(variableName, usedVariablesCache.get(variableName).getValue());
-  			variableNamesToFetch.remove(variableName);
-  		}
-  	}
+  	 // Transient variables 'shadow' any existing variables.
+    // The values in the fetch-cache will be more recent, so they can override any existing ones
+    for (String variableName : variableNames) {
+      if (transientVariabes != null && transientVariabes.containsKey(variableName)) {
+        requestedVariables.put(variableName, transientVariabes.get(variableName).getValue());
+        variableNamesToFetch.remove(variableName);
+      } else if (usedVariablesCache.containsKey(variableName)) {
+        requestedVariables.put(variableName, usedVariablesCache.get(variableName).getValue());
+        variableNamesToFetch.remove(variableName);
+      }
+    }
   	
   	if (fetchAllVariables == true) {
   		
-  		// getVariables() will go up the execution hierarchy, no need to do it here
-  		// also, the cached values will already be applied too 
+  	  // getVariables() will go up the execution hierarchy, no need to do
+      // it here also, the cached values will already be applied too
 	    Map<String, Object> allVariables = getVariables(); 
 	    for (String variableName : variableNamesToFetch) {
 	    	requestedVariables.put(variableName, allVariables.get(variableName));
@@ -137,7 +143,10 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     
     // The values in the fetch-cache will be more recent, so they can override any existing ones
     for (String variableName : variableNames) {
-      if (usedVariablesCache.containsKey(variableName)) {
+      if (transientVariabes != null && transientVariabes.containsKey(variableName)) {
+        requestedVariables.put(variableName, transientVariabes.get(variableName));
+        variableNamesToFetch.remove(variableName);
+      } else if (usedVariablesCache.containsKey(variableName)) {
         requestedVariables.put(variableName, usedVariablesCache.get(variableName));
         variableNamesToFetch.remove(variableName);
       }
@@ -188,6 +197,12 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     	variables.put(variableName, usedVariablesCache.get(variableName).getValue());
     }
     
+    if (transientVariabes != null) {
+      for (String variableName : transientVariabes.keySet()) {
+        variables.put(variableName, transientVariabes.get(variableName).getValue());
+      }
+    }
+    
     return variables;
   }
   
@@ -204,6 +219,10 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
 
     for (String variableName : usedVariablesCache.keySet()) {
       variables.put(variableName, usedVariablesCache.get(variableName));
+    }
+    
+    if (transientVariabes != null) {
+      variables.putAll(variables);
     }
 
     return variables;
@@ -239,9 +258,20 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
   }
   
   public VariableInstance getVariableInstance(String variableName, boolean fetchAllVariables) {
+    
+    // Transient variable
+    if (transientVariabes != null && transientVariabes.containsKey(variableName)) {
+      return transientVariabes.get(variableName);
+    }
+
+    // Check the local single-fetch cache
+    if (usedVariablesCache.containsKey(variableName)) {
+      return usedVariablesCache.get(variableName);
+    }
+    
     if (fetchAllVariables == true) {
       
-       // Check the local single-fetch cache
+      // Check the local single-fetch cache
       if (usedVariablesCache.containsKey(variableName)) {
         return usedVariablesCache.get(variableName);
       }
@@ -261,10 +291,6 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
       return null;
       
     } else {
-      
-      if (usedVariablesCache.containsKey(variableName)) {
-        return usedVariablesCache.get(variableName);
-      }
       
       if (variableInstances != null && variableInstances.containsKey(variableName)) {
         return variableInstances.get(variableName);
@@ -307,11 +333,16 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
   }
   
   public VariableInstance getVariableInstanceLocal(String variableName, boolean fetchAllVariables) {
+    
+    if (transientVariabes != null && transientVariabes.containsKey(variableName)) {
+      return transientVariabes.get(variableName);
+    }
+    
+    if (usedVariablesCache.containsKey(variableName)) {
+      return usedVariablesCache.get(variableName);
+    }
+    
     if (fetchAllVariables == true) {
-      
-      if (usedVariablesCache.containsKey(variableName)) {
-        return usedVariablesCache.get(variableName);
-      }
       
       ensureVariableInstancesInitialized();
       
@@ -322,13 +353,6 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
       return null;
       
     } else {
-      
-      if (usedVariablesCache.containsKey(variableName)) {
-        VariableInstanceEntity variable = usedVariablesCache.get(variableName);
-        if (variable != null) {
-          return variable;
-        }
-      }
       
       if (variableInstances != null && variableInstances.containsKey(variableName)) {
         VariableInstanceEntity variable = variableInstances.get(variableName);
@@ -348,6 +372,10 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
   }
   
   public boolean hasVariables() {
+    if (transientVariabes != null && !transientVariabes.isEmpty()) {
+      return true;
+    }
+    
     ensureVariableInstancesInitialized();
     if (!variableInstances.isEmpty()) {
       return true;
@@ -360,6 +388,9 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
   }
 
   public boolean hasVariablesLocal() {
+    if (transientVariabes != null && !transientVariabes.isEmpty()) {
+      return true;
+    }
     ensureVariableInstancesInitialized();
     return !variableInstances.isEmpty();
   }
@@ -376,11 +407,17 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
   }
 
   public boolean hasVariableLocal(String variableName) {
+    if (transientVariabes != null && transientVariabes.containsKey(variableName)) {
+      return true;
+    }
     ensureVariableInstancesInitialized();
     return variableInstances.containsKey(variableName);
   }
 
   protected Set<String> collectVariableNames(Set<String> variableNames) {
+    if (transientVariabes != null) {
+      variableNames.addAll(transientVariabes.keySet());
+    }
     ensureVariableInstancesInitialized();
     VariableScopeImpl parentScope = getParentVariableScope();
     if (parentScope!=null) {
@@ -405,6 +442,11 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     for (String variableName : usedVariablesCache.keySet()) {
     	variables.put(variableName, usedVariablesCache.get(variableName).getValue());
     }
+    if (transientVariabes != null) {
+      for (String variableName : transientVariabes.keySet()) {
+        variables.put(variableName, transientVariabes.get(variableName).getValue());
+      }
+    }
     return variables;
   }
   
@@ -416,6 +458,9 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     }
     for (String variableName : usedVariablesCache.keySet()) {
       variables.put(variableName, usedVariablesCache.get(variableName));
+    }
+    if (transientVariabes != null) {
+      variables.putAll(transientVariabes);;
     }
     return variables;
   }
@@ -431,14 +476,17 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
   public Map<String, Object> getVariablesLocal(Collection<String> variableNames, boolean fetchAllVariables) {
   	Map<String, Object> requestedVariables = new HashMap<String, Object>();
   	
-  	// The values in the fetch-cache will be more recent, so they can override any existing ones
-  	Set<String> variableNamesToFetch = new HashSet<String>(variableNames);
-  	for (String variableName : variableNames) {
-  		if (usedVariablesCache.containsKey(variableName)) {
-  			requestedVariables.put(variableName, usedVariablesCache.get(variableName).getValue());
-  			variableNamesToFetch.remove(variableName);
-  		}
-  	}
+  	 // The values in the fetch-cache will be more recent, so they can override any existing ones
+    Set<String> variableNamesToFetch = new HashSet<String>(variableNames);
+    for (String variableName : variableNames) {
+      if (transientVariabes != null && transientVariabes.containsKey(variableName)) {
+        requestedVariables.put(variableName, transientVariabes.get(variableName).getValue());
+        variableNamesToFetch.remove(variableName);
+      } else if (usedVariablesCache.containsKey(variableName)) {
+        requestedVariables.put(variableName, usedVariablesCache.get(variableName).getValue());
+        variableNamesToFetch.remove(variableName);
+      }
+    }
   	
   	if (fetchAllVariables == true) {
   		
@@ -465,7 +513,10 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     // The values in the fetch-cache will be more recent, so they can override any existing ones
     Set<String> variableNamesToFetch = new HashSet<String>(variableNames);
     for (String variableName : variableNames) {
-      if (usedVariablesCache.containsKey(variableName)) {
+      if (transientVariabes != null && transientVariabes.containsKey(variableName)) {
+        requestedVariables.put(variableName, transientVariabes.get(variableName));
+        variableNamesToFetch.remove(variableName);
+      } else if (usedVariablesCache.containsKey(variableName)) {
         requestedVariables.put(variableName, usedVariablesCache.get(variableName));
         variableNamesToFetch.remove(variableName);
       }
@@ -493,8 +544,13 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
   protected abstract List<VariableInstanceEntity> getSpecificVariables(Collection<String> variableNames);
 
   public Set<String> getVariableNamesLocal() {
+    Set<String> variableNames = new HashSet<String>();
+    if (transientVariabes != null) {
+      variableNames.addAll(transientVariabes.keySet());
+    }
     ensureVariableInstancesInitialized();
-    return variableInstances.keySet();
+    variableNames.addAll(variableInstances.keySet());
+    return variableNames;
   }
 
   public Map<String, VariableInstanceEntity> getVariableInstanceEntities() {
@@ -852,6 +908,120 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
       .recordHistoricDetailVariableCreate(variableInstance, sourceActivityExecution, isActivityIdUsedForDetails());
 
     return variableInstance;
+  }
+  
+  /*
+   * Transient variables
+   */
+  
+  public void setTransientVariablesLocal(Map<String, Object> transientVariables) {
+    for (String variableName : transientVariables.keySet()) {
+      setTransientVariableLocal(variableName, transientVariables.get(variableName));
+    }
+  }
+  
+  public void setTransientVariableLocal(String variableName, Object variableValue) {
+    if (transientVariabes == null) {
+      transientVariabes = new HashMap<String, VariableInstance>();
+    }
+    transientVariabes.put(variableName, new TransientVariableInstance(variableName, variableValue));
+  }
+  
+  public void setTransientVariables(Map<String, Object> transientVariables) {
+    for (String variableName : transientVariables.keySet()) {
+      setTransientVariable(variableName, transientVariables.get(variableName));
+    }
+  }
+  
+  public void setTransientVariable(String variableName, Object variableValue) {
+    VariableScopeImpl parentVariableScope = getParentVariableScope();
+    if (parentVariableScope != null) {
+      parentVariableScope.setTransientVariable(variableName, variableValue);
+      return;
+    }
+    setTransientVariableLocal(variableName, variableValue);
+  }
+  
+  public Object getTransientVariableLocal(String variableName) {
+    if (transientVariabes != null) {
+      return transientVariabes.get(variableName).getValue();
+    }
+    return null;
+  }
+  
+  public Map<String, Object> getTransientVariablesLocal() {
+    if (transientVariabes != null) {
+      Map<String, Object> variables = new HashMap<String, Object>();
+      for (String variableName : transientVariabes.keySet()) {
+        variables.put(variableName, transientVariabes.get(variableName).getValue());
+      }
+      return variables;
+    } else {
+      return Collections.emptyMap();
+    }
+  }
+  
+  public Object getTransientVariable(String variableName) {
+    if (transientVariabes != null && transientVariabes.containsKey(variableName)) {
+      return transientVariabes.get(variableName).getValue();
+    }
+    
+    VariableScopeImpl  parentScope = getParentVariableScope();
+    if (parentScope != null) {
+      return parentScope.getTransientVariable(variableName);
+    }
+
+    return null;
+  }
+  
+  public Map<String, Object> getTransientVariables() {
+    return collectTransientVariables(new HashMap<String, Object>());
+  }
+  
+  protected Map<String, Object> collectTransientVariables(HashMap<String, Object> variables) {
+    VariableScopeImpl parentScope = getParentVariableScope();
+    if (parentScope != null) {
+      variables.putAll(parentScope.collectVariables(variables));
+    }
+    
+    if (transientVariabes != null) {
+      for (String variableName : transientVariabes.keySet()) {
+        variables.put(variableName, transientVariabes.get(variableName).getValue());
+      }
+    }
+
+    return variables;
+  }
+  
+  public void removeTransientVariableLocal(String variableName) {
+    if (transientVariabes != null) {
+      transientVariabes.remove(variableName);
+    }
+  }
+  
+  public void removeTransientVariablesLocal() {
+    if (transientVariabes != null) {
+      transientVariabes.clear();
+    }
+  }
+  
+  public void removeTransientVariable(String variableName) {
+    if (transientVariabes != null && transientVariabes.containsKey(variableName)) {
+      removeTransientVariableLocal(variableName);
+      return;
+    }
+    VariableScopeImpl parentVariableScope = getParentVariableScope();
+    if (parentVariableScope != null) {
+      parentVariableScope.removeTransientVariable(variableName);
+    }
+  }
+  
+  public void removeTransientVariables() {
+    removeTransientVariablesLocal();
+    VariableScopeImpl parentVariableScope = getParentVariableScope();
+    if (parentVariableScope != null) {
+      parentVariableScope.removeTransientVariablesLocal();
+    }
   }
 
   

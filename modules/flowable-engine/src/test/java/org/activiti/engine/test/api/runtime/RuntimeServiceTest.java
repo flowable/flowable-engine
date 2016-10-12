@@ -160,8 +160,8 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
     
     // by key, with processInstance name with variables
-    processInstance = processInstanceBuilder.processDefinitionKey("oneTaskProcess").businessKey("456").addVariable("var", "value")
-        .processInstanceName("processName1").start();
+    processInstance = processInstanceBuilder.processDefinitionKey("oneTaskProcess").businessKey("456").variable("var", "value")
+        .name("processName1").start();
     assertNotNull(processInstance);
     assertEquals(2, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
     assertEquals("processName1", processInstance.getName());
@@ -179,7 +179,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
     // by id with variables
     processInstance = processInstanceBuilder.processDefinitionId(processDefinition.getId()).businessKey("101123")
-        .addVariable("var", "value2").start();
+        .variable("var", "value2").start();
     assertNotNull(processInstance);
     assertEquals(4, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
     assertEquals("value2", runtimeService.getVariable(processInstance.getId(), "var"));
@@ -188,7 +188,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
     // by id and processInstance name
     processInstance = processInstanceBuilder.processDefinitionId(processDefinition.getId()).businessKey("101124")
-        .processInstanceName("processName2").start();
+        .name("processName2").start();
     assertNotNull(processInstance);
     assertEquals(5, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
     assertEquals("processName2", processInstance.getName());

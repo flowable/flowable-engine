@@ -33,6 +33,7 @@ public class ExecutionActionRequest extends RestActionRequest {
   protected String signalName;
   protected String messageName;
   protected List<RestVariable> variables;
+  protected List<RestVariable> transientVariables;
   
   public void setVariables(List<RestVariable> variables) {
     this.variables = variables;
@@ -41,6 +42,15 @@ public class ExecutionActionRequest extends RestActionRequest {
   @JsonTypeInfo(use=Id.CLASS, defaultImpl=RestVariable.class)
   public List<RestVariable> getVariables() {
     return variables;
+  }
+  
+  public void setTransientVariables(List<RestVariable> transientVariables) {
+    this.transientVariables = transientVariables;
+  }
+
+  @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
+  public List<RestVariable> getTransientVariables() {
+    return transientVariables;
   }
   
   public String getSignalName() {

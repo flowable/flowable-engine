@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Frederik Heremans
+ * @author Joram Barrez
  */
 @RestController
 public class TaskResource extends TaskBaseResource {
@@ -112,21 +113,35 @@ public class TaskResource extends TaskBaseResource {
   }
 
   protected void completeTask(Task task, TaskActionRequest actionRequest) {
-    if(actionRequest.getVariables() != null) {
-      Map<String, Object> variablesToSet = new HashMap<String, Object>(); 
-      for(RestVariable var : actionRequest.getVariables()) {
-        if(var.getName() == null) {
+    
+    Map<String, Object> variablesToSet = null;
+    Map<String, Object> transientVariablesToSet = null;
+    
+    if (actionRequest.getVariables() != null) {
+      variablesToSet = new HashMap<String, Object>();
+      for (RestVariable var : actionRequest.getVariables()) {
+        if (var.getName() == null) {
           throw new ActivitiIllegalArgumentException("Variable name is required");
         }
-        
+
         Object actualVariableValue = restResponseFactory.getVariableValue(var);
         variablesToSet.put(var.getName(), actualVariableValue);
       }
-      
-      taskService.complete(task.getId(), variablesToSet);
-    } else {
-      taskService.complete(task.getId());
     }
+    
+    if (actionRequest.getTransientVariables() != null) {
+      transientVariablesToSet = new HashMap<String, Object>();
+      for (RestVariable var : actionRequest.getTransientVariables()) {
+        if (var.getName() == null) {
+          throw new ActivitiIllegalArgumentException("Transient variable name is required");
+        }
+
+        Object actualVariableValue = restResponseFactory.getVariableValue(var);
+        transientVariablesToSet.put(var.getName(), actualVariableValue);
+      }
+    }
+    
+    taskService.complete(task.getId(), variablesToSet, transientVariablesToSet);
     
   }
 

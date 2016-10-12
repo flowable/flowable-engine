@@ -995,4 +995,68 @@ public class ExecutionImpl implements
   public String getTenantId() {
     return null; // Not implemented
   }
+  
+  /**
+   * Transient variables: not implemented on ExecutionImpl
+   */
+
+  @Override
+  public void setTransientVariable(String variableName, Object variableValue) {
+    
+  }
+
+  @Override
+  public void setTransientVariableLocal(String variableName, Object variableValue) {
+    
+  }
+
+  @Override
+  public void setTransientVariables(Map<String, Object> transientVariables) {
+    
+  }
+
+  @Override
+  public Object getTransientVariable(String variableName) {
+    return null;
+  }
+
+  @Override
+  public Map<String, Object> getTransientVariables() {
+    return null;
+  }
+
+  @Override
+  public void setTransientVariablesLocal(Map<String, Object> transientVariables) {
+    
+  }
+
+  @Override
+  public Object getTransientVariableLocal(String variableName) {
+    return null;
+  }
+
+  @Override
+  public Map<String, Object> getTransientVariablesLocal() {
+    return null;
+  }
+
+  @Override
+  public void removeTransientVariableLocal(String variableName) {
+    
+  }
+
+  @Override
+  public void removeTransientVariable(String variableName) {
+    
+  }
+
+  @Override
+  public void removeTransientVariables() {
+    
+  }
+
+  @Override
+  public void removeTransientVariablesLocal() {
+    
+  }
 }

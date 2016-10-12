@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 /**
  * @author Frederik Heremans
+ * @author Joram Barrez
  */
 public class TaskActionRequest extends RestActionRequest {
 
@@ -34,6 +35,7 @@ public class TaskActionRequest extends RestActionRequest {
   
   private String assignee;
   private List<RestVariable> variables;
+  private List<RestVariable> transientVariables;
   
   public void setAssignee(String assignee) {
     this.assignee = assignee;
@@ -48,4 +50,13 @@ public class TaskActionRequest extends RestActionRequest {
   public List<RestVariable> getVariables() {
     return variables;
   }
+  public List<RestVariable> getTransientVariables() {
+    return transientVariables;
+  }
+
+  @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
+  public void setTransientVariables(List<RestVariable> transientVariables) {
+    this.transientVariables = transientVariables;
+  }
+  
 }
