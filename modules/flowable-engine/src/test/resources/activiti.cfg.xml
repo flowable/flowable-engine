@@ -20,12 +20,6 @@
 			<bean class="org.activiti.engine.test.impl.logger.ProcessExecutionLoggerConfigurator" />
 		</list>
 	</property> -->
-	
-	<property name="configurators">
-    	<list>
-    		<ref bean="idmEngineConfigurator" /> 
-    	</list>
-    </property>
 
     <!-- job executor configurations -->
     <property name="asyncExecutor" ref="asyncExecutor" />
