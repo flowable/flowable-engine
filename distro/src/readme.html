@@ -18,7 +18,6 @@
 
 <h1>Documentation</h1>
 <ul>
-    <li><a href="docs/userguide/index.html#10minutetutorial">10 Minute Tutorial</a></li>
     <li><a href="docs/userguide/index.html">The User Guide</a></li>
     <li><a href="docs/javadocs/index.html">Javadocs</a></li>
 </ul>
@@ -26,7 +25,7 @@
 <h1>Links</h1>
 <ul>
     <li><a href="http://forum.flowable.org">Flowable Forum</a></li>
-    <li><a href="https://github.com/flowable/flowable">Flowable issues</a></li>
+    <li><a href="https://github.com/flowable/flowable-engine">Flowable issues</a></li>
 </ul>
 
 <h1>Flowable Release Notes</h1>
@@ -39,9 +38,11 @@
 First Flowable release. Except from the different Maven group (org.flowable) and artefact id (flowable-engine etc), there are no differences when compared to a new Activiti version.
 No changes have been made to package names or config file names.
 </li>
-<li>
-Transient variables
-</li> 
+<li>Introduction of transient variables. Transient variables won't be persisted in the Activiti variable tables, but are still available on the execution for the duration of a single transaction.
+Transient variables can for example be used to store a REST response that is only needed to create a request to another REST service, or to use a Java service task result in the next Java service task without it getting persisted.
+You can read more about it <a href="http://www.jorambarrez.be/blog/2016/09/01/how-to-use-transient-variables-in-activiti/">here</a></li> 
+</li>
+<li>Several bug fixes and smaller enhancements</li>
 </ul>
 
 <h3>Release Notes - Activiti - Version 5.21.0</h3>

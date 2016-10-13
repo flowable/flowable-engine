@@ -80,11 +80,11 @@ public class BlueprintBasicTest {
   @Configuration
   public Option[] createConfiguration() {
     Option[] coreBundles = options(
-        mavenBundle().groupId("org.flowable").artifactId("flowable-bpmn-model").version("5.22.0-SNAPSHOT"),
-        mavenBundle().groupId("org.flowable").artifactId("flowable-bpmn-converter").version("5.22.0-SNAPSHOT"),
-        mavenBundle().groupId("org.flowable").artifactId("flowable-process-validation").version("5.22.0-SNAPSHOT"),
-        mavenBundle().groupId("org.flowable").artifactId("flowable-image-generator").version("5.22.0-SNAPSHOT"),
-        mavenBundle().groupId("org.flowable").artifactId("flowable-engine").version("5.22.0-SNAPSHOT"),
+        mavenBundle().groupId("org.flowable").artifactId("flowable-bpmn-model").version("5.22.0"),
+        mavenBundle().groupId("org.flowable").artifactId("flowable-bpmn-converter").version("5.22.0"),
+        mavenBundle().groupId("org.flowable").artifactId("flowable-process-validation").version("5.22.0"),
+        mavenBundle().groupId("org.flowable").artifactId("flowable-image-generator").version("5.22.0"),
+        mavenBundle().groupId("org.flowable").artifactId("flowable-engine").version("5.22.0"),
         mavenBundle().groupId("org.apache.commons").artifactId("commons-lang3").version("3.3.2"),
         mavenBundle().groupId("com.fasterxml.jackson.core").artifactId("jackson-core").version("2.7.5"),
         mavenBundle().groupId("com.fasterxml.jackson.core").artifactId("jackson-databind").version("2.7.5"),
