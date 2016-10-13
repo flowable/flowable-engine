@@ -48,14 +48,6 @@
     </dependency>
   </dependencies>
 
-  <!-- <repositories>
-    <repository>
-      <id>activiti</id>
-      <name>Activiti</name>
-      <url>https://maven.alfresco.com/nexus/content/repositories/activiti/</url>
-    </repository>
-  </repositories> -->
-
   <pluginRepositories>
     <pluginRepository>
       <id>maven2.java.net</id>

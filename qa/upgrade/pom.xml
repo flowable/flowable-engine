@@ -92,19 +92,5 @@
       </dependencies>
     </profile>
   </profiles>
-
-  <repositories>
-    <repository>
-      <id>alfresco.snapshot.repo</id>
-      <url>https://maven.alfresco.com/nexus/content/repositories/activiti-snapshots/</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>alfresco</id>
-      <url>https://maven.alfresco.com/nexus/content/repositories/activiti/</url>
-    </repository>
-  </repositories>
   
 </project>

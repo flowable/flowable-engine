@@ -1052,7 +1052,7 @@
 
   <!-- Various information, not used by the build -->
 
-  <url>http://flowable.github.io</url>
+  <url>http://flowable.org</url>
   <licenses>
     <license>
       <name>Apache v2</name>
@@ -1060,19 +1060,19 @@
     </license>
   </licenses>
   <organization>
-    <name>Alfresco</name>
-    <url>http://www.alfresco.com</url>
+    <name>Flowable</name>
+    <url>http://flowable.org</url>
   </organization>
   <developers>
     <developer>
       <name>Tijs Rademakers</name>
-      <organization>Alfresco</organization>
-      <url>http://www.alfresco.com</url>
+      <organization>Flowable</organization>
+      <url>http://flowable.org</url>
     </developer>
     <developer>
       <name>Joram Barrez</name>
-      <organization>Alfresco</organization>
-      <url>http://www.alfresco.com</url>
+      <organization>Flowable</organization>
+      <url>http://flowable.org</url>
     </developer>
     <developer>
       <name>Frederik Heremans</name>
@@ -1080,29 +1080,9 @@
       <url>http://www.alfresco.com</url>
     </developer>
     <developer>
-      <name>Erik Winlöf</name>
-      <organization>Alfresco</organization>
-      <url>http://www.alfresco.com</url>
-    </developer>
-    <developer>
       <name>Josh Long</name>
       <organization>Pivotal</organization>
       <url>http://www.pivotal.com</url>
-    </developer>
-    <developer>
-      <name>Etienne Studer</name>
-      <organization>Edorasware</organization>
-      <url>http://www.edorasware.com</url>
-    </developer>
-    <developer>
-      <name>José Antonio Álvarez</name>
-      <organization>Edorasware</organization>
-      <url>http://www.edorasware.com</url>
-    </developer>
-    <developer>
-      <name>Guy Brand</name>
-      <organization>Edorasware</organization>
-      <url>http://www.edorasware.com</url>
     </developer>
     <developer>
       <name>Martin Grofcik</name>
@@ -1119,21 +1099,19 @@
     </developer>
     <developer>
       <name>Saeid Mirzaei</name>
-      <organization>Atos worldline</organization>
-      <url>http://www.worldline.com/</url>
     </developer>
   </developers>
   <issueManagement>
-    <system>JIRA</system>
-    <url>https://activiti.atlassian.net</url>
+    <system>Github issues</system>
+    <url>https://github.com/flowable/flowable-engine/issues</url>
   </issueManagement>
   <ciManagement>
     <system>Jenkins</system>
-    <url>http://ec2-54-217-5-246.eu-west-1.compute.amazonaws.com:8080/jenkins</url>
+    <url>http://qa.flowable.org</url>
   </ciManagement>
   <scm>
-    <url>git@github.com:Activiti/Activiti.git</url>
-    <connection>scm:git:git@github.com:Activiti/Activiti.git</connection>
-    <developerConnection>scm:git:git@github.com:Activiti/Activiti.git</developerConnection>
+    <url>git@github.com:flowable/flowable-engine.git</url>
+    <connection>scm:git:git@github.com:flowable/flowable-engine.git</connection>
+    <developerConnection>scm:git:git@github.com:flowable/flowable-engine.git</developerConnection>
   </scm>
 </project>
