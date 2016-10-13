@@ -10,7 +10,7 @@ Homepage: http://flowable.org/
 * a lightning fast, tried and tested BPMN 2 process engine written in Java.  It is Apache 2.0 licensed open source, with a committed community.
 * can run embedded in a Java application, or as a service on a server, a cluster, and in the cloud.  It integrates perfectly with Spring.  With a rich Java and REST API, it is the ideal engine for orchestrating human or system activities.
 
-Flowable issues: https://github.com/flowable/flowable
+Flowable issues: https://github.com/flowable/flowable-engine/issues
 
 Flowable QA: http://qa.flowable.org
 
