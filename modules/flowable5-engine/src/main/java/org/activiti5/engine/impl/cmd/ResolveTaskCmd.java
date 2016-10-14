@@ -21,21 +21,31 @@ import org.activiti5.engine.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Tom Baeyens
+ * @author Joram Barrez
  */
 public class ResolveTaskCmd extends NeedsActiveTaskCmd<Void> {
 
   private static final long serialVersionUID = 1L;
 
   protected Map<String, Object> variables;
+  protected Map<String, Object> transientVariables;
 
   public ResolveTaskCmd(String taskId, Map<String, Object> variables) {
     super(taskId);
     this.variables = variables;
   }
   
+  public ResolveTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {
+    this(taskId, variables);
+    this.transientVariables = transientVariables;
+  }
+  
   protected Void execute(CommandContext commandContext, TaskEntity task) {
     if (variables != null) {
       task.setVariables(variables);
+    }
+    if (transientVariables != null) {
+      task.setTransientVariables(transientVariables);
     }
     task.resolve();
     return null;

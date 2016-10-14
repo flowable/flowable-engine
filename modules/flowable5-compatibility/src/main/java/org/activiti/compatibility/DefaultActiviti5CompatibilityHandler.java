@@ -72,6 +72,7 @@ import org.activiti5.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti5.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti5.engine.impl.scripting.ScriptingEngines;
 import org.activiti5.engine.repository.DeploymentBuilder;
+import org.activiti5.engine.runtime.ProcessInstanceBuilder;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -312,25 +313,36 @@ public class DefaultActiviti5CompatibilityHandler implements Activiti5Compatibil
   }
   
   public ProcessInstance startProcessInstance(String processDefinitionKey, String processDefinitionId, 
-      Map<String, Object> variables, String businessKey, String tenantId, String processInstanceName) {
+      Map<String, Object> variables, Map<String, Object> transientVariables, String businessKey, String tenantId, String processInstanceName) {
     
     org.activiti5.engine.impl.identity.Authentication.setAuthenticatedUserId(Authentication.getAuthenticatedUserId());
     
     try {
-      org.activiti5.engine.runtime.ProcessInstance activiti5ProcessInstance = null;
-      if (tenantId != null) { 
-        activiti5ProcessInstance = getProcessEngine().getRuntimeService()
-            .startProcessInstanceByKeyAndTenantId(processDefinitionKey, businessKey, variables, tenantId);
-      } else {
-        activiti5ProcessInstance = getProcessEngine().getRuntimeService()
-            .startProcessInstanceByKey(processDefinitionKey, businessKey, variables);
+        
+      ProcessInstanceBuilder processInstanceBuilder = getProcessEngine().getRuntimeService().createProcessInstanceBuilder();
+      if (processDefinitionKey != null) {
+          processInstanceBuilder.processDefinitionKey(processDefinitionKey);
       }
-      
+      if (processDefinitionId != null) {
+          processInstanceBuilder.processDefinitionId(processDefinitionId);
+      }
+      if (variables != null) {
+          processInstanceBuilder.variables(variables);
+      }
+      if (transientVariables != null) {
+          processInstanceBuilder.transientVariables(transientVariables);
+      }
+      if (businessKey != null) {
+          processInstanceBuilder.businessKey(businessKey);
+      }
+      if (tenantId != null) {
+          processInstanceBuilder.tenantId(tenantId);
+      }
       if (processInstanceName != null) {
-        getProcessEngine().getRuntimeService().setProcessInstanceName(activiti5ProcessInstance.getId(), processInstanceName);
-        ((ExecutionEntity) activiti5ProcessInstance).setName(processInstanceName);
+          processInstanceBuilder.name(processInstanceName);
       }
       
+      org.activiti5.engine.runtime.ProcessInstance activiti5ProcessInstance = processInstanceBuilder.start();
       return new Activiti5ProcessInstanceWrapper(activiti5ProcessInstance);
       
     } catch (org.activiti5.engine.ActivitiException e) {
@@ -339,18 +351,29 @@ public class DefaultActiviti5CompatibilityHandler implements Activiti5Compatibil
     }
   }
   
-  public ProcessInstance startProcessInstanceByMessage(String messageName, Map<String, Object> variables, String businessKey, String tenantId) {
+  public ProcessInstance startProcessInstanceByMessage(String messageName, Map<String, Object> variables, 
+          Map<String, Object> transientVariables, String businessKey, String tenantId) {
     
     try {
-      org.activiti5.engine.runtime.ProcessInstance activiti5ProcessInstance = null;
-      if (tenantId != null) { 
-        activiti5ProcessInstance = getProcessEngine().getRuntimeService()
-            .startProcessInstanceByMessageAndTenantId(messageName, businessKey, variables, tenantId);
-      } else {
-        activiti5ProcessInstance = getProcessEngine().getRuntimeService()
-            .startProcessInstanceByMessage(messageName, businessKey, variables);
+        
+      ProcessInstanceBuilder processInstanceBuilder = getProcessEngine().getRuntimeService().createProcessInstanceBuilder();
+      if (messageName != null) {
+          processInstanceBuilder.messageName(messageName);
+      }
+      if (variables != null) {
+          processInstanceBuilder.variables(variables);
+      }
+      if (transientVariables != null) {
+          processInstanceBuilder.transientVariables(transientVariables);
+      }
+      if (businessKey != null) {
+          processInstanceBuilder.businessKey(businessKey);
+      }
+      if (tenantId != null) {
+          processInstanceBuilder.tenantId(tenantId);
       }
       
+      org.activiti5.engine.runtime.ProcessInstance activiti5ProcessInstance = processInstanceBuilder.start(); 
       return new Activiti5ProcessInstanceWrapper(activiti5ProcessInstance);
       
     } catch (org.activiti5.engine.ActivitiException e) {
@@ -507,6 +530,16 @@ public class DefaultActiviti5CompatibilityHandler implements Activiti5Compatibil
       handleActivitiException(e);
     }
   }
+  
+  @Override
+    public void completeTask(TaskEntity taskEntity, Map<String, Object> variables, Map<String, Object> transientVariables) {
+      org.activiti5.engine.impl.identity.Authentication.setAuthenticatedUserId(Authentication.getAuthenticatedUserId());
+      try {
+        getProcessEngine().getTaskService().complete(taskEntity.getId(), variables, transientVariables);
+      } catch (org.activiti5.engine.ActivitiException e) {
+        handleActivitiException(e);
+      }
+    }
   
   public void claimTask(String taskId, String userId) {
     org.activiti5.engine.impl.identity.Authentication.setAuthenticatedUserId(Authentication.getAuthenticatedUserId());
@@ -720,9 +753,13 @@ public class DefaultActiviti5CompatibilityHandler implements Activiti5Compatibil
     }
   }
   
-  public void trigger(String executionId, Map<String, Object> processVariables) {
+  public void trigger(String executionId, Map<String, Object> processVariables, Map<String, Object> transientVariables) {
     try {
-      getProcessEngine().getRuntimeService().signal(executionId, processVariables);
+        if (transientVariables == null) {
+            getProcessEngine().getRuntimeService().signal(executionId, processVariables);
+        } else {
+            getProcessEngine().getRuntimeService().signal(executionId, processVariables, transientVariables);;
+        }
     } catch (org.activiti5.engine.ActivitiException e) {
       handleActivitiException(e);
     }

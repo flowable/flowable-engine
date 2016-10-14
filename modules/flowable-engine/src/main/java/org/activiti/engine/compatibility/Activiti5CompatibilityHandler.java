@@ -79,9 +79,10 @@ public interface Activiti5CompatibilityHandler {
   
   void deleteDeployment(String deploymentId, boolean cascade);
   
-  ProcessInstance startProcessInstance(String processDefinitionKey, String processDefinitionId, Map<String, Object> variables, String businessKey, String tenantId, String processInstanceName);
+  ProcessInstance startProcessInstance(String processDefinitionKey, String processDefinitionId, Map<String, Object> variables, Map<String, Object> transientVariables,
+          String businessKey, String tenantId, String processInstanceName);
   
-  ProcessInstance startProcessInstanceByMessage(String messageName, Map<String, Object> variables, String businessKey, String tenantId);
+  ProcessInstance startProcessInstanceByMessage(String messageName, Map<String, Object> variables, Map<String, Object> transientVariables, String businessKey, String tenantId);
   
   Object getExecutionVariable(String executionId, String variableName, boolean isLocal);
   
@@ -110,6 +111,8 @@ public interface Activiti5CompatibilityHandler {
   void deleteHistoricProcessInstance(String processInstanceId);
   
   void completeTask(TaskEntity taskEntity, Map<String, Object> variables, boolean localScope);
+  
+  void completeTask(TaskEntity taskEntity, Map<String, Object> variables, Map<String, Object> transientVariables);
   
   void claimTask(String taskId, String userId);
   
@@ -151,7 +154,7 @@ public interface Activiti5CompatibilityHandler {
   
   void deleteAttachment(String attachmentId);
   
-  void trigger(String executionId, Map<String, Object> processVariables);
+  void trigger(String executionId, Map<String, Object> processVariables, Map<String, Object> transientVariables);
   
   void messageEventReceived(String messageName, String executionId, Map<String, Object> processVariables, boolean async);
   

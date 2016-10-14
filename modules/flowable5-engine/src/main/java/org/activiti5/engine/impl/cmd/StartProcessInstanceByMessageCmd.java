@@ -26,6 +26,7 @@ import org.activiti5.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti5.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.activiti5.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
+import org.activiti5.engine.impl.runtime.ProcessInstanceBuilderImpl;
 import org.activiti5.engine.runtime.ProcessInstance;
 
 
@@ -39,6 +40,7 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
   protected final String messageName;
   protected final String businessKey;
   protected final Map<String, Object> processVariables;
+  protected Map<String, Object> transientVariables;
   protected final String tenantId;
 
   public StartProcessInstanceByMessageCmd(String messageName, String businessKey, Map<String, Object> processVariables, String tenantId) {
@@ -46,6 +48,14 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
     this.businessKey = businessKey;
     this.processVariables = processVariables;
     this.tenantId = tenantId;
+  }
+  
+  public StartProcessInstanceByMessageCmd(ProcessInstanceBuilderImpl processInstanceBuilder) {
+    this.messageName = processInstanceBuilder.getMessageName();
+    this.businessKey = processInstanceBuilder.getBusinessKey();
+    this.processVariables = processInstanceBuilder.getVariables();
+    this.transientVariables = processInstanceBuilder.getTransientVariables();
+    this.tenantId = processInstanceBuilder.getTenantId();
   }
 
   public ProcessInstance execute(CommandContext commandContext) {
@@ -86,6 +96,9 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
 
     if (processVariables != null) {
       processInstance.setVariables(processVariables);
+    }
+    if (transientVariables != null) {
+      processInstance.setTransientVariables(transientVariables);
     }
     
     processInstance.start();

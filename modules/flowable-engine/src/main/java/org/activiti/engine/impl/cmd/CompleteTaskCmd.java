@@ -49,7 +49,12 @@ public class CompleteTaskCmd extends AbstractCompleteTaskCmd {
     if (task.getProcessDefinitionId() != null) {
       if (Activiti5Util.isActiviti5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
         Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
-        activiti5CompatibilityHandler.completeTask(task, variables, localScope);
+        
+        if (transientVariables == null) {
+            activiti5CompatibilityHandler.completeTask(task, variables, localScope);
+        } else {
+            activiti5CompatibilityHandler.completeTask(task, variables, transientVariables);
+        }
         return null;
       }
     }
