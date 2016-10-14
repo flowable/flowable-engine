@@ -1,14 +1,13 @@
 = Activiti Migraton Guide : Activiti v5 to Activiti v6
-v  6.0.0.RC1-SNAPSHOT
 :doctype: book
-:toc: left
-:toclevels: 5
+:docinfo1: header
 :icons: font
 :numbered:
 :source-highlighter: pygments
 :pygments-css: class
 :pygments-linenums-mode: table
 :compat-mode:
+:nofooter:
 
 == Introduction
 
@@ -63,13 +62,13 @@ ProcessDefinitionUtil.getProcess(String processDefinitionId);
 
 We removed ActivityExecution and replaced it where used with the DelegateExecution class.
 
-All methods from the ActivityExecution class are copied to the DelegateExecution class. 
+All methods from the ActivityExecution class are copied to the DelegateExecution class.
 
 === Job, timer, suspended and dead letter jobs
 
 Activiti 5 had only 1 job table and this meant that a fairly complex query had to be executed to get the jobs that needed to be executed from the database.
 
-With Activiti 6, the jobs have been split up in a job (ACT_RU_JOB), timer (ACT_RU_TIMER_JOB), suspended (ACT_RU_SUSPENDED_JOB), and (ACT_RU_DEADLETTER_JOB) dead letter table. 
+With Activiti 6, the jobs have been split up in a job (ACT_RU_JOB), timer (ACT_RU_TIMER_JOB), suspended (ACT_RU_SUSPENDED_JOB), and (ACT_RU_DEADLETTER_JOB) dead letter table.
 Jobs in the job table can be directly executed (like asynchronous jobs and due timer jobs). So there's no need for a complex query anymore, the only where clause is a lock time column that should be NULL.
 Timer jobs are now persisted in a dedicated timer jobs table and there's a Runnable that checks for timer jobs due to execute. When a timer job is due to be executed, the job will be moved to the job table.
 When the job executor Runnable is ready to execute the job it will be fetched from the job table and executed.

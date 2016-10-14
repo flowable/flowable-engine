@@ -1,21 +1,23 @@
 
+[[restApiChapter]]
+
 == REST API
 
-=== General Activiti REST principles
+=== General Flowable REST principles
 
 ==== Installation and Authentication
 
-Activiti includes a REST API to the Activiti Engine that can be installed by deploying the activiti-rest.war file to a servlet container like Apache Tomcat. However, it can also be used in another web-application by including the servlet and it's mapping in your application and add all activiti-rest dependencies to the classpath.
+Flowable includes a REST API to the Flowable Engine that can be installed by deploying the flowable-rest.war file to a servlet container like Apache Tomcat. However, it can also be used in another web-application by including the servlet and it's mapping in your application and add all flowable-rest dependencies to the classpath.
 
-By default the Activiti Engine will connect to an in-memory H2 database. You can change the database settings in the db.properties file in the WEB-INF/classes folder. The REST API uses JSON format (http://www.json.org) and is built upon the Spring MVC (http://docs.spring.io/spring/docs/current/spring-framework-reference/html/mvc.html).
+By default the Flowable Engine will connect to an in-memory H2 database. You can change the database settings in the db.properties file in the WEB-INF/classes folder. The REST API uses JSON format (http://www.json.org) and is built upon the Spring MVC (http://docs.spring.io/spring/docs/current/spring-framework-reference/html/mvc.html).
 
-All REST-resources require a valid Activiti-user to be authenticated by default. Basic HTTP access authentication is used, so you should always include a +Authorization: Basic ...==+ HTTP-header when performing requests or include the username and password in the request-url (e.g. ++http://username:password@localhost...++).
+All REST-resources require a valid Flowable-user to be authenticated by default. Basic HTTP access authentication is used, so you should always include a _Authorization: Basic ...==_ HTTP-header when performing requests or include the username and password in the request-url (e.g. _http://username:password@localhost:8080/xyz_).
 
 *It's recommended to use Basic Authentication in combination with HTTPS.*
 
 ==== Configuration
 
-The Activiti REST web application is using Spring Java Configuration for starting the Activiti Engine, defining the basic authentication security using Spring security and to define the variable converters for specific variable handling.
+The Flowable REST web application is using Spring Java Configuration for starting the Flowable Engine, defining the basic authentication security using Spring security and to define the variable converters for specific variable handling.
 A small amount of properties can be defined by changing the engine.properties file you can find in the WEB-INF/classes folder.
 If you need more advanced configuration options there's the possibility to override the default Spring beans in XML in the activiti-custom-context.xml file you can also find in the WEB-INF/classes folder.
 An example configuration is already in comments in this file. This is also the place to override the default RestResponseFactory by defining a new Spring bean with the name restResponsefactory and use your custom implementation class for it.
@@ -27,7 +29,9 @@ An example configuration is already in comments in this file. This is also the p
 
 Due to link:$$http://tomcat.apache.org/tomcat-7.0-doc/security-howto.html$$[ default security properties on Tomcat], *escaped forward slashes (++%2F++ and ++%5C++) are not allowed by default (400-result is returned).* This may have an impact on the deployment resources and their data-URL, as the URL can potentially contain escaped forward slashes.
 
-*When issues are experienced with unexpected 400-results, set the following system-property: +$$-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true.$$+*
+When issues are experienced with unexpected 400-results, set the following system-property:
+
+_-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true_
 
 It's a best practice to always set the *Accept* and *Content-Type* (in case of posting/putting JSON) headers to *application/json* on the HTTP requests described below.
 
@@ -89,7 +93,7 @@ Parameters that are part of the url (e.g. the deploymentId parameter in ++http:/
 
 ===== Rest URL query parameters
 
-Parameters added as query-string in the URL (e.g. the name parameter used in ++http://host/activiti-rest/service/deployments?name=Deployment++) can have the following types and are mentioned in the corresponding REST-API documentation:
+Parameters added as query-string in the URL (e.g. the name parameter used in ++http://host/flowable-rest/service/deployments?name=Deployment++) can have the following types and are mentioned in the corresponding REST-API documentation:
 
 .URL query parameter types
 [options="header"]
@@ -126,7 +130,7 @@ Parameters added as query-string in the URL (e.g. the name parameter used in ++h
 
 ===== Paging and sorting
 
-Paging and order parameters can be added as query-string in the URL (e.g. the name parameter used in ++http://host/activiti-rest/service/deployments?sort=name++).
+Paging and order parameters can be added as query-string in the URL (e.g. the name parameter used in ++http://host/flowable-rest/service/deployments?sort=name++).
 
 .Variable query JSON parameters
 [options="header"]
@@ -276,7 +280,7 @@ GET repository/deployments
   "data": [
     {
       "id": "10",
-      "name": "activiti-examples.bar",
+      "name": "flowable-examples.bar",
       "deploymentTime": "2010-10-13T14:54:26.750+02:00",
       "category": "examples",
       "url": "http://localhost:8081/service/repository/deployments/10",
@@ -321,7 +325,7 @@ GET repository/deployments/{deploymentId}
 ----
 {
   "id": "10",
-  "name": "activiti-examples.bar",
+  "name": "flowable-examples.bar",
   "deploymentTime": "2010-10-13T14:54:26.750+02:00",
   "category": "examples",
   "url": "http://localhost:8081/service/repository/deployments/10",
@@ -357,7 +361,7 @@ An additional parameter (form-field) can be passed in the request body with name
 ----
 {
   "id": "10",
-  "name": "activiti-examples.bar",
+  "name": "flowable-examples.bar",
   "deploymentTime": "2010-10-13T14:54:26.750+02:00",
   "category": null,
   "url": "http://localhost:8081/service/repository/deployments/10",
@@ -420,15 +424,15 @@ GET repository/deployments/{deploymentId}/resources
 [
   {
     "id": "diagrams/my-process.bpmn20.xml",
-    "url": "http://localhost:8081/activiti-rest/service/repository/deployments/10/resources/diagrams%2Fmy-process.bpmn20.xml",
-    "dataUrl": "http://localhost:8081/activiti-rest/service/repository/deployments/10/resourcedata/diagrams%2Fmy-process.bpmn20.xml",
+    "url": "http://localhost:8081/flowable-rest/service/repository/deployments/10/resources/diagrams%2Fmy-process.bpmn20.xml",
+    "dataUrl": "http://localhost:8081/flowable-rest/service/repository/deployments/10/resourcedata/diagrams%2Fmy-process.bpmn20.xml",
     "mediaType": "text/xml",
     "type": "processDefinition"
   },
   {
     "id": "image.png",
-    "url": "http://localhost:8081/activiti-rest/service/repository/deployments/10/resources/image.png",
-    "dataUrl": "http://localhost:8081/activiti-rest/service/repository/deployments/10/resourcedata/image.png",
+    "url": "http://localhost:8081/flowable-rest/service/repository/deployments/10/resources/image.png",
+    "dataUrl": "http://localhost:8081/flowable-rest/service/repository/deployments/10/resourcedata/image.png",
     "mediaType": "image/png",
     "type": "resource"
   }
@@ -477,8 +481,8 @@ GET repository/deployments/{deploymentId}/resources/{resourceId}
 ----
 {
   "id": "diagrams/my-process.bpmn20.xml",
-  "url": "http://localhost:8081/activiti-rest/service/repository/deployments/10/resources/diagrams%2Fmy-process.bpmn20.xml",
-  "dataUrl": "http://localhost:8081/activiti-rest/service/repository/deployments/10/resourcedata/diagrams%2Fmy-process.bpmn20.xml",
+  "url": "http://localhost:8081/flowable-rest/service/repository/deployments/10/resources/diagrams%2Fmy-process.bpmn20.xml",
+  "dataUrl": "http://localhost:8081/flowable-rest/service/repository/deployments/10/resourcedata/diagrams%2Fmy-process.bpmn20.xml",
   "mediaType": "text/xml",
   "type": "processDefinition"
 }
@@ -2206,7 +2210,7 @@ The request should be of type +multipart/form-data+. There should be a single fi
 |400|Indicates the name of the variable to create was missing. Status message provides additional information.
 |404|Indicates the requested process instance was not found.
 |409|Indicates the process instance already has a variable with the given name. Use the PUT method to update the task variable instead.
-|415|Indicates the serializable data contains an object for which no class is present in the JVM running the Activiti engine and therefore cannot be deserialized.
+|415|Indicates the serializable data contains an object for which no class is present in the JVM running the Flowable engine and therefore cannot be deserialized.
 
 |===============
 
@@ -2254,7 +2258,7 @@ The request should be of type +multipart/form-data+. There should be a single fi
 |200|Indicates the variable was updated and the result is returned.
 |400|Indicates the name of the variable to update was missing. Status message provides additional information.
 |404|Indicates the requested process instance was not found or the process instance does not have a variable with the given name.
-|415|Indicates the serializable data contains an object for which no class is present in the JVM running the Activiti engine and therefore cannot be deserialized.
+|415|Indicates the serializable data contains an object for which no class is present in the JVM running the Flowable engine and therefore cannot be deserialized.
 
 |===============
 
@@ -2887,7 +2891,7 @@ The request should be of type +multipart/form-data+. There should be a single fi
 |400|Indicates the name of the variable to create was missing. Status message provides additional information.
 |404|Indicates the requested execution was not found.
 |409|Indicates the execution already has a variable with the given name. Use the PUT method to update the task variable instead.
-|415|Indicates the serializable data contains an object for which no class is present in the JVM running the Activiti engine and therefore cannot be deserialized.
+|415|Indicates the serializable data contains an object for which no class is present in the JVM running the Flowable engine and therefore cannot be deserialized.
 
 |===============
 
@@ -2938,7 +2942,7 @@ The request should be of type +multipart/form-data+. There should be a single fi
 |200|Indicates the variable was updated and the result is returned.
 |400|Indicates the name of the variable to update was missing. Status message provides additional information.
 |404|Indicates the requested execution was not found or the execution does not have a variable with the given name.
-|415|Indicates the serializable data contains an object for which no class is present in the JVM running the Activiti engine and therefore cannot be deserialized.
+|415|Indicates the serializable data contains an object for which no class is present in the JVM running the Flowable engine and therefore cannot be deserialized.
 
 |===============
 
@@ -3600,7 +3604,7 @@ The request should be of type +multipart/form-data+. There should be a single fi
 |400|Indicates the name of the variable to create was missing or that an attempt is done to create a variable on a standalone task (without a process associated) with scope +global+. Status message provides additional information.
 |404|Indicates the requested task was not found.
 |409|Indicates the task already has a variable with the given name. Use the PUT method to update the task variable instead.
-|415|Indicates the serializable data contains an object for which no class is present in the JVM running the Activiti engine and therefore cannot be deserialized.
+|415|Indicates the serializable data contains an object for which no class is present in the JVM running the Flowable engine and therefore cannot be deserialized.
 
 |===============
 
@@ -3718,7 +3722,7 @@ The request should be of type +multipart/form-data+. There should be a single fi
 |200|Indicates the variable was updated and the result is returned.
 |400|Indicates the name of the variable to update was missing or that an attempt is done to update a variable on a standalone task (without a process associated) with scope +global+. Status message provides additional information.
 |404|Indicates the requested task was not found or the variable to update doesn't exist for the given task in the given scope.
-|415|Indicates the serializable data contains an object for which no class is present in the JVM running the Activiti engine and therefore cannot be deserialized.
+|415|Indicates the serializable data contains an object for which no class is present in the JVM running the Flowable engine and therefore cannot be deserialized.
 
 |===============
 
@@ -3815,13 +3819,13 @@ GET runtime/tasks/{taskId}/identitylinks
     "userId" : "kermit",
     "groupId" : null,
     "type" : "candidate",
-    "url" : "http://localhost:8081/activiti-rest/service/runtime/tasks/100/identitylinks/users/kermit/candidate"
+    "url" : "http://localhost:8081/flowable-rest/service/runtime/tasks/100/identitylinks/users/kermit/candidate"
   },
   {
     "userId" : null,
     "groupId" : "sales",
     "type" : "candidate",
-    "url" : "http://localhost:8081/activiti-rest/service/runtime/tasks/100/identitylinks/groups/sales/candidate"
+    "url" : "http://localhost:8081/flowable-rest/service/runtime/tasks/100/identitylinks/groups/sales/candidate"
   },
 
   ...
@@ -3880,7 +3884,7 @@ GET runtime/tasks/{taskId}/identitylinks/{family}/{identityId}/{type}
   "userId" : null,
   "groupId" : "sales",
   "type" : "candidate",
-  "url" : "http://localhost:8081/activiti-rest/service/runtime/tasks/100/identitylinks/groups/sales/candidate"
+  "url" : "http://localhost:8081/flowable-rest/service/runtime/tasks/100/identitylinks/groups/sales/candidate"
 }
 ----
 
@@ -3943,7 +3947,7 @@ POST runtime/tasks/{taskId}/identitylinks
   "userId" : null,
   "groupId" : "sales",
   "type" : "candidate",
-  "url" : "http://localhost:8081/activiti-rest/service/runtime/tasks/100/identitylinks/groups/sales/candidate"
+  "url" : "http://localhost:8081/flowable-rest/service/runtime/tasks/100/identitylinks/groups/sales/candidate"
 }
 ----
 
@@ -4013,8 +4017,8 @@ Parameter +saveProcessInstanceId+ is optional, if +true+ save process instance i
 ----
 {
   "id" : "123",
-  "taskUrl" : "http://localhost:8081/activiti-rest/service/runtime/tasks/101/comments/123",
-  "processInstanceUrl" : "http://localhost:8081/activiti-rest/service/history/historic-process-instances/100/comments/123",
+  "taskUrl" : "http://localhost:8081/flowable-rest/service/runtime/tasks/101/comments/123",
+  "processInstanceUrl" : "http://localhost:8081/flowable-rest/service/history/historic-process-instances/100/comments/123",
   "message" : "This is a comment on the task.",
   "author" : "kermit",
   "time" : "2014-07-13T13:13:52.232+08:00"
@@ -4057,8 +4061,8 @@ GET runtime/tasks/{taskId}/comments
 [
   {
     "id" : "123",
-    "taskUrl" : "http://localhost:8081/activiti-rest/service/runtime/tasks/101/comments/123",
-    "processInstanceUrl" : "http://localhost:8081/activiti-rest/service/history/historic-process-instances/100/comments/123",
+    "taskUrl" : "http://localhost:8081/flowable-rest/service/runtime/tasks/101/comments/123",
+    "processInstanceUrl" : "http://localhost:8081/flowable-rest/service/history/historic-process-instances/100/comments/123",
     "message" : "This is a comment on the task.",
     "author" : "kermit"
     "time" : "2014-07-13T13:13:52.232+08:00"
@@ -4067,8 +4071,8 @@ GET runtime/tasks/{taskId}/comments
   },
   {
     "id" : "456",
-    "taskUrl" : "http://localhost:8081/activiti-rest/service/runtime/tasks/101/comments/456",
-    "processInstanceUrl" : "http://localhost:8081/activiti-rest/service/history/historic-process-instances/100/comments/456",
+    "taskUrl" : "http://localhost:8081/flowable-rest/service/runtime/tasks/101/comments/456",
+    "processInstanceUrl" : "http://localhost:8081/flowable-rest/service/history/historic-process-instances/100/comments/456",
     "message" : "This is another comment on the task.",
     "author" : "gonzo",
     "time" : "2014-07-13T13:13:52.232+08:00"
@@ -4113,8 +4117,8 @@ GET runtime/tasks/{taskId}/comments/{commentId}
 ----
 {
   "id" : "123",
-  "taskUrl" : "http://localhost:8081/activiti-rest/service/runtime/tasks/101/comments/123",
-  "processInstanceUrl" : "http://localhost:8081/activiti-rest/service/history/historic-process-instances/100/comments/123",
+  "taskUrl" : "http://localhost:8081/flowable-rest/service/runtime/tasks/101/comments/123",
+  "processInstanceUrl" : "http://localhost:8081/flowable-rest/service/history/historic-process-instances/100/comments/123",
   "message" : "This is a comment on the task.",
   "author" : "kermit",
   "time" : "2014-07-13T13:13:52.232+08:00"
@@ -4271,7 +4275,7 @@ POST runtime/tasks/{taskId}/attachments
   "name":"Simple attachment",
   "description":"Simple attachment description",
   "type":"simpleType",
-  "externalUrl":"http://activiti.org"
+  "externalUrl":"http://flowable.org"
 }
 ----
 
@@ -4292,7 +4296,7 @@ Only the attachment name is required to create a new attachment.
   "type":"simpleType",
   "taskUrl":"http://localhost:8182/runtime/tasks/2",
   "processInstanceUrl":null,
-  "externalUrl":"http://activiti.org",
+  "externalUrl":"http://flowable.org",
   "contentUrl":null
 }
 ----
@@ -4391,7 +4395,7 @@ GET runtime/tasks/{taskId}/attachments
     "type":"simpleType",
     "taskUrl":"http://localhost:8182/runtime/tasks/2",
     "processInstanceUrl":null,
-    "externalUrl":"http://activiti.org",
+    "externalUrl":"http://flowable.org",
     "contentUrl":null
   },
   {
@@ -4455,7 +4459,7 @@ GET runtime/tasks/{taskId}/attachments/{attachmentId}
 ----
 
 
-*  ++externalUrl - contentUrl:++In case the attachment is a link to an external resource, the +externalUrl+ contains the URL to the external content. If the attachment content is present in the Activiti engine, the +contentUrl+ will contain an URL where the binary content can be streamed from.
+*  ++externalUrl - contentUrl:++In case the attachment is a link to an external resource, the +externalUrl+ contains the URL to the external content. If the attachment content is present in the Flowable engine, the +contentUrl+ will contain an URL where the binary content can be streamed from.
 *  ++type:++Can be any arbitrary value. When a valid formatted media-type (e.g. application/xml, text/plain) is included, the binary content HTTP response content-type will be set the the given value.
 
 .Get an attachment on a task - Response codes
@@ -4481,7 +4485,7 @@ GET runtime/tasks/{taskId}/attachment/{attachmentId}/content
 |===============
 |Parameter|Required|Value|Description
 |taskId|Yes|String|The id of the task to get a variable data for.
-|attachmentId|Yes|String|The id of the attachment, a +404+ is returned when the attachment points to an external URL rather than content attached in Activiti.
+|attachmentId|Yes|String|The id of the attachment, a +404+ is returned when the attachment points to an external URL rather than content attached in Flowable.
 
 |===============
 
@@ -4851,8 +4855,8 @@ Parameter +saveProcessInstanceId+ is optional, if +true+ save process instance i
 ----
 {
   "id" : "123",
-  "taskUrl" : "http://localhost:8081/activiti-rest/service/runtime/tasks/101/comments/123",
-  "processInstanceUrl" : "http://localhost:8081/activiti-rest/service/history/historic-process-instances/100/comments/123",
+  "taskUrl" : "http://localhost:8081/flowable-rest/service/runtime/tasks/101/comments/123",
+  "processInstanceUrl" : "http://localhost:8081/flowable-rest/service/history/historic-process-instances/100/comments/123",
   "message" : "This is a comment on the task.",
   "author" : "kermit",
   "time" : "2014-07-13T13:13:52.232+08:00",
@@ -4897,7 +4901,7 @@ GET history/historic-process-instances/{processInstanceId}/comments
 [
   {
     "id" : "123",
-    "processInstanceUrl" : "http://localhost:8081/activiti-rest/service/history/historic-process-instances/100/comments/123",
+    "processInstanceUrl" : "http://localhost:8081/flowable-rest/service/history/historic-process-instances/100/comments/123",
     "message" : "This is a comment on the task.",
     "author" : "kermit",
     "time" : "2014-07-13T13:13:52.232+08:00",
@@ -4905,7 +4909,7 @@ GET history/historic-process-instances/{processInstanceId}/comments
   },
   {
     "id" : "456",
-    "processInstanceUrl" : "http://localhost:8081/activiti-rest/service/history/historic-process-instances/100/comments/456",
+    "processInstanceUrl" : "http://localhost:8081/flowable-rest/service/history/historic-process-instances/100/comments/456",
     "message" : "This is another comment.",
     "author" : "gonzo",
     "time" : "2014-07-14T15:16:52.232+08:00",
@@ -4948,7 +4952,7 @@ GET history/historic-process-instances/{processInstanceId}/comments/{commentId}
 ----
 {
   "id" : "123",
-  "processInstanceUrl" : "http://localhost:8081/activiti-rest/service/history/historic-process-instances/100/comments/456",
+  "processInstanceUrl" : "http://localhost:8081/flowable-rest/service/history/historic-process-instances/100/comments/456",
   "message" : "This is another comment.",
   "author" : "gonzo",
   "time" : "2014-07-14T15:16:52.232+08:00",
@@ -6476,7 +6480,7 @@ GET identity/users/{userId}
    "firstName":"Fred",
    "lastName":"McDonald",
    "url":"http://localhost:8182/identity/users/testuser",
-   "email":"no-reply@activiti.org"
+   "email":"no-reply@flowable.org"
 }
 ----
 
@@ -6529,7 +6533,7 @@ GET identity/users
          "firstName":"Tijs",
          "lastName":"Barrez",
          "url":"http://localhost:8182/identity/users/anotherUser",
-         "email":"no-reply@alfresco.org"
+         "email":"no-reply@flowable.org"
       },
       {
          "id":"kermit",
@@ -6543,7 +6547,7 @@ GET identity/users
          "firstName":"Fred",
          "lastName":"McDonald",
          "url":"http://localhost:8182/identity/users/testuser",
-         "email":"no-reply@activiti.org"
+         "email":"no-reply@flowable.org"
       }
    ],
    "total":3,
@@ -6578,7 +6582,7 @@ PUT identity/users/{userId}
 {
   "firstName":"Tijs",
   "lastName":"Barrez",
-  "email":"no-reply@alfresco.org",
+  "email":"no-reply@flowable.org",
   "password":"pass123"
 }
 ----
@@ -6613,7 +6617,7 @@ POST identity/users
   "id":"tijs",
   "firstName":"Tijs",
   "lastName":"Barrez",
-  "email":"no-reply@alfresco.org",
+  "email":"no-reply@flowable.org",
   "password":"pass123"
 }
 ----

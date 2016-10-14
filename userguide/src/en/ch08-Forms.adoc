@@ -2,7 +2,7 @@
 
 == Forms
 
-Activiti provides a convenient and flexible way to add forms for the manual steps of  your business processes.  We support two strategies to work with forms: Build-in form rendering with form properties and external form rendering.
+Flowable provides a convenient and flexible way to add forms for the manual steps of your business processes.  We support two strategies to work with forms: Build-in form rendering with form properties and external form rendering.
 
 
 [[formProperties]]
@@ -10,11 +10,11 @@ Activiti provides a convenient and flexible way to add forms for the manual step
 
 === Form properties
 
-All information relevant to a business process is either included in the process  variables themselves or referenced through the process variables.  Activiti supports complex Java objects to be stored as process variables like +Serializable+ objects, JPA entities or whole XML documents as ++String++s.
+All information relevant to a business process is either included in the process  variables themselves or referenced through the process variables.  Flowable supports complex Java objects to be stored as process variables like +Serializable+ objects, JPA entities or whole XML documents as ++String++s.
 
 Starting a process and completing user tasks is where people are involved into a process. Communicating with people requires forms to be rendered in some UI technology.  In order to facilitate multiple UI technologies easy, the process definition can include the logic of transforming of the complex Java typed objects in the process variables to a +Map<String,String>+ of *'properties'*.
 
-Any UI technology can then build a form on top of those properties, using the Activiti API methods that expose the property information. The properties can provide a dedicated (and more limited) view on the process variables. The properties needed to display a form are available in the *FormData* return values of for example
+Any UI technology can then build a form on top of those properties, using the Flowable API methods that expose the property information. The properties can provide a dedicated (and more limited) view on the process variables. The properties needed to display a form are available in the *FormData* return values of for example
 
 [source,java,linenums]
 ----
@@ -137,7 +137,7 @@ For example:
 
 All that information is accessible through the API. The type names can be obtained with  +formProperty.getType().getName()+.  And even the date pattern is available with +formProperty.getType().getInformation("datePattern")+ and the enumeration values are accessible with +formProperty.getType().getInformation("values")+
 
-Activiti explorer supports the form properties and will render the form accordingly to the form definition. The following XML snippet
+The following XML snippet
 
 [source,xml,linenums]
 ----
@@ -151,10 +151,7 @@ Activiti explorer supports the form properties and will render the form accordin
 
 ----
 
-will render to a process start form when used in Activiti Explorer
-
-image::images/forms.explorer.png[align="center"]
-
+could be used to render to a process start form in a custom app.
 
 
 [[externalFormRendering]]
@@ -162,7 +159,7 @@ image::images/forms.explorer.png[align="center"]
 
 === External form rendering
 
-The API also allows for you to perform your own task form rendering outside of the Activiti Engine. These steps explain the hooks that you can use to render your task forms yourself.
+The API also allows for you to perform your own task form rendering outside of the Flowable Engine. These steps explain the hooks that you can use to render your task forms yourself.
 
 Essentially, all the data that's needed to render a form is assembled in one of these two service methods: +StartFormData FormService.getStartFormData(String processDefinitionId)+ and +TaskFormdata FormService.getTaskFormData(String taskId)+.
 

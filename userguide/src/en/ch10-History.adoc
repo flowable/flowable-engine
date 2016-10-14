@@ -14,7 +14,7 @@ There are 5 history entities:
 
 Since the DB contains historic entities for past as well as ongoing instances, you might want to consider  querying these tables in order to minimize access to the runtime process instance data  and that way keeping the runtime execution performant.
 
-Later on, this information will be exposed in Activiti Explorer. Also, it will be the information from which the reports will be generated.
+Later on, this information will be exposed in the Flowable app. Also, it will be the information from which the reports will be generated.
 
 
 [[historyQuery]]
@@ -24,7 +24,7 @@ Later on, this information will be exposed in Activiti Explorer. Also, it will b
 
 In the API, it's possible to query all 5 of the History entities. The HistoryService exposes the methods +createHistoricProcessInstanceQuery()+, +createHistoricVariableInstanceQuery()+, +createHistoricActivityInstanceQuery()+,  +createHistoricDetailQuery()+ and +createHistoricTaskInstanceQuery()+.
 
-Below are a couple of examples that show some of the possibilities of the query API for history. Full description of the possibilities can be found in the link:$$http://activiti.org/javadocs/index.html$$[javadocs], in the +org.activiti.engine.history+ package.
+Below are a couple of examples that show some of the possibilities of the query API for history. Full description of the possibilities can be found in the link:$$http://flowable.org/javadocs/index.html$$[javadocs], in the +org.activiti.engine.history+ package.
 
 [[historyQueryProcessInstance]]
 
@@ -186,7 +186,7 @@ Following history levels can be configured:
 * ++audit++: This is the default. It archives all process instances,  activity instances, keeps variable values continuously in sync and all form properties that are submitted  so that all user interaction through forms is traceable and can be audited.
 * ++full++: This is the highest level of history archiving and hence the  slowest.  This level stores all information as in the +audit+ level  plus all other possible details, mostly this are process variable updates.
 
-*Prior to Activiti 5.11, the history level was stored in the database (table +$$ACT_GE_PROPERTY$$+, property with name ++historyLevel++). Starting from 5.11, this value is not used anymore and is ignored/deleted from the database. The history can now be changed between 2 boots of the engine, without an exception being thrown in case the level changed from the previous engine-boot.*
+*In older releases, the history level was stored in the database (table +$$ACT_GE_PROPERTY$$+, property with name ++historyLevel++). Starting from 5.11, this value is not used anymore and is ignored/deleted from the database. The history can now be changed between 2 boots of the engine, without an exception being thrown in case the level changed from the previous engine-boot.*
 
 [[historyFormAuditPurposes]]
 

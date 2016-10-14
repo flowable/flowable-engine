@@ -1,8 +1,8 @@
-[[activitiDesigner]]
+[[flowableDesigner]]
 
 == Eclipse Designer
 
-Activiti comes with an Eclipse plugin, the Activiti Eclipse Designer, that can be used to graphically model, test and deploy BPMN 2.0 processes.
+Flowable comes with an Eclipse plugin, the Flowable Eclipse Designer, that can be used to graphically model, test and deploy BPMN 2.0 processes.
 
 
 [[eclipseDesignerInstallation]]
@@ -14,8 +14,8 @@ The following installation instructions are verified on link:$$http://www.eclips
 
 Go to *Help -> Install New Software*. In the following panel, click on _Add_ button and fill in the following fields:
 
-* *Name:*Activiti BPMN 2.0 designer
-* *Location:*http://activiti.org/designer/update/
+* *Name:*Flowable BPMN 2.0 designer
+* *Location:*http://flowable.org/designer/update/
 
 image::images/designer.add.update.site.png[align="center"]
 
@@ -24,32 +24,32 @@ Make sure the *"Contact all updates sites.."* checkbox is *checked*, because all
 [[eclipseDesignerEditorFeatures]]
 
 
-=== Activiti Designer editor features
+=== Flowable Designer editor features
 
-* Create Activiti projects and diagrams.
+* Create Flowable projects and diagrams.
 
 image::images/designer.create.activiti.project.png[align="center"]
 
-* The Activiti Designer creates a .bpmn file when creating a new Activiti diagram. When opened with the Activiti Diagram Editor view this will provide a graphical modeling canvas and palette. The same file can however be opened with an XML editor and it then shows the BPMN 2.0 XML elements of the process definition. So the Activiti Designer works with only one file for both the graphical diagram as well as the BPMN 2.0 XML. Note that in Activiti 5.9 the .bpmn extension is not yet supported as deployment artifact for a process definition. Therefore the "create deployment artifacts" feature of the Activiti Designer generates a BAR file with a .bpmn20.xml file that contains the content of the .bpmn file. You can also do a quick file rename yourself. Also note that you can open a .bpmn20.xml file with the Activiti Diagram Editor view as well.
+* The Flowable Designer creates a .bpmn file when creating a new Flowable diagram. When opened with the Flowable Diagram Editor view this will provide a graphical modeling canvas and palette. The same file can however be opened with an XML editor and it then shows the BPMN 2.0 XML elements of the process definition. So the Flowable Designer works with only one file for both the graphical diagram as well as the BPMN 2.0 XML. Note that in old releases, the .bpmn extension is not yet supported as deployment artifact for a process definition. Therefore the "create deployment artifacts" feature of the Flowable Designer generates a BAR file with a .bpmn20.xml file that contains the content of the .bpmn file. You can also do a quick file rename yourself. Also note that you can open a .bpmn20.xml file with the Flowable Diagram Editor view as well.
 
 image::images/designer.bpmn.file.png[align="center"]
 
 
-* BPMN 2.0 XML files can be imported into the Activiti Designer and a diagram will be created. Just copy the BPMN 2.0 XML file to your project and open the file with the Activiti Diagram Editor view. The Activiti Designer uses the BPMN DI information of the file to create the diagram. If you have a BPMN 2.0 XML file without BPMN DI information, no diagram can be created.
+* BPMN 2.0 XML files can be imported into the Flowable Designer and a diagram will be created. Just copy the BPMN 2.0 XML file to your project and open the file with the Flowable Diagram Editor view. The Flowable Designer uses the BPMN DI information of the file to create the diagram. If you have a BPMN 2.0 XML file without BPMN DI information, no diagram can be created.
 
 image::images/designer.open.importedfile.png[align="center"]
 
-*  For deployment a BAR file and optionally a JAR file is created by the Activiti Designer by right-clicking on an Activiti project in the package explorer and choosing the _Create deployment artifacts_ option at the bottom of the popup menu. For more information about the deployment functionality of the Designer look at the <<eclipseDesignerDeployment,deployment>> section.
+*  For deployment a BAR file and optionally a JAR file is created by the Flowable Designer by right-clicking on a Flowable project in the package explorer and choosing the _Create deployment artifacts_ option at the bottom of the popup menu. For more information about the deployment functionality of the Designer look at the <<eclipseDesignerDeployment,deployment>> section.
 
 image::images/designer.create.deployment.png[align="center"]
 
 
-* Generate a unit test (right click on a BPMN 2.0 XML file in the package explorer and select __generate unit test__) A unit test is generated with an Activiti configuration that runs on an embedded H2 database. You can now run the unit test to test your process definition.
+* Generate a unit test (right click on a BPMN 2.0 XML file in the package explorer and select __generate unit test__) A unit test is generated with a Flowable configuration that runs on an embedded H2 database. You can now run the unit test to test your process definition.
 
 image::images/designer.unittest.generate.png[align="center"]
 
 
-* The Activiti project is generated as a Maven project. To configure the dependencies you need to run _mvn eclipse:eclipse_ and the Maven dependencies will be configured as expected. Note that for process design Maven dependencies are not needed. They are only needed to run unit tests.
+* The Flowable project is generated as a Maven project. To configure the dependencies you need to run _mvn eclipse:eclipse_ and the Maven dependencies will be configured as expected. Note that for process design Maven dependencies are not needed. They are only needed to run unit tests.
 
 image::images/designer.project.maven.png[align="center"]
 
@@ -57,11 +57,11 @@ image::images/designer.project.maven.png[align="center"]
 [[eclipseDesignerBPMNFeatures]]
 
 
-=== Activiti Designer BPMN features
+=== Flowable Designer BPMN features
 
 
 
-*  Support for start none event, start error event, timer start event, end none event, end error event, sequence flow,  parallel gateway, exclusive gateway, inclusive gateway, event gateway, embedded subprocess, event sub process, call activity, pool, lane,  script task, user task, service task, mail task, manual task, business rule task, receive task, timer boundary event, error boundary event, signal boundary event, timer catching event, signal catching event, signal throwing event, none throwing event and four Alfresco specific elements (user, script, mail tasks and start event).
+*  Support for start none event, start error event, timer start event, end none event, end error event, sequence flow,  parallel gateway, exclusive gateway, inclusive gateway, event gateway, embedded subprocess, event sub process, call activity, pool, lane,  script task, user task, service task, mail task, manual task, business rule task, receive task, timer boundary event, error boundary event, signal boundary event, timer catching event, signal catching event, signal throwing event, none throwing event and four Flowable specific elements (user, script, mail tasks and start event).
 
 image::images/designer.model.process.png[align="center"]
 
@@ -77,7 +77,7 @@ image::images/designer.model.quick.new.png[align="center"]
 
 image::images/designer.servicetask.property.png[align="center"]
 
-* Support for pools and lanes. Because Activiti reads different pools as different process definition, it makes the most sense to use only one pool. If you use multiple pools, be aware that drawing sequence flows between the pools will result in problems when deploying the process in the Activiti Engine. You can add as much lanes to a pool as you want.
+* Support for pools and lanes. Because Flowable reads different pools as different process definition, it makes the most sense to use only one pool. If you use multiple pools, be aware that drawing sequence flows between the pools will result in problems when deploying the process in the Flowable Engine. You can add as much lanes to a pool as you want.
 
 image::images/designer.model.poolandlanes.png[align="center"]
 
@@ -93,16 +93,16 @@ image::images/designer.model.eventsubprocess.png[align="center"]
 
 image::images/designer.embeddedprocess.canvas.png[align="center"]
 
-* Support for timer boundary events on tasks and embedded sub processes. Although, the timer boundary event makes the most sense when using it on a user task or an embedded sub process in the Activiti Designer.
+* Support for timer boundary events on tasks and embedded sub processes. Although, the timer boundary event makes the most sense when using it on a user task or an embedded sub process in the Flowable Designer.
 
 image::images/designer.timerboundary.canvas.png[align="center"]
 
 
-* Support for additional Activiti extensions like the Mail task, the candidate configuration of User tasks and Script task configuration.
+* Support for additional Flowable extensions like the Mail task, the candidate configuration of User tasks and Script task configuration.
 
 image::images/designer.mailtask.property.png[align="center"]
 
-* Support for the Activiti execution and task listeners. You can also add field extensions for execution listeners.
+* Support for the Flowable execution and task listeners. You can also add field extensions for execution listeners.
 
 image::images/designer.listener.configuration.png[align="center"]
 
@@ -114,33 +114,33 @@ image::images/designer.sequence.condition.png[align="center"]
 [[eclipseDesignerDeployment]]
 
 
-=== Activiti Designer deployment features
+=== Flowable Designer deployment features
 
 
-Deploying process definitions and task forms on the Activiti Engine is not hard. You need a BAR file containing the process definition BPMN 2.0 XML file and optionally task forms and an image of the process that can be viewed in the Activiti Explorer. In the Activiti Designer it's made very easy to create a BAR file. When you've finished your process implementation just right-click on your Activiti project in the package explorer and choose for the *Create deployment artifacts* option at the bottom of the popup menu.
+Deploying process definitions and task forms on the Flowable Engine is not hard. You need a BAR file containing the process definition BPMN 2.0 XML file and optionally task forms and an image of the process that can be viewed in the Flowable app. In the Flowable Designer it's made very easy to create a BAR file. When you've finished your process implementation just right-click on your Flowable project in the package explorer and choose for the *Create deployment artifacts* option at the bottom of the popup menu.
 
 image::images/designer.create.deployment.png[align="center"]
 
-Then a deployment directory is created containing the BAR file and optionally a JAR file with the Java classes of your Activiti project.
+Then a deployment directory is created containing the BAR file and optionally a JAR file with the Java classes of your Flowable project.
 
 image::images/designer.deployment.dir.png[align="center"]
 
-This file can now be uploaded to the Activiti Engine using the deployments tab in Activiti Explorer, and you are ready to go.
+This file can now be uploaded to the Flowable Engine using the deployments tab in Flowable app, and you are ready to go.
 
-When your project contains Java classes, the deployment is a bit more work. In that case the *Create deployment artifacts* step in the Activiti Designer will also generate a JAR file containing the compiled classes. This JAR file must be deployed to the activiti-XXX/WEB-INF/lib directory in your Activiti Tomcat installation directory. This makes the classes available on the classpath of the Activiti Engine.
+When your project contains Java classes, the deployment is a bit more work. In that case the *Create deployment artifacts* step in the Flowable Designer will also generate a JAR file containing the compiled classes. This JAR file must be deployed to the flowable-XXX/WEB-INF/lib directory in your Flowable Tomcat installation directory. This makes the classes available on the classpath of the Flowable Engine.
 
 
 [[eclipseDesignerExtending]]
 
 
-=== Extending Activiti Designer
+=== Extending Flowable Designer
 
-You can extend the default functionality offered by Activiti Designer. This section documents which extensions are available, how they can be used and provides some usage examples. Extending Activiti Designer is useful in cases where the default functionality doesn't suit your needs, you require additional capabilities or have domain specific requirements when modeling business processes. Extension of Activiti Designer falls into two distinct categories, extending the palette and extending output formats. Each of these extension ways requires a specific approach and different technical expertise.
+You can extend the default functionality offered by Flowable Designer. This section documents which extensions are available, how they can be used and provides some usage examples. Extending Flowable Designer is useful in cases where the default functionality doesn't suit your needs, you require additional capabilities or have domain specific requirements when modeling business processes. Extension of Flowable Designer falls into two distinct categories, extending the palette and extending output formats. Each of these extension ways requires a specific approach and different technical expertise.
 
 
 [NOTE]
 ====
-Extending Activiti Designer requires technical knowledge and more specifically, knowledge of programming in Java. Depending on the type of extension you want to create, you might also need to be familiar with Maven, Eclipse, OSGi, Eclipse extensions and SWT.
+Extending Flowable Designer requires technical knowledge and more specifically, knowledge of programming in Java. Depending on the type of extension you want to create, you might also need to be familiar with Maven, Eclipse, OSGi, Eclipse extensions and SWT.
 ====
 
 
@@ -149,14 +149,14 @@ Extending Activiti Designer requires technical knowledge and more specifically, 
 
 ==== Customizing the palette
 
-You can customize the palette that is offered to users when modeling processes. The palette is the collection of shapes that can be dragged onto the canvas in a process diagram and is displayed to the right hand side of the canvas. As you can see in the default palette, the default shapes are grouped into compartments (these are called "drawers") for Events, Gateways and so on. There are two options built-in to Activiti Designer to customize the drawers and shapes in the palette:
+You can customize the palette that is offered to users when modeling processes. The palette is the collection of shapes that can be dragged onto the canvas in a process diagram and is displayed to the right hand side of the canvas. As you can see in the default palette, the default shapes are grouped into compartments (these are called "drawers") for Events, Gateways and so on. There are two options built-in to Flowable Designer to customize the drawers and shapes in the palette:
 
 * Adding your own shapes / nodes to existing or new drawers
-* Disabling any or all of the default BPMN 2.0 shapes offered by Activiti Designer, with the exception of the connection and selection tools
+* Disabling any or all of the default BPMN 2.0 shapes offered by Flowable Designer, with the exception of the connection and selection tools
 
-In order to customize the palette, you create a JAR file that is added to a specific installation of Activiti Designer (more on <<eclipseDesignerApplyingExtension,how to do that>> later). Such a JAR file is called an _extension_. By writing classes that are included in your extension, Activiti Designer understands which customizations you wish to make. In order for this to work, your classes should implement certain interfaces. There is an integration library available with those interfaces and base classes to extend which you should add to your project's classpath.
+In order to customize the palette, you create a JAR file that is added to a specific installation of Flowable Designer (more on <<eclipseDesignerApplyingExtension,how to do that>> later). Such a JAR file is called an _extension_. By writing classes that are included in your extension, Flowable Designer understands which customizations you wish to make. In order for this to work, your classes should implement certain interfaces. There is an integration library available with those interfaces and base classes to extend which you should add to your project's classpath.
 
-You can find the code examples listed below in source control with Activiti Designer. Take a look in the +examples/money-tasks+ directory in the +projects/designer+ directory of Activiti's source code.
+You can find the code examples listed below in source control with Flowable Designer. Take a look in the +examples/money-tasks+ directory in the +projects/designer+ directory of Flowable's source code.
 
 
 [NOTE]
@@ -200,17 +200,16 @@ Add the integration library to your project's dependencies by including this dep
 ----
 <dependencies>
   <dependency>
-    <groupId>org.activiti.designer</groupId>
-    <artifactId>org.activiti.designer.integration</artifactId>
-    <version>5.12.0</version> <!-- Use the current Activiti Designer version -->
+    <groupId>org.flowable.designer</groupId>
+    <artifactId>org.flowable.designer.integration</artifactId>
+    <version>5.12.0</version> <!-- Use the current Flowable Designer version -->
     <scope>compile</scope>
   </dependency>
 </dependencies>
 ...
 <repositories>
   <repository>
-      <id>Activiti</id>
-      <url>https://maven.alfresco.com/nexus/content/groups/public/</url>
+      <id>Flowable</id>
    </repository>
 </repositories>
 ----
@@ -244,7 +243,7 @@ Finally, in the++ pom.xml++ file, add the configuration for the ++maven-compiler
             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
           </manifest>
           <manifestEntries>
-            <ActivitiDesigner-Extension-Name>Acme Money</ActivitiDesigner-Extension-Name>
+            <FlowableDesigner-Extension-Name>Acme Money</FlowableDesigner-Extension-Name>
           </manifestEntries>
         </archive>
       </configuration>
@@ -256,7 +255,7 @@ Finally, in the++ pom.xml++ file, add the configuration for the ++maven-compiler
 
 
 
-The name for the extension is described by the +ActivitiDesigner-Extension-Name+ property. The only thing left to do now is tell Eclipse to setup the project according to the instructions in +pom.xml+. So open up a command shell and go to the root folder of your project in the Eclipse workspace. Then execute the following Maven command:
+The name for the extension is described by the +FlowableDesigner-Extension-Name+ property. The only thing left to do now is tell Eclipse to setup the project according to the instructions in +pom.xml+. So open up a command shell and go to the root folder of your project in the Eclipse workspace. Then execute the following Maven command:
 
 ----
 mvn eclipse:eclipse
@@ -271,33 +270,33 @@ You can of course also use the link:$$http://www.eclipse.org/m2e$$[m2eclipse] pl
 ====
 
 
-That's it for the setup. Now you're ready to start creating customizations to Activiti Designer!
+That's it for the setup. Now you're ready to start creating customizations to Flowable Designer!
 
 [[eclipseDesignerApplyingExtension]]
 
 
-===== Applying your extension to Activiti Designer
+===== Applying your extension to Flowable Designer
 
-You might be wondering how you can add your extension to Activiti Designer so your customizations are applied. These are the steps to do just that:
-* Once you've created your extension JAR (for instance, by performing a mvn install in your project to build it with Maven), you need to transfer the extension to the computer where Activiti Designer is installed;
-* Store the extension somewhere on the hard drive where it will be able to remain and remember the location. _Note:_ the location must be outside the Eclipse workspace of Activiti Designer - storing the extension inside the workspace will lead to the user getting a popup error message and the extensions being unavailable;
-* Start Activiti Designer and from the menu, select +Window+ > +Preferences+
+You might be wondering how you can add your extension to Flowable Designer so your customizations are applied. These are the steps to do just that:
+* Once you've created your extension JAR (for instance, by performing a mvn install in your project to build it with Maven), you need to transfer the extension to the computer where Flowable Designer is installed;
+* Store the extension somewhere on the hard drive where it will be able to remain and remember the location. _Note:_ the location must be outside the Eclipse workspace of Flowable Designer - storing the extension inside the workspace will lead to the user getting a popup error message and the extensions being unavailable;
+* Start Flowable Designer and from the menu, select +Window+ > +Preferences+
 * In the preferences screen, type +user+ as keyword. You should see an option to access the +User Libraries+ in Eclipse in the +Java+ section.
 
 image::images/designer.preferences.userlibraries.png[align="center"]
 
 
-* Select the User Libraries item and a tree view shows up to the right where you can add libraries. You should see the default group where you can add extensions to Activiti Designer (depending on your Eclipse installation, you might see several others as well).
+* Select the User Libraries item and a tree view shows up to the right where you can add libraries. You should see the default group where you can add extensions to Flowable Designer (depending on your Eclipse installation, you might see several others as well).
 
 image::images/designer.preferences.userlibraries.activiti.empty.png[align="center"]
 
 
-* Select the +Activiti Designer Extensions+ group and click the +Add JARs...+ button. Navigate to the folder where your extension is stored and select the extension file you want to add. After completing this, your preferences screen should show the extension as part of the +Activiti Designer Extensions+ group, as shown below.
+* Select the +Flowable Designer Extensions+ group and click the +Add JARs...+ button. Navigate to the folder where your extension is stored and select the extension file you want to add. After completing this, your preferences screen should show the extension as part of the +Flowable Designer Extensions+ group, as shown below.
 
 image::images/designer.preferences.userlibraries.activiti.moneytasks.png[align="center"]
 
 
-* Click the +OK+ button to save and close the preferences dialog. The +Activiti Designer Extensions+ group is automatically added to new Activiti projects you create. You can see the user library as entry in the project's tree in the Navigator or Package Explorer. If you already had Activiti projects in the workspace, you should also see the new extensions show up in the group. An example is shown below.
+* Click the +OK+ button to save and close the preferences dialog. The +Flowable Designer Extensions+ group is automatically added to new Flowable projects you create. You can see the user library as entry in the project's tree in the Navigator or Package Explorer. If you already had Flowable projects in the workspace, you should also see the new extensions show up in the group. An example is shown below.
 
 image::images/designer.userlibraries.project.png[align="center"]
 
@@ -307,7 +306,7 @@ Diagrams you open will now have the shapes from the new extension in their palet
 
 ===== Adding shapes to the palette
 
-With your project set up, you can now easily add shapes to the palette. Each shape you wish to add is represented by a class in your JAR. Take note that these classes are not the classes that will be used by the Activiti engine during runtime. In your extension you describe the properties that can be set in Activiti Designer for each shape. From these shapes, you can also define the runtime characteristics that should be used by the engine when a process instance reaches the node in the process. The runtime characteristics can use any of the options that Activiti supports for regular ++ServiceTask++s. See <<eclipseDesignerConfiguringRuntime,this section>> for more details.
+With your project set up, you can now easily add shapes to the palette. Each shape you wish to add is represented by a class in your JAR. Take note that these classes are not the classes that will be used by the Flowable engine during runtime. In your extension you describe the properties that can be set in Flowable Designer for each shape. From these shapes, you can also define the runtime characteristics that should be used by the engine when a process instance reaches the node in the process. The runtime characteristics can use any of the options that Flowable supports for regular ++ServiceTask++s. See <<eclipseDesignerConfiguringRuntime,this section>> for more details.
 
 A shape's class is a simple Java class, to which a number of annotations are added. The class should implement the +CustomServiceTask+ interface, but you shouldn't implement this interface yourself. Extend the +AbstractCustomServiceTask+ base class instead (at the moment you MUST extend this class directly, so no abstract classes in between). In the Javadoc for that class you can find instructions on the defaults it provides and when you should override any of the methods it already implements. Overrides allow you to do things such as providing icons for the palette and in the shape on the canvas (these can be different) and specifying the base shape you want the node to have (activity, event, gateway).
 
@@ -394,7 +393,7 @@ public class AcmeMoneyTask extends AbstractCustomServiceTask {
 ----
 
 
-If you extend Activiti Designer with this shape, The palette and corresponding node will look like this:
+If you extend Flowable Designer with this shape, The palette and corresponding node will look like this:
 
 image::images/designer.palette.add.money.png[align="center"]
 
@@ -416,7 +415,7 @@ image::images/designer.palette.add.money.help.png[align="center"]
 
 ====== Configuring runtime execution of Custom Service Tasks
 
-With your fields setup and your extension applied to Designer, users can configure the properties of the service task when modelling a process. In most cases, you will want to use these user-configured properties when the process is executed by Activiti. To do this, you must instruct Activiti which class to instantiate when the process reaches your +CustomServiceTask+.
+With your fields setup and your extension applied to Designer, users can configure the properties of the service task when modelling a process. In most cases, you will want to use these user-configured properties when the process is executed by Flowable. To do this, you must instruct Flowable which class to instantiate when the process reaches your +CustomServiceTask+.
 
 There is a special annotation for specifying the runtime characteristics of your +CustomServiceTask+, the +@Runtime+ annotation. Here's an example of how to use it:
 
@@ -427,25 +426,25 @@ There is a special annotation for specifying the runtime characteristics of your
 ----
 
 
-Your +CustomServiceTask+ will result in a normal +ServiceTask+ in the BPMN output of processes modelled with it. Activiti enables <<bpmnJavaServiceTask,several ways>> to define the runtime characteristics of ++ServiceTask++s. Therefore, the +@Runtime+ annotation can take one of three attributes, which match directly to the options Activiti provides, like this:
+Your +CustomServiceTask+ will result in a normal +ServiceTask+ in the BPMN output of processes modelled with it. Flowable enables <<bpmnJavaServiceTask,several ways>> to define the runtime characteristics of ++ServiceTask++s. Therefore, the +@Runtime+ annotation can take one of three attributes, which match directly to the options Flowable provides, like this:
 
 * +javaDelegateClass+ maps to +activiti:class+ in the BPMN output. Specify the fully qualified classname of a class that implements +JavaDelegate+.
 * +expression+ maps to +activiti:expression+ in the BPMN output. Specify an expression to a method to be executed, such as a method in a Spring Bean. You should _not_ specify any +@Property+ annotations on fields when using this option. For more information, see below.
 * +javaDelegateExpression+ maps to +activiti:delegateExpression+ in the BPMN output. Specify an expression to  a class that implements +JavaDelegate+.
 
 
-The user's property values will be injected into the runtime class if you provide members in the class for Activiti to inject into. The names should match the names of the members in your +CustomServiceTask+. For more information, consult <<serviceTaskFieldInjection,this part>> of the userguide. Note that since version 5.11.0 of the Designer you can use the +Expression+ interface for dynamic field values. This means that the value of the property in the Activiti Designer must contain an expression and this expression will then be injected into an +Expression+ property in the +JavaDelegate+ implementation class.
+The user's property values will be injected into the runtime class if you provide members in the class for Flowable to inject into. The names should match the names of the members in your +CustomServiceTask+. For more information, consult <<serviceTaskFieldInjection,this part>> of the userguide. Note that since version 5.11.0 of the Designer you can use the +Expression+ interface for dynamic field values. This means that the value of the property in the Flowable Designer must contain an expression and this expression will then be injected into an +Expression+ property in the +JavaDelegate+ implementation class.
 
 
 [NOTE]
 ====
 
-You can use +@Property+ annotations on members of your +CustomServiceTask+, but this will not work if you use ++@Runtime++'s +expression+ attribute. The reason for this is that the expression you specify will be attempted to be resolved to a _method_ by Activiti, not to a class. Therefore, no injection into a class will be performed. Any members marked with +@Property+ will be ignored by Designer if you use +expression+ in your +@Runtime+ annotation. Designer will not render them as editable fields in the node's property pane and will produce no output for the properties in the process' BPMN.
+You can use +@Property+ annotations on members of your +CustomServiceTask+, but this will not work if you use ++@Runtime++'s +expression+ attribute. The reason for this is that the expression you specify will be attempted to be resolved to a _method_ by Flowable, not to a class. Therefore, no injection into a class will be performed. Any members marked with +@Property+ will be ignored by Designer if you use +expression+ in your +@Runtime+ annotation. Designer will not render them as editable fields in the node's property pane and will produce no output for the properties in the process' BPMN.
 ====
 
 [NOTE]
 ====
-Note that the runtime class shouldn't be in your extension JAR, as it's dependent on the Activiti libraries. Activiti needs to be able to find it at runtime, so it needs to be on the Activiti engine's classpath.
+Note that the runtime class shouldn't be in your extension JAR, as it's dependent on the Flowable libraries. Flowable needs to be able to find it at runtime, so it needs to be on the Flowable engine's classpath.
 ====
 
 The examples project in Designer's source tree contains examples of the different options for configuring +@Runtime+. Take a look in the money-tasks project for some starting points. The examples refer to delegate class examples that are in the money-delegates project.
@@ -546,7 +545,7 @@ image::images/designer.property.date.picker.png[align="center"]
 
 Creates a data grid control as shown below. A data grid can be used to allow the user to enter an arbitrary amount of rows of data and enter values for a fixed set of columns in each of those rows (each individual combination of row and column is referred to as a cell). Rows can be added and removed as the user sees fit.
 
-This property type expects the class member you have annotated to also have an accompanying +@DataGridProperty+ annotation (for an example, see below). Using this additional annotation, you can specify some specific attributes of the data grid. You are required to reference a different class to determine which columns go into the grid with the +itemClass+ attribute. Activiti Designer expects the member type to be a +List+. By convention, you can use the class of the +itemClass+ attribute as its generic type. If, for example, you have a grocery list that you edit in the grid, you would define the columns of the grid in the +GroceryListItem+ class. From your +CustomServiceTask+, you would refer to it like this:
+This property type expects the class member you have annotated to also have an accompanying +@DataGridProperty+ annotation (for an example, see below). Using this additional annotation, you can specify some specific attributes of the data grid. You are required to reference a different class to determine which columns go into the grid with the +itemClass+ attribute. Flowable Designer expects the member type to be a +List+. By convention, you can use the class of the +itemClass+ attribute as its generic type. If, for example, you have a grocery list that you edit in the grid, you would define the columns of the grid in the +GroceryListItem+ class. From your +CustomServiceTask+, you would refer to it like this:
 
 [source,java,linenums]
 ----
@@ -632,7 +631,7 @@ image::images/designer.palette.disable.all.png[align="center"]
 
 ==== Validating diagrams and exporting to custom output formats
 
-Besides customizing the palette, you can also create extensions to Activiti Designer that can perform validations and save information from the diagram to custom resources in the Eclipse workspace. There are built-in extension points for doing this and this section explains how to use them.
+Besides customizing the palette, you can also create extensions to Flowable Designer that can perform validations and save information from the diagram to custom resources in the Eclipse workspace. There are built-in extension points for doing this and this section explains how to use them.
 
 [NOTE]
 ====
@@ -640,21 +639,21 @@ The ExportMarshaller functions were reintroduced recently. We are still working 
 ====
 
 
-Activiti Designer allows you to write extensions that validate diagrams. There are already validations of BPMN constructs in the tool by default, but you can add your own if you want to validate additional items such as modeling conventions or the values in properties of ++CustomServiceTask++s. These extensions are known as +Process Validators+.
+Flowable Designer allows you to write extensions that validate diagrams. There are already validations of BPMN constructs in the tool by default, but you can add your own if you want to validate additional items such as modeling conventions or the values in properties of ++CustomServiceTask++s. These extensions are known as +Process Validators+.
 
-You can also Activiti Designer to publish to additional formats when saving diagrams. These extensions are called +Export Marshallers+ and are invoked automatically by Activiti Designer on each save action by the user. This behavior can be enabled or disabled by setting a preference in Eclipse's preferences dialog for each format for which there is an extension detected. Designer will make sure your +ExportMarshaller+ is invoked when saving the diagram, depending on the user's preference.
+You can also Flowable Designer to publish to additional formats when saving diagrams. These extensions are called +Export Marshallers+ and are invoked automatically by Flowable Designer on each save action by the user. This behavior can be enabled or disabled by setting a preference in Eclipse's preferences dialog for each format for which there is an extension detected. Designer will make sure your +ExportMarshaller+ is invoked when saving the diagram, depending on the user's preference.
 
-Often, you will want to combine a +ProcessValidator+ and an +ExportMarshaller+. Let's say you have a number of ++CustomServiceTask++s in use that have properties you would like to use in the process that gets generated. However, before the process is generated, you want to validate some of those values first. Combining a +ProcessValidator+ and +ExportMarshaller+ is the best way to accomplish this and Activiti Designer enables you to plug your extensions into the tool seamlessly.
+Often, you will want to combine a +ProcessValidator+ and an +ExportMarshaller+. Let's say you have a number of ++CustomServiceTask++s in use that have properties you would like to use in the process that gets generated. However, before the process is generated, you want to validate some of those values first. Combining a +ProcessValidator+ and +ExportMarshaller+ is the best way to accomplish this and Flowable Designer enables you to plug your extensions into the tool seamlessly.
 
-To create a +ProcessValidator+ or an +ExportMarshaller+, you need to create a different kind of extension than for extending the palette. The reason for this is simple: from your code you will need access to more APIs than those that are offered by the integration library. In particular, you will need classes that are available in Eclipse itself. So to get started, you should create an Eclipse plugin (which you can do by using Eclipse's PDE support) and package it in a custom Eclipse product or feature. It's beyond the scope of this user guide to explain all the details involved in developing Eclipse plugins, so the instructions below are limited to the functionality for extending Activiti Designer.
+To create a +ProcessValidator+ or an +ExportMarshaller+, you need to create a different kind of extension than for extending the palette. The reason for this is simple: from your code you will need access to more APIs than those that are offered by the integration library. In particular, you will need classes that are available in Eclipse itself. So to get started, you should create an Eclipse plugin (which you can do by using Eclipse's PDE support) and package it in a custom Eclipse product or feature. It's beyond the scope of this user guide to explain all the details involved in developing Eclipse plugins, so the instructions below are limited to the functionality for extending Flowable Designer.
 
 Your bundle should be dependent on the following libraries:
 
 * org.eclipse.core.runtime
 * org.eclipse.core.resources
-* org.activiti.designer.eclipse
-* org.activiti.designer.libs
-* org.activiti.designer.util
+* org.flowable.designer.eclipse
+* org.flowable.designer.libs
+* org.flowable.designer.util
 
 Optionally, the org.apache.commons.lang bundle is available through Designer if you'd like to use that in your extension.
 

@@ -1,16 +1,3 @@
-= Activiti User Guide
-v  6.0.0.RC1-SNAPSHOT
-:doctype: book
-:toc: left
-:toclevels: 5
-:icons: font
-:numbered:
-:source-highlighter: pygments
-:pygments-css: class
-:pygments-linenums-mode: table
-:compat-mode:
-
-
 include::ch01-Introduction.adoc[]
 
 include::ch02-GettingStarted.adoc[]
