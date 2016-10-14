@@ -48,9 +48,9 @@ public interface UserEntityManager extends EntityManager<UserEntity> {
 
   boolean isNewUser(User user);
 
-  Picture getUserPicture(String userId);
+  Picture getUserPicture(User user);
 
-  void setUserPicture(String userId, Picture picture);
+  void setUserPicture(User user, Picture picture);
   
   void deletePicture(User user);
 

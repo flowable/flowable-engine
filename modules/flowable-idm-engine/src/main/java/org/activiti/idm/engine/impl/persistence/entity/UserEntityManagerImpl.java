@@ -20,7 +20,6 @@ import org.activiti.idm.api.Group;
 import org.activiti.idm.api.Picture;
 import org.activiti.idm.api.User;
 import org.activiti.idm.api.UserQuery;
-import org.activiti.idm.engine.ActivitiIdmObjectNotFoundException;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.Page;
 import org.activiti.idm.engine.impl.UserQueryImpl;
@@ -129,20 +128,16 @@ public class UserEntityManagerImpl extends AbstractEntityManager<UserEntity> imp
   }
 
   @Override
-  public Picture getUserPicture(String userId) {
-    UserEntity user = findById(userId);
-    return user.getPicture();
+  public Picture getUserPicture(User user) {
+    UserEntity userEntity = (UserEntity) user;
+    return userEntity.getPicture();
   }
 
   @Override
-  public void setUserPicture(String userId, Picture picture) {
-    UserEntity user = findById(userId);
-    if (user == null) {
-      throw new ActivitiIdmObjectNotFoundException("user " + userId + " doesn't exist", User.class);
-    }
-
-    user.setPicture(picture);
-    userDataManager.update(user);
+  public void setUserPicture(User user, Picture picture) {
+    UserEntity userEntity = (UserEntity) user;
+    userEntity.setPicture(picture);
+    userDataManager.update(userEntity);
   }
 
   public UserDataManager getUserDataManager() {

@@ -42,7 +42,7 @@ import org.activiti.idm.engine.impl.cmd.SetUserPictureCmd;
 import org.activiti.idm.engine.impl.persistence.entity.IdentityInfoEntity;
 
 /**
- * @author Tom Baeyens
+ * @author Tijs Rademakers
  */
 public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentityService {
 

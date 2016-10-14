@@ -30,6 +30,10 @@
 		</dependency>
 		<dependency>
 			<groupId>org.flowable</groupId>
+			<artifactId>flowable-idm-engine</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flowable</groupId>
 			<artifactId>flowable-spring</artifactId>
 			<scope>test</scope>
 		</dependency>

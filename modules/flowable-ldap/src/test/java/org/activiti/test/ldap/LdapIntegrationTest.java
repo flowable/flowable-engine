@@ -15,8 +15,8 @@ package org.activiti.test.ldap;
 import java.util.List;
 
 import org.activiti.engine.ActivitiException;
-import org.activiti.engine.identity.User;
 import org.activiti.engine.test.Deployment;
+import org.activiti.idm.api.User;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration("classpath:activiti-context.xml")

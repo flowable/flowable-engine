@@ -86,10 +86,6 @@ public class LDAPConfigurator extends AbstractProcessEngineConfigurator {
 
   public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
     
-    // User 
-    processEngineConfiguration.setUserEntityManager(new LDAPUserManager(processEngineConfiguration, this));
-    
-    // Groups
     LDAPGroupCache ldapGroupCache = null;
     if (getGroupCacheSize() > 0) {
       ldapGroupCache = new LDAPGroupCache(getGroupCacheSize(), getGroupCacheExpirationTime(), processEngineConfiguration.getClock());
@@ -98,13 +94,7 @@ public class LDAPConfigurator extends AbstractProcessEngineConfigurator {
       }
     }
     
-    LDAPGroupManager ldapGroupManager = null;
-    if (ldapGroupCache == null) {
-      ldapGroupManager = new LDAPGroupManager(processEngineConfiguration, this);
-    } else {
-      ldapGroupManager = new LDAPGroupManager(processEngineConfiguration, this, ldapGroupCache);
-    }
-    processEngineConfiguration.setGroupEntityManager(ldapGroupManager);
+    processEngineConfiguration.setIdmIdentityService(new LDAPIdentityServiceImpl(processEngineConfiguration, this, ldapGroupCache));
   }
 
   // Getters and Setters //////////////////////////////////////////////////
