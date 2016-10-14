@@ -5,20 +5,20 @@
 
 === License
 
-Activiti is distributed under link:$$http://www.apache.org/licenses/LICENSE-2.0.html$$[the Apache V2 license].
+Flowable is distributed under link:$$http://www.apache.org/licenses/LICENSE-2.0.html$$[the Apache V2 license].
 
 [[download]]
 
 === Download
 
-link:$$http://activiti.org/download.html$$[http://activiti.org/download.html]
+link:$$http://flowable.org/download.html$$[http://flowable.org/download.html]
 
 [[sources]]
 
 === Sources
 
-The distribution contains most of the sources as jar files. The source code of Activiti can be found on
-  link:$$https://github.com/Activiti/Activiti$$[https://github.com/Activiti/Activiti]
+The distribution contains most of the sources as jar files. The source code of Flowable can be found on
+  link:$$https://github.com/Flowable/Flowable$$[https://github.com/Flowable/Flowable]
 
 
 [[required.software]]
@@ -27,12 +27,12 @@ The distribution contains most of the sources as jar files. The source code of A
 
 ==== JDK 7+
 
-Activiti runs on a JDK higher than or equal to version 7.  Go to link:$$http://www.oracle.com/technetwork/java/javase/downloads/index.html$$[Oracle Java SE downloads] and click on button "Download JDK".  There are installation instructions on that page as well. To verify that your installation was successful, run +java -version+ on the command line.  That should print the installed version of your JDK.
+Flowable runs on a JDK higher than or equal to version 7.  Go to link:$$http://www.oracle.com/technetwork/java/javase/downloads/index.html$$[Oracle Java SE downloads] and click on button "Download JDK".  There are installation instructions on that page as well. To verify that your installation was successful, run +java -version+ on the command line.  That should print the installed version of your JDK.
 
 
 ==== IDE
 
-Activiti development can be done with the IDE of your choice. If you would like to use the Activiti Designer then you need Eclipse Kepler or Luna.
+Flowable development can be done with the IDE of your choice. If you would like to use the Flowable Designer then you need Eclipse Kepler or Luna.
 Download the eclipse distribution of your choice from link:$$http://www.eclipse.org/downloads/$$[the Eclipse download page]. Unzip the downloaded file and then you should be able to start it with the eclipse file in the directory +eclipse+.
 Further in this user guide, there is a section on <<eclipseDesignerInstallation,installing our eclipse designer plugin>>.
 
@@ -44,14 +44,8 @@ Further in this user guide, there is a section on <<eclipseDesignerInstallation,
 Every self-respecting developer should have read link:$$http://www.catb.org/~esr/faqs/smart-questions.html$$[How to ask questions the smart way].
 
 
-After you've done that you can post questions and comments on link:$$http://forums.activiti.org/en/viewforum.php?f=3$$[the Users forum] and create issues in link:$$https://activiti.atlassian.net$$[our JIRA issue tracker].
+After you've done that you can post questions and comments on link:$$http://forums.flowable.org$$[the Users forum] and create issues in link:$$https://github.com/Flowable/Flowable/issues$$[our Github issue tracker].
 
-[NOTE]
-====
-
-Even though Activiti is hosted on GitHub, issues should not be reported using GitHub's issue system. If you wish to report an issue, do not create a GitHub issue, but use link:$$https://activiti.atlassian.net$$[our JIRA].
-
-====
 
 [[experimental]]
 

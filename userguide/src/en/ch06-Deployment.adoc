@@ -4,14 +4,14 @@
 
 === Business archives
 
-To deploy processes, they have to be wrapped in a business archive.  A business archive is the unit of deployment to an Activiti Engine. A business archive is equivalent to a zip file.  It can contain  BPMN 2.0 processes, task forms, rules and any other type of file.  In general, a business archive contains a collection of named resources.
+To deploy processes, they have to be wrapped in a business archive.  A business archive is the unit of deployment to a Flowable Engine. A business archive is equivalent to a zip file.  It can contain  BPMN 2.0 processes, task forms, rules and any other type of file.  In general, a business archive contains a collection of named resources.
 
 
 When a business archive is deployed, it is scanned for BPMN files with a +.bpmn20.xml+ or +.bpmn+ extension. Each of those will be parsed and may contain multiple process definitions.
 
 [NOTE]
 ====
-Java classes present in the business archive *will not be added to the classpath*. All custom classes used in process definitions in the business archive (for example Java service tasks or event listener implementations) should be present on the Activiti Engine classpath in order to run the processes.
+Java classes present in the business archive *will not be added to the classpath*. All custom classes used in process definitions in the business archive (for example Java service tasks or event listener implementations) should be present on the Flowable Engine classpath in order to run the processes.
 ====
 
 ==== Deploying programmatically
@@ -34,7 +34,7 @@ It's also possible to build a deployment from individual resources. See the java
 
 === External resources
 
-Process definitions live in the Activiti database. These process definitions can reference delegation classes when using Service Tasks or execution listeners or Spring beans from the Activiti configuration file. These classes and the Spring configuration file have to be available to all process engines that may execute the process definitions.
+Process definitions live in the Flowable database. These process definitions can reference delegation classes when using Service Tasks or execution listeners or Spring beans from the Flowable configuration file. These classes and the Spring configuration file have to be available to all process engines that may execute the process definitions.
 
 ==== Java classes
 
@@ -42,16 +42,16 @@ All custom classes that are used in your process (e.g. JavaDelegates used in Ser
 
 During deployment of a business archive however, those classes don't have to be present on the classpath. This means that your delegation classes don't have to be on the classpath when deploying a new business archive with Ant.
 
-When you are using the demo setup and you want to add your custom classes, you should add a jar containing your classes to the activiti-explorer or activiti-rest webapp lib. Don't forget to include the dependencies of your custom classes (if any) as well. Alternatively, you can include your dependencies in the libraries directory of your Tomcat installation, +${tomcat.home}/lib+.
+When you are using the demo setup and you want to add your custom classes, you should add a jar containing your classes to the flowable-app or flowable-rest webapp lib. Don't forget to include the dependencies of your custom classes (if any) as well. Alternatively, you can include your dependencies in the libraries directory of your Tomcat installation, +${tomcat.home}/lib+.
 
 
 ==== Using Spring beans from a process
 
-When expressions or scripts use Spring beans, those beans have to be available to the engine when executing the process definition. If you are building your own webapp and you configure your process engine in your context as described in <<springintegration,the spring integration section>>, that is straightforward. But bear in mind that you also should update the Activiti rest webapp with that context if you use it. You can do that by replacing the +activiti.cfg.xml+ in the +activiti-rest/lib/activiti-cfg.jar+ JAR file with an +activiti-context.xml+ file containing your Spring context configuration.
+When expressions or scripts use Spring beans, those beans have to be available to the engine when executing the process definition. If you are building your own webapp and you configure your process engine in your context as described in <<springintegration,the spring integration section>>, that is straightforward. But bear in mind that you also should update the Flowable rest webapp with that context if you use it. You can do that by replacing the +activiti.cfg.xml+ in the +flowable-rest/lib/activiti-cfg.jar+ JAR file with an +activiti-context.xml+ file containing your Spring context configuration.
 
 ==== Creating a single app
 
-Instead of making sure that all process engines have all the delegation classes on their classpath and use the right Spring configuration, you may consider including the Activiti rest webapp inside your own webapp so that there is only a single +ProcessEngine+.
+Instead of making sure that all process engines have all the delegation classes on their classpath and use the right Spring configuration, you may consider including the Flowable rest webapp inside your own webapp so that there is only a single +ProcessEngine+.
 
 
 [[versioningOfProcessDefinitions]]
@@ -59,7 +59,7 @@ Instead of making sure that all process engines have all the delegation classes 
 
 === Versioning of process definitions
 
-BPMN doesn't have a notion of versioning.  That is actually good because the executable BPMN process file will probably live in a version control system repository (e.g. Subversion, Git or Mercurial) as part of your development project.  Versions of process definitions are created during deployment. During deployment, Activiti will assign a version to the +ProcessDefinition+ before it is stored in the Activiti DB.
+BPMN doesn't have a notion of versioning.  That is actually good because the executable BPMN process file will probably live in a version control system repository (e.g. Subversion, Git or Mercurial) as part of your development project.  Versions of process definitions are created during deployment. During deployment, Flowable will assign a version to the +ProcessDefinition+ before it is stored in the Flowable DB.
 
 
 For each process definition in a business archive the following steps are performed to initialize the properties +key+, +version+, +name+ and ++id++:
@@ -100,7 +100,7 @@ Suppose we now deploy an updated version of the same process (e.g. changing some
 
 When the ++runtimeService.startProcessInstanceByKey("myProcess")++ is called, it will now use the process definition with version ++2++, as this is the latest version of the process definition.
 
-Should we create a second process, as defined below and deploy this to Activiti, a third row will be added to the table.
+Should we create a second process, as defined below and deploy this to Flowable, a third row will be added to the table.
 
 [source,xml,linenums]
 ----
@@ -120,7 +120,7 @@ The table will look like this:
 
 |===============
 
-Note how the key for the new process is different from our first process. Even though the name is the same (we should probably have changed that too), Activiti only considers the +id+ attribute when distinguishing processes. The new process is therefore deployed with version 1.
+Note how the key for the new process is different from our first process. Even though the name is the same (we should probably have changed that too), Flowable only considers the +id+ attribute when distinguishing processes. The new process is therefore deployed with version 1.
 
 
 [[providingProcessDiagram]]
@@ -128,7 +128,7 @@ Note how the key for the new process is different from our first process. Even t
 
 === Providing a process diagram
 
-A process diagram image can be added to a deployment. This image will be stored in the Activiti repository and is accessible through the API. This image is also used to visualize the process in Activiti Explorer.
+A process diagram image can be added to a deployment. This image will be stored in the Flowable repository and is accessible through the API. This image is also used to visualize the process in Flowable apps.
 
 Suppose we have a process on our classpath, +org/activiti/expenseProcess.bpmn20.xml+ that has a process key 'expense'. The following naming conventions for the process diagram image apply (in this specific order):
 
@@ -168,7 +168,7 @@ InputStream imageStream = repositoryService.getResourceAsStream(
 
 === Generating a process diagram
 
-In case no image is provided in the deployment, as described in the <<providingProcessDiagram,previous section>>, the Activiti engine will generate a diagram image if the process definition contains the necessary 'diagram interchange' information.
+In case no image is provided in the deployment, as described in the <<providingProcessDiagram,previous section>>, the Flowable engine will generate a diagram image if the process definition contains the necessary 'diagram interchange' information.
 
 The resource can be retrieved in exactly the same way as when <<providingProcessDiagram, an image is provided>> in the deployment.
 

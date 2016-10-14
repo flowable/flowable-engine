@@ -47,7 +47,7 @@ public class TriggerCmd extends NeedsActiveExecutionCmd<Object> {
   protected Object execute(CommandContext commandContext, ExecutionEntity execution) {
     if (Activiti5Util.isActiviti5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
       Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
-      activiti5CompatibilityHandler.trigger(executionId, processVariables);
+      activiti5CompatibilityHandler.trigger(executionId, processVariables, transientVariables);
       return null;
     }
     

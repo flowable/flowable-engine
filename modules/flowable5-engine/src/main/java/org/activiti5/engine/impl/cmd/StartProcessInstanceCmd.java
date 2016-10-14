@@ -40,6 +40,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
   protected String processDefinitionKey;
   protected String processDefinitionId;
   protected Map<String, Object> variables;
+  protected Map<String, Object> transientVariables;
   protected String businessKey;
   protected String tenantId;
   protected String processInstanceName;
@@ -58,9 +59,13 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
   }
   
   public StartProcessInstanceCmd(ProcessInstanceBuilderImpl processInstanceBuilder) {
-    this(processInstanceBuilder.getProcessDefinitionKey(), processInstanceBuilder.getProcessDefinitionId(),
-        processInstanceBuilder.getBusinessKey(), processInstanceBuilder.getVariables(), processInstanceBuilder.getTenantId());
+    this(processInstanceBuilder.getProcessDefinitionKey(), 
+         processInstanceBuilder.getProcessDefinitionId(),
+         processInstanceBuilder.getBusinessKey(), 
+         processInstanceBuilder.getVariables(), 
+         processInstanceBuilder.getTenantId());
     this.processInstanceName = processInstanceBuilder.getProcessInstanceName();
+    this.transientVariables = processInstanceBuilder.getTransientVariables();
   }
   
   public ProcessInstance execute(CommandContext commandContext) {
@@ -115,6 +120,9 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
   protected void initializeVariables(ExecutionEntity processInstance) {
     if (variables != null) {
       processInstance.setVariables(variables);
+    }
+    if (transientVariables != null) {
+      processInstance.setTransientVariables(transientVariables);
     }
   }
 }

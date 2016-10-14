@@ -1,13 +1,13 @@
 
 == Advanced
 
-The following sections cover advanced use cases of Activiti, that go beyond typical execution of BPMN 2.0 processes. As such, a certain proficiency and experience with Activiti is advised to understand the topics described here.
+The following sections cover advanced use cases of Flowable, that go beyond typical execution of BPMN 2.0 processes. As such, a certain proficiency and experience with Flowable is advised to understand the topics described here.
 
 === Async Executor
 
-In Activiti version 5 (starting from version 5.17.0), the Async executor was added in addition to the existing job executor. The Async Executor has proved to be more performant than the old job executor by many users of Activiti and our benchmarks.
+In Flowable version 5, the Async executor was added in addition to the existing job executor. The Async Executor has proved to be more performant than the old job executor by many users of Flowable and our benchmarks.
 
-In Activiti 6 (and later), the async executor is the only one available. For version 6, the async executor was completely refactored for optimal performance and pluggability (while still being compatible with existing API's).
+In Flowable 6 (and later), the async executor is the only one available. For version 6, the async executor was completely refactored for optimal performance and pluggability (while still being compatible with existing API's).
 
 [[async_executor_design]]
 
@@ -17,9 +17,9 @@ Two types of jobs exist: timers (like those belonging to a boundary event on a u
 
 *Timers* are the easiest to explain: they are persisted in the ACT_RU_TIMER_JOB table with a certain due date. There is a thread in the async executor that periodically checks if there are new timers that fire (i.e. the due date is 'before' the current time). When that happens, the timer is removed and an async job is created and inserted.
 
-An *async job* is inserted in the database during the execution of process instance steps (which means 'during some API call that was made'). If the async executor is active for the current Activiti engine, the async job is actually already _locked_. This means that the job entry is inserted in the ACT_RU_JOB table and will have a _lock owner_ and a _lock expiration time_ set. A transaction listener that fires on a successful commit of the API call triggers the async executor of the same engine to execute the job (so the data is guaranteed to be in the database). To do this, the async executor has a (configurable) thread pool from which a thread will execute the job and continue the process asynchronously. If the Activiti engine does not have the async executor enabled, the async job is inserted in the ACT_RU_JOB table without being locked.
+An *async job* is inserted in the database during the execution of process instance steps (which means 'during some API call that was made'). If the async executor is active for the current Flowable engine, the async job is actually already _locked_. This means that the job entry is inserted in the ACT_RU_JOB table and will have a _lock owner_ and a _lock expiration time_ set. A transaction listener that fires on a successful commit of the API call triggers the async executor of the same engine to execute the job (so the data is guaranteed to be in the database). To do this, the async executor has a (configurable) thread pool from which a thread will execute the job and continue the process asynchronously. If the Flowable engine does not have the async executor enabled, the async job is inserted in the ACT_RU_JOB table without being locked.
 
-Similar to the thread that checks for new timers, the async executor has a thread that 'acquires' new async jobs. These are jobs that are present in the table and are not locked. This thread will lock these jobs for the current Activiti engine and pass it to the async executor.
+Similar to the thread that checks for new timers, the async executor has a thread that 'acquires' new async jobs. These are jobs that are present in the table and are not locked. This thread will lock these jobs for the current Flowable engine and pass it to the async executor.
 
 The thread pool executing the jobs uses an in-memory queue to take jobs from. When this queue is full (this is configurable), the job will be unlocked and re-inserted into its table. This way, other async executors can pick it up instead.
 
@@ -75,14 +75,14 @@ The implementation consists of two classes:
 * An implementation of the _org.activiti.engine.impl.asyncexecutor.JobManager_ interface that puts a message on a message queue instead of passing it to the thread pool.
 * A _javax.jms.MessageListener_ implementation that consumes a message from the message queue, using the job identifier in the message to fetch and execute the job.
 
-First of all, add the _activiti-jms-spring-executor_ dependency to your project:
+First of all, add the _flowable-jms-spring-executor_ dependency to your project:
 
 [source,xml,linenums]
 ----
 <dependency>
-  <groupId>org.activiti</groupId>
-  <artifactId>activiti-jms-spring-executor</artifactId>
-  <version>${activiti.version}</version>
+  <groupId>org.flowable</groupId>
+  <artifactId>flowable-jms-spring-executor</artifactId>
+  <version>${flowable.version}</version>
 </dependency>
 ----
 
@@ -177,18 +177,18 @@ public class SpringJmsConfig {
 }
 ----
 
-In the code above, the _JobMessageListener_ and _MessageBasedJobManager_ are the only classes from the _activiti-jms-spring-executor_ module. All the other code is from Spring. As such, when wanting to port this to other queues/protocols, these classes must be ported.
+In the code above, the _JobMessageListener_ and _MessageBasedJobManager_ are the only classes from the _flowable-jms-spring-executor_ module. All the other code is from Spring. As such, when wanting to port this to other queues/protocols, these classes must be ported.
 
 
 [[advanced_parseHandlers]]
 
 === Hooking into process parsing
 
-A BPMN 2.0 xml needs to be parsed to the Activiti internal model to be executed on the Activiti engine. This parsing happens during a deployment of the process or when a process is not found in memory, and the xml is fetched from the database.
+A BPMN 2.0 xml needs to be parsed to the Flowable internal model to be executed on the Flowable engine. This parsing happens during a deployment of the process or when a process is not found in memory, and the xml is fetched from the database.
 
-For each of these processes, the +BpmnParser+ class creates a new +BpmnParse+ instance. This instance will be used as container for all things that are done during parsing. The parsing on itself is very simple: for each BPMN 2.0 element, there is a matching instance of the +org.activiti.engine.parse.BpmnParseHandler+ available in the engine. As such, the parser has a map which basically maps a BPMN 2.0 element class to an instance of +BpmnParseHandler+. By default, Activiti has +BpmnParseHandler+ instances to handle all supported elements and also uses it to attach execution listeners to steps of the process for creating the history.
+For each of these processes, the +BpmnParser+ class creates a new +BpmnParse+ instance. This instance will be used as container for all things that are done during parsing. The parsing on itself is very simple: for each BPMN 2.0 element, there is a matching instance of the +org.activiti.engine.parse.BpmnParseHandler+ available in the engine. As such, the parser has a map which basically maps a BPMN 2.0 element class to an instance of +BpmnParseHandler+. By default, Flowable has +BpmnParseHandler+ instances to handle all supported elements and also uses it to attach execution listeners to steps of the process for creating the history.
 
-It is possible to add custom instances of +org.activiti.engine.parse.BpmnParseHandler+ to the Activiti engine. An often seen use case is for example to add execution listeners to certain steps that fire events to some queue for event processing. The history handling is done in such a way internally in Activiti. To add such custom handlers, the Activiti configuration needs to be tweaked:
+It is possible to add custom instances of +org.activiti.engine.parse.BpmnParseHandler+ to the Flowable engine. An often seen use case is for example to add execution listeners to certain steps that fire events to some queue for event processing. The history handling is done in such a way internally in Flowable. To add such custom handlers, the Flowable configuration needs to be tweaked:
 
 [source,xml,linenums]
 ----
@@ -240,7 +240,7 @@ public class TestBPMNParseHandler extends AbstractBpmnParseHandler<Process> {
 
 *Important note:* when writing custom parse handler, do not use any of the internal  classes that are used to parse the BPMN 2.0 constructs. This will cause difficult to find bugs. The safe way to implement a custom handler is to implement the _BpmnParseHandler_ interface or extends the internal abstract class _org.activiti.engine.impl.bpmn.parser.handler.AbstractBpmnParseHandler_.
 
-It is possible (but less common) to replace the default +BpmnParseHandler+ instances that are responsible for the parsing of the BPMN 2.0 elements to the internal Activiti model. This can be done by following snippet of logic:
+It is possible (but less common) to replace the default +BpmnParseHandler+ instances that are responsible for the parsing of the BPMN 2.0 elements to the internal Flowable model. This can be done by following snippet of logic:
 
 [source,xml,linenums]
 ----
@@ -280,7 +280,7 @@ In some (very) high concurrency load cases, the default id generator may cause e
 
 The alternative to the default id generator is the +org.activiti.engine.impl.persistence.StrongUuidGenerator+, which generates a unique link:$$http://en.wikipedia.org/wiki/Universally_unique_identifier$$[UUID] locally and uses that as identifier for all entities. Since the UUID is generated without the need for database access, it copes better with very high concurrency use cases. Do note that performance may differ from the default id generator (both positive and negative) depending on the machine.
 
-The UUID generator can be configured in the activiti configuration as follows:
+The UUID generator can be configured in the Flowable configuration as follows:
 
 [source,xml,linenums]
 ----
@@ -310,11 +310,11 @@ The use of the UUID id generator depends on the following extra dependency:
 
 Multitenancy in general is a concept where the software is capable of serving multiple different organizations. Key is that the data is partitioned and no organization can see the data of other ones. In this context, such an organization (or a department, or a team or ...) is called a _tenant_.
 
-Note that this is fundamentally different from a multi-instance setup, where an Activiti Process Engine instance is running for each organization separately (and with a different database schema). Although Activiti is lightweight, and running a Process Engine instance doesn't take much resources, it does add complexity and more maintenance. But, for some use cases it might be the right solution.
+Note that this is fundamentally different from a multi-instance setup, where a Flowable Process Engine instance is running for each organization separately (and with a different database schema). Although Flowable is lightweight, and running a Process Engine instance doesn't take much resources, it does add complexity and more maintenance. But, for some use cases it might be the right solution.
 
-Multitenancy in Activiti is mainly implemented around partitioning the data. It is important to  note that _Activiti does not enforce multi tenancy rules_. This means it will not verify when querying and using data whether the user doing the operation is belonging to the correct tenant. This should be done in the layer calling the Activiti engine. Activiti does make sure that tenant information can be stored and used when retrieving process data.
+Multitenancy in Flowable is mainly implemented around partitioning the data. It is important to  note that _Flowable does not enforce multi tenancy rules_. This means it will not verify when querying and using data whether the user doing the operation is belonging to the correct tenant. This should be done in the layer calling the Flowable engine. Flowable does make sure that tenant information can be stored and used when retrieving process data.
 
-When deploying process definition to the Activiti Process Engine it is possible to pass a _tenant identifier_. This is a string (e.g. a UUID, department id, etc.), limited to 256 characters which is uniquely identifies the tenant:
+When deploying process definition to the Flowable Process Engine it is possible to pass a _tenant identifier_. This is a string (e.g. a UUID, department id, etc.), limited to 256 characters which is uniquely identifies the tenant:
 
 [source,java,linenums]
 ----
@@ -334,7 +334,7 @@ Passing a tenant id during a deployment has following implications:
 * Firing a signal throw event (in the process itself or through the API) can be done whilst providing a tenant identifier. The signal will only be executed in the tenant context: i.e. if there are multiple signal catch events with the same name, only the one with the correct tenant identifier will actually be called.
 * All jobs (timers and async continuations) inherit the tenant identifier from either the process definition (e.g. timer start event) or the process instance (when a job is created at runtime, e.g. an async continuation). This could potentially be used for giving priority to some tenants in a custom job executor.
 * All the historic entities (historic process instance, task and activities) inherit the tenant identifier from their runtime counterparts.
-* As a side note, models can have a tenant identifier too (models are used e.g. by the Activiti Modeler to store BPMN 2.0 models).
+* As a side note, models can have a tenant identifier too (models are used e.g. by the Flowable modeler to store BPMN 2.0 models).
 
 To actually make use of the tenant identifier on the process data, all the query API's have the capability to filter on tenant. For example (and can be replaced by the relevant query implementation of the other entities):
 
@@ -351,7 +351,7 @@ The query API's also allow to filter on the tenant identifier with _like_ semant
 
 *Important implementation detail:* due to database quirks (more specifically: null handling in unique constraints) the _default_ tenant identifier value indicating _no tenant_ is the *empty string*. The combination of (process definition key, process definition version, tenant identifier) needs to be unique (and there is a database constraint checking this). Also note that the tenant identifier shouldn't be set to null, as this will affect the queries since certain databases (Oracle) treat empty string as a null value (that's why the query _.withoutTenantId_ does a check against the empty string or null). This means that the same process definition (with same process definition key) can be deployed for multiple tenants, each with their own versioning. This does not affect the usage when tenancy is not used.
 
-*Do note that all of the above does not conflict with running multiple Activiti instances in a cluster.*
+*Do note that all of the above does not conflict with running multiple Flowable instances in a cluster.*
 
 [Experimental] It is possible to change the tenant identifier by calling the _changeDeploymentTenantId(String deploymentId, String newTenantId)_ method on the _repositoryService_. This will change the tenant identifier everywhere it was inherited before. This can be useful when going from a non-multitenant setup to a multitenant configuration. See the Javadoc on the method for more detailed information.
 
@@ -360,9 +360,9 @@ The query API's also allow to filter on the tenant identifier with _like_ semant
 
 === Execute custom SQL
 
-The Activiti API allows for interacting with the database using a high level API. For example, for retrieving data the Query API and the Native Query API are powerful in its usage. However, for some use cases they might not be flexible enough. The following section describes how a completely custom SQL statement (select, insert, update and delete are possible) can be executed against the Activiti data store, but completely within the configured Process Engine (and thus levering the transaction setup for example).
+The Flowable API allows for interacting with the database using a high level API. For example, for retrieving data the Query API and the Native Query API are powerful in its usage. However, for some use cases they might not be flexible enough. The following section describes how a completely custom SQL statement (select, insert, update and delete are possible) can be executed against the Flowable data store, but completely within the configured Process Engine (and thus levering the transaction setup for example).
 
-To define custom SQL statements, the Activiti engine leverages the capabilities of its underlying framework, MyBatis. More info can be read  link:$$http://mybatis.github.io/mybatis-3/java-api.html$$[in the MyBatis user guide].
+To define custom SQL statements, the Flowable engine leverages the capabilities of its underlying framework, MyBatis. More info can be read  link:$$http://mybatis.github.io/mybatis-3/java-api.html$$[in the MyBatis user guide].
 
 ==== Annotation based Mapped Statements
 
@@ -502,7 +502,7 @@ List<CustomTask> tasks = managementService.executeCommand(new Command<List<Custo
     });
 ----
 
-For uses cases that require more complicated statements, XML Mapped Statements can be helpful. Since Activiti uses XML Mapped Statements internally, it's possible to make use of the underlying capabilities.
+For uses cases that require more complicated statements, XML Mapped Statements can be helpful. Since Flowable uses XML Mapped Statements internally, it's possible to make use of the underlying capabilities.
 
 Suppose that for some use case the ability to query attachments data is required based on id, name, type, userId, etc! To fulfill the use case a query class _AttachmentQuery_ that extends  _org.activiti.engine.impl.AbstractQuery_ can be created as follows:
 
@@ -811,8 +811,8 @@ List<User> findUserByQueryCriteria(UserQueryImpl query, Page page);
 
 
 The code for the <<chapter_ldap,LDAP integration>> contains full examples of how to implement this. Check out the code on Github, specifically the following classes
-          link:$$https://github.com/Activiti/Activiti/blob/master/modules/activiti-ldap/src/main/java/org/activiti/ldap/LDAPGroupManager.java$$[LDAPGroupManager] and
-   link:$$https://github.com/Activiti/Activiti/blob/master/modules/activiti-ldap/src/main/java/org/activiti/ldap/LDAPUserManager.java$$[LDAPUserManager].
+          link:$$https://github.com/Flowable/Flowable/blob/master/modules/flowable-ldap/src/main/java/org/activiti/ldap/LDAPGroupManager.java$$[LDAPGroupManager] and
+   link:$$https://github.com/Flowable/Flowable/blob/master/modules/flowable-ldap/src/main/java/org/activiti/ldap/LDAPUserManager.java$$[LDAPUserManager].
 
 
 [[advanced.safe.bpmn.xml]]
@@ -821,7 +821,7 @@ The code for the <<chapter_ldap,LDAP integration>> contains full examples of how
 === Enable safe BPMN 2.0 xml
 
 
-In most cases the BPMN 2.0 processes that are being deployed to the Activiti engine are under tight control of e.g. the development team. However, in some use cases it might be desirable to upload arbitrary BPMN 2.0 xml to the engine. In that case, take into consideration that a user with bad intentions can bring the server down as described link:$$http://www.jorambarrez.be/blog/2013/02/19/uploading-a-funny-xml-can-bring-down-your-server/$$[here].
+In most cases the BPMN 2.0 processes that are being deployed to the Flowable engine are under tight control of e.g. the development team. However, in some use cases it might be desirable to upload arbitrary BPMN 2.0 xml to the engine. In that case, take into consideration that a user with bad intentions can bring the server down as described link:$$http://www.jorambarrez.be/blog/2013/02/19/uploading-a-funny-xml-can-bring-down-your-server/$$[here].
 
 To avoid the attacks described in the link above, a property _enableSafeBpmnXml_ can be set on the process engine configuration:
 
@@ -832,7 +832,7 @@ To avoid the attacks described in the link above, a property _enableSafeBpmnXml_
 
 *By default this feature is disabled!* The reason for this is that it relies on  the availability of the link:$$http://download.java.net/jdk7/archive/b123/docs/api/javax/xml/transform/stax/StAXSource.html$$[StaxSource] class. Unfortunately, on some platforms (e.g. JDK 6, JBoss, etc.) this class is unavailable (due to older xml parser implementation) and thus the safe BPMN 2.0 xml feature cannot be enabled.
 
-If the platform on which Activiti runs does support it, do enable this feature.
+If the platform on which Flowable runs does support it, do enable this feature.
 
 
 [[advanced.event.logging]]
@@ -840,7 +840,7 @@ If the platform on which Activiti runs does support it, do enable this feature.
 
 === Event logging (Experimental)
 
-As of Activiti version 5.16, an (experimental) event logging mechanism has been introduced. The logging mechanism builds upon the general-purpose <<eventDispatcher,event mechanism of the Activiti engine>> and is disabled by default. The idea is that the events originating from the engine are caught, and a map containing all the event data (and some more) is created and provided to an _org.activiti.engine.impl.event.logger.EventFlusher_ which will flush this data to somewhere else. By default, simple database-backed event handlers/flusher is used, which serializes the said map to JSON using Jackson and stores it in the database as an _EventLogEntryEntity_ instance.  The table required for this database logging is  created by default (called __$$ACT_EVT_LOG$$__). This table can be deleted if the event logging is not used.
+An (experimental) event logging mechanism has been introduced. The logging mechanism builds upon the general-purpose <<eventDispatcher,event mechanism of the Flowable engine>> and is disabled by default. The idea is that the events originating from the engine are caught, and a map containing all the event data (and some more) is created and provided to an _org.activiti.engine.impl.event.logger.EventFlusher_ which will flush this data to somewhere else. By default, simple database-backed event handlers/flusher is used, which serializes the said map to JSON using Jackson and stores it in the database as an _EventLogEntryEntity_ instance.  The table required for this database logging is  created by default (called __$$ACT_EVT_LOG$$__). This table can be deleted if the event logging is not used.
 
 To enable the database logger:
 
@@ -857,11 +857,11 @@ databaseEventLogger = new EventLogger(processEngineConfiguration.getClock());
 runtimeService.addEventListener(databaseEventLogger);
 ----
 
-The EventLogger class can be subclassed. In particular, the _createEventFlusher()_ method needs to return an instance of the _org.activiti.engine.impl.event.logger.EventFlusher_ interface if the default database logging is not wanted. The _managementService.getEventLogEntries(startLogNr, size);_  can be used to retrieve the _EventLogEntryEntity_ instances through Activiti.
+The EventLogger class can be subclassed. In particular, the _createEventFlusher()_ method needs to return an instance of the _org.activiti.engine.impl.event.logger.EventFlusher_ interface if the default database logging is not wanted. The _managementService.getEventLogEntries(startLogNr, size);_  can be used to retrieve the _EventLogEntryEntity_ instances through Flowable.
 
 It is easy to see how this table data can now be used to feed the JSON into a big data NoSQL store such as MongoDB, Elastic Search, etc. It is also easy to see that the classes used here (org.activiti.engine.impl.event.logger.EventLogger/EventFlusher and many EventHandler classes) are pluggable and can be tweaked to your own use case (eg not storing the JSON in the database, but firing it straight onto a queue or big data store).
 
-Note that this event logging mechanism is additional to the 'traditional' history manager of Activiti. Although all the data is in the database tables,
+Note that this event logging mechanism is additional to the 'traditional' history manager of Flowable. Although all the data is in the database tables,
 it is not optimized for querying nor for easy retrieval. The real use case is audit trailing and feeding it into a big data store.
 
 === Disabling bulk inserts
@@ -878,24 +878,24 @@ However, it could be a specific version of a supported and tested database does 
 [[advancedSecureScripting]]
 === Secure Scripting
 
-*Experimental*: the secure scripting feature has been added as part of the Activiti 5.21 release.
+*Experimental*: the secure scripting feature has been added as part of the Flowable 5.22 release.
 
 By default, when using a <<bpmnScriptTask, script task>>, the script that is executed has similar capabilities as a Java delegate. It has full access to the JVM, can run forever (due to infinite loops) or use up a lot of memory. However, Java delegates need to be written and put on the classpath in a jar and they have a different lifecyle from a process definitions. End-users generally will not write Java delegates, as this is a typical the job of a developer.
 
 Scripts on the other hand are part of the process definition and its lifecycle is the same. Script tasks don't need the extra step of a jar deployment, but can be executed from the moment the process definition is deployed. Sometimes, scripts for script tasks are not written by developers. Yet, this poses a problem as stated above: a script has full access to the JVM and it is possible to block many system resources when executing the script. Allowing scripts from just about anyone is thus not a good idea.
 
-To solve this problem, the _secure scripting_ feature can be enabled. Currently, this feature is implemented for _javascript_ scripting only. To enable it, add the _activiti-secure-javascript_ dependency to your project. When using maven:
+To solve this problem, the _secure scripting_ feature can be enabled. Currently, this feature is implemented for _javascript_ scripting only. To enable it, add the _flowable-secure-javascript_ dependency to your project. When using maven:
 
 [source,xml,linenums]
 ----
 <dependency>
-    <groupId>org.activiti</groupId>
-    <artifactId>activiti-secure-javascript</artifactId>
-    <version>${activiti.version}</version>
+    <groupId>org.flowable</groupId>
+    <artifactId>flowable-secure-javascript</artifactId>
+    <version>${flowable.version}</version>
 </dependency>
 ----
 
-Adding this dependency will transitively bring in the Rhino dependency (see link:$https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino$$[https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino]). Rhino is a javascript engine for the JDK. It used to be included in JDK version 6 and 7 and was superseded by the Nashorn engine. However, the Rhino project continued development after it was included in the JDK. Many features (including the ones Activiti uses to implement the secure scripting) were added afterwards. At the time of writing, the Nashorn engine *does not* have the features that are needed to implement the secure scripting feature.
+Adding this dependency will transitively bring in the Rhino dependency (see link:$https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino$$[https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino]). Rhino is a javascript engine for the JDK. It used to be included in JDK version 6 and 7 and was superseded by the Nashorn engine. However, the Rhino project continued development after it was included in the JDK. Many features (including the ones Flowable uses to implement the secure scripting) were added afterwards. At the time of writing, the Nashorn engine *does not* have the features that are needed to implement the secure scripting feature.
 
 This does mean that there could be (typically small) differences between scripts (for example, _importPackage_ works on Rhino, but _load()_ has to be used on Nashorn). The changes would be similar to switching from JDK 7 to 8 scripts.
 
@@ -942,4 +942,4 @@ It's used as follows:
 </activiti:executionListener>
 ----
 
-For examples that demonstrate unsecure scripts and how they are made secure by the _secure scripting_ feature, please check the  link:$$https://github.com/Activiti/Activiti/tree/master/modules/activiti-secure-javascript/src/test/resources$$[unit tests on Github]
+For examples that demonstrate unsecure scripts and how they are made secure by the _secure scripting_ feature, please check the  link:$$https://github.com/Flowable/Flowable/tree/master/modules/flowable-secure-javascript/src/test/resources$$[unit tests on Github]

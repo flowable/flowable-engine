@@ -42,6 +42,12 @@ import org.activiti5.engine.task.IdentityLinkType;
  * @author Daniel Meyer
  */
 public interface RuntimeService {
+  
+  /** 
+  * Create a {@link ProcessInstanceBuilder}, that allows to set various options for starting a process instance,
+  * as an alternative to the various startProcessInstanceByXX methods. 
+  */
+  ProcessInstanceBuilder createProcessInstanceBuilder();
 
   /**
    * Starts a new process instance in the latest version of the process
@@ -369,6 +375,12 @@ public interface RuntimeService {
    *           when no execution is found for the given executionId.
    */
   void signal(String executionId, Map<String, Object> processVariables);
+  
+  /**
+   * Similar to {@link #trigger(String, Map)}, but with an extra parameter that allows to pass
+   * transient variables.
+   */
+  void signal(String executionId, Map<String, Object> processVariables, Map<String, Object> transientVariables);
 
   /**
    * Updates the business key for the provided process instance
@@ -1089,7 +1101,4 @@ public interface RuntimeService {
   /** The all events related to the given Process Instance. */
   List<Event> getProcessInstanceEvents(String processInstanceId);
   
-  /**Create a ProcessInstanceBuilder*/
-  ProcessInstanceBuilder createProcessInstanceBuilder();
-    
 }

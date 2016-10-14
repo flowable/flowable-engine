@@ -28,6 +28,7 @@ public class SignalCmd extends NeedsActiveExecutionCmd<Object> {
   protected String signalName;
   protected Object signalData;
   protected final Map<String, Object> processVariables;
+  protected Map<String, Object> transientVariables;
   
   public SignalCmd(String executionId, String signalName, Object signalData, Map<String, Object> processVariables) {
     super(executionId);
@@ -36,9 +37,18 @@ public class SignalCmd extends NeedsActiveExecutionCmd<Object> {
     this.processVariables = processVariables;
   }
   
+  public SignalCmd(String executionId, Map<String, Object> processVariables, Map<String, Object> transientVariables) {
+    super(executionId);
+    this.processVariables = processVariables;
+    this.transientVariables = transientVariables;
+  }
+  
   protected Object execute(CommandContext commandContext, ExecutionEntity execution) {
     if(processVariables != null) {
       execution.setVariables(processVariables);
+    }
+    if (transientVariables != null) {
+      execution.setTransientVariables(transientVariables);
     }
     execution.signal(signalName, signalData);
     return null;

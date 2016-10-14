@@ -25,6 +25,7 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
       
   private static final long serialVersionUID = 1L;
   protected Map<String, Object> variables;
+  protected Map<String, Object> transientVariables;
   protected boolean localScope;
   
   public CompleteTaskCmd(String taskId, Map<String, Object> variables) {
@@ -33,9 +34,13 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
   }
   
   public CompleteTaskCmd(String taskId, Map<String, Object> variables, boolean localScope) {
-    super(taskId);
-    this.variables = variables;
+    this(taskId, variables);
     this.localScope = localScope;
+  }
+  
+  public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {
+    this(taskId, variables);
+    this.transientVariables = transientVariables;
   }
   
   protected Void execute(CommandContext commandContext, TaskEntity task) {
@@ -47,6 +52,14 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
     	} else {
     		task.setVariables(variables);
     	}
+    }
+    
+    if (transientVariables != null) {
+      if (localScope) {
+        task.setTransientVariablesLocal(transientVariables);
+      } else {
+        task.setTransientVariables(transientVariables);
+      }
     }
     
     task.complete(variables, localScope);

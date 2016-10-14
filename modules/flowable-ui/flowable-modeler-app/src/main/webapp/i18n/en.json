@@ -820,7 +820,6 @@
             "HEADER-NAME" : "Property name",
             "PLACEHOLDER-NAME" : "Enter a property name",
             "HEADER-TYPE": "Property type",
-            "REQUIRED" : "Required",
             "EDITABLE" : "Editable",
             "SORTABLE" : "Sortable",
             "VISIBLE" : "Show in table",

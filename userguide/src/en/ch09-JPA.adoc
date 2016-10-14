@@ -46,7 +46,7 @@ The example configuration below uses the jpaPersistenceUnitName:
 </bean>
 ----
 
-The next example configuration below provides a +EntityManagerFactory+ which we define ourselves (in this case, an open-jpa entity manager). Note that the snippet only contains the beans that are relevant for the example, the others are omitted. Full working example with open-jpa entity manager can be found in the activiti-spring-examples (++/activiti-spring/src/test/java/org/activiti/spring/test/jpa/JPASpringTest.java++)
+The next example configuration below provides a +EntityManagerFactory+ which we define ourselves (in this case, an open-jpa entity manager). Note that the snippet only contains the beans that are relevant for the example, the others are omitted. Full working example with open-jpa entity manager can be found in the flowable-spring-examples (++/flowable-spring/src/test/java/org/activiti/spring/test/jpa/JPASpringTest.java++)
 
 [source,xml,linenums]
 ----
@@ -91,7 +91,7 @@ Configuration properties:
 
 ==== Simple Example
 
-Examples for using JPA variables can be found in JPAVariableTest in the Activiti source code. We'll explain +JPAVariableTest.testUpdateJPAEntityValues+ step by step.
+Examples for using JPA variables can be found in JPAVariableTest in the Flowable source code. We'll explain +JPAVariableTest.testUpdateJPAEntityValues+ step by step.
 
 First of all, we create an _EntityManagerFactory_ for our persistence-unit, which is based on +META-INF/persistence.xml+. This contains classes which should be included in the persistence unit and some vendor-specific configuration.
 
@@ -171,10 +171,10 @@ You can query for ++ProcessInstance++s and ++Execution++s that have a certain JP
 ==== Advanced example using Spring beans and JPA
 
 
-A more advanced example, +JPASpringTest+, can be found in +activiti-spring-examples+. It describes the following simple use case:
+A more advanced example, +JPASpringTest+, can be found in +flowable-spring-examples+. It describes the following simple use case:
 
 * An existing Spring-bean which uses JPA entities already exists which allows for Loan Requests to be stored.
-* Using Activiti, we can use the existing entities, obtained through the existing bean, and use them as variable in our process. Process is defined in the following steps:
+* Using Flowable, we can use the existing entities, obtained through the existing bean, and use them as variable in our process. Process is defined in the following steps:
 ** Service task that creates a new LoanRequest, using the existing +LoanRequestBean+ using variables received when starting the process (e.g. could come from a start form). The created entity is stored as a variable, using +activiti:resultVariable+ which stores the expression result as a variable.
 ** UserTask that allows a manager to review the request and approve/disapprove, which is stored as a boolean variable +approvedByManager+
 ** ServiceTask that updates the loan request entity so the entity is in sync with the process.
