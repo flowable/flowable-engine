@@ -14,13 +14,6 @@
       <version>1.0</version>
     </dependency>
   </dependencies>
-  
-  <repositories>
-    <repository>
-      <id>flowable-repo</id>
-      <url>https://maven.alfresco.com/nexus/content/repositories/activiti/</url>      
-    </repository>
-  </repositories>
 
   <build>
     <plugins>
