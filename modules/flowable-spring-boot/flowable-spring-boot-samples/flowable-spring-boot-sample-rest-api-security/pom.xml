@@ -16,6 +16,12 @@
             <groupId>org.flowable</groupId>
             <artifactId>flowable-spring-boot-starter-rest-api</artifactId>
             <version>6.0.0.RC1-SNAPSHOT</version>
+            <exclusions>
+			  <exclusion> 
+			    <groupId>org.slf4j</groupId>
+			    <artifactId>log4j-over-slf4j</artifactId>
+			  </exclusion>
+		    </exclusions>
         </dependency>
 
         <dependency>
