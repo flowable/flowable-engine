@@ -75,9 +75,6 @@ public class GroupCollectionResource {
     if (allRequestParams.containsKey("member")) {
       query.groupMember(allRequestParams.get("member"));
     }
-    if (allRequestParams.containsKey("potentialStarter")) {
-      query.potentialStarter(allRequestParams.get("potentialStarter"));
-    }
 
     return new GroupPaginateList(restResponseFactory).paginateList(allRequestParams, query, "id", properties);
   }

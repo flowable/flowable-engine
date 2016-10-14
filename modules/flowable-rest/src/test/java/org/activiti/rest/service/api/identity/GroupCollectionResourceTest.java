@@ -75,13 +75,6 @@ public class GroupCollectionResourceTest extends BaseSpringRestTestCase {
       url = RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP_COLLECTION) + "?member=kermit";
       assertResultsPresentInDataResponse(url, group3.getId());
 
-      // Test based on potentialStarter
-      String processDefinitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKey("simpleProcess").singleResult().getId();
-      repositoryService.addCandidateStarterGroup(processDefinitionId, "admin");
-
-      url = RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP_COLLECTION) + "?potentialStarter=" + processDefinitionId;
-      assertResultsPresentInDataResponse(url, group3.getId());
-
     } finally {
 
       // Delete groups after test passes or fails

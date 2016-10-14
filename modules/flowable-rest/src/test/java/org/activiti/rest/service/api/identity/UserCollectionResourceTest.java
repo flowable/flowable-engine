@@ -93,13 +93,6 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
       url = RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION) + "?memberOfGroup=admin";
       assertResultsPresentInDataResponse(url, user3.getId());
 
-      // Test based on potentialStarter
-      String processDefinitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKey("simpleProcess").singleResult().getId();
-      repositoryService.addCandidateStarterUser(processDefinitionId, "kermit");
-
-      url = RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION) + "?potentialStarter=" + processDefinitionId;
-      assertResultsPresentInDataResponse(url, user3.getId());
-
     } finally {
 
       // Delete user after test passes or fails

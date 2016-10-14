@@ -85,9 +85,6 @@ public class UserCollectionResource {
     if (allRequestParams.containsKey("memberOfGroup")) {
       query.memberOfGroup(allRequestParams.get("memberOfGroup"));
     }
-    if (allRequestParams.containsKey("potentialStarter")) {
-      query.potentialStarter(allRequestParams.get("potentialStarter"));
-    }
 
     return new UserPaginateList(restResponseFactory).paginateList(allRequestParams, query, "id", properties);
   }

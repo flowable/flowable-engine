@@ -78,7 +78,8 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
   private static Logger log = LoggerFactory.getLogger(BaseSpringRestTestCase.class);
   
   protected static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
-    "ACT_GE_PROPERTY"
+    "ACT_GE_PROPERTY",
+    "ACT_ID_PROPERTY"
   );
   
   protected static String SERVER_URL_PREFIX;
