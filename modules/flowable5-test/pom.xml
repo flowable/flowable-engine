@@ -181,7 +181,7 @@
 	                  <tasks>
 	                    <echo message="updating activiti configuration to db ${database}" />
 	                    <copy file="${basedir}/../../qa/activiti5db/activiti.cfg.xml" todir="target/test-classes" overwrite="true">
-	                      <filterset filtersfile="${user.home}/.activiti/jdbc/build.activiti6.${database}.properties" />
+	                      <filterset filtersfile="${user.home}/.activiti/jdbc/build.flowable6.${database}.properties" />
 	                    </copy>
 	                  </tasks>
 	                </configuration>
