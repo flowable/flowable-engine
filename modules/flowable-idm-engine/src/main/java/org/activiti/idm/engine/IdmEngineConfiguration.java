@@ -131,7 +131,7 @@ public class IdmEngineConfiguration {
    */
   public static final String DB_SCHEMA_UPDATE_TRUE = "true";
 
-  protected String formEngineName = IdmEngines.NAME_DEFAULT;
+  protected String idmEngineName = IdmEngines.NAME_DEFAULT;
 
   protected String databaseType;
   protected String jdbcDriver = "org.h2.Driver";
@@ -245,6 +245,14 @@ public class IdmEngineConfiguration {
    * {@link ProcessEngineConfiguration#DB_SCHEMA_UPDATE_TRUE}, activiti will create the database tables using the default names, regardless of the prefix configured here.</strong>
    */
   protected String databaseTablePrefix = "";
+  
+  /**
+   * Escape character for doing wildcard searches.
+   * 
+   * This will be added at then end of queries that include for example a LIKE clause.
+   * For example: SELECT * FROM table WHERE column LIKE '%\%%' ESCAPE '\';
+   */
+  protected String databaseWildcardEscapeCharacter;
 
   /**
    * database catalog to use
@@ -712,6 +720,13 @@ public class IdmEngineConfiguration {
         Reader reader = new InputStreamReader(inputStream);
         Properties properties = new Properties();
         properties.put("prefix", databaseTablePrefix);
+        
+        String wildcardEscapeClause = "";
+        if ((databaseWildcardEscapeCharacter != null) && (databaseWildcardEscapeCharacter.length() != 0)) {
+          wildcardEscapeClause = " escape '" + databaseWildcardEscapeCharacter + "'";
+        }
+        properties.put("wildcardEscapeClause", wildcardEscapeClause);
+        
         // set default properties
         properties.put("limitBefore", "");
         properties.put("limitAfter", "");
@@ -812,12 +827,12 @@ public class IdmEngineConfiguration {
   // getters and setters
   // //////////////////////////////////////////////////////
 
-  public String getFormEngineName() {
-    return formEngineName;
+  public String getIdmEngineName() {
+    return idmEngineName;
   }
 
-  public IdmEngineConfiguration setFormEngineName(String formEngineName) {
-    this.formEngineName = formEngineName;
+  public IdmEngineConfiguration setIdmEngineName(String idmEngineName) {
+    this.idmEngineName = idmEngineName;
     return this;
   }
 
@@ -1290,6 +1305,15 @@ public class IdmEngineConfiguration {
 
   public IdmEngineConfiguration setDatabaseTablePrefix(String databaseTablePrefix) {
     this.databaseTablePrefix = databaseTablePrefix;
+    return this;
+  }
+
+  public String getDatabaseWildcardEscapeCharacter() {
+    return databaseWildcardEscapeCharacter;
+  }
+
+  public IdmEngineConfiguration setDatabaseWildcardEscapeCharacter(String databaseWildcardEscapeCharacter) {
+    this.databaseWildcardEscapeCharacter = databaseWildcardEscapeCharacter;
     return this;
   }
 

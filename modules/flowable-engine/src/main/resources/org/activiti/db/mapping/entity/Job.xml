@@ -11,7 +11,7 @@
 		<result property="revision" column="REV_" jdbcType="INTEGER" />
 		<result property="jobType" column="TYPE_" jdbcType="VARCHAR" />
 		<result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR" />
-	  <result property="lockExpirationTime" column="LOCK_EXP_TIME_" jdbcType="TIMESTAMP" />
+	    <result property="lockExpirationTime" column="LOCK_EXP_TIME_" jdbcType="TIMESTAMP" />
 		<result property="exclusive" column="EXCLUSIVE_" jdbcType="BOOLEAN" />
 		<result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
 		<result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
@@ -59,7 +59,7 @@
 	<select id="selectJobsByConfiguration" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 		select * from ${prefix}ACT_RU_JOB
 		where HANDLER_TYPE_ = #{parameter.handlerType}
-		and HANDLER_CFG_ like #{parameter.handlerConfiguration}
+		and HANDLER_CFG_ like #{parameter.handlerConfiguration}${wildcardEscapeClause}
 	</select>
 
 	<select id="selectJobsByExecutionId" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
@@ -139,7 +139,7 @@
 				and RES.TENANT_ID_ = #{tenantId}
 			</if>
 			<if test="tenantIdLike != null">
-				and RES.TENANT_ID_ like #{tenantIdLike}
+				and RES.TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
 			</if>
 			<if test="withoutTenantId">
 				and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)

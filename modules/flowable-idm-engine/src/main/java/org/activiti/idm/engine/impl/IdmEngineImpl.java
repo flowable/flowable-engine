@@ -36,7 +36,7 @@ public class IdmEngineImpl implements IdmEngine {
 
   public IdmEngineImpl(IdmEngineConfiguration engineConfiguration) {
     this.engineConfiguration = engineConfiguration;
-    this.name = engineConfiguration.getFormEngineName();
+    this.name = engineConfiguration.getIdmEngineName();
     this.identityService = engineConfiguration.getIdmIdentityService();
     this.managementService = engineConfiguration.getIdmManagementService();
     this.commandExecutor = engineConfiguration.getCommandExecutor();
