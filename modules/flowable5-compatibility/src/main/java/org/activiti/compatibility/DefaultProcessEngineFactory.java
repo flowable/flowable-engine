@@ -13,8 +13,12 @@
 
 package org.activiti.compatibility;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentMap;
+
+import javax.xml.namespace.QName;
 
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
@@ -60,6 +64,7 @@ public class DefaultProcessEngineFactory {
     copyListenerFactory(activiti6Configuration, activiti5Configuration);
     convertParseHandlers(activiti6Configuration, activiti5Configuration);
     copyCustomMybatisMappers(activiti6Configuration, activiti5Configuration);
+    copyWsConfig(activiti6Configuration, activiti5Configuration);
     activiti5Configuration.setEventDispatcher(activiti6Configuration.getEventDispatcher());
     copyPostDeployers(activiti6Configuration, activiti5Configuration);
     activiti5Configuration.setBusinessCalendarManager(activiti6Configuration.getBusinessCalendarManager());
@@ -188,6 +193,19 @@ public class DefaultProcessEngineFactory {
     
     if (activiti6Configuration.getActiviti5CustomMybatisXMLMappers() != null) {
       activiti5Configuration.setCustomMybatisXMLMappers(activiti6Configuration.getActiviti5CustomMybatisXMLMappers());
+    }
+  }
+  
+  protected void copyWsConfig(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
+    if (activiti6Configuration.getWsSyncFactoryClassName() != null) {
+      activiti5Configuration.setWsSyncFactoryClassName(activiti6Configuration.getWsSyncFactoryClassName());
+    }
+    
+    ConcurrentMap<QName, URL> endpointMap = activiti6Configuration.getWsOverridenEndpointAddresses();
+    if (endpointMap != null) {
+      for (QName endpointQName : endpointMap.keySet()) {
+        activiti5Configuration.addWsEndpointAddress(endpointQName, endpointMap.get(endpointQName));
+      }
     }
   }
 

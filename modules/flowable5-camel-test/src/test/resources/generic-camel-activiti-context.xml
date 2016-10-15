@@ -8,7 +8,7 @@
         http://www.springframework.org/schema/osgi  http://www.springframework.org/schema/osgi/spring-osgi.xsd
                            http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
-	<import resource="classpath*:camel-flowable-parent-context.xml" />
+	<import resource="classpath*:camel-activiti-parent-context.xml" />
     
     <camelContext id="camelContext" xmlns="http://camel.apache.org/schema/spring" />
        

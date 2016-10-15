@@ -68,7 +68,7 @@ public abstract class AbstractActivityBpmnParseHandler<T extends FlowNode> exten
     ExpressionManager expressionManager = bpmnParse.getExpressionManager();
     BpmnModel bpmnModel = bpmnParse.getBpmnModel();
     
-    // loopcardinality
+    // loop cardinality
     if (StringUtils.isNotEmpty(loopCharacteristics.getLoopCardinality())) {
       miActivityBehavior.setLoopCardinalityExpression(expressionManager.createExpression(loopCharacteristics.getLoopCardinality()));
     }

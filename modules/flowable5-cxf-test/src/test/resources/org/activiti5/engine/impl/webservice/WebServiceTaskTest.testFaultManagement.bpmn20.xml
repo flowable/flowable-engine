@@ -20,11 +20,17 @@
                  name="Web service invocation"
                  implementation="##WebService"
                  operationRef="tns:incOperation" />
+                 
+    <boundaryEvent id="faultMaxValue" attachedToRef="webService">
+      <errorEventDefinition errorRef="org.activiti5.engine.impl.test.MaxValueReachedFault_Exception" />
+    </boundaryEvent>
 
     <sequenceFlow id="flow2" sourceRef="webService" targetRef="theEnd" />
+    <sequenceFlow id="flow2a" sourceRef="faultMaxValue" targetRef="theEndWithError" />
 
     <endEvent id="theEnd" />
-
+    <endEvent id="theEndWithError" />
+    
   </process>
 
 

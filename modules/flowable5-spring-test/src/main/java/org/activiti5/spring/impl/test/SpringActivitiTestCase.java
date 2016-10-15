@@ -32,8 +32,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 @TestExecutionListeners(DependencyInjectionTestExecutionListener.class)
 public abstract class SpringActivitiTestCase extends AbstractActivitiTestCase implements ApplicationContextAware {
 
-  // we need a data structure to store all the resolved ProcessEngines and map
-  // them to something
+  // we need a data structure to store all the resolved ProcessEngines and map them to something
   protected Map<Object, ProcessEngine> cachedProcessEngines = new ConcurrentHashMap<Object, ProcessEngine>();
 
   // protected static Map<String, ProcessEngine> cachedProcessEngines = new

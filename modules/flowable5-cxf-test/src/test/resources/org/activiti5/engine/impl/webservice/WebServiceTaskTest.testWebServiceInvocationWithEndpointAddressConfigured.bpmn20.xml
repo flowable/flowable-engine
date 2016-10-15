@@ -7,7 +7,7 @@
   xmlns:webservice="http://webservice.activiti.org/">
 
   <import importType="http://schemas.xmlsoap.org/wsdl/"
-          location="http://localhost:63081/webservicemock?wsdl"
+          location="webservicemock.wsdl"
           namespace="http://webservice.activiti.org/" />
 
   <process id="webServiceInvocation">

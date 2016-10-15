@@ -162,7 +162,7 @@ public abstract class AbstractActivitiTestCase extends AbstractTestCase {
       
       log.info("dropping and recreating db");
       
-      CommandExecutor commandExecutor = ((ProcessEngineImpl)processEngine).getProcessEngineConfiguration().getCommandExecutor();
+      CommandExecutor commandExecutor = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().getCommandExecutor();
       CommandConfig config = new CommandConfig().transactionNotSupported();
       commandExecutor.execute(config, new Command<Object>() {
         public Object execute(CommandContext commandContext) {

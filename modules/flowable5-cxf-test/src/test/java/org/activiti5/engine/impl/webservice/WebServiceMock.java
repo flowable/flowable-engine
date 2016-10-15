@@ -29,7 +29,7 @@ public interface WebServiceMock {
   /**
    * Increase the counter in 1
    */
-  void inc();
+    void inc() throws MaxValueReachedFault;
 
   /**
    * Returns the current count
@@ -78,4 +78,10 @@ public interface WebServiceMock {
    */
   @WebResult(name="currentStructure")
   WebServiceDataStructure getDataStructure();
+
+  @WebResult
+  String noNameResult(@WebParam(name="prefix") String prefix, @WebParam(name="suffix") String suffix);
+
+  @WebResult(name = "static")
+  String reservedWordAsName(@WebParam(name="prefix") String prefix, @WebParam(name="suffix") String suffix);
 }

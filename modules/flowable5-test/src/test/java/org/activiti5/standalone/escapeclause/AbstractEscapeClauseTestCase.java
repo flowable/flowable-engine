@@ -10,19 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.activiti5.engine.test.history;
-
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
+package org.activiti5.standalone.escapeclause;
 
 
-/**
- * @author Joram Barrez
- */
-public class Noop implements JavaDelegate {
+public class AbstractEscapeClauseTestCase extends org.activiti5.engine.impl.test.ResourceActivitiTestCase {
 
-  public void execute(DelegateExecution execution) {
+  public AbstractEscapeClauseTestCase() {
+    this(null);
   }
-
+  
+  public AbstractEscapeClauseTestCase(String activitiConfigurationResource) {
+    super("org/activiti5/standalone/escapeclause/activiti.cfg.xml");
+  }
+  
 }
