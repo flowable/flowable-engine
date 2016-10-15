@@ -168,4 +168,7 @@ public class MultiSchemaMultiTenantProcessEngineConfiguration extends ProcessEng
     // empty here. will be done in registerTenant
   }
 
+  public TenantInfoHolder getTenantInfoHolder() {
+    return tenantInfoHolder;
+  }
 }

@@ -78,7 +78,7 @@ public class MultiTenantProcessEngineTest {
     config.setDatabaseSchemaUpdate(MultiSchemaMultiTenantProcessEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE);
     
     config.setAsyncExecutorActivate(true);
-    
+    config.setDisableIdmEngine(true);
     
     if (sharedExecutor) {
       config.setAsyncExecutor(new SharedExecutorServiceAsyncExecutor(tenantInfoHolder));
@@ -95,10 +95,18 @@ public class MultiTenantProcessEngineTest {
   }
   
   @Test
-  public void testStartProcessInstances() throws Exception {
-    
+  public void testStartProcessInstancesWithSharedExecutor() throws Exception {
     setupProcessEngine(true);
+    runProcessInstanceTest();
+  }
+  
+  @Test
+  public void testStartProcessInstancesWithExecutorPerTenantAsyncExecutor() throws Exception {
+    setupProcessEngine(false);
+    runProcessInstanceTest();
+  }
     
+  protected void runProcessInstanceTest() throws InterruptedException {
     // Generate data
     startProcessInstances("joram");
     startProcessInstances("joram");
