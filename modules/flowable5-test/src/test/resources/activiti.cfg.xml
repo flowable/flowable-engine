@@ -11,7 +11,7 @@
 		<property name="jdbcUsername" value="alfresco" />
 		<property name="jdbcPassword" value="alfresco" /> -->
 
-		<property name="jdbcUrl" value="jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000" />
+		<property name="jdbcUrl" value="jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000;MVCC=TRUE" />
 		<property name="jdbcDriver" value="org.h2.Driver" />
 		<property name="jdbcUsername" value="sa" />
 		<property name="jdbcPassword" value="" />
