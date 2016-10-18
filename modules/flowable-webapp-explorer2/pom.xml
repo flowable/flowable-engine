@@ -63,7 +63,7 @@
         <artifactId>tomcat7-maven-plugin</artifactId>
 		<configuration>
 		  <port>8080</port>
-		  <path>/activiti-explorer</path>
+		  <path>/flowable-explorer</path>
 		  <systemProperties>
 		    <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>
           </systemProperties>
@@ -223,7 +223,7 @@
     </dependency>
 
     <!-- Vaadin addons -->
-    <!-- Must be defined both in activiti-explorer and activiti-webapp-explorer, 
+    <!-- Must be defined both in flowable-explorer and flowable-webapp-explorer, 
       as otherwise the gwt compiler won't find it -->
     <dependency>
       <groupId>org.vaadin.addons</groupId>
