@@ -319,6 +319,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
+				<artifactId>flowable-form-rest</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.flowable</groupId>
 				<artifactId>flowable-camel</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -863,6 +868,7 @@
 				<module>modules/flowable-form-json-converter</module>
 				<module>modules/flowable-form-engine</module>
 				<module>modules/flowable-form-engine-configurator</module>
+				<module>modules/flowable-form-rest</module>
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>
 				<module>modules/flowable-webapp-rest2</module>
@@ -945,6 +951,7 @@
 				<module>modules/flowable-form-json-converter</module>
 				<module>modules/flowable-form-engine</module>
 				<module>modules/flowable-form-engine-configurator</module>
+				<module>modules/flowable-form-rest</module>
 				<module>modules/flowable-dmn-engine</module>
 				<module>modules/flowable-dmn-model</module>
 				<module>modules/flowable-dmn-json-converter</module>
