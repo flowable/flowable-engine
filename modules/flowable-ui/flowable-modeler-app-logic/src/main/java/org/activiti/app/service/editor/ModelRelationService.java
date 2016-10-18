@@ -12,26 +12,21 @@
  */
 package org.activiti.app.service.editor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.activiti.app.domain.editor.ModelInformation;
 import org.activiti.app.domain.editor.ModelRelation;
 import org.activiti.app.repository.editor.ModelRelationRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * @author jbarrez
+ * @author Joram Barrez
  */
 @Service
 @Transactional
 public class ModelRelationService {
-	
-	private static final Logger logger = LoggerFactory.getLogger(ModelRelationService.class);
 	
 	@Autowired
 	private ModelRelationRepository modelRelationRepository;
@@ -42,8 +37,8 @@ public class ModelRelationService {
 	 * 
 	 * ie modelId here is the parent of the relation.
 	 */
-	public List<ModelInformation> findReferencedModels(Long modelId) {
-		return convert(modelRelationRepository.findModelInformationByParentModelId(modelId));
+	public List<ModelInformation> findReferencedModels(String modelId) {
+		return modelRelationRepository.findModelInformationByParentModelId(modelId);
 	}
 	
 	/**
@@ -52,16 +47,8 @@ public class ModelRelationService {
 	 * 
 	 * ie modelId is the child of the relation
 	 */
-	public List<ModelInformation> findParentModels(Long modelId) {
-		return convert(modelRelationRepository.findModelInformationByChildModelId(modelId));
+	public List<ModelInformation> findParentModels(String modelId) {
+		return modelRelationRepository.findModelInformationByChildModelId(modelId);
 	}
 	
-	protected List<ModelInformation> convert(List<Object[]> rawResults) {
-		List<ModelInformation> result = new ArrayList<ModelInformation>(rawResults.size());
-		for (Object[] rawResult : rawResults) {
-			result.add(new ModelInformation(((Number) rawResult[0]).longValue(), (String) rawResult[1], (Integer) rawResult[2]));
-		}
-		return result;
-	}
-
 }

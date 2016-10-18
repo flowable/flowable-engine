@@ -15,7 +15,7 @@ package org.activiti.app.domain.editor;
 /**
  * Light weight version of the {@link Model}, when you only need metadata.
  * 
- * @author jbarrez
+ * @author Joram Barrez
  */
 public class ModelInformation {
 	

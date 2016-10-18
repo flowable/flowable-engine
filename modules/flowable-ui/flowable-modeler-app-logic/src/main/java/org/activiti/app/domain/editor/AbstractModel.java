@@ -14,18 +14,6 @@ package org.activiti.app.domain.editor;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.TableGenerator;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
-import org.activiti.app.domain.common.IdBlockSize;
-
-@MappedSuperclass
 public class AbstractModel {
 
   public static final int MODEL_TYPE_BPMN = 0;
@@ -33,56 +21,28 @@ public class AbstractModel {
   public static final int MODEL_TYPE_APP = 3;
   public static final int MODEL_TYPE_DECISION_TABLE = 4;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.TABLE, generator = "modelIdGenerator")
-  @TableGenerator(name = "modelIdGenerator", allocationSize = IdBlockSize.DEFAULT_ALLOCATION_SIZE, table = "ACT_DE_HIBERNATE_SEQUENCES")
-  @Column(name = "id")
-  protected Long id;
-
-  @Column(name = "name")
+  protected String id;
   protected String name;
-  
-  @Column(name = "model_key")
   protected String key;
-
-  @Column(name = "description")
   protected String description;
-
-  @Temporal(TemporalType.TIMESTAMP)
-  @Column(name = "created")
   protected Date created;
-
-  @Temporal(TemporalType.TIMESTAMP)
-  @Column(name = "last_updated")
   protected Date lastUpdated;
-
-  @Column(name = "created_by")
   private String createdBy;
-
-  @Column(name = "last_updated_by")
   private String lastUpdatedBy;
-
-  @Column(name = "version")
   protected int version;
-
-  @Column(name = "model_editor_json")
   protected String modelEditorJson;
-
-  @Column(name = "model_comment")
   protected String comment;
-
-  @Column(name = "model_type")
   protected Integer modelType;
 
   public AbstractModel() {
     this.created = new Date();
   }
 
-  public Long getId() {
+  public String getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(String id) {
     this.id = id;
   }
 

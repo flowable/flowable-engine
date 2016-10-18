@@ -12,88 +12,45 @@
  */
 package org.activiti.app.domain.editor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.TableGenerator;
-
-import org.activiti.app.domain.common.IdBlockSize;
-
-@Entity
-@Table(name = "ACT_DE_MODEL_RELATION")
 public class ModelRelation {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.TABLE, generator = "modelRelationIdGenerator")
-  @TableGenerator(name = "modelRelationIdGenerator", allocationSize = IdBlockSize.DEFAULT_ALLOCATION_SIZE, table = "ACT_DE_HIBERNATE_SEQUENCES")
-  @Column(name = "id")
-  private Long id;
-
-  @Column(name = "parent_model_id")
-  private Long parentModelId;
-
-  // Only needed for HQL queries. Not using it!
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "parent_model_id", insertable = false, updatable = false)
-  private Model parentModel;
-
-  @Column(name = "model_id")
-  private Long modelId;
-
-  // Only needed for HQL queries. Not using it!
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "model_id", insertable = false, updatable = false)
-  private Model model;
-
-  @Column(name = "relation_type")
+  private String id;
+  private String parentModelId;
+  private String modelId;
   private String type;
 
   public ModelRelation() {
 
   }
 
-  public ModelRelation(Long parentModelId, Long modelId, String type) {
+  public ModelRelation(String parentModelId, String modelId, String type) {
     this.parentModelId = parentModelId;
     this.modelId = modelId;
     this.type = type;
   }
+  
+  public String getId() {
+    return id;
+  }
 
-  public Long getParentModelId() {
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public String getParentModelId() {
     return parentModelId;
   }
 
-  public void setParentModelId(Long parentModelId) {
+  public void setParentModelId(String parentModelId) {
     this.parentModelId = parentModelId;
   }
 
-  public Model getParentModel() {
-    return parentModel;
-  }
-
-  public void setParentModel(Model parentModel) {
-    this.parentModel = parentModel;
-  }
-
-  public Long getModelId() {
+  public String getModelId() {
     return modelId;
   }
 
-  public void setModelId(Long modelId) {
+  public void setModelId(String modelId) {
     this.modelId = modelId;
-  }
-
-  public Model getModel() {
-    return model;
-  }
-
-  public void setModel(Model model) {
-    this.model = model;
   }
 
   public String getType() {

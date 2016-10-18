@@ -4,17 +4,11 @@
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd
         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<changeSet id="1" author="activiti">
+	<changeSet id="1" author="flowable">
     
-        <!-- Hibernate sequence table -->
-        <createTable tableName="ACT_DE_HIBERNATE_SEQUENCES">
-            <column name="sequence_name" type="varchar(255)" />
-            <column name="sequence_next_hi_value" type="integer" />
-        </createTable>
-
         <!-- model -->
 		<createTable tableName="ACT_DE_MODEL">
-			<column name="id" type="bigint">
+			<column name="id" type="varchar(255)">
 				<constraints primaryKey="true" nullable="false" />
 			</column>
 			<column name="name" type="varchar(400)">
@@ -62,7 +56,7 @@
         
         <!-- Model history -->
         <createTable tableName="ACT_DE_MODEL_HISTORY">
-            <column name="id" type="bigint">
+            <column name="id" type="varchar(255)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="name" type="varchar(400)">
@@ -98,7 +92,7 @@
             <column name="model_editor_json" type="longtext">
                 <constraints nullable="true" />
             </column>
-            <column name="model_id" type="bigint">
+            <column name="model_id" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
             <column name="model_type" type="int">
@@ -114,11 +108,11 @@
 		<!-- MODEL RELATION -->
 		
 		 <createTable tableName="ACT_DE_MODEL_RELATION">
-		 	<column name="id" type="bigint">
+		 	<column name="id" type="varchar(255)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
-            <column name="parent_model_id" type="bigint" />
-            <column name="model_id" type="bigint" />
+            <column name="parent_model_id" type="varchar(255)" />
+            <column name="model_id" type="varchar(255)" />
             <column name="relation_type" type="varchar(255)" />
         </createTable>
         

@@ -15,41 +15,30 @@ package org.activiti.app.repository.editor;
 import java.util.List;
 
 import org.activiti.app.domain.editor.Model;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
-/**
- * Spring Data JPA repository for the Model entity.
- */
-public interface ModelRepository extends JpaRepository<Model, Long> {
+public interface ModelRepository {
 
-  @Query("from Model as model where model.createdBy = :user and model.modelType = :modelType")
-  List<Model> findModelsCreatedBy(@Param("user") String createdBy, @Param("modelType") Integer modelType, Sort sort);
+  Model findOne(String id);
 
-  @Query("from Model as model where model.createdBy = :user and "
-      + "(lower(model.name) like :filter or lower(model.description) like :filter) and model.modelType = :modelType")
-  List<Model> findModelsCreatedBy(@Param("user") String createdBy, @Param("modelType") Integer modelType, @Param("filter") String filter, Sort sort);
-
-  @Query("from Model as model where model.key = :key and model.modelType = :modelType")
-  List<Model> findModelsByKeyAndType(@Param("key") String key, @Param("modelType") Integer modelType);
+  List<Model> findModelsByModelType(Integer modelType);
   
-  @Query("from Model as model where (lower(model.name) like :filter or lower(model.description) like :filter) " + "and model.modelType = :modelType")
-  List<Model> findModelsByModelType(@Param("modelType") Integer modelType, @Param("filter") String filter);
+  List<Model> findModelsByModelType(Integer modelType, String filter);
+  
+  List<Model> findModelsCreatedBy(String createdBy, Integer modelType, String sort);
 
-  @Query("from Model as model where model.modelType = :modelType")
-  List<Model> findModelsByModelType(@Param("modelType") Integer modelType);
+  List<Model> findModelsCreatedBy(String createdBy, Integer modelType, String filter, String sort);
+  
+  List<Model> findModelsByKeyAndType(String key, Integer modelType);
+  
+  List<Model> findModelsByParentModelId(String parentModelId);
+  
+  Long countByModelTypeAndUser(int modelType, String createdBy);
+  
+  boolean exists(String id);
+  
+  void save(Model model);
 
-  @Query("select count(m.id) from Model m where m.createdBy = :user and m.modelType = :modelType")
-  Long countByModelTypeAndUser(@Param("modelType") int modelType, @Param("user") String user);
+  void delete(Model model);
+
   
-  @Query("select m from ModelRelation mr inner join mr.model m where mr.parentModelId = :parentModelId")
-  List<Model> findModelsByParentModelId(@Param("parentModelId") Long parentModelId);
-  
-  @Query("select m from ModelRelation mr inner join mr.model m where mr.parentModelId = :parentModelId and m.modelType = :modelType")
-  List<Model> findModelsByParentModelIdAndType(@Param("parentModelId") Long parentModelId, @Param("modelType") Integer modelType);
-  
-  @Query("select m.id, m.name, m.modelType from ModelRelation mr inner join mr.parentModel m where mr.modelId = :modelId")
-  List<Model> findModelsByChildModelId(@Param("modelId") Long modelId);
 }

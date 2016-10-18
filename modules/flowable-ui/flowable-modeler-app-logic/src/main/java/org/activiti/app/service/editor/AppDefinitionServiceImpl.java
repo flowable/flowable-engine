@@ -27,6 +27,7 @@ import org.activiti.app.model.editor.AppDefinitionSaveRepresentation;
 import org.activiti.app.model.editor.AppDefinitionUpdateResultRepresentation;
 import org.activiti.app.repository.editor.ModelHistoryRepository;
 import org.activiti.app.repository.editor.ModelRepository;
+import org.activiti.app.repository.editor.ModelSort;
 import org.activiti.app.security.SecurityUtils;
 import org.activiti.app.service.api.AppDefinitionService;
 import org.activiti.app.service.api.AppDefinitionServiceRepresentation;
@@ -36,8 +37,6 @@ import org.activiti.editor.language.json.converter.util.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,23 +64,23 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
   @Autowired
   protected ObjectMapper objectMapper;
   
-  public AppDefinitionRepresentation getAppDefinition(Long modelId) {
+  public AppDefinitionRepresentation getAppDefinition(String modelId) {
     Model model = modelService.getModel(modelId);
     return createAppDefinitionRepresentation(model);
   }
   
-  public AppDefinitionRepresentation getAppDefinitionHistory(Long modelId, Long modelHistoryId) {
+  public AppDefinitionRepresentation getAppDefinitionHistory(String modelId, String modelHistoryId) {
     ModelHistory model = modelService.getModelHistory(modelId, modelHistoryId);
     return createAppDefinitionRepresentation(model);
   }
 
   @Override
   public List<AppDefinitionServiceRepresentation> getAppDefinitions() {
-    Map<Long, AbstractModel> modelMap = new HashMap<Long, AbstractModel>();
+    Map<String, AbstractModel> modelMap = new HashMap<String, AbstractModel>();
     List<AppDefinitionServiceRepresentation> resultList = new ArrayList<AppDefinitionServiceRepresentation>();
 
     User user = SecurityUtils.getCurrentUserObject();
-    List<Model> createdByModels = modelRepository.findModelsCreatedBy(user.getUsername(), AbstractModel.MODEL_TYPE_APP, new Sort(Direction.ASC, "name"));
+    List<Model> createdByModels = modelRepository.findModelsCreatedBy(user.getUsername(), AbstractModel.MODEL_TYPE_APP, ModelSort.NAME_ASC); 
     for (Model model : createdByModels) {
       modelMap.put(model.getId(), model);
     }
@@ -101,7 +100,7 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
    */
   @Override
   public List<AppDefinitionServiceRepresentation> getDeployableAppDefinitions(User user) {
-    Map<Long, ModelHistory> modelMap = new HashMap<Long, ModelHistory>();
+    Map<String, ModelHistory> modelMap = new HashMap<String, ModelHistory>();
     List<AppDefinitionServiceRepresentation> resultList = new ArrayList<AppDefinitionServiceRepresentation>();
 
     List<ModelHistory> createdByModels = modelHistoryRepository.findByCreatedByAndModelTypeAndRemovalDateIsNull(
@@ -126,7 +125,7 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
     return resultList;
   }
   
-  public AppDefinitionUpdateResultRepresentation updateAppDefinition(Long modelId, AppDefinitionSaveRepresentation updatedModel) {
+  public AppDefinitionUpdateResultRepresentation updateAppDefinition(String modelId, AppDefinitionSaveRepresentation updatedModel) {
 
     AppDefinitionUpdateResultRepresentation result = new AppDefinitionUpdateResultRepresentation();
 
@@ -184,7 +183,7 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
       resultInfo.setIcon(appDefinition.getIcon());
       List<AppModelDefinition> models = appDefinition.getModels();
       if (CollectionUtils.isNotEmpty(models)) {
-        List<Long> modelIds = new ArrayList<Long>();
+        List<String> modelIds = new ArrayList<String>();
         for (AppModelDefinition appModelDef : models) {
           modelIds.add(appModelDef.getId());
         }

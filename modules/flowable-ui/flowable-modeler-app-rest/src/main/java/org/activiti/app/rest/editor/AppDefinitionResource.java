@@ -61,39 +61,39 @@ public class AppDefinitionResource {
   private static final Logger logger = LoggerFactory.getLogger(AppDefinitionResource.class);
 
   @RequestMapping(value = "/rest/app-definitions/{modelId}", method = RequestMethod.GET, produces = "application/json")
-  public AppDefinitionRepresentation getAppDefinition(@PathVariable("modelId") Long modelId) {
+  public AppDefinitionRepresentation getAppDefinition(@PathVariable("modelId") String modelId) {
     return appDefinitionService.getAppDefinition(modelId);
   }
 
   @RequestMapping(value = "/rest/app-definitions/{modelId}/history/{modelHistoryId}", method = RequestMethod.GET, produces = "application/json")
-  public AppDefinitionRepresentation getAppDefinitionHistory(@PathVariable Long modelId, @PathVariable Long modelHistoryId) {
+  public AppDefinitionRepresentation getAppDefinitionHistory(@PathVariable String modelId, @PathVariable String modelHistoryId) {
     return appDefinitionService.getAppDefinitionHistory(modelId, modelHistoryId);
   }
 
   @RequestMapping(value = "/rest/app-definitions/{modelId}", method = RequestMethod.PUT, produces = "application/json")
-  public AppDefinitionUpdateResultRepresentation updateAppDefinition(@PathVariable("modelId") Long modelId, @RequestBody AppDefinitionSaveRepresentation updatedModel) {
+  public AppDefinitionUpdateResultRepresentation updateAppDefinition(@PathVariable("modelId") String modelId, @RequestBody AppDefinitionSaveRepresentation updatedModel) {
     return appDefinitionService.updateAppDefinition(modelId, updatedModel);
   }
 
   @RequestMapping(value = "/rest/app-definitions/{modelId}/publish", method = RequestMethod.POST, produces = "application/json")
-  public AppDefinitionUpdateResultRepresentation publishAppDefinition(@PathVariable("modelId") Long modelId, @RequestBody AppDefinitionPublishRepresentation publishModel) {
+  public AppDefinitionUpdateResultRepresentation publishAppDefinition(@PathVariable("modelId") String modelId, @RequestBody AppDefinitionPublishRepresentation publishModel) {
     return appDefinitionImportService.publishAppDefinition(modelId, publishModel);
   }
 
   @RequestMapping(value = "/rest/app-definitions/{modelId}/export", method = RequestMethod.GET)
-  public void exportAppDefinition(HttpServletResponse response, @PathVariable Long modelId) throws IOException {
+  public void exportAppDefinition(HttpServletResponse response, @PathVariable String modelId) throws IOException {
     appDefinitionExportService.exportAppDefinition(response, modelId);
   }
 
   @Transactional
   @RequestMapping(value = "/rest/app-definitions/{modelId}/import", method = RequestMethod.POST, produces = "application/json")
-  public AppDefinitionRepresentation importAppDefinition(HttpServletRequest request, @PathVariable Long modelId, @RequestParam("file") MultipartFile file) {
+  public AppDefinitionRepresentation importAppDefinition(HttpServletRequest request, @PathVariable String modelId, @RequestParam("file") MultipartFile file) {
     return appDefinitionImportService.importAppDefinitionNewVersion(request, file, modelId);
   }
 
   @Transactional
   @RequestMapping(value = "/rest/app-definitions/{modelId}/text/import", method = RequestMethod.POST)
-  public String importAppDefinitionText(HttpServletRequest request, @PathVariable Long modelId, @RequestParam("file") MultipartFile file) {
+  public String importAppDefinitionText(HttpServletRequest request, @PathVariable String modelId, @RequestParam("file") MultipartFile file) {
 
     AppDefinitionRepresentation appDefinitionRepresentation = appDefinitionImportService.importAppDefinitionNewVersion(request, file, modelId);
     String appDefinitionRepresentationJson = null;
