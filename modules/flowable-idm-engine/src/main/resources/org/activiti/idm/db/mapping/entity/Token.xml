@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.activiti.idm.engine.impl.persistence.entity.TokenEntityImpl">
+
+  <!-- TOKEN INSERT -->
+  
+  <insert id="insertToken" parameterType="org.activiti.idm.engine.impl.persistence.entity.TokenEntityImpl">
+      insert into ${prefix}ACT_ID_TOKEN (
+      	ID_,
+      	REV_, 
+        TOKEN_VALUE_,
+        TOKEN_DATE_,
+        IP_ADDRESS_,
+        USER_AGENT_,
+        USER_ID_
+      ) values (
+        #{id ,jdbcType=VARCHAR},
+        #{tokenValue, jdbcType=VARCHAR},
+        #{tokenDate, jdbcType=TIMESTAMP},
+        #{ipAddress, jdbcType=VARCHAR},
+        #{userAgent, jdbcType=VARCHAR},
+        #{userId, jdbcType=VARCHAR}
+      )
+  </insert>
+
+  <!-- TOKEN UPDATE -->
+  
+  <update id="updateToken" parameterType="org.activiti.idm.engine.impl.persistence.entity.TokenEntityImpl">
+    update ${prefix}ACT_ID_TOKEN
+    <set>
+      TOKEN_VALUE_ = #{tokenValue, jdbcType=VARCHAR},
+      TOKEN_DATE_ = #{tokenDate, jdbcType=TIMESTAMP}
+    </set>
+    where ID_ = #{id, jdbcType=VARCHAR} AND REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+
+  <!-- TOKEN DELETE -->
+  
+  <delete id="deleteToken" parameterType="org.activiti.idm.engine.impl.persistence.entity.TokenEntityImpl">
+    delete from ${prefix}ACT_ID_TOKEN where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision}
+  </delete>
+
+
+  <!-- TOKEN SELECT -->
+  
+  <resultMap id="tokenResultMap" type="org.activiti.idm.engine.impl.persistence.entity.TokenEntityImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
+    <result property="tokenValue" column="TOKEN_VALUE_" jdbcType="VARCHAR" />
+    <result property="tokenDate" column="TOKEN_DATE_" jdbcType="TIMESTAMP" />
+    <result property="ipAddress" column="IP_ADDRESS_" jdbcType="VARCHAR" />
+    <result property="userAgent" column="USER_AGENT_" jdbcType="VARCHAR" />
+    <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <select id="selectToken" parameterType="string" resultMap="tokenResultMap">
+    select * from ${prefix}ACT_ID_TOKEN where ID_ = #{id, jdbcType=VARCHAR}
+  </select>
+  
+</mapper>

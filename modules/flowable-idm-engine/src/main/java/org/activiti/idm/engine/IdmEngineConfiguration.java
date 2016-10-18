@@ -68,6 +68,8 @@ import org.activiti.idm.engine.impl.persistence.entity.PropertyEntityManager;
 import org.activiti.idm.engine.impl.persistence.entity.PropertyEntityManagerImpl;
 import org.activiti.idm.engine.impl.persistence.entity.TableDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.TableDataManagerImpl;
+import org.activiti.idm.engine.impl.persistence.entity.TokenEntityManager;
+import org.activiti.idm.engine.impl.persistence.entity.TokenEntityManagerImpl;
 import org.activiti.idm.engine.impl.persistence.entity.UserEntityManager;
 import org.activiti.idm.engine.impl.persistence.entity.UserEntityManagerImpl;
 import org.activiti.idm.engine.impl.persistence.entity.data.ByteArrayDataManager;
@@ -75,12 +77,14 @@ import org.activiti.idm.engine.impl.persistence.entity.data.GroupDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.IdentityInfoDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.MembershipDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.PropertyDataManager;
+import org.activiti.idm.engine.impl.persistence.entity.data.TokenDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.UserDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisByteArrayDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisGroupDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisIdentityInfoDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisMembershipDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisPropertyDataManager;
+import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisTokenDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisUserDataManager;
 import org.activiti.idm.engine.impl.util.DefaultClockImpl;
 import org.apache.commons.io.IOUtils;
@@ -192,6 +196,7 @@ public class IdmEngineConfiguration {
   protected IdentityInfoDataManager identityInfoDataManager;
   protected MembershipDataManager membershipDataManager;
   protected PropertyDataManager propertyDataManager;
+  protected TokenDataManager tokenDataManager;
   protected UserDataManager userDataManager;
 
   // ENTITY MANAGERS /////////////////////////////////////////////////
@@ -200,8 +205,9 @@ public class IdmEngineConfiguration {
   protected IdentityInfoEntityManager identityInfoEntityManager;
   protected MembershipEntityManager membershipEntityManager;
   protected PropertyEntityManager propertyEntityManager;
-  protected UserEntityManager userEntityManager;
   protected TableDataManager tableDataManager;
+  protected TokenEntityManager tokenEntityManager;
+  protected UserEntityManager userEntityManager;
 
   protected CommandContextFactory commandContextFactory;
   protected TransactionContextFactory transactionContextFactory;
@@ -429,6 +435,9 @@ public class IdmEngineConfiguration {
     if (propertyDataManager == null) {
       propertyDataManager = new MybatisPropertyDataManager(this);
     }
+    if (tokenDataManager == null) {
+      tokenDataManager = new MybatisTokenDataManager(this);
+    }
     if (userDataManager == null) {
     	userDataManager = new MybatisUserDataManager(this);
     }
@@ -450,11 +459,14 @@ public class IdmEngineConfiguration {
     if (propertyEntityManager == null) {
       propertyEntityManager = new PropertyEntityManagerImpl(this, propertyDataManager);
     }
-    if (userEntityManager == null) {
-    	userEntityManager = new UserEntityManagerImpl(this, userDataManager);
-    }
     if (tableDataManager == null) {
       tableDataManager = new TableDataManagerImpl(this);
+    }
+    if (tokenEntityManager == null) {
+      tokenEntityManager = new TokenEntityManagerImpl(this, tokenDataManager);
+    }
+    if (userEntityManager == null) {
+      userEntityManager = new UserEntityManagerImpl(this, userDataManager);
     }
   }
 
@@ -1155,6 +1167,15 @@ public class IdmEngineConfiguration {
     return this;
   }
 
+  public TokenDataManager getTokenDataManager() {
+    return tokenDataManager;
+  }
+
+  public IdmEngineConfiguration setTokenDataManager(TokenDataManager tokenDataManager) {
+    this.tokenDataManager = tokenDataManager;
+    return this;
+  }
+
   public UserDataManager getUserDataManager() {
     return userDataManager;
   }
@@ -1206,6 +1227,15 @@ public class IdmEngineConfiguration {
 
   public IdmEngineConfiguration setPropertyEntityManager(PropertyEntityManager propertyEntityManager) {
     this.propertyEntityManager = propertyEntityManager;
+    return this;
+  }
+
+  public TokenEntityManager getTokenEntityManager() {
+    return tokenEntityManager;
+  }
+
+  public IdmEngineConfiguration setTokenEntityManager(TokenEntityManager tokenEntityManager) {
+    this.tokenEntityManager = tokenEntityManager;
     return this;
   }
 

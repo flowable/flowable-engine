@@ -134,6 +134,32 @@ public interface IdmIdentityService {
    * @returns null if the user doesn't have a picture.
    */
   Picture getUserPicture(String userId);
+  
+  /**
+   * Creates a new token. The token is transient and must be saved using {@link #saveToken(Token)}.
+   * 
+   * @param tokenId
+   *          id for the new token, cannot be null.
+   */
+  Token newToken(String id);
+  
+  /**
+   * Saves the token. If the token already existed, the token is updated.
+   * 
+   * @param token
+   *          token to save, cannot be null.
+   */
+  void saveToken(Token token);
+  
+  /**
+   * Creates a {@link TokenQuery} that allows to programmatically query the tokens.
+   */
+  TokenQuery createTokenQuery();
+
+  /**
+   * Returns a new {@link org.activiti.idm.engine.query.NativeQuery} for tokens.
+   */
+  NativeTokenQuery createNativeTokenQuery();
 
   /** Generic extensibility key-value pairs associated with a user */
   void setUserInfo(String userId, String key, String value);

@@ -24,9 +24,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
-import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * Responsible for executing all action required after booting up the Spring container.
@@ -38,9 +35,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> {
 
   private final Logger log = LoggerFactory.getLogger(Bootstrapper.class);
-
-  @Autowired
-  private TransactionTemplate transactionTemplate;
 
   @Autowired
   private IdentityService identityService;
@@ -58,21 +52,11 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
   }
 
   protected void createDefaultAdmin() {
-    // Need to be done in a separate TX, otherwise the LDAP sync won't see the created groups/users
-    // Can't use @Transactional here, cause it seems not to be applied as wanted
-    transactionTemplate.execute(new TransactionCallback<Void>() {
-
-      @Override
-      public Void doInTransaction(TransactionStatus status) {
-        if (identityService.createUserQuery().count() == 0) {
-          log.info("No users found, initializing default entities");
-          User user = initializeSuperUser();
-          initializeSuperUserGroups(user);
-        }
-        return null;
-      }
-
-    });
+    if (identityService.createUserQuery().count() == 0) {
+      log.info("No users found, initializing default entities");
+      User user = initializeSuperUser();
+      initializeSuperUserGroups(user);
+    }
   }
 
   protected User initializeSuperUser() {
