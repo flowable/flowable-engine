@@ -33,24 +33,19 @@ public class ModelRepositoryImpl implements ModelRepository {
   protected UuidIdGenerator idGenerator;
 
   @Override
-  public Model findOne(String id) {
+  public Model get(String id) {
     return sqlSessionTemplate.selectOne(NAMESPACE + "selectModel");
   }
   
   @Override
-  public boolean exists(String id) {
-    return findOne(id) != null;
-  }
-  
-  @Override
-  public List<Model> findModelsByModelType(Integer modelType) {
+  public List<Model> findByModelType(Integer modelType) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("modelType", modelType);
     return findModelsByParameters(params);
   }
   
   @Override
-  public List<Model> findModelsByModelType(Integer modelType, String filter) {
+  public List<Model> findByModelTypeAndFilter(Integer modelType, String filter) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("modelType", modelType);
     params.put("filter", filter);
@@ -58,7 +53,7 @@ public class ModelRepositoryImpl implements ModelRepository {
   }
 
   @Override
-  public List<Model> findModelsCreatedBy(String createdBy, Integer modelType, String sort) {
+  public List<Model> findByModelTypeAndCreatedBy(String createdBy, Integer modelType, String sort) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("modelType", modelType);
     params.put("createdBy", createdBy);
@@ -67,7 +62,7 @@ public class ModelRepositoryImpl implements ModelRepository {
   }
   
   @Override
-  public List<Model> findModelsCreatedBy(String createdBy, Integer modelType, String filter, String sort) {
+  public List<Model> findByModelTypeAndCreatedBy(String createdBy, Integer modelType, String filter, String sort) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("modelType", modelType);
     params.put("createdBy", createdBy);
@@ -77,7 +72,7 @@ public class ModelRepositoryImpl implements ModelRepository {
   }
   
   @Override
-  public List<Model> findModelsByKeyAndType(String key, Integer modelType) {
+  public List<Model> findByKeyAndType(String key, Integer modelType) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("key", key);
     params.put("modelType", modelType);
@@ -85,12 +80,12 @@ public class ModelRepositoryImpl implements ModelRepository {
   }
   
   @Override
-  public List<Model> findModelsByParentModelId(String parentModelId) {
+  public List<Model> findByParentModelId(String parentModelId) {
     return sqlSessionTemplate.selectList(NAMESPACE + "selectModelByParentModelId", parentModelId);
   }
   
   @Override
-  public Long countByModelTypeAndUser(int modelType, String createdBy) {
+  public Long countByModelTypeAndCreatedBy(int modelType, String createdBy) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("createdBy", createdBy);
     params.put("modelType", modelType);

@@ -90,10 +90,10 @@ public class ActivitiDecisionTableService extends BaseActivitiModelService {
     List<Model> models = null;
     
     if (validFilter != null) {
-      models = modelRepository.findModelsByModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE, validFilter);
+      models = modelRepository.findByModelTypeAndFilter(AbstractModel.MODEL_TYPE_DECISION_TABLE, validFilter);
 
     } else {
-      models = modelRepository.findModelsByModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE);
+      models = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE);
     }
 
     List<DecisionTableRepresentation> reps = new ArrayList<DecisionTableRepresentation>();
@@ -113,7 +113,7 @@ public class ActivitiDecisionTableService extends BaseActivitiModelService {
 
   public void exportHistoricDecisionTable(HttpServletResponse response, String modelHistoryId) {
     // Get the historic model
-    ModelHistory modelHistory = modelHistoryRepository.findOne(modelHistoryId);
+    ModelHistory modelHistory = modelHistoryRepository.get(modelHistoryId);
 
     // Load model and check we have read rights
     getModel(modelHistory.getModelId(), true, false);
@@ -223,7 +223,7 @@ public class ActivitiDecisionTableService extends BaseActivitiModelService {
 
   public DecisionTableRepresentation getHistoricDecisionTable(String modelHistoryId) {
     // Get the historic model
-    ModelHistory modelHistory = modelHistoryRepository.findOne(modelHistoryId);
+    ModelHistory modelHistory = modelHistoryRepository.get(modelHistoryId);
 
     // Load model and check we have read rights
     getModel(modelHistory.getModelId(), true, false);

@@ -99,10 +99,10 @@ public class ActivitiModelQueryService {
     User user = SecurityUtils.getCurrentUserObject();
 
     if (validFilter != null) {
-      models = modelRepository.findModelsCreatedBy(user.getUsername(), modelType, validFilter, sort);
+      models = modelRepository.findByModelTypeAndCreatedBy(user.getUsername(), modelType, validFilter, sort);
 
     } else {
-      models = modelRepository.findModelsCreatedBy(user.getUsername(), modelType, sort);
+      models = modelRepository.findByModelTypeAndCreatedBy(user.getUsername(), modelType, sort);
     }
 
     if (CollectionUtils.isNotEmpty(models)) {
@@ -127,7 +127,7 @@ public class ActivitiModelQueryService {
     User user = SecurityUtils.getCurrentUserObject();
 
     List<String> addedModelIds = new ArrayList<String>();
-    List<Model> models = modelRepository.findModelsCreatedBy(user.getUsername(), 0, ModelSort.MODIFIED_DESC);
+    List<Model> models = modelRepository.findByModelTypeAndCreatedBy(user.getUsername(), 0, ModelSort.MODIFIED_DESC);
 
     if (CollectionUtils.isNotEmpty(models)) {
       for (Model model : models) {

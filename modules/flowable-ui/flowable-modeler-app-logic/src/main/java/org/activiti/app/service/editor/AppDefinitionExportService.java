@@ -78,7 +78,7 @@ public class AppDefinitionExportService {
         for (AppModelDefinition modelDef : modelDefinitions) {
           Model model = modelService.getModel(modelDef.getId());
 
-          List<Model> referencedModels = modelRepository.findModelsByParentModelId(model.getId());
+          List<Model> referencedModels = modelRepository.findByParentModelId(model.getId());
           for (Model childModel : referencedModels) {
             if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
               formMap.put(childModel.getId(), childModel);

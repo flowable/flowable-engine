@@ -18,27 +18,24 @@ import org.activiti.app.domain.editor.Model;
 
 public interface ModelRepository {
 
-  Model findOne(String id);
-
-  List<Model> findModelsByModelType(Integer modelType);
-  
-  List<Model> findModelsByModelType(Integer modelType, String filter);
-  
-  List<Model> findModelsCreatedBy(String createdBy, Integer modelType, String sort);
-
-  List<Model> findModelsCreatedBy(String createdBy, Integer modelType, String filter, String sort);
-  
-  List<Model> findModelsByKeyAndType(String key, Integer modelType);
-  
-  List<Model> findModelsByParentModelId(String parentModelId);
-  
-  Long countByModelTypeAndUser(int modelType, String createdBy);
-  
-  boolean exists(String id);
-  
   void save(Model model);
 
   void delete(Model model);
+  
+  Model get(String id);
 
+  List<Model> findByModelType(Integer modelType);
+  
+  List<Model> findByModelTypeAndFilter(Integer modelType, String filter);
+  
+  List<Model> findByModelTypeAndCreatedBy(String createdBy, Integer modelType, String sort);
+
+  List<Model> findByModelTypeAndCreatedBy(String createdBy, Integer modelType, String filter, String sort);
+  
+  List<Model> findByKeyAndType(String key, Integer modelType);
+  
+  List<Model> findByParentModelId(String parentModelId);
+  
+  Long countByModelTypeAndCreatedBy(int modelType, String createdBy);
   
 }

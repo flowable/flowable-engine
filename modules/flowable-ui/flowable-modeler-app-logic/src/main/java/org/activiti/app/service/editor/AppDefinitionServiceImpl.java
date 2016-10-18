@@ -80,7 +80,7 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
     List<AppDefinitionServiceRepresentation> resultList = new ArrayList<AppDefinitionServiceRepresentation>();
 
     User user = SecurityUtils.getCurrentUserObject();
-    List<Model> createdByModels = modelRepository.findModelsCreatedBy(user.getUsername(), AbstractModel.MODEL_TYPE_APP, ModelSort.NAME_ASC); 
+    List<Model> createdByModels = modelRepository.findByModelTypeAndCreatedBy(user.getUsername(), AbstractModel.MODEL_TYPE_APP, ModelSort.NAME_ASC); 
     for (Model model : createdByModels) {
       modelMap.put(model.getId(), model);
     }
@@ -103,7 +103,7 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
     Map<String, ModelHistory> modelMap = new HashMap<String, ModelHistory>();
     List<AppDefinitionServiceRepresentation> resultList = new ArrayList<AppDefinitionServiceRepresentation>();
 
-    List<ModelHistory> createdByModels = modelHistoryRepository.findByCreatedByAndModelTypeAndRemovalDateIsNull(
+    List<ModelHistory> createdByModels = modelHistoryRepository.findByModelTypAndCreatedBy(
         user.getUsername(), AbstractModel.MODEL_TYPE_APP);
     for (ModelHistory modelHistory : createdByModels) {
       if (modelMap.containsKey(modelHistory.getModelId())) {
@@ -116,7 +116,7 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
     }
 
     for (ModelHistory model : modelMap.values()) {
-      Model latestModel = modelRepository.findOne(model.getModelId());
+      Model latestModel = modelRepository.get(model.getModelId());
       if (latestModel != null) {
         resultList.add(createAppDefinition(model));
       }

@@ -41,7 +41,7 @@ public class AbstractModelHistoryResource {
   public ResultListDataRepresentation getModelHistoryCollection(String modelId, Boolean includeLatestVersion) {
 
     Model model = modelService.getModel(modelId);
-    List<ModelHistory> history = modelHistoryRepository.findByModelIdAndRemovalDateIsNullOrderByVersionDesc(model.getId());
+    List<ModelHistory> history = modelHistoryRepository.findByModelId(model.getId());
     ResultListDataRepresentation result = new ResultListDataRepresentation();
 
     List<ModelRepresentation> representations = new ArrayList<ModelRepresentation>();

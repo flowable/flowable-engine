@@ -86,7 +86,7 @@ public class AppDefinitionImportService {
         for (AppModelDefinition modelDef : appDefinition.getDefinition().getModels()) {
           Model processModel = modelService.getModel(modelDef.getId());
           
-          List<Model> referencedModels = modelRepository.findModelsByParentModelId(processModel.getId());
+          List<Model> referencedModels = modelRepository.findByParentModelId(processModel.getId());
           for (Model childModel : referencedModels) {
             if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
               existingFormModelMap.put(childModel.getKey(), childModel);

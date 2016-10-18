@@ -18,14 +18,14 @@ import org.activiti.app.domain.editor.ModelHistory;
 
 public interface ModelHistoryRepository {
   
-  ModelHistory findOne(String id);
+  void save(ModelHistory modelHistory);
+  
+  void delete(ModelHistory modelHistory);
+  
+  ModelHistory get(String id);
 
-	List<ModelHistory> findByCreatedByAndModelTypeAndRemovalDateIsNull(String createdBy, Integer modelType);
+	List<ModelHistory> findByModelTypAndCreatedBy(String createdBy, Integer modelType);
 	
-	List<ModelHistory> findByModelIdAndRemovalDateIsNullOrderByVersionDesc(String modelId);
-	
-	void save(ModelHistory modelHistory);
-	
-	void delete(ModelHistory modelHistory);
+	List<ModelHistory> findByModelId(String modelId);
 	
 }

@@ -33,18 +33,18 @@ public class ModelHistoryRepositoryImpl implements ModelHistoryRepository {
   protected UuidIdGenerator idGenerator;
   
   @Override
-  public ModelHistory findOne(String id) {
+  public ModelHistory get(String id) {
     return sqlSessionTemplate.selectOne(NAMESPACE + "selectModelHistory", id);
   }
 
-	public List<ModelHistory> findByCreatedByAndModelTypeAndRemovalDateIsNull(String createdBy, Integer modelType) {
+	public List<ModelHistory> findByModelTypAndCreatedBy(String createdBy, Integer modelType) {
 	  Map<String, Object> params = new HashMap<String, Object>();
     params.put("modelType", modelType);
     params.put("createdBy", createdBy);
     return sqlSessionTemplate.selectList(NAMESPACE + "selectModelHistoryByTypeAndCreatedBy", params);
 	}
 	
-	public List<ModelHistory> findByModelIdAndRemovalDateIsNullOrderByVersionDesc(String modelId) {
+	public List<ModelHistory> findByModelId(String modelId) {
 	  return sqlSessionTemplate.selectList(NAMESPACE + "selectModelHistoryByModelId", modelId);
 	}
 	

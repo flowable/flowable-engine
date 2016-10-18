@@ -21,6 +21,12 @@ import org.activiti.app.domain.editor.ModelRelation;
  * @author Joram Barrez
  */
 public interface ModelRelationRepository {
+  
+  void deleteModelRelationsForParentModel(String parentModelId);
+  
+  void save(ModelRelation modelRelation);
+  
+  void delete(ModelRelation modelRelation);
 	
 	List<ModelRelation> findByParentModelIdAndType(String parentModelId, String type);
 	
@@ -28,10 +34,4 @@ public interface ModelRelationRepository {
 	
 	List<ModelInformation> findModelInformationByChildModelId(String modelId);
 	
-	void deleteModelRelationsForParentModel(String parentModelId);
-	
-	void save(ModelRelation modelRelation);
-	
-	void delete(ModelRelation modelRelation);
-
 }
