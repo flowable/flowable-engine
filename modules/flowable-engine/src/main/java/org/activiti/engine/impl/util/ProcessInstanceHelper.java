@@ -200,27 +200,33 @@ public class ProcessInstanceHelper {
     // Event sub process handling
     List<MessageEventSubscriptionEntity> messageEventSubscriptions = new LinkedList<>();
     for (FlowElement flowElement : process.getFlowElements()) {
-      if (flowElement instanceof EventSubProcess) {
-        EventSubProcess eventSubProcess = (EventSubProcess) flowElement;
-        for (FlowElement subElement : eventSubProcess.getFlowElements()) {
-          if (subElement instanceof StartEvent) {
-            StartEvent startEvent = (StartEvent) subElement;
-            if (CollectionUtil.isNotEmpty(startEvent.getEventDefinitions())) {
-              EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
-              if (eventDefinition instanceof MessageEventDefinition) {
-                MessageEventDefinition messageEventDefinition = (MessageEventDefinition) eventDefinition;
-                BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processInstance.getProcessDefinitionId());
-                if (bpmnModel.containsMessageId(messageEventDefinition.getMessageRef())) {
-                  messageEventDefinition.setMessageRef(bpmnModel.getMessage(messageEventDefinition.getMessageRef()).getName());
-                }
-                ExecutionEntity messageExecution = commandContext.getExecutionEntityManager().createChildExecution(processInstance);
-                messageExecution.setCurrentFlowElement(startEvent);
-                messageExecution.setEventScope(true);
-                messageEventSubscriptions
-                        .add(commandContext.getEventSubscriptionEntityManager().insertMessageEvent(messageEventDefinition.getMessageRef(), messageExecution));
-              }
-            }
+      if (flowElement instanceof EventSubProcess == false) {
+        continue;
+      }
+      
+      EventSubProcess eventSubProcess = (EventSubProcess) flowElement;
+      for (FlowElement subElement : eventSubProcess.getFlowElements()) {
+        if (subElement instanceof StartEvent == false) {
+          continue;
+        }
+          
+        StartEvent startEvent = (StartEvent) subElement;
+        if (CollectionUtil.isEmpty(startEvent.getEventDefinitions())) {
+          continue;
+        }
+          
+        EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
+        if (eventDefinition instanceof MessageEventDefinition) {
+          MessageEventDefinition messageEventDefinition = (MessageEventDefinition) eventDefinition;
+          BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processInstance.getProcessDefinitionId());
+          if (bpmnModel.containsMessageId(messageEventDefinition.getMessageRef())) {
+            messageEventDefinition.setMessageRef(bpmnModel.getMessage(messageEventDefinition.getMessageRef()).getName());
           }
+          ExecutionEntity messageExecution = commandContext.getExecutionEntityManager().createChildExecution(processInstance);
+          messageExecution.setCurrentFlowElement(startEvent);
+          messageExecution.setEventScope(true);
+          messageEventSubscriptions.add(commandContext.getEventSubscriptionEntityManager().insertMessageEvent(
+              messageEventDefinition.getMessageRef(), messageExecution));
         }
       }
     }
@@ -234,9 +240,9 @@ public class ProcessInstanceHelper {
 
       for (MessageEventSubscriptionEntity messageEventSubscription : messageEventSubscriptions) {
         commandContext.getProcessEngineConfiguration().getEventDispatcher()
-                .dispatchEvent(ActivitiEventBuilder.createMessageEvent(ActivitiEventType.ACTIVITY_MESSAGE_WAITING, messageEventSubscription.getActivityId(),
-                        messageEventSubscription.getEventName(), null, messageEventSubscription.getExecution().getId(),
-                        messageEventSubscription.getProcessInstanceId(), messageEventSubscription.getProcessDefinitionId()));
+            .dispatchEvent(ActivitiEventBuilder.createMessageEvent(ActivitiEventType.ACTIVITY_MESSAGE_WAITING, messageEventSubscription.getActivityId(),
+                messageEventSubscription.getEventName(), null, messageEventSubscription.getExecution().getId(),
+                messageEventSubscription.getProcessInstanceId(), messageEventSubscription.getProcessDefinitionId()));
       }
     }
   }
