@@ -89,7 +89,7 @@ public class DmnDeploymentCollectionResource {
       }
     }
 
-    DataResponse response = new DmnDeploymentsDmnPaginateList(dmnRestResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
+    DataResponse response = new DmnDeploymentsPaginateList(dmnRestResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
     return response;
   }
 
