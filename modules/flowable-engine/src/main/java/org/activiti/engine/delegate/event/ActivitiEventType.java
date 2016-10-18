@@ -129,6 +129,11 @@ public enum ActivitiEventType {
   ACTIVITY_COMPENSATE,
 
   /**
+   * A boundary, intermediate, or subprocess start message catching event has started.
+   */
+  ACTIVITY_MESSAGE_WAITING,
+
+  /**
    * An activity has received a message event. Dispatched before the actual message has been received by the activity. This event will be either followed by a {@link #ACTIVITY_SIGNALLED} event or
    * {@link #ACTIVITY_COMPLETE} for the involved activity, if the message was delivered successfully.
    */

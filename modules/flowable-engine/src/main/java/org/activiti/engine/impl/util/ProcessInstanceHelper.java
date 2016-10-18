@@ -14,6 +14,8 @@ package org.activiti.engine.impl.util;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.activiti.bpmn.model.BpmnModel;
@@ -26,11 +28,13 @@ import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.ValuedDataObject;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
+import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
 import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.activiti.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -182,7 +186,19 @@ public class ProcessInstanceHelper {
     ExecutionEntity execution = commandContext.getExecutionEntityManager().createChildExecution(processInstance); 
     execution.setCurrentFlowElement(initialFlowElement);
     
+    if (startProcessInstance) {
+      startProcessInstance(processInstance, commandContext, variables);
+    }
+
+    return processInstance;
+  }
+
+  public void startProcessInstance(ExecutionEntity processInstance, CommandContext commandContext, Map<String, Object> variables) {
+
+    Process process = ProcessDefinitionUtil.getProcess(processInstance.getProcessDefinitionId());
+
     // Event sub process handling
+    List<MessageEventSubscriptionEntity> messageEventSubscriptions = new LinkedList<>();
     for (FlowElement flowElement : process.getFlowElements()) {
       if (flowElement instanceof EventSubProcess) {
         EventSubProcess eventSubProcess = (EventSubProcess) flowElement;
@@ -197,31 +213,31 @@ public class ProcessInstanceHelper {
                 if (bpmnModel.containsMessageId(messageEventDefinition.getMessageRef())) {
                   messageEventDefinition.setMessageRef(bpmnModel.getMessage(messageEventDefinition.getMessageRef()).getName());
                 }
-                ExecutionEntity messageExecution = commandContext.getExecutionEntityManager().createChildExecution(processInstance); 
+                ExecutionEntity messageExecution = commandContext.getExecutionEntityManager().createChildExecution(processInstance);
                 messageExecution.setCurrentFlowElement(startEvent);
                 messageExecution.setEventScope(true);
-                commandContext.getEventSubscriptionEntityManager().insertMessageEvent(messageEventDefinition.getMessageRef(), messageExecution);
+                messageEventSubscriptions
+                        .add(commandContext.getEventSubscriptionEntityManager().insertMessageEvent(messageEventDefinition.getMessageRef(), messageExecution));
               }
             }
           }
         }
       }
     }
-    
-    if (startProcessInstance) {
-      startProcessInstance(processInstance, commandContext, variables);
-    }
 
-    return processInstance;
-  }
-  
-  public void startProcessInstance(ExecutionEntity processInstance, CommandContext commandContext, Map<String, Object> variables) {
     ExecutionEntity execution = processInstance.getExecutions().get(0); // There will always be one child execution created
     commandContext.getAgenda().planContinueProcessOperation(execution);
-    
+
     if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-      Context.getProcessEngineConfiguration().getEventDispatcher()
-        .dispatchEvent(ActivitiEventBuilder.createProcessStartedEvent(execution, variables, false));
+      ActivitiEventDispatcher eventDispatcher = Context.getProcessEngineConfiguration().getEventDispatcher();
+      eventDispatcher.dispatchEvent(ActivitiEventBuilder.createProcessStartedEvent(execution, variables, false));
+
+      for (MessageEventSubscriptionEntity messageEventSubscription : messageEventSubscriptions) {
+        commandContext.getProcessEngineConfiguration().getEventDispatcher()
+                .dispatchEvent(ActivitiEventBuilder.createMessageEvent(ActivitiEventType.ACTIVITY_MESSAGE_WAITING, messageEventSubscription.getActivityId(),
+                        messageEventSubscription.getEventName(), null, messageEventSubscription.getExecution().getId(),
+                        messageEventSubscription.getProcessInstanceId(), messageEventSubscription.getProcessDefinitionId()));
+      }
     }
   }
   
