@@ -54,12 +54,31 @@
             #{removalDate, jdbcType=TIMESTAMP}
           )
     </insert>
+    
+    <update id="updateModelHistory" parameterType="org.activiti.app.domain.editor.Model">
+        update ${prefix}ACT_DE_MODEL
+        <set>
+            name = #{name, jdbcType=VARCHAR},
+            model_key = #{key, jdbcType=VARCHAR},
+            description = #{description, jdbcType=VARCHAR},
+            model_comment = #{comment, jdbcType=VARCHAR},
+            created = #{created, jdbcType=TIMESTAMP},
+            created_by = #{createdBy, jdbcType=VARCHAR},
+            last_updated = #{lastUpdated, jdbcType=TIMESTAMP},
+            last_updated_by = #{lastUpdatedBy, jdbcType=VARCHAR},
+            version = #{version, jdbcType=INTEGER},
+            model_editor_json = #{modelEditorJson, jdbcType=VARCHAR},
+            model_id = #{modelId, jdbcType=VARCHAR},
+            removal_date = #{removalDate, jdbcType=TIMESTAMP}
+        </set>
+        where id = #{id, jdbcType=VARCHAR}
+    </update>
 
 	<select id="selectModelHistory" parameterType="string" resultMap="modelHistoryResultMap">
 		select * from ${prefix}ACT_DE_MODEL_HISTORY where id = #{id, jdbcType=VARCHAR}
 	</select>
 	
-	<select id="selectModelHistoryByTypeAndCreatedBy" parameterType="java.util.map" resultMap="modelHistoryResultMap">
+	<select id="selectModelHistoryByTypeAndCreatedBy" parameterType="map" resultMap="modelHistoryResultMap">
 	   select * from ${prefix}ACT_DE_MODEL_HISTORY 
 	   where created_by = #{createdBy, jdbcType=VARCHAR}
 	   and model_type = #{modelType, jdbcType=INTEGER}

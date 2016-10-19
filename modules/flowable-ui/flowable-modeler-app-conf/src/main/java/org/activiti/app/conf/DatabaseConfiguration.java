@@ -13,8 +13,9 @@
 package org.activiti.app.conf;
 
 import java.beans.PropertyVetoException;
+import java.sql.SQLException;
+import java.util.Properties;
 
-import javax.inject.Inject;
 import javax.sql.DataSource;
 
 import org.activiti.app.service.exception.InternalServerErrorException;
@@ -24,11 +25,12 @@ import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.ResourcePatternUtils;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -51,8 +53,11 @@ public class DatabaseConfiguration {
   
   protected static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_DE_";
 
-  @Inject
-  private Environment env;
+  @Autowired
+  protected Environment env;
+  
+  @Autowired
+  protected ResourceLoader resourceLoader;
 
   @Bean
   public DataSource dataSource() {
@@ -144,7 +149,15 @@ public class DatabaseConfiguration {
       ds.setTestConnectionOnCheckout(testConnectionOnCheckOut);
       ds.setMaxIdleTimeExcessConnections(maxIdleTimeExcessConnections);
       ds.setMaxIdleTime(maxIdleTime);
-
+      
+      if ("org.h2.Driver".equals(dataSourceDriver) && env.getProperty("dev.boot-h2-webserver", Boolean.class, false)) {
+        try {
+          org.h2.tools.Server.createWebServer("-web").start();
+        } catch (SQLException e) {
+          log.warn("Could not boot H2 Webserver", e);
+        }
+      }
+      
       return ds;
     }
   }
@@ -160,16 +173,24 @@ public class DatabaseConfiguration {
   public SqlSessionFactory sqlSessionFactory() {
     SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
     sqlSessionFactoryBean.setDataSource(dataSource());
-    sqlSessionFactoryBean
-        .setMapperLocations(new Resource[] { new ClassPathResource("classpath*:modeler-mybatis-mappings/*.xml") });
-
+    
     try {
+      Properties properties = new Properties();
+      properties.put("prefix", env.getProperty("datasource.prefix", ""));
+      sqlSessionFactoryBean.setConfigurationProperties(properties);
+      sqlSessionFactoryBean
+        .setMapperLocations(ResourcePatternUtils.getResourcePatternResolver(resourceLoader).getResources("classpath:/META-INF/modeler-mybatis-mappings/*.xml"));
       sqlSessionFactoryBean.afterPropertiesSet();
       return sqlSessionFactoryBean.getObject();
     } catch (Exception e) {
       throw new RuntimeException("Could not create sqlSessionFactory", e);
     }
 
+  }
+  
+  @Bean(destroyMethod="clearCache") // destroyMethod: see https://github.com/mybatis/old-google-code-issues/issues/778
+  public SqlSessionTemplate SqlSessionTemplate() {
+    return new SqlSessionTemplate(sqlSessionFactory());
   }
 
   @Bean
@@ -191,9 +212,4 @@ public class DatabaseConfiguration {
     }
   }
   
-  @Bean
-  public SqlSessionTemplate SqlSessionTemplate() {
-    return new SqlSessionTemplate(sqlSessionFactory());
-  }
-
 }

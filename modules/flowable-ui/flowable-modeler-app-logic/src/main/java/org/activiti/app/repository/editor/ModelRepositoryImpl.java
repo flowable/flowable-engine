@@ -34,7 +34,7 @@ public class ModelRepositoryImpl implements ModelRepository {
 
   @Override
   public Model get(String id) {
-    return sqlSessionTemplate.selectOne(NAMESPACE + "selectModel");
+    return sqlSessionTemplate.selectOne(NAMESPACE + "selectModel", id);
   }
   
   @Override
@@ -100,8 +100,10 @@ public class ModelRepositoryImpl implements ModelRepository {
   public void save(Model model) {
     if (model.getId() == null) {
       model.setId(idGenerator.generateId());
+      sqlSessionTemplate.insert(NAMESPACE + "insertModel", model);
+    } else {
+      sqlSessionTemplate.update(NAMESPACE + "updateModel", model);
     }
-    sqlSessionTemplate.insert(NAMESPACE + "insertModel", model);
   }
   
   @Override

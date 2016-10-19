@@ -60,8 +60,10 @@ public class ModelRelationRepositoryImpl implements ModelRelationRepository {
   public void save(ModelRelation modelRelation) {
     if (modelRelation.getId() == null) {
       modelRelation.setId(idGenerator.generateId());
+      sqlSessionTemplate.insert(NAMESPACE + "insertModelRelation", modelRelation);
+    } else {
+      sqlSessionTemplate.update(NAMESPACE + "updateModelRelation", modelRelation);
     }
-    sqlSessionTemplate.insert(NAMESPACE + "insertModelRelation", modelRelation);
   }
   
   @Override

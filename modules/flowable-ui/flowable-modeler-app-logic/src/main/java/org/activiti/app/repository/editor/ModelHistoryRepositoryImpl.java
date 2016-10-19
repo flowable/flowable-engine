@@ -52,8 +52,10 @@ public class ModelHistoryRepositoryImpl implements ModelHistoryRepository {
 	public void save(ModelHistory modelHistory) {
 	  if (modelHistory.getId() == null) {
 	    modelHistory.setId(idGenerator.generateId());
+	    sqlSessionTemplate.insert(NAMESPACE + "insertModelHistory", modelHistory);
+    } else {
+      sqlSessionTemplate.update(NAMESPACE + "updateModelHistory", modelHistory);
     }
-    sqlSessionTemplate.insert(NAMESPACE + "insertModelHistory", modelHistory);
 	}
 	
 	@Override

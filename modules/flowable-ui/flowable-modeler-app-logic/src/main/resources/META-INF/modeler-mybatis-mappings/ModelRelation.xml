@@ -31,7 +31,17 @@
           )
     </insert>
     
-    <select id="selectModelRelationByParentModelIdAndType" parameterType="java.util.map" resultMap="modelRelationResultMap">
+    <update id="updateModelRelation" parameterType="org.activiti.app.domain.editor.ModelRelation">
+        update ${prefix}ACT_DE_MODEL_RELATION
+        <set>
+            parent_model_id = #{parentModelId, jdbcType=VARCHAR},
+            model_id = #{modelId, jdbcType=VARCHAR},
+            relation_type = #{type, jdbcType=VARCHAR}
+        </set>
+        where id = #{id, jdbcType=VARCHAR}
+    </update>
+    
+    <select id="selectModelRelationByParentModelIdAndType" parameterType="map" resultMap="modelRelationResultMap">
         select * from ${prefix}ACT_DE_MODEL_RELATION
         where parent_model_id = #{parentModelId, jdbcType=VARCHAR} and relation_type = #{type, jdbcType=VARCHAR}
     </select>
