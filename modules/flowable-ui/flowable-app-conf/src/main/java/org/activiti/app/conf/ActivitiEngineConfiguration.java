@@ -37,6 +37,7 @@ import org.activiti.engine.runtime.Clock;
 import org.activiti.form.api.FormRepositoryService;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.configurator.FormEngineConfigurator;
+import org.activiti.idm.api.IdmIdentityService;
 import org.activiti.spring.ProcessEngineFactoryBean;
 import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.apache.commons.lang3.StringUtils;
@@ -174,6 +175,11 @@ public class ActivitiEngineConfiguration {
     @Bean
     public IdentityService identityService() {
     	return processEngine().getIdentityService();
+    }
+    
+    @Bean
+    public IdmIdentityService idmIdentityService() {
+      return processEngine().getIdmIdentityService();
     }
     
     @Bean

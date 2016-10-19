@@ -13,7 +13,6 @@
 'use strict';
 
 var activitiApp = angular.module('activitiLanding', [
-  'http-auth-interceptor',
   'ngCookies',
   'ngResource',
   'ngSanitize',
@@ -28,14 +27,14 @@ activitiApp
   // Initialize routes
   .config(['$provide', '$routeProvider', '$selectProvider', '$datepickerProvider', '$translateProvider', function ($provide, $routeProvider, $selectProvider, $datepickerProvider, $translateProvider) {
 
-        var appName = '';
-        $provide.value('appName', appName);
+    var appName = '';
+    $provide.value('appName', appName);
 
-        var ctx = FLOWABLE.CONFIG.webContextRoot;
+    var ctx = FLOWABLE.CONFIG.webContextRoot;
     var appResourceRoot = ctx + (ctx && ctx.charAt(ctx.length - 1) !== '/' ? '/' : '');
     $provide.value('appResourceRoot', appResourceRoot);
 
-        // Override caret for bs-select directive
+    // Override caret for bs-select directive
     angular.extend($selectProvider.defaults, {
         caretHtml: '&nbsp;<i class="icon icon-caret-down"></i>'
     });
@@ -46,45 +45,10 @@ activitiApp
         iconRight: 'icon icon-caret-right'
     });
 
-    /*
-     * Route resolver for all authenticated routes
-     */
-    var authRouteResolver = ['$rootScope', 'AuthenticationSharedService', function($rootScope, AuthenticationSharedService) {
-
-        if(!$rootScope.authenticated) {
-          // Return auth-promise. On success, the promise resolves and user is assumed authenticated from now on. If
-          // promise is rejected, route will not be followed (no unneeded HTTP-calls will be done, which case a 401 in the end, anyway)
-          return AuthenticationSharedService.authenticate();
-
-        } else {
-          // Authentication done on rootscope, no need to call service again. Any unauthenticated access to REST will result in
-          // a 401 and will redirect to login anyway. Done to prevent additional call to authenticate every route-change
-          $rootScope.authenticated = true;
-          return true;
-        }
-    }];
-
-    /*
-     * Route resolver for all unauthenticated routes
-     */
-    var unauthRouteResolver = ['$rootScope', function($rootScope) {
-      $rootScope.authenticationChecked = true;
-    }];
-
     $routeProvider
-        .when('/login', {
-            templateUrl: 'views/login.html',
-            controller: 'LoginController',
-            resolve: {
-                verify: unauthRouteResolver
-            }
-        })
         .when('/', {
             templateUrl: 'views/landing.html',
-            controller: 'LandingController',
-            resolve: {
-                verify: authRouteResolver
-            }
+            controller: 'LandingController'
         })
         .otherwise({
             redirectTo: FLOWABLE.CONFIG.appDefaultRoute || '/'
@@ -103,20 +67,13 @@ activitiApp
 
 
     }])
-    .run(['$rootScope', function($rootScope) {
-        $rootScope.$on( "$routeChangeStart", function(event, next, current) {
-            if (next !== null && next !== undefined) {
-                $rootScope.onLogin = next.templateUrl === 'views/login.html';
-            }
-        });
-    }])
     .run(['$rootScope', '$timeout', '$translate', '$location', '$http', '$window', '$popover', 'appResourceRoot', 'RuntimeAppDefinitionService',
         function($rootScope, $timeout, $translate, $location, $http, $window, $popover, appResourceRoot, RuntimeAppDefinitionService) {
 
 
-            $rootScope.appResourceRoot = appResourceRoot;
+        $rootScope.appResourceRoot = appResourceRoot;
 
-            // Alerts
+        // Alerts
         $rootScope.alerts = {
             queue: []
         };
@@ -175,15 +132,10 @@ activitiApp
             }
         };
      }])
-     .run(['$rootScope', '$location', '$window', 'AuthenticationSharedService', '$translate', '$modal',
-        function($rootScope, $location, $window, AuthenticationSharedService, $translate, $modal) {
+     .run(['$rootScope', '$location', '$window', '$translate', '$modal',
+        function($rootScope, $location, $window, $translate, $modal) {
          
-        var proposedLanguage = $translate.proposedLanguage();
-        if (proposedLanguage !== 'de' && proposedLanguage !== 'en' && proposedLanguage !== 'es' && proposedLanguage !== 'fr'
-            && proposedLanguage !== 'it' && proposedLanguage !== 'ja') {
-            
-            $translate.use('en');
-        }
+        $translate.use('en');
          
         /* Auto-height */
 
@@ -210,57 +162,6 @@ activitiApp
         updateWindowSize();
 
         /* Capabilities */
-
-        $rootScope.logout = function() {
-            AuthenticationSharedService.logout();
-        };
-
-        // Call when the 401 response is returned by the client
-        $rootScope.$on('event:auth-loginRequired', function(rejection) {
-            $rootScope.authenticated = false;
-            $rootScope.authenticationChecked = true;
-            if (FLOWABLE.CONFIG.loginUrl) {
-                $window.location.href = FLOWABLE.CONFIG.loginUrl.replace("{url}", $location.absUrl());
-            }
-            else {
-                $location.path('/login').replace();
-            }
-        });
-
-        // Call when the user is authenticated
-        $rootScope.$on('event:auth-authConfirmed', function(event, data) {
-        
-            $rootScope.authenticated = true;
-            $rootScope.authenticationChecked = true;
-
-            var redirectUrl = $location.search().redirectUrl;
-            if (redirectUrl !== null && redirectUrl !== undefined && redirectUrl.length > 0) {
-                $window.location.href = redirectUrl;
-            } else {
-                var locationPath = $location.path();
-                if (locationPath == '' || locationPath == '#' || locationPath == '/login'
-                    || locationPath.indexOf('/account/activate/') >= 0 || locationPath.indexOf('/account/reset-password/') >= 0) {
-                      
-                    $location.path('/');
-                }
-            }
-        });
-
-        // Call when the user logs in
-        $rootScope.$on('event:auth-loginConfirmed', function() {
-            AuthenticationSharedService.authenticate();
-        });
-
-        // Call when the user logs out
-        $rootScope.$on('event:auth-loginCancelled', function() {
-            $rootScope.authenticated = false;
-            $location.path('/login');
-        });
-
-        // Call when login fails
-        $rootScope.$on('event:auth-loginFailed', function() {
-            $rootScope.addAlertPromise($translate('LOGIN.MESSAGES.ERROR.AUTHENTICATION'), 'error'); 
-        });
 
         $rootScope.backToLanding = function() {
             var baseUrl = $location.absUrl();

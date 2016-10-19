@@ -13,8 +13,8 @@
 'use strict';
 
 // User service
-activitiApp.service('RuntimeAppDefinitionService', ['$http', '$q', '$location', 'AuthenticationSharedService', 'appName',
-    function ($http, $q, $location, AuthenticationSharedService, appName) {
+activitiApp.service('RuntimeAppDefinitionService', ['$http', '$q', '$location', 'appName',
+    function ($http, $q, $location, appName) {
 
         var httpAsPromise = function(options) {
             var deferred = $q.defer();
@@ -95,38 +95,6 @@ activitiApp.service('RuntimeAppDefinitionService', ['$http', '$q', '$location', 
                                     fixedUrl: urls.workflow,
                                     pages: ['tasks', 'processes']
                                 });
-
-                        } else if (app.defaultAppId === 'identity') {
-
-                            var identityApp = {
-                                id: 'identity',
-                                titleKey: 'APP.IDENTITY-MANAGEMENT.TITLE',
-                                descriptionKey: 'APP.IDENTITY-MANAGEMENT.DESCRIPTION',
-                                defaultAppId : app.defaultAppId,
-                                theme: 'theme-3',
-                                icon: 'icon icon-user',
-                                fixedBaseUrl: urls.identity + '/#/',
-                                fixedUrl: urls.identity
-                            };
-
-                                identityApp.pages = ['tenant-mgmt', 'user-mgmt', 'functional-group-mgmt', 'profile'];
-
-                            defaultApps.push(identityApp);
-
-                        } else if (app.defaultAppId === 'analytics') {
-
-                            defaultApps.push(
-                                {
-                                    id: 'analytics',
-                                    titleKey: 'APP.ANALYTICS.TITLE',
-                                    descriptionKey: 'APP.ANALYTICS.DESCRIPTION',
-                                    defaultAppId : app.defaultAppId,
-                                    theme: 'theme-6',
-                                    icon: 'glyphicon glyphicon-stats',
-                                    fixedBaseUrl: urls.analytics + '/#/',
-                                    fixedUrl: urls.analytics
-                                });
-
                         }
 
                     } else {

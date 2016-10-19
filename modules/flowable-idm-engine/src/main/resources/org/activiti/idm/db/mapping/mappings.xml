@@ -22,6 +22,7 @@
     <mapper resource="org/activiti/idm/db/mapping/entity/Membership.xml" />
     <mapper resource="org/activiti/idm/db/mapping/entity/Property.xml" />
     <mapper resource="org/activiti/idm/db/mapping/entity/TableData.xml" />
+    <mapper resource="org/activiti/idm/db/mapping/entity/Token.xml" />
     <mapper resource="org/activiti/idm/db/mapping/entity/User.xml" />
   </mappers>
 </configuration>

@@ -28,13 +28,10 @@
         <div class="fixed-container">
             <div class="navbar-header">
                 <a ng-click="backToLanding()" class="landing-logo" ng-if="account != null && account != undefined" title="{{'GENERAL.MAIN-TITLE' | translate}}">
-                    <img ng-if="account.tenantPictureId && account.tenantId"
-                         ng-src="{{restRootUrl()}}/app/rest/tenants/{{account.tenantId}}/logo">
-
-                    <img ng-if="!account.tenantPictureId" ng-src="{{appResourceRoot}}../images/activiti-logo.png">
+                    <img ng-src="{{appResourceRoot}}../images/flowable-logo.png">
                 </a>
-                <ul class="nav navbar-nav" ng-show="authenticationChecked">
-                    <li ng-repeat="item in mainNavigation" ng-show="(authenticated && !item.unauthenticated) || (item.unauthenticated && !authenticated)" ng-class="{'active': item.id == mainPage.id}">
+                <ul class="nav navbar-nav" ng-show="authenticated">
+                    <li ng-repeat="item in mainNavigation" ng-class="{'active': item.id == mainPage.id}">
                         <a ng-click="setMainPage(item)">{{item.title | translate}}</a>
                     </li>
                 </ul>
@@ -143,8 +140,7 @@
     <script src="scripts/controllers/start-process.js"></script>
     <script src="scripts/workflow-directives.js"></script>
 
-    <script src="../scripts/common/services/authentication-service.js"></script>
-	<script src="../scripts/common/services/user-service.js"></script>
+    <script src="../scripts/common/services/user-service.js"></script>
 	<script src="../scripts/common/services/functional-group-service.js"></script>
 	<script src="../scripts/common/services/related-content-service.js"></script>
     <script src="../scripts/common/services/runtime-app-definition-service.js"></script>

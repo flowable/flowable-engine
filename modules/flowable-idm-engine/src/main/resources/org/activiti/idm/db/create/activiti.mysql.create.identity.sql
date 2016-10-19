@@ -56,6 +56,18 @@ create table ACT_ID_INFO (
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
+create table ACT_ID_TOKEN (
+    ID_ varchar(64) not null,
+    REV_ integer,
+    TOKEN_VALUE_ varchar(255),
+    TOKEN_DATE_ timestamp(3),
+    IP_ADDRESS_ varchar(255),
+    USER_AGENT_ varchar(255),
+    USER_ID_ varchar(255),
+    TOKEN_DATA_ varchar(2000),
+    primary key (ID_)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+
 alter table ACT_ID_MEMBERSHIP 
     add constraint ACT_FK_MEMB_GROUP 
     foreign key (GROUP_ID_) 

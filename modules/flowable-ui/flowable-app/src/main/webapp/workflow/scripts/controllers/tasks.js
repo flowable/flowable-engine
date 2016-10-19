@@ -13,8 +13,8 @@
 'use strict';
 
 angular.module('activitiApp')
-  .controller('TasksController', ['$rootScope', '$scope', '$translate', '$timeout','$location', '$modal', '$popover', 'appResourceRoot', 'CommentService', 'TaskService', '$routeParams', 'AppDefinitionService',
-        function ($rootScope, $scope, $translate, $timeout, $location, $modal, $popover, appResourceRoot, CommentService, TaskService, $routeParams, AppDefinitionService) {
+  .controller('TasksController', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$modal', '$popover', 'appResourceRoot', 'CommentService', 'TaskService', '$routeParams', 'AppDefinitionService',
+        function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal, $popover, appResourceRoot, CommentService, TaskService, $routeParams, AppDefinitionService) {
 
             // Ensure correct main page is set
             $rootScope.setMainPageById('tasks');
@@ -341,6 +341,17 @@ angular.module('activitiApp')
             });
 
             // Initial load
-            $scope.refreshFilter();
+            if (!$rootScope.account) {
+           		$http.get(FLOWABLE.CONFIG.contextRoot + '/app/rest/account')
+                	.success(function (data, status, headers, config) {
+                      	$rootScope.account = data;
+                       	$rootScope.invalidCredentials = false;
+         				$scope.refreshFilter();	
+         					
+                  	});
+                      
+            } else {
+            	$scope.refreshFilter();
+            }
 
   }]);

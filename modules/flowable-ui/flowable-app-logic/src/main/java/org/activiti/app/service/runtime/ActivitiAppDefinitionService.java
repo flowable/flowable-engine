@@ -43,22 +43,14 @@ public class ActivitiAppDefinitionService {
   @Autowired
   protected ObjectMapper objectMapper;
 
-  protected static final AppDefinitionRepresentation kickstartAppDefinitionRepresentation = AppDefinitionRepresentation.createDefaultAppDefinitionRepresentation("kickstart");
-
   protected static final AppDefinitionRepresentation taskAppDefinitionRepresentation = AppDefinitionRepresentation.createDefaultAppDefinitionRepresentation("tasks");
-
-  protected static final AppDefinitionRepresentation idmAppDefinitionRepresentation = AppDefinitionRepresentation.createDefaultAppDefinitionRepresentation("identity");
 
   public ResultListDataRepresentation getAppDefinitions() {
     List<AppDefinitionRepresentation> resultList = new ArrayList<AppDefinitionRepresentation>();
 
-    // Default app: kickstart
-    resultList.add(kickstartAppDefinitionRepresentation);
-
     // Default app: tasks and IDM (available for all)
     resultList.add(taskAppDefinitionRepresentation);
-    resultList.add(idmAppDefinitionRepresentation);
-
+    
     // Custom apps
     Map<String, Deployment> deploymentMap = new HashMap<String, Deployment>();
     List<Deployment> deployments = repositoryService.createDeploymentQuery().list();

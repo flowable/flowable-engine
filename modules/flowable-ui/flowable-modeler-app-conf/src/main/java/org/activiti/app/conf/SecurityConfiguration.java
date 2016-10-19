@@ -156,8 +156,6 @@ public class SecurityConfiguration {
 	                .antMatchers("/*").permitAll()
 	                .antMatchers("/app/rest/authenticate").permitAll()
 	                .antMatchers("/app/rest/integration/login").permitAll()
-	                .antMatchers("/app/rest/temporary/example-options").permitAll()
-	                .antMatchers("/app/rest/idm/email-actions/*").permitAll()
 	                .antMatchers("/app/rest/idm/signups").permitAll()
 	                .antMatchers("/app/rest/idm/passwords").permitAll()
 	                .antMatchers("/app/**").authenticated();
@@ -183,29 +181,6 @@ public class SecurityConfiguration {
 	    public RememberMeAuthenticationProvider rememberMeAuthenticationProvider() {
 	        return new RememberMeAuthenticationProvider(env.getProperty("security.rememberme.key"));
 	    }
-	}
-
-	//
-	// BASIC AUTH
-	//
-
-	@Configuration
-	@Order(1)
-	public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
-
-		protected void configure(HttpSecurity http) throws Exception {
-
-			http
-				.sessionManagement()
-					.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-					.and()
-				.csrf()
-					.disable()
-				.antMatcher("/api" + "/**")
-				.authorizeRequests()
-					.antMatchers("/api" + "/**").authenticated()
-					.and().httpBasic();
-		}
 	}
 
 	public static class LdapAuthenticationEnabledCondition implements Condition {

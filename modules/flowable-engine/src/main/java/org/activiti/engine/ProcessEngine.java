@@ -13,6 +13,7 @@
 package org.activiti.engine;
 
 import org.activiti.form.api.FormRepositoryService;
+import org.activiti.idm.api.IdmIdentityService;
 
 /**
  * Provides access to all the services that expose the BPM and workflow operations.
@@ -71,4 +72,6 @@ public interface ProcessEngine {
   FormRepositoryService getFormEngineRepositoryService();
   
   org.activiti.form.api.FormService getFormEngineFormService();
+  
+  IdmIdentityService getIdmIdentityService();
 }

@@ -71,7 +71,7 @@
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <configuration>
                     <path>/flowable-modeler</path>
-                    <port>9999</port>
+                    <port>8888</port>
                     <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
                     <systemProperties>
                         <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>

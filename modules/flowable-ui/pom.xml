@@ -40,6 +40,10 @@
 	<modules>
 		<module>flowable-content-storage-api</module>
 		<module>flowable-content-storage-fs</module>
+		<module>flowable-idm-app-logic</module>
+		<module>flowable-idm-app-rest</module>
+		<module>flowable-idm-app-conf</module>
+		<module>flowable-idm-app</module>
 		<module>flowable-app-logic</module>
 		<module>flowable-app-rest</module>
 		<module>flowable-app-conf</module>
