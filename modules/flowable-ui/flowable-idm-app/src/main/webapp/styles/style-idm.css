@@ -1,9 +1,42 @@
-/**
- * Copyright 2005-2015 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
+/* Login */
+
+.login-container {
+    width: 100%;
+    height: 100%;
+}
+
+.login-left-column {
+    width: 66%;
+    background-image: url(../images/login-banner.png);
+    background-repeat: no-repeat;
+    background-color: #8FBE6F;
+    background-position: left bottom;
+    height: 100%;
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+}
+
+.login-right-column {
+    width: 30%;
+    height: 100%;
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+}
+
+.login-form {
+    position: absolute;
+    width: 100%;
+    padding: 40px 10px 40px 40px;
+    top: 25%;
+    left: 0;
+}
+
+.login-error {
+    color: #e4593d
+}
+
 /**
  Colors:
  
@@ -406,3 +439,4 @@ ul.filter-list li.current a:hover, ul.filter-list li.current a:focus {
     max-height: 724px;
     overflow-y: auto;
 }
+

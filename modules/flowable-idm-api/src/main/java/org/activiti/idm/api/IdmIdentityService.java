@@ -152,6 +152,12 @@ public interface IdmIdentityService {
   void saveToken(Token token);
   
   /**
+   * @param tokenId
+   *          id of token to delete, cannot be null. When an id is passed for an unexisting token, this operation is ignored.
+   */
+  void deleteToken(String tokenId);
+  
+  /**
    * Creates a {@link TokenQuery} that allows to programmatically query the tokens.
    */
   TokenQuery createTokenQuery();

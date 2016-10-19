@@ -10,3 +10,4 @@ drop table ACT_ID_INFO;
 drop table ACT_ID_MEMBERSHIP;
 drop table ACT_ID_GROUP;
 drop table ACT_ID_USER;
+drop table ACT_ID_TOKEN;

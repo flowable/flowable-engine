@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.idm.api.Group;
+import org.activiti.idm.api.Token;
 import org.activiti.idm.api.User;
 import org.activiti.idm.api.management.IdmTableMetaData;
 import org.activiti.idm.api.management.IdmTablePage;
@@ -59,6 +60,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
     entityToTableNameMap.put(MembershipEntity.class, "ACT_ID_MEMBERSHIP");
     entityToTableNameMap.put(UserEntity.class, "ACT_ID_USER");
     entityToTableNameMap.put(IdentityInfoEntity.class, "ACT_ID_INFO");
+    entityToTableNameMap.put(TokenEntity.class, "ACT_ID_TOKEN");
     
     // general
     entityToTableNameMap.put(PropertyEntity.class, "ACT_ID_PROPERTY");
@@ -66,6 +68,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
     
     apiTypeToTableNameMap.put(Group.class, "ACT_ID_GROUP");
     apiTypeToTableNameMap.put(User.class, "ACT_ID_USER");
+    apiTypeToTableNameMap.put(Token.class, "ACT_ID_TOKEN");
   }
   
   protected DbSqlSession getDbSqlSession() {

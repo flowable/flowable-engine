@@ -35,6 +35,7 @@ import org.activiti.idm.engine.impl.cmd.CreateUserCmd;
 import org.activiti.idm.engine.impl.cmd.CreateUserQueryCmd;
 import org.activiti.idm.engine.impl.cmd.DeleteGroupCmd;
 import org.activiti.idm.engine.impl.cmd.DeleteMembershipCmd;
+import org.activiti.idm.engine.impl.cmd.DeleteTokenCmd;
 import org.activiti.idm.engine.impl.cmd.DeleteUserCmd;
 import org.activiti.idm.engine.impl.cmd.DeleteUserInfoCmd;
 import org.activiti.idm.engine.impl.cmd.GetUserInfoCmd;
@@ -112,6 +113,10 @@ public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentitySe
   
   public void saveToken(Token token) {
     commandExecutor.execute(new SaveTokenCmd(token));
+  }
+  
+  public void deleteToken(String tokenId) {
+    commandExecutor.execute(new DeleteTokenCmd(tokenId));
   }
   
   public TokenQuery createTokenQuery() {

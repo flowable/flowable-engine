@@ -12,15 +12,21 @@
  */
 'use strict';
 
-var activitiApp = angular.module('activitiLanding', [
-  'http-auth-interceptor',
-  'ngCookies',
-  'ngResource',
-  'ngSanitize',
-  'ngRoute',
-  'mgcrea.ngStrap',
-  'ngAnimate',
-  'pascalprecht.translate'
+var activitiApp = angular.module('activitiApp', [
+  	'http-auth-interceptor',
+  	'ngCookies',
+  	'ngResource',
+  	'ngSanitize',
+  	'ngRoute',
+  	'mgcrea.ngStrap',
+  	'ngAnimate',
+  	'ngFileUpload',
+  	'pascalprecht.translate',
+  	'ui.grid',
+    'ui.grid.edit',
+    'ui.grid.selection',
+    'ui.grid.autoResize',
+    'ui.grid.cellNav'
 ]);
 
 var activitiModule = activitiApp;
@@ -28,14 +34,14 @@ activitiApp
   // Initialize routes
   .config(['$provide', '$routeProvider', '$selectProvider', '$datepickerProvider', '$translateProvider', function ($provide, $routeProvider, $selectProvider, $datepickerProvider, $translateProvider) {
 
-        var appName = '';
-        $provide.value('appName', appName);
+    var appName = '';
+    $provide.value('appName', appName);
 
-        var ctx = FLOWABLE.CONFIG.webContextRoot;
+    var ctx = FLOWABLE.CONFIG.webContextRoot;
     var appResourceRoot = ctx + (ctx && ctx.charAt(ctx.length - 1) !== '/' ? '/' : '');
     $provide.value('appResourceRoot', appResourceRoot);
 
-        // Override caret for bs-select directive
+    // Override caret for bs-select directive
     angular.extend($selectProvider.defaults, {
         caretHtml: '&nbsp;<i class="icon icon-caret-down"></i>'
     });
@@ -79,15 +85,40 @@ activitiApp
                 verify: unauthRouteResolver
             }
         })
-        .when('/', {
-            templateUrl: 'views/landing.html',
-            controller: 'LandingController',
+        .when('/user-mgmt', {
+            controller: 'IdmUserMgmtController',
+            templateUrl: appResourceRoot + 'views/idm-user-mgmt.html',
             resolve: {
                 verify: authRouteResolver
             }
         })
+        .when('/system-group-mgmt', {
+            controller: 'IdmSystemGroupMgmtController',
+            templateUrl: appResourceRoot + 'views/idm-system-group-mgmt.html',
+            resolve: {
+                verify: authRouteResolver
+            }
+        })
+        .when('/group-mgmt', {
+            controller: 'GroupMgmtController',
+            templateUrl: appResourceRoot + 'views/idm-group-mgmt.html',
+            resolve: {
+                verify: authRouteResolver
+            }
+        })
+        .when('/profile', {
+            controller: 'IdmProfileMgmtController',
+            templateUrl: appResourceRoot + 'views/idm-profile-mgmt.html',
+            resolve: {
+                verify: authRouteResolver
+            }
+        })
+        .when('/logout', {
+            templateUrl: appResourceRoot + 'views/empty.html',
+            controller: 'LogoutController'
+        })
         .otherwise({
-            redirectTo: FLOWABLE.CONFIG.appDefaultRoute || '/'
+            redirectTo: FLOWABLE.CONFIG.appDefaultRoute || '/profile'
         });
     
         // Initialize angular-translate
@@ -110,13 +141,110 @@ activitiApp
             }
         });
     }])
-    .run(['$rootScope', '$timeout', '$translate', '$location', '$http', '$window', '$popover', 'appResourceRoot', 'RuntimeAppDefinitionService',
-        function($rootScope, $timeout, $translate, $location, $http, $window, $popover, appResourceRoot, RuntimeAppDefinitionService) {
+    .run(['$rootScope', '$timeout', '$translate', '$location', '$window', 'AuthenticationSharedService',
+        function($rootScope, $timeout, $translate, $location, $window, AuthenticationSharedService) {
+
+            $translate.use('en');
+            
+            // Common model (eg selected tenant id)
+            $rootScope.common = {};
+
+            $rootScope.webRootUrl = function() {
+                return FLOWABLE.CONFIG.webContextRoot;
+            };
+
+            $rootScope.restRootUrl = function() {
+                return FLOWABLE.CONFIG.contextRoot;
+            };
+
+            // Needed for auto-height
+            $rootScope.window = {};
+            var updateWindowSize = function() {
+                $rootScope.window.width = $window.innerWidth;
+                $rootScope.window.height  = $window.innerHeight;
+            };
+
+            // Window resize hook
+            angular.element($window).bind('resize', function() {
+                $rootScope.$apply(updateWindowSize());
+            });
+
+            $rootScope.$watch('window.forceRefresh', function(newValue) {
+                if(newValue) {
+                    $timeout(function() {
+                        updateWindowSize();
+                        $rootScope.window.forceRefresh = false;
+                    });
+                }
+            });
+
+            updateWindowSize();
+
+            $rootScope.hasAdminCapability = function() {
+                return AuthenticationSharedService.hasAdminCapability();
+            };
+
+            // Main navigation depends on the account being fetched
+            $rootScope.$watch('account', function() {
+                $rootScope.mainNavigation = [
+                    {
+                        id: 'userMgmt',
+                        title: 'IDM.GENERAL.NAVIGATION.USER-MGMT',
+                        path: '/user-mgmt',
+                        isVisible: function() {
+                            return AuthenticationSharedService.hasAdminCapability();
+                        }
+                    },
+                    {
+                        id: 'functionalGroupMgmt',
+                        title: 'IDM.GENERAL.NAVIGATION.GROUP-MGMT',
+                        path: '/group-mgmt',
+                        isVisible: function() {
+                            return AuthenticationSharedService.hasAdminCapability();
+                        }
+                    },
+                    {
+                        id: 'profile',
+                        title: 'IDM.GENERAL.NAVIGATION.PROFILE',
+                        path: '/profile',
+                        isVisible: function() {
+                            return true; // Visible for everyone
+                        }
+                    }
+                ];
 
 
-            $rootScope.appResourceRoot = appResourceRoot;
+                /*
+                 * Set the current main page, using the page object. If the page is already active,
+                 * this is a no-op.
+                 */
+                $rootScope.setMainPage = function(mainPage) {
+                    $rootScope.mainPage = mainPage;
+                    $location.path($rootScope.mainPage.path);
+                };
 
-            // Alerts
+                /*
+                 * Set the current main page, using the page ID. If the page is already active,
+                 * this is a no-op.
+                 */
+                $rootScope.setMainPageById = function(mainPageId) {
+                    for (var i=0; i<$rootScope.mainNavigation.length; i++) {
+                        if (mainPageId == $rootScope.mainNavigation[i].id) {
+                            $rootScope.mainPage = $rootScope.mainNavigation[i];
+                            break;
+                        }
+                    }
+                };
+            });
+        }
+    ])
+    .run(['$rootScope', '$timeout', '$translate', '$location', '$http', '$window', '$popover', 'appResourceRoot',
+        function($rootScope, $timeout, $translate, $location, $http, $window, $popover, appResourceRoot) {
+
+
+        $rootScope.appResourceRoot = appResourceRoot;
+
+        // Alerts
         $rootScope.alerts = {
             queue: []
         };
@@ -271,4 +399,18 @@ activitiApp
             }
             $window.location.href = baseUrl;
         };
-}]);
+}])
+	
+	// Moment-JS date-formatting filter
+    .filter('dateformat', function() {
+        return function(date, format) {
+            if (date) {
+                if (format) {
+                    return moment(date).format(format);
+                } else {
+                    return moment(date).calendar();
+                }
+            }
+            return '';
+        };
+    });

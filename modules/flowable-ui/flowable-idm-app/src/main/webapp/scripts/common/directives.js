@@ -718,11 +718,11 @@ activitiModule.
             }
 
             if ($scope.ignoreContainer) {
-                $scope.popover = $popover($element, {template: appResourceRoot + '../views/common/popover/select-people-popover.html?'  +
+                $scope.popover = $popover($element, {template: appResourceRoot + '/views/common/popover/select-people-popover.html?'  +
                     Date.now(), placement: placement});
 
             } else {
-                $scope.popover = $popover($element, {template: appResourceRoot + '../views/common/popover/select-people-popover.html?'  +
+                $scope.popover = $popover($element, {template: appResourceRoot + '/views/common/popover/select-people-popover.html?'  +
                     Date.now(), placement: placement, container: 'body'});
             }
 
@@ -953,11 +953,11 @@ directive('selectFunctionalGroupPopover', ['$rootScope', '$http', '$popover','ap
         }
 
         if ($scope.ignoreContainer) {
-            $scope.popover = $popover($element, {template: appResourceRoot + '../views/common/popover/select-functional-group-popover.html?' +
+            $scope.popover = $popover($element, {template: appResourceRoot + '/views/common/popover/select-functional-group-popover.html?' +
                 Date.now(), placement: placement});
 
         } else {
-            $scope.popover = $popover($element, {template: appResourceRoot + '../views/common/popover/select-functional-group-popover.html?' +
+            $scope.popover = $popover($element, {template: appResourceRoot + '/views/common/popover/select-functional-group-popover.html?' +
                 Date.now(), placement: placement, container: 'body'});
         }
 
