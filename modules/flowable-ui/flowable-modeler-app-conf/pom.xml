@@ -23,6 +23,14 @@
         </dependency>
 
 		<!-- Activiti -->
+		<dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-engine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-bpmn-model</artifactId>
@@ -41,13 +49,29 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
+            <artifactId>flowable-form-engine-configurator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-form-engine</artifactId>
+        </dependency>
+		<dependency>
+            <groupId>org.flowable</groupId>
             <artifactId>flowable-form-model</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-form-json-converter</artifactId>
         </dependency>
-       <dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-dmn-engine-configurator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-dmn-engine</artifactId>
+        </dependency>
+       	<dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-dmn-model</artifactId>
         </dependency>

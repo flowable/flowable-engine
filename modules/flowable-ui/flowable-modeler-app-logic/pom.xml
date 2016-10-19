@@ -14,6 +14,10 @@
 	<dependencies>
 	
         <!-- Activiti -->
+        <dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-engine</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-bpmn-model</artifactId>
@@ -105,6 +109,11 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
   			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>

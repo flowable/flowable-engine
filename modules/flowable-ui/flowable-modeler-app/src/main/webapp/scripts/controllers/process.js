@@ -56,7 +56,7 @@ angular.module('activitiModeler')
 	              jQuery("#bpmnModel").attr('data-history-id', $routeParams.modelHistoryId);
 	            }
 
-                var viewerUrl = appResourceRoot + "../display/displaymodel.html?version=" + Date.now();
+                var viewerUrl = appResourceRoot + "display/displaymodel.html?version=" + Date.now();
 
                 // If Activiti has been deployed inside an AMD environment Raphael will fail to register
                 // itself globally until displaymodel.js (which depends ona global Raphale variable) is runned,
@@ -140,7 +140,7 @@ angular.module('activitiModeler')
     
     $scope.openEditor = function() {
       if ($scope.model.process) {
-        $location.path("/" + $scope.model.process.id);
+        $location.path("/editor/" + $scope.model.process.id);
       }
     };
       

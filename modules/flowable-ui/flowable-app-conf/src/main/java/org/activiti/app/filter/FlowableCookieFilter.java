@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.activiti.app.security.ActivitiAppUser;
 import org.activiti.app.security.AuthoritiesConstants;
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.IdmIdentityService;
 import org.activiti.idm.api.Token;
@@ -166,6 +167,8 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
             
             SecurityContextHolder.getContext().setAuthentication(new RememberMeAuthenticationToken(token.getId(), 
                 appUser, appUser.getAuthorities()));
+            
+            Authentication.setAuthenticatedUserId(token.getUserId());
             
             authenticated = true;
             break;

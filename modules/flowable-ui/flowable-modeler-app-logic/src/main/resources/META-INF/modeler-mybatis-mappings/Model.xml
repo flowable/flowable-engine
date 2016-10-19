@@ -48,7 +48,7 @@
             #{version, jdbcType=INTEGER},
             #{modelEditorJson, jdbcType=VARCHAR},
             #{modelType, jdbcType=INTEGER},
-            #{thumbnail, jdbcType=BLOB},
+            #{thumbnail, jdbcType=BLOB}
           )
     </insert>
     
