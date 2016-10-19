@@ -71,10 +71,10 @@ public class FormsResource {
 
     List<Model> models = null;
     if (validFilter != null) {
-      models = modelRepository.findModelsByModelType(AbstractModel.MODEL_TYPE_FORM, validFilter);
+      models = modelRepository.findByModelTypeAndFilter(AbstractModel.MODEL_TYPE_FORM, validFilter);
 
     } else {
-      models = modelRepository.findModelsByModelType(AbstractModel.MODEL_TYPE_FORM);
+      models = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_FORM);
     }
 
     List<FormRepresentation> reps = new ArrayList<FormRepresentation>();

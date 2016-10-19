@@ -27,15 +27,15 @@ import org.springframework.security.core.userdetails.User;
 
 public interface ModelService {
 
-  Model getModel(Long modelId);
+  Model getModel(String modelId);
   
-  ModelRepresentation getModelRepresentation(Long modelId);
+  ModelRepresentation getModelRepresentation(String modelId);
 
   List<AbstractModel> getModelsByModelType(Integer modelType);
   
   ModelKeyRepresentation validateModelKey(Model model, Integer modelType, String key);
   
-  ModelHistory getModelHistory(Long modelId, Long modelHistoryId);
+  ModelHistory getModelHistory(String modelId, String modelHistoryId);
 
   Long getModelCountForUser(User user, int modelTypeApp);
   
@@ -45,7 +45,7 @@ public interface ModelService {
   
   byte[] getBpmnXML(AbstractModel model);
   
-  BpmnModel getBpmnModel(AbstractModel model, Map<Long, Model> formMap, Map<Long, Model> decisionTableMap);
+  BpmnModel getBpmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap);
 
   Model createModel(ModelRepresentation model, String editorJson, User createdBy);
   
@@ -55,16 +55,16 @@ public interface ModelService {
   
   Model saveModel(Model modelObject, String editorJson, byte[] imageBytes, boolean newVersion, String newVersionComment, User updatedBy);
 
-  Model saveModel(long modelId, String name, String key, String description, String editorJson, 
+  Model saveModel(String modelId, String name, String key, String description, String editorJson, 
       boolean newVersion, String newVersionComment, User updatedBy);
   
-  ModelRepresentation importNewVersion(Long modelId, String fileName, InputStream modelStream);
+  ModelRepresentation importNewVersion(String modelId, String fileName, InputStream modelStream);
 
   Model createNewModelVersion(Model modelObject, String comment, User updatedBy);
   
   ModelHistory createNewModelVersionAndReturnModelHistory(Model modelObject, String comment, User updatedBy);
 
-  void deleteModel(long modelId, boolean cascadeHistory, boolean deleteRuntimeApp);
+  void deleteModel(String modelId, boolean cascadeHistory, boolean deleteRuntimeApp);
 
   ReviveModelResultRepresentation reviveProcessModelHistory(ModelHistory modelHistory, User user, String newVersionComment);
 }

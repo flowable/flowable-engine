@@ -38,10 +38,10 @@ public class AbstractModelHistoryResource {
   @Autowired
   protected ObjectMapper objectMapper;
 
-  public ResultListDataRepresentation getModelHistoryCollection(Long modelId, Boolean includeLatestVersion) {
+  public ResultListDataRepresentation getModelHistoryCollection(String modelId, Boolean includeLatestVersion) {
 
     Model model = modelService.getModel(modelId);
-    List<ModelHistory> history = modelHistoryRepository.findByModelIdAndRemovalDateIsNullOrderByVersionDesc(model.getId());
+    List<ModelHistory> history = modelHistoryRepository.findByModelId(model.getId());
     ResultListDataRepresentation result = new ResultListDataRepresentation();
 
     List<ModelRepresentation> representations = new ArrayList<ModelRepresentation>();
@@ -64,7 +64,7 @@ public class AbstractModelHistoryResource {
     return result;
   }
 
-  public ModelRepresentation getProcessModelHistory(Long modelId, Long modelHistoryId) {
+  public ModelRepresentation getProcessModelHistory(String modelId, String modelHistoryId) {
     // Check if the user has read-rights on the process-model in order to fetch history
     ModelHistory modelHistory = modelService.getModelHistory(modelId, modelHistoryId);
     return new ModelRepresentation(modelHistory);

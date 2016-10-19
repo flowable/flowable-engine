@@ -95,8 +95,8 @@ public class ModelServiceImpl implements ModelService {
   protected BpmnXMLConverter bpmnXMLConverter = new BpmnXMLConverter();
   
   @Override
-  public Model getModel(Long modelId) {
-    Model model = modelRepository.findOne(modelId);
+  public Model getModel(String modelId) {
+    Model model = modelRepository.get(modelId);
 
     if (model == null) {
       NotFoundException modelNotFound = new NotFoundException("No model found with the given id: " + modelId);
@@ -107,21 +107,21 @@ public class ModelServiceImpl implements ModelService {
     return model;
   }
   
-  public ModelRepresentation getModelRepresentation(Long modelId) {
+  public ModelRepresentation getModelRepresentation(String modelId) {
     Model model = getModel(modelId);
     return new ModelRepresentation(model);
   }
 
   @Override
   public List<AbstractModel> getModelsByModelType(Integer modelType) {
-    return new ArrayList<AbstractModel>(modelRepository.findModelsByModelType(modelType));
+    return new ArrayList<AbstractModel>(modelRepository.findByModelType(modelType));
   }
   
   @Override
-  public ModelHistory getModelHistory(Long modelId, Long modelHistoryId) {
+  public ModelHistory getModelHistory(String modelId, String modelHistoryId) {
     // Check if the user has read-rights on the process-model in order to fetch history
     Model model = getModel(modelId);
-    ModelHistory modelHistory = modelHistoryRepository.findOne(modelHistoryId);
+    ModelHistory modelHistory = modelHistoryRepository.get(modelHistoryId);
 
     // Check if history corresponds to the current model and is not deleted
     if (modelHistory == null || modelHistory.getRemovalDate() != null || !modelHistory.getModelId().equals(model.getId())) {
@@ -155,7 +155,7 @@ public class ModelServiceImpl implements ModelService {
     ModelKeyRepresentation modelKeyResponse = new ModelKeyRepresentation();
     modelKeyResponse.setKey(key);
     
-    List<Model> models = modelRepository.findModelsByKeyAndType(key, modelType);
+    List<Model> models = modelRepository.findByKeyAndType(key, modelType);
     for (Model modelInfo : models) {
       if (model == null || modelInfo.getId().equals(model.getId()) == false) {
         modelKeyResponse.setKeyAlreadyExists(true);
@@ -200,7 +200,7 @@ public class ModelServiceImpl implements ModelService {
     return newModel;
   }
   
-  public ModelRepresentation importNewVersion(Long modelId, String fileName, InputStream modelStream) {
+  public ModelRepresentation importNewVersion(String modelId, String fileName, InputStream modelStream) {
     Model processModel = getModel(modelId);
     User currentUser = SecurityUtils.getCurrentUserObject();
 
@@ -276,10 +276,10 @@ public class ModelServiceImpl implements ModelService {
 
   @Override
   @Transactional
-  public Model saveModel(long modelId, String name, String key, String description, String editorJson, 
+  public Model saveModel(String modelId, String name, String key, String description, String editorJson, 
       boolean newVersion, String newVersionComment, User updatedBy) {
 
-    Model modelObject = modelRepository.findOne(modelId);
+    Model modelObject = modelRepository.get(modelId);
     return internalSave(name, key, description, editorJson, newVersion, newVersionComment, null, updatedBy, modelObject);
   }
 
@@ -323,15 +323,15 @@ public class ModelServiceImpl implements ModelService {
 
   @Override
   @Transactional
-  public void deleteModel(long modelId, boolean cascadeHistory, boolean deleteRuntimeApp) {
+  public void deleteModel(String modelId, boolean cascadeHistory, boolean deleteRuntimeApp) {
 
-    Model model = modelRepository.findOne(modelId);
+    Model model = modelRepository.get(modelId);
     if (model == null) {
       throw new IllegalArgumentException("No model found with id: " + modelId);
     }
 
     // Fetch current model history list
-    List<ModelHistory> history = modelHistoryRepository.findByModelIdAndRemovalDateIsNullOrderByVersionDesc(model.getId());
+    List<ModelHistory> history = modelHistoryRepository.findByModelId(model.getId());
 
     // if the model is an app definition and the runtime app needs to be deleted, remove it now
     if (deleteRuntimeApp && model.getModelType() == Model.MODEL_TYPE_APP) {
@@ -382,7 +382,7 @@ public class ModelServiceImpl implements ModelService {
   @Override
   @Transactional
   public ReviveModelResultRepresentation reviveProcessModelHistory(ModelHistory modelHistory, User user, String newVersionComment) {
-    Model latestModel = modelRepository.findOne(modelHistory.getModelId());
+    Model latestModel = modelRepository.get(modelHistory.getModelId());
     if (latestModel == null) {
       throw new IllegalArgumentException("No process model found with id: " + modelHistory.getModelId());
     }
@@ -412,7 +412,7 @@ public class ModelServiceImpl implements ModelService {
         try {
           AppDefinition appDefinition = objectMapper.readValue(latestModel.getModelEditorJson(), AppDefinition.class);
           for (AppModelDefinition appModelDefinition : appDefinition.getModels()) {
-            if (!modelRepository.exists(appModelDefinition.getId())) {
+            if (modelRepository.get(appModelDefinition.getId()) == null) {
               result.getUnresolvedModels().add(new UnresolveModelRepresentation(appModelDefinition.getId(), 
                   appModelDefinition.getName(), appModelDefinition.getLastUpdatedBy()));
             }
@@ -430,10 +430,10 @@ public class ModelServiceImpl implements ModelService {
   public BpmnModel getBpmnModel(AbstractModel model) {
     BpmnModel bpmnModel = null;
     try {
-      Map<Long, Model> formMap = new HashMap<Long, Model>();
-      Map<Long, Model> decisionTableMap = new HashMap<Long, Model>();
+      Map<String, Model> formMap = new HashMap<String, Model>();
+      Map<String, Model> decisionTableMap = new HashMap<String, Model>();
       
-      List<Model> referencedModels = modelRepository.findModelsByParentModelId(model.getId());
+      List<Model> referencedModels = modelRepository.findByParentModelId(model.getId());
       for (Model childModel : referencedModels) {
         if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
           formMap.put(childModel.getId(), childModel);
@@ -454,15 +454,15 @@ public class ModelServiceImpl implements ModelService {
   }
   
   @Override
-  public BpmnModel getBpmnModel(AbstractModel model, Map<Long, Model> formMap, Map<Long, Model> decisionTableMap) {
+  public BpmnModel getBpmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap) {
     try {
       ObjectNode editorJsonNode = (ObjectNode) objectMapper.readTree(model.getModelEditorJson());
-      Map<Long, String> formKeyMap = new HashMap<Long, String>();
+      Map<String, String> formKeyMap = new HashMap<String, String>();
       for (Model formModel : formMap.values()) {
         formKeyMap.put(formModel.getId(), formModel.getKey());
       }
       
-      Map<Long, String> decisionTableKeyMap = new HashMap<Long, String>();
+      Map<String, String> decisionTableKeyMap = new HashMap<String, String>();
       for (Model decisionTableModel : decisionTableMap.values()) {
         decisionTableKeyMap.put(decisionTableModel.getId(), decisionTableModel.getKey());
       }
@@ -496,12 +496,12 @@ public class ModelServiceImpl implements ModelService {
   }
 
   public Long getModelCountForUser(User user, int modelType) {
-    return modelRepository.countByModelTypeAndUser(modelType, user.getUsername());
+    return modelRepository.countByModelTypeAndCreatedBy(modelType, user.getUsername());
   }
 
   protected Model persistModel(Model model) {
 
-    model = modelRepository.save((Model) model);
+    modelRepository.save((Model) model);
 
     if (StringUtils.isNotEmpty(model.getModelEditorJson())) {
 
@@ -538,44 +538,46 @@ public class ModelServiceImpl implements ModelService {
     return model;
   }
 
-  protected ModelHistory persistModelHistory(ModelHistory modelHistory) {
-    return modelHistoryRepository.save(modelHistory);
+  protected void persistModelHistory(ModelHistory modelHistory) {
+    modelHistoryRepository.save(modelHistory);
   }
 
   protected void handleBpmnProcessFormModelRelations(AbstractModel bpmnProcessModel, ObjectNode editorJsonNode) {
     List<JsonNode> formReferenceNodes = JsonConverterUtil.filterOutJsonNodes(JsonConverterUtil.getBpmnProcessModelFormReferences(editorJsonNode));
-    Set<Long> formIds = JsonConverterUtil.gatherLongPropertyFromJsonNodes(formReferenceNodes, "id");
+    Set<String> formIds = JsonConverterUtil.gatherStringPropertyFromJsonNodes(formReferenceNodes, "id");
     
     handleModelRelations(bpmnProcessModel, formIds, ModelRelationTypes.TYPE_FORM_MODEL_CHILD);
   }
   
   protected void handleBpmnProcessDecisionTaskModelRelations(AbstractModel bpmnProcessModel, ObjectNode editorJsonNode) {
     List<JsonNode> decisionTableNodes = JsonConverterUtil.filterOutJsonNodes(JsonConverterUtil.getBpmnProcessModelDecisionTableReferences(editorJsonNode));
-    Set<Long> decisionTableIds = JsonConverterUtil.gatherLongPropertyFromJsonNodes(decisionTableNodes, "id");
+    Set<String> decisionTableIds = JsonConverterUtil.gatherStringPropertyFromJsonNodes(decisionTableNodes, "id");
 
     handleModelRelations(bpmnProcessModel, decisionTableIds, ModelRelationTypes.TYPE_DECISION_TABLE_MODEL_CHILD);
   }
 
   protected void handleAppModelProcessRelations(AbstractModel appModel, ObjectNode appModelJsonNode) {
-    Set<Long> processModelIds = JsonConverterUtil.getAppModelReferencedModelIds(appModelJsonNode);
+    Set<String> processModelIds = JsonConverterUtil.getAppModelReferencedModelIds(appModelJsonNode);
     handleModelRelations(appModel, processModelIds, ModelRelationTypes.TYPE_PROCESS_MODEL);
   }
 
   /**
    * Generic handling of model relations: deleting/adding where needed.
    */
-  protected void handleModelRelations(AbstractModel bpmnProcessModel, Set<Long> idsReferencedInJson, String relationshipType) {
+  protected void handleModelRelations(AbstractModel bpmnProcessModel, Set<String> idsReferencedInJson, String relationshipType) {
 
     // Find existing persisted relations
     List<ModelRelation> persistedModelRelations = modelRelationRepository.findByParentModelIdAndType(bpmnProcessModel.getId(), relationshipType);
     
     // if no ids referenced now, just delete them all
     if (idsReferencedInJson == null || idsReferencedInJson.size() == 0) {
-      modelRelationRepository.delete(persistedModelRelations);
+      for (ModelRelation modelRelation : persistedModelRelations) {
+        modelRelationRepository.delete(modelRelation);
+      }
       return;
     }
 
-    Set<Long> alreadyPersistedModelIds = new HashSet<Long>(persistedModelRelations.size());
+    Set<String> alreadyPersistedModelIds = new HashSet<String>(persistedModelRelations.size());
     for (ModelRelation persistedModelRelation : persistedModelRelations) {
       if (!idsReferencedInJson.contains(persistedModelRelation.getModelId())) {
         // model used to be referenced, but not anymore. Delete it.
@@ -586,13 +588,13 @@ public class ModelServiceImpl implements ModelService {
     }
 
     // Loop over all referenced ids and see which one are new
-    for (Long idReferencedInJson : idsReferencedInJson) {
+    for (String idReferencedInJson : idsReferencedInJson) {
       
       // if model is referenced, but it is not yet persisted = create it
       if (!alreadyPersistedModelIds.contains(idReferencedInJson)) {
 
         // Check if model actually still exists. Don't create the relationship if it doesn't exist. The client UI will have cope with this too.
-        if (modelRepository.exists(idReferencedInJson)) {
+        if (modelRepository.get(idReferencedInJson) != null) {
           modelRelationRepository.save(new ModelRelation(bpmnProcessModel.getId(), idReferencedInJson, relationshipType));
         }
       }

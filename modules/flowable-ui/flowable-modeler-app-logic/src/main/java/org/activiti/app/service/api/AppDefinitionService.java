@@ -21,11 +21,11 @@ import org.springframework.security.core.userdetails.User;
 
 public interface AppDefinitionService {
 
-  AppDefinitionRepresentation getAppDefinition(Long appDefinitionId);
+  AppDefinitionRepresentation getAppDefinition(String appDefinitionId);
   
-  AppDefinitionRepresentation getAppDefinitionHistory(Long modelId, Long modelHistoryId);
+  AppDefinitionRepresentation getAppDefinitionHistory(String modelId, String modelHistoryId);
   
-  AppDefinitionUpdateResultRepresentation updateAppDefinition(Long modelId, AppDefinitionSaveRepresentation updatedModel);
+  AppDefinitionUpdateResultRepresentation updateAppDefinition(String modelId, AppDefinitionSaveRepresentation updatedModel);
   
 	List<AppDefinitionServiceRepresentation> getAppDefinitions();
 	

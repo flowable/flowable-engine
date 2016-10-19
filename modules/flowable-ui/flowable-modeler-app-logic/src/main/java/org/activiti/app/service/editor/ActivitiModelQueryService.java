@@ -28,6 +28,7 @@ import org.activiti.app.model.common.ResultListDataRepresentation;
 import org.activiti.app.model.editor.AppDefinitionListModelRepresentation;
 import org.activiti.app.model.editor.ModelRepresentation;
 import org.activiti.app.repository.editor.ModelRepository;
+import org.activiti.app.repository.editor.ModelSort;
 import org.activiti.app.security.SecurityUtils;
 import org.activiti.app.service.api.ModelService;
 import org.activiti.app.service.exception.BadRequestException;
@@ -44,10 +45,9 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -57,6 +57,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Tijs Rademakers
  */
 @Service
+@Transactional
 public class ActivitiModelQueryService {
 
   private static final Logger logger = LoggerFactory.getLogger(ActivitiModelQueryService.class);
@@ -65,9 +66,6 @@ public class ActivitiModelQueryService {
   protected static final String FILTER_SHARED_WITH_OTHERS = "sharedWithOthers";
   protected static final String FILTER_FAVORITE = "favorite";
 
-  protected static final String SORT_NAME_ASC = "nameAsc";
-  protected static final String SORT_NAME_DESC = "nameDesc";
-  protected static final String SORT_MODIFIED_ASC = "modifiedAsc";
   protected static final int MIN_FILTER_LENGTH = 1;
 
   @Autowired
@@ -103,14 +101,14 @@ public class ActivitiModelQueryService {
     User user = SecurityUtils.getCurrentUserObject();
 
     if (validFilter != null) {
-      models = modelRepository.findModelsCreatedBy(user.getUsername(), modelType, validFilter, getSort(sort, false));
+      models = modelRepository.findByModelTypeAndCreatedBy(user.getUsername(), modelType, validFilter, sort);
 
     } else {
-      models = modelRepository.findModelsCreatedBy(user.getUsername(), modelType, getSort(sort, false));
+      models = modelRepository.findByModelTypeAndCreatedBy(user.getUsername(), modelType, sort);
     }
 
     if (CollectionUtils.isNotEmpty(models)) {
-      List<Long> addedModelIds = new ArrayList<Long>();
+      List<String> addedModelIds = new ArrayList<String>();
       for (Model model : models) {
         if (addedModelIds.contains(model.getId()) == false) {
           addedModelIds.add(model.getId());
@@ -130,9 +128,8 @@ public class ActivitiModelQueryService {
 
     User user = SecurityUtils.getCurrentUserObject();
 
-    List<Long> addedModelIds = new ArrayList<Long>();
-
-    List<Model> models = modelRepository.findModelsCreatedBy(user.getUsername(), 0, getSort(null, false));
+    List<String> addedModelIds = new ArrayList<String>();
+    List<Model> models = modelRepository.findByModelTypeAndCreatedBy(user.getUsername(), 0, ModelSort.MODIFIED_DESC);
 
     if (CollectionUtils.isNotEmpty(models)) {
       for (Model model : models) {
@@ -227,39 +224,4 @@ public class ActivitiModelQueryService {
     return validFilter;
   }
 
-  protected Sort getSort(String sort, boolean prefixWithProcessModel) {
-    String propName;
-    Direction direction;
-    if (SORT_NAME_ASC.equals(sort)) {
-      if (prefixWithProcessModel) {
-        propName = "model.name";
-      } else {
-        propName = "name";
-      }
-      direction = Direction.ASC;
-    } else if (SORT_NAME_DESC.equals(sort)) {
-      if (prefixWithProcessModel) {
-        propName = "model.name";
-      } else {
-        propName = "name";
-      }
-      direction = Direction.DESC;
-    } else if (SORT_MODIFIED_ASC.equals(sort)) {
-      if (prefixWithProcessModel) {
-        propName = "model.lastUpdated";
-      } else {
-        propName = "lastUpdated";
-      }
-      direction = Direction.ASC;
-    } else {
-      // Default sorting
-      if (prefixWithProcessModel) {
-        propName = "model.lastUpdated";
-      } else {
-        propName = "lastUpdated";
-      }
-      direction = Direction.DESC;
-    }
-    return new Sort(direction, propName);
-  }
 }
