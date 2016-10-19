@@ -124,7 +124,7 @@
       DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP},
       CATEGORY_ = #{category, jdbcType=VARCHAR},
       SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
-      FORM_KEY_ = #{formKey, jdbcType=INTEGER},
+      FORM_KEY_ = #{formKey, jdbcType=VARCHAR},
       CLAIM_TIME_ = #{claimTime, jdbcType=TIMESTAMP}
     </set>
     where ID_= #{id, jdbcType=VARCHAR}

@@ -66,7 +66,7 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
 
   private final Logger log = LoggerFactory.getLogger(CustomPersistentRememberMeServices.class);
 
-  public static final String COOKIE_NAME = "ACTIVITI_REMEMBER_ME";
+  public static final String COOKIE_NAME = "FLOWABLE_REMEMBER_ME";
 
   @Autowired
   private PersistentTokenService persistentTokenService;

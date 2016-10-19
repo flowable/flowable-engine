@@ -14,12 +14,8 @@ package org.activiti.app.rest.idm;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.activiti.app.model.idm.GroupRepresentation;
 import org.activiti.app.model.idm.UserRepresentation;
-import org.activiti.app.security.SecurityUtils;
-import org.activiti.app.service.exception.UnauthorizedException;
 import org.activiti.engine.IdentityService;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.User;
@@ -29,12 +25,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * REST controller for managing the current user's account.
  * 
  * @author Joram Barrez
+ * @author Tijs Rademakers
  */
 @RestController
 public class AccountResource {
@@ -46,27 +42,12 @@ public class AccountResource {
 	private IdentityService identityService;
 
   /**
-   * GET  /rest/authenticate -> check if the user is authenticated, and return its full name.
-   */
-  @RequestMapping(value = "/rest/authenticate", method = RequestMethod.GET, produces = {"application/json"})
-  public ObjectNode isAuthenticated(HttpServletRequest request) {
-    String user = request.getRemoteUser();
-    
-    if(user == null) {
-        throw new UnauthorizedException("Request did not contain valid authorization");
-    }
-    
-    ObjectNode result = objectMapper.createObjectNode();
-    result.put("login", user);
-    return result;
-  }
-
-  /**
    * GET  /rest/account -> get the current user.
    */
   @RequestMapping(value = "/rest/account", method = RequestMethod.GET, produces = "application/json")
   public UserRepresentation getAccount() {
-    User user = SecurityUtils.getCurrentActivitiAppUser().getUserObject();
+    User user = identityService.createUserQuery().list().get(0);
+    //User user = SecurityUtils.getCurrentActivitiAppUser().getUserObject();
     
     UserRepresentation userRepresentation = new UserRepresentation(user);
     

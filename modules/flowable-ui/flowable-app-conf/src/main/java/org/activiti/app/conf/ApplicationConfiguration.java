@@ -27,6 +27,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
         "org.activiti.app.conf",
         "org.activiti.app.repository",
         "org.activiti.app.service",
+        "org.activiti.app.filter",
         "org.activiti.app.security",
         "org.activiti.app.model.component"})
 public class ApplicationConfiguration {

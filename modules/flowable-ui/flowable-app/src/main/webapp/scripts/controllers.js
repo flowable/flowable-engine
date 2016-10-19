@@ -10,36 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-activitiApp.controller('LoginController', ['$scope', '$location', 'AuthenticationSharedService', '$timeout',
-    function ($scope, $location, AuthenticationSharedService, $timeout) {
-
-        $scope.model = {
-            loading: false
-        };
-        $scope.login = function () {
-
-            $scope.model.loading = true;
-
-            jQuery('#username').trigger('change');
-            jQuery('#password').trigger('change');
-
-            $timeout(function() {
-                AuthenticationSharedService.login({
-                    username: $scope.username,
-                    password: $scope.password,
-                    success: function () {
-                        $scope.model.loading = false;
-                    },
-                    error: function() {
-                        $scope.model.loading = false;
-                    }
-                });
-            });
-
-
-        };
-    }]
-);
 
 activitiApp.controller('AddAppDefinitionPopupCrtl', ['$rootScope', '$scope', '$http', '$translate', function ($rootScope, $scope, $http, $translate) {
 

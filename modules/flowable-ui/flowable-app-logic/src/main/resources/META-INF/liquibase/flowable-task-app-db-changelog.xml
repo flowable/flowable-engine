@@ -12,18 +12,7 @@
             <column name="sequence_next_hi_value" type="integer" />
         </createTable>
 
-		<createTable tableName="ACT_IDM_PERSISTENT_TOKEN">
-            <column name="series" type="varchar(255)">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="user_id" type="varchar(255)"/>
-            <column name="token_value" type="varchar(255)"/>
-            <column name="token_date" type="datetime(6)"/>
-            <column name="ip_address" type="varchar(39)"/>
-            <column name="user_agent" type="varchar(255)"/>
-        </createTable>
-        
-        <createTable tableName="ACT_WO_COMMENTS">
+		<createTable tableName="ACT_WO_COMMENTS">
             <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false" />
             </column>

@@ -13,7 +13,6 @@
 'use strict';
 
 var activitiApp = angular.module('activitiApp', [
-    'http-auth-interceptor',
     'ngCookies',
     'ngResource',
     'ngSanitize',
@@ -55,101 +54,46 @@ activitiApp
         iconRight: 'icon icon-caret-right'
     });
 
-    /*
-     * Route resolver for all authenticated routes
-     */
-    var authRouteResolver = ['$rootScope', 'AuthenticationSharedService', function($rootScope, AuthenticationSharedService) {
-
-        if(!$rootScope.authenticated) {
-          // Return auth-promise. On success, the promise resolves and user is assumed authenticated from now on. If
-          // promise is rejected, route will not be followed (no unneeded HTTP-calls will be done, which case a 401 in the end, anyway)
-          return AuthenticationSharedService.authenticate();
-
-        } else {
-          // Authentication done on rootscope, no need to call service again. Any unauthenticated access to REST will result in
-          // a 401 and will redirect to login anyway. Done to prevent additional call to authenticate every route-change
-          $rootScope.authenticated = true;
-          return true;
-        }
-      }];
-
-    /*
-     * Route resolver for all unauthenticated routes
-     */
-    var unauthRouteResolver = ['$rootScope', function($rootScope) {
-      $rootScope.authenticationChecked = true;
-    }];
-
     $routeProvider
         .when('/start-process', {
             templateUrl: appResourceRoot + 'views/start-process.html',
-            controller: 'StartProcessController',
-            resolve: {
-                verify: authRouteResolver
-            }
+            controller: 'StartProcessController'
         })
         .when('/apps/:deploymentKey/start-process', {
             templateUrl: appResourceRoot + 'views/start-process.html',
-            controller: 'StartProcessController',
-            resolve: {
-                verify: authRouteResolver
-            }
+            controller: 'StartProcessController'
         })
         .when('/tasks', {
             templateUrl: appResourceRoot + 'views/tasks.html',
-            controller: 'TasksController',
-            resolve: {
-                verify: authRouteResolver
-            }
+            controller: 'TasksController'
         })
         .when('/apps/:deploymentKey/tasks', {
             templateUrl: appResourceRoot + 'views/tasks.html',
-            controller: 'TasksController',
-            resolve: {
-                verify: authRouteResolver
-            }
+            controller: 'TasksController'
         })
         .when('/task/:taskId', {
             templateUrl: appResourceRoot + 'views/task.html',
-            controller: 'TaskController',
-            resolve: {
-                verify: authRouteResolver
-            }
+            controller: 'TaskController'
         })
         .when('/apps/:deploymentKey/task/:taskId', {
             templateUrl: appResourceRoot + 'views/task.html',
-            controller: 'TaskController',
-            resolve: {
-                verify: authRouteResolver
-            }
+            controller: 'TaskController'
         })
         .when('/processes', {
             templateUrl: appResourceRoot + 'views/processes.html',
-            controller: 'ProcessesController',
-            resolve: {
-                verify: authRouteResolver
-            }
+            controller: 'ProcessesController'
         })
         .when('/apps/:deploymentKey/processes', {
             templateUrl: appResourceRoot + 'views/processes.html',
-            controller: 'ProcessesController',
-            resolve: {
-                verify: authRouteResolver
-            }
+            controller: 'ProcessesController'
         })
         .when('/process/:processId', {
             templateUrl: appResourceRoot + 'views/process.html',
-            controller: 'ProcessController',
-            resolve: {
-                verify: authRouteResolver
-            }
+            controller: 'ProcessController'
         })
         .when('/apps/:deploymentKey/process/:processId', {
             templateUrl: appResourceRoot + 'views/process.html',
-            controller: 'ProcessController',
-            resolve: {
-                verify: authRouteResolver
-            }
+            controller: 'ProcessController'
         })
         .otherwise({
             redirectTo: FLOWABLE.CONFIG.appDefaultRoute || '/tasks'
@@ -172,20 +116,15 @@ activitiApp
     .run(['$rootScope', '$routeParams', '$timeout', '$translate', '$location', '$http', '$window', 'appResourceRoot', 'AppDefinitionService',
         function($rootScope, $routeParams, $timeout, $translate, $location, $http, $window, appResourceRoot, AppDefinitionService) {
 
-            $rootScope.restRootUrl = function() {
-                return FLOWABLE.CONFIG.contextRoot;
-            };
+        $rootScope.restRootUrl = function() {
+            return FLOWABLE.CONFIG.contextRoot;
+        };
 
         $rootScope.config = FLOWABLE.CONFIG;
         $rootScope.appResourceRoot = appResourceRoot;
         $rootScope.activitiFieldIdPrefix = 'activiti-';
 
-        var proposedLanguage = $translate.proposedLanguage();
-        if (proposedLanguage !== 'de' && proposedLanguage !== 'en' && proposedLanguage !== 'es' && proposedLanguage !== 'fr'
-            && proposedLanguage !== 'it' && proposedLanguage !== 'ja') {
-            
-            $translate.use('en');
-        }
+        $translate.use('en');
         
         $rootScope.window = {};
         var updateWindowSize = function() {
@@ -211,11 +150,6 @@ activitiApp
 
         // Main navigation
         $rootScope.mainNavigation = [
-            {
-                'id': 'login',
-                'title': 'GENERAL.NAVIGATION.LOGIN',
-                'unauthenticated': true
-            },
             {
                 'id': 'tasks',
                 'title': 'GENERAL.NAVIGATION.TASKS',
@@ -263,8 +197,6 @@ activitiApp
                 }
             }
         };
-
-
 
         // Alerts
         $rootScope.alerts = {
@@ -316,6 +248,13 @@ activitiApp
                 });
             }
         };
+        
+        $http.get(FLOWABLE.CONFIG.contextRoot + '/app/rest/account')
+        	.success(function (data, status, headers, config) {
+              	$rootScope.account = data;
+               	$rootScope.invalidCredentials = false;
+ 				$rootScope.authenticated = true;
+          	});
 
         $rootScope.model = {};
         // TODO: remove proc-def from rootscope or make smarter
@@ -360,66 +299,10 @@ activitiApp
         };
     }
   ])
-  .run(['$rootScope', '$location', '$window', 'AuthenticationSharedService', '$translate', 'appName', '$modal',
-        function($rootScope, $location, $window, AuthenticationSharedService, $translate, appName , $modal) {
+  .run(['$rootScope', '$location', '$window', '$translate', 'appName', '$modal',
+        function($rootScope, $location, $window, $translate, appName , $modal) {
 
-          var fixedUrlPart = '/' + appName + '/';
-
-          $rootScope.logout = function() {
-              AuthenticationSharedService.logout();
-          };
-
-          var redirectToLogin = function(data) {
-              var absUrl = $location.absUrl();
-              var index = absUrl.indexOf(fixedUrlPart);
-              var newUrl;
-              if (data !== null && data !== undefined && data.isFromLogout !== undefined && data.isFromLogout === true) {
-                  newUrl = absUrl.substring(0, index) + '/#login';
-                  if (FLOWABLE.CONFIG.loginUrl) {
-                      newUrl = FLOWABLE.CONFIG.loginUrl.replace("{url}", $location.absUrl());
-                  }
-              } else {
-                  newUrl = absUrl.substring(0, index) + '/#login?redirectUrl=' + encodeURIComponent($location.absUrl());
-                  if (FLOWABLE.CONFIG.loginUrl) {
-                      newUrl = FLOWABLE.CONFIG.loginUrl.replace("{url}", encodeURIComponent($location.absUrl()));
-                  }
-              }
-              $window.location.href = newUrl;
-          };
-
-          // Call when the 401 response is returned by the client
-          $rootScope.$on('event:auth-loginRequired', function(rejection) {
-              $rootScope.authenticated = false;
-              $rootScope.authenticationChecked = true;
-
-              redirectToLogin();
-          });
-
-          // Call when the user is authenticated
-          $rootScope.$on('event:auth-authConfirmed', function() {
-              $rootScope.authenticated = true;
-              $rootScope.authenticationChecked = true;
-
-              if($location.path() == '' || $location.path()=='#' || $location.path() == '/login') {
-                  $location.path('/');
-              }
-          });
-
-          // Call when the user logs in
-          $rootScope.$on('event:auth-loginConfirmed', function() {
-              AuthenticationSharedService.authenticate();
-          });
-
-          // Call when the user logs out
-          $rootScope.$on('event:auth-loginCancelled', function(event, data) {
-              $rootScope.authenticated = false;
-              redirectToLogin(data);
-          });
-
-          // Call when login fails
-          $rootScope.$on('event:auth-loginFailed', function() {
-              $rootScope.addAlertPromise($translate('LOGIN.MESSAGES.ERROR.AUTHENTICATION'), 'error');
-          });
+        var fixedUrlPart = '/' + appName + '/';
 
         $rootScope.backToLanding = function() {
             var baseUrl = $location.absUrl();
