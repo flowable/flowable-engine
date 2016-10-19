@@ -12,6 +12,7 @@
  */
 package org.activiti.standalone.escapeclause;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -141,18 +142,30 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
         // processDefinitionNameLike
         List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().processDefinitionNameLike("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(4, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
-        assertEquals(task2.getId(), list.get(2).getId());
-        assertEquals(task4.getId(), list.get(3).getId());
+        // only check for existence and assume that the SQL processing has ordered the values correctly
+        // see https://github.com/flowable/flowable-engine/issues/8
+        ArrayList tasks = new ArrayList(4);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        tasks.add(list.get(2).getId());
+        tasks.add(list.get(3).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task3.getId()));
+        assertTrue(tasks.contains(task4.getId()));
         
         // orQuery
         list = historyService.createHistoricTaskInstanceQuery().or().processDefinitionNameLike("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(4, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
-        assertEquals(task2.getId(), list.get(2).getId());
-        assertEquals(task4.getId(), list.get(3).getId());
+        tasks = new ArrayList(4);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        tasks.add(list.get(2).getId());
+        tasks.add(list.get(3).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task3.getId()));
+        assertTrue(tasks.contains(task4.getId()));
     }
   }
   
@@ -162,24 +175,38 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
         // processInstanceBusinessKeyLike
         List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKeyLike("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task2.getId(), list.get(1).getId());
-        
+        // only check for existence and assume that the SQL processing has ordered the values correctly
+        // see https://github.com/flowable/flowable-engine/issues/8
+        ArrayList tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task2.getId()));
+
         list = historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKeyLike("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task3.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
-        
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task3.getId()));
+        assertTrue(tasks.contains(task4.getId()));
+
         // orQuery
         list = historyService.createHistoricTaskInstanceQuery().or().processInstanceBusinessKeyLike("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task2.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task2.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().or().processInstanceBusinessKeyLike("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task3.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task3.getId()));
+        assertTrue(tasks.contains(task4.getId()));
     }
   }
   
@@ -189,24 +216,38 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
         // processInstanceBusinessKeyLikeIgnoreCase
         List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKeyLikeIgnoreCase("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task2.getId(), list.get(1).getId());
+        // only check for existence and assume that the SQL processing has ordered the values correctly
+        // see https://github.com/flowable/flowable-engine/issues/8
+        ArrayList tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task2.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKeyLikeIgnoreCase("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task3.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task3.getId()));
+        assertTrue(tasks.contains(task4.getId()));
         
         // orQuery
         list = historyService.createHistoricTaskInstanceQuery().or().processInstanceBusinessKeyLikeIgnoreCase("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task2.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task2.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().or().processInstanceBusinessKeyLikeIgnoreCase("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task3.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task3.getId()));
+        assertTrue(tasks.contains(task4.getId()));
     }
   }
   
@@ -235,24 +276,38 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
         // taskNameLike
         List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskNameLike("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
+        // only check for existence and assume that the SQL processing has ordered the values correctly
+        // see https://github.com/flowable/flowable-engine/issues/8
+        ArrayList tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task3.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().taskNameLike("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task2.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task4.getId()));;
         
         // orQuery
         list = historyService.createHistoricTaskInstanceQuery().or().taskNameLike("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task3.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().or().taskNameLike("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task2.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task4.getId()));
     }
   }
   
@@ -262,24 +317,38 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
         // taskNameLikeIgnoreCase
         List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskNameLikeIgnoreCase("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
+        // only check for existence and assume that the SQL processing has ordered the values correctly
+        // see https://github.com/flowable/flowable-engine/issues/8
+        ArrayList tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task3.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().taskNameLikeIgnoreCase("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task2.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task4.getId()));
         
         // orQuery
         list = historyService.createHistoricTaskInstanceQuery().or().taskNameLikeIgnoreCase("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
+        new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task3.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().or().taskNameLikeIgnoreCase("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task2.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task4.getId()));
     }
   }
   
@@ -289,24 +358,38 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
         // taskDescriptionLike
         List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskDescriptionLike("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
+        // only check for existence and assume that the SQL processing has ordered the values correctly
+        // see https://github.com/flowable/flowable-engine/issues/8
+        ArrayList tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task3.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().taskDescriptionLike("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task2.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task4.getId()));
         
         // orQuery
         list = historyService.createHistoricTaskInstanceQuery().or().taskDescriptionLike("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
-        
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task3.getId()));
+
         list = historyService.createHistoricTaskInstanceQuery().or().taskDescriptionLike("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task2.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task4.getId()));
     }
   }
   
@@ -316,24 +399,38 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
         // taskDescriptionLikeIgnoreCase
         List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskDescriptionLikeIgnoreCase("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
+        // only check for existence and assume that the SQL processing has ordered the values correctly
+        // see https://github.com/flowable/flowable-engine/issues/8
+        ArrayList tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task3.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().taskDescriptionLikeIgnoreCase("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task2.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task4.getId()));
         
         // orQuery
         list = historyService.createHistoricTaskInstanceQuery().or().taskDescriptionLikeIgnoreCase("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task3.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().or().taskDescriptionLikeIgnoreCase("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task2.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task4.getId()));
     }
   }
   
@@ -378,24 +475,38 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
         // taskOwnerLike
         List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskOwnerLike("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
+        // only check for existence and assume that the SQL processing has ordered the values correctly
+        // see https://github.com/flowable/flowable-engine/issues/8
+        ArrayList tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task3.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().taskOwnerLike("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task2.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
-        
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task4.getId()));
+
         // orQuery
         list = historyService.createHistoricTaskInstanceQuery().or().taskOwnerLike("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task3.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().or().taskOwnerLike("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task2.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task4.getId()));
     }
   }
   
@@ -405,24 +516,38 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
         // taskOwnerLikeIgnoreCase
         List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskOwnerLikeIgnoreCase("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
+        // only check for existence and assume that the SQL processing has ordered the values correctly
+        // see https://github.com/flowable/flowable-engine/issues/8
+        ArrayList tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task3.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().taskOwnerLikeIgnoreCase("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task2.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task4.getId()));;
         
         // orQuery
         list = historyService.createHistoricTaskInstanceQuery().or().taskOwnerLikeIgnoreCase("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task3.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().or().taskOwnerLikeIgnoreCase("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task2.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task4.getId()));
     }
   }
   
@@ -432,24 +557,38 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
         // taskAssigneeLike
         List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
-        
+        // only check for existence and assume that the SQL processing has ordered the values correctly
+        // see https://github.com/flowable/flowable-engine/issues/8
+        ArrayList tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task3.getId()));
+
         list = historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task2.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task4.getId()));
         
         // orQuery
         list = historyService.createHistoricTaskInstanceQuery().or().taskAssigneeLike("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task3.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().or().taskAssigneeLike("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task2.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task4.getId()));
     }
   }
   
@@ -459,24 +598,38 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
         // taskAssigneeLikeIgnoreCase
         List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskAssigneeLikeIgnoreCase("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
-        
+        // only check for existence and assume that the SQL processing has ordered the values correctly
+        // see https://github.com/flowable/flowable-engine/issues/8
+        ArrayList tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task3.getId()));
+
         list = historyService.createHistoricTaskInstanceQuery().taskAssigneeLikeIgnoreCase("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task2.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task4.getId()));
         
         // orQuery
         list = historyService.createHistoricTaskInstanceQuery().or().taskAssigneeLikeIgnoreCase("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task3.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().or().taskAssigneeLikeIgnoreCase("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task2.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task4.getId()));
     }
   }
   
@@ -486,24 +639,38 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
         // tenantIdLike
         List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskTenantIdLike("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task2.getId(), list.get(1).getId());
+        // only check for existence and assume that the SQL processing has ordered the values correctly
+        // see https://github.com/flowable/flowable-engine/issues/8
+        ArrayList tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task2.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().taskTenantIdLike("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task3.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task3.getId()));
+        assertTrue(tasks.contains(task4.getId()));
         
         // orQuery
         list = historyService.createHistoricTaskInstanceQuery().or().taskTenantIdLike("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task2.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task2.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().or().taskTenantIdLike("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task3.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task3.getId()));
+        assertTrue(tasks.contains(task4.getId()));
     }
   }
   
@@ -513,24 +680,38 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
         // variableValueLike
         List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskVariableValueLike("var1", "%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
+        // only check for existence and assume that the SQL processing has ordered the values correctly
+        // see https://github.com/flowable/flowable-engine/issues/8
+        ArrayList tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task3.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().taskVariableValueLike("var1", "%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task2.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task4.getId()));
         
         // orQuery
         list = historyService.createHistoricTaskInstanceQuery().or().taskVariableValueLike("var1", "%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task3.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().or().taskVariableValueLike("var1", "%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task2.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task4.getId()));
     }
   }
   
@@ -539,24 +720,38 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
         // variableValueLikeIgnoreCase
         List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskVariableValueLikeIgnoreCase("var1", "%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
+        // only check for existence and assume that the SQL processing has ordered the values correctly
+        // see https://github.com/flowable/flowable-engine/issues/8
+        ArrayList tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task3.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().taskVariableValueLikeIgnoreCase("var1", "%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task2.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task4.getId()));
         
         // orQuery
         list = historyService.createHistoricTaskInstanceQuery().or().taskVariableValueLikeIgnoreCase("var1", "%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task1.getId(), list.get(0).getId());
-        assertEquals(task3.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task1.getId()));
+        assertTrue(tasks.contains(task3.getId()));
         
         list = historyService.createHistoricTaskInstanceQuery().or().taskVariableValueLikeIgnoreCase("var1", "%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        assertEquals(task2.getId(), list.get(0).getId());
-        assertEquals(task4.getId(), list.get(1).getId());
+        tasks = new ArrayList(2);
+        tasks.add(list.get(0).getId());
+        tasks.add(list.get(1).getId());
+        assertTrue(tasks.contains(task2.getId()));
+        assertTrue(tasks.contains(task4.getId()));
     }
   }
 }
