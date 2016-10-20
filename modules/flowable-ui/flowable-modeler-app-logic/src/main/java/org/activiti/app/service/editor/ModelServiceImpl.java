@@ -67,6 +67,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Service
+@Transactional
 public class ModelServiceImpl implements ModelService {
 
   private final Logger log = LoggerFactory.getLogger(ModelServiceImpl.class);
@@ -169,7 +170,6 @@ public class ModelServiceImpl implements ModelService {
   }
   
   @Override
-  @Transactional
   public Model createModel(Model newModel, User createdBy) {
     newModel.setVersion(1);
     newModel.setCreated(Calendar.getInstance().getTime());
@@ -182,7 +182,6 @@ public class ModelServiceImpl implements ModelService {
   }
 
   @Override
-  @Transactional
   public Model createModel(ModelRepresentation model, String editorJson, User createdBy) {
     Model newModel = new Model();
     newModel.setVersion(1);
@@ -236,13 +235,11 @@ public class ModelServiceImpl implements ModelService {
   }
 
   @Override
-  @Transactional
   public Model createNewModelVersion(Model modelObject, String comment, User updatedBy) {
     return (Model) internalCreateNewModelVersion(modelObject, comment, updatedBy, false);
   }
 
   @Override
-  @Transactional
   public ModelHistory createNewModelVersionAndReturnModelHistory(Model modelObject, String comment, User updatedBy) {
     return (ModelHistory) internalCreateNewModelVersion(modelObject, comment, updatedBy, true);
   }
@@ -267,7 +264,6 @@ public class ModelServiceImpl implements ModelService {
   }
 
   @Override
-  @Transactional
   public Model saveModel(Model modelObject, String editorJson, byte[] imageBytes, boolean newVersion, String newVersionComment, User updatedBy) {
 
     return internalSave(modelObject.getName(), modelObject.getKey(), modelObject.getDescription(), editorJson, newVersion, 
@@ -275,7 +271,6 @@ public class ModelServiceImpl implements ModelService {
   }
 
   @Override
-  @Transactional
   public Model saveModel(String modelId, String name, String key, String description, String editorJson, 
       boolean newVersion, String newVersionComment, User updatedBy) {
 
@@ -322,7 +317,6 @@ public class ModelServiceImpl implements ModelService {
   }
 
   @Override
-  @Transactional
   public void deleteModel(String modelId, boolean cascadeHistory, boolean deleteRuntimeApp) {
 
     Model model = modelRepository.get(modelId);
@@ -380,7 +374,6 @@ public class ModelServiceImpl implements ModelService {
   }
 
   @Override
-  @Transactional
   public ReviveModelResultRepresentation reviveProcessModelHistory(ModelHistory modelHistory, User user, String newVersionComment) {
     Model latestModel = modelRepository.get(modelHistory.getModelId());
     if (latestModel == null) {
@@ -501,8 +494,6 @@ public class ModelServiceImpl implements ModelService {
 
   protected Model persistModel(Model model) {
 
-    modelRepository.save((Model) model);
-
     if (StringUtils.isNotEmpty(model.getModelEditorJson())) {
 
       // Parse json to java
@@ -517,7 +508,12 @@ public class ModelServiceImpl implements ModelService {
       if ((model.getModelType() == null || model.getModelType().intValue() == Model.MODEL_TYPE_BPMN)) {
 
         // Thumbnail
-        modelImageService.generateThumbnailImage(model, jsonNode);
+        byte[] thumbnail = modelImageService.generateThumbnailImage(model, jsonNode);
+        if (thumbnail != null) {
+          model.setThumbnail(thumbnail);
+        }
+        
+        modelRepository.save(model);
 
         // Relations
         handleBpmnProcessFormModelRelations(model, jsonNode);
@@ -528,9 +524,11 @@ public class ModelServiceImpl implements ModelService {
         
         jsonNode.put("name", model.getName());
         jsonNode.put("key", model.getKey());
+        modelRepository.save(model);
 
       } else if (model.getModelType().intValue() == Model.MODEL_TYPE_APP) {
 
+        modelRepository.save(model);
         handleAppModelProcessRelations(model, jsonNode);
       }
     }

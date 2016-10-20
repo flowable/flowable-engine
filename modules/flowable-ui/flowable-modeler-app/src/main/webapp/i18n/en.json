@@ -3,7 +3,7 @@
         "SELECT-FOLDER": "Select folder..."
     },
     "GENERAL" : {
-        "MAIN-TITLE": "Activiti - Kickstart",
+        "MAIN-TITLE": "Flowable - Kickstart",
         "NAVIGATION" : {
             "PROCESSES": "Processes",
             "FORMS": "Forms",
@@ -208,7 +208,7 @@
             "SHARED-WITH-OTHERS-ONE": "You have shared one app definition model with others",
             "SHARED-WITH-OTHERS-EMPTY": "You have not shared any app definitions with others",
 
-            "NO-APPS": "You can create a Process App by publishing a bundle of Process Models and sharing it with your colleagues. You can add any Process App that has been shared with you on your Activiti home page. You can even create a Process App with no processes if you just want to group simple collaborative tasks!",
+            "NO-APPS": "You can create a Process App by publishing a bundle of Process Models and sharing it with your colleagues. You can add any Process App that has been shared with you on your Flowable home page. You can even create a Process App with no processes if you just want to group simple collaborative tasks!",
             "NO-APPS-CALL-TO-ACTION": "You can create a Process App now.",
             "NO-APPS-NOTE": "Remember to Publish it when you are ready to use it."
         },
@@ -614,7 +614,7 @@
           "IMPORT": {
               "DROPZONE": "Drop a .zip app definition file",
               "CANCEL-UPLOAD": "Cancel the upload",
-              "RENEWIDM-IDS": "Renew the user and group identifiers when importing step and BPMN models. This is often required when importing the app definition into a different Activiti environment. It will try to link the human steps and user tasks to the right user and group in this target environment.",
+              "RENEWIDM-IDS": "Renew the user and group identifiers when importing step and BPMN models. This is often required when importing the app definition into a different Flowable environment. It will try to link the human steps and user tasks to the right user and group in this target environment.",
               "ERROR": "Error while processing the app definition file",
               "NO-DROP": "Drag and drop not supported"
           },
@@ -997,7 +997,7 @@
 
     "TOUR": {
         "WELCOME-TITLE": "Welcome, {{userName}}",
-        "WELCOME-CONTENT": "This a short tour of the Alfresco Activiti Editor. The next few steps will guide you through the different sections of the application to get you started. Press the ESC key to stop at any time." ,
+        "WELCOME-CONTENT": "This a short tour of the Flowable editor. The next few steps will guide you through the different sections of the application to get you started. Press the ESC key to stop at any time." ,
         "PALETTE-TITLE": "The Palette",
         "PALETTE-CONTENT": "All the available constructs to create a business process can be found here. They are arranged in logical groups. To open a group simply click on it:",
         "CANVAS-TITLE": "The Canvas",
@@ -1009,7 +1009,7 @@
         "TOOLBAR-TITLE": "The Toolbar",
         "TOOLBAR-CONTENT": "All the actions can be found here: saving or validating a model, copy and pasting parts of a process, and so on. Hover over the buttons to get a description for an action.",
         "END-TITLE": "The End",
-        "END-CONTENT": "That's it! You can now start modeling your processes. If you have any questions, feel free to ask them on the <a href=\"http://forums.activiti.org/\" target=\"_blank\">Alfresco Activiti Forum</a> "
+        "END-CONTENT": "That's it! You can now start modeling your processes. If you have any questions, feel free to ask them on the <a href=\"http://forum.flowable.org/\" target=\"_blank\">Flowable Forum</a> "
     },
 
     "FEATURE-TOUR" : {
@@ -1258,7 +1258,7 @@
             },
             "EVENT-LISTENERS": {
                 "TITLE": "Event listeners",
-                "DESCRIPTION": "Listeners for any event happening in the Activiti Engine. It's also possible to rethrow the event as a signal, message or error event."
+                "DESCRIPTION": "Listeners for any event happening in the Flowable Engine. It's also possible to rethrow the event as a signal, message or error event."
             },
             "EXCLUSIVE": {
                 "TITLE": "Exclusive",
@@ -1499,8 +1499,7 @@
         }
     },
 
-    "HEADER.BRAND" : "Activiti Editor",
-    "HEADER.BRAND_TAGLINE" : "powered by Alfresco",
+    "HEADER.BRAND" : "Flowable Editor",
     "PAGE.HEADER" : "Orchestration Details",
 
     "ACTION.OK" : "Ok",
@@ -1775,7 +1774,7 @@
     "MODEL.SAVE.SAVING" : "Saving model",
     "MODEL.LASTMODIFIEDDATE" : "Last saved",
     "MODEL.SAVE.ERROR": "Unexpected error: could not save model",
-    "MODEL.VALIDATIONERRORS": "Note that the model contains validation errors. This means that the model can not be deployed on the Activiti Engine in its current state.",
+    "MODEL.VALIDATIONERRORS": "Note that the model contains validation errors. This means that the model can not be deployed on the Flowable Engine in its current state.",
     "MODEL.CONFLICT.WRITE": "Could not save model: '{{userFullName}}' has made changes to this model",
     "MODEL.CONFLICT.WRITE.OPTIONS": "Select an option to resolve this conflict:",
     "MODEL.CONFLICT.WRITE.OPTION.OVERWRITE": "Overwrite other model",

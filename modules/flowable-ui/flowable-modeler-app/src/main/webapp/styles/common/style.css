@@ -2679,7 +2679,7 @@ h3+div > .dropzone {
     height: 40px;
     width: 180px;
     float: left;
-    cursor: pointer;
+    cursor: default;
 }
 
 .landing-logo img {

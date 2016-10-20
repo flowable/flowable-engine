@@ -150,14 +150,6 @@ public class DatabaseConfiguration {
       ds.setMaxIdleTimeExcessConnections(maxIdleTimeExcessConnections);
       ds.setMaxIdleTime(maxIdleTime);
       
-      if ("org.h2.Driver".equals(dataSourceDriver) && env.getProperty("dev.boot-h2-webserver", Boolean.class, false)) {
-        try {
-          org.h2.tools.Server.createWebServer("-web").start();
-        } catch (SQLException e) {
-          log.warn("Could not boot H2 Webserver", e);
-        }
-      }
-      
       return ds;
     }
   }
