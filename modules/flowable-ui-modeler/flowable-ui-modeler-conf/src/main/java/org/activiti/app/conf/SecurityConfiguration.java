@@ -17,12 +17,9 @@ import org.activiti.app.security.AjaxLogoutSuccessHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Condition;
-import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
-import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -41,15 +38,9 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
 public class SecurityConfiguration {
 	
 	private static final Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
-	
-	public static final String KEY_LDAP_ENABLED = "ldap.authentication.enabled";
-
-  //
-	// GLOBAL CONFIG
-	//
 
 	@Autowired
-	protected Environment env;
+	private Environment env;
 	
 	//
 	// REGULAR WEBAP CONFIG
@@ -59,11 +50,11 @@ public class SecurityConfiguration {
 	@Order(10) // API config first (has Order(1))
   public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
-	  private static final Logger logger = LoggerFactory.getLogger(FormLoginWebSecurityConfigurerAdapter.class);
+	private static final Logger logger = LoggerFactory.getLogger(FormLoginWebSecurityConfigurerAdapter.class);
 	
     @Autowired
     protected Environment env;
-    
+
     @Autowired
     protected FlowableCookieFilter flowableCookieFilter;
 
@@ -74,7 +65,7 @@ public class SecurityConfiguration {
     protected void configure(HttpSecurity http) throws Exception {
       http
         .sessionManagement()
-          .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+           .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
           .addFilterBefore(flowableCookieFilter, UsernamePasswordAuthenticationFilter.class)
           .logout()
@@ -90,37 +81,4 @@ public class SecurityConfiguration {
               	.addHeaderWriter(new XXssProtectionHeaderWriter());
     }
 	}
-
-	//
-	// BASIC AUTH
-	//
-
-	@Configuration
-	@Order(1)
-	public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
-
-		protected void configure(HttpSecurity http) throws Exception {
-
-			http
-				.sessionManagement()
-					.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-					.and()
-				.csrf()
-					.disable()
-				.antMatcher("/api" + "/**")
-				.authorizeRequests()
-					.antMatchers("/api" + "/**").authenticated()
-					.and().httpBasic();
-		}
-	}
-
-	public static class LdapAuthenticationEnabledCondition implements Condition {
-
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-			return context.getEnvironment().getProperty(KEY_LDAP_ENABLED, Boolean.class, false);
-		}
-
-	}
-
 }

@@ -12,13 +12,7 @@
  */
 package org.activiti.app.rest.idm;
 
-import java.util.List;
-
-import org.activiti.app.model.idm.GroupRepresentation;
-import org.activiti.app.model.idm.UserRepresentation;
 import org.activiti.app.security.SecurityUtils;
-import org.activiti.engine.IdentityService;
-import org.activiti.idm.api.Group;
 import org.activiti.idm.api.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,10 +33,7 @@ public class AccountResource {
 	@Autowired
 	private ObjectMapper objectMapper;
 	
-	@Autowired
-	private IdentityService identityService;
-
-  /**
+	/**
    * GET  /rest/account -> get the current user.
    */
   @RequestMapping(value = "/rest/account", method = RequestMethod.GET, produces = "application/json")
@@ -50,11 +41,6 @@ public class AccountResource {
     User user = SecurityUtils.getCurrentActivitiAppUser().getUserObject();
     
     UserRepresentation userRepresentation = new UserRepresentation(user);
-    
-    List<Group> groups = identityService.createGroupQuery().groupMember(user.getId()).list();
-    for (Group group : groups) {
-      userRepresentation.getGroups().add(new GroupRepresentation(group));
-    }
     
     return userRepresentation;
   }
