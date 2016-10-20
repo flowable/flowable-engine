@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class RelatedContentRepositoryImpl implements RelatedContentRepository {
 
-  private static final String NAMESPACE = "org.activiti.app.domain.runtime.RelatedContent";
+  private static final String NAMESPACE = "org.activiti.app.domain.runtime.RelatedContent.";
 
   @Autowired
   protected SqlSessionTemplate sqlSessionTemplate;

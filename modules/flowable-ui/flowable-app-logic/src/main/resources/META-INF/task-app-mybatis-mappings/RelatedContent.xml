@@ -51,7 +51,7 @@
             lock_exp_date,
             lock_owner,
             checked_out,
-            checkout_out_to_local,
+            checked_out_to_local,
             checkout_date,
             store_id,
             checkout_owner,
@@ -61,7 +61,7 @@
             related_content,
             link,
             link_url,
-            content_size
+            content_size)
          values (
             #{id, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
@@ -70,7 +70,7 @@
             #{createdBy, jdbcType=VARCHAR},
             #{taskId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
-            #{contentSource, jdbcType=VARCHAR},
+            #{source, jdbcType=VARCHAR},
             #{sourceId, jdbcType=VARCHAR},
             #{contentAvailable, jdbcType=BOOLEAN},
             #{locked, jdbcType=BOOLEAN},
@@ -80,7 +80,7 @@
             #{checkedOut, jdbcType=BOOLEAN},
             #{checkedOutToLocal, jdbcType=BOOLEAN},
             #{checkoutDate, jdbcType=TIMESTAMP},
-            #{storeId, jdbcType=VARCHAR},
+            #{contentStoreId, jdbcType=VARCHAR},
             #{checkoutOwner, jdbcType=VARCHAR},
             #{lastModified, jdbcType=TIMESTAMP},
             #{lastModifiedBy, jdbcType=VARCHAR},
@@ -101,17 +101,17 @@
             created_by=#{createdBy, jdbcType=VARCHAR},
             task_id=#{taskId, jdbcType=VARCHAR},
             process_id=#{processInstanceId, jdbcType=VARCHAR},
-            content_source=#{contentSource, jdbcType=VARCHAR},
+            content_source=#{source, jdbcType=VARCHAR},
             source_id=#{sourceId, jdbcType=VARCHAR},
             content_available=#{contentAvailable, jdbcType=BOOLEAN},
             locked=#{locked, jdbcType=BOOLEAN},
             lock_date=#{lockDate, jdbcType=TIMESTAMP},
             lock_exp_date=#{lockExpirationDate, jdbcType=TIMESTAMP},
             lock_owner=#{lockOwner, jdbcType=VARCHAR},
-            checked_out=#{checkedOut, jdbcType=BOOLEAN},
+            checked_out_to_local=#{checkedOut, jdbcType=BOOLEAN},
             checkout_out_to_local=#{checkedOutToLocal, jdbcType=BOOLEAN},
             checkout_date=#{checkoutDate, jdbcType=TIMESTAMP},
-            store_id=#{storeId, jdbcType=VARCHAR},
+            store_id=#{contentStoreId, jdbcType=VARCHAR},
             checkout_owner=#{checkoutOwner, jdbcType=VARCHAR},
             last_modified=#{lastModified, jdbcType=TIMESTAMP},
             last_modified_by=#{lastModifiedBy, jdbcType=VARCHAR},
@@ -123,27 +123,33 @@
         </set>
         where id = #{id, jdbcType=VARCHAR}
     </update>
+    
+    <select id="selectRelatedContent" parameterType="string" resultMap="relatedContentResultMap">
+        select * from ${prefix}ACT_WO_RELATED_CONTENT where id = #{id, jdbcType=VARCHAR}
+    </select>
 
 	<select id="selectRelatedContentByParameters" parameterType="map" resultMap="relatedContentResultMap">
-		select * from ${prefix}ACT_WO_RELATED_CONTENT where
-		<if test="source != null">
-		    source = #{source, jdbcType=VARCHAR}
-		</if>
-		<if test="sourceId != null">
-		  and source_id = #{sourceId, jdbcType=VARCHAR}
-		</if>
-		<if test="taskId != null">
-		  and task_id = #{taskId, jdbcType=VARCHAR}
-		</if>
-		<if test="processInstanceId != null">
-		  and process_id = #{processInstanceId, jdbcType=VARCHAR}
-		</if>
-		<if test="field != null">
-		  and field = #{field, jdbcType=VARCHAR}
-		</if>
-		<if test="isRelatedContent != null">
-		  and related_content = #{isRelatedContent, jdbcType=VARCHAR}
-		</if>
+		select * from ${prefix}ACT_WO_RELATED_CONTENT
+		<where>
+			<if test="source != null">
+			    source = #{source, jdbcType=VARCHAR}
+			</if>
+			<if test="sourceId != null">
+			  and source_id = #{sourceId, jdbcType=VARCHAR}
+			</if>
+			<if test="taskId != null">
+			  and task_id = #{taskId, jdbcType=VARCHAR}
+			</if>
+			<if test="processInstanceId != null">
+			  and process_id = #{processInstanceId, jdbcType=VARCHAR}
+			</if>
+			<if test="field != null">
+			  and field = #{field, jdbcType=VARCHAR}
+			</if>
+			<if test="isRelatedContent != null">
+			  and related_content = #{isRelatedContent, jdbcType=VARCHAR}
+			</if>
+		</where>
 	</select>
 	
 	<delete id="deleteRelatedContent" parameterType="org.activiti.app.domain.runtime.RelatedContent">

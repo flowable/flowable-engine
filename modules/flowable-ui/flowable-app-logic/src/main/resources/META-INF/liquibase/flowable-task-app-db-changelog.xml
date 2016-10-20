@@ -7,7 +7,7 @@
 	<changeSet id="1" author="activiti">
     
         <createTable tableName="ACT_WO_RELATED_CONTENT">
-            <column name="id" type="bigint">
+            <column name="id" type="varchar(255)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="name" type="varchar(255)">

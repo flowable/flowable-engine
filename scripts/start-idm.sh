@@ -1,2 +1,2 @@
-cd ../modules/flowable-ui/
+cd ../modules/flowable-ui-idm/
 ./start-idm.sh
