@@ -14,31 +14,31 @@ package org.activiti.app.model.runtime;
 
 import java.util.Date;
 
-import org.activiti.app.domain.runtime.Comment;
 import org.activiti.app.model.common.AbstractRepresentation;
+import org.activiti.engine.task.Comment;
 
 public class CommentRepresentation extends AbstractRepresentation {
 
-  private Long id;
+  private String id;
   private String message;
   private Date created;
   private String createdBy;
 
   public CommentRepresentation(Comment comment) {
     this.id = comment.getId();
-    this.message = comment.getMessage();
-    this.created = comment.getCreated();
-    this.createdBy = comment.getCreatedBy();
+    this.message = comment.getFullMessage();
+    this.created = comment.getTime();
+    this.createdBy = comment.getUserId();
   }
 
   public CommentRepresentation() {
   }
 
-  public Long getId() {
+  public String getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(String id) {
     this.id = id;
   }
 

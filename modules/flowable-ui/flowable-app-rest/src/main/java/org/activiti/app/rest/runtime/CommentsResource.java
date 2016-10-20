@@ -36,10 +36,8 @@ public class CommentsResource {
   protected ActivitiCommentService commentService;
 
   @RequestMapping(value = "/rest/tasks/{taskId}/comments", method = RequestMethod.GET, produces = "application/json")
-  public ResultListDataRepresentation getTaskComments(@PathVariable("taskId") String taskId,
-          @RequestParam(value = "latestFirst", required = false) Boolean latestFirst) {
-
-  	return commentService.getTaskComments(taskId, latestFirst);
+  public ResultListDataRepresentation getTaskComments(@PathVariable("taskId") String taskId) {
+  	return commentService.getTaskComments(taskId);
   }
 
   @RequestMapping(value = "/rest/tasks/{taskId}/comments", method = RequestMethod.POST, produces = "application/json")
@@ -48,16 +46,13 @@ public class CommentsResource {
   }
   
   @RequestMapping(value = "/rest/process-instances/{processInstanceId}/comments", method = RequestMethod.GET, produces = "application/json")
-  public ResultListDataRepresentation getProcessInstanceComments(@PathVariable("processInstanceId") String processInstanceId,
-          @RequestParam(value = "latestFirst", required = false) Boolean latestFirst) {
-
-  	return commentService.getProcessInstanceComments(processInstanceId, latestFirst);
+  public ResultListDataRepresentation getProcessInstanceComments(@PathVariable("processInstanceId") String processInstanceId) {
+  	return commentService.getProcessInstanceComments(processInstanceId);
   }
   
   @RequestMapping(value = "/rest/process-instances/{processInstanceId}/comments", method = RequestMethod.POST, produces = "application/json")
   public CommentRepresentation addProcessInstanceComment(@RequestBody CommentRepresentation commentRequest,
           @PathVariable("processInstanceId") String processInstanceId) {
-
     return commentService.addProcessInstanceComment(commentRequest, processInstanceId);
   }
 

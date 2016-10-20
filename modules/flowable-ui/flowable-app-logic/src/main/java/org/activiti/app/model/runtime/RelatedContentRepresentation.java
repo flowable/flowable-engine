@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  */
 public class RelatedContentRepresentation extends AbstractRepresentation {
 
-  protected Long id;
+  protected String id;
 
   protected String name;
 
@@ -73,11 +73,11 @@ public class RelatedContentRepresentation extends AbstractRepresentation {
     }
   }
 
-  public Long getId() {
+  public String getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(String id) {
     this.id = id;
   }
 

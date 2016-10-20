@@ -13,7 +13,6 @@
 package org.activiti.app.conf;
 
 import java.beans.PropertyVetoException;
-import java.sql.SQLException;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -200,7 +199,7 @@ public class DatabaseConfiguration {
       return liquibase;
       
     } catch (Exception e) {
-      throw new InternalServerErrorException("Error creating liquibase database");
+      throw new InternalServerErrorException("Error creating liquibase database", e);
     }
   }
   

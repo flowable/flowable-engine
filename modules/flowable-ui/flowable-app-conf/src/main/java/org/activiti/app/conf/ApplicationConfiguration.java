@@ -18,9 +18,9 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 @Configuration
 @PropertySources({
 	
-	@PropertySource("classpath:/META-INF/flowable-app/flowable-app.properties"),
-	@PropertySource(value = "classpath:flowable-app.properties", ignoreResourceNotFound = true),
-	@PropertySource(value = "file:flowable-app.properties", ignoreResourceNotFound = true),
+	@PropertySource("classpath:/META-INF/flowable-app/flowable-task-app.properties"),
+	@PropertySource(value = "classpath:flowable-task-app.properties", ignoreResourceNotFound = true),
+	@PropertySource(value = "file:flowable-task-app.properties", ignoreResourceNotFound = true),
 
 })
 @ComponentScan(basePackages = {

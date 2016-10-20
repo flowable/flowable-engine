@@ -141,18 +141,18 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
     }
 
     @RequestMapping(value = "/rest/content/{contentId}", method = RequestMethod.DELETE)
-    public void deleteContent(@PathVariable("contentId") Long contentId, HttpServletResponse response) {
+    public void deleteContent(@PathVariable("contentId") String contentId, HttpServletResponse response) {
         super.deleteContent(contentId, response);
     }
 
     @RequestMapping(value = "/rest/content/{contentId}", method = RequestMethod.GET)
-    public RelatedContentRepresentation getContent(@PathVariable("contentId") Long contentId) {
+    public RelatedContentRepresentation getContent(@PathVariable("contentId") String contentId) {
         
         return super.getContent(contentId);
     }
 
     @RequestMapping(value = "/rest/content/{contentId}/raw", method = RequestMethod.GET)
-    public void getRawContent(@PathVariable("contentId") Long contentId, HttpServletResponse response) {
+    public void getRawContent(@PathVariable("contentId") String contentId, HttpServletResponse response) {
         super.getRawContent(contentId, response);
     }
 

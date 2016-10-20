@@ -12,46 +12,39 @@
  */
 package org.activiti.app.repository.runtime;
 
+import java.util.List;
+
 import org.activiti.app.domain.runtime.RelatedContent;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 /**
  * @author Frederik Heremans
  * @author Erik Winlof
+ * @author Joram Barrez
  */
-public interface RelatedContentRepository extends JpaRepository<RelatedContent, Long> {
+public interface RelatedContentRepository {
 
-    Page<RelatedContent> findAllRelatedBySourceAndSourceId(@Param("source")String source, @Param("sourceId")String sourceId, Pageable paging);
+  RelatedContent get(String id);
+  
+  void save(RelatedContent relatedContent);
 
-    @Query("from RelatedContent r where r.taskId = :taskId and r.relatedContent = true")
-    Page<RelatedContent> findAllRelatedByTaskId(@Param("taskId") String taskId, Pageable paging);
-    
-    @Query("from RelatedContent r where r.taskId = :taskId and r.relatedContent = false")
-    Page<RelatedContent> findAllFieldBasedContentByTaskId(@Param("taskId") String taskId, Pageable paging);
-    
-    Page<RelatedContent> findAllByTaskIdAndField(@Param("taskId") String taskId, @Param("field") String field, Pageable paging);
-    
-    @Query("from RelatedContent r where r.processInstanceId = :processInstanceId and r.relatedContent = true")
-    Page<RelatedContent> findAllRelatedByProcessInstanceId(@Param("processInstanceId")String processId, Pageable paging);
-    
-    @Query("from RelatedContent r where r.processInstanceId = :processInstanceId and r.relatedContent = false")
-    Page<RelatedContent> findAllFieldBasedContentByProcessInstanceId(@Param("processInstanceId")String processId, Pageable paging);
-    
-    @Query("from RelatedContent r where r.processInstanceId = :processInstanceId")
-    Page<RelatedContent> findAllContentByProcessInstanceId(@Param("processInstanceId")String processId, Pageable paging);
+  List<RelatedContent> findBySourceAndSourceId(String source, String sourceId);
+  
+  List<RelatedContent> findAllRelatedByTaskId(String taskId);
+  
+  List<RelatedContent> findAllFieldBasedContentByTaskId(String taskId);
+  
+  List<RelatedContent> findAllByTaskIdAndField(String taskId, String field);
+  
+  List<RelatedContent> findAllRelatedByProcessInstanceId(String processId);
 
-    @Query("from RelatedContent r where r.processInstanceId = :processInstanceId and r.field = :field")
-    Page<RelatedContent> findAllByProcessInstanceIdAndField(@Param("processInstanceId")String processId, @Param("field") String field, Pageable paging);
+  List<RelatedContent> findAllFieldBasedContentByProcessInstanceId(String processId);
 
-    @Modifying
-    @Query("delete from RelatedContent r where r.processInstanceId = :processInstanceId")
-    void deleteAllContentByProcessInstanceId(@Param("processInstanceId") String processInstanceId);
-    
-    @Query("select sum(r.contentSize) from RelatedContent r where r.createdBy = :user")
-    Long getTotalContentSizeForUser(@Param("user") String user);
+  List<RelatedContent> findAllContentByProcessInstanceId(String processId);
+  
+  List<RelatedContent> findAllByProcessInstanceIdAndField(String processId, String field);
+  
+  void delete(RelatedContent relatedContent);
+  
+  void deleteAllContentByProcessInstanceId(String processInstanceId);
+
 }

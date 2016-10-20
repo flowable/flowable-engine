@@ -38,7 +38,7 @@ public class AsyncConfiguration implements AsyncConfigurer {
         executor.setCorePoolSize(2);
         executor.setMaxPoolSize(50);
         executor.setQueueCapacity(10000);
-        executor.setThreadNamePrefix("flowable-app-rest-Executor-");
+        executor.setThreadNamePrefix("flowable-task-Executor-");
         executor.setAwaitTerminationSeconds(30);
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.initialize();

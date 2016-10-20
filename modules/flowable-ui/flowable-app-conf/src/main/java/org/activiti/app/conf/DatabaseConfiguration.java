@@ -15,30 +15,25 @@ package org.activiti.app.conf;
 import java.beans.PropertyVetoException;
 import java.util.Properties;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.activiti.engine.ActivitiException;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.ejb.HibernatePersistence;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.ResourcePatternUtils;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
-import org.springframework.orm.hibernate4.HibernateExceptionTranslator;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.JpaVendorAdapter;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
@@ -50,7 +45,6 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
 @Configuration
-@EnableJpaRepositories({ "org.activiti.app.repository" })
 @EnableTransactionManagement
 public class DatabaseConfiguration {
 
@@ -58,8 +52,11 @@ public class DatabaseConfiguration {
   
   protected static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_DE_";
 
-  @Inject
-  private Environment env;
+  @Autowired
+  protected Environment env;
+  
+  @Autowired
+  protected ResourceLoader resourceLoader;
 
   @Bean
   public DataSource dataSource() {
@@ -155,45 +152,36 @@ public class DatabaseConfiguration {
       return ds;
     }
   }
-
-  @Bean(name = "entityManagerFactory")
-  public EntityManagerFactory entityManagerFactory() {
-    log.info("Configuring EntityManager");
-    LocalContainerEntityManagerFactoryBean lcemfb = new LocalContainerEntityManagerFactoryBean();
-    lcemfb.setPersistenceProvider(new HibernatePersistence());
-    lcemfb.setPersistenceUnitName("persistenceUnit");
-    lcemfb.setDataSource(dataSource());
-    lcemfb.setJpaDialect(new HibernateJpaDialect());
-    lcemfb.setJpaVendorAdapter(jpaVendorAdapter());
-
-    Properties jpaProperties = new Properties();
-    jpaProperties.put("hibernate.cache.use_second_level_cache", false);
-    jpaProperties.put("hibernate.generate_statistics", env.getProperty("hibernate.generate_statistics", Boolean.class, false));
-    lcemfb.setJpaProperties(jpaProperties);
-
-    lcemfb.setPackagesToScan("org.activiti.app.domain");
-    lcemfb.afterPropertiesSet();
-    return lcemfb.getObject();
-  }
-
+  
   @Bean
-  public JpaVendorAdapter jpaVendorAdapter() {
-    HibernateJpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
-    jpaVendorAdapter.setShowSql(env.getProperty("hibernate.show_sql", Boolean.class, false));
-    jpaVendorAdapter.setDatabasePlatform(env.getProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect"));
-    return jpaVendorAdapter;
-  }
-
-  @Bean
-  public HibernateExceptionTranslator hibernateExceptionTranslator() {
-    return new HibernateExceptionTranslator();
-  }
-
-  @Bean(name = "transactionManager")
   public PlatformTransactionManager annotationDrivenTransactionManager() {
-    JpaTransactionManager jpaTransactionManager = new JpaTransactionManager();
-    jpaTransactionManager.setEntityManagerFactory(entityManagerFactory());
-    return jpaTransactionManager;
+    DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
+    dataSourceTransactionManager.setDataSource(dataSource());
+    return dataSourceTransactionManager;
+  }
+    
+  @Bean
+  public SqlSessionFactory sqlSessionFactory() {
+    SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+    sqlSessionFactoryBean.setDataSource(dataSource());
+    
+    try {
+      Properties properties = new Properties();
+      properties.put("prefix", env.getProperty("datasource.prefix", ""));
+      sqlSessionFactoryBean.setConfigurationProperties(properties);
+      sqlSessionFactoryBean
+        .setMapperLocations(ResourcePatternUtils.getResourcePatternResolver(resourceLoader).getResources("classpath:/META-INF/task-app-mybatis-mappings/*.xml"));
+      sqlSessionFactoryBean.afterPropertiesSet();
+      return sqlSessionFactoryBean.getObject();
+    } catch (Exception e) {
+      throw new RuntimeException("Could not create sqlSessionFactory", e);
+    }
+
+  }
+  
+  @Bean(destroyMethod="clearCache") // destroyMethod: see https://github.com/mybatis/old-google-code-issues/issues/778
+  public SqlSessionTemplate SqlSessionTemplate() {
+    return new SqlSessionTemplate(sqlSessionFactory());
   }
 
   @Bean(name = "liquibase")
@@ -211,18 +199,8 @@ public class DatabaseConfiguration {
       return liquibase;
       
     } catch (Exception e) {
-      throw new ActivitiException("Error creating liquibase database");
+      throw new ActivitiException("Error creating liquibase database", e);
     }
-  }
-
-  @Bean
-  public JdbcTemplate jdbcTemplate() {
-    return new JdbcTemplate(dataSource());
-  }
-
-  @Bean
-  public TransactionTemplate transactionTemplate() {
-    return new TransactionTemplate(annotationDrivenTransactionManager());
   }
 
 }

@@ -92,21 +92,6 @@
 			<artifactId>jackson-datatype-joda</artifactId>
 		</dependency>
 
-		<!-- DATABASE -->
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-entitymanager</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator</artifactId>
-		</dependency>
-
-
 		<!-- COMMON dependencies -->
 		<dependency>
 			<groupId>commons-fileupload</groupId>

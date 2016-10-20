@@ -6,37 +6,6 @@
 
 	<changeSet id="1" author="activiti">
     
-        <!-- Hibernate sequence table -->
-        <createTable tableName="ACT_WO_HIBERNATE_SEQUENCES">
-            <column name="sequence_name" type="varchar(255)" />
-            <column name="sequence_next_hi_value" type="integer" />
-        </createTable>
-
-		<createTable tableName="ACT_WO_COMMENTS">
-            <column name="id" type="bigint">
-                <constraints primaryKey="true" nullable="false" />
-            </column>
-            <column name="message" type="varchar(4000)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created" type="timestamp(6)" />
-            <column name="created_by" type="varchar(255)" /> 
-            <column name="task_id" type="varchar(255)" /> 
-            <column name="proc_inst_id" type="varchar(255)" /> 
-             
-            <column name="comment_definition" type="longtext" />
-        </createTable>
-        
-        <createIndex tableName="ACT_WO_COMMENTS" indexName="comment_task_created">
-            <column name="task_id" />
-            <column name="created" />
-        </createIndex>
-        
-        <createIndex tableName="ACT_WO_COMMENTS" indexName="comment_proc_created">
-            <column name="proc_inst_id" />
-            <column name="created" />
-        </createIndex>
-        
         <createTable tableName="ACT_WO_RELATED_CONTENT">
             <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false" />

@@ -48,7 +48,6 @@ import org.activiti.idm.api.User;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 public abstract class AbstractRelatedContentResource {
@@ -84,7 +83,7 @@ public abstract class AbstractRelatedContentResource {
 
     public ResultListDataRepresentation getRelatedContentForTask(String taskId) {
         permissionService.validateReadPermissionOnTask(SecurityUtils.getCurrentUserObject(), taskId);
-        return createResultRepresentation(contentService.getRelatedContentForTask(taskId, MAX_CONTENT_ITEMS, 0));
+        return createResultRepresentation(contentService.getRelatedContentForTask(taskId));
     }
 
     public ResultListDataRepresentation getRelatedContentForProcessInstance(String processInstanceId) {
@@ -92,7 +91,7 @@ public abstract class AbstractRelatedContentResource {
         if(!permissionService.hasReadPermissionOnProcessInstance(SecurityUtils.getCurrentUserObject(), processInstanceId)) {
             throw new NotPermittedException("You are not allowed to read the process with id: " + processInstanceId);
         }
-        return createResultRepresentation(contentService.getRelatedContentForProcessInstance(processInstanceId, MAX_CONTENT_ITEMS, 0));
+        return createResultRepresentation(contentService.getRelatedContentForProcessInstance(processInstanceId));
     }
     
     public RelatedContentRepresentation createRelatedContentOnTask(String taskId, MultipartFile file) {
@@ -153,7 +152,7 @@ public abstract class AbstractRelatedContentResource {
         return addRelatedContent(relatedContent, null, null, false);
     }
     
-    public void deleteContent(Long contentId, HttpServletResponse response) {
+    public void deleteContent(String contentId, HttpServletResponse response) {
         RelatedContent content = contentService.getRelatedContent(contentId, false);
         
         if (content == null) {
@@ -172,7 +171,7 @@ public abstract class AbstractRelatedContentResource {
         contentService.deleteRelatedContent(content);
     }
     
-    public RelatedContentRepresentation getContent(Long contentId) {
+    public RelatedContentRepresentation getContent(String contentId) {
         RelatedContent content = contentService.getRelatedContent(contentId, false);
         
         if (content == null) {
@@ -186,7 +185,7 @@ public abstract class AbstractRelatedContentResource {
         return createRelatedContentResponse(content);
     }
     
-    public void getRawContent(Long contentId, HttpServletResponse response) {
+    public void getRawContent(String contentId, HttpServletResponse response) {
         RelatedContent content = contentService.getRelatedContent(contentId, false);
         
         if (content == null) {
@@ -222,10 +221,9 @@ public abstract class AbstractRelatedContentResource {
 
 
     public ResultListDataRepresentation getRelatedProcessInstancesForContent(String source, String sourceId) {
-        Page<RelatedContent> relatedContents = contentService.getRelatedContent(source, sourceId, MAX_CONTENT_ITEMS, 0);
-        Set<String> processInstanceIds = new HashSet<String>(relatedContents.getSize());
-        for(RelatedContent relatedContent : relatedContents)
-        {
+        List<RelatedContent> relatedContents = contentService.getRelatedContent(source, sourceId);
+        Set<String> processInstanceIds = new HashSet<String>(relatedContents.size());
+        for(RelatedContent relatedContent : relatedContents) {
             processInstanceIds.add(relatedContent.getProcessInstanceId());
         }
         List<HistoricProcessInstance> processInstances;
@@ -306,15 +304,15 @@ public abstract class AbstractRelatedContentResource {
         return file.getOriginalFilename() != null ? file.getOriginalFilename() : "Nameless file";
     }
     
-    protected ResultListDataRepresentation createResultRepresentation(Page<RelatedContent> results) {
-        List<RelatedContentRepresentation> resultList = new ArrayList<RelatedContentRepresentation>(results.getNumberOfElements());
+    protected ResultListDataRepresentation createResultRepresentation(List<RelatedContent> results) {
+        List<RelatedContentRepresentation> resultList = new ArrayList<RelatedContentRepresentation>(results.size());
 
         for (RelatedContent content : results) {
             resultList.add(createRelatedContentResponse(content));
         }
         
         ResultListDataRepresentation result = new ResultListDataRepresentation(resultList);
-        result.setTotal(results.getTotalElements());
+        result.setTotal((long) results.size());
         return result;
     }
     

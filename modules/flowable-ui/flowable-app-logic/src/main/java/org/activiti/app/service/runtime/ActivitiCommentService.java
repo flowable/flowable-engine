@@ -15,25 +15,21 @@ package org.activiti.app.service.runtime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.app.domain.runtime.Comment;
 import org.activiti.app.model.common.ResultListDataRepresentation;
 import org.activiti.app.model.runtime.CommentRepresentation;
-import org.activiti.app.repository.runtime.CommentRepository;
 import org.activiti.app.security.SecurityUtils;
 import org.activiti.app.service.exception.BadRequestException;
 import org.activiti.app.service.exception.NotFoundException;
 import org.activiti.app.service.exception.NotPermittedException;
 import org.activiti.engine.HistoryService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.runtime.Clock;
+import org.activiti.engine.task.Comment;
 import org.activiti.idm.api.User;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,25 +39,23 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ActivitiCommentService {
 
-  private static final Logger logger = LoggerFactory.getLogger(ActivitiCommentService.class);
-
   @Autowired
   protected PermissionService permissionService;
 
   @Autowired
-  protected HistoryService historyService;
-
+  protected TaskService taskService;
+  
   @Autowired
-  protected CommentRepository commentRepository;
+  protected HistoryService historyService;
 
   @Autowired
   protected Clock clock;
 
-  public ResultListDataRepresentation getTaskComments(String taskId, Boolean latestFirst) {
+  public ResultListDataRepresentation getTaskComments(String taskId) {
 
     User currentUser = SecurityUtils.getCurrentUserObject();
     checkReadPermissionOnTask(currentUser, taskId);
-    List<Comment> comments = getCommentsForTask(taskId, Boolean.TRUE.equals(latestFirst));
+    List<Comment> comments = getCommentsForTask(taskId);
 
     // Create representation for all comments
     List<CommentRepresentation> commentList = new ArrayList<CommentRepresentation>();
@@ -92,11 +86,11 @@ public class ActivitiCommentService {
     return new CommentRepresentation(comment);
   }
 
-  public ResultListDataRepresentation getProcessInstanceComments(String processInstanceId, Boolean latestFirst) {
+  public ResultListDataRepresentation getProcessInstanceComments(String processInstanceId) {
 
     User currentUser = SecurityUtils.getCurrentUserObject();
     checkReadPermissionOnProcessInstance(currentUser, processInstanceId);
-    List<Comment> comments = getCommentsForProcessInstance(processInstanceId, Boolean.TRUE.equals(latestFirst));
+    List<Comment> comments = getCommentsForProcessInstance(processInstanceId);
 
     // Create representation for all comments
     List<CommentRepresentation> commentList = new ArrayList<CommentRepresentation>();
@@ -128,19 +122,19 @@ public class ActivitiCommentService {
   }
 
   public Long countCommentsForTask(String taskId) {
-    return commentRepository.countByTaskId(taskId);
+    return (long) taskService.getTaskComments(taskId).size();
   }
 
   public Long countCommentsForProcessInstance(String processInstanceId) {
-    return commentRepository.countByProcessInstanceId(processInstanceId);
+    return (long) taskService.getProcessInstanceComments(processInstanceId).size();
   }
 
-  public List<Comment> getCommentsForTask(String taskId, boolean latestFirst) {
-    return commentRepository.findByTaskId(taskId, new Sort((latestFirst ? Direction.DESC : Direction.ASC), Comment.PROPERTY_CREATED));
+  public List<Comment> getCommentsForTask(String taskId) {
+    return taskService.getTaskComments(taskId);
   }
 
-  public List<Comment> getCommentsForProcessInstance(String processInstanceId, boolean latestFirst) {
-    return commentRepository.findByProcessInstanceId(processInstanceId, new Sort((latestFirst ? Direction.DESC : Direction.ASC), Comment.PROPERTY_CREATED));
+  public List<Comment> getCommentsForProcessInstance(String processInstanceId) {
+    return taskService.getProcessInstanceComments(processInstanceId);
   }
 
   public Comment createComment(String message, User createdBy, String processInstanceId) {
@@ -148,19 +142,11 @@ public class ActivitiCommentService {
   }
 
   public Comment createComment(String message, User createdBy, String taskId, String processInstanceId) {
-    Comment newComment = new Comment();
-    newComment.setMessage(message);
-    newComment.setCreatedBy(createdBy.getId());
-    newComment.setCreated(clock.getCurrentTime());
-    newComment.setTaskId(taskId);
-    newComment.setProcessInstanceId(processInstanceId);
-
-    commentRepository.save(newComment);
-    return newComment;
+    return taskService.addComment(taskId, processInstanceId, message); 
   }
 
   public void deleteComment(Comment comment) {
-    commentRepository.delete(comment);
+    taskService.deleteComment(comment.getId());
   }
 
   /**
@@ -168,7 +154,7 @@ public class ActivitiCommentService {
    */
   @Transactional
   public void deleteAllCommentsForProcessInstance(String processInstanceId) {
-    commentRepository.deleteAllByProcessInstanceId(processInstanceId);
+    taskService.deleteComments(null, processInstanceId);
   }
 
   protected void checkReadPermissionOnTask(User user, String taskId) {

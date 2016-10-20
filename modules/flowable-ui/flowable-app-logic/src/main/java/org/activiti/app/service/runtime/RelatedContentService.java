@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.activiti.app.domain.runtime.RelatedContent;
@@ -25,8 +26,6 @@ import org.activiti.content.storage.api.ContentStorage;
 import org.activiti.engine.runtime.Clock;
 import org.activiti.idm.api.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
@@ -38,8 +37,6 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 @Service
 public class RelatedContentService {
     
-    private static final int RELATED_CONTENT_INTERNAL_BATCH_SIZE = 256;
-    
     @Autowired
     protected RelatedContentRepository contentRepository;
 
@@ -49,39 +46,32 @@ public class RelatedContentService {
     @Autowired
     protected Clock clock;
 
-    public Page<RelatedContent> getRelatedContent(String source, String sourceId, int pageSize, int page) {
-        PageRequest paging = new PageRequest(page, pageSize);
-        return contentRepository.findAllRelatedBySourceAndSourceId(source, sourceId, paging);
+    public List<RelatedContent> getRelatedContent(String source, String sourceId) {
+        return contentRepository.findBySourceAndSourceId(source, sourceId);
     }
 
-    public Page<RelatedContent> getRelatedContentForTask(String taskId, int pageSize, int page) {
-        PageRequest paging = new PageRequest(page, pageSize);
-        return contentRepository.findAllRelatedByTaskId(taskId, paging);
+    public List<RelatedContent> getRelatedContentForTask(String taskId) {
+        return contentRepository.findAllRelatedByTaskId(taskId);
     }
 
-    public Page<RelatedContent> getRelatedContentForProcessInstance(String processInstanceId, int pageSize, int page) {
-        PageRequest paging = new PageRequest(page, pageSize);
-        return contentRepository.findAllRelatedByProcessInstanceId(processInstanceId, paging);
+    public List<RelatedContent> getRelatedContentForProcessInstance(String processInstanceId) {
+        return contentRepository.findAllRelatedByProcessInstanceId(processInstanceId);
     }
     
-    public Page<RelatedContent> getFieldContentForProcessInstance(String processInstanceId, String field, int pageSize, int page) {
-        PageRequest paging = new PageRequest(page, pageSize);
-        return contentRepository.findAllByProcessInstanceIdAndField(processInstanceId, field, paging);
+    public List<RelatedContent> getFieldContentForProcessInstance(String processInstanceId, String field) {
+        return contentRepository.findAllByProcessInstanceIdAndField(processInstanceId, field);
     }
     
-    public Page<RelatedContent> getFieldContentForTask(String taskId, int pageSize, int page) {
-        PageRequest paging = new PageRequest(page, pageSize);
-        return contentRepository.findAllFieldBasedContentByTaskId(taskId, paging);
+    public List<RelatedContent> getFieldContentForTask(String taskId) {
+        return contentRepository.findAllFieldBasedContentByTaskId(taskId);
     }
     
-    public Page<RelatedContent> getAllFieldContentForProcessInstance(String processInstanceId, int pageSize, int page) {
-        PageRequest paging = new PageRequest(page, pageSize);
-        return contentRepository.findAllFieldBasedContentByProcessInstanceId(processInstanceId, paging);
+    public List<RelatedContent> getAllFieldContentForProcessInstance(String processInstanceId) {
+        return contentRepository.findAllFieldBasedContentByProcessInstanceId(processInstanceId);
     }
     
-    public Page<RelatedContent> getAllFieldContentForTask(String taskId, String field, int pageSize, int page) {
-        PageRequest paging = new PageRequest(page, pageSize);
-        return contentRepository.findAllByTaskIdAndField(taskId, field, paging);
+    public List<RelatedContent> getAllFieldContentForTask(String taskId, String field) {
+        return contentRepository.findAllByTaskIdAndField(taskId, field);
     }
 
     @Transactional
@@ -145,8 +135,8 @@ public class RelatedContentService {
         return newContent;
     }
 
-    public RelatedContent getRelatedContent(Long id, boolean includeOwner) {
-        RelatedContent content = contentRepository.findOne(id);
+    public RelatedContent getRelatedContent(String id, boolean includeOwner) {
+        RelatedContent content = contentRepository.get(id);
         
         if (content != null && includeOwner) {
             // Touch related entities
@@ -237,12 +227,12 @@ public class RelatedContentService {
     }
 
     @Transactional
-    public void updateRelatedContentData(Long relatedContentId, String contentStoreId, InputStream contentStream, Long lengthHint, User user) {
+    public void updateRelatedContentData(String relatedContentId, String contentStoreId, InputStream contentStream, Long lengthHint, User user) {
         Date timestamp = clock.getCurrentTime();
         
         ContentObject updatedContent = contentStorage.updateContentObject(contentStoreId, contentStream, lengthHint);
         
-        RelatedContent relatedContent = contentRepository.findOne(relatedContentId);
+        RelatedContent relatedContent = contentRepository.get(relatedContentId);
         relatedContent.setLastModifiedBy(user.getId());
         relatedContent.setLastModified(timestamp);
         relatedContent.setContentSize(lengthHint);
@@ -251,8 +241,8 @@ public class RelatedContentService {
     }
 
     @Transactional
-    public void updateName(Long relatedContentId, String newName) {
-        RelatedContent relatedContent = contentRepository.findOne(relatedContentId);
+    public void updateName(String relatedContentId, String newName) {
+        RelatedContent relatedContent = contentRepository.get(relatedContentId);
         relatedContent.setName(newName);
         contentRepository.save(relatedContent);
     }
@@ -262,8 +252,8 @@ public class RelatedContentService {
      * for the given process instance id and (optional) task id.
      */
     @Transactional
-    public void setContentField(Long relatedContentId, String field, String processInstanceId, String taskId) {
-        final RelatedContent relatedContent = contentRepository.findOne(relatedContentId);
+    public void setContentField(String relatedContentId, String field, String processInstanceId, String taskId) {
+        final RelatedContent relatedContent = contentRepository.get(relatedContentId);
         relatedContent.setProcessInstanceId(processInstanceId);
         relatedContent.setTaskId(taskId);
         relatedContent.setRelatedContent(false);
@@ -287,29 +277,13 @@ public class RelatedContentService {
      */
     @Transactional
     public void deleteContentForProcessInstance(String processInstanceId) {
-        int page = 0;
-        Page<RelatedContent> content = contentRepository.findAllContentByProcessInstanceId(
-                processInstanceId, new PageRequest(page, RELATED_CONTENT_INTERNAL_BATCH_SIZE));
-        
+        List<RelatedContent> contentList = contentRepository.findAllContentByProcessInstanceId(processInstanceId);
         final Set<String> storageIds = new HashSet<String>();
         
-        // Loop over all content, cascading any referencing entities
-        while (content!= null) {
-            for (RelatedContent relatedContent : content.getContent()) {
-                
-                if (relatedContent.getContentStoreId() != null) {
-                    storageIds.add(relatedContent.getContentStoreId());
-                }
-            }
-            
-            // Get next page, if needed
-            if (!content.isLast()) {
-                page++;
-                content = contentRepository.findAllContentByProcessInstanceId(
-                        processInstanceId, new PageRequest(page, RELATED_CONTENT_INTERNAL_BATCH_SIZE));
-            } else {
-                content = null;
-            }
+        for (RelatedContent relatedContent : contentList) {
+            if (relatedContent.getContentStoreId() != null) {
+              storageIds.add(relatedContent.getContentStoreId());
+          }
         }
         
         // Delete raw content AFTER transaction has been committed to prevent missing content on rollback
