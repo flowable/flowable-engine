@@ -44,6 +44,7 @@ import org.activiti.dmn.api.DmnRepositoryService;
 import org.activiti.dmn.api.DmnRuleService;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.DynamicBpmnService;
+import org.activiti.engine.FlowableEngineAgendaFactory;
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
@@ -72,6 +73,7 @@ import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.RuntimeServiceImpl;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.impl.TaskServiceImpl;
+import org.activiti.engine.impl.agenda.DefaultFlowableEngineAgendaFactory;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.activiti.engine.impl.asyncexecutor.DefaultJobManager;
@@ -874,6 +876,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   
   protected PerformanceSettings performanceSettings = new PerformanceSettings();
   
+  // agenda factory
+  protected FlowableEngineAgendaFactory agendaFactory;
+  
   // Backwards compatibility //////////////////////////////////////////////////////////////
   
   protected boolean isActiviti5CompatibilityEnabled; // Default activiti 5 backwards compatibility is disabled!
@@ -917,6 +922,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initProcessDiagramGenerator();
     initHistoryLevel();
     initExpressionManager();
+    initAgendaFactory();
     
     if (usingRelationalDatabase) {
       initDataSource();
@@ -2127,6 +2133,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       businessCalendarManager = mapBusinessCalendarManager;
     }
   }
+  
+  public void initAgendaFactory() {
+    if (this.agendaFactory == null) {
+      this.agendaFactory = new DefaultFlowableEngineAgendaFactory();
+    }
+  }
 
   public void initDelegateInterceptor() {
     if (delegateInterceptor == null) {
@@ -2762,6 +2774,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setTransactionContextFactory(TransactionContextFactory transactionContextFactory) {
     this.transactionContextFactory = transactionContextFactory;
+    return this;
+  }
+
+  public FlowableEngineAgendaFactory getAgendaFactory() {
+    return agendaFactory;
+  }
+
+  public ProcessEngineConfigurationImpl setAgendaFactory(FlowableEngineAgendaFactory agendaFactory) {
+    this.agendaFactory = agendaFactory;
     return this;
   }
 

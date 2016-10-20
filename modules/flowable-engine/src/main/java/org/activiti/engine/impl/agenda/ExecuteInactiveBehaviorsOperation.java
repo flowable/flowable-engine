@@ -29,7 +29,7 @@ public class ExecuteInactiveBehaviorsOperation extends AbstractOperation {
 
   public ExecuteInactiveBehaviorsOperation(CommandContext commandContext) {
     super(commandContext, null);
-    this.involvedExecutions = agenda.getCommandContext().getInvolvedExecutions();
+    this.involvedExecutions = commandContext.getInvolvedExecutions();
   }
 
   @Override

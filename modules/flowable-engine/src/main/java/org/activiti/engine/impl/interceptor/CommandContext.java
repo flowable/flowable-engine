@@ -22,9 +22,9 @@ import java.util.Map;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiOptimisticLockingException;
 import org.activiti.engine.ActivitiTaskAlreadyClaimedException;
+import org.activiti.engine.FlowableEngineAgenda;
 import org.activiti.engine.JobNotFoundException;
 import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.impl.agenda.Agenda;
 import org.activiti.engine.impl.asyncexecutor.JobManager;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.db.DbSqlSession;
@@ -81,7 +81,7 @@ public class CommandContext {
   protected Map<String, Object> attributes; // General-purpose storing of anything during the lifetime of a command context
   protected boolean reused;
 
-  protected Agenda agenda = new Agenda(this);
+  protected FlowableEngineAgenda agenda;
   protected Map<String, ExecutionEntity> involvedExecutions = new HashMap<String, ExecutionEntity>(1); // The executions involved with the command
   protected LinkedList<Object> resultStack = new LinkedList<Object>(); // needs to be a stack, as JavaDelegates can do api calls again
 
@@ -90,6 +90,7 @@ public class CommandContext {
     this.processEngineConfiguration = processEngineConfiguration;
     this.failedJobCommandFactory = processEngineConfiguration.getFailedJobCommandFactory();
     this.sessionFactories = processEngineConfiguration.getSessionFactories();
+    this.agenda = processEngineConfiguration.getAgendaFactory().createAgenda(this);
   }
 
   public void close() {
@@ -450,7 +451,7 @@ public class CommandContext {
     return processEngineConfiguration.getEventDispatcher();
   }
 
-  public Agenda getAgenda() {
+  public FlowableEngineAgenda getAgenda() {
     return agenda;
   }
 

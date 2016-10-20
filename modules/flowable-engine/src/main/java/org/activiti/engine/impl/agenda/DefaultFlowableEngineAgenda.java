@@ -14,6 +14,7 @@ package org.activiti.engine.impl.agenda;
 
 import java.util.LinkedList;
 
+import org.activiti.engine.FlowableEngineAgenda;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.delegate.ActivityBehavior;
 import org.activiti.engine.impl.interceptor.Command;
@@ -35,15 +36,15 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Joram Barrez
  */
-public class Agenda {
+public class DefaultFlowableEngineAgenda implements FlowableEngineAgenda {
 
-  private static final Logger logger = LoggerFactory.getLogger(Agenda.class);
+  private static final Logger logger = LoggerFactory.getLogger(DefaultFlowableEngineAgenda.class);
 
   protected CommandContext commandContext;
 
   protected LinkedList<Runnable> operations = new LinkedList<Runnable>();
 
-  public Agenda(CommandContext commandContext) {
+  public DefaultFlowableEngineAgenda(CommandContext commandContext) {
     this.commandContext = commandContext;
   }
 

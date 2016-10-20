@@ -22,8 +22,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Stack;
 
+import org.activiti.engine.FlowableEngineAgenda;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
-import org.activiti.engine.impl.agenda.Agenda;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.cfg.TransactionContext;
 import org.activiti.engine.impl.interceptor.CommandContext;
@@ -57,7 +57,7 @@ public class Context {
     return stack.peek();
   }
 
-  public static Agenda getAgenda() {
+  public static FlowableEngineAgenda getAgenda() {
     return getCommandContext().getAgenda();
   }
 
