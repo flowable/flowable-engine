@@ -12,55 +12,24 @@
  */
 package org.activiti.engine.impl.interceptor;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiOptimisticLockingException;
 import org.activiti.engine.ActivitiTaskAlreadyClaimedException;
 import org.activiti.engine.JobNotFoundException;
 import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.impl.agenda.Agenda;
+import org.activiti.engine.ActivitiAgenda;
 import org.activiti.engine.impl.asyncexecutor.JobManager;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.history.HistoryManager;
 import org.activiti.engine.impl.jobexecutor.FailedJobCommandFactory;
 import org.activiti.engine.impl.persistence.cache.EntityCache;
-import org.activiti.engine.impl.persistence.entity.AttachmentEntityManager;
-import org.activiti.engine.impl.persistence.entity.ByteArrayEntityManager;
-import org.activiti.engine.impl.persistence.entity.CommentEntityManager;
-import org.activiti.engine.impl.persistence.entity.DeadLetterJobEntityManager;
-import org.activiti.engine.impl.persistence.entity.DeploymentEntityManager;
-import org.activiti.engine.impl.persistence.entity.EventLogEntryEntityManager;
-import org.activiti.engine.impl.persistence.entity.EventSubscriptionEntityManager;
-import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.activiti.engine.impl.persistence.entity.ExecutionEntityManager;
-import org.activiti.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
-import org.activiti.engine.impl.persistence.entity.HistoricDetailEntityManager;
-import org.activiti.engine.impl.persistence.entity.HistoricIdentityLinkEntityManager;
-import org.activiti.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
-import org.activiti.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
-import org.activiti.engine.impl.persistence.entity.HistoricVariableInstanceEntityManager;
-import org.activiti.engine.impl.persistence.entity.IdentityLinkEntityManager;
-import org.activiti.engine.impl.persistence.entity.JobEntityManager;
-import org.activiti.engine.impl.persistence.entity.ModelEntityManager;
-import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
-import org.activiti.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManager;
-import org.activiti.engine.impl.persistence.entity.PropertyEntityManager;
-import org.activiti.engine.impl.persistence.entity.ResourceEntityManager;
-import org.activiti.engine.impl.persistence.entity.SuspendedJobEntityManager;
-import org.activiti.engine.impl.persistence.entity.TableDataManager;
-import org.activiti.engine.impl.persistence.entity.TaskEntityManager;
-import org.activiti.engine.impl.persistence.entity.TimerJobEntityManager;
-import org.activiti.engine.impl.persistence.entity.VariableInstanceEntityManager;
+import org.activiti.engine.impl.persistence.entity.*;
 import org.activiti.engine.logging.LogMDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * @author Tom Baeyens
@@ -81,7 +50,7 @@ public class CommandContext {
   protected Map<String, Object> attributes; // General-purpose storing of anything during the lifetime of a command context
   protected boolean reused;
 
-  protected Agenda agenda = new Agenda(this);
+  protected ActivitiAgenda agenda;
   protected Map<String, ExecutionEntity> involvedExecutions = new HashMap<String, ExecutionEntity>(1); // The executions involved with the command
   protected LinkedList<Object> resultStack = new LinkedList<Object>(); // needs to be a stack, as JavaDelegates can do api calls again
 
@@ -90,10 +59,11 @@ public class CommandContext {
     this.processEngineConfiguration = processEngineConfiguration;
     this.failedJobCommandFactory = processEngineConfiguration.getFailedJobCommandFactory();
     this.sessionFactories = processEngineConfiguration.getSessionFactories();
+    this.agenda = processEngineConfiguration.createAgenda();
   }
 
   public void close() {
-    
+
     // The intention of this method is that all resources are closed properly, even if exceptions occur
     // in close or flush methods of the sessions or the transaction context.
 
@@ -107,7 +77,7 @@ public class CommandContext {
         } catch (Throwable exception) {
           exception(exception);
         } finally {
-          
+
           try {
             if (exception == null) {
               executeCloseListenersAfterSessionFlushed();
@@ -115,14 +85,14 @@ public class CommandContext {
           } catch (Throwable exception) {
             exception(exception);
           }
-          
+
           if (exception != null) {
             logException();
             executeCloseListenersCloseFailure();
           } else {
             executeCloseListenersClosed();
           }
-          
+
         }
       } catch (Throwable exception) {
         // Catch exceptions during rollback
@@ -135,7 +105,7 @@ public class CommandContext {
       // Catch exceptions during session closing
       exception(exception);
     }
-    
+
     if (exception != null) {
       rethrowExceptionIfNeeded();
     }
@@ -173,7 +143,7 @@ public class CommandContext {
   public List<CommandContextCloseListener> getCloseListeners() {
     return closeListeners;
   }
-  
+
   protected void executeCloseListenersClosing() {
     if (closeListeners != null) {
       try {
@@ -185,7 +155,7 @@ public class CommandContext {
       }
     }
   }
-  
+
   protected void executeCloseListenersAfterSessionFlushed() {
     if (closeListeners != null) {
       try {
@@ -197,7 +167,7 @@ public class CommandContext {
       }
     }
   }
-  
+
   protected void executeCloseListenersClosed() {
     if (closeListeners != null) {
       try {
@@ -209,7 +179,7 @@ public class CommandContext {
       }
     }
   }
-  
+
   protected void executeCloseListenersCloseFailure() {
     if (closeListeners != null) {
       try {
@@ -240,8 +210,8 @@ public class CommandContext {
 
   /**
    * Stores the provided exception on this {@link CommandContext} instance.
-   * That exception will be rethrown at the end of closing the {@link CommandContext} instance. 
-   * 
+   * That exception will be rethrown at the end of closing the {@link CommandContext} instance.
+   *
    * If there is already an exception being stored, a 'masked exception' message will be logged.
    */
   public void exception(Throwable exception) {
@@ -314,7 +284,7 @@ public class CommandContext {
   public ModelEntityManager getModelEntityManager() {
     return processEngineConfiguration.getModelEntityManager();
   }
-  
+
   public ProcessDefinitionInfoEntityManager getProcessDefinitionInfoEntityManager() {
     return processEngineConfiguration.getProcessDefinitionInfoEntityManager();
   }
@@ -366,15 +336,15 @@ public class CommandContext {
   public JobEntityManager getJobEntityManager() {
     return processEngineConfiguration.getJobEntityManager();
   }
-  
+
   public TimerJobEntityManager getTimerJobEntityManager() {
     return processEngineConfiguration.getTimerJobEntityManager();
   }
-  
+
   public SuspendedJobEntityManager getSuspendedJobEntityManager() {
     return processEngineConfiguration.getSuspendedJobEntityManager();
   }
-  
+
   public DeadLetterJobEntityManager getDeadLetterJobEntityManager() {
     return processEngineConfiguration.getDeadLetterJobEntityManager();
   }
@@ -402,7 +372,7 @@ public class CommandContext {
   public HistoryManager getHistoryManager() {
     return processEngineConfiguration.getHistoryManager();
   }
-  
+
   public JobManager getJobManager() {
     return processEngineConfiguration.getJobManager();
   }
@@ -450,7 +420,7 @@ public class CommandContext {
     return processEngineConfiguration.getEventDispatcher();
   }
 
-  public Agenda getAgenda() {
+  public ActivitiAgenda getAgenda() {
     return agenda;
   }
 
@@ -469,5 +439,5 @@ public class CommandContext {
   public void setReused(boolean reused) {
     this.reused = reused;
   }
-  
+
 }
