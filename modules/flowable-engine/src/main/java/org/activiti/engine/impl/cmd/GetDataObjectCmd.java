@@ -120,7 +120,7 @@ public class GetDataObjectCmd implements Command<DataObject>, Serializable {
         ObjectNode languageNode = Context.getLocalizationElementProperties(locale, foundDataObject.getId(), 
             execution.getProcessDefinitionId(), withLocalizationFallback);
         
-        if (variableEntity != null && languageNode != null) {
+        if (languageNode != null) {
           JsonNode nameNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_NAME);
           if (nameNode != null) {
             localizedName = nameNode.asText();
