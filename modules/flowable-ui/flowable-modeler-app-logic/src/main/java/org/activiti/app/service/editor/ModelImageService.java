@@ -33,10 +33,12 @@ import org.activiti.editor.language.json.converter.BpmnJsonConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Service
+@Transactional
 public class ModelImageService {
 
   private final Logger log = LoggerFactory.getLogger(ModelImageService.class);
@@ -45,7 +47,7 @@ public class ModelImageService {
 
   protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
 
-  public void generateThumbnailImage(Model model, ObjectNode editorJsonNode) {
+  public byte[] generateThumbnailImage(Model model, ObjectNode editorJsonNode) {
     try {
 
       BpmnModel bpmnModel = bpmnJsonConverter.convertToBpmnModel(editorJsonNode);
@@ -59,12 +61,12 @@ public class ModelImageService {
 
       BufferedImage modelImage = ImageGenerator.createImage(bpmnModel, scaleFactor);
       if (modelImage != null) {
-        byte[] thumbnailBytes = ImageGenerator.createByteArrayForImage(modelImage, "png");
-        model.setThumbnail(thumbnailBytes);
+        return ImageGenerator.createByteArrayForImage(modelImage, "png");
       }
     } catch (Exception e) {
       log.error("Error creating thumbnail image " + model.getId(), e);
     }
+    return null;
   }
 
   protected GraphicInfo calculateDiagramSize(BpmnModel bpmnModel) {
