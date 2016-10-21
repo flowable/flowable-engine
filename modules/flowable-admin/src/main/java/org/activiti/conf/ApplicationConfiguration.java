@@ -12,7 +12,12 @@
  */
 package org.activiti.conf;
 
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
@@ -22,24 +27,26 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 	@PropertySource(value = "file:flowable-admin-app.properties", ignoreResourceNotFound = true)
 })
 @ComponentScan(basePackages = {
+        "org.activiti.repository",
         "org.activiti.service",
+        "org.activiti.filter",
         "org.activiti.security"})
 @Import(value = {
+        ActivitiIdmEngineConfiguration.class,
         SecurityConfiguration.class,
-        AsyncConfiguration.class,
         DatabaseConfiguration.class,
         JacksonConfiguration.class})
 public class ApplicationConfiguration {
 
-    /**
-     * This is needed to make property resolving work on annotations ...
-     * (see http://stackoverflow.com/questions/11925952/custom-spring-property-source-does-not-resolve-placeholders-in-value)
-     *
-     * @Scheduled(cron="${someProperty}")
-     */
-    @Bean
-    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-        return new PropertySourcesPlaceholderConfigurer();
-    }
+  /**
+   * This is needed to make property resolving work on annotations ...
+   * (see http://stackoverflow.com/questions/11925952/custom-spring-property-source-does-not-resolve-placeholders-in-value)
+   *
+   * @Scheduled(cron="${someProperty}")
+   */
+  @Bean
+  public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+    return new PropertySourcesPlaceholderConfigurer();
+  }
 
 }

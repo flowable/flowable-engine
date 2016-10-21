@@ -14,15 +14,14 @@ package org.activiti.app.conf;
 
 import org.activiti.app.filter.FlowableCookieFilter;
 import org.activiti.app.security.AjaxLogoutSuccessHandler;
+import org.activiti.app.security.IdentityServiceAuthenticationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Condition;
-import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
-import org.springframework.core.type.AnnotatedTypeMetadata;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -41,15 +40,27 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
 public class SecurityConfiguration {
 	
 	private static final Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
-	
-	public static final String KEY_LDAP_ENABLED = "ldap.authentication.enabled";
-
-  //
-	// GLOBAL CONFIG
-	//
 
 	@Autowired
+	protected IdentityServiceAuthenticationProvider authenticationProvider;
+	
+	@Autowired
 	protected Environment env;
+	
+	//
+  // GLOBAL CONFIG
+  //
+  
+  @Autowired
+  public void configureGlobal(AuthenticationManagerBuilder auth) {
+
+    // Default auth (database backed)
+    try {
+      auth.authenticationProvider(authenticationProvider);
+    } catch (Exception e) {
+      logger.error("Could not configure authentication mechanism:", e);
+    }
+  }
 	
 	//
 	// REGULAR WEBAP CONFIG
@@ -113,14 +124,4 @@ public class SecurityConfiguration {
 					.and().httpBasic();
 		}
 	}
-
-	public static class LdapAuthenticationEnabledCondition implements Condition {
-
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-			return context.getEnvironment().getProperty(KEY_LDAP_ENABLED, Boolean.class, false);
-		}
-
-	}
-
 }

@@ -224,6 +224,10 @@
 		<!-- Flowable -->
 		<dependency>
             <groupId>org.flowable</groupId>
+            <artifactId>flowable-idm-engine</artifactId>
+        </dependency>
+		<dependency>
+            <groupId>org.flowable</groupId>
             <artifactId>flowable-bpmn-model</artifactId>
         </dependency>
         <dependency>
@@ -330,26 +334,15 @@
 			<version>3.2.1</version>
 		</dependency>
 		<dependency>
-			<groupId>javax.annotation</groupId>
-			<artifactId>jsr250-api</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.inject</groupId>
-			<artifactId>javax.inject</artifactId>
-			<version>1</version>
-		</dependency>
-		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 			<version>3.1.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>jstl</artifactId>
-			<version>1.2</version>
-		</dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
 
 		<!-- JODA TIME -->
 		<dependency>
@@ -586,7 +579,7 @@
 				<version>2.1</version>
 				<configuration>
 					<path>/flowable-admin</path>
-					<port>8081</port>
+					<port>9988</port>
 					<protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
 				</configuration>
 			    <dependencies>

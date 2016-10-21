@@ -8,23 +8,10 @@
 
 /* App Module */
 
-var activitiAdminApp = angular.module('activitiAdminApp', ['http-auth-interceptor', 'ngResource', 'ngRoute', 'ngCookies',
+var activitiAdminApp = angular.module('activitiAdminApp', ['ngResource', 'ngRoute', 'ngCookies',
     'pascalprecht.translate', 'ngGrid', 'ui.select2', 'ui.bootstrap', 'angularFileUpload', 'ui.keypress',
     'ui.grid', 'ui.grid.edit', 'ui.grid.selection', 'ui.grid.autoResize', 'ui.grid.moveColumns', 'ui.grid.cellNav']);
 
-var authRouteResolver = ['$rootScope', 'AuthenticationSharedService', function($rootScope, AuthenticationSharedService) {
-
-  if(!$rootScope.authenticated) {
-    // Return auth-promise. On success, the promise resolves and user is assumed authenticated from now on. If
-    // promise is rejected, route will not be followed (no unneeded HTTP-calls will be dne, which case a 401 in the end, anyway)
-    return AuthenticationSharedService.authenticate();
-  } else {
-    // Authentication done on rootscope, no need to call service again. Any unauthenticated access to REST will result in
-    // a 401 and will redirect to login anyway. Done to prevent additional call to authenticate every route-change
-    $rootScope.authenticated = true;
-    return true;
-  }
-}];
 activitiAdminApp
     .config(['$routeProvider', '$httpProvider', '$translateProvider', '$provide',
         function ($routeProvider, $httpProvider, $translateProvider, $provide) {
@@ -36,89 +23,75 @@ activitiAdminApp
                 .when('/process-definitions', {
                     templateUrl: 'views/process-definitions.html',
                     controller: 'ProcessDefinitionsController',
-                    resolve: authRouteResolver,
                     reloadOnSearch: true
                 })
                 .when('/process-definition/:definitionId', {
                     templateUrl: 'views/process-definition.html',
                     controller: 'ProcessDefinitionController',
-                    resolve: authRouteResolver,
                     reloadOnSearch: true
                 })
                 .when('/deployments', {
                     templateUrl: 'views/deployments.html',
                     controller: 'DeploymentsController',
-                    resolve: authRouteResolver,
                     reloadOnSearch: true
                 })
                 .when('/deployment/:deploymentId', {
                     templateUrl: 'views/deployment.html',
                     controller: 'DeploymentController',
-                    resolve: authRouteResolver,
                     reloadOnSearch: true
                 })
                 .when('/process-instances', {
                     templateUrl: 'views/process-instances.html',
                     controller: 'ProcessInstancesController',
-                    resolve: authRouteResolver,
                     reloadOnSearch: true
                 })
                 .when('/process-instance/:processInstanceId', {
                 	templateUrl: 'views/process-instance.html',
                 	controller: 'ProcessInstanceController',
-                  resolve: authRouteResolver,
-                  reloadOnSearch: true
+                  	reloadOnSearch: true
                 })
                 .when('/tasks', {
                 	templateUrl: 'views/tasks.html',
                 	controller: 'TasksController',
-                  resolve: authRouteResolver,
-                  reloadOnSearch: true
+                 	reloadOnSearch: true
                 })
                 .when('/task/:taskId', {
                 	templateUrl: 'views/task.html',
                 	controller: 'TaskController',
-                  resolve: authRouteResolver,
-                  reloadOnSearch: true
+                  	reloadOnSearch: true
                 })
                 .when('/jobs', {
                 	templateUrl: 'views/jobs.html',
                 	controller: 'JobsController',
-                  resolve: authRouteResolver,
-                  reloadOnSearch: true
+                  	reloadOnSearch: true
                 })
                 .when('/job/:jobId', {
                 	templateUrl: 'views/job.html',
                 	controller: 'JobController',
-                  resolve: authRouteResolver,
-                  reloadOnSearch: true
+                  	reloadOnSearch: true
                 })
                 .when('/users', {
                 	templateUrl: 'views/users.html',
                 	controller: 'UsersController',
-                  resolve: authRouteResolver,
-                  reloadOnSearch: true
+                  	reloadOnSearch: true
                 })
                 .when('/engine', {
                     templateUrl: 'views/engine.html',
                     controller: 'EngineController',
-                    resolve: authRouteResolver,
                     reloadOnSearch: true
                 })
                 .when('/monitoring', {
                     templateUrl: 'views/monitoring.html',
                     controller: 'MonitoringController',
-                    resolve: authRouteResolver,
                     reloadOnSearch: true
                 })
                 .when('/logout', {
               		templateUrl: 'views/login.html',
               		controller: 'LogoutController',
-                  resolve: authRouteResolver,
-                  reloadOnSearch: true
+                  	reloadOnSearch: true
               	})
               	.when('/', {
-              	  redirectTo: '/engine'
+              	  	redirectTo: '/engine'
                 })
               	.when('/process-definitions-refresh', {
               		redirectTo: '/process-definitions'
@@ -126,43 +99,36 @@ activitiAdminApp
                 .when('/apps', {
                     templateUrl: 'views/app-deployments.html',
                     controller: 'AppDeploymentsController',
-                    resolve: authRouteResolver,
                     reloadOnSearch: true
                 })
                 .when('/app/:appId', {
                     templateUrl: 'views/app-deployment.html',
                     controller: 'AppDeploymentController',
-                    resolve: authRouteResolver,
                     reloadOnSearch: true
                 })
                 .when('/decision-tables', {
                     templateUrl: 'views/decision-tables.html',
                     controller: 'DecisionTablesController',
-                    resolve: authRouteResolver,
                     reloadOnSearch: true
                 })
                 .when('/decision-table/:decisionTableId', {
                     templateUrl: 'views/decision-table.html',
                     controller: 'DecisionTableController',
-                    resolve: authRouteResolver,
                     reloadOnSearch: true
                 })
                 .when('/forms', {
                     templateUrl: 'views/forms.html',
                     controller: 'FormsController',
-                    resolve: authRouteResolver,
                     reloadOnSearch: true
                 })
                 .when('/form/:formId', {
                     templateUrl: 'views/form.html',
                     controller: 'FormController',
-                    resolve: authRouteResolver,
                     reloadOnSearch: true
                 })
                 .when('/submitted-form/:submittedFormId', {
                     templateUrl: 'views/submitted-form.html',
                     controller: 'SubmittedFormController',
-                    resolve: authRouteResolver,
                     reloadOnSearch: true
                 })
                 .otherwise({
@@ -271,82 +237,17 @@ activitiAdminApp
             return input;
           };
         })
-        .run(['$rootScope', '$location', 'AuthenticationSharedService', 'Account',
-            function($rootScope, $location, AuthenticationSharedService, Account) {
-	            // Call when the 401 response is returned by the client
-	            $rootScope.$on('event:auth-loginRequired', function(rejection) {
-	                $rootScope.authenticated = false;
-
-	                if ($location.path() !== "/" && $location.path() !== "" && $location.path() !== "/login") {
-	                    $rootScope.pageAfterLogin = $location.path();
-	                    $location.path('/login').replace();
-	                }
-	            });
-
-	            // Call when the user is authenticated
-	           $rootScope.$on('event:auth-authConfirmed', function() {
-	               if (!$rootScope.authenticated) {
-	                   $rootScope.authenticated = true;
-	                   $rootScope.account = Account.get(function () {
-	                       // Load cluster configs, in case direct navigation is done to the page
-	                       $rootScope.loadServerConfig(false);
-	                   }, function () {
-	                       $rootScope.authenticated = false;
-	                       $location.path('/login');
-	                   });
-	                   
-	               }
-	               
-	            });
-
-	            // Call when the user logs in
-	            $rootScope.$on('event:auth-loginConfirmed', function() {
-	                if (!$rootScope.authenticated) {
-	                    $rootScope.authenticated = true;
-	                    $rootScope.account = Account.get(function () {
-	                        $rootScope.loadServerConfig(true);
-
-                            if($rootScope.pageAfterLogin) {
-	                          $location.path($rootScope.pageAfterLogin);
-	                        } else {
-	                          // Show default page
-	                          $location.path('engine');
-	                        }
-	                        
-	                       }, function () {
-	                           $rootScope.authenticated = false;
-	                           $location.path('/login');
-	                       });
-	                }
-	                
-	            });
-
-	            // Call when the user logs out
-	            $rootScope.$on('event:auth-loginCancelled', function() {
-	                $rootScope.authenticated = false;
-
-	                // Explicitly clear cluster data to re-fetch
-	                $rootScope.activeServer = undefined;
-	                $rootScope.serverLoaded = false;
-	                $location.path('');
-            });
-        }])
         .run(['$rootScope', '$http', '$timeout', '$location', '$cookies', '$modal', '$translate',
             function($rootScope, $http, $timeout, $location, $cookies, $modal, $translate) {
 
                 $rootScope.serverStatus = {
                 };
 
-                var proposedLanguage = $translate.proposedLanguage();
-                var supportedLanguages = ['en','de','es','fr','it','nl','ja'];
-
-                if (supportedLanguages.indexOf(proposedLanguage) === -1) {
-                    $translate.use('en');
-                }
+                $translate.use('en');
 
         		$rootScope.serverLoaded = false;
-
-                $rootScope.loadServerConfig = function(callbackAfterLoad) {
+        		
+        		$rootScope.loadServerConfig = function(callbackAfterLoad) {
                     $http({method: 'GET', url: '/app/rest/server-configs'}).
                     success(function(data) {
                         if (data.length > 0) {
@@ -361,6 +262,13 @@ activitiAdminApp
                     });
 
                 };
+        		
+        		$http.get('/app/rest/account')
+		        	.success(function (data, status, headers, config) {
+		              	$rootScope.account = data;
+		               	$rootScope.authenticated = true;
+		               	$rootScope.loadServerConfig(false);
+		          	});
 
 	        	$rootScope.loadProcessDefinitionsCache = function() {
                     if ($rootScope.activeServer && $rootScope.activeServer.id) {
@@ -452,37 +360,6 @@ activitiAdminApp
 	                    });
 	                }
 	            };
-	            //
-	            // $rootScope.handleNoServerConfigs = function (clusterId, callback) {
-	            //     if (!$rootScope.account.multiTenant) {
-	            //         // do nothing on single tenant mode
-	            //         return;
-	            //     }
-	            //     var clusterId = clusterId || $rootScope.activeCluster.id;
-	            //     $http({method: 'GET', url: '/app/rest/server-configs/default'}).
-                 //    success(function(defaultServerconfig, status, headers, config) {
-                 //
-                 //        defaultServerconfig.clusterConfigId = clusterId;
-                 //        var modalInstance = $modal.open({
-                 //            templateUrl: 'views/engine-edit-endpoint-popup.html',
-                 //            controller: 'EditEndpointConfigModalInstanceCrtl',
-                 //            resolve: {
-                 //                server: function() {return defaultServerconfig;}
-                 //            }
-                 //        });
-                //
-                 //        modalInstance.result.then(function (result) {
-                 //            if(result) {
-                 //                $rootScope.addAlert($translate.instant('ALERT.ENGINE.ENDPOINT-UPDATED', result), 'info');
-                 //                $rootScope.loadServers();
-                 //                if (callback) {
-                 //                    callback(clusterId);
-                 //                }
-                 //            }
-                 //        });
-                 //
-                 //    });
-	            // };
         	}
         ]);
 
