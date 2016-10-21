@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.activiti.domain.ServerConfig">
+
+	<resultMap id="serverConfigResultMap" type="org.activiti.domain.ServerConfig">
+		<id property="id" column="id" jdbcType="VARCHAR" />
+		<result property="name" column="name" jdbcType="VARCHAR" />
+		<result property="description" column="description" jdbcType="VARCHAR" />
+		<result property="serverAddress" column="server_address" jdbcType="VARCHAR" />
+		<result property="port" column="port" jdbcType="INTEGER" />
+		<result property="contextRoot" column="context_root" jdbcType="VARCHAR" />
+		<result property="restRoot" column="rest_root" jdbcType="VARCHAR" />
+		<result property="userName" column="user_name" jdbcType="VARCHAR" />
+		<result property="password" column="password" jdbcType="VARCHAR" />
+		<result property="tenantId" column="tenant_id" jdbcType="VARCHAR" />
+	</resultMap>
+	
+    <insert id="insertServerConfig" parameterType="org.activiti.domain.ServerConfig">
+        insert into ${prefix}ACT_ADM_SERVER_CONFIG (
+            id,
+            name,
+            description,
+            server_address,
+            port,
+            context_root,
+            rest_root,
+            user_name,
+            password,
+            tenant_id) 
+         values (
+            #{id, jdbcType=VARCHAR},
+            #{name, jdbcType=VARCHAR},
+            #{description, jdbcType=VARCHAR},
+            #{serverAddress, jdbcType=VARCHAR},
+            #{port, jdbcType=VARCHAR},
+            #{contextRoot, jdbcType=VARCHAR},
+            #{restRoot, jdbcType=VARCHAR},
+            #{userName, jdbcType=VARCHAR},
+            #{password, jdbcType=VARCHAR},
+            #{tenantId, jdbcType=VARCHAR}
+          )
+    </insert>
+    
+    <update id="updateServerConfig" parameterType="org.activiti.domain.ServerConfig">
+        update ${prefix}ACT_ADM_SERVER_CONFIG
+        <set>
+            name = #{name, jdbcType=VARCHAR},
+            description = #{description, jdbcType=VARCHAR},
+            server_address = #{serverAddress, jdbcType=VARCHAR},
+            port = #{port, jdbcType=VARCHAR},
+            context_root = #{contextRoot, jdbcType=VARCHAR},
+            rest_root = #{restRoot, jdbcType=VARCHAR},
+            user_name = #{userName, jdbcType=VARCHAR},
+            password = #{password, jdbcType=VARCHAR},
+            tenant_id = #{tenantId, jdbcType=VARCHAR}  
+        </set>
+        where id = #{id, jdbcType=VARCHAR}
+    </update>
+
+	<select id="selectServerConfig" parameterType="string" resultMap="serverConfigResultMap">
+		select * from ${prefix}ACT_ADM_SERVER_CONFIG where id = #{id, jdbcType=VARCHAR}
+	</select>
+	
+	<select id="selectAllServerConfigs" resultMap="serverConfigResultMap">
+        select * from ${prefix}ACT_ADM_SERVER_CONFIG
+    </select>
+	
+</mapper>
