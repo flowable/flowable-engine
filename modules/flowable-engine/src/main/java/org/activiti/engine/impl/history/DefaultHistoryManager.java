@@ -297,8 +297,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
       }
     }
     
-    if (createOnNotFound 
-        && activityId != null
+    if (createOnNotFound
         && ( (execution.getCurrentFlowElement() != null && execution.getCurrentFlowElement() instanceof FlowNode) || execution.getCurrentFlowElement() == null)) {
       return createHistoricActivityInstanceEntity(execution);
     }
