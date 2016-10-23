@@ -19,7 +19,6 @@ import java.util.List;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.DynamicBpmnConstants;
-import org.activiti.engine.IdentityService;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
@@ -28,7 +27,6 @@ import org.activiti.engine.impl.variable.VariableTypes;
 import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
-import org.activiti.idm.api.Group;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -1117,13 +1115,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
   }
 
   protected List<String> getGroupsForCandidateUser(String candidateUser) {
-    IdentityService identityService = Context.getProcessEngineConfiguration().getIdentityService();
-    List<Group> groups = identityService.createGroupQuery().groupMember(candidateUser).list();
-    List<String> groupIds = new ArrayList<String>();
-    for (Group group : groups) {
-      groupIds.add(group.getId());
-    }
-    return groupIds;
+    return Context.getProcessEngineConfiguration().getCandidateManager().getGroupsForCandidateUser(candidateUser);
   }
 
   protected void ensureVariablesInitialized() {
