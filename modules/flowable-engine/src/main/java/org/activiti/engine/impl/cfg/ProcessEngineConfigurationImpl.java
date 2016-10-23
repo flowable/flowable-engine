@@ -43,6 +43,8 @@ import javax.xml.namespace.QName;
 import org.activiti.dmn.api.DmnRepositoryService;
 import org.activiti.dmn.api.DmnRuleService;
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.CandidateManager;
+import org.activiti.engine.DefaultCandidateManager;
 import org.activiti.engine.DynamicBpmnService;
 import org.activiti.engine.FlowableEngineAgendaFactory;
 import org.activiti.engine.FormService;
@@ -464,6 +466,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected TaskEntityManager taskEntityManager;
   protected VariableInstanceEntityManager variableInstanceEntityManager;
   
+  // Candidate Manager
+  
+  protected CandidateManager candidateManager;
+
   // History Manager
   
   protected HistoryManager historyManager;
@@ -960,6 +966,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initSessionFactories();
     initDataManagers();
     initEntityManagers();
+    initCandidateManager();
     initHistoryManager();
     initJpa();
     initDeployers();
@@ -1503,6 +1510,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
     if (variableInstanceEntityManager == null) {
       variableInstanceEntityManager = new VariableInstanceEntityManagerImpl(this, variableInstanceDataManager);
+    }
+  }
+  
+  // CandidateManager //////////////////////////////
+  
+  public void initCandidateManager() {
+    if (candidateManager == null) {
+      candidateManager = new DefaultCandidateManager(this);
     }
   }
   
@@ -3706,6 +3721,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public ProcessEngineConfigurationImpl setTableDataManager(TableDataManager tableDataManager) {
     this.tableDataManager = tableDataManager;
     return this;
+  }
+  
+  public CandidateManager getCandidateManager() {
+    return candidateManager;
+  }
+  
+  public void setCandidateManager(CandidateManager candidateManager) {
+    this.candidateManager = candidateManager;
   }
 
   public HistoryManager getHistoryManager() {
