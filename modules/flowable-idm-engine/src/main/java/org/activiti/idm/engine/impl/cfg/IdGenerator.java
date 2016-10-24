@@ -14,7 +14,7 @@ package org.activiti.idm.engine.impl.cfg;
 
 
 /**
- * The scope of an instance of this class is dmn engine, which means that there is only one instance in one dmn engine instance.
+ * The scope of an instance of this class is idm engine, which means that there is only one instance in one idm engine instance.
  * 
  * @author Tijs Rademakers
  * @author Joram Barrez
