@@ -16,6 +16,7 @@ package org.activiti.rest.service.api.identity;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.*;
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.idm.api.Group;
 import org.activiti.rest.exception.ActivitiConflictException;
@@ -30,10 +31,18 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Frederik Heremans
  */
 @RestController
+@Api(tags = { "Groups" }, description = "Manage Groups")
 public class GroupMembershipCollectionResource extends BaseGroupResource {
 
+  @ApiOperation(value = "Add a member to a group", tags = {"Groups"})
+  @ApiResponses(value = {
+          @ApiResponse(code = 201, message = "Indicates the group was found and the member has been added."),
+          @ApiResponse(code = 400, message = "Indicates the userId was not included in the request body."),
+          @ApiResponse(code = 404, message = "Indicates the requested group was not found."),
+          @ApiResponse(code = 409, message = "Indicates the requested user is already a member of the group.")
+  })
   @RequestMapping(value = "/identity/groups/{groupId}/members", method = RequestMethod.POST, produces = "application/json")
-  public MembershipResponse createMembership(@PathVariable String groupId, @RequestBody MembershipRequest memberShip, HttpServletRequest request, HttpServletResponse response) {
+  public MembershipResponse createMembership(@ApiParam(name = "groupId") @PathVariable String groupId, @RequestBody MembershipRequest memberShip, HttpServletRequest request, HttpServletResponse response) {
 
     Group group = getGroupFromRequest(groupId);
 

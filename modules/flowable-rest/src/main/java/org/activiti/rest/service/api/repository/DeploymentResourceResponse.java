@@ -13,6 +13,8 @@ package org.activiti.rest.service.api.repository;
  * limitations under the License.
  */
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author Frederik Heremans
  */
@@ -63,6 +65,7 @@ public class DeploymentResourceResponse {
     this.mediaType = mimeType;
   }
 
+  @ApiModelProperty(value = "Contains the media-type the resource has. This is resolved using a (pluggable) MediaTypeResolver and contains, by default, a limited number of mime-type mappings.")
   public String getMediaType() {
     return mediaType;
   }
@@ -71,6 +74,7 @@ public class DeploymentResourceResponse {
     this.type = type;
   }
 
+  @ApiModelProperty(value = "Type of resource", allowableValues = "resource,processDefinition,processImage")
   public String getType() {
     return type;
   }

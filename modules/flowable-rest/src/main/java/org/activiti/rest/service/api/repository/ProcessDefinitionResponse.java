@@ -13,6 +13,8 @@
 
 package org.activiti.rest.service.api.repository;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author Frederik Heremans
  */
@@ -110,6 +112,7 @@ public class ProcessDefinitionResponse {
     this.resource = resource;
   }
 
+  @ApiModelProperty(value = "Contains the actual deployed BPMN 2.0 xml.")
   public String getResource() {
     return resource;
   }
@@ -126,6 +129,7 @@ public class ProcessDefinitionResponse {
     this.diagramResource = diagramResource;
   }
 
+  @ApiModelProperty(value = "Contains a graphical representation of the process, null when no diagram is available.")
   public String getDiagramResource() {
     return diagramResource;
   }
@@ -134,6 +138,7 @@ public class ProcessDefinitionResponse {
     this.graphicalNotationDefined = graphicalNotationDefined;
   }
 
+  @ApiModelProperty(value = "Indicates the process definition contains graphical information (BPMN DI).")
   public boolean isGraphicalNotationDefined() {
     return graphicalNotationDefined;
   }

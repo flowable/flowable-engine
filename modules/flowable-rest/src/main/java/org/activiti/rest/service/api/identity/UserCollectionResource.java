@@ -19,6 +19,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.*;
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.IdentityService;
 import org.activiti.idm.api.QueryProperty;
@@ -40,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Frederik Heremans
  */
 @RestController
+@Api(tags = { "Users" }, description = "Manage Users")
 public class UserCollectionResource {
 
   protected static HashMap<String, QueryProperty> properties = new HashMap<String, QueryProperty>();
@@ -57,8 +59,24 @@ public class UserCollectionResource {
   @Autowired
   protected IdentityService identityService;
 
+  @ApiOperation(value = "Get a list of users", tags = {"Users"})
+  @ApiImplicitParams({
+          @ApiImplicitParam(name = "id", dataType = "string", value = "Only return group with the given id", paramType = "query"),
+          @ApiImplicitParam(name = "firstName", dataType = "string", value = "Only return users with the given firstname", paramType = "query"),
+          @ApiImplicitParam(name = "lastName", dataType = "string", value = "Only return users with the given lastname", paramType = "query"),
+          @ApiImplicitParam(name = "email", dataType = "string", value = "Only return users with the given email", paramType = "query"),
+          @ApiImplicitParam(name = "firstNameLike", dataType = "string", value = "Only return userswith a firstname like the given value. Use % as wildcard-character.", paramType = "query"),
+          @ApiImplicitParam(name = "lastNameLike", dataType = "string", value = "Only return users with a lastname like the given value. Use % as wildcard-character.", paramType = "query"),
+          @ApiImplicitParam(name = "emailLike", dataType = "string", value = "Only return users with an email like the given value. Use % as wildcard-character.", paramType = "query"),
+          @ApiImplicitParam(name = "memberOfGroup", dataType = "string", value = "Only return users which are a member of the given group.", paramType = "query"),
+          @ApiImplicitParam(name = "potentialStarter", dataType = "string", value = "Only return users  which members are potential starters for a process-definition with the given id.", paramType = "query"),
+          @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues ="id,firstName,lastname,email", paramType = "query"),
+  })
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates the group exists and is returned.")
+  })
   @RequestMapping(value = "/identity/users", method = RequestMethod.GET, produces = "application/json")
-  public DataResponse getUsers(@RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+  public DataResponse getUsers(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
     UserQuery query = identityService.createUserQuery();
 
     if (allRequestParams.containsKey("id")) {
@@ -89,6 +107,12 @@ public class UserCollectionResource {
     return new UserPaginateList(restResponseFactory).paginateList(allRequestParams, query, "id", properties);
   }
 
+  @ApiOperation(value = "Create a user", tags = {"Users"})
+  @ApiResponses(value = {
+          @ApiResponse(code = 201, message = "Indicates the user was created."),
+          @ApiResponse(code = 400, message = "Indicates the id of the user was missing.")
+
+  })
   @RequestMapping(value = "/identity/users", method = RequestMethod.POST, produces = "application/json")
   public UserResponse createUser(@RequestBody UserRequest userRequest, HttpServletRequest request, HttpServletResponse response) {
     if (userRequest.getId() == null) {

@@ -18,6 +18,10 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.RuntimeService;
 import org.activiti.rest.service.api.RestResponseFactory;
@@ -36,6 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Frederik Heremans
  */
 @RestController
+@Api(tags = { "Runtime" }, description = "Manage Runtime")
 public class SignalResource {
 
   @Autowired
@@ -44,6 +49,12 @@ public class SignalResource {
   @Autowired
   protected RuntimeService runtimeService;
 
+  @ApiOperation(value = "Signal event received", tags = {"Runtime"})
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicated signal has been processed and no errors occurred."),
+          @ApiResponse(code = 202, message = "Indicated signal processing is queued as a job, ready to be executed."),
+          @ApiResponse(code = 400, message = "Signal not processed. The signal name is missing or variables are used together with async, which is not allowed. Response body contains additional information about the error.")
+  })
   @RequestMapping(value = "/runtime/signals", method = RequestMethod.POST)
   public void signalEventReceived(@RequestBody SignalEventReceivedRequest signalRequest, HttpServletResponse response) {
     if (signalRequest.getSignalName() == null) {
