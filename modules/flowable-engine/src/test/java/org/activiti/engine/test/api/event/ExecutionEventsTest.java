@@ -39,7 +39,7 @@ public class ExecutionEventsTest extends PluggableActivitiTestCase {
     assertNotNull(processInstance);
 
     // Check create-event
-    assertEquals(5, listener.getEventsReceived().size());
+    assertEquals(6, listener.getEventsReceived().size());
     assertTrue(listener.getEventsReceived().get(0) instanceof ActivitiEntityEvent);
 
     ActivitiEntityEvent event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
@@ -47,14 +47,18 @@ public class ExecutionEventsTest extends PluggableActivitiTestCase {
     assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
 
     event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
+    assertEquals(ActivitiEventType.PROCESS_CREATED, event.getType());
+    assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
+
+    event = (ActivitiEntityEvent) listener.getEventsReceived().get(2);
     assertEquals(ActivitiEventType.ENTITY_INITIALIZED, event.getType());
     assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
     
-    event = (ActivitiEntityEvent) listener.getEventsReceived().get(2);
+    event = (ActivitiEntityEvent) listener.getEventsReceived().get(3);
     assertEquals(ActivitiEventType.ENTITY_CREATED, event.getType());
     assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
 
-    event = (ActivitiEntityEvent) listener.getEventsReceived().get(3);
+    event = (ActivitiEntityEvent) listener.getEventsReceived().get(4);
     assertEquals(ActivitiEventType.ENTITY_INITIALIZED, event.getType());
     assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
     listener.clearEventsReceived();
