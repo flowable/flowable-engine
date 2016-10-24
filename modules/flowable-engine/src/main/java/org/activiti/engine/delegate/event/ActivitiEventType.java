@@ -214,13 +214,13 @@ public enum ActivitiEventType {
   TASK_COMPLETED,
 
   /**
-   * A process has been created.
+   * A process instance has been created. All basic properties have been set, but variables not yet.
    */
   PROCESS_CREATED,
 
   /**
    * A process instance has been started. Dispatched when starting a process instance previously created. The event
-   * PROCESS_STARTED is dispatched after the associated event ENTITY_INITIALIZED.
+   * PROCESS_STARTED is dispatched after the associated event ENTITY_INITIALIZED and after the variables have been set.
    */
   PROCESS_STARTED,
 
