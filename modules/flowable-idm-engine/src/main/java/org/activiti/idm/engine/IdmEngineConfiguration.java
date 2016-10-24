@@ -694,7 +694,7 @@ public class IdmEngineConfiguration {
     if (commandContextFactory == null) {
       commandContextFactory = new CommandContextFactory();
     }
-    commandContextFactory.setDmnEngineConfiguration(this);
+    commandContextFactory.setIdmEngineConfiguration(this);
   }
 
   public void initTransactionContextFactory() {
