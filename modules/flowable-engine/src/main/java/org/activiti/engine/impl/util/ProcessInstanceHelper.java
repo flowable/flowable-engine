@@ -155,6 +155,12 @@ public class ProcessInstanceHelper {
     		.createProcessInstanceExecution(processDefinition, businessKey, processDefinition.getTenantId(), initiatorVariableName);
     
     commandContext.getHistoryManager().recordProcessInstanceStart(processInstance, initialFlowElement);
+
+    boolean eventDispatcherEnabled = Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled();
+    if (eventDispatcherEnabled) {
+      Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+          ActivitiEventBuilder.createEntityEvent(ActivitiEventType.PROCESS_CREATED, processInstance));
+    }
     
     processInstance.setVariables(processDataObjects(process.getDataObjects()));
 
@@ -177,7 +183,7 @@ public class ProcessInstanceHelper {
     }
     
     // Fire events
-    if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+    if (eventDispatcherEnabled) {
       Context.getProcessEngineConfiguration().getEventDispatcher()
         .dispatchEvent(ActivitiEventBuilder.createEntityWithVariablesEvent(ActivitiEventType.ENTITY_INITIALIZED, processInstance, variables, false));
     }
