@@ -120,7 +120,9 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     }
 
     // process template-defined data objects
-    Map<String, Object> variables = processDataObjects(subProcess.getDataObjects());
+    subProcessInstance.setVariables(processDataObjects(subProcess.getDataObjects()));
+    
+    Map<String, Object> variables = new HashMap<String,Object>();
     
     if (callActivity.isInheritVariables()) {
       Map<String, Object> executionVariables = execution.getVariables();
