@@ -16,8 +16,8 @@ import org.activiti.form.api.Form;
 import org.activiti.form.api.FormDeployment;
 import org.activiti.form.model.CompletedFormDefinition;
 import org.activiti.form.model.FormDefinition;
-import org.activiti.rest.form.service.api.form.CompletedFormDefinitionResponse;
-import org.activiti.rest.form.service.api.form.RuntimeFormDefinitionResponse;
+import org.activiti.rest.form.service.api.form.CompletedTaskFormDefinitionResponse;
+import org.activiti.rest.form.service.api.form.TaskFormDefinitionResponse;
 import org.activiti.rest.form.service.api.repository.FormDeploymentResponse;
 import org.activiti.rest.form.service.api.repository.FormResponse;
 
@@ -32,23 +32,23 @@ import java.util.List;
  */
 public class FormRestResponseFactory {
 
-  public RuntimeFormDefinitionResponse createRuntimeFormDefinitionResponse(FormDefinition runtimeFormDefinition) {
+  public TaskFormDefinitionResponse createRuntimeFormDefinitionResponse(FormDefinition runtimeFormDefinition) {
     return createRuntimeFormDefinitionResponse(runtimeFormDefinition, createUrlBuilder());
   }
 
-  public RuntimeFormDefinitionResponse createRuntimeFormDefinitionResponse(FormDefinition runtimeFormDefinition, FormRestUrlBuilder urlBuilder) {
-    RuntimeFormDefinitionResponse response = new RuntimeFormDefinitionResponse(runtimeFormDefinition);
+  public TaskFormDefinitionResponse createRuntimeFormDefinitionResponse(FormDefinition runtimeFormDefinition, FormRestUrlBuilder urlBuilder) {
+    TaskFormDefinitionResponse response = new TaskFormDefinitionResponse(runtimeFormDefinition);
     response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_RUNTIME_TASK_FORM));
 
     return response;
   }
 
-  public CompletedFormDefinitionResponse createCompletedFormDefinitionResponse(CompletedFormDefinition completedFormDefinition) {
-    return createCompletedFormDefinitionResponse(completedFormDefinition, createUrlBuilder());
+  public CompletedTaskFormDefinitionResponse createCompletedTaskFormDefinitionResponse(CompletedFormDefinition completedFormDefinition) {
+    return createCompletedTaskFormDefinitionResponse(completedFormDefinition, createUrlBuilder());
   }
 
-  public CompletedFormDefinitionResponse createCompletedFormDefinitionResponse(CompletedFormDefinition completedFormDefinition, FormRestUrlBuilder urlBuilder) {
-    CompletedFormDefinitionResponse response = new CompletedFormDefinitionResponse(completedFormDefinition);
+  public CompletedTaskFormDefinitionResponse createCompletedTaskFormDefinitionResponse(CompletedFormDefinition completedFormDefinition, FormRestUrlBuilder urlBuilder) {
+    CompletedTaskFormDefinitionResponse response = new CompletedTaskFormDefinitionResponse(completedFormDefinition);
     response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_COMPLETED_TASK_FORM));
 
     return response;

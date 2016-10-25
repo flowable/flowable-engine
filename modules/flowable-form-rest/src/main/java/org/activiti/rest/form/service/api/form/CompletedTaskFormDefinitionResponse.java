@@ -17,24 +17,33 @@
  */
 package org.activiti.rest.form.service.api.form;
 
+import org.activiti.form.model.CompletedFormDefinition;
 import org.activiti.form.model.FormDefinition;
 
 /**
  * @author Yvo Swillens
  */
-public class RuntimeFormDefinitionResponse extends FormDefinition {
+public class CompletedTaskFormDefinitionResponse extends CompletedFormDefinition {
 
   private String url;
 
-  public RuntimeFormDefinitionResponse(FormDefinition formDefinition) {
-    setId(formDefinition.getId());
-    setName(formDefinition.getName());
-    setDescription(formDefinition.getDescription());
-    setKey(formDefinition.getKey());
-    setVersion(formDefinition.getVersion());
-    setFields(formDefinition.getFields());
-    setOutcomes(formDefinition.getOutcomes());
-    setOutcomeVariableName(formDefinition.getOutcomeVariableName());
+  public CompletedTaskFormDefinitionResponse(FormDefinition formDefinition, String url) {
+    super(formDefinition);
+    this.url = url;
+  }
+
+  public CompletedTaskFormDefinitionResponse(CompletedFormDefinition completedFormDefinition) {
+
+    super(completedFormDefinition);
+
+    setSubmittedFormId(completedFormDefinition.getSubmittedFormId());
+    setSubmittedBy(completedFormDefinition.getSubmittedBy());
+    setSubmittedDate(completedFormDefinition.getSubmittedDate());
+    setSelectedOutcome(completedFormDefinition.getSelectedOutcome());
+    setTaskId(completedFormDefinition.getTaskId());
+    setProcessInstanceId(completedFormDefinition.getProcessInstanceId());
+    setProcessDefinitionId(completedFormDefinition.getProcessDefinitionId());
+    setTenantId(completedFormDefinition.getTenantId());
   }
 
   public String getUrl() {
