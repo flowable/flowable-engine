@@ -132,12 +132,6 @@
                   <info>
                     <title>Flowable REST API</title>
                     <version>v1</version>
-                    <description>
-                      This is a sample.
-                    </description>
-                    <termsOfService>
-                      http://www.flowable.org/
-                    </termsOfService>
                     <contact>
                       <email></email>
                       <name>Flowable</name>
@@ -176,12 +170,6 @@
                   <info>
                     <title>Flowable REST API</title>
                     <version>v1</version>
-                    <description>
-                      This is a sample.
-                    </description>
-                    <termsOfService>
-                      http://www.flowable.org/
-                    </termsOfService>
                     <contact>
                       <email></email>
                       <name>Flowable</name>
@@ -220,12 +208,6 @@
                   <info>
                     <title>Flowable REST API</title>
                     <version>v1</version>
-                    <description>
-                      This is a sample.
-                    </description>
-                    <termsOfService>
-                      http://www.flowable.org/
-                    </termsOfService>
                     <contact>
                       <email></email>
                       <name>Flowable</name>
@@ -264,12 +246,6 @@
                   <info>
                     <title>Flowable REST API</title>
                     <version>v1</version>
-                    <description>
-                      This is a sample.
-                    </description>
-                    <termsOfService>
-                      http://www.flowable.org/
-                    </termsOfService>
                     <contact>
                       <email></email>
                       <name>Flowable</name>
@@ -308,12 +284,6 @@
                   <info>
                     <title>Flowable REST API</title>
                     <version>v1</version>
-                    <description>
-                      This is a sample.
-                    </description>
-                    <termsOfService>
-                      http://www.flowable.org/
-                    </termsOfService>
                     <contact>
                       <email></email>
                       <name>Flowable</name>
@@ -354,12 +324,6 @@
                   <info>
                     <title>Flowable Runtime REST API</title>
                     <version>v1</version>
-                    <description>
-                      Runtime REST API
-                    </description>
-                    <termsOfService>
-                      http://www.flowable.org/
-                    </termsOfService>
                     <contact>
                       <email></email>
                       <name>Flowable</name>
@@ -398,12 +362,6 @@
                   <info>
                     <title>Flowable Runtime REST API</title>
                     <version>v1</version>
-                    <description>
-                      Runtime REST API
-                    </description>
-                    <termsOfService>
-                      http://www.flowable.org/
-                    </termsOfService>
                     <contact>
                       <email></email>
                       <name>Flowable</name>
@@ -442,12 +400,6 @@
                   <info>
                     <title>Flowable Runtime REST API</title>
                     <version>v1</version>
-                    <description>
-                      Runtime REST API
-                    </description>
-                    <termsOfService>
-                      http://www.flowable.org/
-                    </termsOfService>
                     <contact>
                       <email></email>
                       <name>Flowable</name>
@@ -486,12 +438,6 @@
                   <info>
                     <title>Flowable REST API</title>
                     <version>v1</version>
-                    <description>
-                      This is a sample.
-                    </description>
-                    <termsOfService>
-                      http://www.flowable.org/
-                    </termsOfService>
                     <contact>
                       <email></email>
                       <name>Flowable</name>
