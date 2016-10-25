@@ -465,8 +465,8 @@ public class DbSqlSession implements Session {
         
         if (!isEntityInserted(cachedEntity) && 
             (ExecutionEntity.class.isAssignableFrom(cachedEntity.getClass()) || !isEntityToBeDeleted(cachedEntity)) &&
-            cachedObject.hasChanged() 
-            ) {
+            cachedObject.hasChanged()) {
+          
           updatedObjects.add(cachedEntity);
         }
       }

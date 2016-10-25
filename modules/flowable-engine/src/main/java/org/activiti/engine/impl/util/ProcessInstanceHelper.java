@@ -14,6 +14,8 @@ package org.activiti.engine.impl.util;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.activiti.bpmn.model.BpmnModel;
@@ -26,11 +28,13 @@ import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.ValuedDataObject;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
+import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
 import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.activiti.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -41,7 +45,7 @@ import org.activiti.engine.runtime.ProcessInstance;
  */
 public class ProcessInstanceHelper {
   
-  public ProcessInstance createProcessInstance(ProcessDefinitionEntity processDefinition, 
+  public ProcessInstance createProcessInstance(ProcessDefinition processDefinition, 
       String businessKey, String processInstanceName, Map<String, Object> variables, Map<String, Object> transientVariables) {
     
     return createAndStartProcessInstance(processDefinition, businessKey, processInstanceName, variables, transientVariables, false);
@@ -151,6 +155,12 @@ public class ProcessInstanceHelper {
     		.createProcessInstanceExecution(processDefinition, businessKey, processDefinition.getTenantId(), initiatorVariableName);
     
     commandContext.getHistoryManager().recordProcessInstanceStart(processInstance, initialFlowElement);
+
+    boolean eventDispatcherEnabled = Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled();
+    if (eventDispatcherEnabled) {
+      Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+          ActivitiEventBuilder.createEntityEvent(ActivitiEventType.PROCESS_CREATED, processInstance));
+    }
     
     processInstance.setVariables(processDataObjects(process.getDataObjects()));
 
@@ -173,7 +183,7 @@ public class ProcessInstanceHelper {
     }
     
     // Fire events
-    if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+    if (eventDispatcherEnabled) {
       Context.getProcessEngineConfiguration().getEventDispatcher()
         .dispatchEvent(ActivitiEventBuilder.createEntityWithVariablesEvent(ActivitiEventType.ENTITY_INITIALIZED, processInstance, variables, false));
     }
@@ -182,46 +192,64 @@ public class ProcessInstanceHelper {
     ExecutionEntity execution = commandContext.getExecutionEntityManager().createChildExecution(processInstance); 
     execution.setCurrentFlowElement(initialFlowElement);
     
-    // Event sub process handling
-    for (FlowElement flowElement : process.getFlowElements()) {
-      if (flowElement instanceof EventSubProcess) {
-        EventSubProcess eventSubProcess = (EventSubProcess) flowElement;
-        for (FlowElement subElement : eventSubProcess.getFlowElements()) {
-          if (subElement instanceof StartEvent) {
-            StartEvent startEvent = (StartEvent) subElement;
-            if (CollectionUtil.isNotEmpty(startEvent.getEventDefinitions())) {
-              EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
-              if (eventDefinition instanceof MessageEventDefinition) {
-                MessageEventDefinition messageEventDefinition = (MessageEventDefinition) eventDefinition;
-                BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processInstance.getProcessDefinitionId());
-                if (bpmnModel.containsMessageId(messageEventDefinition.getMessageRef())) {
-                  messageEventDefinition.setMessageRef(bpmnModel.getMessage(messageEventDefinition.getMessageRef()).getName());
-                }
-                ExecutionEntity messageExecution = commandContext.getExecutionEntityManager().createChildExecution(processInstance); 
-                messageExecution.setCurrentFlowElement(startEvent);
-                messageExecution.setEventScope(true);
-                commandContext.getEventSubscriptionEntityManager().insertMessageEvent(messageEventDefinition.getMessageRef(), messageExecution);
-              }
-            }
-          }
-        }
-      }
-    }
-    
     if (startProcessInstance) {
       startProcessInstance(processInstance, commandContext, variables);
     }
 
     return processInstance;
   }
-  
+
   public void startProcessInstance(ExecutionEntity processInstance, CommandContext commandContext, Map<String, Object> variables) {
+
+    Process process = ProcessDefinitionUtil.getProcess(processInstance.getProcessDefinitionId());
+
+    // Event sub process handling
+    List<MessageEventSubscriptionEntity> messageEventSubscriptions = new LinkedList<>();
+    for (FlowElement flowElement : process.getFlowElements()) {
+      if (flowElement instanceof EventSubProcess == false) {
+        continue;
+      }
+      
+      EventSubProcess eventSubProcess = (EventSubProcess) flowElement;
+      for (FlowElement subElement : eventSubProcess.getFlowElements()) {
+        if (subElement instanceof StartEvent == false) {
+          continue;
+        }
+          
+        StartEvent startEvent = (StartEvent) subElement;
+        if (CollectionUtil.isEmpty(startEvent.getEventDefinitions())) {
+          continue;
+        }
+          
+        EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
+        if (eventDefinition instanceof MessageEventDefinition) {
+          MessageEventDefinition messageEventDefinition = (MessageEventDefinition) eventDefinition;
+          BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processInstance.getProcessDefinitionId());
+          if (bpmnModel.containsMessageId(messageEventDefinition.getMessageRef())) {
+            messageEventDefinition.setMessageRef(bpmnModel.getMessage(messageEventDefinition.getMessageRef()).getName());
+          }
+          ExecutionEntity messageExecution = commandContext.getExecutionEntityManager().createChildExecution(processInstance);
+          messageExecution.setCurrentFlowElement(startEvent);
+          messageExecution.setEventScope(true);
+          messageEventSubscriptions.add(commandContext.getEventSubscriptionEntityManager().insertMessageEvent(
+              messageEventDefinition.getMessageRef(), messageExecution));
+        }
+      }
+    }
+
     ExecutionEntity execution = processInstance.getExecutions().get(0); // There will always be one child execution created
     commandContext.getAgenda().planContinueProcessOperation(execution);
-    
+
     if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-      Context.getProcessEngineConfiguration().getEventDispatcher()
-        .dispatchEvent(ActivitiEventBuilder.createProcessStartedEvent(execution, variables, false));
+      ActivitiEventDispatcher eventDispatcher = Context.getProcessEngineConfiguration().getEventDispatcher();
+      eventDispatcher.dispatchEvent(ActivitiEventBuilder.createProcessStartedEvent(execution, variables, false));
+
+      for (MessageEventSubscriptionEntity messageEventSubscription : messageEventSubscriptions) {
+        commandContext.getProcessEngineConfiguration().getEventDispatcher()
+            .dispatchEvent(ActivitiEventBuilder.createMessageEvent(ActivitiEventType.ACTIVITY_MESSAGE_WAITING, messageEventSubscription.getActivityId(),
+                messageEventSubscription.getEventName(), null, messageEventSubscription.getExecution().getId(),
+                messageEventSubscription.getProcessInstanceId(), messageEventSubscription.getProcessDefinitionId()));
+      }
     }
   }
   

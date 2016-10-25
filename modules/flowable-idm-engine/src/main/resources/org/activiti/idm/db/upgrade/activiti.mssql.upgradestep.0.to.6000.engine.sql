@@ -18,3 +18,15 @@ create table ACT_ID_BYTEARRAY (
     BYTES_  varbinary(max),
     primary key (ID_)
 );
+
+create table ACT_ID_TOKEN (
+    ID_ nvarchar(64) not null,
+    REV_ int,
+    TOKEN_VALUE_ nvarchar(255),
+    TOKEN_DATE_ datetime,
+    IP_ADDRESS_ nvarchar(255),
+    USER_AGENT_ nvarchar(255),
+    USER_ID_ nvarchar(255),
+    TOKEN_DATA_ nvarchar(2000),
+    primary key (ID_)
+);

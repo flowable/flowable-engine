@@ -28,6 +28,7 @@ import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.Expression;
+import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
@@ -112,6 +113,12 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         processDefinition,executionEntity, businessKey);
     Context.getCommandContext().getHistoryManager().recordSubProcessInstanceStart(executionEntity, subProcessInstance, initialFlowElement);
 
+    boolean eventDispatcherEnabled = Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled();
+    if (eventDispatcherEnabled) {
+      Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+          ActivitiEventBuilder.createEntityEvent(ActivitiEventType.PROCESS_CREATED, subProcessInstance));
+    }
+
     // process template-defined data objects
     Map<String, Object> variables = processDataObjects(subProcess.getDataObjects());
     
@@ -145,8 +152,10 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
     Context.getAgenda().planContinueProcessOperation(subProcessInitialExecution);
     
-    Context.getProcessEngineConfiguration().getEventDispatcher()
-      .dispatchEvent(ActivitiEventBuilder.createProcessStartedEvent(subProcessInitialExecution, variables, false));
+    if (eventDispatcherEnabled) {
+      Context.getProcessEngineConfiguration().getEventDispatcher()
+        .dispatchEvent(ActivitiEventBuilder.createProcessStartedEvent(subProcessInitialExecution, variables, false));
+    }
   }
   
   public void completing(DelegateExecution execution, DelegateExecution subProcessInstance) throws Exception {

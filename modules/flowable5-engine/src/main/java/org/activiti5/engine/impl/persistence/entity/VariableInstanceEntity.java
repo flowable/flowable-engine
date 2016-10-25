@@ -85,8 +85,7 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
   }
   
   public void forceUpdate() {
-	    forcedUpdate = true;
-	  
+    forcedUpdate = true;
   }
 
   public void delete() {
@@ -120,6 +119,10 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
       persistentState.put("forcedUpdate", Boolean.TRUE);
     }
     return persistentState;
+  }
+  
+  public boolean isDeleted() {
+    return deleted;
   }
   
   // lazy initialized relations ///////////////////////////////////////////////

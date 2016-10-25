@@ -14,6 +14,7 @@ package org.activiti.engine.impl.agenda;
 
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.HasExecutionListeners;
+import org.activiti.engine.FlowableEngineAgenda;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
@@ -25,7 +26,7 @@ import org.activiti.engine.impl.util.ProcessDefinitionUtil;
  * Abstract superclass for all operation interfaces (which are {@link Runnable} instances),
  * exposing some shared helper methods and member fields to subclasses.
  * 
- * An operations is a {@link Runnable} instance that is put on the {@link Agenda} during
+ * An operations is a {@link Runnable} instance that is put on the {@link FlowableEngineAgenda} during
  * the execution of a {@link Command}.
  * 
  * @author Joram Barrez
@@ -33,7 +34,7 @@ import org.activiti.engine.impl.util.ProcessDefinitionUtil;
 public abstract class AbstractOperation implements Runnable {
 
   protected CommandContext commandContext;
-  protected Agenda agenda;
+  protected FlowableEngineAgenda agenda;
   protected ExecutionEntity execution;
 
   public AbstractOperation() {
@@ -105,11 +106,11 @@ public abstract class AbstractOperation implements Runnable {
     this.commandContext = commandContext;
   }
 
-  public Agenda getAgenda() {
+  public FlowableEngineAgenda getAgenda() {
     return agenda;
   }
 
-  public void setAgenda(Agenda agenda) {
+  public void setAgenda(FlowableEngineAgenda agenda) {
     this.agenda = agenda;
   }
 

@@ -129,10 +129,20 @@ public enum ActivitiEventType {
   ACTIVITY_COMPENSATE,
 
   /**
+   * A boundary, intermediate, or subprocess start message catching event has started.
+   */
+  ACTIVITY_MESSAGE_WAITING,
+
+  /**
    * An activity has received a message event. Dispatched before the actual message has been received by the activity. This event will be either followed by a {@link #ACTIVITY_SIGNALLED} event or
    * {@link #ACTIVITY_COMPLETE} for the involved activity, if the message was delivered successfully.
    */
   ACTIVITY_MESSAGE_RECEIVED,
+
+  /**
+   * A boundary, intermediate, or subprocess start message catching event has been cancelled.
+   */
+  ACTIVITY_MESSAGE_CANCELLED,
 
   /**
    * An activity has received an error event. Dispatched before the actual error has been received by the activity. This event will be either followed by a {@link #ACTIVITY_SIGNALLED} event or
@@ -203,10 +213,15 @@ public enum ActivitiEventType {
    */
   TASK_COMPLETED,
 
-    /**
-     * A process instance has been started. Dispatched when starting a process instance previously created. The event
-     * PROCESS_STARTED is dispatched after the associated event ENTITY_INITIALIZED.
-     */
+  /**
+   * A process instance has been created. All basic properties have been set, but variables not yet.
+   */
+  PROCESS_CREATED,
+
+  /**
+   * A process instance has been started. Dispatched when starting a process instance previously created. The event
+   * PROCESS_STARTED is dispatched after the associated event ENTITY_INITIALIZED and after the variables have been set.
+   */
   PROCESS_STARTED,
 
   /**

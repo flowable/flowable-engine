@@ -552,7 +552,7 @@ When *deploying* a process definition with one or more message start events, the
 
 * The name of the message start event must be unique across a given process definition. A process definition must not have multiple message start events with the same name. Flowable throws an exception upon deployment of a process definition such that two or more message start events reference the same message	of if two or more message start events reference messages with the same message name.
 * The name of the message start event must be unique across all deployed process definitions. Flowable throws an exception upon deployment of a process definition such that one or more message start events reference a message with the same name as a message start event already deployed by a different process definition.
-* Process versioning: Upon deployment of a new version of a process definition, the message subscriptions of the previous version are cancelled. This is also true for message events that are not present in the new version.
+* Process versioning: Upon deployment of a new version of a process definition, the start message subscriptions of the previous version are removed.
 
 When *starting* a process instance, a message start event can be triggered using the following methods on the ++RuntimeService++:
 

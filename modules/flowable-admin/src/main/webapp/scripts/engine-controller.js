@@ -31,14 +31,13 @@ activitiAdminApp.controller('EngineController', ['$rootScope', '$scope', '$http'
 		        // load default endpoint configs properties
 		        $http({method: 'GET', url: '/app/rest/server-configs/default'}).
 	            success(function(defaultServerconfig, status, headers, config) {
-	                defaultServerconfig.clusterConfigId = $scope.activeCluster.id;
 	                showEditpointConfigModel(defaultServerconfig);
 	            });
 		    }
 			
 		    function showEditpointConfigModel(server) {
 		        var cloneOfModel = {};
-	            for(var prop in server) {
+	            for (var prop in server) {
 	                cloneOfModel[prop] = server[prop];
 	            }
 
@@ -61,11 +60,11 @@ activitiAdminApp.controller('EngineController', ['$rootScope', '$scope', '$http'
 
 		$scope.checkEndpointConfig = function() {
 			$http({method: 'GET', url: '/app/rest/activiti/engine-info', ignoreErrors: true}).
-        	success(function(data, status, headers, config) {
-        	  $scope.addAlert($translate.instant('ALERT.ENGINE.ENDPOINT-VALID', data), 'info');
-            }).error(function(data, status, headers, config) {
-              $scope.addAlert($translate.instant('ALERT.ENGINE.ENDPOINT-INVALID',  $rootScope.activeServer), 'error');
-            });
+	        	success(function(data, status, headers, config) {
+	        	  $scope.addAlert($translate.instant('ALERT.ENGINE.ENDPOINT-VALID', data), 'info');
+	            }).error(function(data, status, headers, config) {
+	              $scope.addAlert($translate.instant('ALERT.ENGINE.ENDPOINT-INVALID',  $rootScope.activeServer), 'error');
+	            });
 		};
     }]);
 
@@ -76,6 +75,8 @@ activitiAdminApp.controller('EditEndpointConfigModalInstanceCrtl',
 	$scope.model = {server: server};
 
 	$scope.status = {loading: false};
+	
+	console.log($scope.model.server);
 
     $scope.ok = function () {
       $scope.status.loading = true;

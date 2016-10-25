@@ -56,6 +56,18 @@ create table ACT_ID_INFO (
     primary key (ID_)
 );
 
+create table ACT_ID_TOKEN (
+    ID_ NVARCHAR2(64) not null,
+    REV_ INTEGER,
+    TOKEN_VALUE_ NVARCHAR2(255),
+    TOKEN_DATE_ TIMESTAMP(6),
+    IP_ADDRESS_ NVARCHAR2(255),
+    USER_AGENT_ NVARCHAR2(255),
+    USER_ID_ NVARCHAR2(255),
+    TOKEN_DATA_ NVARCHAR2(2000),
+    primary key (ID_)
+);
+
 create index ACT_IDX_MEMB_GROUP on ACT_ID_MEMBERSHIP(GROUP_ID_);
 alter table ACT_ID_MEMBERSHIP 
     add constraint ACT_FK_MEMB_GROUP 

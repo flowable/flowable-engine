@@ -32,6 +32,7 @@ import org.activiti.engine.impl.cfg.TransactionContextFactory;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.interceptor.SessionFactory;
 import org.activiti.form.api.FormRepositoryService;
+import org.activiti.idm.api.IdmIdentityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +54,7 @@ public class ProcessEngineImpl implements ProcessEngine {
   protected DynamicBpmnService dynamicBpmnService;
   protected FormRepositoryService formEngineRepositoryService;
   protected org.activiti.form.api.FormService formEngineFormService;
+  protected IdmIdentityService idmIdentityService;
   protected AsyncExecutor asyncExecutor;
   protected CommandExecutor commandExecutor;
   protected Map<Class<?>, SessionFactory> sessionFactories;
@@ -76,6 +78,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     this.transactionContextFactory = processEngineConfiguration.getTransactionContextFactory();
     this.formEngineRepositoryService = processEngineConfiguration.getFormEngineRepositoryService();
     this.formEngineFormService = processEngineConfiguration.getFormEngineFormService();
+    this.idmIdentityService = processEngineConfiguration.getIdmIdentityService();
 
     if (processEngineConfiguration.isUsingRelationalDatabase() && processEngineConfiguration.getDatabaseSchemaUpdate() != null) {
       commandExecutor.execute(processEngineConfiguration.getSchemaCommandConfig(), new SchemaOperationsProcessEngineBuild());
@@ -164,5 +167,9 @@ public class ProcessEngineImpl implements ProcessEngine {
   
   public org.activiti.form.api.FormService getFormEngineFormService() {
     return formEngineFormService;
+  }
+  
+  public IdmIdentityService getIdmIdentityService() {
+    return idmIdentityService;
   }
 }

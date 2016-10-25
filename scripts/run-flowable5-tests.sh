@@ -84,7 +84,7 @@ fi
 cd ../..
 
 cd modules/flowable-cxf/
-mvn clean install
+mvn clean install -DskipTests
 
 STATUS=$?
 if [ $STATUS -ne 0 ]
@@ -108,7 +108,7 @@ fi
 cd ../..
 
 cd modules/flowable-camel/
-mvn clean install
+mvn clean install -DskipTests
 
 STATUS=$?
 if [ $STATUS -ne 0 ]

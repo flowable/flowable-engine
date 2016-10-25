@@ -226,7 +226,7 @@ public class ProcessInstanceSuspensionTest extends PluggableActivitiTestCase {
       fail();
     } catch (ActivitiException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
 
     try {
@@ -234,7 +234,7 @@ public class ProcessInstanceSuspensionTest extends PluggableActivitiTestCase {
       fail();
     } catch (ActivitiException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
 
     try {
@@ -242,7 +242,7 @@ public class ProcessInstanceSuspensionTest extends PluggableActivitiTestCase {
       fail();
     } catch (ActivitiException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
 
     try {
@@ -250,7 +250,7 @@ public class ProcessInstanceSuspensionTest extends PluggableActivitiTestCase {
       fail();
     } catch (ActivitiException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
 
     try {
@@ -258,7 +258,7 @@ public class ProcessInstanceSuspensionTest extends PluggableActivitiTestCase {
       fail();
     } catch (ActivitiException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
 
     try {
@@ -266,7 +266,7 @@ public class ProcessInstanceSuspensionTest extends PluggableActivitiTestCase {
       fail();
     } catch (ActivitiException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
 
     try {
@@ -274,7 +274,7 @@ public class ProcessInstanceSuspensionTest extends PluggableActivitiTestCase {
       fail();
     } catch (ActivitiException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
 
     try {
@@ -282,7 +282,7 @@ public class ProcessInstanceSuspensionTest extends PluggableActivitiTestCase {
       fail();
     } catch (ActivitiException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
 
     try {
@@ -290,7 +290,7 @@ public class ProcessInstanceSuspensionTest extends PluggableActivitiTestCase {
       fail();
     } catch (ActivitiException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
 
     try {
@@ -298,7 +298,7 @@ public class ProcessInstanceSuspensionTest extends PluggableActivitiTestCase {
       fail();
     } catch (ActivitiException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
 
     try {
@@ -306,7 +306,7 @@ public class ProcessInstanceSuspensionTest extends PluggableActivitiTestCase {
       fail();
     } catch (ActivitiException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
 
     try {
@@ -314,7 +314,7 @@ public class ProcessInstanceSuspensionTest extends PluggableActivitiTestCase {
       fail();
     } catch (ActivitiException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
 
     try {
@@ -322,7 +322,7 @@ public class ProcessInstanceSuspensionTest extends PluggableActivitiTestCase {
       fail();
     } catch (ActivitiException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
 
     try {
@@ -330,7 +330,7 @@ public class ProcessInstanceSuspensionTest extends PluggableActivitiTestCase {
       fail();
     } catch (ActivitiException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
   }
 
