@@ -143,5 +143,10 @@
       <version>3.1.0</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <scope>compile</scope>
+    </dependency>
   </dependencies>
 </project>
