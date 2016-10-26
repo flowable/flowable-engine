@@ -66,6 +66,10 @@ public interface TaskEntity extends VariableScope, Task, DelegateTask, Entity, H
   
   void setDeleted(boolean isDeleted);
 
+  boolean isCanceled();
+  
+  void setCanceled(boolean isCanceled);
+  
   Date getClaimTime();
 
   void setClaimTime(Date claimTime);

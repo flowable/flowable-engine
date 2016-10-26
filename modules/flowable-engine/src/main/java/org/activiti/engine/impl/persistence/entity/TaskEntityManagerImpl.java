@@ -175,12 +175,12 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
                   task.getProcessDefinitionId(), "userTask", deleteReason));
       }
 
-      deleteTask(task, deleteReason, cascade, false);
+      deleteTask(task, deleteReason, cascade);
     }
   }
   
   @Override
-  public void deleteTask(TaskEntity task, String deleteReason, boolean cascade, boolean cancel) {
+  public void deleteTask(TaskEntity task, String deleteReason, boolean cascade) {
     if (!task.isDeleted()) {
       getProcessEngineConfiguration().getListenerNotificationHelper()
         .executeTaskListeners(task, TaskListener.EVENTNAME_DELETE);
@@ -190,7 +190,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
 
       List<Task> subTasks = findTasksByParentTaskId(taskId);
       for (Task subTask : subTasks) {
-        deleteTask((TaskEntity) subTask, deleteReason, cascade, cancel);
+        deleteTask((TaskEntity) subTask, deleteReason, cascade);
       }
 
       getIdentityLinkEntityManager().deleteIdentityLinksByTaskId(taskId);
@@ -204,17 +204,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
 
       delete(task, false);
 
-      if (getEventDispatcher().isEnabled()) {
-        if (cancel) {
-          getEventDispatcher().dispatchEvent(
-                  ActivitiEventBuilder.createActivityCancelledEvent(task.getExecution() != null ? task.getExecution().getActivityId() : null, 
-                      task.getName(), task.getExecutionId(), 
-                      task.getProcessInstanceId(),
-                      task.getProcessDefinitionId(), 
-                      "userTask", 
-                      deleteReason));
-        }
-        
+      if (getEventDispatcher().isEnabled()) {        
         getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_DELETED, task));
       }
     }
@@ -288,7 +278,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         return;
       }
 
-      deleteTask(task, deleteReason, cascade, false);
+      deleteTask(task, deleteReason, cascade);
     } else if (cascade) {
       getHistoricTaskInstanceEntityManager().delete(taskId);
     }
