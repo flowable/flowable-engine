@@ -15,6 +15,7 @@ package org.activiti.rest.service.api.engine;
 
 import java.util.Date;
 
+import io.swagger.annotations.ApiModelProperty;
 import org.activiti.rest.common.util.DateToStringSerializer;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -77,6 +78,7 @@ public class AttachmentResponse {
     this.description = description;
   }
 
+  @ApiModelProperty(value = "Can be any arbitrary value. When a valid formatted media-type (e.g. application/xml, text/plain) is included, the binary content HTTP response content-type will be set the the given value.")
   public String getType() {
     return type;
   }
@@ -101,6 +103,7 @@ public class AttachmentResponse {
     this.processInstanceUrl = processInstanceUrl;
   }
 
+  @ApiModelProperty(value = "contentUrl:In case the attachment is a link to an external resource, the externalUrl contains the URL to the external content. If the attachment content is present in the Flowable engine, the contentUrl will contain an URL where the binary content can be streamed from.")
   public String getExternalUrl() {
     return externalUrl;
   }

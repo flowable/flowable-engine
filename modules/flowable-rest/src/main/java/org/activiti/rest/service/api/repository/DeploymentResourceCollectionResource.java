@@ -17,6 +17,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import io.swagger.annotations.*;
 import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.Deployment;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Frederik Heremans
  */
 @RestController
+@Api(tags = { "Deployment" }, description = "Manage Deployment")
 public class DeploymentResourceCollectionResource {
 
   @Autowired
@@ -43,8 +45,13 @@ public class DeploymentResourceCollectionResource {
   @Autowired
   protected RepositoryService repositoryService;
 
+  @ApiOperation(value = "List resources in a deployment", tags = {"Deployment"}, notes="The dataUrl property in the resulting JSON for a single resource contains the actual URL to use for retrieving the binary resource.")
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates the deployment was found and the resource list has been returned."),
+          @ApiResponse(code = 404, message = "Indicates the requested deployment was not found.")
+  })
   @RequestMapping(value = "/repository/deployments/{deploymentId}/resources", method = RequestMethod.GET, produces = "application/json")
-  public List<DeploymentResourceResponse> getDeploymentResources(@PathVariable String deploymentId, HttpServletRequest request) {
+  public List<DeploymentResourceResponse> getDeploymentResources(@ApiParam(name = "deploymentId") @PathVariable String deploymentId, HttpServletRequest request) {
     // Check if deployment exists
     Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
     if (deployment == null) {

@@ -15,6 +15,7 @@ package org.activiti.rest.service.api.runtime.process;
 
 import java.util.List;
 
+import io.swagger.annotations.*;
 import org.activiti.engine.runtime.Execution;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,11 +25,19 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Frederik Heremans
  */
+
 @RestController
+@Api(tags = { "Executions" }, description = "Manage Executions")
 public class ExecutionActiveActivitiesCollectionResource extends ExecutionBaseResource {
 
+  @ApiOperation(value = "Get active activities in an execution", tags = {"Executions"},
+  notes = "Returns all activities which are active in the execution and in all child-executions (and their children, recursively), if any.")
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates the execution was found and activities are returned."),
+          @ApiResponse(code = 404, message = "Indicates the execution was not found.")
+  })
   @RequestMapping(value = "/runtime/executions/{executionId}/activities", method = RequestMethod.GET, produces = "application/json")
-  public List<String> getActiveActivities(@PathVariable String executionId) {
+  public List<String> getActiveActivities(@ApiParam(name = "executionId") @PathVariable String executionId) {
     Execution execution = getExecutionFromRequest(executionId);
     return runtimeService.getActiveActivityIds(execution.getId());
   }

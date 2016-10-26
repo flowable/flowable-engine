@@ -19,6 +19,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.*;
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.IdentityService;
 import org.activiti.idm.api.Group;
@@ -40,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Frederik Heremans
  */
 @RestController
+@Api(tags = { "Groups" }, description = "Manage Groups")
 public class GroupCollectionResource {
 
   protected static HashMap<String, QueryProperty> properties = new HashMap<String, QueryProperty>();
@@ -56,8 +58,21 @@ public class GroupCollectionResource {
   @Autowired
   protected IdentityService identityService;
 
+  @ApiOperation(value = "Get a list of groups", tags = {"Groups"}, produces = "application/json")
+  @ApiImplicitParams({
+          @ApiImplicitParam(name = "id", dataType = "string", value = "Only return group with the given id", paramType = "query"),
+          @ApiImplicitParam(name = "name", dataType = "string", value = "Only return groups with the given name", paramType = "query"),
+          @ApiImplicitParam(name = "type", dataType = "string", value = "Only return groups with the given type", paramType = "query"),
+          @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return groups with a name like the given value. Use % as wildcard-character.", paramType = "query"),
+          @ApiImplicitParam(name = "member", dataType = "string", value = "Only return groups which have a member with the given username.", paramType = "query"),
+          @ApiImplicitParam(name = "potentialStarter", dataType = "string", value = "Only return groups which members are potential starters for a process-definition with the given id.", paramType = "query"),
+          @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues ="id,name,type", paramType = "query"),
+  })
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates the requested groups were returned.")
+  })
   @RequestMapping(value = "/identity/groups", method = RequestMethod.GET, produces = "application/json")
-  public DataResponse getGroups(@RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+  public DataResponse getGroups(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
     GroupQuery query = identityService.createGroupQuery();
 
     if (allRequestParams.containsKey("id")) {
@@ -79,6 +94,11 @@ public class GroupCollectionResource {
     return new GroupPaginateList(restResponseFactory).paginateList(allRequestParams, query, "id", properties);
   }
 
+  @ApiOperation(value = "Create a group", tags = {"Groups"})
+  @ApiResponses(value = {
+          @ApiResponse(code = 201, message = "Indicates the group was created."),
+          @ApiResponse(code = 400, message = "Indicates the id of the group was missing.")
+  })
   @RequestMapping(value = "/identity/groups", method = RequestMethod.POST, produces = "application/json")
   public GroupResponse createGroup(@RequestBody GroupRequest groupRequest, HttpServletRequest httpRequest, HttpServletResponse response) {
     if (groupRequest.getId() == null) {
