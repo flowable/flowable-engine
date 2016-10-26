@@ -1,18 +1,30 @@
+/**
+ * Activiti app component part of the Activiti project
+ * Copyright 2005-2015 Alfresco Software, Ltd. All rights reserved.
+ * <p>
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * <p>
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 package org.activiti.rest.servlet;
 
-import java.util.List;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.activiti.rest.service.api.PutAwareCommonsMultipartResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
@@ -20,20 +32,17 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 
-@Configuration
-@ComponentScan({ "org.activiti.rest.exception", "org.activiti.rest.service.api" })
-@EnableAsync
-public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
+/**
+ * @author Yvo Swillens
+ */
+public class BaseDispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
-  private final Logger log = LoggerFactory.getLogger(DispatcherServletConfiguration.class);
-
-  @Autowired
-  private ObjectMapper objectMapper;
+  protected final Logger log = LoggerFactory.getLogger(BaseDispatcherServletConfiguration.class);
 
   @Autowired
-  private Environment environment;
+  protected ObjectMapper objectMapper;
 
   @Bean
   public SessionLocaleResolver localeResolver() {
@@ -80,5 +89,4 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
   protected void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
     configurer.favorPathExtension(false);
   }
-
 }
