@@ -29,7 +29,7 @@ public class FlowableFormEngineConfiguration extends BaseEngineConfiguration {
   public FormEngine formEngine() {
     FormEngineConfiguration formEngineConfiguration = new FormEngineConfiguration();
     formEngineConfiguration.setDataSource(dataSource());
-    formEngineConfiguration.setDatabaseSchemaUpdate(environment.getProperty("engine.dmn.schema.update", "true"));
+    formEngineConfiguration.setDatabaseSchemaUpdate(environment.getProperty("engine.form.schema.update", "true"));
 
     return formEngineConfiguration.buildFormEngine();
   }
