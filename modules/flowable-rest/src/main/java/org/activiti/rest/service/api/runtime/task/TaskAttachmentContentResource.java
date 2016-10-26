@@ -17,6 +17,7 @@ import java.io.InputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.*;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.history.HistoricTaskInstance;
@@ -35,10 +36,17 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Frederik Heremans
  */
 @RestController
+@Api(tags = { "Tasks" }, description = "Manage Tasks")
 public class TaskAttachmentContentResource extends TaskBaseResource {
 
+  @ApiOperation(value = "Get the content for an attachment", tags = {"Tasks"},
+  notes = "The response body contains the binary content. By default, the content-type of the response is set to application/octet-stream unless the attachment type contains a valid Content-type.")
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates the task and attachment was found and the requested content is returned."),
+          @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have an attachment with the given id or the attachment doesn’t have a binary stream available. Status message provides additional information.")
+  })
   @RequestMapping(value = "/runtime/tasks/{taskId}/attachments/{attachmentId}/content", method = RequestMethod.GET)
-  public ResponseEntity<byte[]> getAttachmentContent(@PathVariable("taskId") String taskId, @PathVariable("attachmentId") String attachmentId, HttpServletResponse response) {
+  public ResponseEntity<byte[]> getAttachmentContent(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "attachmentId") @PathVariable("attachmentId") String attachmentId, HttpServletResponse response) {
 
     HistoricTaskInstance task = getHistoricTaskFromRequest(taskId);
     Attachment attachment = taskService.getAttachment(attachmentId);

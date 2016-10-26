@@ -15,6 +15,7 @@ package org.activiti.rest.service.api.management;
 
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.*;
 import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.runtime.Job;
@@ -29,13 +30,19 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Joram Barrez
  */
 @RestController
+@Api(tags = { "Jobs" }, description = "Manage Jobs")
 public class JobExceptionStacktraceResource {
 
   @Autowired
   protected ManagementService managementService;
 
+  @ApiOperation(value = "Get the exception stacktrace for a job", tags = {"Jobs"})
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates the requested job was not found and the stacktrace has been returned. The response contains the raw stacktrace and always has a Content-type of text/plain."),
+          @ApiResponse(code = 404, message = "Indicates the requested job was not found or the job doesn’t have an exception stacktrace. Status-description contains additional information about the error.")
+  })
   @RequestMapping(value = "/management/jobs/{jobId}/exception-stacktrace", method = RequestMethod.GET)
-  public String getJobStacktrace(@PathVariable String jobId, HttpServletResponse response) {
+  public String getJobStacktrace(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
     Job job = managementService.createJobQuery().jobId(jobId).singleResult();
     if (job == null) {
       throw new ActivitiObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
@@ -50,9 +57,14 @@ public class JobExceptionStacktraceResource {
     response.setContentType("text/plain");
     return stackTrace;
   }
-  
+
+  @ApiOperation(value = "Get the exception stacktrace for a timer job", tags = {"Jobs"})
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates the requested job was not found and the stacktrace has been returned. The response contains the raw stacktrace and always has a Content-type of text/plain."),
+          @ApiResponse(code = 404, message = "Indicates the requested job was not found or the job doesn’t have an exception stacktrace. Status-description contains additional information about the error.")
+  })
   @RequestMapping(value = "/management/timer-jobs/{jobId}/exception-stacktrace", method = RequestMethod.GET)
-  public String getTimerJobStacktrace(@PathVariable String jobId, HttpServletResponse response) {
+  public String getTimerJobStacktrace(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
     Job job = managementService.createTimerJobQuery().jobId(jobId).singleResult();
     if (job == null) {
       throw new ActivitiObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
@@ -67,9 +79,14 @@ public class JobExceptionStacktraceResource {
     response.setContentType("text/plain");
     return stackTrace;
   }
-  
+
+  @ApiOperation(value = "Get the exception stacktrace for a suspended job", tags = {"Jobs"})
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates the requested job was not found and the stacktrace has been returned. The response contains the raw stacktrace and always has a Content-type of text/plain."),
+          @ApiResponse(code = 404, message = "Indicates the requested job was not found or the job doesn’t have an exception stacktrace. Status-description contains additional information about the error.")
+  })
   @RequestMapping(value = "/management/suspended-jobs/{jobId}/exception-stacktrace", method = RequestMethod.GET)
-  public String getSuspendedJobStacktrace(@PathVariable String jobId, HttpServletResponse response) {
+  public String getSuspendedJobStacktrace(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
     Job job = managementService.createSuspendedJobQuery().jobId(jobId).singleResult();
     if (job == null) {
       throw new ActivitiObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
@@ -84,9 +101,14 @@ public class JobExceptionStacktraceResource {
     response.setContentType("text/plain");
     return stackTrace;
   }
-  
+
+  @ApiOperation(value = "Get the exception stacktrace for a deadletter job", tags = {"Jobs"})
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates the requested job was not found and the stacktrace has been returned. The response contains the raw stacktrace and always has a Content-type of text/plain."),
+          @ApiResponse(code = 404, message = "Indicates the requested job was not found or the job doesn’t have an exception stacktrace. Status-description contains additional information about the error.")
+  })
   @RequestMapping(value = "/management/deadletter-jobs/{jobId}/exception-stacktrace", method = RequestMethod.GET)
-  public String getDeadLetterJobStacktrace(@PathVariable String jobId, HttpServletResponse response) {
+  public String getDeadLetterJobStacktrace(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
     Job job = managementService.createDeadLetterJobQuery().jobId(jobId).singleResult();
     if (job == null) {
       throw new ActivitiObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);

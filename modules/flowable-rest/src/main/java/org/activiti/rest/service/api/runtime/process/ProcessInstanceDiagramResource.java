@@ -18,6 +18,7 @@ import java.util.Collections;
 
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.*;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.ProcessEngineConfiguration;
@@ -39,6 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Frederik Heremans
  */
 @RestController
+@Api(tags = { "Process Instances" }, description = "Manage Process Instances")
 public class ProcessInstanceDiagramResource extends BaseProcessInstanceResource {
 
   @Autowired
@@ -47,8 +49,14 @@ public class ProcessInstanceDiagramResource extends BaseProcessInstanceResource 
   @Autowired
   protected ProcessEngineConfiguration processEngineConfiguration;
 
+  @ApiOperation(value = "Get diagram for a process instance", tags = { "Process Instances" })
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates the process instance was found and the diagram was returned."),
+          @ApiResponse(code = 400, message = "Indicates the requested process instance was not found but the process doesn’t contain any graphical information (BPMN:DI) and no diagram can be created."),
+          @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
+  })
   @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/diagram", method = RequestMethod.GET)
-  public ResponseEntity<byte[]> getProcessInstanceDiagram(@PathVariable String processInstanceId, HttpServletResponse response) {
+  public ResponseEntity<byte[]> getProcessInstanceDiagram(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletResponse response) {
     ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
 
     ProcessDefinition pde = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());

@@ -16,6 +16,7 @@ package org.activiti.rest.service.api.repository;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.*;
 import org.activiti.engine.repository.Model;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,17 +29,32 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Frederik Heremans
  */
 @RestController
+@Api(tags = { "Models" }, description = "Manage Models")
 public class ModelResource extends BaseModelResource {
 
+  @ApiOperation(value = "Get a model", tags = {"Models"})
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates the model was found and returned."),
+          @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
+  })
   @RequestMapping(value = "/repository/models/{modelId}", method = RequestMethod.GET, produces = "application/json")
-  public ModelResponse getModel(@PathVariable String modelId, HttpServletRequest request) {
+  public ModelResponse getModel(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletRequest request) {
     Model model = getModelFromRequest(modelId);
 
     return restResponseFactory.createModelResponse(model);
   }
 
+  @ApiOperation(value = "Update a model", tags = {"Models"},
+          notes ="All request values are optional. "
+                  + "For example, you can only include the name attribute in the request body JSON-object, only updating the name of the model, leaving all other fields unaffected. "
+                  + "When an attribute is explicitly included and is set to null, the model-value will be updated to null. "
+                  + "Example: ```JSON \n{\"metaInfo\" : null}``` will clear the metaInfo of the model).")
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates the model was found and updated."),
+          @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
+  })
   @RequestMapping(value = "/repository/models/{modelId}", method = RequestMethod.PUT, produces = "application/json")
-  public ModelResponse updateModel(@PathVariable String modelId, @RequestBody ModelRequest modelRequest, HttpServletRequest request) {
+  public ModelResponse updateModel(@ApiParam(name = "modelId") @PathVariable String modelId, @RequestBody ModelRequest modelRequest, HttpServletRequest request) {
     Model model = getModelFromRequest(modelId);
 
     if (modelRequest.isCategoryChanged()) {
@@ -67,8 +83,13 @@ public class ModelResource extends BaseModelResource {
     return restResponseFactory.createModelResponse(model);
   }
 
+  @ApiOperation(value = "Delete a model", tags = {"Models"})
+  @ApiResponses(value = {
+          @ApiResponse(code = 204, message = "Indicates the model was found and has been deleted. Response-body is intentionally empty."),
+          @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
+  })
   @RequestMapping(value = "/repository/models/{modelId}", method = RequestMethod.DELETE)
-  public void deleteModel(@PathVariable String modelId, HttpServletResponse response) {
+  public void deleteModel(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletResponse response) {
     Model model = getModelFromRequest(modelId);
     repositoryService.deleteModel(model.getId());
     response.setStatus(HttpStatus.NO_CONTENT.value());
