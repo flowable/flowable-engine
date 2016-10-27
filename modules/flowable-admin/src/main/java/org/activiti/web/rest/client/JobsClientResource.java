@@ -16,6 +16,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.JobService;
 import org.activiti.service.engine.exception.ActivitiServiceException;
@@ -45,7 +46,7 @@ public class JobsClientResource extends AbstractClientResource {
             produces = "application/json")
     public JsonNode listJobs(HttpServletRequest request) {
         log.debug("REST request to get a list of jobs");
-        ServerConfig serverConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
         
         try {

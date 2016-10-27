@@ -12,6 +12,7 @@
  */
 package org.activiti.web.rest.client;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.TaskService;
 import org.activiti.service.engine.exception.ActivitiServiceException;
@@ -45,7 +46,7 @@ public class TaskClientResource extends AbstractClientResource {
 	@RequestMapping(value = "/rest/activiti/tasks/{taskId}", method = RequestMethod.GET, produces = "application/json")
 	public JsonNode getTask(@PathVariable String taskId, @RequestParam(required=false, defaultValue="false") boolean runtime) throws BadRequestException {
 		
-		ServerConfig serverConfig = retrieveServerConfig();
+		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			return clientService.getTask(serverConfig, taskId, runtime);
 		} catch (ActivitiServiceException e) {
@@ -56,7 +57,7 @@ public class TaskClientResource extends AbstractClientResource {
 	@RequestMapping(value = "/rest/activiti/tasks/{taskId}", method = RequestMethod.DELETE)
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	public void deleteTask(@PathVariable String taskId) throws BadRequestException {
-		ServerConfig serverConfig = retrieveServerConfig();
+		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			clientService.deleteTask(serverConfig, taskId);
 		} catch (ActivitiServiceException e) {
@@ -67,7 +68,7 @@ public class TaskClientResource extends AbstractClientResource {
 	@RequestMapping(value = "/rest/activiti/tasks/{taskId}", method = RequestMethod.POST)
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	public void executeTaskAction(@PathVariable String taskId, @RequestBody ObjectNode actionBody) throws BadRequestException {
-		ServerConfig serverConfig = retrieveServerConfig();
+		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			clientService.executeTaskAction(serverConfig, taskId, actionBody);
 		} catch (ActivitiServiceException e) {
@@ -78,7 +79,7 @@ public class TaskClientResource extends AbstractClientResource {
 	@RequestMapping(value = "/rest/activiti/tasks/{taskId}", method = RequestMethod.PUT)
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	public void updateTask(@PathVariable String taskId, @RequestBody ObjectNode actionBody) throws BadRequestException {
-		ServerConfig serverConfig = retrieveServerConfig();
+		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			clientService.updateTask(serverConfig, taskId, actionBody);
 		} catch (ActivitiServiceException e) {
@@ -88,7 +89,7 @@ public class TaskClientResource extends AbstractClientResource {
 	
 	@RequestMapping(value = "/rest/activiti/tasks/{taskId}/subtasks", method = RequestMethod.GET)
 	public JsonNode getSubtasks(@PathVariable String taskId) throws BadRequestException {
-		ServerConfig serverConfig = retrieveServerConfig();
+		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			return clientService.getSubTasks(serverConfig, taskId);
 		} catch (ActivitiServiceException e) {
@@ -98,7 +99,7 @@ public class TaskClientResource extends AbstractClientResource {
 	
 	@RequestMapping(value = "/rest/activiti/tasks/{taskId}/variables", method = RequestMethod.GET)
 	public JsonNode getVariables(@PathVariable String taskId) throws BadRequestException {
-		ServerConfig serverConfig = retrieveServerConfig();
+		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			return clientService.getVariables(serverConfig, taskId);
 		} catch (ActivitiServiceException e) {
@@ -108,7 +109,7 @@ public class TaskClientResource extends AbstractClientResource {
 	
 	@RequestMapping(value = "/rest/activiti/tasks/{taskId}/identitylinks", method = RequestMethod.GET)
 	public JsonNode getIdentityLinks(@PathVariable String taskId) throws BadRequestException {
-		ServerConfig serverConfig = retrieveServerConfig();
+		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			return clientService.getIdentityLinks(serverConfig, taskId);
 		} catch (ActivitiServiceException e) {

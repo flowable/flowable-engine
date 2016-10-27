@@ -16,6 +16,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.SubmittedFormService;
 import org.activiti.service.engine.exception.ActivitiServiceException;
@@ -40,7 +41,7 @@ public class SubmittedFormsClientResource extends AbstractClientResource {
     @RequestMapping(value = "/rest/activiti/submitted-forms", method = RequestMethod.GET, produces = "application/json")
     public JsonNode listSubmittedForms(HttpServletRequest request) {
         JsonNode resultNode = null;
-        ServerConfig serverConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
         Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
 
         try {
@@ -55,7 +56,7 @@ public class SubmittedFormsClientResource extends AbstractClientResource {
     
     @RequestMapping(value = "/rest/activiti/form-submitted-forms/{formId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode listFomrSubmittedForms(HttpServletRequest request, @PathVariable String formId) {
-        ServerConfig serverConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 
         try {
             return clientService.listFormSubmittedForms(serverConfig, formId, getRequestParametersWithoutServerId(request));
@@ -66,7 +67,7 @@ public class SubmittedFormsClientResource extends AbstractClientResource {
     
     @RequestMapping(value = "/rest/activiti/task-submitted-form/{taskId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getTaskSubmittedForm(@PathVariable String taskId) {
-        ServerConfig serverConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 
         try {
             return clientService.getTaskSubmittedForm(serverConfig, taskId);
@@ -79,7 +80,7 @@ public class SubmittedFormsClientResource extends AbstractClientResource {
     
     @RequestMapping(value = "/rest/activiti/process-submitted-forms/{processId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getProcessSubmittedForms(@PathVariable String processId) {
-        ServerConfig serverConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 
         try {
             return clientService.getProcessSubmittedForms(serverConfig, processId);
@@ -91,7 +92,7 @@ public class SubmittedFormsClientResource extends AbstractClientResource {
     
     @RequestMapping(value = "/rest/activiti/submitted-forms/{submittedFormId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getSubmittedForm(@PathVariable String submittedFormId) {
-        ServerConfig serverConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 
         try {
             return clientService.getSubmittedForm(serverConfig, submittedFormId);

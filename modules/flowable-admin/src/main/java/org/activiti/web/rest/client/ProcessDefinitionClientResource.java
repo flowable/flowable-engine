@@ -14,6 +14,7 @@ package org.activiti.web.rest.client;
 
 import java.util.Collections;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.JobService;
 import org.activiti.service.engine.ProcessDefinitionService;
@@ -55,7 +56,7 @@ public class ProcessDefinitionClientResource extends AbstractClientResource {
 	@RequestMapping(value = "/rest/activiti/process-definitions/{definitionId}", method = RequestMethod.GET, produces = "application/json")
 	public JsonNode getProcessDefinition(@PathVariable String definitionId) throws BadRequestException {
 
-		ServerConfig serverConfig = retrieveServerConfig();
+		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			return clientService.getProcessDefinition(serverConfig, definitionId);
 		} catch (ActivitiServiceException e) {
@@ -67,7 +68,7 @@ public class ProcessDefinitionClientResource extends AbstractClientResource {
 	public JsonNode updateProcessDefinitionCategory(@PathVariable String definitionId,
 		 @RequestBody ObjectNode updateBody) throws BadRequestException {
 
-		ServerConfig serverConfig = retrieveServerConfig();
+		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		if(updateBody.has("category")) {
 			try {
 
@@ -87,7 +88,7 @@ public class ProcessDefinitionClientResource extends AbstractClientResource {
 
 	@RequestMapping(value = "/rest/activiti/process-definitions/{definitionId}/process-instances", method = RequestMethod.GET, produces = "application/json")
 	public JsonNode getProcessInstances(@PathVariable String definitionId) throws BadRequestException {
-		ServerConfig serverConfig = retrieveServerConfig();
+		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			ObjectNode bodyNode = objectMapper.createObjectNode();
 			bodyNode.put("processDefinitionId", definitionId);
@@ -99,7 +100,7 @@ public class ProcessDefinitionClientResource extends AbstractClientResource {
 
 	@RequestMapping(value = "/rest/activiti/process-definitions/{definitionId}/jobs", method = RequestMethod.GET, produces = "application/json")
 	public JsonNode getJobs(@PathVariable String definitionId) throws BadRequestException {
-		ServerConfig serverConfig = retrieveServerConfig();
+		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			return jobService.listJobs(serverConfig, Collections.singletonMap("processDefinitionId", new String[] {definitionId}));
 		} catch (ActivitiServiceException e) {

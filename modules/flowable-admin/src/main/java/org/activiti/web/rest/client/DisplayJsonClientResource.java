@@ -35,6 +35,7 @@ import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.bpmn.model.SignalEventDefinition;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.TimerEventDefinition;
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.ProcessDefinitionService;
 import org.activiti.service.engine.ProcessInstanceService;
@@ -86,7 +87,7 @@ public class DisplayJsonClientResource extends AbstractClientResource {
 	@RequestMapping(value = "/rest/activiti/process-definitions/{processDefinitionId}/model-json", method = RequestMethod.GET, produces = "application/json")
 	public JsonNode getProcessDefinitionModelJSON(@PathVariable String processDefinitionId) {
 
-		ServerConfig config = retrieveServerConfig();
+		ServerConfig config = retrieveServerConfig(EndpointType.PROCESS);
 		ObjectNode displayNode = objectMapper.createObjectNode();
 		
 		BpmnModel pojoModel = clientService.getProcessDefinitionModel(config, processDefinitionId);
@@ -113,7 +114,7 @@ public class DisplayJsonClientResource extends AbstractClientResource {
 	public JsonNode getProcessInstanceModelJSON(@PathVariable String processInstanceId, @RequestParam(required=true) String processDefinitionId) {
 		ObjectNode displayNode = objectMapper.createObjectNode();
 		
-		ServerConfig config = retrieveServerConfig();
+		ServerConfig config = retrieveServerConfig(EndpointType.PROCESS);
 		BpmnModel pojoModel = clientService.getProcessDefinitionModel(config, processDefinitionId);
 		
 		if (!pojoModel.getLocationMap().isEmpty()) {

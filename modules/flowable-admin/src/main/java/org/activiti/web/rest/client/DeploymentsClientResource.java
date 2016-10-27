@@ -17,6 +17,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.DeploymentService;
 import org.activiti.service.engine.exception.ActivitiServiceException;
@@ -53,7 +54,7 @@ public class DeploymentsClientResource extends AbstractClientResource {
         log.debug("REST request to get a list of deployments");
         
         JsonNode resultNode = null;
-        ServerConfig serverConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
     	Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
     	
     	try {
@@ -73,7 +74,7 @@ public class DeploymentsClientResource extends AbstractClientResource {
     public JsonNode handleFileUpload(HttpServletRequest request, @RequestParam("file") MultipartFile file){
         if (!file.isEmpty()) {
         	try {
-        		ServerConfig serverConfig = retrieveServerConfig();
+        		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         		String fileName = file.getOriginalFilename();
         		if (fileName != null &&
         				(fileName.endsWith(".bpmn") || fileName.endsWith(".bpmn20.xml")
