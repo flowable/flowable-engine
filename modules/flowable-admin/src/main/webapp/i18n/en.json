@@ -572,15 +572,17 @@
             "CREATE-CLUSTER-CONFIG": "Create new cluster",
             "DELETE-CLUSTER-CONFIG": "Delete cluster configuration",
             "GENERATE-JAR": "Generate cluster config jar",
-            "EDIT-ENDPOINT": "Edit Activiti REST endpoint",
-            "CHECK-ENDPOINT": "Check Activiti REST endpoint",
+            "EDIT-ENDPOINT": "Edit REST endpoint",
+            "CHECK-ENDPOINT": "Check REST endpoint",
             "SELECT-MASTER": "Select master configuration",
             "ADD-CONFIGURATION": "Add master configuration",
             "EDIT-CONFIGURATION": "Edit master configuration",
             "DELETE-CONFIGURATION": "Delete master configuration"
         },
         "TITLE": {
-            "ENDPOINT": "Endpoint configuration"
+            "PROCESS-ENDPOINT": "Process API Endpoint configuration",
+            "DMN-ENDPOINT": "DMN API Endpoint configuration",
+            "FORM-ENDPOINT": "Form API Endpoint configuration"
         },
         "POPUP": {
             "EDIT-ENDPOINT": {
