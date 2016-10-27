@@ -6,6 +6,9 @@
  */
 package org.activiti.domain;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Yvo Swillens
  */
@@ -15,6 +18,14 @@ public enum EndpointType {
   DMN(2),
   FORM(3);
 
+  private static Map<Integer, EndpointType> map = new HashMap<>();
+
+  static {
+    for (EndpointType endpointType : EndpointType.values()) {
+      map.put(endpointType.endpointCode, endpointType);
+    }
+  }
+
   private final int endpointCode;
 
   EndpointType(int endpointCode) {
@@ -23,6 +34,10 @@ public enum EndpointType {
 
   public int getEndpointCode() {
     return this.endpointCode;
+  }
+
+  public static EndpointType valueOf(int endpointCode) {
+    return map.get(endpointCode);
   }
 
 }

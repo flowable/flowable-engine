@@ -52,10 +52,10 @@ public class ServerConfigsResource {
     return serverConfigService.findAll();
   }
 
-  @RequestMapping(value = "/rest/server-configs/default/{endpointType}", method = RequestMethod.GET, produces = "application/json")
+  @RequestMapping(value = "/rest/server-configs/default/{endpointTypeCode}", method = RequestMethod.GET, produces = "application/json")
   @ResponseStatus(value = HttpStatus.OK)
   public ServerConfigRepresentation getDefaultServerConfig(@PathVariable Integer endpointTypeCode) {
-    EndpointType endpointType = EndpointType.values()[endpointTypeCode];
+    EndpointType endpointType = EndpointType.valueOf(endpointTypeCode);
 
     if (endpointType == null) {
       throw new IllegalArgumentException("Unknown endpoint type code: " + endpointTypeCode);

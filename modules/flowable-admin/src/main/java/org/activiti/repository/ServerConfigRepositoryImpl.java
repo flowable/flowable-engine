@@ -14,6 +14,7 @@ package org.activiti.repository;
 
 import java.util.List;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,33 +22,38 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ServerConfigRepositoryImpl implements ServerConfigRepository {
-  
-  private static final String NAMESPACE = "org.activiti.domain.ServerConfig.";
-  
-  @Autowired
-  protected SqlSessionTemplate sqlSessionTemplate;
-  
-  @Autowired
-  protected UuidIdGenerator idGenerator;
-  
-  @Override
-  public ServerConfig get(String id) {
-    return sqlSessionTemplate.selectOne(NAMESPACE + "selectServerConfig", id);
-  }
-  
-  @Override
-  public List<ServerConfig> getAll() {
-    return sqlSessionTemplate.selectList(NAMESPACE + "selectAllServerConfigs");
-  }
-  
-  @Override
-  public void save(ServerConfig serverConfig) {
-    if (serverConfig.getId() == null) {
-      serverConfig.setId(idGenerator.generateId());
-      sqlSessionTemplate.insert(NAMESPACE + "insertServerConfig", serverConfig);
-    } else {
-      sqlSessionTemplate.update(NAMESPACE + "updateServerConfig", serverConfig);
+
+    private static final String NAMESPACE = "org.activiti.domain.ServerConfig.";
+
+    @Autowired
+    protected SqlSessionTemplate sqlSessionTemplate;
+
+    @Autowired
+    protected UuidIdGenerator idGenerator;
+
+    @Override
+    public ServerConfig get(String id) {
+        return sqlSessionTemplate.selectOne(NAMESPACE + "selectServerConfig", id);
     }
-  }
+
+    @Override
+    public List<ServerConfig> getAll() {
+        return sqlSessionTemplate.selectList(NAMESPACE + "selectAllServerConfigs");
+    }
+
+    @Override
+    public List<ServerConfig> getByEndpointType(EndpointType endpointType) {
+        return sqlSessionTemplate.selectList(NAMESPACE + "selectAllServerConfigsByEndpointType", endpointType.getEndpointCode());
+    }
+
+    @Override
+    public void save(ServerConfig serverConfig) {
+        if (serverConfig.getId() == null) {
+            serverConfig.setId(idGenerator.generateId());
+            sqlSessionTemplate.insert(NAMESPACE + "insertServerConfig", serverConfig);
+        } else {
+            sqlSessionTemplate.update(NAMESPACE + "updateServerConfig", serverConfig);
+        }
+    }
 
 }
