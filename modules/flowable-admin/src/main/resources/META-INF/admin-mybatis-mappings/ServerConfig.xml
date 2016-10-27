@@ -70,5 +70,9 @@
 	<select id="selectAllServerConfigs" resultMap="serverConfigResultMap">
         select * from ${prefix}ACT_ADM_SERVER_CONFIG
     </select>
+
+    <select id="selectAllServerConfigsByEndpointType" resultMap="serverConfigResultMap">
+        select * from ${prefix}ACT_ADM_SERVER_CONFIG where endpoint_type = #{endpointType, jdbcType=INTEGER}
+    </select>
 	
 </mapper>
