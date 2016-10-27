@@ -40,7 +40,7 @@ public class FlowableFormEngineConfiguration extends BaseEngineConfiguration {
   }
 
   @Bean
-  public FormService dmnRuleService() {
+  public FormService dmnFormService() {
     return formEngine().getFormService();
   }
 }

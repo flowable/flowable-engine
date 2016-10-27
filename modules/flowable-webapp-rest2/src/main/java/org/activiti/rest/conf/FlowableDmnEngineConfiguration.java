@@ -16,7 +16,6 @@ import org.activiti.dmn.api.DmnRepositoryService;
 import org.activiti.dmn.api.DmnRuleService;
 import org.activiti.dmn.engine.DmnEngine;
 import org.activiti.dmn.engine.DmnEngineConfiguration;
-import org.activiti.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,7 +27,7 @@ public class FlowableDmnEngineConfiguration extends BaseEngineConfiguration {
 
   @Bean
   public DmnEngine ruleEngine() {
-    DmnEngineConfiguration dmnEngineConfiguration = new StandaloneDmnEngineConfiguration();
+    DmnEngineConfiguration dmnEngineConfiguration = new DmnEngineConfiguration();
     dmnEngineConfiguration.setDataSource(dataSource());
     dmnEngineConfiguration.setDatabaseSchemaUpdate(environment.getProperty("engine.dmn.schema.update", "true"));
 
