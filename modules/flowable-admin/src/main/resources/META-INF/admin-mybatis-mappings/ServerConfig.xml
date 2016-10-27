@@ -14,6 +14,7 @@
 		<result property="restRoot" column="rest_root" jdbcType="VARCHAR" />
 		<result property="userName" column="user_name" jdbcType="VARCHAR" />
 		<result property="password" column="password" jdbcType="VARCHAR" />
+		<result property="endpointType" column="endpoint_type" jdbcType="INTEGER" />
 		<result property="tenantId" column="tenant_id" jdbcType="VARCHAR" />
 	</resultMap>
 	
@@ -28,17 +29,19 @@
             rest_root,
             user_name,
             password,
+            endpoint_type,
             tenant_id) 
          values (
             #{id, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
             #{description, jdbcType=VARCHAR},
             #{serverAddress, jdbcType=VARCHAR},
-            #{port, jdbcType=VARCHAR},
+            #{port, jdbcType=INTEGER},
             #{contextRoot, jdbcType=VARCHAR},
             #{restRoot, jdbcType=VARCHAR},
             #{userName, jdbcType=VARCHAR},
             #{password, jdbcType=VARCHAR},
+            #{endpointType, jdbcType=INTEGER},
             #{tenantId, jdbcType=VARCHAR}
           )
     </insert>
@@ -49,12 +52,13 @@
             name = #{name, jdbcType=VARCHAR},
             description = #{description, jdbcType=VARCHAR},
             server_address = #{serverAddress, jdbcType=VARCHAR},
-            port = #{port, jdbcType=VARCHAR},
+            port = #{port, jdbcType=INTEGER},
             context_root = #{contextRoot, jdbcType=VARCHAR},
             rest_root = #{restRoot, jdbcType=VARCHAR},
             user_name = #{userName, jdbcType=VARCHAR},
             password = #{password, jdbcType=VARCHAR},
-            tenant_id = #{tenantId, jdbcType=VARCHAR}  
+            endpoint_type = #{endpointType, jdbcType=INTEGER},
+            tenant_id = #{tenantId, jdbcType=VARCHAR}
         </set>
         where id = #{id, jdbcType=VARCHAR}
     </update>

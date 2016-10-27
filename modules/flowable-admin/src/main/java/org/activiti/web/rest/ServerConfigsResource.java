@@ -14,6 +14,7 @@ package org.activiti.web.rest;
 
 import java.util.List;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.ServerConfigService;
 import org.activiti.web.rest.dto.ServerConfigRepresentation;
@@ -51,17 +52,22 @@ public class ServerConfigsResource {
     return serverConfigService.findAll();
   }
 
-  @RequestMapping(value = "/rest/server-configs/default", method = RequestMethod.GET, produces = "application/json")
+  @RequestMapping(value = "/rest/server-configs/default/{endpointType}", method = RequestMethod.GET, produces = "application/json")
   @ResponseStatus(value = HttpStatus.OK)
-  public ServerConfigRepresentation getDefaultServerConfig() {
-    return new ServerConfigRepresentation(serverConfigService.getDefaultServerConfig());
+  public ServerConfigRepresentation getDefaultServerConfig(@PathVariable Integer endpointTypeCode) {
+    EndpointType endpointType = EndpointType.values()[endpointTypeCode];
+
+    if (endpointType == null) {
+      throw new IllegalArgumentException("Unknown endpoint type code: " + endpointTypeCode);
+    }
+
+    return new ServerConfigRepresentation(serverConfigService.getDefaultServerConfig(endpointType));
   }
 
   @RequestMapping(value = "/rest/server-configs/{serverId}", method = RequestMethod.PUT, produces = "application/json")
   @ResponseStatus(value = HttpStatus.OK)
   public void updateServer(@PathVariable String serverId,
       @RequestBody ServerConfigRepresentation configRepresentation) {
-
     ServerConfig config = serverConfigService.findOne(serverId);
 
     if (config == null) {
