@@ -112,7 +112,10 @@
                 </div>
             </li>
         </ul>
-        <div id="{{activitiFieldIdPrefix + field.id}}" external-content link-only="field.params.link" on-content-upload="contentUploaded(content, field)" on-upload-in-progress="uploadInProgress(status)" ng-show="field.params.multiple || (!field.params.multiple && model.uploads[field.id].length != 1)"></div>
+        <div id="{{activitiFieldIdPrefix + field.id}}" external-content link-only="field.params.link"
+             on-content-upload="contentUploaded(content, field)"
+             on-upload-in-progress="uploadInProgress(status)"
+             ng-show="field.params.multiple || (!field.params.multiple && model.uploads[field.id].length != 1)"></div>
     </div>
     
     <div ng-switch-when="expression" class="form-group" ng-show="field.isVisible">

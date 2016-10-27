@@ -45,6 +45,10 @@ public class RelatedContentService {
 
     @Autowired
     protected Clock clock;
+    
+    public RelatedContent get(String id) {
+      return contentRepository.get(id);
+    }
 
     public List<RelatedContent> getRelatedContent(String source, String sourceId) {
         return contentRepository.findBySourceAndSourceId(source, sourceId);
@@ -254,11 +258,13 @@ public class RelatedContentService {
     @Transactional
     public void setContentField(String relatedContentId, String field, String processInstanceId, String taskId) {
         final RelatedContent relatedContent = contentRepository.get(relatedContentId);
-        relatedContent.setProcessInstanceId(processInstanceId);
-        relatedContent.setTaskId(taskId);
-        relatedContent.setRelatedContent(false);
-        relatedContent.setField(field);
-        contentRepository.save(relatedContent);
+        if (relatedContent != null) {
+          relatedContent.setProcessInstanceId(processInstanceId);
+          relatedContent.setTaskId(taskId);
+          relatedContent.setRelatedContent(false);
+          relatedContent.setField(field);
+          contentRepository.save(relatedContent);
+        }
     }
     
     @Transactional
