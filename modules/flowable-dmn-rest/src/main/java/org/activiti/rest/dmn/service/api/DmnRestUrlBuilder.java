@@ -52,10 +52,12 @@ public class DmnRestUrlBuilder {
 
   /** Uses baseUrl as the base URL */
   public static DmnRestUrlBuilder usingBaseUrl(String baseUrl) {
-    if (baseUrl == null)
+    if (baseUrl == null) {
       throw new ActivitiDmnIllegalArgumentException("baseUrl can not be null");
-    if (baseUrl.endsWith("/"))
+    }
+    if (baseUrl.endsWith("/")) {
       baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+    }
     return new DmnRestUrlBuilder(baseUrl);
   }
 
