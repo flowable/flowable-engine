@@ -199,7 +199,12 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
   public void deleteContentObject(String id) {
     try {
       File contentFile = getContentFile(id);
+      File parentFile = contentFile.getParentFile();
       contentFile.delete();
+      
+      if (parentFile.listFiles().length == 0) {
+        parentFile.delete();
+      }
     } catch (Exception e) {
       throw new ContentStorageException("Error while deleting content", e);
     }
