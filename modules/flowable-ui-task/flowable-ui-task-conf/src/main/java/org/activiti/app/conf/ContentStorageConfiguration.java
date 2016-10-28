@@ -15,7 +15,7 @@ package org.activiti.app.conf;
 import java.io.File;
 
 import org.activiti.content.storage.api.ContentStorage;
-import org.activiti.content.storage.fs.FileSystemContentStorage;
+import org.activiti.content.storage.fs.SimpleFileSystemContentStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,30 +29,15 @@ public class ContentStorageConfiguration {
     private final Logger log = LoggerFactory.getLogger(ContentStorageConfiguration.class);
     
     private static final String PROP_FS_ROOT = "contentstorage.fs.rootFolder";
-    private static final String PROP_FS_DEPTH = "contentstorage.fs.depth";
-    private static final String PROP_FS_BLOCK_SIZE = "contentstorage.fs.blockSize";
     private static final String PROP_FS_CREATE_ROOT = "contentstorage.fs.createRoot";
-    
-    private static final Integer DEFAULT_FS_DEPTH = 4;
-    private static final Integer DEFAULT_FS_BLOCK_SIZE = 1024;
     
     @Autowired
     private Environment env;
     
-    /**
-     * @return an instance of {@link ContentStorage}. Depending on the configured properties,
-     * a different implementation will be created.
-     */
     @Bean
     public ContentStorage contentStorage() {
-        
-        // TODO: separate the configuration of each instance to a class, so this class doesn't depend on any IMPL being
-        // on the classpath
-        
         String fsRoot = env.getProperty(PROP_FS_ROOT);
         log.info("Using file-system based content storage (" + fsRoot + ")");
-        Integer iterationDepth = env.getProperty(PROP_FS_DEPTH, Integer.class, DEFAULT_FS_DEPTH);
-        Integer blockSize = env.getProperty(PROP_FS_BLOCK_SIZE, Integer.class, DEFAULT_FS_BLOCK_SIZE);
 
         File root = new File(fsRoot);
         if(env.getProperty(PROP_FS_CREATE_ROOT, Boolean.class, Boolean.FALSE).booleanValue() && !root.exists()) {
@@ -62,6 +47,6 @@ public class ContentStorageConfiguration {
         if (root != null && root.exists()) {
            log.info("File system root : " + root.getAbsolutePath());
         }
-        return new FileSystemContentStorage(root, blockSize, iterationDepth);
+        return new SimpleFileSystemContentStorage(root);
     }
 }

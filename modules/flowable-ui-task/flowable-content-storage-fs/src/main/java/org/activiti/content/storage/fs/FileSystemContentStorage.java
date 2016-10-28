@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.util.Map;
 
 import org.activiti.content.storage.api.ContentObject;
 import org.activiti.content.storage.api.ContentStorage;
@@ -28,7 +29,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Note that this implementation of the {@link ContentStorage} interface doesn't do anything with the passed metadata,
+ * nor returns it when requested!
+ * 
  * @author Frederik Heremans
+ * @author Joram Barrez
  */
 public class FileSystemContentStorage implements ContentStorage {
 
@@ -65,7 +70,8 @@ public class FileSystemContentStorage implements ContentStorage {
         converter.setIterationDepth(depth);
     }
     
-    public ContentObject createContentObject(InputStream contentStream, Long lengthHint) {
+    @Override
+    public ContentObject createContentObject(InputStream contentStream, Long lengthHint, Map<String, Object> metaData) {
         // Get hold of the next free ID to use
         BigInteger id = fetchNewId();
         File contentFile = new File(rootFolder, converter.getPathForId(id).getPath());
@@ -91,7 +97,15 @@ public class FileSystemContentStorage implements ContentStorage {
         return new FileSystemContentObject(contentFile, id, null);
     }
     
-    public ContentObject updateContentObject(String id, InputStream contentStream, Long lengthHint) {
+    @Override
+    public Map<String, Object> getMetaData() {
+      // This implementation doesn't support metadata
+      return null;
+    }
+    
+    @Override
+    public ContentObject updateContentObject(String id, InputStream contentStream, Long lengthHint, Map<String, Object> metaData) {
+      
         File contentFile = getFileForId(id, true);
         
         // Write stream to a temporary file and rename when content is read successfully to prevent
