@@ -24,6 +24,7 @@
  */
 package org.activiti.service.engine;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
@@ -36,18 +37,38 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class ProcessEngineInfoService {
 
-	public static final String ENGINE_INFO_URL = "management/engine";
+    public static final String PROCESS_ENGINE_INFO_URL = "management/engine";
+    public static final String DMN_ENGINE_INFO_URL = "dmn-management/engine";
+    public static final String FORM_ENGINE_INFO_URL = "form-management/engine";
 
-	@Autowired
+    @Autowired
     protected ActivitiClientService clientUtil;
 
-	@Autowired
-	protected ObjectMapper objectMapper;
+    @Autowired
+    protected ObjectMapper objectMapper;
 
-	public JsonNode getEngineInfo(ServerConfig serverConfig) {
-		URIBuilder builder = clientUtil.createUriBuilder(ENGINE_INFO_URL);
+    public JsonNode getEngineInfo(ServerConfig serverConfig) {
 
-		HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));
-		return clientUtil.executeRequest(get, serverConfig);
-	}
+        EndpointType endpointType = EndpointType.valueOf(serverConfig.getEndpointType());
+
+        URIBuilder builder = null;
+
+        switch (endpointType) {
+
+            case PROCESS:
+                builder = clientUtil.createUriBuilder(PROCESS_ENGINE_INFO_URL);
+                break;
+
+            case DMN:
+                builder = clientUtil.createUriBuilder(DMN_ENGINE_INFO_URL);
+                break;
+
+            case FORM:
+                builder = clientUtil.createUriBuilder(FORM_ENGINE_INFO_URL);
+                break;
+        }
+
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));
+        return clientUtil.executeRequest(get, serverConfig);
+    }
 }

@@ -27,24 +27,23 @@ import org.springframework.core.env.Environment;
  */
 public class MinimalDataGenerator implements ApplicationListener<ContextRefreshedEvent> {
 
-    private final Logger log = LoggerFactory.getLogger(MinimalDataGenerator.class);
+  private final Logger log = LoggerFactory.getLogger(MinimalDataGenerator.class);
 
-	@Autowired
-	protected Environment environment;
+  @Autowired
+  protected Environment environment;
 
-    @Autowired
-    protected ServerConfigService serverConfigService;
+  @Autowired
+  protected ServerConfigService serverConfigService;
 
-    @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        if (event.getApplicationContext().getParent() == null) { // Using Spring MVC, there are multiple child contexts. We only care about the root
-            log.info("Verifying if minimal data is present");
+  @Override
+  public void onApplicationEvent(ContextRefreshedEvent event) {
+    if (event.getApplicationContext().getParent() == null) { // Using Spring MVC, there are multiple child contexts. We only care about the root
+      log.info("Verifying if minimal data is present");
 
-            if (serverConfigService.findAll().size() == 0) {
-                log.info("No server configuration found, creating default server configuration");
-                serverConfigService.createDefaultServerConfig();
-            }
-        }
+      if (serverConfigService.findAll().size() == 0) {
+        log.info("No server configurations found, creating default server configurations");
+        serverConfigService.createDefaultServerConfigs();
+      }
     }
-
+  }
 }

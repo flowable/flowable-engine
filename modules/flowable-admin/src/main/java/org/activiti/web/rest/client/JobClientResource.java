@@ -12,6 +12,7 @@
  */
 package org.activiti.web.rest.client;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.JobService;
 import org.activiti.service.engine.exception.ActivitiServiceException;
@@ -42,7 +43,7 @@ public class JobClientResource extends AbstractClientResource {
 	@RequestMapping(value = "/rest/activiti/jobs/{jobId}", method = RequestMethod.GET, produces = "application/json")
 	public JsonNode getJob(@PathVariable String jobId) throws BadRequestException {
 
-		ServerConfig serverConfig = retrieveServerConfig();
+		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			return clientService.getJob(serverConfig, jobId);
 		} catch (ActivitiServiceException e) {
@@ -57,7 +58,7 @@ public class JobClientResource extends AbstractClientResource {
 	@ResponseStatus(value = HttpStatus.OK)
 	public void deleteJob(@PathVariable String jobId) throws BadRequestException {
 
-		ServerConfig serverConfig = retrieveServerConfig();
+		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			clientService.deleteJob(serverConfig, jobId);
 		} catch (ActivitiServiceException e) {
@@ -72,7 +73,7 @@ public class JobClientResource extends AbstractClientResource {
 	@ResponseStatus(value = HttpStatus.OK)
 	public void executeJob(@PathVariable String jobId) throws BadRequestException {
 
-		ServerConfig serverConfig = retrieveServerConfig();
+		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			 clientService.executeJob(serverConfig, jobId);
 		} catch (ActivitiServiceException e) {
@@ -86,7 +87,7 @@ public class JobClientResource extends AbstractClientResource {
 	@RequestMapping(value = "/rest/activiti/jobs/{jobId}/stacktrace", method = RequestMethod.GET, produces = "text/plain")
 	public String getJobStacktrace(@PathVariable String jobId) throws BadRequestException {
 
-		ServerConfig serverConfig = retrieveServerConfig();
+		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			String trace =  clientService.getJobStacktrace(serverConfig, jobId);
 			if(trace != null) {

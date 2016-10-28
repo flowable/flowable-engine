@@ -27,6 +27,7 @@ public class ServerConfig implements Serializable {
   protected String restRoot;
   protected String userName;
   protected String password;
+  protected Integer endpointType;
   protected String tenantId;
 
   public String getId() {
@@ -99,6 +100,14 @@ public class ServerConfig implements Serializable {
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  public Integer getEndpointType() {
+    return endpointType;
+  }
+
+  public void setEndpointType(Integer endpointType) {
+    this.endpointType = endpointType;
   }
 
   @Override

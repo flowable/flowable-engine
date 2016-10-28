@@ -14,6 +14,7 @@ package org.activiti.web.rest.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.AppService;
 import org.activiti.service.engine.exception.ActivitiServiceException;
@@ -54,7 +55,7 @@ public class AppDeploymentsClientResource extends AbstractClientResource {
         log.debug("REST request to get a list of apps");
         
         JsonNode resultNode = null;
-        ServerConfig serverConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
     	Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
     	
     	try {
@@ -74,7 +75,7 @@ public class AppDeploymentsClientResource extends AbstractClientResource {
     public void handleFileUpload(HttpServletRequest request, HttpServletResponse httpResponse, @RequestParam("file") MultipartFile file){
         if (!file.isEmpty()) {
         	try {
-        		ServerConfig serverConfig = retrieveServerConfig();
+        		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         		String fileName = file.getOriginalFilename();
         		if (fileName != null && fileName.endsWith(".zip")) {
         			clientService.uploadAppDefinition(httpResponse, serverConfig, fileName, file.getInputStream());

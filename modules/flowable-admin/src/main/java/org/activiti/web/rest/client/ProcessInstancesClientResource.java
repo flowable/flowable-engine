@@ -12,6 +12,7 @@
  */
 package org.activiti.web.rest.client;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.ProcessInstanceService;
 import org.activiti.web.rest.exception.BadRequestException;
@@ -49,7 +50,7 @@ public class ProcessInstancesClientResource extends AbstractClientResource {
         
         JsonNode resultNode = null;
         try {
-            ServerConfig serverConfig = retrieveServerConfig();
+            ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 	        resultNode = clientService.listProcesInstances(bodyNode, serverConfig);
 			
 		} catch (Exception e) {

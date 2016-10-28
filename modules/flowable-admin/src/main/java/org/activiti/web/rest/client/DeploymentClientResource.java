@@ -14,6 +14,7 @@ package org.activiti.web.rest.client;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.DeploymentService;
 import org.activiti.service.engine.exception.ActivitiServiceException;
@@ -41,7 +42,7 @@ public class DeploymentClientResource extends AbstractClientResource {
 	@RequestMapping(value = "/rest/activiti/deployments/{deploymentId}", method = RequestMethod.GET, produces = "application/json")
 	public JsonNode getDeployment(@PathVariable String deploymentId) throws BadRequestException {
 		
-		ServerConfig serverConfig = retrieveServerConfig();
+		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			return clientService.getDeployment(serverConfig, deploymentId);
 		} catch (ActivitiServiceException e) {
@@ -51,6 +52,6 @@ public class DeploymentClientResource extends AbstractClientResource {
 	
 	@RequestMapping(value = "/rest/activiti/deployments/{deploymentId}", method = RequestMethod.DELETE)
 	public void deleteDeployment(@PathVariable String deploymentId, HttpServletResponse httpResponse) {
-	    clientService.deleteDeployment(retrieveServerConfig(), httpResponse, deploymentId);
+	    clientService.deleteDeployment(retrieveServerConfig(EndpointType.PROCESS), httpResponse, deploymentId);
 	}
 }

@@ -28,7 +28,7 @@ public class DefaultContentTypeResolver implements ContentTypeResolver {
 
       if (lowerResourceName.endsWith("png")) {
         contentType = "image/png";
-      } else if (lowerResourceName.endsWith("xml") || lowerResourceName.endsWith("bpmn")) {
+      } else if (lowerResourceName.endsWith("xml") || lowerResourceName.endsWith("dmn")) {
         contentType = "text/xml";
       }
     }

@@ -18,6 +18,7 @@
             <column name="rest_root" type="varchar(100)" />
             <column name="user_name" type="varchar(100)" />
             <column name="password" type="varchar(100)" />
+            <column name="endpoint_type" type="int" />
             <column name="tenant_id" type="varchar(50)" />
         </createTable>
 
