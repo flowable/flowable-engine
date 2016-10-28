@@ -17,7 +17,14 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import liquibase.Liquibase;
+import liquibase.database.Database;
+import liquibase.database.DatabaseConnection;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.resource.ClassLoaderResourceAccessor;
 import org.activiti.domain.generator.MinimalDataGenerator;
+import org.activiti.web.rest.exception.InternalServerErrorException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -37,13 +44,13 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
-import liquibase.integration.spring.SpringLiquibase;
-
 @Configuration
 @EnableTransactionManagement
 public class DatabaseConfiguration {
 
     private final Logger log = LoggerFactory.getLogger(DatabaseConfiguration.class);
+
+    protected static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_ADM_";
 
     @Autowired
     private Environment env;
@@ -178,13 +185,23 @@ public class DatabaseConfiguration {
     }
     
     @Bean(name="liquibase")
-    public SpringLiquibase liquibase() {
-        log.debug("Configuring Liquibase");
-        SpringLiquibase liquibase = new SpringLiquibase();
-        liquibase.setDataSource(dataSource());
-        liquibase.setChangeLog("classpath:META-INF/liquibase/db-changelog.xml");
-        liquibase.setContexts("development, production");
+    public Liquibase liquibase() {
+      log.debug("Configuring Liquibase");
+
+      try {
+
+        DatabaseConnection connection = new JdbcConnection(dataSource().getConnection());
+        Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
+        database.setDatabaseChangeLogTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
+        database.setDatabaseChangeLogLockTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());
+
+        Liquibase liquibase = new Liquibase("META-INF/liquibase/flowable-admin-app-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
+        liquibase.update("flowable");
         return liquibase;
+
+      } catch (Exception e) {
+        throw new InternalServerErrorException("Error creating liquibase database");
+      }
     }
 
     @Bean(name="minimalDataGenerator")

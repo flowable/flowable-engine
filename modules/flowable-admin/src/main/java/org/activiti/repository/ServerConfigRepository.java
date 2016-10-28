@@ -14,14 +14,17 @@ package org.activiti.repository;
 
 import java.util.List;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 
 public interface ServerConfigRepository {
-  
-  ServerConfig get(String id);
-  
-  List<ServerConfig> getAll();
-  
-  void save(ServerConfig serverConfig);
+
+    ServerConfig get(String id);
+
+    List<ServerConfig> getAll();
+
+    List<ServerConfig> getByEndpointType(EndpointType endpointType);
+
+    void save(ServerConfig serverConfig);
 
 }

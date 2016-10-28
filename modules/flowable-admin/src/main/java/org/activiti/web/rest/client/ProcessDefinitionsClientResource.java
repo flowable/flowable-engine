@@ -16,6 +16,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.ProcessDefinitionService;
 import org.activiti.service.engine.exception.ActivitiServiceException;
@@ -47,7 +48,7 @@ public class ProcessDefinitionsClientResource extends AbstractClientResource {
         log.debug("REST request to get a list of process definitions");
         
         JsonNode resultNode = null;
-        ServerConfig serverConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
     	Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
     	
     	try {

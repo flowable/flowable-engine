@@ -16,6 +16,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.ModelService;
 import org.activiti.service.engine.exception.ActivitiServiceException;
@@ -34,7 +35,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RequestMapping("/rest/activiti/models")
 public class ModelsClientResource extends AbstractClientResource {
 
-
     @Autowired
     protected ModelService clientService;
 
@@ -43,7 +43,7 @@ public class ModelsClientResource extends AbstractClientResource {
      */
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
     public JsonNode listModels(HttpServletRequest request) {
-        ServerConfig serverConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
     	Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
     	
     	try {

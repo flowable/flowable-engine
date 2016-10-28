@@ -16,6 +16,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.FormService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,7 @@ public class FormsClientResource extends AbstractClientResource {
      */
     @RequestMapping(value = "/rest/activiti/forms", method = RequestMethod.GET, produces = "application/json")
     public JsonNode listForms(HttpServletRequest request) {
-        ServerConfig serverConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
         Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
         return clientService.listForms(serverConfig, parameterMap);
     }
@@ -50,6 +51,6 @@ public class FormsClientResource extends AbstractClientResource {
      */
     @RequestMapping(value = "/rest/activiti/process-definition-forms/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getProcessDefinitionForms(@PathVariable String processDefinitionId, HttpServletRequest request) {
-        return clientService.getProcessDefinitionForms(retrieveServerConfig(), processDefinitionId);
+        return clientService.getProcessDefinitionForms(retrieveServerConfig(EndpointType.FORM), processDefinitionId);
     }
 }
