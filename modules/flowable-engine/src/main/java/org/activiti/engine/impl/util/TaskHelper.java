@@ -1,16 +1,4 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.activiti.engine.impl.cmd;
+package org.activiti.engine.impl.util;
 
 import java.util.Map;
 
@@ -29,20 +17,39 @@ import org.activiti.engine.task.IdentityLinkType;
 
 /**
  * @author Joram Barrez
+ * @author Marcus Klimstra
  */
-public abstract class AbstractCompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
+public class TaskHelper {
   
-  private static final long serialVersionUID = 1L;
-
-  public AbstractCompleteTaskCmd(String taskId) {
-    super(taskId);
+  private final CommandContext commandContext;
+  
+  public TaskHelper(CommandContext commandContext) {
+    this.commandContext = commandContext;
   }
 
-  protected void executeTaskComplete(CommandContext commandContext, TaskEntity taskEntity, Map<String, Object> variables, boolean localScope) {
+  public void completeTask(TaskEntity taskEntity, Map<String, Object> variables, Map<String, Object> transientVariables, boolean localScope) {
     // Task complete logic
     
     if (taskEntity.getDelegationState() != null && taskEntity.getDelegationState().equals(DelegationState.PENDING)) {
       throw new ActivitiException("A delegated task cannot be completed, but should be resolved instead.");
+    }
+
+    if (variables != null) {
+      if (localScope) {
+        taskEntity.setVariablesLocal(variables);
+      } else if (taskEntity.getExecutionId() != null) {
+        taskEntity.setExecutionVariables(variables);
+      } else {
+        taskEntity.setVariables(variables);
+      }
+    }
+    
+    if (transientVariables != null) {
+      if (localScope) {
+        taskEntity.setTransientVariablesLocal(transientVariables);
+      } else {
+        taskEntity.setTransientVariables(transientVariables);
+      }
     }
 
     commandContext.getProcessEngineConfiguration().getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_COMPLETE);
@@ -68,5 +75,5 @@ public abstract class AbstractCompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
       commandContext.getAgenda().planTriggerExecutionOperation(executionEntity);
     }
   }
-  
+
 }
