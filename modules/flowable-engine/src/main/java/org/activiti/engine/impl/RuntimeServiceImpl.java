@@ -24,7 +24,7 @@ import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.form.FormData;
 import org.activiti.engine.impl.cmd.ActivateProcessInstanceCmd;
 import org.activiti.engine.impl.cmd.AddEventListenerCommand;
@@ -484,7 +484,7 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   @Override
-  public void addEventListener(ActivitiEventListener listenerToAdd, ActivitiEventType... types) {
+  public void addEventListener(ActivitiEventListener listenerToAdd, ActivitiEngineEventType... types) {
     commandExecutor.execute(new AddEventListenerCommand(listenerToAdd, types));
   }
 

@@ -13,7 +13,7 @@
 package org.activiti.engine.delegate.event.impl;
 
 import org.activiti.engine.delegate.event.ActivitiErrorEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 
 /**
  * Implementation of an {@link ActivitiErrorEvent}.
@@ -25,7 +25,7 @@ public class ActivitiErrorEventImpl extends ActivitiActivityEventImpl implements
   protected String errorId;
   protected String errorCode;
 
-  public ActivitiErrorEventImpl(ActivitiEventType type) {
+  public ActivitiErrorEventImpl(ActivitiEngineEventType type) {
     super(type);
   }
   

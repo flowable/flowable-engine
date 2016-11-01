@@ -21,7 +21,7 @@ import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.EventListener;
 import org.activiti.bpmn.model.ImplementationType;
 import org.activiti.bpmn.model.Process;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventSupport;
 import org.activiti.engine.impl.bpmn.data.IOSpecification;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
@@ -112,7 +112,7 @@ public class ProcessParseHandler extends AbstractBpmnParseHandler<Process> {
     if (eventListeners != null && !eventListeners.isEmpty()) {
       for (EventListener eventListener : eventListeners) {
         // Extract specific event-types (if any)
-        ActivitiEventType[] types = ActivitiEventType.getTypesFromString(eventListener.getEvents());
+        ActivitiEngineEventType[] types = ActivitiEngineEventType.getTypesFromString(eventListener.getEvents());
 
         if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(eventListener.getImplementationType())) {
           getEventSupport(bpmnParse.getBpmnModel()).addEventListener(bpmnParse.getListenerFactory().createClassDelegateEventListener(eventListener), types);

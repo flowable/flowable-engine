@@ -60,9 +60,9 @@ import org.activiti.engine.cfg.ProcessEngineConfigurator;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandlerFactory;
 import org.activiti.engine.compatibility.DefaultActiviti5CompatibilityHandlerFactory;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventDispatcherImpl;
 import org.activiti.engine.form.AbstractFormType;
 import org.activiti.engine.impl.DynamicBpmnServiceImpl;
@@ -325,7 +325,6 @@ import org.activiti.engine.parse.BpmnParseHandler;
 import org.activiti.engine.runtime.Clock;
 import org.activiti.form.api.FormRepositoryService;
 import org.activiti.idm.api.IdmIdentityService;
-import org.activiti.idm.api.event.ActivitiIdmEventDispatcher;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.activiti.validation.ProcessValidator;
 import org.activiti.validation.ProcessValidatorFactory;
@@ -378,7 +377,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean disableIdmEngine;
   protected boolean idmEngineInitialized;
   protected IdmIdentityService idmIdentityService;
-  protected ActivitiIdmEventDispatcher idmEventDispatcher;
   
   // FORM ENGINE SERVICES /////////////////////////////////////////////////////
   protected boolean formEngineInitialized;
@@ -2235,7 +2233,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (typedEventListeners != null) {
       for (Entry<String, List<ActivitiEventListener>> listenersToAdd : typedEventListeners.entrySet()) {
         // Extract types from the given string
-        ActivitiEventType[] types = ActivitiEventType.getTypesFromString(listenersToAdd.getKey());
+        ActivitiEngineEventType[] types = ActivitiEngineEventType.getTypesFromString(listenersToAdd.getKey());
 
         for (ActivitiEventListener listenerToAdd : listenersToAdd.getValue()) {
           this.eventDispatcher.addEventListener(listenerToAdd, types);
@@ -2452,15 +2450,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setIdmIdentityService(IdmIdentityService idmIdentityService) {
     this.idmIdentityService = idmIdentityService;
-    return this;
-  }
-
-  public ActivitiIdmEventDispatcher getIdmEventDispatcher() {
-    return idmEventDispatcher;
-  }
-
-  public ProcessEngineConfigurationImpl setIdmEventDispatcher(ActivitiIdmEventDispatcher idmEventDispatcher) {
-    this.idmEventDispatcher = idmEventDispatcher;
     return this;
   }
 

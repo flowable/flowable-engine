@@ -51,7 +51,13 @@ public class IdmEngineConfigurator extends AbstractProcessEngineConfigurator {
     
     processEngineConfiguration.setIdmEngineInitialized(true);
     processEngineConfiguration.setIdmIdentityService(idmEngine.getIdmIdentityService());
-    processEngineConfiguration.setIdmEventDispatcher(idmEngine.getIdmEngineConfiguration().getEventDispatcher());
+  }
+  
+  @Override
+  public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    if (processEngineConfiguration.getEventDispatcher() != null) {
+      idmEngineConfiguration.setEventDispatcher(processEngineConfiguration.getEventDispatcher());
+    }
   }
 
   protected synchronized void initIdmEngine() {

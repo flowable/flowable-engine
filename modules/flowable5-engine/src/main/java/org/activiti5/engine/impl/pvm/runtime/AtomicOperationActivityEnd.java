@@ -15,7 +15,7 @@ package org.activiti5.engine.impl.pvm.runtime;
 
 import java.util.List;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.delegate.ActivityBehavior;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.context.Context;
@@ -52,7 +52,7 @@ public class AtomicOperationActivityEnd extends AbstractEventAtomicOperation {
   		if (execution instanceof ExecutionEntity) {
 	  		ExecutionEntity executionEntity = (ExecutionEntity) execution;
 	    	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-	    			ActivitiEventBuilder.createActivityEvent(ActivitiEventType.ACTIVITY_COMPLETED, execution.getActivity().getId(),
+	    			ActivitiEventBuilder.createActivityEvent(ActivitiEngineEventType.ACTIVITY_COMPLETED, execution.getActivity().getId(),
 	    					(String) executionEntity.getActivity().getProperties().get("name"),
 	    					execution.getId(), 
 	    					execution.getProcessInstanceId(), execution.getProcessDefinitionId(),
@@ -72,7 +72,7 @@ public class AtomicOperationActivityEnd extends AbstractEventAtomicOperation {
       // dispatch process completed event
       if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
         Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEventType.PROCESS_COMPLETED, execution));
+          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.PROCESS_COMPLETED, execution));
       }
 
       execution.performOperation(PROCESS_END);
@@ -110,7 +110,7 @@ public class AtomicOperationActivityEnd extends AbstractEventAtomicOperation {
             // dispatch process completed event
             if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
               Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                ActivitiEventBuilder.createEntityEvent(ActivitiEventType.PROCESS_COMPLETED, execution));
+                ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.PROCESS_COMPLETED, execution));
             }
 
         	  parentScopeExecution.performOperation(PROCESS_END);

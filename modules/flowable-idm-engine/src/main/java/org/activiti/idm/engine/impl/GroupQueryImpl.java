@@ -15,10 +15,10 @@ package org.activiti.idm.engine.impl;
 
 import java.util.List;
 
+import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.GroupQuery;
 import org.activiti.idm.api.GroupQueryProperty;
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 import org.activiti.idm.engine.impl.interceptor.CommandExecutor;
 
@@ -49,7 +49,7 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
 
   public GroupQuery groupId(String id) {
     if (id == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided id is null");
+      throw new ActivitiIllegalArgumentException("Provided id is null");
     }
     this.id = id;
     return this;
@@ -57,7 +57,7 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
   
   public GroupQuery groupIds(List<String> ids) {
     if (ids == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided id list is null");
+      throw new ActivitiIllegalArgumentException("Provided id list is null");
     }
     this.ids = ids;
     return this;
@@ -65,7 +65,7 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
 
   public GroupQuery groupName(String name) {
     if (name == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided name is null");
+      throw new ActivitiIllegalArgumentException("Provided name is null");
     }
     this.name = name;
     return this;
@@ -73,7 +73,7 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
 
   public GroupQuery groupNameLike(String nameLike) {
     if (nameLike == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided nameLike is null");
+      throw new ActivitiIllegalArgumentException("Provided nameLike is null");
     }
     this.nameLike = nameLike;
     return this;
@@ -81,7 +81,7 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
 
   public GroupQuery groupType(String type) {
     if (type == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided type is null");
+      throw new ActivitiIllegalArgumentException("Provided type is null");
     }
     this.type = type;
     return this;
@@ -89,7 +89,7 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
 
   public GroupQuery groupMember(String userId) {
     if (userId == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided userId is null");
+      throw new ActivitiIllegalArgumentException("Provided userId is null");
     }
     this.userId = userId;
     return this;
@@ -97,7 +97,7 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
 
   public GroupQuery groupMembers(List<String> userIds) {
     if (userIds == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided userIds is null");
+      throw new ActivitiIllegalArgumentException("Provided userIds is null");
     }
     this.userIds = userIds;
     return this;

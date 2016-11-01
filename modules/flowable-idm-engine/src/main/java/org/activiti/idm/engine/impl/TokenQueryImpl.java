@@ -16,10 +16,10 @@ package org.activiti.idm.engine.impl;
 import java.util.Date;
 import java.util.List;
 
+import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.idm.api.Token;
 import org.activiti.idm.api.TokenQuery;
 import org.activiti.idm.api.TokenQueryProperty;
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 import org.activiti.idm.engine.impl.interceptor.CommandExecutor;
 
@@ -57,7 +57,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
 
   public TokenQuery tokenId(String id) {
     if (id == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided id is null");
+      throw new ActivitiIllegalArgumentException("Provided id is null");
     }
     this.id = id;
     return this;
@@ -65,7 +65,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
   
   public TokenQuery tokenIds(List<String> ids) {
     if (ids == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided ids is null");
+      throw new ActivitiIllegalArgumentException("Provided ids is null");
     }
     this.ids = ids;
     return this;
@@ -73,7 +73,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
 
   public TokenQuery tokenValue(String tokenValue) {
     if (tokenValue == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided token value is null");
+      throw new ActivitiIllegalArgumentException("Provided token value is null");
     }
     this.tokenValue = tokenValue;
     return this;
@@ -81,7 +81,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
   
   public TokenQuery tokenDate(Date tokenDate) {
     if (tokenDate == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided token date is null");
+      throw new ActivitiIllegalArgumentException("Provided token date is null");
     }
     this.tokenDate = tokenDate;
     return this;
@@ -89,7 +89,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
   
   public TokenQuery tokenDateBefore(Date tokenDateBefore) {
     if (tokenDateBefore == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided tokenDateBefore is null");
+      throw new ActivitiIllegalArgumentException("Provided tokenDateBefore is null");
     }
     this.tokenDateBefore = tokenDateBefore;
     return this;
@@ -97,7 +97,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
   
   public TokenQuery tokenDateAfter(Date tokenDateAfter) {
     if (tokenDateAfter == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided tokenDateAfter is null");
+      throw new ActivitiIllegalArgumentException("Provided tokenDateAfter is null");
     }
     this.tokenDateAfter = tokenDateAfter;
     return this;
@@ -105,7 +105,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
   
   public TokenQuery ipAddress(String ipAddress) {
     if (ipAddress == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided ip address is null");
+      throw new ActivitiIllegalArgumentException("Provided ip address is null");
     }
     this.ipAddress = ipAddress;
     return this;
@@ -113,7 +113,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
 
   public TokenQuery ipAddressLike(String ipAddressLike) {
     if (ipAddressLike == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided ipAddressLike is null");
+      throw new ActivitiIllegalArgumentException("Provided ipAddressLike is null");
     }
     this.ipAddressLike = ipAddressLike;
     return this;
@@ -121,7 +121,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
 
   public TokenQuery userAgent(String userAgent) {
     if (userAgent == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided user agent is null");
+      throw new ActivitiIllegalArgumentException("Provided user agent is null");
     }
     this.userAgent = userAgent;
     return this;
@@ -129,7 +129,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
 
   public TokenQuery userAgentLike(String userAgentLike) {
     if (userAgentLike == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided userAgentLike is null");
+      throw new ActivitiIllegalArgumentException("Provided userAgentLike is null");
     }
     this.userAgentLike = userAgentLike;
     return this;
@@ -137,7 +137,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
 
   public TokenQuery userId(String userId) {
     if (userId == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided user id is null");
+      throw new ActivitiIllegalArgumentException("Provided user id is null");
     }
     this.userId = userId;
     return this;
@@ -145,7 +145,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
 
   public TokenQuery userIdLike(String userIdLike) {
     if (userIdLike == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided userIdLike is null");
+      throw new ActivitiIllegalArgumentException("Provided userIdLike is null");
     }
     this.userIdLike = userIdLike;
     return this;
@@ -153,7 +153,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
   
   public TokenQuery tokenData(String tokenData) {
     if (tokenData == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided token data is null");
+      throw new ActivitiIllegalArgumentException("Provided token data is null");
     }
     this.tokenData = tokenData;
     return this;
@@ -161,7 +161,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
 
   public TokenQuery tokenDataLike(String tokenDataLike) {
     if (tokenDataLike == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided tokenDataLike is null");
+      throw new ActivitiIllegalArgumentException("Provided tokenDataLike is null");
     }
     this.tokenDataLike = tokenDataLike;
     return this;

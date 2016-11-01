@@ -14,8 +14,8 @@ package org.activiti.idm.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.idm.api.management.IdmTableMetaData;
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
 import org.activiti.idm.engine.impl.interceptor.Command;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 
@@ -33,7 +33,7 @@ public class GetTableMetaDataCmd implements Command<IdmTableMetaData>, Serializa
 
   public IdmTableMetaData execute(CommandContext commandContext) {
     if (tableName == null) {
-      throw new ActivitiIdmIllegalArgumentException("tableName is null");
+      throw new ActivitiIllegalArgumentException("tableName is null");
     }
     return commandContext.getTableDataManager().getTableMetaData(tableName);
   }

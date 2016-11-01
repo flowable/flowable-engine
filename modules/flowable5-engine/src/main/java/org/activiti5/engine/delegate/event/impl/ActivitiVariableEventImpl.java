@@ -12,7 +12,7 @@
  */
 package org.activiti5.engine.delegate.event.impl;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.ActivitiVariableEvent;
 import org.activiti.engine.impl.variable.VariableType;
 
@@ -28,7 +28,7 @@ public class ActivitiVariableEventImpl extends ActivitiEventImpl implements Acti
 	protected VariableType variableType;
 	protected String taskId;
 	
-	public ActivitiVariableEventImpl(ActivitiEventType type) {
+	public ActivitiVariableEventImpl(ActivitiEngineEventType type) {
 	  super(type);
   }
 

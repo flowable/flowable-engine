@@ -12,7 +12,7 @@
  */
 package org.activiti5.engine.delegate.event.impl;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.ActivitiSignalEvent;
 
 /**
@@ -25,7 +25,7 @@ public class ActivitiSignalEventImpl extends ActivitiActivityEventImpl implement
 	protected String signalName;
 	protected Object signalData;
 	
-	public ActivitiSignalEventImpl(ActivitiEventType type) {
+	public ActivitiSignalEventImpl(ActivitiEngineEventType type) {
 	  super(type);
   }
 

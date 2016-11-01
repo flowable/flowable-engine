@@ -17,7 +17,7 @@ import java.util.List;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.delegate.event.ActivitiEntityEvent;
 import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.repository.DeploymentProperties;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -56,7 +56,7 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
 		// Check if the listener (defined as bean) received events (only creation, not other events)
 		assertFalse(testListenerBean.getEventsReceived().isEmpty());
 		for (ActivitiEvent event : testListenerBean.getEventsReceived()) {
-			assertEquals(ActivitiEventType.ENTITY_CREATED, event.getType());
+			assertEquals(ActivitiEngineEventType.ENTITY_CREATED, event.getType());
 		}
 		
 		// First event received should be creation of Process-definition
@@ -79,9 +79,9 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
 		boolean deleteFound = false;
 		
 		for (ActivitiEvent e : events) {
-			if (ActivitiEventType.ENTITY_CREATED == e.getType() ) {
+			if (ActivitiEngineEventType.ENTITY_CREATED == e.getType() ) {
 				insertFound = true;
-			} else if (ActivitiEventType.ENTITY_DELETED == e.getType()) {
+			} else if (ActivitiEngineEventType.ENTITY_DELETED == e.getType()) {
 				deleteFound = true;
 			}
 		}
@@ -153,8 +153,8 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
 		
 		taskService.createAttachment("test", task.getId(), processInstance.getId(), "test", "test", "url");
 		assertEquals(2, theListener.getEventsReceived().size());
-		assertEquals(ActivitiEventType.ENTITY_CREATED, theListener.getEventsReceived().get(0).getType());
-		assertEquals(ActivitiEventType.ENTITY_INITIALIZED, theListener.getEventsReceived().get(1).getType());
+		assertEquals(ActivitiEngineEventType.ENTITY_CREATED, theListener.getEventsReceived().get(0).getType());
+		assertEquals(ActivitiEngineEventType.ENTITY_INITIALIZED, theListener.getEventsReceived().get(1).getType());
 		
 	}
 	

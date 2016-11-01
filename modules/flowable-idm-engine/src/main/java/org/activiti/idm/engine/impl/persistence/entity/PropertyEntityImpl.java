@@ -14,7 +14,7 @@ package org.activiti.idm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
-import org.activiti.idm.engine.ActivitiIdmException;
+import org.activiti.engine.ActivitiException;
 
 /**
  * @author Tijs Rademakers
@@ -55,7 +55,7 @@ public class PropertyEntityImpl extends AbstractEntity implements PropertyEntity
   }
 
   public void setId(String id) {
-    throw new ActivitiIdmException("only provided id generation allowed for properties");
+    throw new ActivitiException("only provided id generation allowed for properties");
   }
 
   // common methods //////////////////////////////////////////////////////////

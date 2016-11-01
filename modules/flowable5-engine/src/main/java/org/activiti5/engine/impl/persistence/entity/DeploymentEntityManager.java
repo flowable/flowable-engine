@@ -16,7 +16,7 @@ package org.activiti5.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.Job;
 import org.activiti5.engine.ProcessEngineConfiguration;
@@ -105,7 +105,7 @@ public class DeploymentEntityManager extends AbstractManager {
 					if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
 						Context.getProcessEngineConfiguration()
 						       .getEventDispatcher()
-						       .dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.JOB_CANCELED, timerStartJob, null, null, processDefinition.getId()));
+						       .dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.JOB_CANCELED, timerStartJob, null, null, processDefinition.getId()));
 					}
 
 					((TimerJobEntity) timerStartJob).delete();

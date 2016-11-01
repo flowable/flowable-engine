@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.Condition;
@@ -91,14 +91,14 @@ public class BpmnActivityBehavior implements Serializable {
       for (JobEntity job: jobs) {
         if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
           Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-            ActivitiEventBuilder.createEntityEvent(ActivitiEventType.JOB_CANCELED, job));
+            ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.JOB_CANCELED, job));
         }
       }
       
       List<TimerJobEntity> timerJobs = ((ExecutionEntity) activityExecution).getTimerJobs();
       for (TimerJobEntity job : timerJobs) {
         if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-          Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.JOB_CANCELED, job));
+          Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.JOB_CANCELED, job));
         }
       }
     }

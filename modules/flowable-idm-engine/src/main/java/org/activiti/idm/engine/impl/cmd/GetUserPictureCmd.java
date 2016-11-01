@@ -15,10 +15,10 @@ package org.activiti.idm.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.idm.api.Picture;
 import org.activiti.idm.api.User;
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
-import org.activiti.idm.engine.ActivitiIdmObjectNotFoundException;
 import org.activiti.idm.engine.impl.interceptor.Command;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 
@@ -36,7 +36,7 @@ public class GetUserPictureCmd implements Command<Picture>, Serializable {
 
   public Picture execute(CommandContext commandContext) {
     if (userId == null) {
-      throw new ActivitiIdmIllegalArgumentException("userId is null");
+      throw new ActivitiIllegalArgumentException("userId is null");
     }
     
     User user = commandContext.getIdmEngineConfiguration().getIdmIdentityService()
@@ -44,7 +44,7 @@ public class GetUserPictureCmd implements Command<Picture>, Serializable {
         .singleResult();
     
     if (user == null) {
-      throw new ActivitiIdmObjectNotFoundException("user " + userId + " doesn't exist", User.class);
+      throw new ActivitiObjectNotFoundException("user " + userId + " doesn't exist", User.class);
     }
     
     return commandContext.getUserEntityManager().getUserPicture(user);

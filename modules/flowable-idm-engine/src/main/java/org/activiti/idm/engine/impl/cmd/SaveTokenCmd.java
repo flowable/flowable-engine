@@ -14,8 +14,8 @@ package org.activiti.idm.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.idm.api.Token;
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
 import org.activiti.idm.engine.impl.db.Entity;
 import org.activiti.idm.engine.impl.interceptor.Command;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
@@ -36,7 +36,7 @@ public class SaveTokenCmd implements Command<Void>, Serializable {
 
   public Void execute(CommandContext commandContext) {
     if (token == null) {
-      throw new ActivitiIdmIllegalArgumentException("token is null");
+      throw new ActivitiIllegalArgumentException("token is null");
     }
     
     if (commandContext.getTokenEntityManager().isNewToken(token)) {

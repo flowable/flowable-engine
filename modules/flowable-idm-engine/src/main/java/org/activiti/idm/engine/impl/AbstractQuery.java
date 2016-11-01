@@ -15,10 +15,10 @@ package org.activiti.idm.engine.impl;
 import java.io.Serializable;
 import java.util.List;
 
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.idm.api.Query;
 import org.activiti.idm.api.QueryProperty;
-import org.activiti.idm.engine.ActivitiIdmException;
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.context.Context;
 import org.activiti.idm.engine.impl.db.ListQueryParameterObject;
@@ -100,7 +100,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
   @SuppressWarnings("unchecked")
   public T direction(Direction direction) {
     if (orderProperty == null) {
-      throw new ActivitiIdmIllegalArgumentException("You should call any of the orderBy methods first before specifying a direction");
+      throw new ActivitiIllegalArgumentException("You should call any of the orderBy methods first before specifying a direction");
     }
     addOrder(orderProperty.getName(), direction.getName(), nullHandlingOnOrder);
     orderProperty = null;
@@ -110,7 +110,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
 
   protected void checkQueryOk() {
     if (orderProperty != null) {
-      throw new ActivitiIdmIllegalArgumentException("Invalid query: call asc() or desc() after using orderByXX()");
+      throw new ActivitiIllegalArgumentException("Invalid query: call asc() or desc() after using orderByXX()");
     }
   }
 
@@ -178,7 +178,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
     if (results.size() == 1) {
       return results.get(0);
     } else if (results.size() > 1) {
-      throw new ActivitiIdmException("Query return " + results.size() + " results instead of max 1");
+      throw new ActivitiException("Query return " + results.size() + " results instead of max 1");
     }
     return null;
   }

@@ -12,24 +12,23 @@
  */
 package org.activiti.idm.engine.delegate.event.impl;
 
-import org.activiti.idm.api.event.ActivitiIdmEntityEvent;
-import org.activiti.idm.api.event.ActivitiIdmEvent;
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.delegate.event.ActivitiEntityEvent;
 import org.activiti.idm.api.event.ActivitiIdmEventType;
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
 
 /**
  * Base class for all {@link ActivitiIdmEvent} implementations, related to entities.
  * 
  * @author Tijs Rademakers
  */
-public class ActivitiIdmEntityEventImpl extends ActivitiIdmEventImpl implements ActivitiIdmEntityEvent {
+public class ActivitiIdmEntityEventImpl extends ActivitiIdmEventImpl implements ActivitiEntityEvent {
 
   protected Object entity;
 
   public ActivitiIdmEntityEventImpl(Object entity, ActivitiIdmEventType type) {
     super(type);
     if (entity == null) {
-      throw new ActivitiIdmIllegalArgumentException("Entity cannot be null.");
+      throw new ActivitiIllegalArgumentException("Entity cannot be null.");
     }
     this.entity = entity;
   }

@@ -14,7 +14,7 @@ package org.activiti5.engine.delegate.event.impl;
 
 import org.activiti.engine.delegate.event.ActivitiEntityEvent;
 import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 
 /**
@@ -26,7 +26,7 @@ public class ActivitiEntityEventImpl extends ActivitiEventImpl implements Activi
 
 	protected Object entity;
 	
-	public ActivitiEntityEventImpl(Object entity, ActivitiEventType type) {
+	public ActivitiEntityEventImpl(Object entity, ActivitiEngineEventType type) {
 		super(type);
 		if(entity == null) {
 			throw new ActivitiIllegalArgumentException("Entity cannot be null.");

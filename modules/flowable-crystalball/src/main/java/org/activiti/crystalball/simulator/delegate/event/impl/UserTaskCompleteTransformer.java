@@ -16,7 +16,7 @@ package org.activiti.crystalball.simulator.delegate.event.impl;
 import org.activiti.crystalball.simulator.SimulationEvent;
 import org.activiti.engine.delegate.event.ActivitiEntityEvent;
 import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.task.Task;
 
@@ -38,7 +38,7 @@ public class UserTaskCompleteTransformer extends Activiti2SimulationEventFunctio
 
   @Override
   public SimulationEvent apply(ActivitiEvent event) {
-    if (ActivitiEventType.TASK_COMPLETED.equals(event.getType())) {
+    if (ActivitiEngineEventType.TASK_COMPLETED.equals(event.getType())) {
       Task task = (Task) ((ActivitiEntityEvent) event).getEntity();
 
       Map<String, Object> properties = new HashMap<String, Object>();

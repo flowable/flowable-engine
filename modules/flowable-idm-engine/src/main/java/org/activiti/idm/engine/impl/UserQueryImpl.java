@@ -15,10 +15,10 @@ package org.activiti.idm.engine.impl;
 
 import java.util.List;
 
+import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.idm.api.User;
 import org.activiti.idm.api.UserQuery;
 import org.activiti.idm.api.UserQueryProperty;
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 import org.activiti.idm.engine.impl.interceptor.CommandExecutor;
 
@@ -53,7 +53,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
 
   public UserQuery userId(String id) {
     if (id == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided id is null");
+      throw new ActivitiIllegalArgumentException("Provided id is null");
     }
     this.id = id;
     return this;
@@ -61,7 +61,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
   
   public UserQuery userIds(List<String> ids) {
     if (ids == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided ids is null");
+      throw new ActivitiIllegalArgumentException("Provided ids is null");
     }
     this.ids = ids;
     return this;
@@ -69,7 +69,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
 
   public UserQuery userFirstName(String firstName) {
     if (firstName == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided firstName is null");
+      throw new ActivitiIllegalArgumentException("Provided firstName is null");
     }
     this.firstName = firstName;
     return this;
@@ -77,7 +77,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
 
   public UserQuery userFirstNameLike(String firstNameLike) {
     if (firstNameLike == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided firstNameLike is null");
+      throw new ActivitiIllegalArgumentException("Provided firstNameLike is null");
     }
     this.firstNameLike = firstNameLike;
     return this;
@@ -85,7 +85,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
 
   public UserQuery userLastName(String lastName) {
     if (lastName == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided lastName is null");
+      throw new ActivitiIllegalArgumentException("Provided lastName is null");
     }
     this.lastName = lastName;
     return this;
@@ -93,7 +93,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
 
   public UserQuery userLastNameLike(String lastNameLike) {
     if (lastNameLike == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided lastNameLike is null");
+      throw new ActivitiIllegalArgumentException("Provided lastNameLike is null");
     }
     this.lastNameLike = lastNameLike;
     return this;
@@ -101,7 +101,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
 
   public UserQuery userFullNameLike(String fullNameLike) {
     if (fullNameLike == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided full name is null");
+      throw new ActivitiIllegalArgumentException("Provided full name is null");
     }
     this.fullNameLike = fullNameLike;
     return this;
@@ -109,7 +109,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
 
   public UserQuery userEmail(String email) {
     if (email == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided email is null");
+      throw new ActivitiIllegalArgumentException("Provided email is null");
     }
     this.email = email;
     return this;
@@ -117,7 +117,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
 
   public UserQuery userEmailLike(String emailLike) {
     if (emailLike == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided emailLike is null");
+      throw new ActivitiIllegalArgumentException("Provided emailLike is null");
     }
     this.emailLike = emailLike;
     return this;
@@ -125,7 +125,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
 
   public UserQuery memberOfGroup(String groupId) {
     if (groupId == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided groupId is null");
+      throw new ActivitiIllegalArgumentException("Provided groupId is null");
     }
     this.groupId = groupId;
     return this;
@@ -133,7 +133,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
   
   public UserQuery memberOfGroups(List<String> groupIds) {
     if (groupIds == null) {
-      throw new ActivitiIdmIllegalArgumentException("Provided groupIds is null");
+      throw new ActivitiIllegalArgumentException("Provided groupIds is null");
     }
     this.groupIds = groupIds;
     return this;

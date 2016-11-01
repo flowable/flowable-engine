@@ -17,8 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.ActivitiException;
 import org.activiti.idm.api.NativeQuery;
-import org.activiti.idm.engine.ActivitiIdmException;
 import org.activiti.idm.engine.impl.context.Context;
 import org.activiti.idm.engine.impl.interceptor.Command;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
@@ -160,7 +160,7 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> implem
     if (results.size() == 1) {
       return results.get(0);
     } else if (results.size() > 1) {
-      throw new ActivitiIdmException("Query return " + results.size() + " results instead of max 1");
+      throw new ActivitiException("Query return " + results.size() + " results instead of max 1");
     }
     return null;
   }

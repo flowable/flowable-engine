@@ -30,10 +30,13 @@ import java.util.Set;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
+import org.activiti.engine.delegate.event.ActivitiEventListener;
+import org.activiti.engine.impl.cfg.IdGenerator;
+import org.activiti.engine.impl.persistence.StrongUuidGenerator;
 import org.activiti.idm.api.IdmIdentityService;
 import org.activiti.idm.api.IdmManagementService;
-import org.activiti.idm.api.event.ActivitiIdmEventDispatcher;
-import org.activiti.idm.api.event.ActivitiIdmEventListener;
 import org.activiti.idm.api.event.ActivitiIdmEventType;
 import org.activiti.idm.engine.delegate.event.impl.ActivitiIdmEventDispatcherImpl;
 import org.activiti.idm.engine.impl.IdmEngineImpl;
@@ -41,7 +44,6 @@ import org.activiti.idm.engine.impl.IdmIdentityServiceImpl;
 import org.activiti.idm.engine.impl.IdmManagementServiceImpl;
 import org.activiti.idm.engine.impl.ServiceImpl;
 import org.activiti.idm.engine.impl.cfg.CommandExecutorImpl;
-import org.activiti.idm.engine.impl.cfg.IdGenerator;
 import org.activiti.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
 import org.activiti.idm.engine.impl.cfg.StandaloneInMemIdmEngineConfiguration;
 import org.activiti.idm.engine.impl.cfg.TransactionContextFactory;
@@ -55,7 +57,6 @@ import org.activiti.idm.engine.impl.interceptor.CommandInterceptor;
 import org.activiti.idm.engine.impl.interceptor.CommandInvoker;
 import org.activiti.idm.engine.impl.interceptor.LogInterceptor;
 import org.activiti.idm.engine.impl.interceptor.SessionFactory;
-import org.activiti.idm.engine.impl.persistence.StrongUuidGenerator;
 import org.activiti.idm.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.activiti.idm.engine.impl.persistence.entity.ByteArrayEntityManagerImpl;
 import org.activiti.idm.engine.impl.persistence.entity.GroupEntityManager;
@@ -226,9 +227,9 @@ public class IdmEngineConfiguration {
   protected Map<Class<?>, SessionFactory> sessionFactories;
   
   protected boolean enableEventDispatcher = true;
-  protected ActivitiIdmEventDispatcher eventDispatcher;
-  protected List<ActivitiIdmEventListener> eventListeners;
-  protected Map<String, List<ActivitiIdmEventListener>> typedEventListeners;
+  protected ActivitiEventDispatcher eventDispatcher;
+  protected List<ActivitiEventListener> eventListeners;
+  protected Map<String, List<ActivitiEventListener>> typedEventListeners;
 
   protected boolean transactionsExternallyManaged;
 
@@ -479,12 +480,12 @@ public class IdmEngineConfiguration {
         try {
           dataSource = (DataSource) new InitialContext().lookup(dataSourceJndiName);
         } catch (Exception e) {
-          throw new ActivitiIdmException("couldn't lookup datasource from " + dataSourceJndiName + ": " + e.getMessage(), e);
+          throw new ActivitiException("couldn't lookup datasource from " + dataSourceJndiName + ": " + e.getMessage(), e);
         }
 
       } else if (jdbcUrl != null) {
         if ((jdbcDriver == null) || (jdbcUsername == null)) {
-          throw new ActivitiIdmException("DataSource or JDBC properties have to be specified in a process engine configuration");
+          throw new ActivitiException("DataSource or JDBC properties have to be specified in a process engine configuration");
         }
 
         logger.debug("initializing datasource to db: {}", jdbcUrl);
@@ -544,7 +545,7 @@ public class IdmEngineConfiguration {
       logger.debug("database product name: '{}'", databaseProductName);
       databaseType = databaseTypeMappings.getProperty(databaseProductName);
       if (databaseType == null) {
-        throw new ActivitiIdmException("couldn't deduct database type from database product name '" + databaseProductName + "'");
+        throw new ActivitiException("couldn't deduct database type from database product name '" + databaseProductName + "'");
       }
       logger.debug("using database type: {}", databaseType);
 
@@ -666,7 +667,7 @@ public class IdmEngineConfiguration {
 
   public CommandInterceptor initInterceptorChain(List<CommandInterceptor> chain) {
     if (chain == null || chain.isEmpty()) {
-      throw new ActivitiIdmException("invalid command interceptor chain configuration: " + chain);
+      throw new ActivitiException("invalid command interceptor chain configuration: " + chain);
     }
     for (int i = 0; i < chain.size() - 1; i++) {
       chain.get(i).setNext(chain.get(i + 1));
@@ -757,7 +758,7 @@ public class IdmEngineConfiguration {
         sqlSessionFactory = new DefaultSqlSessionFactory(configuration);
 
       } catch (Exception e) {
-        throw new ActivitiIdmException("Error while building ibatis SqlSessionFactory: " + e.getMessage(), e);
+        throw new ActivitiException("Error while building ibatis SqlSessionFactory: " + e.getMessage(), e);
       } finally {
         IOUtils.closeQuietly(inputStream);
       }
@@ -818,17 +819,17 @@ public class IdmEngineConfiguration {
     this.eventDispatcher.setEnabled(enableEventDispatcher);
 
     if (eventListeners != null) {
-      for (ActivitiIdmEventListener listenerToAdd : eventListeners) {
+      for (ActivitiEventListener listenerToAdd : eventListeners) {
         this.eventDispatcher.addEventListener(listenerToAdd);
       }
     }
 
     if (typedEventListeners != null) {
-      for (Entry<String, List<ActivitiIdmEventListener>> listenersToAdd : typedEventListeners.entrySet()) {
+      for (Entry<String, List<ActivitiEventListener>> listenersToAdd : typedEventListeners.entrySet()) {
         // Extract types from the given string
         ActivitiIdmEventType[] types = ActivitiIdmEventType.getTypesFromString(listenersToAdd.getKey());
 
-        for (ActivitiIdmEventListener listenerToAdd : listenersToAdd.getValue()) {
+        for (ActivitiEventListener listenerToAdd : listenersToAdd.getValue()) {
           this.eventDispatcher.addEventListener(listenerToAdd, types);
         }
       }
@@ -1410,29 +1411,29 @@ public class IdmEngineConfiguration {
     return this;
   }
 
-  public ActivitiIdmEventDispatcher getEventDispatcher() {
+  public ActivitiEventDispatcher getEventDispatcher() {
     return eventDispatcher;
   }
 
-  public IdmEngineConfiguration setEventDispatcher(ActivitiIdmEventDispatcher eventDispatcher) {
+  public IdmEngineConfiguration setEventDispatcher(ActivitiEventDispatcher eventDispatcher) {
     this.eventDispatcher = eventDispatcher;
     return this;
   }
 
-  public List<ActivitiIdmEventListener> getEventListeners() {
+  public List<ActivitiEventListener> getEventListeners() {
     return eventListeners;
   }
 
-  public IdmEngineConfiguration setEventListeners(List<ActivitiIdmEventListener> eventListeners) {
+  public IdmEngineConfiguration setEventListeners(List<ActivitiEventListener> eventListeners) {
     this.eventListeners = eventListeners;
     return this;
   }
 
-  public Map<String, List<ActivitiIdmEventListener>> getTypedEventListeners() {
+  public Map<String, List<ActivitiEventListener>> getTypedEventListeners() {
     return typedEventListeners;
   }
 
-  public IdmEngineConfiguration setTypedEventListeners(Map<String, List<ActivitiIdmEventListener>> typedEventListeners) {
+  public IdmEngineConfiguration setTypedEventListeners(Map<String, List<ActivitiEventListener>> typedEventListeners) {
     this.typedEventListeners = typedEventListeners;
     return this;
   }
