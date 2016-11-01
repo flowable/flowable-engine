@@ -13,6 +13,8 @@
 
 package org.activiti.rest.service.api;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Generic class that represents an action to be performed on a resource. Should be subclasses if additional action-parameters are required.
  * 
@@ -22,6 +24,7 @@ public class RestActionRequest {
 
   private String action;
 
+  @ApiModelProperty(value = "Action to perform")
   public void setAction(String action) {
     this.action = action;
   }

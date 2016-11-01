@@ -52,10 +52,12 @@ public class RestUrlBuilder {
 
   /** Uses baseUrl as the base URL */
   public static RestUrlBuilder usingBaseUrl(String baseUrl) {
-    if (baseUrl == null)
+    if (baseUrl == null) {
       throw new ActivitiIllegalArgumentException("baseUrl can not be null");
-    if (baseUrl.endsWith("/"))
+    }
+    if (baseUrl.endsWith("/")) {
       baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+    }
     return new RestUrlBuilder(baseUrl);
   }
 

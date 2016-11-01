@@ -10,27 +10,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.rest.dmn.service.api.repository;
+package org.activiti.rest.form.service.api.repository;
 
-import org.activiti.rest.dmn.common.AbstractDmnPaginateList;
-import org.activiti.rest.dmn.service.api.DmnRestResponseFactory;
+import org.activiti.rest.form.FormRestResponseFactory;
+import org.activiti.rest.form.common.AbstractFormPaginateList;
 
 import java.util.List;
 
 /**
  * @author Yvo Swillens
  */
-public class DmnDeploymentsDmnPaginateList extends AbstractDmnPaginateList {
+public class FormDeploymentsPaginateList extends AbstractFormPaginateList {
 
-  protected DmnRestResponseFactory dmnRestResponseFactory;
+  protected FormRestResponseFactory formRestResponseFactory;
 
-  public DmnDeploymentsDmnPaginateList(DmnRestResponseFactory dmnRestResponseFactory) {
-    this.dmnRestResponseFactory = dmnRestResponseFactory;
+  public FormDeploymentsPaginateList(FormRestResponseFactory formRestResponseFactory) {
+    this.formRestResponseFactory = formRestResponseFactory;
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
   protected List processList(List list) {
-    return dmnRestResponseFactory.createDmnDeploymentResponseList(list);
+    return formRestResponseFactory.createFormDeploymentResponseList(list);
   }
 }

@@ -17,6 +17,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import io.swagger.annotations.*;
 import org.activiti.engine.task.Task;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,10 +28,16 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Tijs Rademakers
  */
 @RestController
+@Api(tags = { "Tasks" }, description = "Manage Tasks")
 public class TaskSubTaskCollectionResource extends TaskBaseResource {
 
+  @ApiOperation(value = "Get list of sub tasks for a task", tags = {"Tasks"})
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates request was successful and the  sub tasks are returned"),
+          @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
+  })
   @RequestMapping(value = "/runtime/tasks/{taskId}/subtasks", method = RequestMethod.GET, produces = "application/json")
-  public List<TaskResponse> getSubTasks(@PathVariable String taskId, HttpServletRequest request) {
+  public List<TaskResponse> getSubTasks(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
     Task task = getTaskFromRequest(taskId);
     return restResponseFactory.createTaskResponseList(taskService.getSubTasks(task.getId()));
   }

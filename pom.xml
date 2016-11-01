@@ -320,6 +320,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
+				<artifactId>flowable-form-rest</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.flowable</groupId>
 				<artifactId>flowable-camel</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -899,6 +904,7 @@
 				<module>modules/flowable-form-json-converter</module>
 				<module>modules/flowable-form-engine</module>
 				<module>modules/flowable-form-engine-configurator</module>
+				<module>modules/flowable-form-rest</module>
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>
 				<module>modules/flowable-webapp-rest2</module>
@@ -911,7 +917,6 @@
 				<module>modules/flowable-cxf</module>
 				<module>modules/flowable-mule</module>
 				<module>modules/flowable-camel</module>
-				<module>modules/flowable-ui</module>
 				<module>modules/flowable-cdi</module>
 				<module>modules/flowable-osgi</module>
 				<module>modules/flowable-ldap</module>
@@ -981,6 +986,7 @@
 				<module>modules/flowable-form-json-converter</module>
 				<module>modules/flowable-form-engine</module>
 				<module>modules/flowable-form-engine-configurator</module>
+				<module>modules/flowable-form-rest</module>
 				<module>modules/flowable-dmn-engine</module>
 				<module>modules/flowable-dmn-model</module>
 				<module>modules/flowable-dmn-json-converter</module>
@@ -1079,7 +1085,6 @@
 				<module>modules/flowable-osgi</module>
 				<module>modules/flowable-camel</module>
 				<module>modules/flowable-mule</module>
-				<module>modules/flowable-ui</module>
 				<module>modules/flowable-cdi</module>
 				<module>modules/flowable-ldap</module>
 				<module>modules/flowable-jmx</module>
@@ -1166,6 +1171,19 @@
 				<module>modules/flowable-spring</module>
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>
+				<module>modules/flowable-dmn-model</module>
+				<module>modules/flowable-dmn-api</module>
+				<module>modules/flowable-dmn-engine</module>
+				<module>modules/flowable-dmn-engine-configurator</module>
+				<module>modules/flowable-dmn-json-converter</module>
+				<module>modules/flowable-dmn-xml-converter</module>
+				<module>modules/flowable-dmn-rest</module>
+				<module>modules/flowable-form-model</module>
+				<module>modules/flowable-form-api</module>
+				<module>modules/flowable-form-engine</module>
+				<module>modules/flowable-form-engine-configurator</module>
+				<module>modules/flowable-form-json-converter</module>
+				<module>modules/flowable-form-rest</module>
 			</modules>
 			<properties>
 				<skipTests>true</skipTests>

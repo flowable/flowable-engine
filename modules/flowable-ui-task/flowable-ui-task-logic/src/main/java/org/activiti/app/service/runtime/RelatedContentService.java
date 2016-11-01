@@ -15,12 +15,15 @@ package org.activiti.app.service.runtime;
 import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.activiti.app.domain.runtime.RelatedContent;
 import org.activiti.app.repository.runtime.RelatedContentRepository;
+import org.activiti.content.storage.api.ContentMetaDataKeys;
 import org.activiti.content.storage.api.ContentObject;
 import org.activiti.content.storage.api.ContentStorage;
 import org.activiti.engine.runtime.Clock;
@@ -45,6 +48,10 @@ public class RelatedContentService {
 
     @Autowired
     protected Clock clock;
+    
+    public RelatedContent get(String id) {
+      return contentRepository.get(id);
+    }
 
     public List<RelatedContent> getRelatedContent(String source, String sourceId) {
         return contentRepository.findBySourceAndSourceId(source, sourceId);
@@ -111,7 +118,15 @@ public class RelatedContentService {
         if (data != null) {
 
             // Stream given, write to store and save a reference to the content object
-            ContentObject createContentObject = contentStorage.createContentObject(data, lengthHint);
+            Map<String, Object> metaData = new HashMap<String, Object>();
+            if (taskId != null) {
+              metaData.put(ContentMetaDataKeys.TASK_ID, taskId);
+            } else {
+              if (processId != null) {
+                metaData.put(ContentMetaDataKeys.PROCESS_INSTANCE_ID, processId);
+              }
+            }
+            ContentObject createContentObject = contentStorage.createContentObject(data, lengthHint, metaData);
             newContent.setContentStoreId(createContentObject.getId());
             newContent.setContentAvailable(true);
 
@@ -230,7 +245,7 @@ public class RelatedContentService {
     public void updateRelatedContentData(String relatedContentId, String contentStoreId, InputStream contentStream, Long lengthHint, User user) {
         Date timestamp = clock.getCurrentTime();
         
-        ContentObject updatedContent = contentStorage.updateContentObject(contentStoreId, contentStream, lengthHint);
+        ContentObject updatedContent = contentStorage.updateContentObject(contentStoreId, contentStream, lengthHint, null);
         
         RelatedContent relatedContent = contentRepository.get(relatedContentId);
         relatedContent.setLastModifiedBy(user.getId());
@@ -254,11 +269,13 @@ public class RelatedContentService {
     @Transactional
     public void setContentField(String relatedContentId, String field, String processInstanceId, String taskId) {
         final RelatedContent relatedContent = contentRepository.get(relatedContentId);
-        relatedContent.setProcessInstanceId(processInstanceId);
-        relatedContent.setTaskId(taskId);
-        relatedContent.setRelatedContent(false);
-        relatedContent.setField(field);
-        contentRepository.save(relatedContent);
+        if (relatedContent != null) {
+          relatedContent.setProcessInstanceId(processInstanceId);
+          relatedContent.setTaskId(taskId);
+          relatedContent.setRelatedContent(false);
+          relatedContent.setField(field);
+          contentRepository.save(relatedContent);
+        }
     }
     
     @Transactional

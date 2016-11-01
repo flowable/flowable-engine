@@ -20,6 +20,7 @@ import java.io.ObjectOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.*;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.runtime.Execution;
@@ -36,11 +37,17 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Frederik Heremans
  */
 @RestController
+@Api(tags = { "Executions" }, description = "Manage Executions")
 public class ExecutionVariableDataResource extends BaseExecutionVariableResource {
 
+  @ApiOperation(value = "Get the binary data for an execution", tags = {"Executions"},  nickname = "getExecutionVariableData")
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message =  "Indicates the execution was found and the requested variables are returned."),
+          @ApiResponse(code = 404, message = "Indicates the requested execution was not found or the task doesn’t have a variable with the given name (in the given scope). Status message provides additional information.")
+  })
   @RequestMapping(value = "/runtime/executions/{executionId}/variables/{variableName}/data", method = RequestMethod.GET)
   public @ResponseBody
-  byte[] getVariableData(@PathVariable("executionId") String executionId, @PathVariable("variableName") String variableName, @RequestParam(value = "scope", required = false) String scope,
+  byte[] getVariableData(@ApiParam(name = "executionId") @PathVariable("executionId") String executionId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName, @RequestParam(value = "scope", required = false) String scope,
       HttpServletRequest request, HttpServletResponse response) {
 
     try {

@@ -27,7 +27,7 @@ import org.junit.runners.model.MultipleFailureException;
 import org.junit.runners.model.Statement;
 
 /**
- * Convenience for DmnEngine and services initialization in the form of a JUnit rule.
+ * Convenience for IdmEngine and services initialization in the form of a JUnit rule.
  * 
  * <p>
  * Usage:
@@ -44,7 +44,8 @@ import org.junit.runners.model.Statement;
  * </pre>
  * 
  * <p>
- * The IdmEngine and the services will be made available to the test class through the getters of the activitiRule. The dmnEngine will be initialized by default with the activiti.dmn.cfg.xml resource
+ * The IdmEngine and the services will be made available to the test class through the getters of the activitiRule. The idmEngine will be initialized by
+ * default with the activiti.idm.cfg.xml resource
  * on the classpath. To specify a different configuration file, pass the resource location in {@link #ActivitiRule(String) the appropriate constructor}. Process engines will be cached statically.
  * Right before the first time the setUp is called for a given configuration resource, the process engine will be constructed.
  * </p>

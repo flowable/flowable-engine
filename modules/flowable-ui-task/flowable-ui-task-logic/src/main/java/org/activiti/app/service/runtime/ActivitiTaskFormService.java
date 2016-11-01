@@ -17,8 +17,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.app.domain.runtime.RelatedContent;
+import org.activiti.app.model.component.SimpleContentTypeMapper;
 import org.activiti.app.model.runtime.CompleteFormRepresentation;
 import org.activiti.app.model.runtime.ProcessInstanceVariableRepresentation;
+import org.activiti.app.model.runtime.RelatedContentRepresentation;
 import org.activiti.app.security.SecurityUtils;
 import org.activiti.app.service.exception.NotFoundException;
 import org.activiti.app.service.exception.NotPermittedException;
@@ -33,6 +36,8 @@ import org.activiti.engine.task.Task;
 import org.activiti.form.api.FormRepositoryService;
 import org.activiti.form.api.FormService;
 import org.activiti.form.model.FormDefinition;
+import org.activiti.form.model.FormField;
+import org.activiti.form.model.FormFieldTypes;
 import org.activiti.idm.api.User;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -67,6 +72,12 @@ public class ActivitiTaskFormService {
 
   @Autowired
   protected PermissionService permissionService;
+  
+  @Autowired
+  protected RelatedContentService relatedContentService;
+  
+  @Autowired
+  protected SimpleContentTypeMapper simpleTypeMapper;
 
   @Autowired
   protected ObjectMapper objectMapper;
@@ -110,8 +121,42 @@ public class ActivitiTaskFormService {
     if (formDefinition == null) {
       throw new NotFoundException("Form definition for task " + task.getTaskDefinitionKey() + " cannot be found for form key " + task.getFormKey());
     }
+    
+    
+    // TODO: needs to be moved to form service, but currently form service doesn't know about related content
+    fetchRelatedContentInfoIfNeeded(formDefinition);
 
     return formDefinition;
+  }
+  
+  protected void fetchRelatedContentInfoIfNeeded(FormDefinition formDefinition) {
+    if (formDefinition.getFields() != null) {
+      for (FormField formField : formDefinition.getFields()) {
+        if (FormFieldTypes.UPLOAD.equals(formField.getType())) {
+          
+          List<String> relatedContentIds = null;
+          if (formField.getValue() instanceof List) {
+            relatedContentIds = (List<String>) formField.getValue();
+          } else if (formField.getValue() instanceof String) {
+            String[] splittedString = ((String) formField.getValue()).split(",");
+            relatedContentIds = new ArrayList<String>();
+            for (String relatedContentId : splittedString) {
+              relatedContentIds.add(relatedContentId);
+            }
+          }
+          
+          List<RelatedContentRepresentation> relatedContentRepresentations = new ArrayList<RelatedContentRepresentation>();
+          if (relatedContentIds != null) {
+            for (String relatedContentId : relatedContentIds) {
+              RelatedContent relatedContent = relatedContentService.get(relatedContentId);
+              relatedContentRepresentations.add(new RelatedContentRepresentation(relatedContent, simpleTypeMapper));
+            }
+          }
+          
+          formField.setValue(relatedContentRepresentations);
+        }
+      }
+    }
   }
   
   public void completeTaskForm(String taskId, CompleteFormRepresentation completeTaskFormRepresentation) {
@@ -126,20 +171,55 @@ public class ActivitiTaskFormService {
     FormDefinition formDefinition = formRepositoryService.getFormDefinitionById(completeTaskFormRepresentation.getFormId());
 
     User currentUser = SecurityUtils.getCurrentUserObject();
-
     if (!permissionService.isTaskOwnerOrAssignee(currentUser, taskId)) {
       if (!permissionService.validateIfUserIsInitiatorAndCanCompleteTask(currentUser, task)) {
         throw new NotPermittedException();
       }
     }
+    
 
     // Extract raw variables and complete the task
     Map<String, Object> variables = formService.getVariablesFromFormSubmission(formDefinition, completeTaskFormRepresentation.getValues(),
         completeTaskFormRepresentation.getOutcome());
-
+    
     formService.storeSubmittedForm(variables, formDefinition, task.getId(), task.getProcessInstanceId());
     
+    processUploadFieldsIfNeeded(currentUser, task, formDefinition, variables);
+    
     taskService.complete(taskId, variables);
+  }
+  
+  /**
+   * When content is uploaded for a field, it is uploaded as a 'temporary related content'.
+   * Now that the task is completed, we need to associate the field/taskId/processInstanceId 
+   * with the related content so we can retrieve it later.
+   */
+  protected void processUploadFieldsIfNeeded(User currentUser, Task task, FormDefinition formDefinition, Map<String, Object> variables) {
+    if (formDefinition != null && formDefinition.getFields() != null) {
+      for (FormField formField : formDefinition.getFields()) {
+        if (FormFieldTypes.UPLOAD.equals(formField.getType())) {
+          
+          String variableName = formField.getId();
+          if (variables.containsKey(variableName)) {
+            String variableValue = (String) variables.get(variableName);
+            if (StringUtils.isNotEmpty(variableValue)) {
+              String[] relatedContentIds = StringUtils.split(variableValue, ",");
+              for (String relatedContentId : relatedContentIds) {
+                
+                // Only allowed to update content that was uploaded by user
+                RelatedContent relatedContent = relatedContentService.get(relatedContentId);
+                if (relatedContent.getCreatedBy() != null && relatedContent.getCreatedBy().equals(currentUser.getId())) {
+                  relatedContentService.setContentField(relatedContentId, formField.getId(), task.getProcessInstanceId(), task.getId());
+                } else {
+                  throw new NotPermittedException();
+                }
+              }
+            }
+          }
+          
+        }
+      }
+    }
   }
   
   public List<ProcessInstanceVariableRepresentation> getProcessInstanceVariables(String taskId) {

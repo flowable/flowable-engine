@@ -15,6 +15,7 @@ package org.activiti.rest.service.api.repository;
 
 import java.io.InputStream;
 
+import io.swagger.annotations.*;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -31,10 +32,16 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Tijs Rademakers
  */
 @RestController
+@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions")
 public class ProcessDefinitionImageResource extends BaseProcessDefinitionResource {
 
+  @ApiOperation(value = "Get a process definition image", tags = {"Process Definitions"})
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates request was successful and the process-definitions are returned"),
+          @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
+  })
   @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/image", method = RequestMethod.GET)
-  public ResponseEntity<byte[]> getModelResource(@PathVariable String processDefinitionId) {
+  public ResponseEntity<byte[]> getModelResource(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId) {
     ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
     InputStream imageStream = repositoryService.getProcessDiagram(processDefinition.getId());
 

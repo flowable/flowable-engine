@@ -18,6 +18,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.*;
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -35,10 +36,17 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Frederik Heremans
  */
 @RestController
+@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions")
 public class ProcessDefinitionIdentityLinkResource extends BaseProcessDefinitionResource {
 
+  @ApiOperation(value = "Get a candidate starter from a process definition", tags = {"Process Definitions"})
+  @ApiResponses(value = {
+          @ApiResponse(code = 204, message = "Indicates the process definition was found and the identity link was returned."),
+          @ApiResponse(code = 404, message = "Indicates the requested process definition was not found or the process definition doesn’t have an identity-link that matches the url.")
+  })
   @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/identitylinks/{family}/{identityId}", method = RequestMethod.GET, produces = "application/json")
-  public RestIdentityLink getIdentityLink(@PathVariable("processDefinitionId") String processDefinitionId, @PathVariable("family") String family, @PathVariable("identityId") String identityId,
+  public RestIdentityLink getIdentityLink(@ApiParam(name = "processDefinitionId") @PathVariable("processDefinitionId") String processDefinitionId,
+          @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
       HttpServletRequest request) {
 
     ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
@@ -51,8 +59,14 @@ public class ProcessDefinitionIdentityLinkResource extends BaseProcessDefinition
     return restResponseFactory.createRestIdentityLink(link);
   }
 
+  @ApiOperation(value = "Delete a candidate starter from a process definition", tags = {"Process Definitions"})
+  @ApiResponses(value = {
+          @ApiResponse(code = 204, message = "Indicates the process definition was found and the identity link was removed. The response body is intentionally empty."),
+          @ApiResponse(code = 404, message = "Indicates the requested process definition was not found or the process definition doesn’t have an identity-link that matches the url.")
+  })
   @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/identitylinks/{family}/{identityId}", method = RequestMethod.DELETE)
-  public void deleteIdentityLink(@PathVariable("processDefinitionId") String processDefinitionId, @PathVariable("family") String family, @PathVariable("identityId") String identityId,
+  public void deleteIdentityLink(@ApiParam(name = "processDefinitionId") @PathVariable("processDefinitionId") String processDefinitionId,
+          @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
       HttpServletResponse response) {
 
     ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);

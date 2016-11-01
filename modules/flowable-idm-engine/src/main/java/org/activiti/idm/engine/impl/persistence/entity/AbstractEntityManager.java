@@ -26,8 +26,8 @@ import org.activiti.idm.engine.impl.persistence.entity.data.DataManager;
  */
 public abstract class AbstractEntityManager<EntityImpl extends Entity> extends AbstractManager implements EntityManager<EntityImpl> {
 
-  public AbstractEntityManager(IdmEngineConfiguration dmnEngineConfiguration) {
-    super(dmnEngineConfiguration);
+  public AbstractEntityManager(IdmEngineConfiguration idmEngineConfiguration) {
+    super(idmEngineConfiguration);
   }
   
   /*

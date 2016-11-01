@@ -55,6 +55,17 @@ activitiModule.service('RelatedContentService', ['$http', '$q', '$rootScope', '$
                     file: file
                 });
                 
+            } else if (processInstanceId) {
+                if (isIE) {
+                    url = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/' + processInstanceId + '/raw-content/text';
+                } else {
+                    url = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/' + processInstanceId + '/raw-content';
+                }
+                uploadPromise = Upload.upload({
+                    url: url,
+                    method: 'POST',
+                    file: file
+                });
             } else {
                 if (isIE) {
                     url = FLOWABLE.CONFIG.contextRoot + '/app/rest/content/raw/text';

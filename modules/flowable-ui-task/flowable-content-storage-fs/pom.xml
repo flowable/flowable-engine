@@ -2,13 +2,16 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>flowable-content-storage-fs</artifactId>
+	
 	<parent>
 		<groupId>org.flowable</groupId>
 		<artifactId>flowable-ui-root</artifactId>
 		<version>6.0.0.RC1-SNAPSHOT</version>
 	</parent>
+	
 	<name>Flowable Content Storage - File System Implementation</name>
 	<description>Implementation of the content-storage-api using a file-system.</description>
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.flowable</groupId>
@@ -17,6 +20,14 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+		</dependency>
+		<dependency>
+		     <groupId>com.fasterxml.uuid</groupId>
+             <artifactId>java-uuid-generator</artifactId>
 		</dependency>
 
 		<!-- LOGGING -->

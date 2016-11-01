@@ -14,6 +14,7 @@ package org.activiti.web.rest.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.DecisionTableService;
 import org.activiti.service.engine.exception.ActivitiServiceException;
@@ -40,7 +41,7 @@ public class DecisionTableClientResource extends AbstractClientResource {
     @RequestMapping(value = "/rest/activiti/decision-tables/{decisionTableId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getDecisionTable(@PathVariable String decisionTableId) throws BadRequestException {
 
-        ServerConfig serverConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
         try {
             return clientService.getDecisionTable(serverConfig, decisionTableId);
         } catch (ActivitiServiceException e) {
@@ -51,7 +52,7 @@ public class DecisionTableClientResource extends AbstractClientResource {
     @RequestMapping(value = "/rest/activiti/decision-tables/{decisionTableId}/editorJson", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getEditorJsonForDecisionTable(@PathVariable String decisionTableId) throws BadRequestException {
 
-        ServerConfig serverConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
         try {
             return clientService.getEditorJsonForDecisionTable(serverConfig, decisionTableId);
         } catch (ActivitiServiceException e) {

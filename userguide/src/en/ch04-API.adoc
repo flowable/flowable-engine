@@ -280,7 +280,7 @@ The condition on the sequence flow leaving the exclusive gateway are oblivious t
 
 === Expressions
 
-Flowable uses UEL for expression-resolving. UEL stands for _Unified Expression Language_ and is part of the EE6 specification (see link:$$http://docs.oracle.com/javaee/6/tutorial/doc/gjddd.html$$[ the EE6 specification] for detailed information). To support all features of latest UEL spec on ALL environments, we use a modified version of JUEL.
+Flowable uses UEL for expression-resolving. UEL stands for _Unified Expression Language_ and is part of the EE6 specification (see link:$$http://docs.oracle.com/javaee/6/tutorial/doc/gjddd.html$$[ the EE6 specification] for detailed information).footnote:[To support all features of latest UEL spec on ALL environments, we use a modified version of JUEL for the Version 5 compatibility engine.]
 
 Expressions can be used in for example <<bpmnJavaServiceTaskXML,Java Service tasks>>, <<executionListeners,Execution Listeners>>, <<taskListeners,Task Listeners>> and <<conditionalSequenceFlowXml,Conditional sequence flows>>. Although there are 2 types of expressions, value-expression and method-expression, Flowable abstracts  this so they can both be used where an +expression+ is needed.
 

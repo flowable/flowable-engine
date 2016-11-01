@@ -15,6 +15,7 @@ package org.activiti.web.rest.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.TaskService;
 import org.activiti.service.engine.exception.ActivitiServiceException;
@@ -40,7 +41,7 @@ public class TasksClientResource extends AbstractClientResource {
 	 */
 	@RequestMapping(value = "/rest/activiti/tasks", method = RequestMethod.POST, produces = "application/json")
 	public JsonNode listTasks(@RequestBody ObjectNode requestNode) {
-		ServerConfig serverConfig = retrieveServerConfig();
+		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		JsonNode resultNode;
 		try {
 			resultNode = clientService.listTasks(serverConfig, requestNode);

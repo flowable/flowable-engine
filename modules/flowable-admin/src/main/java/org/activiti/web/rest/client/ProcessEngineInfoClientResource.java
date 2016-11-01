@@ -14,34 +14,42 @@ package org.activiti.web.rest.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.service.engine.ProcessEngineInfoService;
 import org.activiti.service.engine.exception.ActivitiServiceException;
 import org.activiti.web.rest.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- *
  * @author Frederik Heremans
+ * @author Yvo Swillens
  */
 @RestController
 public class ProcessEngineInfoClientResource extends AbstractClientResource {
 
-	@Autowired
-	protected ProcessEngineInfoService clientService;
-	
-	@Autowired
+    @Autowired
+    protected ProcessEngineInfoService clientService;
+
+    @Autowired
     protected Environment env;
 
-	@RequestMapping(value = "/rest/activiti/engine-info", method = RequestMethod.GET)
-	public JsonNode getEngineInfo() throws BadRequestException {
-		try {
-			return clientService.getEngineInfo(retrieveServerConfig());
-		} catch (ActivitiServiceException e) {
-			throw new BadRequestException(e.getMessage());
-		}
-	}
+    @RequestMapping(value = "/rest/activiti/engine-info/{endpointTypeCode}", method = RequestMethod.GET)
+    public JsonNode getEngineInfo(@PathVariable Integer endpointTypeCode) throws BadRequestException {
+        EndpointType endpointType = EndpointType.valueOf(endpointTypeCode);
+
+        if (endpointType == null) {
+            throw new BadRequestException("No valid endpoint type code provided: "+endpointTypeCode);
+        }
+
+        try {
+            return clientService.getEngineInfo(retrieveServerConfig(endpointType));
+        } catch (ActivitiServiceException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
 }

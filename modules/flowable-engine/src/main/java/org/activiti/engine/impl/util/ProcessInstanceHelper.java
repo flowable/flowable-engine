@@ -45,7 +45,7 @@ import org.activiti.engine.runtime.ProcessInstance;
  */
 public class ProcessInstanceHelper {
   
-  public ProcessInstance createProcessInstance(ProcessDefinitionEntity processDefinition, 
+  public ProcessInstance createProcessInstance(ProcessDefinition processDefinition, 
       String businessKey, String processInstanceName, Map<String, Object> variables, Map<String, Object> transientVariables) {
     
     return createAndStartProcessInstance(processDefinition, businessKey, processInstanceName, variables, transientVariables, false);
@@ -155,6 +155,12 @@ public class ProcessInstanceHelper {
     		.createProcessInstanceExecution(processDefinition, businessKey, processDefinition.getTenantId(), initiatorVariableName);
     
     commandContext.getHistoryManager().recordProcessInstanceStart(processInstance, initialFlowElement);
+
+    boolean eventDispatcherEnabled = Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled();
+    if (eventDispatcherEnabled) {
+      Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+          ActivitiEventBuilder.createEntityEvent(ActivitiEventType.PROCESS_CREATED, processInstance));
+    }
     
     processInstance.setVariables(processDataObjects(process.getDataObjects()));
 
@@ -177,7 +183,7 @@ public class ProcessInstanceHelper {
     }
     
     // Fire events
-    if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+    if (eventDispatcherEnabled) {
       Context.getProcessEngineConfiguration().getEventDispatcher()
         .dispatchEvent(ActivitiEventBuilder.createEntityWithVariablesEvent(ActivitiEventType.ENTITY_INITIALIZED, processInstance, variables, false));
     }

@@ -16,6 +16,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.DecisionTableService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,7 @@ public class DecisionTablesClientResource extends AbstractClientResource {
      */
     @RequestMapping(value="/rest/activiti/decision-tables", method = RequestMethod.GET, produces = "application/json")
     public JsonNode listDecisionTables(HttpServletRequest request) {
-        ServerConfig serverConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
         Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
         return clientService.listDecisionTables(serverConfig, parameterMap);
     }
@@ -51,6 +52,6 @@ public class DecisionTablesClientResource extends AbstractClientResource {
      */
     @RequestMapping(value = "/rest/activiti/process-definition-decision-tables/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getProcessDefinitionDecisionTables(@PathVariable String processDefinitionId, HttpServletRequest request) {
-        return clientService.getProcessDefinitionDecisionTables(retrieveServerConfig(), processDefinitionId);
+        return clientService.getProcessDefinitionDecisionTables(retrieveServerConfig(EndpointType.DMN), processDefinitionId);
     }
 }

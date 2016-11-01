@@ -17,6 +17,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.AppService;
 import org.activiti.service.engine.exception.ActivitiServiceException;
@@ -42,7 +43,7 @@ public class AppDeploymentClientResource extends AbstractClientResource {
 	@RequestMapping(value = "/rest/activiti/apps/{appId}", method = RequestMethod.GET, produces = "application/json")
 	public JsonNode getAppDefinition(@PathVariable String appId) throws BadRequestException {
 		
-		ServerConfig serverConfig = retrieveServerConfig();
+		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			return clientService.getAppDefinition(serverConfig, appId);
 		} catch (ActivitiServiceException e) {
@@ -52,19 +53,19 @@ public class AppDeploymentClientResource extends AbstractClientResource {
 	
 	@RequestMapping(value = "/rest/activiti/apps/{appId}", method = RequestMethod.DELETE)
     public void deleteAppDeployment(HttpServletResponse response, @PathVariable String appId) {
-        clientService.deleteAppDeployment(retrieveServerConfig(), response, appId);
+        clientService.deleteAppDeployment(retrieveServerConfig(EndpointType.PROCESS), response, appId);
     }
 	
 	@RequestMapping(value = "/rest/activiti/app", method = RequestMethod.GET)
     public void getAppDefinitionByDeployment(HttpServletRequest request, HttpServletResponse respone) {
-        clientService.getAppDefinitionByDeployment(retrieveServerConfig(), respone, getRequestParametersWithoutServerId(request));
+        clientService.getAppDefinitionByDeployment(retrieveServerConfig(EndpointType.PROCESS), respone, getRequestParametersWithoutServerId(request));
     }
 
     //todo: should not be path variable but request
     @RequestMapping(value = "/rest/activiti/apps/process-definitions/{deploymentId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getProcessDefinitionsForDeploymentId(@PathVariable String deploymentId) throws BadRequestException {
 
-        ServerConfig serverConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
             return clientService.getProcessDefinitionsForDeploymentId(serverConfig, deploymentId);
         } catch (ActivitiServiceException e) {
@@ -76,7 +77,7 @@ public class AppDeploymentClientResource extends AbstractClientResource {
     @RequestMapping(value = "/rest/activiti/apps/decision-tables/{dmnDeploymentId}", method = RequestMethod.GET, produces = "application/json")
 	public JsonNode getDecisionTablesForDeploymentId(@PathVariable String dmnDeploymentId) throws BadRequestException {
 
-		ServerConfig serverConfig = retrieveServerConfig();
+		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			return clientService.getDecisionDefinitionsForDeploymentId(serverConfig, dmnDeploymentId);
 		} catch (ActivitiServiceException e) {
@@ -88,7 +89,7 @@ public class AppDeploymentClientResource extends AbstractClientResource {
     @RequestMapping(value = "/rest/activiti/apps/forms/{appDeploymentId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getFormsForAppDeploymentId(@PathVariable String appDeploymentId) throws BadRequestException {
 
-        ServerConfig serverConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
             return clientService.getFormsForAppDeploymentId(serverConfig, appDeploymentId);
         } catch (ActivitiServiceException e) {
@@ -98,7 +99,7 @@ public class AppDeploymentClientResource extends AbstractClientResource {
     
     @RequestMapping(value="/rest/activiti/apps/export/{deploymentId}",method=RequestMethod.GET, produces = "application/json")
     public JsonNode exportApp(HttpServletRequest request,@PathVariable String deploymentId, HttpServletResponse httpResponse){
-        ServerConfig serverConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
             return clientService.exportApp(serverConfig, deploymentId, httpResponse);
         } catch (IOException e) {
@@ -108,8 +109,8 @@ public class AppDeploymentClientResource extends AbstractClientResource {
     
     @RequestMapping(value="/rest/activiti/apps/redeploy/{deploymentId}",method=RequestMethod.GET, produces = "application/json")
     public JsonNode redeployApp(HttpServletRequest request, HttpServletResponse httpResponse, @PathVariable String deploymentId){
-        ServerConfig serverConfig = retrieveServerConfig();
-        ServerConfig targetServerConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        ServerConfig targetServerConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
             return clientService.redeployApp(httpResponse, serverConfig, targetServerConfig, deploymentId);
         } catch (IOException e) {
@@ -119,8 +120,8 @@ public class AppDeploymentClientResource extends AbstractClientResource {
     
     @RequestMapping(value="/rest/activiti/apps/redeploy/{deploymentId}/{replaceAppId}",method=RequestMethod.GET, produces = "application/json")
     public JsonNode redeployApp(HttpServletRequest request, HttpServletResponse httpResponse, @PathVariable String deploymentId, @PathVariable String replaceAppId){
-        ServerConfig serverConfig = retrieveServerConfig();
-        ServerConfig targetServerConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        ServerConfig targetServerConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
             return clientService.redeployReplaceApp(httpResponse, serverConfig, targetServerConfig, deploymentId, replaceAppId);
         } catch (IOException e) {

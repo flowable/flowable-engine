@@ -13,6 +13,7 @@
 package org.activiti.form.engine.impl.cmd;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -126,6 +127,21 @@ public class GetCompletedFormDefinitionCmd implements Command<CompletedFormDefin
             logger.error("Error getting value for expression " + expressionField.getExpression() + " " + e.getMessage());
           }
           
+        } else if (FormFieldTypes.UPLOAD.equals(field.getType())) {
+          
+          // Multiple docs are stored as comma-separated string ids,
+          // explicitely storing them as an array so they're seralized properly
+          if (variables.containsKey(field.getId())) {
+            String uploadValue = (String) variables.get(field.getId());
+            if (uploadValue != null) {
+              List<String> contentIds = new ArrayList<>();
+              for (String s : uploadValue.split(",")) {
+                contentIds.add(s);
+              }
+              field.setValue(contentIds);
+            }
+          }
+            
         } else {
           field.setValue(variables.get(field.getId()));
         }

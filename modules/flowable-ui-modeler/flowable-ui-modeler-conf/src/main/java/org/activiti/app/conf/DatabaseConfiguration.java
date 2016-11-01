@@ -195,7 +195,7 @@ public class DatabaseConfiguration {
       database.setDatabaseChangeLogLockTableName(LIQUIBASE_CHANGELOG_PREFIX+database.getDatabaseChangeLogLockTableName());
   
       Liquibase liquibase = new Liquibase("META-INF/liquibase/flowable-modeler-app-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
-      liquibase.update("activiti");
+      liquibase.update("flowable");
       return liquibase;
       
     } catch (Exception e) {

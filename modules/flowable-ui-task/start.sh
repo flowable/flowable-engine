@@ -1,4 +1,7 @@
 #!/bin/sh
+cd ../flowable-form-engine
+mvn -T 1C clean install -DskipTests
+cd ../flowable-ui-task
 echo "Building all submodules"
 mvn -T 1C clean install -DskipTests
 STATUS=$?

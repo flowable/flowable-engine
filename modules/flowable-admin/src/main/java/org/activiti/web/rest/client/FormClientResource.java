@@ -12,6 +12,7 @@
  */
 package org.activiti.web.rest.client;
 
+import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.FormService;
 import org.activiti.service.engine.exception.ActivitiServiceException;
@@ -36,7 +37,7 @@ public class FormClientResource extends AbstractClientResource {
     @RequestMapping(value = "/rest/activiti/forms/{formId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getForm(@PathVariable String formId) throws BadRequestException {
 
-        ServerConfig serverConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
         try {
             return clientService.getForm(serverConfig, formId);
         } catch (ActivitiServiceException e) {
@@ -47,7 +48,7 @@ public class FormClientResource extends AbstractClientResource {
     @RequestMapping(value = "/rest/activiti/forms/{formId}/editorJson", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getEditorJsonForForm(@PathVariable String formId) throws BadRequestException {
 
-        ServerConfig serverConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
         try {
             return clientService.getEditorJsonForForm(serverConfig, formId);
         } catch (ActivitiServiceException e) {
@@ -58,7 +59,7 @@ public class FormClientResource extends AbstractClientResource {
     @RequestMapping(value = "/rest/activiti/process-definition-start-form/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getProcessDefinitionStartForm(@PathVariable String processDefinitionId) throws BadRequestException {
 
-        ServerConfig serverConfig = retrieveServerConfig();
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
         try {
             return clientService.getProcessDefinitionStartForm(serverConfig, processDefinitionId);
         } catch (ActivitiServiceException e) {
