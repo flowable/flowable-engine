@@ -1214,7 +1214,7 @@
 
 	<!-- Various information, not used by the build -->
 
-	<url>http://activiti.org</url>
+	<url>http://flowable.org</url>
 	<licenses>
 		<license>
 			<name>Apache v2</name>
