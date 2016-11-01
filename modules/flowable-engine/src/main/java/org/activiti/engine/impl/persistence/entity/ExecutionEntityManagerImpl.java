@@ -453,7 +453,12 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
     deleteExecutionAndRelatedData(processInstanceEntity, deleteReason, cancel);
     
     if (getEventDispatcher().isEnabled()) {
-      getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.PROCESS_COMPLETED, processInstanceEntity));
+      if(!cancel) {
+        getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.PROCESS_COMPLETED, processInstanceEntity));
+      }
+      else {
+        getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createCancelledEvent(processInstanceEntity.getId(), processInstanceEntity.getId(), processInstanceEntity.getProcessDefinitionId(), deleteReason));
+      }
     }
 
     // TODO: what about delete reason?
@@ -575,7 +580,18 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
       TaskEntityManager taskEntityManager = getTaskEntityManager();
       Collection<TaskEntity> tasksForExecution = taskEntityManager.findTasksByExecutionId(executionEntity.getId());
       for (TaskEntity taskEntity : tasksForExecution) {
-        taskEntityManager.deleteTask(taskEntity, deleteReason, false, cancel);
+        
+        if (cancel && !taskEntity.isCanceled()) {
+          getEventDispatcher().dispatchEvent(
+                  ActivitiEventBuilder.createActivityCancelledEvent(taskEntity.getExecution() != null ? taskEntity.getExecution().getActivityId() : null, 
+                          taskEntity.getName(), taskEntity.getExecutionId(), 
+                          taskEntity.getProcessInstanceId(),
+                          taskEntity.getProcessDefinitionId(), 
+                          "userTask", 
+                          deleteReason));
+        }
+        
+        taskEntityManager.deleteTask(taskEntity, deleteReason, false);
       }
     }
 

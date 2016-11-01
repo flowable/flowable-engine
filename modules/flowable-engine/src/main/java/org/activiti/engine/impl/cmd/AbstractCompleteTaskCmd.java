@@ -60,7 +60,7 @@ public abstract class AbstractCompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
       }
     }
 
-    commandContext.getTaskEntityManager().deleteTask(taskEntity, null, false, false);
+    commandContext.getTaskEntityManager().deleteTask(taskEntity, null, false);
 
     // Continue process (if not a standalone task)
     if (taskEntity.getExecutionId() != null) {
