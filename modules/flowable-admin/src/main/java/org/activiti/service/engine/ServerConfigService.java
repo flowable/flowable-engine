@@ -15,6 +15,7 @@ package org.activiti.service.engine;
 import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.repository.ServerConfigRepository;
+import org.activiti.service.engine.exception.ActivitiServiceException;
 import org.activiti.web.rest.dto.ServerConfigRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -78,6 +79,22 @@ public class ServerConfigService extends AbstractEncryptingService {
   }
 
   @Transactional
+  public ServerConfig findOneByEndpointTypeCode(EndpointType endpointType) {
+    List<ServerConfig> serverConfigs = serverConfigRepository.getByEndpointType(endpointType);
+
+    if (serverConfigs == null) {
+      throw new ActivitiServiceException("No server config found");
+    }
+
+    if (serverConfigs.size() > 1) {
+      throw new ActivitiServiceException("Only one server config per endpoint type allowed");
+    }
+
+    return serverConfigs.get(0);
+  }
+
+
+  @Transactional
   public List<ServerConfigRepresentation> findAll() {
     return createServerConfigRepresentation(serverConfigRepository.getAll());
   }
@@ -112,6 +129,7 @@ public class ServerConfigService extends AbstractEncryptingService {
     serverRepresentation.setContextRoot(serverConfig.getContextRoot());
     serverRepresentation.setRestRoot(serverConfig.getRestRoot());
     serverRepresentation.setUserName(serverConfig.getUserName());
+    serverRepresentation.setEndpointType(serverConfig.getEndpointType());
     return serverRepresentation;
   }
 
