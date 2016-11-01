@@ -16,8 +16,8 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
+import org.activiti.engine.ActivitiException;
 import org.activiti.form.api.SubmittedForm;
-import org.activiti.form.engine.ActivitiFormException;
 import org.activiti.form.engine.impl.interceptor.Command;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
 import org.activiti.form.engine.impl.persistence.entity.SubmittedFormEntity;
@@ -52,7 +52,7 @@ public class StoreSubmittedFormCmd implements Command<SubmittedForm>, Serializab
   public SubmittedForm execute(CommandContext commandContext) {
     
     if (formDefinition == null || formDefinition.getId() == null) {
-      throw new ActivitiFormException("Invalid form definition provided");
+      throw new ActivitiException("Invalid form definition provided");
     }
     
     ObjectMapper objectMapper = commandContext.getFormEngineConfiguration().getObjectMapper();
@@ -109,7 +109,7 @@ public class StoreSubmittedFormCmd implements Command<SubmittedForm>, Serializab
     try {
       submittedFormEntity.setFormValueBytes(objectMapper.writeValueAsBytes(submittedFormValuesJson));
     } catch (Exception e) {
-      throw new ActivitiFormException("Error setting form values JSON", e);
+      throw new ActivitiException("Error setting form values JSON", e);
     }
     
     submittedFormEntityManager.insert(submittedFormEntity);

@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.cfg.IdGenerator;
+import org.activiti.engine.impl.persistence.entity.Entity;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 import org.activiti.idm.engine.impl.interceptor.Session;
 import org.activiti.idm.engine.impl.interceptor.SessionFactory;

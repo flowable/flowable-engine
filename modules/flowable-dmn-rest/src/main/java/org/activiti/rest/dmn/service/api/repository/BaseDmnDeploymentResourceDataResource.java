@@ -19,10 +19,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.dmn.api.DmnDeployment;
 import org.activiti.dmn.api.DmnRepositoryService;
-import org.activiti.dmn.engine.ActivitiDmnException;
-import org.activiti.dmn.engine.ActivitiDmnIllegalArgumentException;
-import org.activiti.dmn.engine.ActivitiDmnObjectNotFoundException;
-
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.rest.dmn.common.ContentTypeResolver;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,16 +40,16 @@ public class BaseDmnDeploymentResourceDataResource {
   protected byte[] getDmnDeploymentResourceData(String deploymentId, String resourceId, HttpServletResponse response) {
 
     if (deploymentId == null) {
-      throw new ActivitiDmnIllegalArgumentException("No deployment id provided");
+      throw new ActivitiIllegalArgumentException("No deployment id provided");
     }
     if (resourceId == null) {
-      throw new ActivitiDmnIllegalArgumentException("No resource id provided");
+      throw new ActivitiIllegalArgumentException("No resource id provided");
     }
 
     // Check if deployment exists
     DmnDeployment deployment = dmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
     if (deployment == null) {
-      throw new ActivitiDmnObjectNotFoundException("Could not find a DMN deployment with id '" + deploymentId);
+      throw new ActivitiObjectNotFoundException("Could not find a DMN deployment with id '" + deploymentId);
     }
 
     List<String> resourceList = dmnRepositoryService.getDeploymentResourceNames(deploymentId);
@@ -63,11 +62,11 @@ public class BaseDmnDeploymentResourceDataResource {
       try {
         return IOUtils.toByteArray(resourceStream);
       } catch (Exception e) {
-        throw new ActivitiDmnException("Error converting resource stream", e);
+        throw new ActivitiException("Error converting resource stream", e);
       }
     } else {
       // Resource not found in deployment
-      throw new ActivitiDmnObjectNotFoundException("Could not find a resource with id '" + resourceId + "' in deployment '" + deploymentId);
+      throw new ActivitiObjectNotFoundException("Could not find a resource with id '" + resourceId + "' in deployment '" + deploymentId);
     }
   }
 }

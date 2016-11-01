@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.impl.Page;
 import org.activiti.idm.api.Token;
 import org.activiti.idm.api.TokenQuery;
 import org.activiti.idm.api.TokenQueryProperty;

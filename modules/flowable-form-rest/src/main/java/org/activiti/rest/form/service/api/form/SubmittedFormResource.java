@@ -12,17 +12,17 @@
  */
 package org.activiti.rest.form.service.api.form;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.form.api.FormService;
-import org.activiti.form.engine.ActivitiFormIllegalArgumentException;
-import org.activiti.form.engine.ActivitiFormObjectNotFoundException;
 import org.activiti.form.model.FormDefinition;
 import org.activiti.rest.form.FormRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Yvo Swillens
@@ -55,11 +55,11 @@ public class SubmittedFormResource {
           formDefinitionRequest.getTenantId()
       );
     } else {
-      throw new ActivitiFormIllegalArgumentException("Either form definition key or form id must be provided in the request");
+      throw new ActivitiIllegalArgumentException("Either form definition key or form id must be provided in the request");
     }
 
     if (formDefinition == null) {
-      throw new ActivitiFormObjectNotFoundException("Could not find a form definition");
+      throw new ActivitiObjectNotFoundException("Could not find a form definition");
     }
 
     formService.storeSubmittedForm(formDefinitionRequest.getVariables(), formDefinition, formDefinitionRequest.getTaskId(),

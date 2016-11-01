@@ -13,6 +13,8 @@
 
 package org.activiti.form.api;
 
+import org.activiti.engine.query.Query;
+
 /**
  * Allows programmatic querying of {@link FormDeployment}s.
  * 

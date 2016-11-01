@@ -1,8 +1,8 @@
 package org.activiti.rest.dmn.exception;
 
-import org.activiti.dmn.engine.ActivitiDmnException;
+import org.activiti.engine.ActivitiException;
 
-public class ActivitiDmnConflictException extends ActivitiDmnException {
+public class ActivitiDmnConflictException extends ActivitiException {
 
   private static final long serialVersionUID = 1L;
 

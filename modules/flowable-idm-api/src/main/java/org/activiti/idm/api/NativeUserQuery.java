@@ -12,6 +12,8 @@
  */
 package org.activiti.idm.api;
 
+import org.activiti.engine.query.NativeQuery;
+
 /**
  * Allows querying of {@link org.activiti.idm.api.User}s via native (SQL) queries
  * 

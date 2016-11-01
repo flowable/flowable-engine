@@ -17,8 +17,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.activiti.form.engine.ActivitiFormException;
-import org.activiti.form.engine.ActivitiFormIllegalArgumentException;
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.context.Context;
 import org.activiti.form.engine.impl.persistence.entity.FormDeploymentEntity;
@@ -42,7 +42,7 @@ public class FormDeploymentHelper  {
     Set<String> keySet = new LinkedHashSet<String>();
     for (FormEntity form : forms) {
       if (keySet.contains(form.getKey())) {
-        throw new ActivitiFormException(
+        throw new ActivitiException(
             "The deployment contains forms with the same key, this is not allowed");
       }
       keySet.add(form.getKey());
@@ -108,7 +108,7 @@ public class FormDeploymentHelper  {
   public FormEntity getPersistedInstanceOfForm(FormEntity form) {
     String deploymentId = form.getDeploymentId();
     if (StringUtils.isEmpty(form.getDeploymentId())) {
-      throw new ActivitiFormIllegalArgumentException("Provided form must have a deployment id.");
+      throw new ActivitiIllegalArgumentException("Provided form must have a deployment id.");
     }
 
     FormEntityManager formEntityManager = Context.getCommandContext().getFormEngineConfiguration().getFormEntityManager();

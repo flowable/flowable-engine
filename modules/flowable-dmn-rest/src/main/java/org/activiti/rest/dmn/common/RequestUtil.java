@@ -13,12 +13,11 @@
 
 package org.activiti.rest.dmn.common;
 
-import org.activiti.dmn.engine.ActivitiDmnIllegalArgumentException;
-
-import org.apache.commons.lang3.time.FastDateFormat;
-
 import java.util.Date;
 import java.util.Map;
+
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.apache.commons.lang3.time.FastDateFormat;
 
 /**
  * @author Tijs Rademakers
@@ -65,7 +64,7 @@ public class RequestUtil {
       try {
         value = longDateFormat.parse(input);
       } catch (Exception e) {
-        throw new ActivitiDmnIllegalArgumentException("Failed to parse date " + input);
+        throw new ActivitiIllegalArgumentException("Failed to parse date " + input);
       }
     }
     return value;

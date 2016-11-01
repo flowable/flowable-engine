@@ -16,9 +16,10 @@ package org.activiti.form.engine.impl;
 import java.util.List;
 import java.util.Set;
 
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.impl.Page;
 import org.activiti.form.api.Form;
 import org.activiti.form.api.FormQuery;
-import org.activiti.form.engine.ActivitiFormIllegalArgumentException;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
 import org.activiti.form.engine.impl.interceptor.CommandExecutor;
 
@@ -78,7 +79,7 @@ public class FormQueryImpl extends AbstractQuery<FormQuery, Form> implements For
   
   public FormQueryImpl formCategory(String category) {
     if (category == null) {
-      throw new ActivitiFormIllegalArgumentException("category is null");
+      throw new ActivitiIllegalArgumentException("category is null");
     }
     this.category = category;
     return this;
@@ -86,7 +87,7 @@ public class FormQueryImpl extends AbstractQuery<FormQuery, Form> implements For
 
   public FormQueryImpl formCategoryLike(String categoryLike) {
     if (categoryLike == null) {
-      throw new ActivitiFormIllegalArgumentException("categoryLike is null");
+      throw new ActivitiIllegalArgumentException("categoryLike is null");
     }
     this.categoryLike = categoryLike;
     return this;
@@ -94,7 +95,7 @@ public class FormQueryImpl extends AbstractQuery<FormQuery, Form> implements For
 
   public FormQueryImpl formCategoryNotEquals(String categoryNotEquals) {
     if (categoryNotEquals == null) {
-      throw new ActivitiFormIllegalArgumentException("categoryNotEquals is null");
+      throw new ActivitiIllegalArgumentException("categoryNotEquals is null");
     }
     this.categoryNotEquals = categoryNotEquals;
     return this;
@@ -102,7 +103,7 @@ public class FormQueryImpl extends AbstractQuery<FormQuery, Form> implements For
 
   public FormQueryImpl formName(String name) {
     if (name == null) {
-      throw new ActivitiFormIllegalArgumentException("name is null");
+      throw new ActivitiIllegalArgumentException("name is null");
     }
     this.name = name;
     return this;
@@ -110,7 +111,7 @@ public class FormQueryImpl extends AbstractQuery<FormQuery, Form> implements For
 
   public FormQueryImpl formNameLike(String nameLike) {
     if (nameLike == null) {
-      throw new ActivitiFormIllegalArgumentException("nameLike is null");
+      throw new ActivitiIllegalArgumentException("nameLike is null");
     }
     this.nameLike = nameLike;
     return this;
@@ -118,7 +119,7 @@ public class FormQueryImpl extends AbstractQuery<FormQuery, Form> implements For
 
   public FormQueryImpl deploymentId(String deploymentId) {
     if (deploymentId == null) {
-      throw new ActivitiFormIllegalArgumentException("id is null");
+      throw new ActivitiIllegalArgumentException("id is null");
     }
     this.deploymentId = deploymentId;
     return this;
@@ -126,7 +127,7 @@ public class FormQueryImpl extends AbstractQuery<FormQuery, Form> implements For
 
   public FormQueryImpl deploymentIds(Set<String> deploymentIds) {
     if (deploymentIds == null) {
-      throw new ActivitiFormIllegalArgumentException("ids are null");
+      throw new ActivitiIllegalArgumentException("ids are null");
     }
     this.deploymentIds = deploymentIds;
     return this;
@@ -134,7 +135,7 @@ public class FormQueryImpl extends AbstractQuery<FormQuery, Form> implements For
   
   public FormQueryImpl parentDeploymentId(String parentDeploymentId) {
     if (parentDeploymentId == null) {
-      throw new ActivitiFormIllegalArgumentException("parentDeploymentId is null");
+      throw new ActivitiIllegalArgumentException("parentDeploymentId is null");
     }
     this.parentDeploymentId = parentDeploymentId;
     return this;
@@ -142,7 +143,7 @@ public class FormQueryImpl extends AbstractQuery<FormQuery, Form> implements For
   
   public FormQueryImpl parentDeploymentIdLike(String parentDeploymentIdLike) {
     if (parentDeploymentIdLike == null) {
-      throw new ActivitiFormIllegalArgumentException("parentDeploymentIdLike is null");
+      throw new ActivitiIllegalArgumentException("parentDeploymentIdLike is null");
     }
     this.parentDeploymentIdLike = parentDeploymentIdLike;
     return this;
@@ -150,7 +151,7 @@ public class FormQueryImpl extends AbstractQuery<FormQuery, Form> implements For
 
   public FormQueryImpl formDefinitionKey(String key) {
     if (key == null) {
-      throw new ActivitiFormIllegalArgumentException("key is null");
+      throw new ActivitiIllegalArgumentException("key is null");
     }
     this.key = key;
     return this;
@@ -158,7 +159,7 @@ public class FormQueryImpl extends AbstractQuery<FormQuery, Form> implements For
 
   public FormQueryImpl formDefinitionKeyLike(String keyLike) {
     if (keyLike == null) {
-      throw new ActivitiFormIllegalArgumentException("keyLike is null");
+      throw new ActivitiIllegalArgumentException("keyLike is null");
     }
     this.keyLike = keyLike;
     return this;
@@ -166,7 +167,7 @@ public class FormQueryImpl extends AbstractQuery<FormQuery, Form> implements For
 
   public FormQueryImpl formResourceName(String resourceName) {
     if (resourceName == null) {
-      throw new ActivitiFormIllegalArgumentException("resourceName is null");
+      throw new ActivitiIllegalArgumentException("resourceName is null");
     }
     this.resourceName = resourceName;
     return this;
@@ -174,7 +175,7 @@ public class FormQueryImpl extends AbstractQuery<FormQuery, Form> implements For
 
   public FormQueryImpl formResourceNameLike(String resourceNameLike) {
     if (resourceNameLike == null) {
-      throw new ActivitiFormIllegalArgumentException("resourceNameLike is null");
+      throw new ActivitiIllegalArgumentException("resourceNameLike is null");
     }
     this.resourceNameLike = resourceNameLike;
     return this;
@@ -212,9 +213,9 @@ public class FormQueryImpl extends AbstractQuery<FormQuery, Form> implements For
   
   protected void checkVersion(Integer version) {
     if (version == null) {
-      throw new ActivitiFormIllegalArgumentException("version is null");
+      throw new ActivitiIllegalArgumentException("version is null");
     } else if (version <= 0) {
-      throw new ActivitiFormIllegalArgumentException("version must be positive");
+      throw new ActivitiIllegalArgumentException("version must be positive");
     }
   }
 
@@ -225,7 +226,7 @@ public class FormQueryImpl extends AbstractQuery<FormQuery, Form> implements For
 
   public FormQuery formTenantId(String tenantId) {
     if (tenantId == null) {
-      throw new ActivitiFormIllegalArgumentException("form tenantId is null");
+      throw new ActivitiIllegalArgumentException("form tenantId is null");
     }
     this.tenantId = tenantId;
     return this;
@@ -233,7 +234,7 @@ public class FormQueryImpl extends AbstractQuery<FormQuery, Form> implements For
 
   public FormQuery formTenantIdLike(String tenantIdLike) {
     if (tenantIdLike == null) {
-      throw new ActivitiFormIllegalArgumentException("form tenantId is null");
+      throw new ActivitiIllegalArgumentException("form tenantId is null");
     }
     this.tenantIdLike = tenantIdLike;
     return this;

@@ -104,7 +104,7 @@ public abstract class AbstractPaginateList {
         
       } else if (query instanceof org.activiti.idm.engine.impl.AbstractQuery) {
         org.activiti.idm.engine.impl.AbstractQuery queryObject = (org.activiti.idm.engine.impl.AbstractQuery) query;
-        org.activiti.idm.api.QueryProperty queryProperty = (org.activiti.idm.api.QueryProperty) qp;
+        QueryProperty queryProperty = (QueryProperty) qp;
         queryObject.orderBy(queryProperty);
         if (order.equals("asc")) {
           queryObject.asc();

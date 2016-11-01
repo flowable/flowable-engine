@@ -12,9 +12,14 @@
  */
 package org.activiti.rest.form.service.api.repository;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.activiti.engine.query.QueryProperty;
 import org.activiti.form.api.FormQuery;
 import org.activiti.form.api.FormRepositoryService;
-import org.activiti.form.api.QueryProperty;
 import org.activiti.form.engine.impl.FormQueryProperty;
 import org.activiti.rest.form.FormRestResponseFactory;
 import org.activiti.rest.form.common.DataResponse;
@@ -23,10 +28,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Yvo Swillens

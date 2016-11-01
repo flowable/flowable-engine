@@ -12,8 +12,8 @@
  */
 package org.activiti.form.engine.impl.persistence.entity;
 
+import org.activiti.engine.impl.persistence.entity.Entity;
 import org.activiti.form.engine.FormEngineConfiguration;
-import org.activiti.form.engine.impl.db.Entity;
 import org.activiti.form.engine.impl.persistence.AbstractManager;
 import org.activiti.form.engine.impl.persistence.entity.data.DataManager;
 

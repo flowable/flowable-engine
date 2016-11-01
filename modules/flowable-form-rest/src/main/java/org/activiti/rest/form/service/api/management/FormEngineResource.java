@@ -12,7 +12,7 @@
  */
 package org.activiti.rest.form.service.api.management;
 
-import org.activiti.form.engine.ActivitiFormException;
+import org.activiti.engine.ActivitiException;
 import org.activiti.form.engine.FormEngine;
 import org.activiti.form.engine.FormEngineInfo;
 import org.activiti.form.engine.FormEngines;
@@ -44,7 +44,7 @@ public class FormEngineResource {
                 response.setName(formEngine.getName());
             }
         } catch (Exception e) {
-            throw new ActivitiFormException("Error retrieving form engine info", e);
+            throw new ActivitiException("Error retrieving form engine info", e);
         }
 
         response.setVersion(FormEngine.VERSION);

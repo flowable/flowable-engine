@@ -1,8 +1,7 @@
 package org.activiti.rest.dmn.exception;
 
-import org.activiti.dmn.engine.ActivitiDmnIllegalArgumentException;
-import org.activiti.dmn.engine.ActivitiDmnObjectNotFoundException;
-
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -39,9 +38,9 @@ public class ExceptionHandlerAdvice {
 
   @ResponseStatus(HttpStatus.NOT_FOUND)
   // 404
-  @ExceptionHandler(ActivitiDmnObjectNotFoundException.class)
+  @ExceptionHandler(ActivitiObjectNotFoundException.class)
   @ResponseBody
-  public ErrorInfo handleNotFound(ActivitiDmnObjectNotFoundException e) {
+  public ErrorInfo handleNotFound(ActivitiObjectNotFoundException e) {
     return new ErrorInfo("Not found", e);
   }
 
@@ -55,9 +54,9 @@ public class ExceptionHandlerAdvice {
 
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   // 400
-  @ExceptionHandler(ActivitiDmnIllegalArgumentException.class)
+  @ExceptionHandler(ActivitiIllegalArgumentException.class)
   @ResponseBody
-  public ErrorInfo handleIllegal(ActivitiDmnIllegalArgumentException e) {
+  public ErrorInfo handleIllegal(ActivitiIllegalArgumentException e) {
     return new ErrorInfo("Bad request", e);
   }
 

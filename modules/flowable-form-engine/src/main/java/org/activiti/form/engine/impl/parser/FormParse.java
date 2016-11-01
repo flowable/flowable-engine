@@ -20,14 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.activiti.editor.form.converter.FormJsonConverter;
-import org.activiti.form.engine.ActivitiFormException;
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.impl.util.io.InputStreamSource;
+import org.activiti.engine.impl.util.io.StreamSource;
+import org.activiti.engine.impl.util.io.StringStreamSource;
+import org.activiti.engine.impl.util.io.UrlStreamSource;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.context.Context;
-import org.activiti.form.engine.impl.io.InputStreamSource;
 import org.activiti.form.engine.impl.io.ResourceStreamSource;
-import org.activiti.form.engine.impl.io.StreamSource;
-import org.activiti.form.engine.impl.io.StringStreamSource;
-import org.activiti.form.engine.impl.io.UrlStreamSource;
 import org.activiti.form.engine.impl.persistence.entity.FormDeploymentEntity;
 import org.activiti.form.engine.impl.persistence.entity.FormEntity;
 import org.activiti.form.model.FormDefinition;
@@ -93,7 +93,7 @@ public class FormParse {
         forms.add(formEntity);
       }
     } catch(Exception e) {
-      throw new ActivitiFormException("Error parsing form JSON", e);
+      throw new ActivitiException("Error parsing form JSON", e);
     }
     return this;
   }
@@ -123,7 +123,7 @@ public class FormParse {
     try {
       return sourceUrl(new URL(url));
     } catch (MalformedURLException e) {
-      throw new ActivitiFormException("malformed url: " + url, e);
+      throw new ActivitiException("malformed url: " + url, e);
     }
   }
 
@@ -145,7 +145,7 @@ public class FormParse {
 
   protected void setStreamSource(StreamSource streamSource) {
     if (this.streamSource != null) {
-      throw new ActivitiFormException("invalid: multiple sources " + this.streamSource + " and " + streamSource);
+      throw new ActivitiException("invalid: multiple sources " + this.streamSource + " and " + streamSource);
     }
     this.streamSource = streamSource;
   }

@@ -17,14 +17,14 @@ import java.util.Map;
 
 import org.activiti.dmn.api.DecisionTable;
 import org.activiti.dmn.api.RuleEngineExecutionResult;
-import org.activiti.dmn.engine.ActivitiDmnIllegalArgumentException;
-import org.activiti.dmn.engine.ActivitiDmnObjectNotFoundException;
 import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.impl.interceptor.Command;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
 import org.activiti.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
 import org.activiti.dmn.engine.impl.persistence.deploy.DeploymentManager;
 import org.activiti.dmn.model.DmnDefinition;
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -56,7 +56,7 @@ public class ExecuteDecisionCmd implements Command<RuleEngineExecutionResult>, S
 
   public RuleEngineExecutionResult execute(CommandContext commandContext) {
     if (decisionKey == null) {
-      throw new ActivitiDmnIllegalArgumentException("decisionKey is null");
+      throw new ActivitiIllegalArgumentException("decisionKey is null");
     }
 
     DmnEngineConfiguration dmnEngineConfiguration = commandContext.getDmnEngineConfiguration();
@@ -66,28 +66,28 @@ public class ExecuteDecisionCmd implements Command<RuleEngineExecutionResult>, S
     if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(parentDeploymentId) && StringUtils.isNotEmpty(tenantId)) {
       decisionTable = deploymentManager.findDeployedLatestDecisionByKeyParentDeploymentIdAndTenantId(decisionKey, parentDeploymentId, tenantId);
       if (decisionTable == null) {
-        throw new ActivitiDmnObjectNotFoundException("No decision found for key: " + decisionKey + 
+        throw new ActivitiObjectNotFoundException("No decision found for key: " + decisionKey + 
             ", parent deployment id " + parentDeploymentId + " and tenant id: " + tenantId);
       }
       
     } else if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(parentDeploymentId)) {
       decisionTable = deploymentManager.findDeployedLatestDecisionByKeyAndParentDeploymentId(decisionKey, parentDeploymentId);
       if (decisionTable == null) {
-        throw new ActivitiDmnObjectNotFoundException("No decision found for key: " + decisionKey + 
+        throw new ActivitiObjectNotFoundException("No decision found for key: " + decisionKey + 
             " and parent deployment id " + parentDeploymentId);
       }
       
     } else if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(tenantId)) {
       decisionTable = deploymentManager.findDeployedLatestDecisionByKeyAndTenantId(decisionKey, tenantId);
       if (decisionTable == null) {
-        throw new ActivitiDmnObjectNotFoundException("No decision found for key: " + decisionKey + 
+        throw new ActivitiObjectNotFoundException("No decision found for key: " + decisionKey + 
             " and tenant id " + tenantId);
       }
       
     } else if (StringUtils.isNotEmpty(decisionKey)) {
       decisionTable = deploymentManager.findDeployedLatestDecisionByKey(decisionKey);
       if (decisionTable == null) {
-        throw new ActivitiDmnObjectNotFoundException("No decision found for key: " + decisionKey);
+        throw new ActivitiObjectNotFoundException("No decision found for key: " + decisionKey);
       }
       
     } else {

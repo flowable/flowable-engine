@@ -16,8 +16,7 @@ package org.activiti.idm.api;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.idm.api.GroupQuery;
-import org.activiti.idm.api.QueryProperty;
+import org.activiti.engine.query.QueryProperty;
 
 /**
  * Contains the possible properties that can be used by the {@link GroupQuery}.

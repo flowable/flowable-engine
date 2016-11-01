@@ -17,9 +17,11 @@ import java.sql.Connection;
 import java.util.Collections;
 import java.util.List;
 
-import org.activiti.form.engine.ActivitiFormException;
-import org.activiti.form.engine.ActivitiFormOptimisticLockingException;
-import org.activiti.form.engine.impl.Page;
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ActivitiOptimisticLockingException;
+import org.activiti.engine.impl.Page;
+import org.activiti.engine.impl.db.ListQueryParameterObject;
+import org.activiti.engine.impl.persistence.entity.Entity;
 import org.activiti.form.engine.impl.interceptor.Session;
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
@@ -63,7 +65,7 @@ public class DbSqlSession implements Session {
     insertStatement = dbSqlSessionFactory.mapStatement(insertStatement);
 
     if (insertStatement==null) {
-      throw new ActivitiFormException("no insert statement for " + entity.getClass() + " in the ibatis mapping files");
+      throw new ActivitiException("no insert statement for " + entity.getClass() + " in the ibatis mapping files");
     }
     
     log.debug("inserting: {}", entity);
@@ -78,13 +80,13 @@ public class DbSqlSession implements Session {
     updateStatement = dbSqlSessionFactory.mapStatement(updateStatement);
 
     if (updateStatement == null) {
-      throw new ActivitiFormException("no update statement for " + entity.getClass() + " in the ibatis mapping files");
+      throw new ActivitiException("no update statement for " + entity.getClass() + " in the ibatis mapping files");
     }
 
     log.debug("updating: {}", entity);
     int updatedRecords = sqlSession.update(updateStatement, entity);
     if (updatedRecords == 0) {
-      throw new ActivitiFormOptimisticLockingException(entity + " was updated by another transaction concurrently");
+      throw new ActivitiOptimisticLockingException(entity + " was updated by another transaction concurrently");
     }
   }
 
@@ -104,7 +106,7 @@ public class DbSqlSession implements Session {
     String deleteStatement = dbSqlSessionFactory.getDeleteStatement(entity.getClass());
     deleteStatement = dbSqlSessionFactory.mapStatement(deleteStatement);
     if (deleteStatement == null) {
-      throw new ActivitiFormException("no delete statement for " + entity.getClass() + " in the ibatis mapping files");
+      throw new ActivitiException("no delete statement for " + entity.getClass() + " in the ibatis mapping files");
     }
 
     sqlSession.delete(deleteStatement, entity);

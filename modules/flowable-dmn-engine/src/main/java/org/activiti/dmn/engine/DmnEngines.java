@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.activiti.engine.ActivitiException;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,7 @@ public abstract class DmnEngines {
             try {
                 resources = classLoader.getResources("activiti.dmn.cfg.xml");
             } catch (IOException e) {
-                throw new ActivitiDmnException("problem retrieving activiti.dmn.cfg.xml resources on the classpath: " + System.getProperty("java.class.path"),
+                throw new ActivitiException("problem retrieving activiti.dmn.cfg.xml resources on the classpath: " + System.getProperty("java.class.path"),
                         e);
             }
 
@@ -78,7 +79,7 @@ public abstract class DmnEngines {
             /*try {
                 resources = classLoader.getResources("activiti-dmn-context.xml");
             } catch (IOException e) {
-                throw new ActivitiDmnException("problem retrieving activiti-dmn-context.xml resources on the classpath: "
+                throw new ActivitiException("problem retrieving activiti-dmn-context.xml resources on the classpath: "
                         + System.getProperty("java.class.path"), e);
             }
             while (resources.hasMoreElements()) {
@@ -156,7 +157,7 @@ public abstract class DmnEngines {
             return dmnEngineConfiguration.buildDmnEngine();
 
         } catch (IOException e) {
-            throw new ActivitiDmnException("couldn't open resource stream: " + e.getMessage(), e);
+            throw new ActivitiException("couldn't open resource stream: " + e.getMessage(), e);
         } finally {
             IOUtils.closeQuietly(inputStream);
         }
@@ -201,7 +202,7 @@ public abstract class DmnEngines {
         try {
             return initDmnEngineFromResource(new URL(resourceUrl));
         } catch (MalformedURLException e) {
-            throw new ActivitiDmnException("invalid url: " + resourceUrl, e);
+            throw new ActivitiException("invalid url: " + resourceUrl, e);
         }
     }
 

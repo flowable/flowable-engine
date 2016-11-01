@@ -17,9 +17,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.activiti.dmn.api.DmnRepositoryService;
-import org.activiti.dmn.engine.ActivitiDmnException;
 import org.activiti.dmn.engine.DmnEngine;
 import org.activiti.dmn.engine.DmnEngineConfiguration;
+import org.activiti.engine.ActivitiException;
 import org.junit.internal.AssumptionViolatedException;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
@@ -196,7 +196,7 @@ public class ActivitiDmnRule implements TestRule {
         try {
             deploymentId = DmnTestHelper.annotationDeploymentSetUp(dmnEngine, Class.forName(description.getClassName()), description.getMethodName());
         } catch (ClassNotFoundException e) {
-            throw new ActivitiDmnException("Programmatic error: could not instantiate " + description.getClassName(), e);
+            throw new ActivitiException("Programmatic error: could not instantiate " + description.getClassName(), e);
         }
     }
 
@@ -219,7 +219,7 @@ public class ActivitiDmnRule implements TestRule {
         try {
             DmnTestHelper.annotationDeploymentTearDown(dmnEngine, deploymentId, Class.forName(description.getClassName()), description.getMethodName());
         } catch (ClassNotFoundException e) {
-            throw new ActivitiDmnException("Programmatic error: could not instantiate " + description.getClassName(), e);
+            throw new ActivitiException("Programmatic error: could not instantiate " + description.getClassName(), e);
         }
     }
 

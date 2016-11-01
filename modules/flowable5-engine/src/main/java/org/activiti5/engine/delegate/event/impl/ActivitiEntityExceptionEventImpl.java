@@ -12,10 +12,10 @@
  */
 package org.activiti5.engine.delegate.event.impl;
 
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
+import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiExceptionEvent;
+import org.activiti.engine.impl.delegate.event.ActivitiEngineEntityEvent;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 
 /**
@@ -24,7 +24,7 @@ import org.activiti5.engine.ActivitiIllegalArgumentException;
  * 
  * @author Frederik Heremans
  */
-public class ActivitiEntityExceptionEventImpl extends ActivitiEventImpl implements ActivitiEntityEvent, ActivitiExceptionEvent {
+public class ActivitiEntityExceptionEventImpl extends ActivitiEventImpl implements ActivitiEngineEntityEvent, ActivitiExceptionEvent {
 
 	protected Object entity;
 	protected Throwable cause;

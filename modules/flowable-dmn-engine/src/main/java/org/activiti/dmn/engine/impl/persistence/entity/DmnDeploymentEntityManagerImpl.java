@@ -20,9 +20,9 @@ import org.activiti.dmn.api.DecisionTable;
 import org.activiti.dmn.api.DmnDeployment;
 import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.impl.DmnDeploymentQueryImpl;
-import org.activiti.dmn.engine.impl.Page;
 import org.activiti.dmn.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.dmn.engine.impl.persistence.entity.data.DmnDeploymentDataManager;
+import org.activiti.engine.impl.Page;
 
 /**
  * @author Tijs Rademakers

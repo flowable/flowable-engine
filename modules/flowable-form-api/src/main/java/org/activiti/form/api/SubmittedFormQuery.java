@@ -16,6 +16,8 @@ package org.activiti.form.api;
 import java.util.Date;
 import java.util.Set;
 
+import org.activiti.engine.query.Query;
+
 /**
  * Allows programmatic querying of {@link SubmittedForm}s.
  * 

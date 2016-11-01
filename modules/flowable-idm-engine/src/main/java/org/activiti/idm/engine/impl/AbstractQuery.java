@@ -17,11 +17,13 @@ import java.util.List;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.idm.api.Query;
-import org.activiti.idm.api.QueryProperty;
+import org.activiti.engine.impl.Direction;
+import org.activiti.engine.impl.Page;
+import org.activiti.engine.impl.db.ListQueryParameterObject;
+import org.activiti.engine.query.Query;
+import org.activiti.engine.query.QueryProperty;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.context.Context;
-import org.activiti.idm.engine.impl.db.ListQueryParameterObject;
 import org.activiti.idm.engine.impl.interceptor.Command;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 import org.activiti.idm.engine.impl.interceptor.CommandExecutor;

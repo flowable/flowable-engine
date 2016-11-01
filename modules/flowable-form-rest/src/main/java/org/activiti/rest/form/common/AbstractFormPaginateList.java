@@ -13,13 +13,13 @@
 
 package org.activiti.rest.form.common;
 
-import org.activiti.form.api.Query;
-import org.activiti.form.api.QueryProperty;
-import org.activiti.form.engine.ActivitiFormIllegalArgumentException;
-import org.activiti.form.engine.impl.AbstractQuery;
-
 import java.util.List;
 import java.util.Map;
+
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.query.Query;
+import org.activiti.engine.query.QueryProperty;
+import org.activiti.form.engine.impl.AbstractQuery;
 
 /**
  * @author Yvo Swillens
@@ -90,7 +90,7 @@ public abstract class AbstractFormPaginateList {
     if (sort != null && !properties.isEmpty()) {
       QueryProperty qp = properties.get(sort);
       if (qp == null) {
-        throw new ActivitiFormIllegalArgumentException("Value for param 'sort' is not valid, '" + sort + "' is not a valid property");
+        throw new ActivitiIllegalArgumentException("Value for param 'sort' is not valid, '" + sort + "' is not a valid property");
       }
       ((AbstractQuery) query).orderBy(qp);
       if (order.equals("asc")) {
@@ -98,7 +98,7 @@ public abstract class AbstractFormPaginateList {
       } else if (order.equals("desc")) {
         query.desc();
       } else {
-        throw new ActivitiFormIllegalArgumentException("Value for param 'order' is not valid : '" + order + "', must be 'asc' or 'desc'");
+        throw new ActivitiIllegalArgumentException("Value for param 'order' is not valid : '" + order + "', must be 'asc' or 'desc'");
       }
     }
 

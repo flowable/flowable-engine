@@ -16,10 +16,10 @@ package org.activiti.rest.dmn.common;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.dmn.api.Query;
-import org.activiti.dmn.api.QueryProperty;
-import org.activiti.dmn.engine.ActivitiDmnIllegalArgumentException;
 import org.activiti.dmn.engine.impl.AbstractQuery;
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.query.Query;
+import org.activiti.engine.query.QueryProperty;
 
 /**
  * @author Yvo Swillens
@@ -90,7 +90,7 @@ public abstract class AbstractDmnPaginateList {
     if (sort != null && !properties.isEmpty()) {
       QueryProperty qp = properties.get(sort);
       if (qp == null) {
-        throw new ActivitiDmnIllegalArgumentException("Value for param 'sort' is not valid, '" + sort + "' is not a valid property");
+        throw new ActivitiIllegalArgumentException("Value for param 'sort' is not valid, '" + sort + "' is not a valid property");
       }
       ((AbstractQuery) query).orderBy(qp);
       if (order.equals("asc")) {
@@ -98,7 +98,7 @@ public abstract class AbstractDmnPaginateList {
       } else if (order.equals("desc")) {
         query.desc();
       } else {
-        throw new ActivitiDmnIllegalArgumentException("Value for param 'order' is not valid : '" + order + "', must be 'asc' or 'desc'");
+        throw new ActivitiIllegalArgumentException("Value for param 'order' is not valid : '" + order + "', must be 'asc' or 'desc'");
       }
     }
 

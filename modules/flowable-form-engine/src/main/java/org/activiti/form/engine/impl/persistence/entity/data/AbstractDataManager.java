@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.activiti.engine.impl.persistence.entity.Entity;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.db.DbSqlSession;
-import org.activiti.form.engine.impl.db.Entity;
 import org.activiti.form.engine.impl.persistence.AbstractManager;
 
 /**

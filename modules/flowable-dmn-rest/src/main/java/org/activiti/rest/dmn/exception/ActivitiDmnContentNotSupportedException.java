@@ -1,8 +1,8 @@
 package org.activiti.rest.dmn.exception;
 
-import org.activiti.dmn.engine.ActivitiDmnException;
+import org.activiti.engine.ActivitiException;
 
-public class ActivitiDmnContentNotSupportedException extends ActivitiDmnException {
+public class ActivitiDmnContentNotSupportedException extends ActivitiException {
 
   private static final long serialVersionUID = 1L;
 

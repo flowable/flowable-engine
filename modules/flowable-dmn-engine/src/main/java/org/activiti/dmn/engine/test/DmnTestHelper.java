@@ -21,10 +21,10 @@ import java.util.Map;
 import org.activiti.dmn.api.DmnDeployment;
 import org.activiti.dmn.api.DmnDeploymentBuilder;
 import org.activiti.dmn.api.DmnRepositoryService;
-import org.activiti.dmn.engine.ActivitiDmnObjectNotFoundException;
 import org.activiti.dmn.engine.DmnEngine;
 import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.impl.deployer.ParsedDeploymentBuilder;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +78,7 @@ public abstract class DmnTestHelper {
         if (deploymentId != null) {
             try {
                 dmnEngine.getDmnRepositoryService().deleteDeployment(deploymentId);
-            } catch (ActivitiDmnObjectNotFoundException e) {
+            } catch (ActivitiObjectNotFoundException e) {
                 // Deployment was already deleted by the test case. Ignore.
             }
         }

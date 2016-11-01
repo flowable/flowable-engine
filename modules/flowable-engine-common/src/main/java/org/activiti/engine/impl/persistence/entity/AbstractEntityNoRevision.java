@@ -10,20 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.idm.engine.impl.persistence.entity;
-
-import org.activiti.idm.engine.impl.db.Entity;
-import org.activiti.idm.engine.impl.db.HasRevision;
+package org.activiti.engine.impl.persistence.entity;
 
 /**
  * Abstract superclass for the common properties of all {@link Entity} implementations.
  * 
  * @author Joram Barrez
  */
-public abstract class AbstractEntity implements Entity, HasRevision {
+public abstract class AbstractEntityNoRevision implements Entity {
 
   protected String id;
-  protected int revision = 1;
   
   protected boolean isInserted;
   protected boolean isUpdated;
@@ -37,18 +33,6 @@ public abstract class AbstractEntity implements Entity, HasRevision {
   @Override
   public void setId(String id) {
     this.id = id;
-  }
-  
-  public int getRevisionNext() {
-    return revision + 1;
-  }
-
-  public int getRevision() {
-    return revision;
-  }
-
-  public void setRevision(int revision) {
-    this.revision = revision;
   }
 
   public boolean isInserted() {

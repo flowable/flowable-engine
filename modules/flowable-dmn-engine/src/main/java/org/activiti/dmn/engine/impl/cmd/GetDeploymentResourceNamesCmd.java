@@ -15,9 +15,9 @@ package org.activiti.dmn.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
-import org.activiti.dmn.engine.ActivitiDmnIllegalArgumentException;
 import org.activiti.dmn.engine.impl.interceptor.Command;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
+import org.activiti.engine.ActivitiIllegalArgumentException;
 
 /**
  * @author Joram Barrez
@@ -33,7 +33,7 @@ public class GetDeploymentResourceNamesCmd implements Command<List<String>>, Ser
 
   public List<String> execute(CommandContext commandContext) {
     if (deploymentId == null) {
-      throw new ActivitiDmnIllegalArgumentException("deploymentId is null");
+      throw new ActivitiIllegalArgumentException("deploymentId is null");
     }
 
     return commandContext.getDeploymentEntityManager().getDeploymentResourceNames(deploymentId);

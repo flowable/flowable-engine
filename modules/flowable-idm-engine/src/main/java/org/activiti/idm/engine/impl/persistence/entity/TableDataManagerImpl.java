@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.impl.persistence.entity.Entity;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.Token;
 import org.activiti.idm.api.User;
@@ -32,7 +33,6 @@ import org.activiti.idm.api.management.IdmTablePage;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.TablePageQueryImpl;
 import org.activiti.idm.engine.impl.db.DbSqlSession;
-import org.activiti.idm.engine.impl.db.Entity;
 import org.activiti.idm.engine.impl.persistence.AbstractManager;
 import org.apache.ibatis.session.RowBounds;
 import org.slf4j.Logger;
