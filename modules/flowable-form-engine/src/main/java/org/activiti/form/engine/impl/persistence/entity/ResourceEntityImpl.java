@@ -15,14 +15,15 @@ package org.activiti.form.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
+import org.activiti.engine.impl.persistence.entity.AbstractEntityNoRevision;
+
 /**
  * @author Tijs Rademakers
  */
-public class ResourceEntityImpl implements ResourceEntity, Serializable {
+public class ResourceEntityImpl extends AbstractEntityNoRevision implements ResourceEntity, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  protected String id;
   protected String name;
   protected byte[] bytes;
   protected String deploymentId;
@@ -31,14 +32,6 @@ public class ResourceEntityImpl implements ResourceEntity, Serializable {
     
   }
   
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
   public String getName() {
     return name;
   }

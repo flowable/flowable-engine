@@ -15,7 +15,7 @@ package org.activiti.form.engine.impl.deployer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.activiti.form.engine.impl.cfg.IdGenerator;
+import org.activiti.engine.impl.cfg.IdGenerator;
 import org.activiti.form.engine.impl.context.Context;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
 import org.activiti.form.engine.impl.persistence.deploy.Deployer;

@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.activiti.engine.delegate.VariableScope;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.TimerJobQueryImpl;
@@ -170,7 +170,7 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
     
     // Send event
     if (getEventDispatcher().isEnabled()) {
-      getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_DELETED, this));
+      getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_DELETED, this));
     }
   }
   

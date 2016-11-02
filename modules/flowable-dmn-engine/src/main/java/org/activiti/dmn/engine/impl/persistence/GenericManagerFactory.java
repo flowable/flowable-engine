@@ -13,10 +13,10 @@
 
 package org.activiti.dmn.engine.impl.persistence;
 
-import org.activiti.dmn.engine.ActivitiDmnException;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
 import org.activiti.dmn.engine.impl.interceptor.Session;
 import org.activiti.dmn.engine.impl.interceptor.SessionFactory;
+import org.activiti.engine.ActivitiException;
 
 /**
  * @author Tijs Rademakers
@@ -44,7 +44,7 @@ public class GenericManagerFactory implements SessionFactory {
     try {
       return implementationClass.newInstance();
     } catch (Exception e) {
-      throw new ActivitiDmnException("couldn't instantiate " + implementationClass.getName() + ": " + e.getMessage(), e);
+      throw new ActivitiException("couldn't instantiate " + implementationClass.getName() + ": " + e.getMessage(), e);
     }
   }
 }

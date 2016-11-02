@@ -32,10 +32,14 @@ public class FileSystemContentObject implements ContentObject{
     private InputStream inputStream;
     private String id;
     private Long length;
+    
+    public FileSystemContentObject(File file, String id) {
+      this.file = file;
+      this.id = id;
+    }
      
     public FileSystemContentObject(File file, String id, Long length) {
-        this.file = file;
-        this.id = id;
+        this(file, id);
         this.length = length;
     }
     

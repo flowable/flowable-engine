@@ -15,8 +15,8 @@ package org.activiti.idm.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.idm.api.Token;
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
 import org.activiti.idm.engine.impl.interceptor.Command;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 
@@ -31,7 +31,7 @@ public class CreateTokenCmd implements Command<Token>, Serializable {
 
   public CreateTokenCmd(String tokenId) {
     if (tokenId == null) {
-      throw new ActivitiIdmIllegalArgumentException("tokenId is null");
+      throw new ActivitiIllegalArgumentException("tokenId is null");
     }
     this.tokenId = tokenId;
   }

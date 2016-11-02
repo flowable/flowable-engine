@@ -12,17 +12,17 @@
  */
 package org.activiti.rest.form.service.api.repository;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.form.api.Form;
 import org.activiti.form.api.FormRepositoryService;
-import org.activiti.form.engine.ActivitiFormObjectNotFoundException;
 import org.activiti.rest.form.FormRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Yvo Swillens
@@ -41,7 +41,7 @@ public class FormResource {
     Form form = formRepositoryService.getForm(formId);
 
     if (form == null) {
-      throw new ActivitiFormObjectNotFoundException("Could not find a form with id '" + formId);
+      throw new ActivitiObjectNotFoundException("Could not find a form with id '" + formId);
     }
 
     return formRestResponseFactory.createFormResponse(form);

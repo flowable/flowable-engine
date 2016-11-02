@@ -51,13 +51,13 @@ public class BaseEntityEventListener implements ActivitiEventListener {
   public final void onEvent(ActivitiEvent event) {
     if (isValidEvent(event)) {
       // Check if this event
-      if (event.getType() == ActivitiEventType.ENTITY_CREATED) {
+      if (event.getType() == ActivitiEngineEventType.ENTITY_CREATED) {
         onCreate(event);
-      } else if (event.getType() == ActivitiEventType.ENTITY_INITIALIZED) {
+      } else if (event.getType() == ActivitiEngineEventType.ENTITY_INITIALIZED) {
         onInitialized(event);
-      } else if (event.getType() == ActivitiEventType.ENTITY_DELETED) {
+      } else if (event.getType() == ActivitiEngineEventType.ENTITY_DELETED) {
         onDelete(event);
-      } else if (event.getType() == ActivitiEventType.ENTITY_UPDATED) {
+      } else if (event.getType() == ActivitiEngineEventType.ENTITY_UPDATED) {
         onUpdate(event);
       } else {
         // Entity-specific event

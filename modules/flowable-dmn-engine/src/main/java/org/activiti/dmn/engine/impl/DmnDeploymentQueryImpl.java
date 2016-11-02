@@ -18,9 +18,10 @@ import java.util.List;
 
 import org.activiti.dmn.api.DmnDeployment;
 import org.activiti.dmn.api.DmnDeploymentQuery;
-import org.activiti.dmn.engine.ActivitiDmnIllegalArgumentException;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
 import org.activiti.dmn.engine.impl.interceptor.CommandExecutor;
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.impl.Page;
 
 /**
  * @author Tijs Rademakers
@@ -55,7 +56,7 @@ public class DmnDeploymentQueryImpl extends AbstractQuery<DmnDeploymentQuery, Dm
 
   public DmnDeploymentQueryImpl deploymentId(String deploymentId) {
     if (deploymentId == null) {
-      throw new ActivitiDmnIllegalArgumentException("Deployment id is null");
+      throw new ActivitiIllegalArgumentException("Deployment id is null");
     }
     this.deploymentId = deploymentId;
     return this;
@@ -63,7 +64,7 @@ public class DmnDeploymentQueryImpl extends AbstractQuery<DmnDeploymentQuery, Dm
 
   public DmnDeploymentQueryImpl deploymentName(String deploymentName) {
     if (deploymentName == null) {
-      throw new ActivitiDmnIllegalArgumentException("deploymentName is null");
+      throw new ActivitiIllegalArgumentException("deploymentName is null");
     }
     this.name = deploymentName;
     return this;
@@ -71,7 +72,7 @@ public class DmnDeploymentQueryImpl extends AbstractQuery<DmnDeploymentQuery, Dm
 
   public DmnDeploymentQueryImpl deploymentNameLike(String nameLike) {
     if (nameLike == null) {
-      throw new ActivitiDmnIllegalArgumentException("deploymentNameLike is null");
+      throw new ActivitiIllegalArgumentException("deploymentNameLike is null");
     }
     this.nameLike = nameLike;
     return this;
@@ -79,7 +80,7 @@ public class DmnDeploymentQueryImpl extends AbstractQuery<DmnDeploymentQuery, Dm
 
   public DmnDeploymentQueryImpl deploymentCategory(String deploymentCategory) {
     if (deploymentCategory == null) {
-      throw new ActivitiDmnIllegalArgumentException("deploymentCategory is null");
+      throw new ActivitiIllegalArgumentException("deploymentCategory is null");
     }
     this.category = deploymentCategory;
     return this;
@@ -87,7 +88,7 @@ public class DmnDeploymentQueryImpl extends AbstractQuery<DmnDeploymentQuery, Dm
 
   public DmnDeploymentQueryImpl deploymentCategoryNotEquals(String deploymentCategoryNotEquals) {
     if (deploymentCategoryNotEquals == null) {
-      throw new ActivitiDmnIllegalArgumentException("deploymentCategoryExclude is null");
+      throw new ActivitiIllegalArgumentException("deploymentCategoryExclude is null");
     }
     this.categoryNotEquals = deploymentCategoryNotEquals;
     return this;
@@ -95,7 +96,7 @@ public class DmnDeploymentQueryImpl extends AbstractQuery<DmnDeploymentQuery, Dm
 
   public DmnDeploymentQueryImpl deploymentTenantId(String tenantId) {
     if (tenantId == null) {
-      throw new ActivitiDmnIllegalArgumentException("deploymentTenantId is null");
+      throw new ActivitiIllegalArgumentException("deploymentTenantId is null");
     }
     this.tenantId = tenantId;
     return this;
@@ -103,7 +104,7 @@ public class DmnDeploymentQueryImpl extends AbstractQuery<DmnDeploymentQuery, Dm
 
   public DmnDeploymentQueryImpl deploymentTenantIdLike(String tenantIdLike) {
     if (tenantIdLike == null) {
-      throw new ActivitiDmnIllegalArgumentException("deploymentTenantIdLike is null");
+      throw new ActivitiIllegalArgumentException("deploymentTenantIdLike is null");
     }
     this.tenantIdLike = tenantIdLike;
     return this;
@@ -116,7 +117,7 @@ public class DmnDeploymentQueryImpl extends AbstractQuery<DmnDeploymentQuery, Dm
   
   public DmnDeploymentQueryImpl parentDeploymentId(String parentDeploymentId) {
     if (parentDeploymentId == null) {
-      throw new ActivitiDmnIllegalArgumentException("parentDeploymentId is null");
+      throw new ActivitiIllegalArgumentException("parentDeploymentId is null");
     }
     this.parentDeploymentId = parentDeploymentId;
     return this;
@@ -124,7 +125,7 @@ public class DmnDeploymentQueryImpl extends AbstractQuery<DmnDeploymentQuery, Dm
 
   public DmnDeploymentQueryImpl parentDeploymentIdLike(String parentDeploymentIdLike) {
     if (parentDeploymentIdLike == null) {
-      throw new ActivitiDmnIllegalArgumentException("parentDeploymentIdLike is null");
+      throw new ActivitiIllegalArgumentException("parentDeploymentIdLike is null");
     }
     this.parentDeploymentIdLike = parentDeploymentIdLike;
     return this;
@@ -132,7 +133,7 @@ public class DmnDeploymentQueryImpl extends AbstractQuery<DmnDeploymentQuery, Dm
 
   public DmnDeploymentQueryImpl decisionTableKey(String key) {
     if (key == null) {
-      throw new ActivitiDmnIllegalArgumentException("key is null");
+      throw new ActivitiIllegalArgumentException("key is null");
     }
     this.decisionTableKey = key;
     return this;
@@ -140,7 +141,7 @@ public class DmnDeploymentQueryImpl extends AbstractQuery<DmnDeploymentQuery, Dm
 
   public DmnDeploymentQueryImpl decisionTableKeyLike(String keyLike) {
     if (keyLike == null) {
-      throw new ActivitiDmnIllegalArgumentException("keyLike is null");
+      throw new ActivitiIllegalArgumentException("keyLike is null");
     }
     this.decisionTableKeyLike = keyLike;
     return this;

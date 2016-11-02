@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.activiti.engine.ActivitiException;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,7 @@ public abstract class IdmEngines {
       try {
         resources = classLoader.getResources("activiti.idm.cfg.xml");
       } catch (IOException e) {
-        throw new ActivitiIdmException("problem retrieving activiti.idm.cfg.xml resources on the classpath: " + System.getProperty("java.class.path"), e);
+        throw new ActivitiException("problem retrieving activiti.idm.cfg.xml resources on the classpath: " + System.getProperty("java.class.path"), e);
       }
 
       // Remove duplicated configuration URL's using set. Some
@@ -150,7 +151,7 @@ public abstract class IdmEngines {
       return idmEngineConfiguration.buildIdmEngine();
 
     } catch (IOException e) {
-      throw new ActivitiIdmException("couldn't open resource stream: " + e.getMessage(), e);
+      throw new ActivitiException("couldn't open resource stream: " + e.getMessage(), e);
     } finally {
       IOUtils.closeQuietly(inputStream);
     }
@@ -194,7 +195,7 @@ public abstract class IdmEngines {
     try {
       return initFormEngineFromResource(new URL(resourceUrl));
     } catch (MalformedURLException e) {
-      throw new ActivitiIdmException("invalid url: " + resourceUrl, e);
+      throw new ActivitiException("invalid url: " + resourceUrl, e);
     }
   }
 

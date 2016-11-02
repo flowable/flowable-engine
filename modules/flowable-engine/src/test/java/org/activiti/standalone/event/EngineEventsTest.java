@@ -12,7 +12,7 @@
  */
 package org.activiti.standalone.event;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.test.ResourceActivitiTestCase;
 import org.activiti.engine.test.api.event.TestActivitiEventListener;
 
@@ -34,13 +34,13 @@ public class EngineEventsTest extends ResourceActivitiTestCase {
 
     // Check create-event
     assertEquals(1, listener.getEventsReceived().size());
-    assertEquals(ActivitiEventType.ENGINE_CREATED, listener.getEventsReceived().get(0).getType());
+    assertEquals(ActivitiEngineEventType.ENGINE_CREATED, listener.getEventsReceived().get(0).getType());
     listener.clearEventsReceived();
 
     // Check close-event
     processEngine.close();
     assertEquals(1, listener.getEventsReceived().size());
-    assertEquals(ActivitiEventType.ENGINE_CLOSED, listener.getEventsReceived().get(0).getType());
+    assertEquals(ActivitiEngineEventType.ENGINE_CLOSED, listener.getEventsReceived().get(0).getType());
 
   }
 

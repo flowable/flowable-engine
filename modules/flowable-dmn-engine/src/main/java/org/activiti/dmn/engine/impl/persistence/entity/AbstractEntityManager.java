@@ -13,9 +13,9 @@
 package org.activiti.dmn.engine.impl.persistence.entity;
 
 import org.activiti.dmn.engine.DmnEngineConfiguration;
-import org.activiti.dmn.engine.impl.db.Entity;
 import org.activiti.dmn.engine.impl.persistence.AbstractManager;
 import org.activiti.dmn.engine.impl.persistence.entity.data.DataManager;
+import org.activiti.engine.impl.persistence.entity.Entity;
 
 /**
  * @author Joram Barrez

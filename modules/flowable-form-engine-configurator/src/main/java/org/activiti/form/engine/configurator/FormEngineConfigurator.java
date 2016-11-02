@@ -15,10 +15,10 @@ package org.activiti.form.engine.configurator;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.activiti.engine.ActivitiException;
 import org.activiti.engine.cfg.AbstractProcessEngineConfigurator;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.persistence.deploy.Deployer;
-import org.activiti.form.engine.ActivitiFormException;
 import org.activiti.form.engine.FormEngine;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.deployer.FormDeployer;
@@ -53,7 +53,7 @@ public class FormEngineConfigurator extends AbstractProcessEngineConfigurator {
   protected synchronized void initFormEngine() {
     if (formEngine == null) {
       if (formEngineConfiguration == null) {
-        throw new ActivitiFormException("FormEngineConfiguration is required");
+        throw new ActivitiException("FormEngineConfiguration is required");
       }
       
       formEngine = formEngineConfiguration.buildFormEngine();

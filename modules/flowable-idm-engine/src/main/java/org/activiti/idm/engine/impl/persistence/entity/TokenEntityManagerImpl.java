@@ -16,10 +16,10 @@ package org.activiti.idm.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.impl.Page;
 import org.activiti.idm.api.Token;
 import org.activiti.idm.api.TokenQuery;
 import org.activiti.idm.engine.IdmEngineConfiguration;
-import org.activiti.idm.engine.impl.Page;
 import org.activiti.idm.engine.impl.TokenQueryImpl;
 import org.activiti.idm.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.TokenDataManager;

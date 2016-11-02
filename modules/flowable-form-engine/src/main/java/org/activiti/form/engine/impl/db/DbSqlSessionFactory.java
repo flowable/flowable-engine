@@ -18,8 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.activiti.form.engine.ActivitiFormException;
-import org.activiti.form.engine.impl.cfg.IdGenerator;
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.impl.cfg.IdGenerator;
+import org.activiti.engine.impl.persistence.entity.Entity;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
 import org.activiti.form.engine.impl.interceptor.Session;
 import org.activiti.form.engine.impl.interceptor.SessionFactory;
@@ -63,14 +64,14 @@ public class DbSqlSessionFactory implements SessionFactory {
       try {
         dbSqlSession.getSqlSession().getConnection().setSchema(getDatabaseSchema());
       } catch (SQLException e) {
-        throw new ActivitiFormException("Could not set database schema on connection", e);
+        throw new ActivitiException("Could not set database schema on connection", e);
       }
     }
     if (getDatabaseCatalog() != null && getDatabaseCatalog().length() > 0) {
       try {
         dbSqlSession.getSqlSession().getConnection().setCatalog(getDatabaseCatalog());
       } catch (SQLException e) {
-        throw new ActivitiFormException("Could not set database catalog on connection", e);
+        throw new ActivitiException("Could not set database catalog on connection", e);
       }
     }
     return dbSqlSession;

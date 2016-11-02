@@ -21,16 +21,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.dmn.engine.DmnEngineConfiguration;
+import org.activiti.engine.impl.persistence.entity.AbstractEntityNoRevision;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class DmnDeploymentEntityImpl implements DmnDeploymentEntity, Serializable {
+public class DmnDeploymentEntityImpl extends AbstractEntityNoRevision implements DmnDeploymentEntity, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  protected String id;
   protected String name;
   protected String category;
   protected String tenantId = DmnEngineConfiguration.NO_TENANT_ID;
@@ -94,14 +94,6 @@ public class DmnDeploymentEntityImpl implements DmnDeploymentEntity, Serializabl
   }
 
   // getters and setters ////////////////////////////////////////////////////////
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
 
   public String getName() {
     return name;

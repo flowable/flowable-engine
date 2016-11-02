@@ -17,8 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.form.engine.ActivitiFormException;
-import org.activiti.form.engine.ActivitiFormOptimisticLockingException;
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ActivitiOptimisticLockingException;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.cfg.TransactionContext;
 import org.activiti.form.engine.impl.db.DbSqlSession;
@@ -98,7 +98,7 @@ public class CommandContext {
           }
 
           if (exception != null) {
-            if (exception instanceof ActivitiFormOptimisticLockingException) {
+            if (exception instanceof ActivitiOptimisticLockingException) {
               // reduce log level, as normally we're not
               // interested in logging this exception
               log.debug("Optimistic locking exception : " + exception);
@@ -126,7 +126,7 @@ public class CommandContext {
       } else if (exception instanceof RuntimeException) {
         throw (RuntimeException) exception;
       } else {
-        throw new ActivitiFormException("exception while executing command " + command, exception);
+        throw new ActivitiException("exception while executing command " + command, exception);
       }
     }
   }
@@ -187,7 +187,7 @@ public class CommandContext {
     if (session == null) {
       SessionFactory sessionFactory = sessionFactories.get(sessionClass);
       if (sessionFactory == null) {
-        throw new ActivitiFormException("no session factory configured for " + sessionClass.getName());
+        throw new ActivitiException("no session factory configured for " + sessionClass.getName());
       }
       session = sessionFactory.openSession(this);
       sessions.put(sessionClass, session);

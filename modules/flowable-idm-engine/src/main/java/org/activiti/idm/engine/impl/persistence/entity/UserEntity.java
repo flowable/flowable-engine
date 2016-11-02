@@ -12,10 +12,10 @@
  */
 package org.activiti.idm.engine.impl.persistence.entity;
 
+import org.activiti.engine.impl.db.HasRevision;
+import org.activiti.engine.impl.persistence.entity.Entity;
 import org.activiti.idm.api.Picture;
 import org.activiti.idm.api.User;
-import org.activiti.idm.engine.impl.db.Entity;
-import org.activiti.idm.engine.impl.db.HasRevision;
 
 /**
  * @author Tom Baeyens

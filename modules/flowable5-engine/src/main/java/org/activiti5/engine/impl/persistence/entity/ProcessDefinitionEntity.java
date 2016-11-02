@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti5.engine.ProcessEngineConfiguration;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
@@ -124,7 +124,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     
     if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
         Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_CREATED, processInstance));
+                ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_CREATED, processInstance));
     }
     
     return processInstance;

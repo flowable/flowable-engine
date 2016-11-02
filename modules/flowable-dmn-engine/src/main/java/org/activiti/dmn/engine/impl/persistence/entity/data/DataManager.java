@@ -12,7 +12,7 @@
  */
 package org.activiti.dmn.engine.impl.persistence.entity.data;
 
-import org.activiti.dmn.engine.impl.db.Entity;
+import org.activiti.engine.impl.persistence.entity.Entity;
 
 /**
  * @author Joram Barrez

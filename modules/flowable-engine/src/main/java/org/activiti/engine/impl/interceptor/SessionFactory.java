@@ -14,7 +14,7 @@
 package org.activiti.engine.impl.interceptor;
 
 /**
- * A session factory produces a {@link Session} instance that has the lifespane of one {@link Command}.
+ * A session factory produces a {@link Session} instance that has the lifespan of one {@link Command}.
  * 
  * @author Tom Baeyens
  * @author Joram Barrez

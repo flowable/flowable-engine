@@ -17,12 +17,6 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import liquibase.Liquibase;
-import liquibase.database.Database;
-import liquibase.database.DatabaseConnection;
-import liquibase.database.DatabaseFactory;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.resource.ClassLoaderResourceAccessor;
 import org.activiti.domain.generator.MinimalDataGenerator;
 import org.activiti.web.rest.exception.InternalServerErrorException;
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +37,13 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+
+import liquibase.Liquibase;
+import liquibase.database.Database;
+import liquibase.database.DatabaseConnection;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.resource.ClassLoaderResourceAccessor;
 
 @Configuration
 @EnableTransactionManagement

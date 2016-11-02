@@ -12,16 +12,16 @@ package org.activiti.editor.language.xml;
  * limitations under the License.
  */
 
-import org.activiti.bpmn.BpmnAutoLayout;
-import org.activiti.bpmn.converter.BpmnXMLConverter;
-import org.activiti.bpmn.converter.util.InputStreamProvider;
-import org.activiti.bpmn.model.BpmnModel;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import static org.junit.Assert.assertEquals;
+import org.activiti.bpmn.BpmnAutoLayout;
+import org.activiti.bpmn.converter.BpmnXMLConverter;
+import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.engine.io.InputStreamProvider;
+import org.junit.Test;
 
 /**
  * @author Vasile Dirla

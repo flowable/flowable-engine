@@ -14,7 +14,7 @@ package org.activiti5.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.JobNotFoundException;
@@ -89,7 +89,7 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
       
       if (commandContext.getEventDispatcher().isEnabled()) {
       	commandContext.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(
-      			ActivitiEventType.JOB_EXECUTION_SUCCESS, job));
+      			ActivitiEngineEventType.JOB_EXECUTION_SUCCESS, job));
       }
       
     } catch (Throwable exception) {
@@ -100,7 +100,7 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
       if (commandContext.getEventDispatcher().isEnabled()) {
 	      try {
 	      	commandContext.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityExceptionEvent(
-	      			ActivitiEventType.JOB_EXECUTION_FAILURE, job, exception));
+	      			ActivitiEngineEventType.JOB_EXECUTION_FAILURE, job, exception));
 	      } catch(Throwable ignore) {
 	      	log.warn("Exception occured while dispatching job failure event, ignoring.", ignore);
 	      }

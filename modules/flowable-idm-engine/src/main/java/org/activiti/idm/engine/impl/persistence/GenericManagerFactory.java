@@ -13,7 +13,7 @@
 
 package org.activiti.idm.engine.impl.persistence;
 
-import org.activiti.idm.engine.ActivitiIdmException;
+import org.activiti.engine.ActivitiException;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 import org.activiti.idm.engine.impl.interceptor.Session;
 import org.activiti.idm.engine.impl.interceptor.SessionFactory;
@@ -44,7 +44,7 @@ public class GenericManagerFactory implements SessionFactory {
     try {
       return implementationClass.newInstance();
     } catch (Exception e) {
-      throw new ActivitiIdmException("couldn't instantiate " + implementationClass.getName() + ": " + e.getMessage(), e);
+      throw new ActivitiException("couldn't instantiate " + implementationClass.getName() + ": " + e.getMessage(), e);
     }
   }
 }

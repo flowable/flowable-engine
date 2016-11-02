@@ -15,6 +15,9 @@ package org.activiti.dmn.api;
 
 import java.util.Set;
 
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.query.Query;
+
 /**
  * Allows programmatic querying of {@link DecisionTable}s.
  * 

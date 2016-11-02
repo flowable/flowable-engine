@@ -12,7 +12,9 @@
  */
 package org.activiti.dmn.engine;
 
-public class ActivitiDmnExpressionException extends ActivitiDmnException {
+import org.activiti.engine.ActivitiException;
+
+public class ActivitiDmnExpressionException extends ActivitiException {
 
     private static final long serialVersionUID = 1L;
 

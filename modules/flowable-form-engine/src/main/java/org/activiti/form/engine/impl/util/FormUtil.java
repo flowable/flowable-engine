@@ -12,7 +12,7 @@
  */
 package org.activiti.form.engine.impl.util;
 
-import org.activiti.form.engine.ActivitiFormException;
+import org.activiti.engine.ActivitiException;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.context.Context;
 import org.activiti.form.engine.impl.persistence.deploy.DeploymentManager;
@@ -72,7 +72,7 @@ public class FormUtil {
     FormEntityManager formEntityManager = Context.getFormEngineConfiguration().getFormEntityManager();
     FormEntity form = formEntityManager.findById(formId);
     if (form == null) {
-      throw new ActivitiFormException("No form found with id " + formId);
+      throw new ActivitiException("No form found with id " + formId);
     }
     
     return form;

@@ -14,6 +14,7 @@ package org.activiti5.engine.impl.bpmn.helper;
 
 import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
+import org.activiti.engine.impl.delegate.event.ActivitiEngineEvent;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.persistence.entity.ExecutionEntity;
@@ -31,15 +32,15 @@ public class ErrorThrowingEventListener extends BaseDelegateEventListener {
 
 	@Override
 	public void onEvent(ActivitiEvent event) {
-		if(isValidEvent(event)) {
+		if (isValidEvent(event) && event instanceof ActivitiEngineEvent) {
+		  ActivitiEngineEvent engineEvent = (ActivitiEngineEvent) event;
 			ExecutionEntity execution = null;
 			
 			if (Context.isExecutionContextActive()) {
 				execution = Context.getExecutionContext().getExecution();
-			} else if(event.getExecutionId() != null){
+			} else if (engineEvent.getExecutionId() != null){
 				// Get the execution based on the event's execution ID instead
-				execution = Context.getCommandContext().getExecutionEntityManager()
-						.findExecutionById(event.getExecutionId());
+				execution = Context.getCommandContext().getExecutionEntityManager().findExecutionById(engineEvent.getExecutionId());
 			}
 			
 			if(execution == null) {

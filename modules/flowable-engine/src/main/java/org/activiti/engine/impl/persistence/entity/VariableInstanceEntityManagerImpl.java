@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.ActivitiVariableEvent;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -127,7 +127,7 @@ public class VariableInstanceEntityManagerImpl extends AbstractEntityManager<Var
 
     ActivitiEventDispatcher eventDispatcher =  getEventDispatcher();
     if (fireDeleteEvent && eventDispatcher.isEnabled()) {
-      eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_DELETED, entity));
+      eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_DELETED, entity));
       
       eventDispatcher.dispatchEvent(createVariableDeleteEvent(entity));
     }
@@ -144,7 +144,7 @@ public class VariableInstanceEntityManagerImpl extends AbstractEntityManager<Var
       }
     }
     
-    return ActivitiEventBuilder.createVariableEvent(ActivitiEventType.VARIABLE_DELETED, 
+    return ActivitiEventBuilder.createVariableEvent(ActivitiEngineEventType.VARIABLE_DELETED, 
         variableInstance.getName(), 
         null, 
         variableInstance.getType(), 

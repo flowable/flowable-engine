@@ -76,7 +76,9 @@ import org.activiti.dmn.engine.impl.persistence.entity.data.ResourceDataManager;
 import org.activiti.dmn.engine.impl.persistence.entity.data.impl.MybatisDecisionTableDataManager;
 import org.activiti.dmn.engine.impl.persistence.entity.data.impl.MybatisDmnDeploymentDataManager;
 import org.activiti.dmn.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
-import org.activiti.dmn.engine.impl.util.DefaultClockImpl;
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.impl.util.DefaultClockImpl;
+import org.activiti.engine.runtime.Clock;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
@@ -298,7 +300,7 @@ public class DmnEngineConfiguration {
       logger.debug("database product name: '{}'", databaseProductName);
       databaseType = databaseTypeMappings.getProperty(databaseProductName);
       if (databaseType == null) {
-        throw new ActivitiDmnException("couldn't deduct database type from database product name '" + databaseProductName + "'");
+        throw new ActivitiException("couldn't deduct database type from database product name '" + databaseProductName + "'");
       }
       logger.debug("using database type: {}", databaseType);
 
@@ -477,12 +479,12 @@ public class DmnEngineConfiguration {
         try {
           dataSource = (DataSource) new InitialContext().lookup(dataSourceJndiName);
         } catch (Exception e) {
-          throw new ActivitiDmnException("couldn't lookup datasource from " + dataSourceJndiName + ": " + e.getMessage(), e);
+          throw new ActivitiException("couldn't lookup datasource from " + dataSourceJndiName + ": " + e.getMessage(), e);
         }
 
       } else if (jdbcUrl != null) {
         if ((jdbcDriver == null) || (jdbcUsername == null)) {
-          throw new ActivitiDmnException("DataSource or JDBC properties have to be specified in a process engine configuration");
+          throw new ActivitiException("DataSource or JDBC properties have to be specified in a process engine configuration");
         }
 
         logger.debug("initializing datasource to db: {}", jdbcUrl);
@@ -567,7 +569,7 @@ public class DmnEngineConfiguration {
         liquibase.validate();
       }
     } catch (Exception e) {
-      throw new ActivitiDmnException("Error initialising dmn data model");
+      throw new ActivitiException("Error initialising dmn data model");
     }
   }
 
@@ -676,7 +678,7 @@ public class DmnEngineConfiguration {
 
   public CommandInterceptor initInterceptorChain(List<CommandInterceptor> chain) {
     if (chain == null || chain.isEmpty()) {
-      throw new ActivitiDmnException("invalid command interceptor chain configuration: " + chain);
+      throw new ActivitiException("invalid command interceptor chain configuration: " + chain);
     }
     for (int i = 0; i < chain.size() - 1; i++) {
       chain.get(i).setNext(chain.get(i + 1));
@@ -843,7 +845,7 @@ public class DmnEngineConfiguration {
         sqlSessionFactory = new DefaultSqlSessionFactory(configuration);
 
       } catch (Exception e) {
-        throw new ActivitiDmnException("Error while building ibatis SqlSessionFactory: " + e.getMessage(), e);
+        throw new ActivitiException("Error while building ibatis SqlSessionFactory: " + e.getMessage(), e);
       } finally {
         IOUtils.closeQuietly(inputStream);
       }

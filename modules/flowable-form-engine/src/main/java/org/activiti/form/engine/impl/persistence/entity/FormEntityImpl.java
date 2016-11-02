@@ -16,17 +16,17 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.activiti.engine.impl.persistence.entity.AbstractEntityNoRevision;
 import org.activiti.form.engine.FormEngineConfiguration;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class FormEntityImpl implements FormEntity, Serializable {
+public class FormEntityImpl extends AbstractEntityNoRevision implements FormEntity, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  protected String id;
   protected String name;
   protected String description;
   protected String key;
@@ -92,14 +92,6 @@ public class FormEntityImpl implements FormEntity, Serializable {
 
   public void setVersion(int version) {
     this.version = version;
-  }
-
-  public String getId() {
-    return id;
-  }
-  
-  public void setId(String id) {
-    this.id = id;
   }
 
   public String getResourceName() {

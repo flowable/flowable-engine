@@ -30,6 +30,11 @@ import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
 import org.activiti.editor.form.converter.FormJsonConverter;
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.impl.cfg.IdGenerator;
+import org.activiti.engine.impl.persistence.StrongUuidGenerator;
+import org.activiti.engine.impl.util.DefaultClockImpl;
+import org.activiti.engine.runtime.Clock;
 import org.activiti.form.api.FormRepositoryService;
 import org.activiti.form.api.FormService;
 import org.activiti.form.engine.impl.FormEngineImpl;
@@ -37,7 +42,6 @@ import org.activiti.form.engine.impl.FormRepositoryServiceImpl;
 import org.activiti.form.engine.impl.FormServiceImpl;
 import org.activiti.form.engine.impl.ServiceImpl;
 import org.activiti.form.engine.impl.cfg.CommandExecutorImpl;
-import org.activiti.form.engine.impl.cfg.IdGenerator;
 import org.activiti.form.engine.impl.cfg.StandaloneFormEngineConfiguration;
 import org.activiti.form.engine.impl.cfg.StandaloneInMemFormEngineConfiguration;
 import org.activiti.form.engine.impl.cfg.TransactionContextFactory;
@@ -57,7 +61,6 @@ import org.activiti.form.engine.impl.interceptor.CommandInvoker;
 import org.activiti.form.engine.impl.interceptor.LogInterceptor;
 import org.activiti.form.engine.impl.interceptor.SessionFactory;
 import org.activiti.form.engine.impl.parser.FormParseFactory;
-import org.activiti.form.engine.impl.persistence.StrongUuidGenerator;
 import org.activiti.form.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.activiti.form.engine.impl.persistence.deploy.Deployer;
 import org.activiti.form.engine.impl.persistence.deploy.DeploymentCache;
@@ -79,7 +82,6 @@ import org.activiti.form.engine.impl.persistence.entity.data.impl.MybatisFormDat
 import org.activiti.form.engine.impl.persistence.entity.data.impl.MybatisFormDeploymentDataManager;
 import org.activiti.form.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
 import org.activiti.form.engine.impl.persistence.entity.data.impl.MybatisSubmittedFormDataManager;
-import org.activiti.form.engine.impl.util.DefaultClockImpl;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
@@ -463,12 +465,12 @@ public class FormEngineConfiguration {
         try {
           dataSource = (DataSource) new InitialContext().lookup(dataSourceJndiName);
         } catch (Exception e) {
-          throw new ActivitiFormException("couldn't lookup datasource from " + dataSourceJndiName + ": " + e.getMessage(), e);
+          throw new ActivitiException("couldn't lookup datasource from " + dataSourceJndiName + ": " + e.getMessage(), e);
         }
 
       } else if (jdbcUrl != null) {
         if ((jdbcDriver == null) || (jdbcUsername == null)) {
-          throw new ActivitiFormException("DataSource or JDBC properties have to be specified in a process engine configuration");
+          throw new ActivitiException("DataSource or JDBC properties have to be specified in a process engine configuration");
         }
 
         logger.debug("initializing datasource to db: {}", jdbcUrl);
@@ -528,7 +530,7 @@ public class FormEngineConfiguration {
       logger.debug("database product name: '{}'", databaseProductName);
       databaseType = databaseTypeMappings.getProperty(databaseProductName);
       if (databaseType == null) {
-        throw new ActivitiFormException("couldn't deduct database type from database product name '" + databaseProductName + "'");
+        throw new ActivitiException("couldn't deduct database type from database product name '" + databaseProductName + "'");
       }
       logger.debug("using database type: {}", databaseType);
 
@@ -578,7 +580,7 @@ public class FormEngineConfiguration {
         liquibase.validate();
       }
     } catch (Exception e) {
-      throw new ActivitiFormException("Error initialising form data schema", e);
+      throw new ActivitiException("Error initialising form data schema", e);
     }
   }
 
@@ -687,7 +689,7 @@ public class FormEngineConfiguration {
 
   public CommandInterceptor initInterceptorChain(List<CommandInterceptor> chain) {
     if (chain == null || chain.isEmpty()) {
-      throw new ActivitiFormException("invalid command interceptor chain configuration: " + chain);
+      throw new ActivitiException("invalid command interceptor chain configuration: " + chain);
     }
     for (int i = 0; i < chain.size() - 1; i++) {
       chain.get(i).setNext(chain.get(i + 1));
@@ -840,7 +842,7 @@ public class FormEngineConfiguration {
         sqlSessionFactory = new DefaultSqlSessionFactory(configuration);
 
       } catch (Exception e) {
-        throw new ActivitiFormException("Error while building ibatis SqlSessionFactory: " + e.getMessage(), e);
+        throw new ActivitiException("Error while building ibatis SqlSessionFactory: " + e.getMessage(), e);
       } finally {
         IOUtils.closeQuietly(inputStream);
       }

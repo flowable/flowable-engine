@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 
-import org.activiti.idm.engine.ActivitiIdmException;
+import org.activiti.engine.ActivitiException;
 
 /**
  * @author Tijs Rademakers
@@ -41,7 +41,7 @@ public class IoUtil {
         bytesRead = inputStream.read(buffer);
       }
     } catch (Exception e) {
-      throw new ActivitiIdmException("couldn't read input stream " + inputStreamName, e);
+      throw new ActivitiException("couldn't read input stream " + inputStreamName, e);
     }
     return outputStream.toByteArray();
   }
@@ -53,7 +53,7 @@ public class IoUtil {
       inputStream = new BufferedInputStream(new FileInputStream(getFile(filePath)));
       inputStream.read(buffer);
     } catch (Exception e) {
-      throw new ActivitiIdmException("Couldn't read file " + filePath + ": " + e.getMessage());
+      throw new ActivitiException("Couldn't read file " + filePath + ": " + e.getMessage());
     } finally {
       IoUtil.closeSilently(inputStream);
     }
@@ -65,7 +65,7 @@ public class IoUtil {
     try {
       return new File(url.toURI());
     } catch (Exception e) {
-      throw new ActivitiIdmException("Couldn't get file " + filePath + ": " + e.getMessage());
+      throw new ActivitiException("Couldn't get file " + filePath + ": " + e.getMessage());
     }
   }
 
@@ -76,7 +76,7 @@ public class IoUtil {
       outputStream.write(content.getBytes());
       outputStream.flush();
     } catch (Exception e) {
-      throw new ActivitiIdmException("Couldn't write file " + filePath, e);
+      throw new ActivitiException("Couldn't write file " + filePath, e);
     } finally {
       IoUtil.closeSilently(outputStream);
     }

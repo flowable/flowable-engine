@@ -17,6 +17,7 @@ import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
 import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.impl.context.Context;
+import org.activiti.engine.impl.delegate.event.ActivitiEngineEvent;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.util.Activiti5Util;
@@ -33,11 +34,14 @@ public class ErrorThrowingEventListener extends BaseDelegateEventListener {
 
   @Override
   public void onEvent(ActivitiEvent event) {
-    if (isValidEvent(event)) {
+    if (isValidEvent(event) && event instanceof ActivitiEngineEvent) {
       
+      ActivitiEngineEvent engineEvent = (ActivitiEngineEvent) event;
       CommandContext commandContext = Context.getCommandContext();
       
-      if (event.getProcessDefinitionId() != null && Activiti5Util.isActiviti5ProcessDefinitionId(commandContext, event.getProcessDefinitionId())) {
+      if (engineEvent.getProcessDefinitionId() != null && 
+          Activiti5Util.isActiviti5ProcessDefinitionId(commandContext, engineEvent.getProcessDefinitionId())) {
+        
         Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
         activiti5CompatibilityHandler.throwErrorEvent(event);
         return;
@@ -45,9 +49,9 @@ public class ErrorThrowingEventListener extends BaseDelegateEventListener {
       
       ExecutionEntity execution = null;
 
-      if (event.getExecutionId() != null) {
+      if (engineEvent.getExecutionId() != null) {
         // Get the execution based on the event's execution ID instead
-        execution = Context.getCommandContext().getExecutionEntityManager().findById(event.getExecutionId());
+        execution = Context.getCommandContext().getExecutionEntityManager().findById(engineEvent.getExecutionId());
       }
 
       if (execution == null) {

@@ -17,8 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.idm.engine.ActivitiIdmException;
-import org.activiti.idm.engine.ActivitiIdmOptimisticLockingException;
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ActivitiOptimisticLockingException;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.cfg.TransactionContext;
 import org.activiti.idm.engine.impl.db.DbSqlSession;
@@ -102,7 +102,7 @@ public class CommandContext {
           }
 
           if (exception != null) {
-            if (exception instanceof ActivitiIdmOptimisticLockingException) {
+            if (exception instanceof ActivitiOptimisticLockingException) {
               // reduce log level, as normally we're not
               // interested in logging this exception
               log.debug("Optimistic locking exception : " + exception);
@@ -130,7 +130,7 @@ public class CommandContext {
       } else if (exception instanceof RuntimeException) {
         throw (RuntimeException) exception;
       } else {
-        throw new ActivitiIdmException("exception while executing command " + command, exception);
+        throw new ActivitiException("exception while executing command " + command, exception);
       }
     }
   }
@@ -191,7 +191,7 @@ public class CommandContext {
     if (session == null) {
       SessionFactory sessionFactory = sessionFactories.get(sessionClass);
       if (sessionFactory == null) {
-        throw new ActivitiIdmException("no session factory configured for " + sessionClass.getName());
+        throw new ActivitiException("no session factory configured for " + sessionClass.getName());
       }
       session = sessionFactory.openSession(this);
       sessions.put(sessionClass, session);

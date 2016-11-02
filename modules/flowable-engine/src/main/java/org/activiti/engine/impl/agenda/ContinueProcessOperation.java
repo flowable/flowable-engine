@@ -12,7 +12,7 @@ import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.delegate.ExecutionListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.delegate.ActivityBehavior;
@@ -178,7 +178,7 @@ public class ContinueProcessOperation extends AbstractOperation {
     
     if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createActivityEvent(ActivitiEventType.ACTIVITY_STARTED, flowNode.getId(), flowNode.getName(), execution.getId(),
+          ActivitiEventBuilder.createActivityEvent(ActivitiEngineEventType.ACTIVITY_STARTED, flowNode.getId(), flowNode.getName(), execution.getId(),
               execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
     }
     
@@ -208,7 +208,7 @@ public class ContinueProcessOperation extends AbstractOperation {
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
         ActivitiEventBuilder.createSequenceFlowTakenEvent(
             (ExecutionEntity) execution,
-            ActivitiEventType.SEQUENCEFLOW_TAKEN, 
+            ActivitiEngineEventType.SEQUENCEFLOW_TAKEN, 
             sequenceFlow.getId(),
             sourceFlowElement != null ? sourceFlowElement.getId() : null, 
             sourceFlowElement != null ? (String) sourceFlowElement.getName() : null, 

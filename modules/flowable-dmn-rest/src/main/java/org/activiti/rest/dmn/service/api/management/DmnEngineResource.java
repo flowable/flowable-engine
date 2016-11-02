@@ -12,10 +12,10 @@
  */
 package org.activiti.rest.dmn.service.api.management;
 
-import org.activiti.dmn.engine.ActivitiDmnException;
 import org.activiti.dmn.engine.DmnEngine;
 import org.activiti.dmn.engine.DmnEngineInfo;
 import org.activiti.dmn.engine.DmnEngines;
+import org.activiti.engine.ActivitiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -44,7 +44,7 @@ public class DmnEngineResource {
                 response.setName(dmnEngine.getName());
             }
         } catch (Exception e) {
-            throw new ActivitiDmnException("Error retrieving DMN engine info", e);
+            throw new ActivitiException("Error retrieving DMN engine info", e);
         }
 
         response.setVersion(DmnEngine.VERSION);

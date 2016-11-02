@@ -14,7 +14,7 @@ package org.activiti5.engine.test.api.event;
 
 import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.test.Deployment;
@@ -36,7 +36,7 @@ public class ErrorThrowingEventListenerTest extends PluggableActivitiTestCase {
 		try {
 			listener = new ErrorThrowingEventListener();
 			
-			processEngineConfiguration.getEventDispatcher().addEventListener(listener, ActivitiEventType.TASK_ASSIGNED);
+			processEngineConfiguration.getEventDispatcher().addEventListener(listener, ActivitiEngineEventType.TASK_ASSIGNED);
 			
 			ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testError");
 			assertNotNull(processInstance);
@@ -87,7 +87,7 @@ public class ErrorThrowingEventListenerTest extends PluggableActivitiTestCase {
 			listener = new ErrorThrowingEventListener();
 			listener.setErrorCode("123");
 			
-			processEngineConfiguration.getEventDispatcher().addEventListener(listener, ActivitiEventType.TASK_ASSIGNED);
+			processEngineConfiguration.getEventDispatcher().addEventListener(listener, ActivitiEngineEventType.TASK_ASSIGNED);
 			
 			ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testError");
 			assertNotNull(processInstance);

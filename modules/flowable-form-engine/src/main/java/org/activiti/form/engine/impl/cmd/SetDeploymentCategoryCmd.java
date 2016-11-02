@@ -12,8 +12,8 @@
  */
 package org.activiti.form.engine.impl.cmd;
 
-import org.activiti.form.engine.ActivitiFormIllegalArgumentException;
-import org.activiti.form.engine.ActivitiFormObjectNotFoundException;
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.form.engine.impl.interceptor.Command;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
 import org.activiti.form.engine.impl.persistence.entity.FormDeploymentEntity;
@@ -34,13 +34,13 @@ public class SetDeploymentCategoryCmd implements Command<Void> {
   public Void execute(CommandContext commandContext) {
 
     if (deploymentId == null) {
-      throw new ActivitiFormIllegalArgumentException("Deployment id is null");
+      throw new ActivitiIllegalArgumentException("Deployment id is null");
     }
 
     FormDeploymentEntity deployment = commandContext.getDeploymentEntityManager().findById(deploymentId);
 
     if (deployment == null) {
-      throw new ActivitiFormObjectNotFoundException("No deployment found for id = '" + deploymentId + "'");
+      throw new ActivitiObjectNotFoundException("No deployment found for id = '" + deploymentId + "'");
     }
 
     // Update category

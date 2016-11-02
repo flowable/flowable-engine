@@ -12,10 +12,10 @@
  */
 package org.activiti5.engine.test.api.event;
 
+import org.activiti.engine.delegate.event.ActivitiEntityEvent;
 import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.User;
-import org.activiti.idm.api.event.ActivitiIdmEntityEvent;
 import org.activiti.idm.api.event.ActivitiIdmEventType;
 import org.activiti.idm.api.event.ActivitiIdmMembershipEvent;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
@@ -27,7 +27,7 @@ import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
  */
 public class GroupEventsTest extends PluggableActivitiTestCase {
 
-	private TestActiviti6IdmEntityEventListener listener;
+	private TestActiviti6EntityEventListener listener;
 
 	/**
 	 * Test create, update and delete events of Groups.
@@ -41,13 +41,13 @@ public class GroupEventsTest extends PluggableActivitiTestCase {
 			identityService.saveGroup(group);
 
 			assertEquals(2, listener.getEventsReceived().size());
-			ActivitiIdmEntityEvent event = (ActivitiIdmEntityEvent) listener.getEventsReceived().get(0);
+			ActivitiEntityEvent event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
 			assertEquals(ActivitiIdmEventType.ENTITY_CREATED, event.getType());
 			assertTrue(event.getEntity() instanceof Group);
 			Group groupFromEvent = (Group) event.getEntity();
 			assertEquals("fred", groupFromEvent.getId());
 			
-			event = (ActivitiIdmEntityEvent) listener.getEventsReceived().get(1);
+			event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
 			assertEquals(ActivitiIdmEventType.ENTITY_INITIALIZED, event.getType());
 			listener.clearEventsReceived();
 
@@ -55,7 +55,7 @@ public class GroupEventsTest extends PluggableActivitiTestCase {
 			group.setName("Another name");
 			identityService.saveGroup(group);
 			assertEquals(1, listener.getEventsReceived().size());
-			event = (ActivitiIdmEntityEvent) listener.getEventsReceived().get(0);
+			event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
 			assertEquals(ActivitiIdmEventType.ENTITY_UPDATED, event.getType());
 			assertTrue(event.getEntity() instanceof Group);
 			groupFromEvent = (Group) event.getEntity();
@@ -67,7 +67,7 @@ public class GroupEventsTest extends PluggableActivitiTestCase {
 			identityService.deleteGroup(group.getId());
 			
 			assertEquals(1, listener.getEventsReceived().size());
-			event = (ActivitiIdmEntityEvent) listener.getEventsReceived().get(0);
+			event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
 			assertEquals(ActivitiIdmEventType.ENTITY_DELETED, event.getType());
 			assertTrue(event.getEntity() instanceof Group);
 			groupFromEvent = (Group) event.getEntity();
@@ -85,8 +85,8 @@ public class GroupEventsTest extends PluggableActivitiTestCase {
 	 * Test create, update and delete events of Groups.
 	 */
 	public void testGroupMembershipEvents() throws Exception {
-	  TestActiviti6IdmEventListener membershipListener = new TestActiviti6IdmEventListener();
-		processEngineConfiguration.getIdmEventDispatcher().addEventListener(membershipListener);
+	  TestActiviti6EventListener membershipListener = new TestActiviti6EventListener();
+		processEngineConfiguration.getEventDispatcher().addEventListener(membershipListener);
 		
 		User user = null;
 		Group group = null;
@@ -131,7 +131,7 @@ public class GroupEventsTest extends PluggableActivitiTestCase {
 			assertNull(event.getUserId());
 			membershipListener.clearEventsReceived();
 		} finally {
-		  processEngineConfiguration.getIdmEventDispatcher().removeEventListener(membershipListener);
+		  processEngineConfiguration.getEventDispatcher().removeEventListener(membershipListener);
 			if(user != null) {
 				identityService.deleteUser(user.getId());
 			}
@@ -144,8 +144,8 @@ public class GroupEventsTest extends PluggableActivitiTestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		listener = new TestActiviti6IdmEntityEventListener(Group.class);
-		processEngineConfiguration.getIdmEventDispatcher().addEventListener(listener);
+		listener = new TestActiviti6EntityEventListener(Group.class);
+		processEngineConfiguration.getEventDispatcher().addEventListener(listener);
 	}
 
 	@Override
@@ -153,7 +153,7 @@ public class GroupEventsTest extends PluggableActivitiTestCase {
 		super.tearDown();
 
 		if (listener != null) {
-		  processEngineConfiguration.getIdmEventDispatcher().removeEventListener(listener);
+		  processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
 		}
 	}
 }

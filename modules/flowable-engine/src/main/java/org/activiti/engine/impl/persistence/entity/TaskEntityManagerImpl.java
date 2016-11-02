@@ -19,7 +19,7 @@ import java.util.Map;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
 import org.activiti.engine.delegate.TaskListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.TaskQueryImpl;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -96,7 +96,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     if (getEventDispatcher().isEnabled()) {
       if (taskEntity.getAssignee() != null) {
         getEventDispatcher().dispatchEvent(
-            ActivitiEventBuilder.createEntityEvent(ActivitiEventType.TASK_ASSIGNED, taskEntity));
+            ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.TASK_ASSIGNED, taskEntity));
       }
     }
     
@@ -142,7 +142,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     getHistoryManager().recordTaskAssignment(taskEntity);
 
     if (getEventDispatcher().isEnabled()) {
-      getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.TASK_ASSIGNED, taskEntity));
+      getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.TASK_ASSIGNED, taskEntity));
     }
 
   }
@@ -215,7 +215,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
                       deleteReason));
         }
         
-        getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_DELETED, task));
+        getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_DELETED, task));
       }
     }
   }

@@ -12,8 +12,8 @@
  */
 package org.activiti.form.engine.impl.cmd;
 
-import org.activiti.form.engine.ActivitiFormIllegalArgumentException;
-import org.activiti.form.engine.ActivitiFormObjectNotFoundException;
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.form.engine.impl.interceptor.Command;
 import org.activiti.form.engine.impl.persistence.deploy.DeploymentCache;
 import org.activiti.form.engine.impl.persistence.deploy.FormCacheEntry;
@@ -35,13 +35,13 @@ public class SetFormCategoryCmd implements Command<Void> {
   public Void execute(org.activiti.form.engine.impl.interceptor.CommandContext commandContext) {
 
     if (formId == null) {
-      throw new ActivitiFormIllegalArgumentException("Form id is null");
+      throw new ActivitiIllegalArgumentException("Form id is null");
     }
 
     FormEntity form = commandContext.getFormEntityManager().findById(formId);
 
     if (form == null) {
-      throw new ActivitiFormObjectNotFoundException("No form found for id = '" + formId + "'");
+      throw new ActivitiObjectNotFoundException("No form found for id = '" + formId + "'");
     }
 
     // Update category

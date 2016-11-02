@@ -14,7 +14,7 @@ package org.activiti5.engine.delegate.event.impl;
 
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.ActivitiProcessStartedEvent;
 import org.activiti5.engine.impl.persistence.entity.ExecutionEntity;
 
@@ -31,7 +31,7 @@ public class ActivitiProcessStartedEventImpl extends ActivitiEntityWithVariables
 
   @SuppressWarnings("rawtypes")
   public ActivitiProcessStartedEventImpl(final Object entity, final Map variables, final boolean localScope) {
-    super(entity, variables, localScope, ActivitiEventType.PROCESS_STARTED);
+    super(entity, variables, localScope, ActivitiEngineEventType.PROCESS_STARTED);
     if (entity instanceof ExecutionEntity) {
       final ExecutionEntity superExecution = ((ExecutionEntity) entity).getSuperExecution();
       if (superExecution != null) {

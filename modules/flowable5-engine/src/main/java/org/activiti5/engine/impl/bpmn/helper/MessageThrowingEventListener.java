@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
+import org.activiti.engine.impl.delegate.event.ActivitiEngineEvent;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.event.MessageEventHandler;
@@ -37,21 +38,24 @@ public class MessageThrowingEventListener extends BaseDelegateEventListener {
 	
 	@Override
 	public void onEvent(ActivitiEvent event) {
-		if(isValidEvent(event)) {
+	  if (isValidEvent(event) && event instanceof ActivitiEngineEvent) {
+      ActivitiEngineEvent engineEvent = (ActivitiEngineEvent) event;
 		
-			if (event.getProcessInstanceId() == null) {
+			if (engineEvent.getProcessInstanceId() == null) {
 				throw new ActivitiIllegalArgumentException(
 				    "Cannot throw process-instance scoped message, since the dispatched event is not part of an ongoing process instance");
 			}
 	
 			CommandContext commandContext = Context.getCommandContext();
 			List<EventSubscriptionEntity> subscriptionEntities = commandContext.getEventSubscriptionEntityManager()
-				    .findEventSubscriptionsByNameAndExecution(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, event.getExecutionId());
+				    .findEventSubscriptionsByNameAndExecution(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, engineEvent.getExecutionId());
 	
 			// Revert to messaging the process instance
-			if(subscriptionEntities.isEmpty() && event.getProcessInstanceId() != null && !event.getExecutionId().equals(event.getProcessInstanceId())) {
+			if (subscriptionEntities.isEmpty() && engineEvent.getProcessInstanceId() != null && 
+			    !engineEvent.getExecutionId().equals(engineEvent.getProcessInstanceId())) {
+			  
 				subscriptionEntities = commandContext.getEventSubscriptionEntityManager()
-				    .findEventSubscriptionsByNameAndExecution(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, event.getProcessInstanceId());
+				    .findEventSubscriptionsByNameAndExecution(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, engineEvent.getProcessInstanceId());
 			}
 			
 			for (EventSubscriptionEntity signalEventSubscriptionEntity : subscriptionEntities) {

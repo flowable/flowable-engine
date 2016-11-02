@@ -22,7 +22,7 @@ import org.activiti.engine.delegate.VariableScope;
 import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.persistence.entity.VariableInstance;
 import org.activiti.engine.runtime.DataObject;
 import org.activiti.engine.runtime.Execution;
@@ -1158,7 +1158,7 @@ public interface RuntimeService {
    * @param types
    *          types of events the listener should be notified for
    */
-  void addEventListener(ActivitiEventListener listenerToAdd, ActivitiEventType... types);
+  void addEventListener(ActivitiEventListener listenerToAdd, ActivitiEngineEventType... types);
 
   /**
    * Removes the given listener from this dispatcher. The listener will no longer be notified, regardless of the type(s) it was registered for in the first place.

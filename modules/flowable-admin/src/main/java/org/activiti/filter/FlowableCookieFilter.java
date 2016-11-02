@@ -24,11 +24,11 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.activiti.engine.ActivitiException;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.IdmIdentityService;
 import org.activiti.idm.api.Token;
 import org.activiti.idm.api.User;
-import org.activiti.idm.engine.ActivitiIdmException;
 import org.activiti.security.ActivitiAppUser;
 import org.activiti.security.AuthoritiesConstants;
 import org.slf4j.Logger;
@@ -81,7 +81,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
             if (token != null) {
               return token;
             } else {
-              throw new ActivitiIdmException("token not found " + tokenId);
+              throw new ActivitiException("token not found " + tokenId);
             }
           }
 
@@ -96,7 +96,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
             User userFromToken = idmIdentityService.createUserQuery().userId(userId).singleResult();
             
             if (userFromToken == null) {
-              throw new ActivitiIdmException("user not found " + userId);
+              throw new ActivitiException("user not found " + userId);
             }
             
             // Add capabilities to user object

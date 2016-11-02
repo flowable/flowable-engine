@@ -17,7 +17,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.idm.engine.impl.db.HasRevision;
+import org.activiti.engine.impl.db.HasRevision;
+import org.activiti.engine.impl.persistence.entity.AbstractEntity;
 
 /**
  * @author Tijs Rademakers

@@ -14,9 +14,9 @@ package org.activiti.form.engine.impl.persistence.deploy;
 
 import java.util.List;
 
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.form.api.Form;
-import org.activiti.form.engine.ActivitiFormException;
-import org.activiti.form.engine.ActivitiFormObjectNotFoundException;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.FormQueryImpl;
 import org.activiti.form.engine.impl.persistence.entity.FormDeploymentEntity;
@@ -51,7 +51,7 @@ public class DeploymentManager {
 
   public FormEntity findDeployedFormById(String formId) {
     if (formId == null) {
-      throw new ActivitiFormException("Invalid form id : null");
+      throw new ActivitiException("Invalid form id : null");
     }
 
     // first try the cache
@@ -61,7 +61,7 @@ public class DeploymentManager {
     if (form == null) {
       form = engineConfig.getFormEntityManager().findById(formId);
       if (form == null) {
-        throw new ActivitiFormObjectNotFoundException("no deployed form found with id '" + formId + "'");
+        throw new ActivitiObjectNotFoundException("no deployed form found with id '" + formId + "'");
       }
       form = resolveForm(form).getFormEntity();
     }
@@ -72,7 +72,7 @@ public class DeploymentManager {
     FormEntity form = formEntityManager.findLatestFormByKey(formDefinitionKey);
 
     if (form == null) {
-      throw new ActivitiFormObjectNotFoundException("no forms deployed with key '" + formDefinitionKey + "'");
+      throw new ActivitiObjectNotFoundException("no forms deployed with key '" + formDefinitionKey + "'");
     }
     form = resolveForm(form).getFormEntity();
     return form;
@@ -82,7 +82,7 @@ public class DeploymentManager {
     FormEntity form = formEntityManager.findLatestFormByKeyAndTenantId(formDefinitionKey, tenantId);
     
     if (form == null) {
-      throw new ActivitiFormObjectNotFoundException("no forms deployed with key '" + formDefinitionKey + "' for tenant identifier '" + tenantId + "'");
+      throw new ActivitiObjectNotFoundException("no forms deployed with key '" + formDefinitionKey + "' for tenant identifier '" + tenantId + "'");
     }
     form = resolveForm(form).getFormEntity();
     return form;
@@ -92,7 +92,7 @@ public class DeploymentManager {
     FormEntity form = formEntityManager.findLatestFormByKeyAndParentDeploymentId(formDefinitionKey, parentDeploymentId);
     
     if (form == null) {
-      throw new ActivitiFormObjectNotFoundException("no forms deployed with key '" + formDefinitionKey + 
+      throw new ActivitiObjectNotFoundException("no forms deployed with key '" + formDefinitionKey + 
           "' for parent deployment id '" + parentDeploymentId + "'");
     }
     form = resolveForm(form).getFormEntity();
@@ -103,7 +103,7 @@ public class DeploymentManager {
     FormEntity form = formEntityManager.findLatestFormByKeyParentDeploymentIdAndTenantId(formDefinitionKey, parentDeploymentId, tenantId);
     
     if (form == null) {
-      throw new ActivitiFormObjectNotFoundException("no forms deployed with key '" + formDefinitionKey + 
+      throw new ActivitiObjectNotFoundException("no forms deployed with key '" + formDefinitionKey + 
           "' for parent deployment id '" + parentDeploymentId + "' and tenant identifier '" + tenantId + "'");
     }
     form = resolveForm(form).getFormEntity();
@@ -114,7 +114,7 @@ public class DeploymentManager {
     FormEntity form = formEntityManager.findFormByKeyAndVersionAndTenantId(formDefinitionKey, formVersion, tenantId);
     
     if (form == null) {
-      throw new ActivitiFormObjectNotFoundException("no decisions deployed with key = '" + formDefinitionKey + "' and version = '" + formVersion + "'");
+      throw new ActivitiObjectNotFoundException("no decisions deployed with key = '" + formDefinitionKey + "' and version = '" + formVersion + "'");
     }
     
     form = resolveForm(form).getFormEntity();
@@ -143,7 +143,7 @@ public class DeploymentManager {
       cachedForm = formCache.get(formId);
 
       if (cachedForm == null) {
-        throw new ActivitiFormException("deployment '" + deploymentId + "' didn't put form '" + formId + "' in the cache");
+        throw new ActivitiException("deployment '" + deploymentId + "' didn't put form '" + formId + "' in the cache");
       }
     }
     return cachedForm;
@@ -153,7 +153,7 @@ public class DeploymentManager {
 
     FormDeploymentEntity deployment = deploymentEntityManager.findById(deploymentId);
     if (deployment == null) {
-      throw new ActivitiFormObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.");
+      throw new ActivitiObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.");
     }
 
     // Remove any process definition from the cache

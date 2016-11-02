@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.activiti.engine.ActivitiException;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +59,7 @@ public abstract class FormEngines {
       try {
         resources = classLoader.getResources("activiti.form.cfg.xml");
       } catch (IOException e) {
-        throw new ActivitiFormException("problem retrieving activiti.form.cfg.xml resources on the classpath: " + System.getProperty("java.class.path"), e);
+        throw new ActivitiException("problem retrieving activiti.form.cfg.xml resources on the classpath: " + System.getProperty("java.class.path"), e);
       }
 
       // Remove duplicated configuration URL's using set. Some
@@ -74,7 +75,7 @@ public abstract class FormEngines {
       }
 
       /*
-       * try { resources = classLoader.getResources("activiti-form-context.xml"); } catch (IOException e) { throw new ActivitiDmnException(
+       * try { resources = classLoader.getResources("activiti-form-context.xml"); } catch (IOException e) { throw new ActivitiException(
        * "problem retrieving activiti-dmn-context.xml resources on the classpath: " + System.getProperty("java.class.path"), e); } while (resources.hasMoreElements()) { URL resource =
        * resources.nextElement(); log.info("Initializing dmn engine using Spring configuration '{}'", resource.toString()); initDmnEngineFromSpringResource(resource); }
        */
@@ -146,7 +147,7 @@ public abstract class FormEngines {
       return formEngineConfiguration.buildFormEngine();
 
     } catch (IOException e) {
-      throw new ActivitiFormException("couldn't open resource stream: " + e.getMessage(), e);
+      throw new ActivitiException("couldn't open resource stream: " + e.getMessage(), e);
     } finally {
       IOUtils.closeQuietly(inputStream);
     }
@@ -190,7 +191,7 @@ public abstract class FormEngines {
     try {
       return initFormEngineFromResource(new URL(resourceUrl));
     } catch (MalformedURLException e) {
-      throw new ActivitiFormException("invalid url: " + resourceUrl, e);
+      throw new ActivitiException("invalid url: " + resourceUrl, e);
     }
   }
 

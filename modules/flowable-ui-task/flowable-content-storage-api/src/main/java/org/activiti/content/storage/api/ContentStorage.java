@@ -13,6 +13,7 @@
 package org.activiti.content.storage.api;
 
 import java.io.InputStream;
+import java.util.Map;
 
 import org.activiti.content.storage.exception.ContentNotFoundException;
 import org.activiti.content.storage.exception.ContentStorageException;
@@ -21,30 +22,38 @@ import org.activiti.content.storage.exception.ContentStorageException;
  * Storage for reading and writing content.
  * 
  * @author Frederik Heremans
+ * @author Joram Barrez
  */
 public interface ContentStorage {
 
     /**
      * @param lengthHint hint about the stream length. If length is unknown, pass in null or a negative number.
+     * @param metadata A key-value collection that can be used to change the way the content is stored.
      * @return reads the given {@link InputStream} and stores it. Returns a {@link ContentObject} with a unique id generated - which can be
      * used for reading the content again.
      */
-    ContentObject createContentObject(InputStream contentStream, Long lengthHint);
+    ContentObject createContentObject(InputStream contentStream, Long lengthHint, Map<String, Object> metaData);
     
     /**
      * Update the content with the given id to the content present in the given stream.
      * @param lengthHint hint about the stream length. If length is unknown, pass in null or a negative number.
+     * @param metadata A key-value collection that can be used to change the way the content is stored.
      * @return Returns a {@link ContentObject} with a unique id generated - which can br used for reading the content again.
      * @throws ContentStorageException When an exception occurred while updating the content and the content
      * is not updated.
      */
-    ContentObject updateContentObject(String id, InputStream contentStream, Long lengthHint);
+    ContentObject updateContentObject(String id, InputStream contentStream, Long lengthHint, Map<String, Object> metaData);
     
     /**
      * @return a {@link ContentObject} with the given id.
      * @throws ContentNotFoundException When the content with the given id does not exist 
      */
     ContentObject getContentObject(String id);
+    
+    /**
+     * @return Returns the metadata that was passed when creating the {@link ContentObject}
+     */
+    Map<String, Object> getMetaData();
     
     /**
      * Deletes the object the given id.
