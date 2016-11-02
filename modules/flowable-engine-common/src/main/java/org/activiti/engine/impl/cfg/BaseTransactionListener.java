@@ -10,15 +10,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.idm.engine.impl.cfg;
+package org.activiti.engine.impl.cfg;
+
+import org.activiti.engine.impl.interceptor.AbstractCommandContext;
 
 /**
- * Enumeration that represents the transaction propagation behaviours supported by the command executor.
- * 
- * @author Marcus Klimstra (CGI)
+ * @author Tom Baeyens
  */
-public enum TransactionPropagation {
+public interface BaseTransactionListener<C extends AbstractCommandContext> {
 
-  REQUIRED, REQUIRES_NEW, NOT_SUPPORTED,
-
+  void execute(C commandContext);
 }

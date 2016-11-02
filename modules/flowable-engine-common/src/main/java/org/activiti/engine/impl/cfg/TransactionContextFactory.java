@@ -10,14 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.idm.engine.impl.interceptor;
+package org.activiti.engine.impl.cfg;
+
+import org.activiti.engine.impl.interceptor.AbstractCommandContext;
 
 /**
- * @author Tijs Rademakers
+ * @author Tom Baeyens
  */
-public interface Session {
+public interface TransactionContextFactory<T extends BaseTransactionListener<C>, C extends AbstractCommandContext> {
 
-  void flush();
+  BaseTransactionContext<T, C> openTransactionContext(C commandContext);
 
-  void close();
 }

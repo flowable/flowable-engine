@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.cfg.IdGenerator;
+import org.activiti.engine.impl.interceptor.AbstractCommandContext;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.Session;
 import org.activiti.engine.impl.interceptor.SessionFactory;
@@ -71,8 +72,9 @@ public class DbSqlSessionFactory implements SessionFactory {
     return DbSqlSession.class;
   }
 
-  public Session openSession(CommandContext commandContext) {
-    DbSqlSession dbSqlSession = new DbSqlSession(this, commandContext.getEntityCache());
+  public Session openSession(AbstractCommandContext commandContext) {
+    CommandContext currentCommandContext = (CommandContext) commandContext;
+    DbSqlSession dbSqlSession = new DbSqlSession(this, currentCommandContext.getEntityCache());
     if (getDatabaseSchema() != null && getDatabaseSchema().length() > 0) {
       try {
         dbSqlSession.getSqlSession().getConnection().setSchema(getDatabaseSchema());

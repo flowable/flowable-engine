@@ -15,6 +15,7 @@ package org.activiti.idm.engine.impl;
 import java.sql.Connection;
 import java.util.Map;
 
+import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.idm.api.IdmManagementService;
 import org.activiti.idm.api.management.IdmTableMetaData;
 import org.activiti.idm.api.management.IdmTablePageQuery;
@@ -27,7 +28,6 @@ import org.activiti.idm.engine.impl.cmd.GetTableNameCmd;
 import org.activiti.idm.engine.impl.db.DbSqlSession;
 import org.activiti.idm.engine.impl.db.DbSqlSessionFactory;
 import org.activiti.idm.engine.impl.interceptor.Command;
-import org.activiti.idm.engine.impl.interceptor.CommandConfig;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 
 /**
