@@ -15,7 +15,7 @@ Common to all the ways of setting up Flowable is the core engine, which can be s
 
 === Flowable and Activiti
 
-Flowable is a fork of Activiti (registered trademark by Alfresco). In the all the following sections you’ll notice that the package names, configuration files, etc. use _activiti_.
+Flowable is a fork of Activiti (registered trademark by Alfresco). In all the following sections you’ll notice that the package names, configuration files, etc. use _activiti_.
 
 [[getting.started.command.line]]
 === Building a command-line application
