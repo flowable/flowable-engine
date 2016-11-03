@@ -14,7 +14,7 @@ package org.activiti.rest.conf;
 
 import org.activiti.engine.ActivitiTaskAlreadyClaimedException;
 import org.activiti.rest.exception.ErrorInfo;
-import org.activiti.rest.exception.ExceptionHandlerAdvice;
+import org.activiti.rest.exception.BaseExceptionHandlerAdvice;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @author Yvo Swillens
  */
 @ControllerAdvice
-public class RestExceptionHandlerAdvice extends ExceptionHandlerAdvice {
+public class RestExceptionHandlerAdvice extends BaseExceptionHandlerAdvice {
 
     @ResponseStatus(HttpStatus.CONFLICT)
     // 409

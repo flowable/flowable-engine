@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  *
  * @author Yvo Swillens
  */
-public class ProcessExceptionHandlerAdvice extends ExceptionHandlerAdvice {
+public class ProcessExceptionHandlerAdvice extends BaseExceptionHandlerAdvice {
 
     @ResponseStatus(HttpStatus.CONFLICT)
     // 409
