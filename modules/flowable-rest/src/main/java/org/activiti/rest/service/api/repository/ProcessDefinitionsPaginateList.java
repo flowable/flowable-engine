@@ -15,7 +15,7 @@ package org.activiti.rest.service.api.repository;
 
 import java.util.List;
 
-import org.activiti.rest.common.api.AbstractPaginateList;
+import org.activiti.rest.api.AbstractPaginateList;
 import org.activiti.rest.service.api.RestResponseFactory;
 
 /**

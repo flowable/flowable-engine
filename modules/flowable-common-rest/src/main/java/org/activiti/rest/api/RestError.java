@@ -11,17 +11,31 @@
  * limitations under the License.
  */
 
-package org.activiti.rest.common.application;
+package org.activiti.rest.api;
 
 /**
- * Interface describing a class that is capable of resolving the content type of a resource/file based on the resource name.
+ * Used for creating a response that represent an error that occurred.
  * 
- * @author Tijs Rademakers
+ * @author Frederik Heremans
  */
-public interface ContentTypeResolver {
+public class RestError {
 
-  /**
-   * @return the content type resolved from the given resource name. Returns null if the content type cannot be resolved.
-   */
-  String resolveContentType(String resourceName);
+  private String errorMessage;
+  private Integer statusCode;
+
+  public String getErrorMessage() {
+    return errorMessage;
+  }
+
+  public void setErrorMessage(String errorMessage) {
+    this.errorMessage = errorMessage;
+  }
+
+  public Integer getStatusCode() {
+    return statusCode;
+  }
+
+  public void setStatusCode(Integer statusCode) {
+    this.statusCode = statusCode;
+  }
 }

@@ -11,20 +11,15 @@
  * limitations under the License.
  */
 
-package org.activiti.rest.dmn.common;
+package org.activiti.rest.api;
 
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.dmn.engine.impl.AbstractQuery;
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.query.Query;
-import org.activiti.engine.query.QueryProperty;
-
 /**
- * @author Yvo Swillens
+ * @author Tijs Rademakers
  */
-public abstract class AbstractDmnPaginateList {
+public abstract class AbstractPaginateList {
 
   /**
    * uses the pagination parameters form the request and makes sure to order the result and set all pagination attributes for the response to render
@@ -41,14 +36,13 @@ public abstract class AbstractDmnPaginateList {
    *          THe default sort column (the rest attribute) that later will be mapped to an internal engine name
    */
   @SuppressWarnings("rawtypes")
-  public DataResponse paginateList(Map<String, String> requestParams, PaginateRequest paginateRequest, Query query, String defaultSort, Map<String, QueryProperty> properties) {
+  public DataResponse paginateList(Map<String, String> requestParams, PaginateRequest paginateRequest, Object query, String defaultSort, Map properties) {
 
     if (paginateRequest == null) {
       paginateRequest = new PaginateRequest();
     }
 
-    // In case pagination request is incomplete, fill with values found in
-    // URL if possible
+    // In case pagination request is incomplete, fill with values found in URL if possible
     if (paginateRequest.getStart() == null) {
       paginateRequest.setStart(RequestUtil.getInteger(requestParams, "start", 0));
     }
@@ -65,8 +59,7 @@ public abstract class AbstractDmnPaginateList {
       paginateRequest.setSort(requestParams.get("sort"));
     }
 
-    // Use defaults for paging, if not set in the PaginationRequest, nor in
-    // the URL
+    // Use defaults for paging, if not set in the PaginationRequest, nor in the URL
     Integer start = paginateRequest.getStart();
     if (start == null || start < 0) {
       start = 0;
@@ -88,35 +81,67 @@ public abstract class AbstractDmnPaginateList {
 
     // Sort order
     if (sort != null && !properties.isEmpty()) {
-      QueryProperty qp = properties.get(sort);
+      Object qp = properties.get(sort);
       if (qp == null) {
         throw new ActivitiIllegalArgumentException("Value for param 'sort' is not valid, '" + sort + "' is not a valid property");
       }
-      ((AbstractQuery) query).orderBy(qp);
-      if (order.equals("asc")) {
-        query.asc();
-      } else if (order.equals("desc")) {
-        query.desc();
-      } else {
-        throw new ActivitiIllegalArgumentException("Value for param 'order' is not valid : '" + order + "', must be 'asc' or 'desc'");
+
+      if (query instanceof AbstractQuery) {
+        AbstractQuery queryObject = (AbstractQuery) query;
+        QueryProperty queryProperty = (QueryProperty) qp;
+        queryObject.orderBy(queryProperty);
+        if (order.equals("asc")) {
+          queryObject.asc();
+        } else if (order.equals("desc")) {
+          queryObject.desc();
+        } else {
+          throw new ActivitiIllegalArgumentException("Value for param 'order' is not valid : '" + order + "', must be 'asc' or 'desc'");
+        }
+
+      } else if (query instanceof org.activiti.idm.engine.impl.AbstractQuery) {
+        org.activiti.idm.engine.impl.AbstractQuery queryObject = (org.activiti.idm.engine.impl.AbstractQuery) query;
+        QueryProperty queryProperty = (QueryProperty) qp;
+        queryObject.orderBy(queryProperty);
+        if (order.equals("asc")) {
+          queryObject.asc();
+        } else if (order.equals("desc")) {
+          queryObject.desc();
+        } else {
+          throw new ActivitiIllegalArgumentException("Value for param 'order' is not valid : '" + order + "', must be 'asc' or 'desc'");
+        }
       }
     }
-
-    // Get result and set pagination parameters
-    List list = processList(query.listPage(start, size));
+    
     DataResponse response = new DataResponse();
     response.setStart(start);
-    response.setSize(list.size());
     response.setSort(sort);
     response.setOrder(order);
-    response.setTotal(query.count());
-    response.setData(list);
+
+    if (query instanceof AbstractQuery) {
+      AbstractQuery queryObject = (AbstractQuery) query;
+
+      // Get result and set pagination parameters
+      List list = processList(queryObject.listPage(start, size));
+      response.setTotal(queryObject.count());
+      response.setSize(list.size());
+      response.setData(list);
+
+    } else if (query instanceof org.activiti.idm.engine.impl.AbstractQuery) {
+      org.activiti.idm.engine.impl.AbstractQuery queryObject = (org.activiti.idm.engine.impl.AbstractQuery) query;
+
+      // Get result and set pagination parameters
+      List list = processList(queryObject.listPage(start, size));
+      response.setTotal(queryObject.count());
+      response.setSize(list.size());
+      response.setData(list);
+    }
+    
     return response;
   }
 
   /**
    * uses the pagination parameters from the request and makes sure to order the result and set all pagination attributes for the response to render
-   *
+   * 
    * @param req
    *          The request containing the pagination parameters
    * @param query
@@ -129,7 +154,7 @@ public abstract class AbstractDmnPaginateList {
    *          THe default sort column (the rest attribute) that later will be mapped to an internal engine name
    */
   @SuppressWarnings("rawtypes")
-  public DataResponse paginateList(Map<String, String> requestParams, Query query, String defaultSort, Map<String, QueryProperty> properties) {
+  public DataResponse paginateList(Map<String, String> requestParams, Object query, String defaultSort, Map properties) {
     return paginateList(requestParams, null, query, defaultSort, properties);
   }
 

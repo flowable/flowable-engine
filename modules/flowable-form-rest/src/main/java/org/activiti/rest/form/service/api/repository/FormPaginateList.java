@@ -12,15 +12,15 @@
  */
 package org.activiti.rest.form.service.api.repository;
 
+import org.activiti.rest.api.AbstractPaginateList;
 import org.activiti.rest.form.FormRestResponseFactory;
-import org.activiti.rest.form.common.AbstractFormPaginateList;
 
 import java.util.List;
 
 /**
  * @author Yvo Swillens
  */
-public class FormPaginateList extends AbstractFormPaginateList {
+public class FormPaginateList extends AbstractPaginateList {
 
   protected FormRestResponseFactory formRestResponseFactory;
 

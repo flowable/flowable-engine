@@ -26,7 +26,7 @@ import org.activiti.dmn.engine.impl.DeploymentQueryProperty;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.query.QueryProperty;
-import org.activiti.rest.dmn.common.DataResponse;
+import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.dmn.service.api.DmnRestResponseFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

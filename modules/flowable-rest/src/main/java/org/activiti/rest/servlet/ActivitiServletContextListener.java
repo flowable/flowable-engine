@@ -11,15 +11,15 @@
  * limitations under the License.
  */
 
-package org.activiti.rest.common.servlet;
-
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+package org.activiti.rest.servlet;
 
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngines;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
 /**
  * @author Tijs Rademakers

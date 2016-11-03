@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.rest.dmn.common;
+package org.activiti.rest.api;
 
 /**
  * Interface representing a paginated request object, use when paging is needed without using URL-parameters.
