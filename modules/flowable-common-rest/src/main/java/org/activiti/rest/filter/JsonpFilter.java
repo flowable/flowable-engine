@@ -1,4 +1,4 @@
-package org.activiti.rest.common.filter;
+package org.activiti.rest.filter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

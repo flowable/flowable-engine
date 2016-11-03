@@ -11,12 +11,13 @@
  * limitations under the License.
  */
 
-package org.activiti.rest.dmn.common;
+package org.activiti.rest.application;
 
 /**
  * Default implementation of a {@link ContentTypeResolver}, resolving a limited set of well-known content types used in the engine.
  * 
  * @author Tijs Rademakers
+ * @author Yvo Swillens
  */
 public class DefaultContentTypeResolver implements ContentTypeResolver {
 
@@ -28,7 +29,10 @@ public class DefaultContentTypeResolver implements ContentTypeResolver {
 
       if (lowerResourceName.endsWith("png")) {
         contentType = "image/png";
-      } else if (lowerResourceName.endsWith("xml") || lowerResourceName.endsWith("dmn")) {
+      } else if (lowerResourceName.endsWith("xml")
+              || lowerResourceName.endsWith("bpmn")
+              || lowerResourceName.endsWith("dmn")
+              || lowerResourceName.endsWith("form")) {
         contentType = "text/xml";
       }
     }

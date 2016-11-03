@@ -55,10 +55,6 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
 
   protected QueryProperty orderProperty;
 
-  public static enum NullHandlingOnOrder {
-    NULLS_FIRST, NULLS_LAST
-  }
-
   protected NullHandlingOnOrder nullHandlingOnOrder;
 
   protected AbstractQuery() {
@@ -78,13 +74,11 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
     return this;
   }
 
-  @SuppressWarnings("unchecked")
   public T orderBy(QueryProperty property) {
     this.orderProperty = property;
     return (T) this;
   }
 
-  @SuppressWarnings("unchecked")
   public T orderBy(QueryProperty property, NullHandlingOnOrder nullHandlingOnOrder) {
     orderBy(property);
     this.nullHandlingOnOrder = nullHandlingOnOrder;

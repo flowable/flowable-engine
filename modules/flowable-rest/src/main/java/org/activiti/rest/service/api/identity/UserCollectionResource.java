@@ -25,7 +25,7 @@ import org.activiti.engine.query.QueryProperty;
 import org.activiti.idm.api.User;
 import org.activiti.idm.api.UserQuery;
 import org.activiti.idm.api.UserQueryProperty;
-import org.activiti.rest.common.api.DataResponse;
+import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.exception.ActivitiConflictException;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;

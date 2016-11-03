@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.activiti.rest.dmn.common;
+package org.activiti.rest.application;
 
 /**
  * Interface describing a class that is capable of resolving the content type of a resource/file based on the resource name.

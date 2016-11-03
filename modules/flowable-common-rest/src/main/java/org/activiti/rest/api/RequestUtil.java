@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.activiti.rest.common.api;
+package org.activiti.rest.api;
 
 import java.util.Date;
 import java.util.Map;

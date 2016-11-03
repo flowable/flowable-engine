@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.activiti.rest.common.filter;
+package org.activiti.rest.filter;
 
 import javax.servlet.http.HttpServletRequest;
 

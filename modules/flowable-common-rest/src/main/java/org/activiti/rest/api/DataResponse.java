@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.activiti.rest.form.common;
+package org.activiti.rest.api;
 
 /**
  * @author Tijs Rademakers

@@ -11,31 +11,18 @@
  * limitations under the License.
  */
 
-package org.activiti.rest.common.api;
+package org.activiti.rest.api;
+
+import java.util.List;
 
 /**
- * Used for creating a response that represent an error that occurred.
- * 
- * @author Frederik Heremans
+ * @author Tijs Rademakers
  */
-public class RestError {
+public class DefaultPaginateList extends AbstractPaginateList {
 
-  private String errorMessage;
-  private Integer statusCode;
-
-  public String getErrorMessage() {
-    return errorMessage;
-  }
-
-  public void setErrorMessage(String errorMessage) {
-    this.errorMessage = errorMessage;
-  }
-
-  public Integer getStatusCode() {
-    return statusCode;
-  }
-
-  public void setStatusCode(Integer statusCode) {
-    this.statusCode = statusCode;
+  @SuppressWarnings("rawtypes")
+  @Override
+  protected List processList(List list) {
+    return list;
   }
 }

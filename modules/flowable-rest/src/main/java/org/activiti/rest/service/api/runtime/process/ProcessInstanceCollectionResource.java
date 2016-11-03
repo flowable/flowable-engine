@@ -27,7 +27,7 @@ import org.activiti.engine.HistoryService;
 import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.runtime.ProcessInstanceBuilder;
-import org.activiti.rest.common.api.DataResponse;
+import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
