@@ -811,8 +811,8 @@ List<User> findUserByQueryCriteria(UserQueryImpl query, Page page);
 
 
 The code for the <<chapter_ldap,LDAP integration>> contains full examples of how to implement this. Check out the code on Github, specifically the following classes
-          link:$$https://github.com/Flowable/Flowable/blob/master/modules/flowable-ldap/src/main/java/org/activiti/ldap/LDAPGroupManager.java$$[LDAPGroupManager] and
-   link:$$https://github.com/Flowable/Flowable/blob/master/modules/flowable-ldap/src/main/java/org/activiti/ldap/LDAPUserManager.java$$[LDAPUserManager].
+          link:$$https://github.com/flowable/flowable-engine/blob/flowable-5.22.0-dev/modules/flowable-ldap/src/main/java/org/activiti/ldap/LDAPGroupManager.java$$[LDAPGroupManager] and
+   link:$$https://github.com/flowable/flowable-engine/blob/flowable-5.22.0-dev/modules/flowable-ldap/src/main/java/org/activiti/ldap/LDAPUserManager.java$$[LDAPUserManager].
 
 
 [[advanced.safe.bpmn.xml]]
@@ -942,4 +942,4 @@ It's used as follows:
 </activiti:executionListener>
 ----
 
-For examples that demonstrate unsecure scripts and how they are made secure by the _secure scripting_ feature, please check the  link:$$https://github.com/Flowable/Flowable/tree/master/modules/flowable-secure-javascript/src/test/resources$$[unit tests on Github]
+For examples that demonstrate unsecure scripts and how they are made secure by the _secure scripting_ feature, please check the  link:$$https://github.com/flowable/flowable-engine/tree/flowable-5.22.0-dev/modules/flowable-secure-javascript/src/test/resources$$[unit tests on Github]
