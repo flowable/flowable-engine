@@ -32,6 +32,9 @@ import javax.sql.DataSource;
 import org.activiti.editor.form.converter.FormJsonConverter;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.cfg.IdGenerator;
+import org.activiti.engine.impl.cfg.TransactionContextFactory;
+import org.activiti.engine.impl.interceptor.CommandConfig;
+import org.activiti.engine.impl.interceptor.SessionFactory;
 import org.activiti.engine.impl.persistence.StrongUuidGenerator;
 import org.activiti.engine.impl.util.DefaultClockImpl;
 import org.activiti.engine.runtime.Clock;
@@ -44,7 +47,7 @@ import org.activiti.form.engine.impl.ServiceImpl;
 import org.activiti.form.engine.impl.cfg.CommandExecutorImpl;
 import org.activiti.form.engine.impl.cfg.StandaloneFormEngineConfiguration;
 import org.activiti.form.engine.impl.cfg.StandaloneInMemFormEngineConfiguration;
-import org.activiti.form.engine.impl.cfg.TransactionContextFactory;
+import org.activiti.form.engine.impl.cfg.TransactionListener;
 import org.activiti.form.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.activiti.form.engine.impl.db.DbSqlSessionFactory;
 import org.activiti.form.engine.impl.deployer.CachingAndArtifactsManager;
@@ -52,14 +55,14 @@ import org.activiti.form.engine.impl.deployer.FormDeployer;
 import org.activiti.form.engine.impl.deployer.FormDeploymentHelper;
 import org.activiti.form.engine.impl.deployer.ParsedDeploymentBuilderFactory;
 import org.activiti.form.engine.impl.el.ExpressionManager;
-import org.activiti.form.engine.impl.interceptor.CommandConfig;
+import org.activiti.form.engine.impl.interceptor.CommandContext;
 import org.activiti.form.engine.impl.interceptor.CommandContextFactory;
 import org.activiti.form.engine.impl.interceptor.CommandContextInterceptor;
 import org.activiti.form.engine.impl.interceptor.CommandExecutor;
 import org.activiti.form.engine.impl.interceptor.CommandInterceptor;
 import org.activiti.form.engine.impl.interceptor.CommandInvoker;
 import org.activiti.form.engine.impl.interceptor.LogInterceptor;
-import org.activiti.form.engine.impl.interceptor.SessionFactory;
+import org.activiti.form.engine.impl.interceptor.TransactionContextInterceptor;
 import org.activiti.form.engine.impl.parser.FormParseFactory;
 import org.activiti.form.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.activiti.form.engine.impl.persistence.deploy.Deployer;
@@ -200,7 +203,7 @@ public class FormEngineConfiguration {
   protected SubmittedFormEntityManager submittedFormEntityManager;
 
   protected CommandContextFactory commandContextFactory;
-  protected TransactionContextFactory transactionContextFactory;
+  protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
   
   protected ExpressionManager expressionManager;
   
@@ -671,12 +674,13 @@ public class FormEngineConfiguration {
     List<CommandInterceptor> interceptors = new ArrayList<CommandInterceptor>();
     interceptors.add(new LogInterceptor());
 
+    interceptors.add(new CommandContextInterceptor(commandContextFactory, this));
+    
     CommandInterceptor transactionInterceptor = createTransactionInterceptor();
     if (transactionInterceptor != null) {
       interceptors.add(transactionInterceptor);
     }
-
-    interceptors.add(new CommandContextInterceptor(commandContextFactory, this));
+    
     return interceptors;
   }
 
@@ -698,7 +702,11 @@ public class FormEngineConfiguration {
   }
 
   public CommandInterceptor createTransactionInterceptor() {
-    return null;
+    if (transactionContextFactory != null) {
+      return new TransactionContextInterceptor(transactionContextFactory);
+    } else {
+      return null;
+    }
   }
 
   // deployers
@@ -1373,11 +1381,13 @@ public class FormEngineConfiguration {
     return this;
   }
 
-  public TransactionContextFactory getTransactionContextFactory() {
+  public TransactionContextFactory<TransactionListener, CommandContext> getTransactionContextFactory() {
     return transactionContextFactory;
   }
 
-  public FormEngineConfiguration setTransactionContextFactory(TransactionContextFactory transactionContextFactory) {
+  public FormEngineConfiguration setTransactionContextFactory(
+      TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory) {
+    
     this.transactionContextFactory = transactionContextFactory;
     return this;
   }

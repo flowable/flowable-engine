@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.impl.Page;
+import org.activiti.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.engine.impl.GroupQueryImpl;
 import org.activiti.idm.engine.impl.persistence.entity.GroupEntity;

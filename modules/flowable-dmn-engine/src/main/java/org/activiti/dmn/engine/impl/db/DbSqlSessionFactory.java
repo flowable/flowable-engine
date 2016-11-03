@@ -18,11 +18,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.activiti.dmn.engine.impl.cfg.IdGenerator;
-import org.activiti.dmn.engine.impl.interceptor.CommandContext;
-import org.activiti.dmn.engine.impl.interceptor.Session;
-import org.activiti.dmn.engine.impl.interceptor.SessionFactory;
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.impl.cfg.IdGenerator;
+import org.activiti.engine.impl.interceptor.AbstractCommandContext;
+import org.activiti.engine.impl.interceptor.Session;
+import org.activiti.engine.impl.interceptor.SessionFactory;
 import org.activiti.engine.impl.persistence.entity.Entity;
 import org.apache.ibatis.session.SqlSessionFactory;
 
@@ -58,7 +58,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     return DbSqlSession.class;
   }
 
-  public Session openSession(CommandContext commandContext) {
+  public Session openSession(AbstractCommandContext commandContext) {
     DbSqlSession dbSqlSession = new DbSqlSession(this);
     if (getDatabaseSchema() != null && getDatabaseSchema().length() > 0) {
       try {

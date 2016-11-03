@@ -12,6 +12,7 @@
  */
 package org.activiti.idm.engine.impl.persistence.entity.data;
 
+import org.activiti.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.idm.engine.impl.persistence.entity.MembershipEntity;
 
 /**

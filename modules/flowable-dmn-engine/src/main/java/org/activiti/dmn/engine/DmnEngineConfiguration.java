@@ -38,27 +38,25 @@ import org.activiti.dmn.engine.impl.DmnRuleServiceImpl;
 import org.activiti.dmn.engine.impl.RuleEngineExecutorImpl;
 import org.activiti.dmn.engine.impl.ServiceImpl;
 import org.activiti.dmn.engine.impl.cfg.CommandExecutorImpl;
-import org.activiti.dmn.engine.impl.cfg.IdGenerator;
 import org.activiti.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration;
 import org.activiti.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration;
-import org.activiti.dmn.engine.impl.cfg.TransactionContextFactory;
+import org.activiti.dmn.engine.impl.cfg.TransactionListener;
 import org.activiti.dmn.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.activiti.dmn.engine.impl.db.DbSqlSessionFactory;
 import org.activiti.dmn.engine.impl.deployer.CachingAndArtifactsManager;
 import org.activiti.dmn.engine.impl.deployer.DmnDeployer;
 import org.activiti.dmn.engine.impl.deployer.DmnDeploymentHelper;
 import org.activiti.dmn.engine.impl.deployer.ParsedDeploymentBuilderFactory;
-import org.activiti.dmn.engine.impl.interceptor.CommandConfig;
+import org.activiti.dmn.engine.impl.interceptor.CommandContext;
 import org.activiti.dmn.engine.impl.interceptor.CommandContextFactory;
 import org.activiti.dmn.engine.impl.interceptor.CommandContextInterceptor;
 import org.activiti.dmn.engine.impl.interceptor.CommandExecutor;
 import org.activiti.dmn.engine.impl.interceptor.CommandInterceptor;
 import org.activiti.dmn.engine.impl.interceptor.CommandInvoker;
 import org.activiti.dmn.engine.impl.interceptor.LogInterceptor;
-import org.activiti.dmn.engine.impl.interceptor.SessionFactory;
+import org.activiti.dmn.engine.impl.interceptor.TransactionContextInterceptor;
 import org.activiti.dmn.engine.impl.mvel.config.DefaultCustomExpressionFunctionRegistry;
 import org.activiti.dmn.engine.impl.parser.DmnParseFactory;
-import org.activiti.dmn.engine.impl.persistence.StrongUuidGenerator;
 import org.activiti.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
 import org.activiti.dmn.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.activiti.dmn.engine.impl.persistence.deploy.Deployer;
@@ -77,6 +75,11 @@ import org.activiti.dmn.engine.impl.persistence.entity.data.impl.MybatisDecision
 import org.activiti.dmn.engine.impl.persistence.entity.data.impl.MybatisDmnDeploymentDataManager;
 import org.activiti.dmn.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.impl.cfg.IdGenerator;
+import org.activiti.engine.impl.cfg.TransactionContextFactory;
+import org.activiti.engine.impl.interceptor.CommandConfig;
+import org.activiti.engine.impl.interceptor.SessionFactory;
+import org.activiti.engine.impl.persistence.StrongUuidGenerator;
 import org.activiti.engine.impl.util.DefaultClockImpl;
 import org.activiti.engine.runtime.Clock;
 import org.apache.commons.io.IOUtils;
@@ -195,7 +198,7 @@ public class DmnEngineConfiguration {
   protected ResourceEntityManager resourceEntityManager;
 
   protected CommandContextFactory commandContextFactory;
-  protected TransactionContextFactory transactionContextFactory;
+  protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
 
   // MYBATIS SQL SESSION FACTORY /////////////////////////////////////
 
@@ -660,12 +663,13 @@ public class DmnEngineConfiguration {
     List<CommandInterceptor> interceptors = new ArrayList<CommandInterceptor>();
     interceptors.add(new LogInterceptor());
 
+    interceptors.add(new CommandContextInterceptor(commandContextFactory, this));
+    
     CommandInterceptor transactionInterceptor = createTransactionInterceptor();
     if (transactionInterceptor != null) {
       interceptors.add(transactionInterceptor);
     }
-
-    interceptors.add(new CommandContextInterceptor(commandContextFactory, this));
+    
     return interceptors;
   }
 
@@ -687,7 +691,11 @@ public class DmnEngineConfiguration {
   }
 
   public CommandInterceptor createTransactionInterceptor() {
-    return null;
+    if (transactionContextFactory != null) {
+      return new TransactionContextInterceptor(transactionContextFactory);
+    } else {
+      return null;
+    }
   }
 
   // deployers
@@ -1326,11 +1334,11 @@ public class DmnEngineConfiguration {
     return this;
   }
 
-  public TransactionContextFactory getTransactionContextFactory() {
+  public TransactionContextFactory<TransactionListener, CommandContext> getTransactionContextFactory() {
     return transactionContextFactory;
   }
 
-  public DmnEngineConfiguration setTransactionContextFactory(TransactionContextFactory transactionContextFactory) {
+  public DmnEngineConfiguration setTransactionContextFactory(TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory) {
     this.transactionContextFactory = transactionContextFactory;
     return this;
   }

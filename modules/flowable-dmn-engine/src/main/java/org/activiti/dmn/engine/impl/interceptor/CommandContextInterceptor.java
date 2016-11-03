@@ -15,6 +15,7 @@ package org.activiti.dmn.engine.impl.interceptor;
 
 import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.impl.context.Context;
+import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +47,7 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
     } else {
       log.debug("Valid context found. Reusing it for the current command '{}'", command.getClass().getCanonicalName());
       contextReused = true;
+      context.setReused(true);
     }
 
     try {
