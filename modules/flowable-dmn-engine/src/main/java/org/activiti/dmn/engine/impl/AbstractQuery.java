@@ -55,10 +55,6 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
 
   protected QueryProperty orderProperty;
 
-  public static enum NullHandlingOnOrder {
-    NULLS_FIRST, NULLS_LAST
-  }
-
   protected NullHandlingOnOrder nullHandlingOnOrder;
 
   protected AbstractQuery() {
