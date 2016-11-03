@@ -13,26 +13,32 @@
 package org.activiti.engine;
 
 /**
- * Represents information about the initialization of the process engine.
+ * Represents information about the initialization of the engine.
  * 
- * @see ProcessEngines
- * @author Tom Baeyens
+ * @author Tijs Rademakers
  */
-public interface ProcessEngineInfo {
+public class EngineInfo {
 
-  /**
-   * Returns the name of the process engine.
-   */
-  String getName();
+  String name;
+  String resourceUrl;
+  String exception;
 
-  /**
-   * Returns the resources the engine was configured from.
-   */
-  String getResourceUrl();
+  public EngineInfo(String name, String resourceUrl, String exception) {
+    this.name = name;
+    this.resourceUrl = resourceUrl;
+    this.exception = exception;
+  }
 
-  /**
-   * Returns the exception stacktrace in case an exception occurred while initializing the engine. When no exception occurred, null is returned.
-   */
-  String getException();
+  public String getName() {
+    return name;
+  }
+
+  public String getResourceUrl() {
+    return resourceUrl;
+  }
+
+  public String getException() {
+    return exception;
+  }
 
 }

@@ -13,9 +13,9 @@
 package org.activiti.rest.dmn.service.api.management;
 
 import org.activiti.dmn.engine.DmnEngine;
-import org.activiti.dmn.engine.DmnEngineInfo;
 import org.activiti.dmn.engine.DmnEngines;
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.EngineInfo;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,7 +31,7 @@ public class DmnEngineResource {
         DmnEngineInfoResponse response = new DmnEngineInfoResponse();
 
         try {
-            DmnEngineInfo dmnEngineInfo = DmnEngines.getDmnEngineInfo(DmnEngines.getDefaultDmnEngine().getName());
+            EngineInfo dmnEngineInfo = DmnEngines.getDmnEngineInfo(DmnEngines.getDefaultDmnEngine().getName());
             if (dmnEngineInfo != null) {
                 response.setName(dmnEngineInfo.getName());
                 response.setResourceUrl(dmnEngineInfo.getResourceUrl());
