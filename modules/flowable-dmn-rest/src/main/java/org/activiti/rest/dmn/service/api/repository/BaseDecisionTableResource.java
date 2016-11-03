@@ -23,7 +23,7 @@ import org.activiti.dmn.api.DmnRepositoryService;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.ActivitiObjectNotFoundException;
-import org.activiti.rest.dmn.common.ContentTypeResolver;
+import org.activiti.rest.application.ContentTypeResolver;
 import org.activiti.rest.dmn.service.api.DmnRestResponseFactory;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;

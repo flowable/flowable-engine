@@ -10,12 +10,12 @@ Flowable comes with an Eclipse plugin, the Flowable Eclipse Designer, that can b
 
 === Installation
 
-The following installation instructions are verified on link:$$http://www.eclipse.org/downloads/$$[Eclipse Kepler and Indigo]. Note that Eclipse Helios is *NOT* supported.
+The following installation instructions are verified on link:$$http://www.eclipse.org/downloads/$$[Eclipse Mars and Neon].
 
 Go to *Help -> Install New Software*. In the following panel, click on _Add_ button and fill in the following fields:
 
-* *Name:*Flowable BPMN 2.0 designer
-* *Location:*http://flowable.org/designer/update/
+* **Name:** Flowable BPMN 2.0 designer
+* **Location:** http://flowable.org/designer/update/
 
 image::images/designer.add.update.site.png[align="center"]
 

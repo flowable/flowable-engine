@@ -22,7 +22,7 @@ import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.form.api.FormDeployment;
 import org.activiti.form.api.FormRepositoryService;
-import org.activiti.rest.form.common.ContentTypeResolver;
+import org.activiti.rest.application.ContentTypeResolver;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;

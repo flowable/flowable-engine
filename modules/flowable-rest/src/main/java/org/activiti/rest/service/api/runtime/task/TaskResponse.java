@@ -20,7 +20,7 @@ import java.util.List;
 import io.swagger.annotations.ApiModelProperty;
 import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.Task;
-import org.activiti.rest.common.util.DateToStringSerializer;
+import org.activiti.rest.util.DateToStringSerializer;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

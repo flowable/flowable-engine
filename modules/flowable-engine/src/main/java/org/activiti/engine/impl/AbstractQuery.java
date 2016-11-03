@@ -29,7 +29,7 @@ import org.activiti.engine.query.QueryProperty;
 
 /**
  * Abstract superclass for all query types.
- * 
+ *
  * @author Joram Barrez
  */
 public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryParameterObject implements Command<Object>, Query<T, U>, Serializable {
@@ -54,9 +54,6 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
 
   protected QueryProperty orderProperty;
 
-  public static enum NullHandlingOnOrder {
-    NULLS_FIRST, NULLS_LAST
-  }
 
   protected NullHandlingOnOrder nullHandlingOnOrder;
 
@@ -82,13 +79,11 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
     return this;
   }
 
-  @SuppressWarnings("unchecked")
   public T orderBy(QueryProperty property) {
     this.orderProperty = property;
     return (T) this;
   }
 
-  @SuppressWarnings("unchecked")
   public T orderBy(QueryProperty property, NullHandlingOnOrder nullHandlingOnOrder) {
     orderBy(property);
     this.nullHandlingOnOrder = nullHandlingOnOrder;
@@ -173,7 +168,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
 
   /**
    * Executes the actual query to retrieve the list of results.
-   * 
+   *
    * @param page
    *          used if the results must be paged. If null, no paging will be applied.
    */
@@ -242,7 +237,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
       return orderBy;
     }
   }
-  
+
   public String getOrderByColumns() {
       return getOrderBy();
   }

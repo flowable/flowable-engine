@@ -16,7 +16,7 @@ package org.activiti.rest.service.api.engine;
 import java.util.Date;
 
 import io.swagger.annotations.ApiModelProperty;
-import org.activiti.rest.common.util.DateToStringSerializer;
+import org.activiti.rest.util.DateToStringSerializer;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
