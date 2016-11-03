@@ -10,15 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.idm.engine.impl.cfg;
 
-import org.activiti.idm.engine.impl.interceptor.CommandContext;
+package org.activiti.engine.impl.interceptor;
 
 /**
- * @author Tijs Rademakers
+ * A session factory produces a {@link Session} instance that has the lifespan of one {@link Command}.
+ * 
+ * @author Tom Baeyens
+ * @author Joram Barrez
  */
-public interface TransactionContextFactory {
+public interface SessionFactory {
 
-  TransactionContext openTransactionContext(CommandContext commandContext);
+  Class<?> getSessionType();
+
+  Session openSession(AbstractCommandContext commandContext);
 
 }

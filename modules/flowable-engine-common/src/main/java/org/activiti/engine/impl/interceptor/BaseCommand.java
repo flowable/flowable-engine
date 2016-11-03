@@ -10,23 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.idm.engine;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
+package org.activiti.engine.impl.interceptor;
 
 /**
- * This interface provides clock reading functionality
+ * @author Tom Baeyens
  */
-public interface ClockReader {
+public interface BaseCommand<T, C extends AbstractCommandContext> {
 
-  Date getCurrentTime();
-
-  Calendar getCurrentCalendar();
-
-  Calendar getCurrentCalendar(TimeZone timeZone);
-
-  TimeZone getCurrentTimeZone();
+  T execute(C commandContext);
 
 }

@@ -13,36 +13,36 @@
 
 package org.activiti.engine.impl.interceptor;
 
-import org.activiti.engine.impl.cfg.TransactionContext;
+import org.activiti.engine.impl.cfg.BaseTransactionContext;
 
 /**
  * @author Joram Barrez
  */
-public class TransactionCommandContextCloseListener implements CommandContextCloseListener {
+public class TransactionCommandContextCloseListener implements BaseCommandContextCloseListener<AbstractCommandContext> {
   
-  protected TransactionContext transactionContext;
+  protected BaseTransactionContext transactionContext;
   
-  public TransactionCommandContextCloseListener(TransactionContext transactionContext) {
+  public TransactionCommandContextCloseListener(BaseTransactionContext transactionContext) {
     this.transactionContext = transactionContext;
   }
 
   @Override
-  public void closing(CommandContext commandContext) {
+  public void closing(AbstractCommandContext commandContext) {
     
   }
 
   @Override
-  public void afterSessionsFlush(CommandContext commandContext) {
+  public void afterSessionsFlush(AbstractCommandContext commandContext) {
     transactionContext.commit();
   }
 
   @Override
-  public void closed(CommandContext commandContext) {
+  public void closed(AbstractCommandContext commandContext) {
     
   }
 
   @Override
-  public void closeFailure(CommandContext commandContext) {
+  public void closeFailure(AbstractCommandContext commandContext) {
     transactionContext.rollback();
   }
 

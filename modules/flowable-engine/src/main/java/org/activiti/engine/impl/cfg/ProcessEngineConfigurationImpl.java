@@ -158,6 +158,7 @@ import org.activiti.engine.impl.history.DefaultHistoryManager;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.impl.history.HistoryManager;
 import org.activiti.engine.impl.interceptor.CommandConfig;
+import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandContextFactory;
 import org.activiti.engine.impl.interceptor.CommandContextInterceptor;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
@@ -786,7 +787,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected ConcurrentMap<QName, URL> wsOverridenEndpointAddresses = new ConcurrentHashMap<QName, URL>();
 
   protected CommandContextFactory commandContextFactory;
-  protected TransactionContextFactory transactionContextFactory;
+  protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
 
   protected Map<Object, Object> beans;
 
@@ -2772,11 +2773,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public TransactionContextFactory getTransactionContextFactory() {
+  public TransactionContextFactory<TransactionListener, CommandContext> getTransactionContextFactory() {
     return transactionContextFactory;
   }
 
-  public ProcessEngineConfigurationImpl setTransactionContextFactory(TransactionContextFactory transactionContextFactory) {
+  public ProcessEngineConfigurationImpl setTransactionContextFactory(
+      TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory) {
+    
     this.transactionContextFactory = transactionContextFactory;
     return this;
   }

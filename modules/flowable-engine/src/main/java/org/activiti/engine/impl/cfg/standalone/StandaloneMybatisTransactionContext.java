@@ -22,6 +22,7 @@ import org.activiti.engine.impl.cfg.TransactionListener;
 import org.activiti.engine.impl.cfg.TransactionPropagation;
 import org.activiti.engine.impl.cfg.TransactionState;
 import org.activiti.engine.impl.db.DbSqlSession;
+import org.activiti.engine.impl.interceptor.AbstractCommandContext;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.CommandContext;
@@ -40,8 +41,8 @@ public class StandaloneMybatisTransactionContext implements TransactionContext {
   protected CommandContext commandContext;
   protected Map<TransactionState, List<TransactionListener>> stateTransactionListeners;
 
-  public StandaloneMybatisTransactionContext(CommandContext commandContext) {
-    this.commandContext = commandContext;
+  public StandaloneMybatisTransactionContext(AbstractCommandContext commandContext) {
+    this.commandContext = (CommandContext) commandContext;
   }
 
   public void addTransactionListener(TransactionState transactionState, TransactionListener transactionListener) {

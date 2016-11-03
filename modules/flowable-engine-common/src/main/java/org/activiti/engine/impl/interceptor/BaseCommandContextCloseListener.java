@@ -1,13 +1,11 @@
 package org.activiti.engine.impl.interceptor;
 
-import org.activiti.engine.impl.cfg.TransactionContext;
-
 /**
  * A listener that can be used to be notified of lifecycle events of the {@link CommandContext}.
  * 
  * @author Joram Barrez
  */
-public interface CommandContextCloseListener extends BaseCommandContextCloseListener<CommandContext> {
+public interface BaseCommandContextCloseListener<C extends AbstractCommandContext> {
 
   /**
    * Called when the {@link CommandContext} is being closed, but no 'close logic' has been executed.
@@ -19,7 +17,7 @@ public interface CommandContextCloseListener extends BaseCommandContextCloseList
    * - The {@link Session} instances will *not* be flushed
    * - The {@link TransactionContext} will be rolled back (if applicable) 
    */
-  void closing(CommandContext commandContext);
+  void closing(C commandContext);
   
   /**
    * Called when the {@link Session} have been successfully flushed.
@@ -29,7 +27,7 @@ public interface CommandContextCloseListener extends BaseCommandContextCloseList
    * - The {@link Session} instances will *not* be flushed
    * - The {@link TransactionContext} will be rolled back (if applicable) 
    */
-  void afterSessionsFlush(CommandContext commandContext);
+  void afterSessionsFlush(C commandContext);
 
   /**
    * Called when the {@link CommandContext} is successfully closed.
@@ -40,7 +38,7 @@ public interface CommandContextCloseListener extends BaseCommandContextCloseList
    * Note that throwing an exception here does *not* affect the transaction. 
    * The {@link CommandContext} will log the exception though.
    */
-  void closed(CommandContext commandContext);
+  void closed(C commandContext);
   
   /**
    * Called when the {@link CommandContext} has not been successully closed due to an exception that happened.
@@ -48,6 +46,6 @@ public interface CommandContextCloseListener extends BaseCommandContextCloseList
    * Note that throwing an exception here does *not* affect the transaction. 
    * The {@link CommandContext} will log the exception though.
    */
-  void closeFailure(CommandContext commandContext);
+  void closeFailure(C commandContext);
 
 }

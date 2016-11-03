@@ -10,19 +10,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.activiti.engine.impl.cfg;
 
-package org.activiti.engine.impl.interceptor;
+import org.activiti.engine.impl.interceptor.AbstractCommandContext;
 
 /**
- * A session factory produces a {@link Session} instance that has the lifespan of one {@link Command}.
- * 
  * @author Tom Baeyens
- * @author Joram Barrez
  */
-public interface SessionFactory {
+public interface BaseTransactionContext<T extends BaseTransactionListener<C>, C extends AbstractCommandContext> {
 
-  Class<?> getSessionType();
+  void commit();
 
-  Session openSession(CommandContext commandContext);
+  void rollback();
 
+  void addTransactionListener(TransactionState transactionState, T transactionListener);
 }

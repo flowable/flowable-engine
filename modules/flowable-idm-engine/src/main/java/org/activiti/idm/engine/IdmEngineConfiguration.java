@@ -34,7 +34,12 @@ import org.activiti.engine.ActivitiException;
 import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.impl.cfg.IdGenerator;
+import org.activiti.engine.impl.cfg.TransactionContextFactory;
+import org.activiti.engine.impl.interceptor.CommandConfig;
+import org.activiti.engine.impl.interceptor.SessionFactory;
 import org.activiti.engine.impl.persistence.StrongUuidGenerator;
+import org.activiti.engine.impl.util.DefaultClockImpl;
+import org.activiti.engine.runtime.Clock;
 import org.activiti.idm.api.IdmIdentityService;
 import org.activiti.idm.api.IdmManagementService;
 import org.activiti.idm.api.event.ActivitiIdmEventType;
@@ -46,17 +51,17 @@ import org.activiti.idm.engine.impl.ServiceImpl;
 import org.activiti.idm.engine.impl.cfg.CommandExecutorImpl;
 import org.activiti.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
 import org.activiti.idm.engine.impl.cfg.StandaloneInMemIdmEngineConfiguration;
-import org.activiti.idm.engine.impl.cfg.TransactionContextFactory;
+import org.activiti.idm.engine.impl.cfg.TransactionListener;
 import org.activiti.idm.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.activiti.idm.engine.impl.db.DbSqlSessionFactory;
-import org.activiti.idm.engine.impl.interceptor.CommandConfig;
+import org.activiti.idm.engine.impl.interceptor.CommandContext;
 import org.activiti.idm.engine.impl.interceptor.CommandContextFactory;
 import org.activiti.idm.engine.impl.interceptor.CommandContextInterceptor;
 import org.activiti.idm.engine.impl.interceptor.CommandExecutor;
 import org.activiti.idm.engine.impl.interceptor.CommandInterceptor;
 import org.activiti.idm.engine.impl.interceptor.CommandInvoker;
 import org.activiti.idm.engine.impl.interceptor.LogInterceptor;
-import org.activiti.idm.engine.impl.interceptor.SessionFactory;
+import org.activiti.idm.engine.impl.interceptor.TransactionContextInterceptor;
 import org.activiti.idm.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.activiti.idm.engine.impl.persistence.entity.ByteArrayEntityManagerImpl;
 import org.activiti.idm.engine.impl.persistence.entity.GroupEntityManager;
@@ -87,7 +92,6 @@ import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisMembersh
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisPropertyDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisTokenDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisUserDataManager;
-import org.activiti.idm.engine.impl.util.DefaultClockImpl;
 import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
@@ -211,7 +215,7 @@ public class IdmEngineConfiguration {
   protected UserEntityManager userEntityManager;
 
   protected CommandContextFactory commandContextFactory;
-  protected TransactionContextFactory transactionContextFactory;
+  protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
   
   // MYBATIS SQL SESSION FACTORY /////////////////////////////////////
 
@@ -649,12 +653,13 @@ public class IdmEngineConfiguration {
     List<CommandInterceptor> interceptors = new ArrayList<CommandInterceptor>();
     interceptors.add(new LogInterceptor());
 
+    interceptors.add(new CommandContextInterceptor(commandContextFactory, this));
+    
     CommandInterceptor transactionInterceptor = createTransactionInterceptor();
     if (transactionInterceptor != null) {
       interceptors.add(transactionInterceptor);
     }
-
-    interceptors.add(new CommandContextInterceptor(commandContextFactory, this));
+    
     return interceptors;
   }
 
@@ -676,7 +681,11 @@ public class IdmEngineConfiguration {
   }
 
   public CommandInterceptor createTransactionInterceptor() {
-    return null;
+    if (transactionContextFactory != null) {
+      return new TransactionContextInterceptor(transactionContextFactory);
+    } else {
+      return null;
+    }
   }
 
   // id generator
@@ -1384,11 +1393,11 @@ public class IdmEngineConfiguration {
     return this;
   }
 
-  public TransactionContextFactory getTransactionContextFactory() {
+  public TransactionContextFactory<TransactionListener, CommandContext> getTransactionContextFactory() {
     return transactionContextFactory;
   }
 
-  public IdmEngineConfiguration setTransactionContextFactory(TransactionContextFactory transactionContextFactory) {
+  public IdmEngineConfiguration setTransactionContextFactory(TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory) {
     this.transactionContextFactory = transactionContextFactory;
     return this;
   }
