@@ -32,6 +32,7 @@ import org.activiti.engine.ActivitiOptimisticLockingException;
 import org.activiti.engine.ActivitiWrongDbException;
 import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.db.ListQueryParameterObject;
+import org.activiti.engine.impl.interceptor.ConnectionHolder;
 import org.activiti.engine.impl.interceptor.Session;
 import org.activiti.engine.impl.persistence.entity.Entity;
 import org.activiti.engine.impl.util.IoUtil;
@@ -75,7 +76,13 @@ public class DbSqlSession implements Session {
 
   public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory) {
     this.dbSqlSessionFactory = dbSqlSessionFactory;
-    this.sqlSession = dbSqlSessionFactory.getSqlSessionFactory().openSession();
+    
+    Connection connection = ConnectionHolder.get();
+    if (connection != null) {
+      this.sqlSession = dbSqlSessionFactory.getSqlSessionFactory().openSession(connection);
+    } else {
+      this.sqlSession = dbSqlSessionFactory.getSqlSessionFactory().openSession();
+    }
   }
 
   public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory, Connection connection, String catalog, String schema) {
@@ -284,7 +291,7 @@ public class DbSqlSession implements Session {
   }
 
   protected String getDbVersion() {
-    String selectSchemaVersionStatement = dbSqlSessionFactory.mapStatement("selectDbSchemaVersion");
+    String selectSchemaVersionStatement = dbSqlSessionFactory.mapStatement("org.activiti.idm.engine.impl.persistence.entity.PropertyEntityImpl.selectDbSchemaVersion");
     return (String) sqlSession.selectOne(selectSchemaVersionStatement);
   }
 

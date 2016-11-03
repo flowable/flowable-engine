@@ -10,19 +10,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.engine.impl;
+package org.activiti.engine.impl.interceptor;
 
-import org.activiti.engine.impl.interceptor.Command;
-import org.activiti.engine.impl.interceptor.CommandContext;
+import java.sql.Connection;
 
 /**
- * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class SchemaOperationProcessEngineClose implements Command<Void> {
-
-  public Void execute(CommandContext commandContext) {
-    commandContext.getDbSqlSession().performSchemaOperationsProcessEngineClose();
-    return null;
+public class ConnectionHolder {
+  
+  protected static ThreadLocal<Connection> connectionHolder = new ThreadLocal<Connection>();
+  
+  public static Connection get() {
+    return connectionHolder.get();
   }
+  
+  public static void setConnection(Connection connection) {
+    connectionHolder.set(connection);
+  }
+  
+  public static void clear() {
+    connectionHolder.remove();
+  }
+
 }

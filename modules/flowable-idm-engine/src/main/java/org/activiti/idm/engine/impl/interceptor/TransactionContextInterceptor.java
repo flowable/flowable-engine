@@ -16,6 +16,7 @@ package org.activiti.idm.engine.impl.interceptor;
 import org.activiti.engine.impl.cfg.TransactionContextFactory;
 import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.TransactionCommandContextCloseListener;
+import org.activiti.engine.impl.interceptor.TransactionContextHolder;
 import org.activiti.idm.engine.impl.cfg.TransactionContext;
 import org.activiti.idm.engine.impl.cfg.TransactionListener;
 import org.activiti.idm.engine.impl.context.Context;
@@ -35,14 +36,14 @@ public class TransactionContextInterceptor extends AbstractCommandInterceptor {
   }
 
   public <T> T execute(CommandConfig config, Command<T> command) {
-    
     CommandContext commandContext = Context.getCommandContext();
     // Storing it in a variable, to reference later (it can change during command execution)
     boolean isReused = commandContext.isReused();
     
+    boolean isCurrentTransactionContextActive = TransactionContextHolder.getTransactionContext() != null;
     try {
       
-      if (transactionContextFactory != null && !isReused) {
+      if (isNewTransactionContextNeeded(isReused, isCurrentTransactionContextActive)) {
         TransactionContext transactionContext = (TransactionContext) transactionContextFactory.openTransactionContext(commandContext);
         Context.setTransactionContext(transactionContext);
         commandContext.addCloseListener(new TransactionCommandContextCloseListener(transactionContext));
@@ -51,11 +52,15 @@ public class TransactionContextInterceptor extends AbstractCommandInterceptor {
       return next.execute(config, command);
       
     } finally {
-      if (transactionContextFactory != null && !isReused) {
+      if (isNewTransactionContextNeeded(isReused, isCurrentTransactionContextActive)) {
         Context.removeTransactionContext();
       }
     }
 
+  }
+
+  protected boolean isNewTransactionContextNeeded(boolean isReused, boolean isCurrentTransactionContextActive) {
+    return !isCurrentTransactionContextActive && transactionContextFactory != null && !isReused;
   }
 
   public TransactionContextFactory<TransactionListener, CommandContext> getTransactionContextFactory() {

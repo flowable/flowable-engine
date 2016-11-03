@@ -56,12 +56,14 @@ import org.activiti.engine.impl.TaskQueryImpl;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.db.upgrade.DbUpgradeStep;
+import org.activiti.engine.impl.interceptor.ConnectionHolder;
 import org.activiti.engine.impl.interceptor.Session;
 import org.activiti.engine.impl.persistence.cache.CachedEntity;
 import org.activiti.engine.impl.persistence.cache.EntityCache;
 import org.activiti.engine.impl.persistence.entity.Entity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.PropertyEntity;
+import org.activiti.engine.impl.persistence.entity.PropertyEntityImpl;
 import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.impl.util.ReflectUtil;
 import org.apache.ibatis.session.SqlSession;
@@ -162,6 +164,8 @@ public class DbSqlSession implements Session {
     this.entityCache = entityCache;
     this.connectionMetadataDefaultCatalog = dbSqlSessionFactory.getDatabaseCatalog();
     this.connectionMetadataDefaultSchema = dbSqlSessionFactory.getDatabaseSchema();
+    
+    ConnectionHolder.setConnection(this.sqlSession.getConnection());
   }
 
   public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory, EntityCache entityCache, Connection connection, String catalog, String schema) {
@@ -170,6 +174,8 @@ public class DbSqlSession implements Session {
     this.entityCache = entityCache;
     this.connectionMetadataDefaultCatalog = catalog;
     this.connectionMetadataDefaultSchema = schema;
+    
+    ConnectionHolder.setConnection(this.sqlSession.getConnection());
   }
   
   // insert ///////////////////////////////////////////////////////////////////
@@ -776,6 +782,7 @@ public class DbSqlSession implements Session {
 
   public void close() {
     sqlSession.close();
+    ConnectionHolder.clear();
   }
 
   public void commit() {
@@ -783,7 +790,7 @@ public class DbSqlSession implements Session {
   }
 
   public void rollback() {
-    sqlSession.rollback();
+    sqlSession.rollback(true);
   }
 
   // schema operations
@@ -833,7 +840,7 @@ public class DbSqlSession implements Session {
   }
 
   protected String getDbVersion() {
-    String selectSchemaVersionStatement = dbSqlSessionFactory.mapStatement("selectDbSchemaVersion");
+    String selectSchemaVersionStatement = dbSqlSessionFactory.mapStatement("org.activiti.engine.impl.persistence.entity.PropertyEntityImpl.selectDbSchemaVersion");
     return (String) sqlSession.selectOne(selectSchemaVersionStatement);
   }
 
@@ -887,7 +894,7 @@ public class DbSqlSession implements Session {
 
     if (isEngineTablePresent()) {
 
-      PropertyEntity dbVersionProperty = selectById(PropertyEntity.class, "schema.version");
+      PropertyEntity dbVersionProperty = selectById(PropertyEntityImpl.class, "schema.version");
       String dbVersion = dbVersionProperty.getValue();
 
       // Determine index in the sequence of Activiti releases

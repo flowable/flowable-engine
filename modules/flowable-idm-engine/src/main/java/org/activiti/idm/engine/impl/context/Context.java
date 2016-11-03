@@ -15,6 +15,7 @@ package org.activiti.idm.engine.impl.context;
 
 import java.util.Stack;
 
+import org.activiti.engine.impl.interceptor.TransactionContextHolder;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.cfg.TransactionContext;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
@@ -27,7 +28,6 @@ public class Context {
 
   protected static ThreadLocal<Stack<CommandContext>> commandContextThreadLocal = new ThreadLocal<Stack<CommandContext>>();
   protected static ThreadLocal<Stack<IdmEngineConfiguration>> idmEngineConfigurationStackThreadLocal = new ThreadLocal<Stack<IdmEngineConfiguration>>();
-  protected static ThreadLocal<Stack<TransactionContext>> transactionContextThreadLocal = new ThreadLocal<Stack<TransactionContext>>();
   
   public static CommandContext getCommandContext() {
     Stack<CommandContext> stack = getStack(commandContextThreadLocal);
@@ -62,19 +62,15 @@ public class Context {
   }
   
   public static TransactionContext getTransactionContext() {
-    Stack<TransactionContext> stack = getStack(transactionContextThreadLocal);
-    if (stack.isEmpty()) {
-      return null;
-    }
-    return stack.peek();
+    return (TransactionContext) TransactionContextHolder.getTransactionContext();
   }
   
   public static void setTransactionContext(TransactionContext transactionContext) {
-    getStack(transactionContextThreadLocal).push(transactionContext);
+    TransactionContextHolder.setTransactionContext(transactionContext);
   }
   
   public static void removeTransactionContext() {
-    getStack(transactionContextThreadLocal).pop();
+    TransactionContextHolder.removeTransactionContext();
   }
   
   protected static <T> Stack<T> getStack(ThreadLocal<Stack<T>> threadLocal) {

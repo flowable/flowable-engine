@@ -652,12 +652,18 @@ public class IdmEngineConfiguration {
   public Collection<? extends CommandInterceptor> getDefaultCommandInterceptors() {
     List<CommandInterceptor> interceptors = new ArrayList<CommandInterceptor>();
     interceptors.add(new LogInterceptor());
-
-    interceptors.add(new CommandContextInterceptor(commandContextFactory, this));
     
     CommandInterceptor transactionInterceptor = createTransactionInterceptor();
     if (transactionInterceptor != null) {
       interceptors.add(transactionInterceptor);
+    }
+    
+    if (commandContextFactory != null) {
+      interceptors.add(new CommandContextInterceptor(commandContextFactory, this));
+    }
+    
+    if (transactionContextFactory != null) {
+      interceptors.add(new TransactionContextInterceptor(transactionContextFactory));
     }
     
     return interceptors;
@@ -681,11 +687,8 @@ public class IdmEngineConfiguration {
   }
 
   public CommandInterceptor createTransactionInterceptor() {
-    if (transactionContextFactory != null) {
-      return new TransactionContextInterceptor(transactionContextFactory);
-    } else {
-      return null;
-    }
+    // Should be overridden by subclasses
+    return null;
   }
 
   // id generator

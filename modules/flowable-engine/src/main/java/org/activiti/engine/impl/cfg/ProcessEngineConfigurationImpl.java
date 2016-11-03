@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -73,6 +74,7 @@ import org.activiti.engine.impl.ManagementServiceImpl;
 import org.activiti.engine.impl.ProcessEngineImpl;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.RuntimeServiceImpl;
+import org.activiti.engine.impl.SchemaOperationProcessEngineClose;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.impl.TaskServiceImpl;
 import org.activiti.engine.impl.agenda.DefaultFlowableEngineAgendaFactory;
@@ -157,6 +159,7 @@ import org.activiti.engine.impl.form.StringFormType;
 import org.activiti.engine.impl.history.DefaultHistoryManager;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.impl.history.HistoryManager;
+import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandContextFactory;
@@ -1295,7 +1298,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initMybatisTypeHandlers(configuration);
     initCustomMybatisMappers(configuration);
 
-    configuration = parseMybatisConfiguration(configuration, parser);
+    configuration = parseMybatisConfiguration(parser);
     return configuration;
   }
 
@@ -1311,7 +1314,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
 
-  public Configuration parseMybatisConfiguration(Configuration configuration, XMLConfigBuilder parser) {
+  public Configuration parseMybatisConfiguration(XMLConfigBuilder parser) {
     return parseCustomMybatisXMLMappers(parser.parse());
   }
 
@@ -1319,7 +1322,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (getCustomMybatisXMLMappers() != null)
       // see XMLConfigBuilder.mapperElement()
       for (String resource : getCustomMybatisXMLMappers()) {
-        XMLMapperBuilder mapperParser = new XMLMapperBuilder(getResourceAsStream(resource), configuration, resource, configuration.getSqlFragments());
+        InputStream inputStream = getResourceAsStream(resource);
+        if (inputStream == null) {
+          throw new ActivitiException("Could not find resource " + resource);
+        }
+        XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
         mapperParser.parse();
       }
     return configuration;
@@ -1338,7 +1345,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   public void setCustomMybatisMappers(Set<Class<?>> customMybatisMappers) {
-    this.customMybatisMappers = customMybatisMappers;
+    if (this.customMybatisMappers == null) {
+      this.customMybatisMappers = new LinkedHashSet<Class<?>>();
+    }
+    
+    for (Class<?> mapperClass : customMybatisMappers) {
+      this.customMybatisMappers.add(mapperClass);
+    }
   }
 
   public Set<String> getCustomMybatisXMLMappers() {
@@ -1346,7 +1359,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   public void setCustomMybatisXMLMappers(Set<String> customMybatisXMLMappers) {
-    this.customMybatisXMLMappers = customMybatisXMLMappers;
+    if (this.customMybatisXMLMappers == null) {
+      this.customMybatisXMLMappers = new LinkedHashSet<String>();
+    }
+    
+    for (String xmlMapper : customMybatisXMLMappers) {
+      this.customMybatisXMLMappers.add(xmlMapper);
+    }
   }
   
   // Data managers ///////////////////////////////////////////////////////////
@@ -2286,6 +2305,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (performanceSettings.isValidateExecutionRelationshipCountConfigOnBoot()) {
       commandExecutor.execute(new ValidateExecutionRelatedEntityCountCfgCmd());
     }
+  }
+  
+  public Command<Void> getProcessEngineCloseCommand() {
+    return new SchemaOperationProcessEngineClose();
   }
 
   // getters and setters

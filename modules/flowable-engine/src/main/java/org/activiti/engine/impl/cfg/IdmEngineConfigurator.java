@@ -12,23 +12,28 @@
  */
 package org.activiti.engine.impl.cfg;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.activiti.engine.cfg.AbstractProcessEngineConfigurator;
 import org.activiti.idm.engine.IdmEngine;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
+import org.activiti.idm.engine.impl.interceptor.TransactionContextAwareTransactionFactory;
 
 /**
  * @author Tijs Rademakers
  */
 public class IdmEngineConfigurator extends AbstractProcessEngineConfigurator {
   
-  protected static IdmEngine idmEngine;
   protected IdmEngineConfiguration idmEngineConfiguration;
   
   @Override
   public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
     if (idmEngineConfiguration == null) {
+      
       idmEngineConfiguration = new StandaloneIdmEngineConfiguration();
+      
       if (processEngineConfiguration.getDataSource() != null) {
         idmEngineConfiguration.setDataSource(processEngineConfiguration.getDataSource());
         
@@ -45,9 +50,23 @@ public class IdmEngineConfigurator extends AbstractProcessEngineConfigurator {
       idmEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
       idmEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
       idmEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
+      
+      idmEngineConfiguration.setTransactionFactory(new TransactionContextAwareTransactionFactory());
+      
+//      Set<String> customXmlMappers = new LinkedHashSet<String>(); // Linked set -> order is important!
+//      customXmlMappers.add("org/activiti/idm/db/mapping/common.xml");
+//      customXmlMappers.add("org/activiti/idm/db/mapping/entity/ByteArray.xml");
+//      customXmlMappers.add("org/activiti/idm/db/mapping/entity/Group.xml");
+//      customXmlMappers.add("org/activiti/idm/db/mapping/entity/IdentityInfo.xml");
+//      customXmlMappers.add("org/activiti/idm/db/mapping/entity/Membership.xml");
+//      customXmlMappers.add("org/activiti/idm/db/mapping/entity/Property.xml");
+//      customXmlMappers.add("org/activiti/idm/db/mapping/entity/TableData.xml");
+//      customXmlMappers.add("org/activiti/idm/db/mapping/entity/Token.xml");
+//      customXmlMappers.add("org/activiti/idm/db/mapping/entity/User.xml");
+//      processEngineConfiguration.setCustomMybatisXMLMappers(customXmlMappers);
     }
     
-    initIdmEngine();
+    IdmEngine idmEngine = idmEngineConfiguration.buildIdmEngine();
     
     processEngineConfiguration.setIdmEngineInitialized(true);
     processEngineConfiguration.setIdmIdentityService(idmEngine.getIdmIdentityService());
@@ -57,12 +76,6 @@ public class IdmEngineConfigurator extends AbstractProcessEngineConfigurator {
   public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
     if (processEngineConfiguration.getEventDispatcher() != null) {
       idmEngineConfiguration.setEventDispatcher(processEngineConfiguration.getEventDispatcher());
-    }
-  }
-
-  protected synchronized void initIdmEngine() {
-    if (idmEngine == null) {
-      idmEngine = idmEngineConfiguration.buildIdmEngine();
     }
   }
 
