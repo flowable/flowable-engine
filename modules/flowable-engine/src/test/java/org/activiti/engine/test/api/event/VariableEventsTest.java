@@ -12,8 +12,11 @@
  */
 package org.activiti.engine.test.api.event;
 
-import org.activiti.engine.delegate.event.ActivitiEvent;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
+import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiVariableEvent;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
@@ -22,9 +25,6 @@ import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.test.Deployment;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Test case for all {@link ActivitiEvent}s related to variables.
@@ -364,7 +364,7 @@ public class VariableEventsTest extends PluggableActivitiTestCase {
     // Check create event
     assertEquals(2, listener.getEventsReceived().size());
     ActivitiVariableEvent event = (ActivitiVariableEvent) listener.getEventsReceived().get(0);
-    assertEquals(ActivitiEventType.VARIABLE_CREATED, event.getType());
+    assertEquals(ActivitiEngineEventType.VARIABLE_CREATED, event.getType());
     assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
     assertEquals(processInstance.getId(), event.getExecutionId());
     assertEquals(processInstance.getId(), event.getProcessInstanceId());
@@ -373,7 +373,7 @@ public class VariableEventsTest extends PluggableActivitiTestCase {
     assertEquals("var2 value", event.getVariableValue());
 
     event = (ActivitiVariableEvent) listener.getEventsReceived().get(1);
-    assertEquals(ActivitiEventType.VARIABLE_UPDATED, event.getType());
+    assertEquals(ActivitiEngineEventType.VARIABLE_UPDATED, event.getType());
     assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
     assertEquals(processInstance.getId(), event.getExecutionId());
     assertEquals(processInstance.getId(), event.getProcessInstanceId());
@@ -397,7 +397,7 @@ public class VariableEventsTest extends PluggableActivitiTestCase {
     assertEquals(3, listener.getEventsReceived().size());
 
     ActivitiVariableEvent event = (ActivitiVariableEvent) listener.getEventsReceived().get(0);
-    assertEquals(ActivitiEventType.VARIABLE_CREATED, event.getType());
+    assertEquals(ActivitiEngineEventType.VARIABLE_CREATED, event.getType());
     assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
     assertEquals(processInstance.getId(), event.getExecutionId());
     assertEquals(processInstance.getId(), event.getProcessInstanceId());
@@ -405,12 +405,14 @@ public class VariableEventsTest extends PluggableActivitiTestCase {
     assertEquals("var1", event.getVariableName());
     assertEquals("var1 value", event.getVariableValue());
 
-    ExecutionEntity subprocessInstance = (ExecutionEntity) runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).onlySubProcessExecutions()
-            .singleResult();
+    ExecutionEntity subprocessInstance = (ExecutionEntity) runtimeService.createExecutionQuery()
+        .rootProcessInstanceId(processInstance.getId())
+        .onlySubProcessExecutions()
+        .singleResult();
     assertNotNull(subprocessInstance);
 
     event = (ActivitiVariableEvent) listener.getEventsReceived().get(1);
-    assertEquals(ActivitiEventType.VARIABLE_CREATED, event.getType());
+    assertEquals(ActivitiEngineEventType.VARIABLE_CREATED, event.getType());
     assertEquals(subprocessInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
     assertEquals(subprocessInstance.getId(), event.getExecutionId());
     assertEquals(subprocessInstance.getId(), event.getProcessInstanceId());
@@ -419,7 +421,7 @@ public class VariableEventsTest extends PluggableActivitiTestCase {
     assertEquals("var3 value", event.getVariableValue());
 
     event = (ActivitiVariableEvent) listener.getEventsReceived().get(2);
-    assertEquals(ActivitiEventType.VARIABLE_UPDATED, event.getType());
+    assertEquals(ActivitiEngineEventType.VARIABLE_UPDATED, event.getType());
     assertEquals(subprocessInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
     assertEquals(subprocessInstance.getId(), event.getExecutionId());
     assertEquals(subprocessInstance.getId(), event.getProcessInstanceId());
