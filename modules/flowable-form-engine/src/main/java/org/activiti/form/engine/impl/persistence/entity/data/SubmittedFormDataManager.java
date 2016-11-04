@@ -15,6 +15,7 @@ package org.activiti.form.engine.impl.persistence.entity.data;
 import java.util.List;
 
 import org.activiti.engine.impl.Page;
+import org.activiti.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.form.api.SubmittedForm;
 import org.activiti.form.engine.impl.SubmittedFormQueryImpl;
 import org.activiti.form.engine.impl.persistence.entity.SubmittedFormEntity;

@@ -20,6 +20,7 @@ import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.impl.db.DbSqlSession;
 import org.activiti.dmn.engine.impl.persistence.AbstractManager;
 import org.activiti.engine.impl.persistence.entity.Entity;
+import org.activiti.engine.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Joram Barrez

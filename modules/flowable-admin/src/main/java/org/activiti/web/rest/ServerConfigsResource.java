@@ -64,6 +64,8 @@ public class ServerConfigsResource {
     return new ServerConfigRepresentation(serverConfigService.getDefaultServerConfig(endpointType));
   }
 
+
+
   @RequestMapping(value = "/rest/server-configs/{serverId}", method = RequestMethod.PUT, produces = "application/json")
   @ResponseStatus(value = HttpStatus.OK)
   public void updateServer(@PathVariable String serverId,

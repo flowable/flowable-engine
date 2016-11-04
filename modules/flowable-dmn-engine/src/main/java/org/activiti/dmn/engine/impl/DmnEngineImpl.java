@@ -34,7 +34,7 @@ public class DmnEngineImpl implements DmnEngine {
 
     public DmnEngineImpl(DmnEngineConfiguration dmnEngineConfiguration) {
         this.dmnEngineConfiguration = dmnEngineConfiguration;
-        this.name = dmnEngineConfiguration.getDmnEngineName();
+        this.name = dmnEngineConfiguration.getEngineName();
         this.dmnRepositoryService = dmnEngineConfiguration.getDmnRepositoryService();
         this.dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
 

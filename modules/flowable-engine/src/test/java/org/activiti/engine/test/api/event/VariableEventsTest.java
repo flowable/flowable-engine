@@ -12,18 +12,19 @@
  */
 package org.activiti.engine.test.api.event;
 
-import org.activiti.engine.delegate.event.ActivitiEvent;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
+import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiVariableEvent;
 import org.activiti.engine.impl.history.HistoryLevel;
+import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.test.Deployment;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Test case for all {@link ActivitiEvent}s related to variables.
@@ -349,6 +350,84 @@ public class VariableEventsTest extends PluggableActivitiTestCase {
       }
     }
 
+  }
+
+  @Deployment(resources = { "org/activiti/engine/test/api/runtime/processVariableEvent.bpmn20.xml" })
+  public void testProcessInstanceVariableEventsForModeledDataObjectOnStart() throws Exception {
+
+    HashMap<String, Object> vars = new HashMap<String, Object>();
+    vars.put("var2", "The value");
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processVariableEvent", vars);
+    assertNotNull(processInstance);
+
+    // Check create event
+    assertEquals(2, listener.getEventsReceived().size());
+    ActivitiVariableEvent event = (ActivitiVariableEvent) listener.getEventsReceived().get(0);
+    assertEquals(ActivitiEngineEventType.VARIABLE_CREATED, event.getType());
+    assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+    assertEquals(processInstance.getId(), event.getExecutionId());
+    assertEquals(processInstance.getId(), event.getProcessInstanceId());
+    assertNull(event.getTaskId());
+    assertEquals("var2", event.getVariableName());
+    assertEquals("var2 value", event.getVariableValue());
+
+    event = (ActivitiVariableEvent) listener.getEventsReceived().get(1);
+    assertEquals(ActivitiEngineEventType.VARIABLE_UPDATED, event.getType());
+    assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+    assertEquals(processInstance.getId(), event.getExecutionId());
+    assertEquals(processInstance.getId(), event.getProcessInstanceId());
+    assertNull(event.getTaskId());
+    assertEquals("var2", event.getVariableName());
+    assertEquals("The value", event.getVariableValue());
+
+    listener.clearEventsReceived();
+  }
+
+  /**
+   * Test variables event for modeled data objects on callActivity.
+   */
+  @Deployment(resources = { "org/activiti/engine/test/api/runtime/callActivity.bpmn20.xml", "org/activiti/engine/test/api/runtime/calledActivity.bpmn20.xml" })
+  public void testProcessInstanceVariableEventsForModeledDataObjectOnCallActivityStart() throws Exception {
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callActivity");
+    assertNotNull(processInstance);
+
+    // Check create event
+    assertEquals(3, listener.getEventsReceived().size());
+
+    ActivitiVariableEvent event = (ActivitiVariableEvent) listener.getEventsReceived().get(0);
+    assertEquals(ActivitiEngineEventType.VARIABLE_CREATED, event.getType());
+    assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+    assertEquals(processInstance.getId(), event.getExecutionId());
+    assertEquals(processInstance.getId(), event.getProcessInstanceId());
+    assertNull(event.getTaskId());
+    assertEquals("var1", event.getVariableName());
+    assertEquals("var1 value", event.getVariableValue());
+
+    ExecutionEntity subprocessInstance = (ExecutionEntity) runtimeService.createExecutionQuery()
+        .rootProcessInstanceId(processInstance.getId())
+        .onlySubProcessExecutions()
+        .singleResult();
+    assertNotNull(subprocessInstance);
+
+    event = (ActivitiVariableEvent) listener.getEventsReceived().get(1);
+    assertEquals(ActivitiEngineEventType.VARIABLE_CREATED, event.getType());
+    assertEquals(subprocessInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+    assertEquals(subprocessInstance.getId(), event.getExecutionId());
+    assertEquals(subprocessInstance.getId(), event.getProcessInstanceId());
+    assertNull(event.getTaskId());
+    assertEquals("var3", event.getVariableName());
+    assertEquals("var3 value", event.getVariableValue());
+
+    event = (ActivitiVariableEvent) listener.getEventsReceived().get(2);
+    assertEquals(ActivitiEngineEventType.VARIABLE_UPDATED, event.getType());
+    assertEquals(subprocessInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+    assertEquals(subprocessInstance.getId(), event.getExecutionId());
+    assertEquals(subprocessInstance.getId(), event.getProcessInstanceId());
+    assertNull(event.getTaskId());
+    assertEquals("var3", event.getVariableName());
+    assertEquals("var1 value", event.getVariableValue());
   }
 
   @Override

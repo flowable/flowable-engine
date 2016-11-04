@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.EngineInfo;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,9 +41,9 @@ public abstract class FormEngines {
 
   protected static boolean isInitialized;
   protected static Map<String, FormEngine> formEngines = new HashMap<String, FormEngine>();
-  protected static Map<String, FormEngineInfo> formEngineInfosByName = new HashMap<String, FormEngineInfo>();
-  protected static Map<String, FormEngineInfo> formEngineInfosByResourceUrl = new HashMap<String, FormEngineInfo>();
-  protected static List<FormEngineInfo> formEngineInfos = new ArrayList<FormEngineInfo>();
+  protected static Map<String, EngineInfo> formEngineInfosByName = new HashMap<String, EngineInfo>();
+  protected static Map<String, EngineInfo> formEngineInfosByResourceUrl = new HashMap<String, EngineInfo>();
+  protected static List<EngineInfo> formEngineInfos = new ArrayList<EngineInfo>();
 
   /**
    * Initializes all dmn engines that can be found on the classpath for resources <code>activiti.dmn.cfg.xml</code> and for resources <code>activiti-dmn-context.xml</code> (Spring style
@@ -100,8 +101,8 @@ public abstract class FormEngines {
     formEngines.remove(formEngine.getName());
   }
 
-  private static FormEngineInfo initFormEngineFromResource(URL resourceUrl) {
-    FormEngineInfo formEngineInfo = formEngineInfosByResourceUrl.get(resourceUrl.toString());
+  private static EngineInfo initFormEngineFromResource(URL resourceUrl) {
+    EngineInfo formEngineInfo = formEngineInfosByResourceUrl.get(resourceUrl.toString());
     // if there is an existing dmn engine info
     if (formEngineInfo != null) {
       // remove that dmn engine from the member fields
@@ -120,12 +121,12 @@ public abstract class FormEngines {
       FormEngine formEngine = buildFormEngine(resourceUrl);
       String formEngineName = formEngine.getName();
       log.info("initialised form engine {}", formEngineName);
-      formEngineInfo = new FormEngineInfo(formEngineName, resourceUrlString, null);
+      formEngineInfo = new EngineInfo(formEngineName, resourceUrlString, null);
       formEngines.put(formEngineName, formEngine);
       formEngineInfosByName.put(formEngineName, formEngineInfo);
     } catch (Throwable e) {
       log.error("Exception while initializing form engine: {}", e.getMessage(), e);
-      formEngineInfo = new FormEngineInfo(null, resourceUrlString, getExceptionString(e));
+      formEngineInfo = new EngineInfo(null, resourceUrlString, getExceptionString(e));
     }
     formEngineInfosByResourceUrl.put(resourceUrlString, formEngineInfo);
     formEngineInfos.add(formEngineInfo);
@@ -154,7 +155,7 @@ public abstract class FormEngines {
   }
 
   /** Get initialization results. */
-  public static List<FormEngineInfo> getFormEngineInfos() {
+  public static List<EngineInfo> getFormEngineInfos() {
     return formEngineInfos;
   }
 
@@ -162,7 +163,7 @@ public abstract class FormEngines {
    * Get initialization results. Only info will we available for form engines which were added in the {@link FormEngines#init()}. No {@link FormEngineInfo} is available for engines which were
    * registered programmatically.
    */
-  public static FormEngineInfo getFormEngineInfo(String formEngineName) {
+  public static EngineInfo getFormEngineInfo(String formEngineName) {
     return formEngineInfosByName.get(formEngineName);
   }
 
@@ -186,7 +187,7 @@ public abstract class FormEngines {
   /**
    * retries to initialize a dmn engine that previously failed.
    */
-  public static FormEngineInfo retry(String resourceUrl) {
+  public static EngineInfo retry(String resourceUrl) {
     log.debug("retying initializing of resource {}", resourceUrl);
     try {
       return initFormEngineFromResource(new URL(resourceUrl));

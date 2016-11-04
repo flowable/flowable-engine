@@ -14,23 +14,23 @@ package org.activiti.rest.dmn.service.api.repository;
 
 import java.util.List;
 
-import org.activiti.rest.dmn.common.AbstractDmnPaginateList;
+import org.activiti.rest.api.AbstractPaginateList;
 import org.activiti.rest.dmn.service.api.DmnRestResponseFactory;
 
 /**
  * @author Yvo Swillens
  */
-public class DecisionTablesDmnPaginateList extends AbstractDmnPaginateList {
+public class DecisionTablesDmnPaginateList extends AbstractPaginateList {
 
-  protected DmnRestResponseFactory dmnRestResponseFactory;
+    protected DmnRestResponseFactory dmnRestResponseFactory;
 
-  public DecisionTablesDmnPaginateList(DmnRestResponseFactory dmnRestResponseFactory) {
-    this.dmnRestResponseFactory = dmnRestResponseFactory;
-  }
+    public DecisionTablesDmnPaginateList(DmnRestResponseFactory dmnRestResponseFactory) {
+        this.dmnRestResponseFactory = dmnRestResponseFactory;
+    }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  @Override
-  protected List processList(List list) {
-    return dmnRestResponseFactory.createDecisionTableResponseList(list);
-  }
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @Override
+    protected List processList(List list) {
+        return dmnRestResponseFactory.createDecisionTableResponseList(list);
+    }
 }

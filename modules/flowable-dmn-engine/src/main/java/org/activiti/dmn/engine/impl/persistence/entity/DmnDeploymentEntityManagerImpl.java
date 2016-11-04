@@ -20,9 +20,9 @@ import org.activiti.dmn.api.DecisionTable;
 import org.activiti.dmn.api.DmnDeployment;
 import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.impl.DmnDeploymentQueryImpl;
-import org.activiti.dmn.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.dmn.engine.impl.persistence.entity.data.DmnDeploymentDataManager;
 import org.activiti.engine.impl.Page;
+import org.activiti.engine.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Tijs Rademakers
@@ -44,7 +44,7 @@ public class DmnDeploymentEntityManagerImpl extends AbstractEntityManager<DmnDep
   
   @Override
   public void insert(DmnDeploymentEntity deployment) {
-    super.insert(deployment);
+    super.insert(deployment, true);
 
     for (ResourceEntity resource : deployment.getResources().values()) {
       resource.setDeploymentId(deployment.getId());

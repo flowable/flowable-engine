@@ -14,7 +14,7 @@ package org.activiti.rest.form.service.api.repository;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.activiti.form.api.FormDeployment;
-import org.activiti.rest.form.common.DateToStringSerializer;
+import org.activiti.rest.util.DateToStringSerializer;
 
 import java.util.Date;
 

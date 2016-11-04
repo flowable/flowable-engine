@@ -34,7 +34,7 @@ public class SimulationProcessEngineFactory implements FactoryBean<ProcessEngine
 
   @Override
   public ProcessEngineImpl getObject() {
-    this.processEngineConfiguration.setProcessEngineName("simRunProcessEngine-" + uniqueLongId.getAndIncrement());
+    this.processEngineConfiguration.setEngineName("simRunProcessEngine-" + uniqueLongId.getAndIncrement());
 
     return (ProcessEngineImpl) this.processEngineConfiguration.buildProcessEngine();
   }

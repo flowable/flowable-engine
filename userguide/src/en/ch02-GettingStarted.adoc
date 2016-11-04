@@ -13,10 +13,9 @@ Common to all the ways of setting up Flowable is the core engine, which can be s
 * The <<getting.started.rest, section on the Flowable REST API>> shows how to run and use the same API via REST.
 * The <<getting.started.flowable.app, section on the Flowable App>>, will guide you through the basics of using the out-of-the-box Flowable user interface.
 
-=== Flowable vs. Activiti
+=== Flowable and Activiti
 
-Flowable is a drop-in replacement for Activiti (registered trademark by Alfresco). In the all the following sections you'll notice that the package names, configuration files, etc. use _activiti_. The reason is to make the life of people migrating to Flowable as easy as possible (changing the jar dependencies should be enough), but for new people this might be a bit confusing.  We also see Flowable as the natural evolution of our work on Activiti.
-
+Flowable is a fork of Activiti (registered trademark by Alfresco). In all the following sections you’ll notice that the package names, configuration files, etc. use _activiti_.
 
 [[getting.started.command.line]]
 === Building a command-line application

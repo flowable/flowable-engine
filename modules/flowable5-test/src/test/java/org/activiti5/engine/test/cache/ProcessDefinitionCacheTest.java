@@ -52,14 +52,14 @@ public class ProcessDefinitionCacheTest extends PvmTestCase {
 
     // Creating the DB schema (without building a process engine)
     ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
-    processEngineConfiguration.setProcessEngineName("reboot-test-schema");
+    processEngineConfiguration.setEngineName("reboot-test-schema");
     processEngineConfiguration.setJdbcUrl("jdbc:h2:mem:activiti-reboot-test;DB_CLOSE_DELAY=1000");
     processEngineConfiguration.setActiviti5CompatibilityEnabled(true);
     ProcessEngine schemaProcessEngine = processEngineConfiguration.buildProcessEngine();
     
     // Create process engine and deploy test process
     StandaloneProcessEngineConfiguration standaloneProcessEngineConfiguration = new StandaloneProcessEngineConfiguration();
-    standaloneProcessEngineConfiguration.setProcessEngineName("reboot-test");
+    standaloneProcessEngineConfiguration.setEngineName("reboot-test");
     standaloneProcessEngineConfiguration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE);
     standaloneProcessEngineConfiguration.setJdbcUrl("jdbc:h2:mem:activiti-reboot-test;DB_CLOSE_DELAY=1000");
     standaloneProcessEngineConfiguration.setAsyncExecutorActivate(false);
@@ -91,7 +91,7 @@ public class ProcessDefinitionCacheTest extends PvmTestCase {
      
     // Reboot the process engine
     standaloneProcessEngineConfiguration = new StandaloneProcessEngineConfiguration();
-    standaloneProcessEngineConfiguration.setProcessEngineName("reboot-test");
+    standaloneProcessEngineConfiguration.setEngineName("reboot-test");
     standaloneProcessEngineConfiguration.setDatabaseSchemaUpdate(org.activiti5.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE);
     standaloneProcessEngineConfiguration.setJdbcUrl("jdbc:h2:mem:activiti-reboot-test;DB_CLOSE_DELAY=1000");
     standaloneProcessEngineConfiguration.setAsyncExecutorActivate(false);
@@ -140,7 +140,7 @@ public class ProcessDefinitionCacheTest extends PvmTestCase {
     
     // Setup both process engines
     StandaloneProcessEngineConfiguration standaloneProcessEngineConfiguration = new StandaloneProcessEngineConfiguration();
-    standaloneProcessEngineConfiguration.setProcessEngineName("reboot-test-schema");
+    standaloneProcessEngineConfiguration.setEngineName("reboot-test-schema");
     standaloneProcessEngineConfiguration.setDatabaseSchemaUpdate(org.activiti5.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
     standaloneProcessEngineConfiguration.setJdbcUrl("jdbc:h2:mem:activiti-process-cache-test;DB_CLOSE_DELAY=1000");
     standaloneProcessEngineConfiguration.setAsyncExecutorActivate(false);
@@ -149,7 +149,7 @@ public class ProcessDefinitionCacheTest extends PvmTestCase {
     RepositoryService repositoryService1 = processEngine1.getRepositoryService();
     
     StandaloneProcessEngineConfiguration standaloneProcessEngineConfiguration2 = new StandaloneProcessEngineConfiguration();
-    standaloneProcessEngineConfiguration2.setProcessEngineName("reboot-test");
+    standaloneProcessEngineConfiguration2.setEngineName("reboot-test");
     standaloneProcessEngineConfiguration2.setDatabaseSchemaUpdate(org.activiti5.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE);
     standaloneProcessEngineConfiguration2.setJdbcUrl("jdbc:h2:mem:activiti-process-cache-test;DB_CLOSE_DELAY=1000");
     standaloneProcessEngineConfiguration2.setAsyncExecutorActivate(false);

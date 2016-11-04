@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.activiti.engine.impl.persistence.entity.Entity;
+import org.activiti.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.db.DbSqlSession;
 import org.activiti.idm.engine.impl.persistence.AbstractManager;

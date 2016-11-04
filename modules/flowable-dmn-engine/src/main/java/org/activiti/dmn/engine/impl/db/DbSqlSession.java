@@ -17,11 +17,11 @@ import java.sql.Connection;
 import java.util.Collections;
 import java.util.List;
 
-import org.activiti.dmn.engine.impl.interceptor.Session;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiOptimisticLockingException;
 import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.db.ListQueryParameterObject;
+import org.activiti.engine.impl.interceptor.Session;
 import org.activiti.engine.impl.persistence.entity.Entity;
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;

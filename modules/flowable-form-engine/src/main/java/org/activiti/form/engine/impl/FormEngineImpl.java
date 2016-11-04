@@ -34,7 +34,7 @@ public class FormEngineImpl implements FormEngine {
 
   public FormEngineImpl(FormEngineConfiguration engineConfiguration) {
     this.engineConfiguration = engineConfiguration;
-    this.name = engineConfiguration.getFormEngineName();
+    this.name = engineConfiguration.getEngineName();
     this.repositoryService = engineConfiguration.getFormRepositoryService();
     this.formService = engineConfiguration.getFormService();
 
