@@ -93,16 +93,16 @@ public class ProcessEngineImpl implements ProcessEngine {
     }
 
     ProcessEngines.registerProcessEngine(this);
+    
+    if (processEngineConfiguration.getProcessEngineLifecycleListener() != null) {
+      processEngineConfiguration.getProcessEngineLifecycleListener().onProcessEngineBuilt(this);
+    }
+    
+    processEngineConfiguration.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createGlobalEvent(ActivitiEngineEventType.ENGINE_CREATED));
 
     if (asyncExecutor != null && asyncExecutor.isAutoActivate()) {
       asyncExecutor.start();
     }
-
-    if (processEngineConfiguration.getProcessEngineLifecycleListener() != null) {
-      processEngineConfiguration.getProcessEngineLifecycleListener().onProcessEngineBuilt(this);
-    }
-
-    processEngineConfiguration.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createGlobalEvent(ActivitiEngineEventType.ENGINE_CREATED));
   }
 
   public void close() {

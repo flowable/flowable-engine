@@ -18,7 +18,7 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import org.activiti.engine.impl.cfg.BaseTransactionContext;
-import org.activiti.engine.impl.interceptor.TransactionContextHolder;
+import org.activiti.engine.impl.transaction.TransactionContextHolder;
 import org.activiti.idm.engine.impl.cfg.TransactionContext;
 import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.apache.ibatis.transaction.Transaction;

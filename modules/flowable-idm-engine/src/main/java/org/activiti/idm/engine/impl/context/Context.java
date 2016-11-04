@@ -15,7 +15,7 @@ package org.activiti.idm.engine.impl.context;
 
 import java.util.Stack;
 
-import org.activiti.engine.impl.interceptor.TransactionContextHolder;
+import org.activiti.engine.impl.transaction.TransactionContextHolder;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.cfg.TransactionContext;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;

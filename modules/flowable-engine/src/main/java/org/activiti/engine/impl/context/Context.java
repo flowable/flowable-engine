@@ -27,8 +27,8 @@ import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.cfg.TransactionContext;
 import org.activiti.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.impl.interceptor.TransactionContextHolder;
 import org.activiti.engine.impl.persistence.deploy.ProcessDefinitionInfoCacheObject;
+import org.activiti.engine.impl.transaction.TransactionContextHolder;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 

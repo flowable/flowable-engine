@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.engine.impl.interceptor;
+package org.activiti.engine.impl.transaction;
 
 import java.util.Stack;
 
@@ -40,6 +40,10 @@ public class TransactionContextHolder {
     getStack(transactionContextThreadLocal).pop();
   }
   
+  public static boolean isCurrentTransactionContextActive() {
+    return !getStack(transactionContextThreadLocal).isEmpty();
+  }
+  
   protected static <T> Stack<T> getStack(ThreadLocal<Stack<T>> threadLocal) {
     Stack<T> stack = threadLocal.get();
     if (stack == null) {
@@ -48,5 +52,5 @@ public class TransactionContextHolder {
     }
     return stack;
   }
-
+  
 }
