@@ -84,9 +84,9 @@ public class EndExecutionOperation extends AbstractOperation {
     if (activeExecutions == 0) {
       logger.debug("No active executions found. Ending process instance {} ", processInstanceId);
       
-   // note the use of execution here vs processinstance execution for getting the flowelement
+      // note the use of execution here vs processinstance execution for getting the flow element
       executionEntityManager.deleteProcessInstanceExecutionEntity(processInstanceId, 
-          execution.getCurrentFlowElement() != null ? execution.getCurrentFlowElement().getId() : null, null, false, false, true);
+          execution.getCurrentFlowElement() != null ? execution.getCurrentFlowElement().getId() : null, null, false, false);
     } else {
       logger.debug("Active executions found. Process instance {} will not be ended.", processInstanceId);
     }
