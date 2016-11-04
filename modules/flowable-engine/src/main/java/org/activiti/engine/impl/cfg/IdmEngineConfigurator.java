@@ -17,10 +17,10 @@ import javax.sql.DataSource;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.cfg.AbstractProcessEngineConfigurator;
 import org.activiti.engine.impl.transaction.TransactionContextAwareDataSource;
+import org.activiti.engine.impl.transaction.TransactionContextAwareTransactionFactory;
 import org.activiti.idm.engine.IdmEngine;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
-import org.activiti.idm.engine.impl.interceptor.TransactionContextAwareTransactionFactory;
 
 /**
  * @author Tijs Rademakers
@@ -44,7 +44,9 @@ public class IdmEngineConfigurator extends AbstractProcessEngineConfigurator {
         
       }
       
-      idmEngineConfiguration.setTransactionFactory(new TransactionContextAwareTransactionFactory());
+      idmEngineConfiguration.setTransactionFactory(
+          new TransactionContextAwareTransactionFactory<org.activiti.idm.engine.impl.cfg.TransactionContext>(
+              org.activiti.idm.engine.impl.cfg.TransactionContext.class));
       idmEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
       idmEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
       idmEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());

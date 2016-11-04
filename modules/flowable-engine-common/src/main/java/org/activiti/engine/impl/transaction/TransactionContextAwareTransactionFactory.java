@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.idm.engine.impl.interceptor;
+package org.activiti.engine.impl.transaction;
 
 import java.sql.Connection;
 import java.util.Properties;
@@ -18,8 +18,6 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import org.activiti.engine.impl.cfg.BaseTransactionContext;
-import org.activiti.engine.impl.transaction.TransactionContextHolder;
-import org.activiti.idm.engine.impl.cfg.TransactionContext;
 import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.apache.ibatis.transaction.Transaction;
 import org.apache.ibatis.transaction.TransactionFactory;
@@ -29,12 +27,16 @@ import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 /**
  * @author Joram Barrez
  */
-public class TransactionContextAwareTransactionFactory implements TransactionFactory {
+public class TransactionContextAwareTransactionFactory<T> implements TransactionFactory {
+  
+  protected Class<T> transactionContextClass; // sadly, needed because of generics and type erasure ...
   
   protected ManagedTransactionFactory managedTransactionFactory;
   protected JdbcTransactionFactory jdbcTransactionFactory;
   
-  public TransactionContextAwareTransactionFactory() {
+  public TransactionContextAwareTransactionFactory(Class<T> transactionContextClass) {
+    this.transactionContextClass = transactionContextClass;
+
     this.jdbcTransactionFactory = new JdbcTransactionFactory();
     
     this.managedTransactionFactory = new ManagedTransactionFactory();
@@ -70,9 +72,13 @@ public class TransactionContextAwareTransactionFactory implements TransactionFac
     }
   }
   
+  @SuppressWarnings("rawtypes")
   protected boolean isNonIdmTransactionContextActive() {
     BaseTransactionContext transactionContext = TransactionContextHolder.getTransactionContext();
-    return transactionContext != null && !(transactionContext instanceof org.activiti.idm.engine.impl.cfg.TransactionContext);
+    if (transactionContext != null) {
+      return transactionContext != null && !transactionContextClass.isInstance(transactionContext);
+    } 
+    return false;
   }
 
 }

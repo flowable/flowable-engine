@@ -68,6 +68,7 @@ import org.activiti.engine.impl.ManagementServiceImpl;
 import org.activiti.engine.impl.ProcessEngineImpl;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.RuntimeServiceImpl;
+import org.activiti.engine.impl.SchemaOperationProcessEngineClose;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.impl.TaskServiceImpl;
 import org.activiti.engine.impl.agenda.DefaultFlowableEngineAgendaFactory;
@@ -152,6 +153,7 @@ import org.activiti.engine.impl.form.StringFormType;
 import org.activiti.engine.impl.history.DefaultHistoryManager;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.impl.history.HistoryManager;
+import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandContextFactory;
@@ -2014,6 +2016,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       commandExecutor.execute(new ValidateExecutionRelatedEntityCountCfgCmd());
     }
   }
+  
+  public Command<Void> getProcessEngineCloseCommand() {
+    return new SchemaOperationProcessEngineClose();
+  }
+
 
   // getters and setters
   // //////////////////////////////////////////////////////
