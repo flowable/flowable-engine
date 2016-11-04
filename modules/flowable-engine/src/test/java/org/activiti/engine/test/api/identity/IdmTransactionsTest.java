@@ -23,6 +23,7 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.test.Deployment;
+import org.activiti.idm.api.Group;
 import org.activiti.idm.api.User;
 
 /**
@@ -36,6 +37,11 @@ public class IdmTransactionsTest extends PluggableActivitiTestCase {
     List<User> allUsers = identityService.createUserQuery().list();
     for (User user : allUsers) {
       identityService.deleteUser(user.getId());
+    }
+    
+    List<Group> allGroups = identityService.createGroupQuery().list();
+    for (Group group : allGroups) {
+      identityService.deleteGroup(group.getId());
     }
     
     super.tearDown();
@@ -80,6 +86,20 @@ public class IdmTransactionsTest extends PluggableActivitiTestCase {
     // no new user should have been created
     assertEquals(0, identityService.createUserQuery().list().size());
     
+  }
+  
+  @Deployment
+  public void testMultipleIdmCallsInDelegate() {
+    runtimeService.startProcessInstanceByKey("multipleServiceInvocations");
+
+    // The service task should have created a user which is part of the admin group
+    User user = identityService.createUserQuery().singleResult();
+    assertEquals("Kermit", user.getId());
+    Group group = identityService.createGroupQuery().groupMember(user.getId()).singleResult();
+    assertNotNull(group);
+    assertEquals("admin", group.getId());
+
+    identityService.deleteMembership("Kermit", "admin");
   }
   
   public static class NoopDelegate implements JavaDelegate {

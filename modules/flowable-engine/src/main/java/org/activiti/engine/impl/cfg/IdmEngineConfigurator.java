@@ -37,7 +37,11 @@ public class IdmEngineConfigurator extends AbstractProcessEngineConfigurator {
       
       if (processEngineConfiguration.getDataSource() != null) {
         DataSource originalDatasource = processEngineConfiguration.getDataSource();
-        idmEngineConfiguration.setDataSource(new TransactionContextAwareDataSource(originalDatasource));
+        if (processEngineConfiguration.isTransactionsExternallyManaged()) {
+          idmEngineConfiguration.setDataSource(originalDatasource);
+        } else {
+          idmEngineConfiguration.setDataSource(new TransactionContextAwareDataSource(originalDatasource));
+        }
         
       } else {
         throw new ActivitiException("A datasource is required for initializing the IDM engine ");
@@ -48,11 +52,9 @@ public class IdmEngineConfigurator extends AbstractProcessEngineConfigurator {
       idmEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
       idmEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
       
-      if (!processEngineConfiguration.isTransactionsExternallyManaged()) {
-        idmEngineConfiguration.setTransactionFactory(
-            new TransactionContextAwareTransactionFactory<org.activiti.idm.engine.impl.cfg.TransactionContext>(
+      idmEngineConfiguration.setTransactionFactory(
+          new TransactionContextAwareTransactionFactory<org.activiti.idm.engine.impl.cfg.TransactionContext>(
                 org.activiti.idm.engine.impl.cfg.TransactionContext.class));
-      }
       
       if (processEngineConfiguration.getEventDispatcher() != null) {
         idmEngineConfiguration.setEventDispatcher(processEngineConfiguration.getEventDispatcher());
