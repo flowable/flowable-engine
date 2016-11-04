@@ -33,18 +33,19 @@ public class TransactionContextAwareDataSource implements DataSource {
   
   @Override
   public Connection getConnection() throws SQLException {
-    if (TransactionContextHolder.isCurrentTransactionContextActive()) {
+    if (TransactionContextHolder.isTransactionContextActive()) {
       Connection connection = ConnectionHolder.get();
       if (connection != null) {
         return connection;
       }
     } 
+    
     return dataSource.getConnection();
   }
 
   @Override
   public Connection getConnection(String username, String password) throws SQLException {
-    if (TransactionContextHolder.isCurrentTransactionContextActive()) {
+    if (TransactionContextHolder.isTransactionContextActive()) {
       Connection connection = ConnectionHolder.get();
       if (connection != null) {
         return connection;

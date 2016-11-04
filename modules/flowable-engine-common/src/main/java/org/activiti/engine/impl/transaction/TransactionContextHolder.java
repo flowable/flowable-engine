@@ -40,7 +40,7 @@ public class TransactionContextHolder {
     getStack(transactionContextThreadLocal).pop();
   }
   
-  public static boolean isCurrentTransactionContextActive() {
+  public static boolean isTransactionContextActive() {
     return !getStack(transactionContextThreadLocal).isEmpty();
   }
   

@@ -110,9 +110,11 @@ public class ProcessEngineImpl implements ProcessEngine {
     if (asyncExecutor != null && asyncExecutor.isActive()) {
       asyncExecutor.shutdown();
     }
-
-    commandExecutor.execute(processEngineConfiguration.getSchemaCommandConfig(), 
-        processEngineConfiguration.getProcessEngineCloseCommand());
+    
+    Runnable closeRunnable = processEngineConfiguration.getProcessEngineCloseRunnable();
+    if (closeRunnable != null) {
+      closeRunnable.run();
+    }
 
     if (processEngineConfiguration.getProcessEngineLifecycleListener() != null) {
       processEngineConfiguration.getProcessEngineLifecycleListener().onProcessEngineClosed(this);

@@ -36,14 +36,12 @@ public class ContextAwareJdbcTransaction extends JdbcTransaction {
     super(ds, desiredLevel, desiredAutoCommit);
   }  
   
-  @Override
-  public Connection getConnection() throws SQLException {
-    Connection connection = super.getConnection();
+  protected void openConnection() throws SQLException {
+    super.openConnection();
+    
     if (!connectionStored) {
-      ConnectionHolder.setConnection(connection);
-      connectionStored = true;
+      ConnectionHolder.setConnection(super.connection);
     }
-    return connection;
   }
   
   @Override

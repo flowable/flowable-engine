@@ -207,16 +207,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     initEventDispatcher();
   }
   
-  public void initTransactionFactory() {
-    if (transactionFactory == null) {
-      if (transactionsExternallyManaged) {
-        transactionFactory = new ManagedTransactionFactory();
-      } else {
-        transactionFactory = new JdbcTransactionFactory();
-      }
-    }
-  }
-
   // services
   // /////////////////////////////////////////////////////////////////
 

@@ -2017,10 +2017,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
   
-  public Command<Void> getProcessEngineCloseCommand() {
-    return new SchemaOperationProcessEngineClose();
+  public Runnable getProcessEngineCloseRunnable() {
+    return new Runnable() {
+      public void run() {
+        commandExecutor.execute(getSchemaCommandConfig(), new SchemaOperationProcessEngineClose());
+      }
+    };
   }
-
+  
 
   // getters and setters
   // //////////////////////////////////////////////////////
