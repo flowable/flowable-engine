@@ -32,6 +32,7 @@ import org.activiti.engine.impl.cfg.IdGenerator;
 import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.SessionFactory;
 import org.activiti.engine.impl.persistence.StrongUuidGenerator;
+import org.activiti.engine.impl.transaction.ContextAwareJdbcTransactionFactory;
 import org.activiti.engine.impl.util.DefaultClockImpl;
 import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.runtime.Clock;
@@ -375,7 +376,7 @@ public abstract class AbstractEngineConfiguration {
       if (transactionsExternallyManaged) {
         transactionFactory = new ManagedTransactionFactory();
       } else {
-        transactionFactory = new JdbcTransactionFactory();
+        transactionFactory = new ContextAwareJdbcTransactionFactory();
       }
     }
   }

@@ -164,8 +164,6 @@ public class DbSqlSession implements Session {
     this.entityCache = entityCache;
     this.connectionMetadataDefaultCatalog = dbSqlSessionFactory.getDatabaseCatalog();
     this.connectionMetadataDefaultSchema = dbSqlSessionFactory.getDatabaseSchema();
-    
-    ConnectionHolder.setConnection(this.sqlSession.getConnection());
   }
 
   public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory, EntityCache entityCache, Connection connection, String catalog, String schema) {
@@ -174,8 +172,6 @@ public class DbSqlSession implements Session {
     this.entityCache = entityCache;
     this.connectionMetadataDefaultCatalog = catalog;
     this.connectionMetadataDefaultSchema = schema;
-    
-    ConnectionHolder.setConnection(this.sqlSession.getConnection());
   }
   
   // insert ///////////////////////////////////////////////////////////////////
@@ -782,7 +778,6 @@ public class DbSqlSession implements Session {
 
   public void close() {
     sqlSession.close();
-    ConnectionHolder.clear();
   }
 
   public void commit() {

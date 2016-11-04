@@ -31,6 +31,7 @@ import org.activiti.engine.impl.cfg.IdGenerator;
 import org.activiti.engine.impl.cfg.TransactionContextFactory;
 import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.SessionFactory;
+import org.activiti.engine.impl.transaction.ContextAwareJdbcTransactionFactory;
 import org.activiti.engine.runtime.Clock;
 import org.activiti.idm.api.IdmIdentityService;
 import org.activiti.idm.api.IdmManagementService;
@@ -86,6 +87,8 @@ import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisTokenDat
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisUserDataManager;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
+import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
+import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
@@ -202,6 +205,16 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     initEntityManagers();
     initClock();
     initEventDispatcher();
+  }
+  
+  public void initTransactionFactory() {
+    if (transactionFactory == null) {
+      if (transactionsExternallyManaged) {
+        transactionFactory = new ManagedTransactionFactory();
+      } else {
+        transactionFactory = new JdbcTransactionFactory();
+      }
+    }
   }
 
   // services
