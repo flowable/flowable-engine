@@ -22,6 +22,13 @@ import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.apache.ibatis.transaction.jdbc.JdbcTransaction;
 
 /**
+ * Extension of the regular {@link JdbcTransaction} of Mybatis.
+ * The main difference is that the threadlocal on {@link ConnectionHolder}
+ * gets set/cleared when the connection is opened/closed.
+ * 
+ * This class will be used by the Process Engine when running in 
+ * 'standalone' mode (i.e. Mybatis directly vs in a transaction managed environment).
+ * 
  * @author Joram Barrez
  */
 public class ContextAwareJdbcTransaction extends JdbcTransaction {

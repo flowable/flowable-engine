@@ -15,6 +15,8 @@ package org.activiti.engine.impl.transaction;
 import java.sql.Connection;
 
 /**
+ * Simple wrapper for storing the {@link Connection} in a threadlocal object.
+ * 
  * @author Joram Barrez
  */
 public class ConnectionHolder {

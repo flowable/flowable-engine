@@ -21,6 +21,11 @@ import org.apache.ibatis.transaction.Transaction;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 
 /**
+  * Typically used for the process engine, as it's the 'driver' of other engine 
+  * (i.e. it call other engines like idm/form/dmn).
+  * 
+  * @see ContextAwareJdbcTransaction
+  *  
   * @author Joram Barrez
   */
 public class ContextAwareJdbcTransactionFactory extends JdbcTransactionFactory {

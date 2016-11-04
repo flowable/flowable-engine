@@ -21,10 +21,22 @@ import org.activiti.engine.impl.cfg.BaseTransactionContext;
 import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.apache.ibatis.transaction.Transaction;
 import org.apache.ibatis.transaction.TransactionFactory;
+import org.apache.ibatis.transaction.jdbc.JdbcTransaction;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
+import org.apache.ibatis.transaction.managed.ManagedTransaction;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 
 /**
+ * A {@link TransactionFactory} implementation for 'dependent' engine
+ * (so not the process engine, but the IDM/DMN/Form/... engine).
+ * 
+ * This implementation will switch depending on the current context:
+ * 
+ * If a transaction context is active, the dependent engine does not
+ * need to create a transaction, and a regular {@link JdbcTransaction} is used.
+ * Otherwise, the engine simply need to participate in the existing transaction,
+ * and a {@link ManagedTransaction} is used. 
+ * 
  * @author Joram Barrez
  */
 public class TransactionContextAwareTransactionFactory<T> implements TransactionFactory {

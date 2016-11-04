@@ -17,6 +17,10 @@ import java.util.Stack;
 import org.activiti.engine.impl.cfg.BaseTransactionContext;
 
 /**
+ * Holder for a threadlocal stack of {@link BaseTransactionContext} objects.
+ * Different engines (process/idm/dmn/form/...) use this 'shared' object
+ * to see if another engine has already started a transaction or not. 
+ * 
  * @author Joram Barrez
  */
 @SuppressWarnings("rawtypes")

@@ -21,6 +21,15 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 /**
+ * A wrapper for a {@link DataSource}, to be used by a 'dependent' engine 
+ * (e.g. IDM/DMN/Form, NOT the process engine). The process engine 
+ * will have created a valid transaction context and typically openend a {@link Connection}.
+ * 
+ * This implementation will check for such an active transaction context
+ * and reuse an existing context and connection, such that the transaction
+ * and connection is shared between engines.
+ * Note that this only applies to the 'standalone mybatis' engine setup.
+ * 
  * @author Joram Barrez
  */
 public class TransactionContextAwareDataSource implements DataSource {
