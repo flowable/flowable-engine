@@ -12,7 +12,7 @@
  */
 package org.activiti5.engine.impl.cmd;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.ActivitiObjectNotFoundException;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
@@ -53,7 +53,7 @@ public class SetDeploymentCategoryCmd implements Command<Void> {
     
     if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_UPDATED, deployment));
+    			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_UPDATED, deployment));
     }
     
     return null;

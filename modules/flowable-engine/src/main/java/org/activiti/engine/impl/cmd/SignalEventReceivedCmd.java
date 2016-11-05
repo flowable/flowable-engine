@@ -20,7 +20,7 @@ import java.util.Map;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.Command;
@@ -107,7 +107,7 @@ public class SignalEventReceivedCmd implements Command<Void> {
           
         } else {
           Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-              ActivitiEventBuilder.createSignalEvent(ActivitiEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventName, 
+              ActivitiEventBuilder.createSignalEvent(ActivitiEngineEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventName, 
                   payload, signalEventSubscriptionEntity.getExecutionId(), signalEventSubscriptionEntity.getProcessInstanceId(), 
                   signalEventSubscriptionEntity.getProcessDefinitionId()));
           

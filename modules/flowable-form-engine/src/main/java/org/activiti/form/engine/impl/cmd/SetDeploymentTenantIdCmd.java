@@ -15,9 +15,9 @@ package org.activiti.form.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.form.api.Form;
-import org.activiti.form.engine.ActivitiFormIllegalArgumentException;
-import org.activiti.form.engine.ActivitiFormObjectNotFoundException;
 import org.activiti.form.engine.impl.FormQueryImpl;
 import org.activiti.form.engine.impl.interceptor.Command;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
@@ -40,14 +40,14 @@ public class SetDeploymentTenantIdCmd implements Command<Void>, Serializable {
 
   public Void execute(CommandContext commandContext) {
     if (deploymentId == null) {
-      throw new ActivitiFormIllegalArgumentException("deploymentId is null");
+      throw new ActivitiIllegalArgumentException("deploymentId is null");
     }
 
     // Update all entities
 
     FormDeploymentEntity deployment = commandContext.getDeploymentEntityManager().findById(deploymentId);
     if (deployment == null) {
-      throw new ActivitiFormObjectNotFoundException("Could not find deployment with id " + deploymentId);
+      throw new ActivitiObjectNotFoundException("Could not find deployment with id " + deploymentId);
     }
     
     deployment.setTenantId(newTenantId);

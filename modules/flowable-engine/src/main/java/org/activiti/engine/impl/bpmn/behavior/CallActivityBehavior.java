@@ -28,7 +28,7 @@ import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
@@ -116,11 +116,13 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     boolean eventDispatcherEnabled = Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled();
     if (eventDispatcherEnabled) {
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEventType.PROCESS_CREATED, subProcessInstance));
+          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.PROCESS_CREATED, subProcessInstance));
     }
 
     // process template-defined data objects
-    Map<String, Object> variables = processDataObjects(subProcess.getDataObjects());
+    subProcessInstance.setVariables(processDataObjects(subProcess.getDataObjects()));
+    
+    Map<String, Object> variables = new HashMap<String,Object>();
     
     if (callActivity.isInheritVariables()) {
       Map<String, Object> executionVariables = execution.getVariables();

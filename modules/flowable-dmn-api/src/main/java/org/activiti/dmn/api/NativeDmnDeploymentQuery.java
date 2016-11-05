@@ -1,5 +1,7 @@
 package org.activiti.dmn.api;
 
+import org.activiti.engine.query.NativeQuery;
+
 /**
  * Allows querying of {@link org.activiti.engine.repository.DmnDeployment}s via native (SQL) queries
  * 

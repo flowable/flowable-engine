@@ -14,9 +14,9 @@ package org.activiti.idm.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.impl.persistence.entity.Entity;
 import org.activiti.idm.api.Group;
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
-import org.activiti.idm.engine.impl.db.Entity;
 import org.activiti.idm.engine.impl.interceptor.Command;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 import org.activiti.idm.engine.impl.persistence.entity.GroupEntity;
@@ -35,7 +35,7 @@ public class SaveGroupCmd implements Command<Void>, Serializable {
 
   public Void execute(CommandContext commandContext) {
     if (group == null) {
-      throw new ActivitiIdmIllegalArgumentException("group is null");
+      throw new ActivitiIllegalArgumentException("group is null");
     }
 
     if (commandContext.getGroupEntityManager().isNewGroup(group)) {

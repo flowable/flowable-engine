@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.delegate.VariableScope;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.calendar.BusinessCalendar;
 import org.activiti.engine.impl.calendar.CycleBusinessCalendar;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -157,9 +157,9 @@ public class TimerJobEntity extends AbstractJobEntity {
     
     if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_CREATED, this));
+          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_CREATED, this));
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_INITIALIZED, this));
+          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_INITIALIZED, this));
     }
   }
   
@@ -181,7 +181,7 @@ public class TimerJobEntity extends AbstractJobEntity {
 
     if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_DELETED, this));
+          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_DELETED, this));
     }
   }
 

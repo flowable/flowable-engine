@@ -33,7 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.ActivitiVariableEvent;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiOptimisticLockingException;
@@ -925,7 +925,7 @@ public class DbSqlSession implements Session {
   }
 
   protected static ActivitiVariableEvent createVariableDeleteEvent(VariableInstanceEntity variableInstance) {
-    return ActivitiEventBuilder.createVariableEvent(ActivitiEventType.VARIABLE_DELETED, variableInstance.getName(), null, variableInstance.getType(),
+    return ActivitiEventBuilder.createVariableEvent(ActivitiEngineEventType.VARIABLE_DELETED, variableInstance.getName(), null, variableInstance.getType(),
     		variableInstance.getTaskId(), variableInstance.getExecutionId(), variableInstance.getProcessInstanceId(), null);
   }
 

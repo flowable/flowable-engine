@@ -17,7 +17,7 @@ import java.util.Map;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.delegate.TaskListener;
 import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.identity.Authentication;
@@ -73,9 +73,9 @@ public class TaskHelper {
     ActivitiEventDispatcher eventDispatcher = Context.getProcessEngineConfiguration().getEventDispatcher();
     if (eventDispatcher.isEnabled()) {
       if (variables != null) {
-        eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityWithVariablesEvent(ActivitiEventType.TASK_COMPLETED, taskEntity, variables, localScope));
+        eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityWithVariablesEvent(ActivitiEngineEventType.TASK_COMPLETED, taskEntity, variables, localScope));
       } else {
-        eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.TASK_COMPLETED, taskEntity));
+        eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.TASK_COMPLETED, taskEntity));
       }
     }
 

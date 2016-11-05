@@ -16,6 +16,7 @@ package org.activiti.dmn.engine.impl.context;
 import java.util.Stack;
 
 import org.activiti.dmn.engine.DmnEngineConfiguration;
+import org.activiti.dmn.engine.impl.cfg.TransactionContext;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
 
 /**
@@ -26,6 +27,7 @@ public class Context {
 
   protected static ThreadLocal<Stack<CommandContext>> commandContextThreadLocal = new ThreadLocal<Stack<CommandContext>>();
   protected static ThreadLocal<Stack<DmnEngineConfiguration>> dmnEngineConfigurationStackThreadLocal = new ThreadLocal<Stack<DmnEngineConfiguration>>();
+  protected static ThreadLocal<Stack<TransactionContext>> transactionContextThreadLocal = new ThreadLocal<Stack<TransactionContext>>();
   
   public static CommandContext getCommandContext() {
     Stack<CommandContext> stack = getStack(commandContextThreadLocal);
@@ -57,6 +59,22 @@ public class Context {
 
   public static void removeDmnEngineConfiguration() {
     getStack(dmnEngineConfigurationStackThreadLocal).pop();
+  }
+  
+  public static TransactionContext getTransactionContext() {
+    Stack<TransactionContext> stack = getStack(transactionContextThreadLocal);
+    if (stack.isEmpty()) {
+      return null;
+    }
+    return stack.peek();
+  }
+  
+  public static void setTransactionContext(TransactionContext transactionContext) {
+    getStack(transactionContextThreadLocal).push(transactionContext);
+  }
+  
+  public static void removeTransactionContext() {
+    getStack(transactionContextThreadLocal).pop();
   }
   
   protected static <T> Stack<T> getStack(ThreadLocal<Stack<T>> threadLocal) {

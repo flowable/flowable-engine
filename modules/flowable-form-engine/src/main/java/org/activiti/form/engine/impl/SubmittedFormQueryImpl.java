@@ -18,9 +18,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.impl.Page;
 import org.activiti.form.api.SubmittedForm;
 import org.activiti.form.api.SubmittedFormQuery;
-import org.activiti.form.engine.ActivitiFormIllegalArgumentException;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
 import org.activiti.form.engine.impl.interceptor.CommandExecutor;
 
@@ -138,7 +139,7 @@ public class SubmittedFormQueryImpl extends AbstractQuery<SubmittedFormQuery, Su
 
   public SubmittedFormQueryImpl deploymentTenantId(String tenantId) {
     if (tenantId == null) {
-      throw new ActivitiFormIllegalArgumentException("deploymentTenantId is null");
+      throw new ActivitiIllegalArgumentException("deploymentTenantId is null");
     }
     this.tenantId = tenantId;
     return this;
@@ -146,7 +147,7 @@ public class SubmittedFormQueryImpl extends AbstractQuery<SubmittedFormQuery, Su
 
   public SubmittedFormQueryImpl deploymentTenantIdLike(String tenantIdLike) {
     if (tenantIdLike == null) {
-      throw new ActivitiFormIllegalArgumentException("deploymentTenantIdLike is null");
+      throw new ActivitiIllegalArgumentException("deploymentTenantIdLike is null");
     }
     this.tenantIdLike = tenantIdLike;
     return this;

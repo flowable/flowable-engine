@@ -14,9 +14,9 @@ package org.activiti.idm.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.impl.persistence.entity.Entity;
 import org.activiti.idm.api.User;
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
-import org.activiti.idm.engine.impl.db.Entity;
 import org.activiti.idm.engine.impl.interceptor.Command;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 import org.activiti.idm.engine.impl.persistence.entity.UserEntity;
@@ -35,7 +35,7 @@ public class SaveUserCmd implements Command<Void>, Serializable {
 
   public Void execute(CommandContext commandContext) {
     if (user == null) {
-      throw new ActivitiIdmIllegalArgumentException("user is null");
+      throw new ActivitiIllegalArgumentException("user is null");
     }
     if (commandContext.getUserEntityManager().isNewUser(user)) {
       if (user instanceof UserEntity) {

@@ -13,6 +13,8 @@
 
 package org.activiti.form.engine.impl.interceptor;
 
+import org.activiti.engine.impl.interceptor.CommandConfig;
+
 /**
  * @author Tom Baeyens
  */

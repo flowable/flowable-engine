@@ -13,12 +13,13 @@
 
 package org.activiti.rest.form;
 
-import org.activiti.form.engine.ActivitiFormIllegalArgumentException;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import java.text.MessageFormat;
 
 import javax.servlet.http.HttpServletRequest;
-import java.text.MessageFormat;
+
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 /**
  * Helper class for building URLs based on a base URL.
@@ -53,7 +54,7 @@ public class FormRestUrlBuilder {
   /** Uses baseUrl as the base URL */
   public static FormRestUrlBuilder usingBaseUrl(String baseUrl) {
     if (baseUrl == null) {
-      throw new ActivitiFormIllegalArgumentException("baseUrl can not be null");
+      throw new ActivitiIllegalArgumentException("baseUrl can not be null");
     }
     if (baseUrl.endsWith("/")) {
       baseUrl = baseUrl.substring(0, baseUrl.length() - 1);

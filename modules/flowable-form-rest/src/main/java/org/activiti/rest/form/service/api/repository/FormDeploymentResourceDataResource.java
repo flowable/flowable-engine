@@ -12,22 +12,23 @@
  */
 package org.activiti.rest.form.service.api.repository;
 
+import java.io.InputStream;
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.form.api.FormDeployment;
 import org.activiti.form.api.FormRepositoryService;
-import org.activiti.form.engine.ActivitiFormException;
-import org.activiti.form.engine.ActivitiFormIllegalArgumentException;
-import org.activiti.form.engine.ActivitiFormObjectNotFoundException;
-import org.activiti.rest.form.common.ContentTypeResolver;
+import org.activiti.rest.application.ContentTypeResolver;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.InputStream;
-import java.util.List;
 
 /**
  * @author Yvo Swillens
@@ -45,16 +46,16 @@ public class FormDeploymentResourceDataResource {
   byte[] getFormDeploymentResource(@PathVariable("deploymentId") String deploymentId, @PathVariable("resourceId") String resourceId, HttpServletResponse response) {
 
     if (deploymentId == null) {
-      throw new ActivitiFormIllegalArgumentException("No deployment id provided");
+      throw new ActivitiIllegalArgumentException("No deployment id provided");
     }
     if (resourceId == null) {
-      throw new ActivitiFormIllegalArgumentException("No resource id provided");
+      throw new ActivitiIllegalArgumentException("No resource id provided");
     }
 
     // Check if deployment exists
     FormDeployment deployment = formRepositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
     if (deployment == null) {
-      throw new ActivitiFormObjectNotFoundException("Could not find a form deployment with id '" + deploymentId);
+      throw new ActivitiObjectNotFoundException("Could not find a form deployment with id '" + deploymentId);
     }
 
     List<String> resourceList = formRepositoryService.getDeploymentResourceNames(deploymentId);
@@ -67,11 +68,11 @@ public class FormDeploymentResourceDataResource {
       try {
         return IOUtils.toByteArray(resourceStream);
       } catch (Exception e) {
-        throw new ActivitiFormException("Error converting resource stream", e);
+        throw new ActivitiException("Error converting resource stream", e);
       }
     } else {
       // Resource not found in deployment
-      throw new ActivitiFormObjectNotFoundException("Could not find a resource with id '" + resourceId + "' in deployment '" + deploymentId);
+      throw new ActivitiObjectNotFoundException("Could not find a resource with id '" + resourceId + "' in deployment '" + deploymentId);
     }
   }
 }

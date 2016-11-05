@@ -19,7 +19,7 @@ import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.history.DeleteReason;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -116,11 +116,11 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
 
         MultiInstanceActivityBehavior multiInstanceBehavior = (MultiInstanceActivityBehavior) callActivity.getBehavior();
         multiInstanceBehavior.leave(callActivityExecution);
-        executionEntityManager.deleteProcessInstanceExecutionEntity(scopeExecutionEntity.getId(), execution.getCurrentFlowElement().getId(), "terminate end event", false, false, true);
+        executionEntityManager.deleteProcessInstanceExecutionEntity(scopeExecutionEntity.getId(), execution.getCurrentFlowElement().getId(), "terminate end event", false, false);
 
       } else {
 
-        executionEntityManager.deleteProcessInstanceExecutionEntity(scopeExecutionEntity.getId(), execution.getCurrentFlowElement().getId(), "terminate end event", false, false, true);
+        executionEntityManager.deleteProcessInstanceExecutionEntity(scopeExecutionEntity.getId(), execution.getCurrentFlowElement().getId(), "terminate end event", false, false);
         ExecutionEntity superExecutionEntity = executionEntityManager.findById(scopeExecutionEntity.getSuperExecutionId());
         commandContext.getAgenda().planTakeOutgoingSequenceFlowsOperation(superExecutionEntity, true);
 
@@ -145,7 +145,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
       ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
       if (config != null && config.getEventDispatcher().isEnabled()) {
         config.getEventDispatcher().dispatchEvent(
-            ActivitiEventBuilder.createEntityEvent(ActivitiEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
+            ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
       }
     }
     

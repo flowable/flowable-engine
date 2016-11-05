@@ -13,7 +13,7 @@
 
 package org.activiti.idm.engine.test;
 
-import org.activiti.idm.engine.ActivitiIdmException;
+import org.activiti.engine.ActivitiException;
 import org.activiti.idm.engine.IdmEngine;
 import org.activiti.idm.engine.IdmEngines;
 import org.slf4j.Logger;
@@ -43,7 +43,7 @@ public abstract class PluggableActivitiIdmTestCase extends AbstractActivitiIdmTe
 
       cachedIdmEngine = IdmEngines.getDefaultIdmEngine();
       if (cachedIdmEngine == null) {
-        throw new ActivitiIdmException("no default idm engine available");
+        throw new ActivitiException("no default idm engine available");
       }
     }
     

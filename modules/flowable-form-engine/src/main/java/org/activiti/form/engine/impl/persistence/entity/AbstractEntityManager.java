@@ -12,10 +12,11 @@
  */
 package org.activiti.form.engine.impl.persistence.entity;
 
+import org.activiti.engine.impl.persistence.entity.Entity;
+import org.activiti.engine.impl.persistence.entity.EntityManager;
+import org.activiti.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.form.engine.FormEngineConfiguration;
-import org.activiti.form.engine.impl.db.Entity;
 import org.activiti.form.engine.impl.persistence.AbstractManager;
-import org.activiti.form.engine.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Joram Barrez
@@ -42,11 +43,21 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
 
   @Override
   public void insert(EntityImpl entity) {
+    insert(entity, true);
+  }
+  
+  @Override
+  public void insert(EntityImpl entity, boolean fireEvent) {
     getDataManager().insert(entity);
   }
   
   @Override
   public EntityImpl update(EntityImpl entity) {
+    return update(entity, true);
+  }
+  
+  @Override
+  public EntityImpl update(EntityImpl entity, boolean fireEvent) {
     EntityImpl updatedEntity = getDataManager().update(entity);
     
     return updatedEntity;
@@ -60,6 +71,11 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
   
   @Override
   public void delete(EntityImpl entity) {
+    delete(entity, true);
+  }
+  
+  @Override
+  public void delete(EntityImpl entity, boolean fireEvent) {
     getDataManager().delete(entity);
   }
 

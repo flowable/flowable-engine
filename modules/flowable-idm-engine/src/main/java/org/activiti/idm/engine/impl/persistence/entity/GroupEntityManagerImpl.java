@@ -16,14 +16,14 @@ package org.activiti.idm.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.impl.Page;
+import org.activiti.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.GroupQuery;
 import org.activiti.idm.api.event.ActivitiIdmEventType;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.delegate.event.impl.ActivitiIdmEventBuilder;
 import org.activiti.idm.engine.impl.GroupQueryImpl;
-import org.activiti.idm.engine.impl.Page;
-import org.activiti.idm.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.GroupDataManager;
 
 /**

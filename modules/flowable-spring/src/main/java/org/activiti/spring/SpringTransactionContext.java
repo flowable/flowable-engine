@@ -16,6 +16,7 @@ package org.activiti.spring;
 import org.activiti.engine.impl.cfg.TransactionContext;
 import org.activiti.engine.impl.cfg.TransactionListener;
 import org.activiti.engine.impl.cfg.TransactionState;
+import org.activiti.engine.impl.interceptor.AbstractCommandContext;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.springframework.core.Ordered;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -32,13 +33,13 @@ public class SpringTransactionContext implements TransactionContext {
   protected CommandContext commandContext;
   protected Integer transactionSynchronizationAdapterOrder;
 
-  public SpringTransactionContext(PlatformTransactionManager transactionManager, CommandContext commandContext) {
+  public SpringTransactionContext(PlatformTransactionManager transactionManager, AbstractCommandContext commandContext) {
     this(transactionManager, commandContext, null);
   }
 
-  public SpringTransactionContext(PlatformTransactionManager transactionManager, CommandContext commandContext, Integer transactionSynchronizationAdapterOrder) {
+  public SpringTransactionContext(PlatformTransactionManager transactionManager, AbstractCommandContext commandContext, Integer transactionSynchronizationAdapterOrder) {
     this.transactionManager = transactionManager;
-    this.commandContext = commandContext;
+    this.commandContext = (CommandContext) commandContext;
     if (transactionSynchronizationAdapterOrder != null) {
       this.transactionSynchronizationAdapterOrder = transactionSynchronizationAdapterOrder;
     } else {

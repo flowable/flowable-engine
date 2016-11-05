@@ -33,7 +33,6 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.activiti.dmn.converter.util.DmnXMLUtil;
-import org.activiti.dmn.converter.util.InputStreamProvider;
 import org.activiti.dmn.model.Decision;
 import org.activiti.dmn.model.DecisionRule;
 import org.activiti.dmn.model.DecisionTable;
@@ -48,6 +47,7 @@ import org.activiti.dmn.model.RuleInputClauseContainer;
 import org.activiti.dmn.model.RuleOutputClauseContainer;
 import org.activiti.dmn.xml.constants.DmnXMLConstants;
 import org.activiti.dmn.xml.exception.DmnXMLException;
+import org.activiti.engine.io.InputStreamProvider;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -25,15 +25,36 @@ activitiAdminApp.controller('EngineController', ['$rootScope', '$scope', '$http'
 
 
         // Show popup to edit the Flowable endpoint
-        $scope.editEndpointConfig = function () {
-            if ($scope.activeServer) {
-                showEditpointConfigModel($scope.activeServer);
+        $scope.editProcessEndpointConfig = function () {
+            editEndpointConfig(1);
+        };
+
+        $scope.editDmnEndpointConfig = function () {
+            editEndpointConfig(2);
+        };
+
+        $scope.editFormEndpointConfig = function () {
+            editEndpointConfig(3);
+        };
+
+        var editEndpointConfig = function (endpointType) {
+
+            var selectedServer;
+
+            if (endpointType === 1) {
+                selectedServer = $rootScope.activeServers['process'];
+            } else if (endpointType === 2) {
+                selectedServer = $rootScope.activeServers['dmn'];
+            } else if (endpointType === 3) {
+                selectedServer = $rootScope.activeServers['form'];
+            }
+
+            if (selectedServer) {
+                showEditpointConfigModel(selectedServer);
             } else {
                 // load default endpoint configs properties
-                $http({
-                    method: 'GET',
-                    url: '/app/rest/server-configs/default'
-                }).success(function (defaultServerconfig, status, headers, config) {
+                $http({method: 'GET', url: '/app/rest/server-configs/default/'+endpointType}).
+                success(function(defaultServerconfig, status, headers, config) {
                     showEditpointConfigModel(defaultServerconfig);
                 });
             }
@@ -57,7 +78,13 @@ activitiAdminApp.controller('EngineController', ['$rootScope', '$scope', '$http'
                 modalInstance.result.then(function (result) {
                     if (result) {
                         $scope.addAlert($translate.instant('ALERT.ENGINE.ENDPOINT-UPDATED', result), 'info');
-                        $rootScope.activeServer = result;
+                        if (endpointType === 1) {
+                            $rootScope.activeServers['process'] = result;
+                        } else if (endpointType === 2) {
+                            $rootScope.activeServers['dmn'] = result;
+                        } else if (endpointType === 3) {
+                            $rootScope.activeServers['form'] = result;
+                        }
                     }
                 });
             }
@@ -80,9 +107,9 @@ activitiAdminApp.controller('EngineController', ['$rootScope', '$scope', '$http'
                 method: 'GET',
                 url: '/app/rest/activiti/engine-info/'+endpointType,
                 ignoreErrors: true
-            }).success(function (data, status, headers, config) {
+            }).success(function (data) {
                 $scope.addAlert($translate.instant('ALERT.ENGINE.ENDPOINT-VALID', data), 'info');
-            }).error(function (data, status, headers, config) {
+            }).error(function () {
                 $scope.addAlert($translate.instant('ALERT.ENGINE.ENDPOINT-INVALID', $rootScope.activeServer), 'error');
             });
         };
@@ -95,8 +122,6 @@ activitiAdminApp.controller('EditEndpointConfigModalInstanceCrtl',
         $scope.model = {server: server};
 
         $scope.status = {loading: false};
-
-        console.log($scope.model.server);
 
         $scope.ok = function () {
             $scope.status.loading = true;

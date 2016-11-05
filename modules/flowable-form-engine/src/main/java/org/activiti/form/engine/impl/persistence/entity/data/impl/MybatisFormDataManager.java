@@ -16,11 +16,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.impl.Page;
 import org.activiti.form.api.Form;
-import org.activiti.form.engine.ActivitiFormException;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.FormQueryImpl;
-import org.activiti.form.engine.impl.Page;
 import org.activiti.form.engine.impl.persistence.entity.FormEntity;
 import org.activiti.form.engine.impl.persistence.entity.FormEntityImpl;
 import org.activiti.form.engine.impl.persistence.entity.data.AbstractDataManager;
@@ -117,7 +117,7 @@ public class MybatisFormDataManager extends AbstractDataManager<FormEntity> impl
     if (results.size() == 1) {
       return results.get(0);
     } else if (results.size() > 1) {
-      throw new ActivitiFormException("There are " + results.size() + " forms with key = '" + formDefinitionKey + "' and version = '" + formVersion + "'.");
+      throw new ActivitiException("There are " + results.size() + " forms with key = '" + formDefinitionKey + "' and version = '" + formVersion + "'.");
     }
     return null;
   }
@@ -133,7 +133,7 @@ public class MybatisFormDataManager extends AbstractDataManager<FormEntity> impl
     if (results.size() == 1) {
       return results.get(0);
     } else if (results.size() > 1) {
-      throw new ActivitiFormException("There are " + results.size() + " forms with key = '" + formDefinitionKey + "' and version = '" + formVersion + "'.");
+      throw new ActivitiException("There are " + results.size() + " forms with key = '" + formDefinitionKey + "' and version = '" + formVersion + "'.");
     }
     return null;
   }

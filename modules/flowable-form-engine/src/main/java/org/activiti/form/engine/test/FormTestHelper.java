@@ -18,10 +18,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.form.api.FormDeployment;
 import org.activiti.form.api.FormDeploymentBuilder;
 import org.activiti.form.api.FormRepositoryService;
-import org.activiti.form.engine.ActivitiFormObjectNotFoundException;
 import org.activiti.form.engine.FormEngine;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.deployer.ParsedDeploymentBuilder;
@@ -78,7 +78,7 @@ public abstract class FormTestHelper {
     if (deploymentId != null) {
       try {
         formEngine.getFormRepositoryService().deleteDeployment(deploymentId);
-      } catch (ActivitiFormObjectNotFoundException e) {
+      } catch (ActivitiObjectNotFoundException e) {
         // Deployment was already deleted by the test case. Ignore.
       }
     }

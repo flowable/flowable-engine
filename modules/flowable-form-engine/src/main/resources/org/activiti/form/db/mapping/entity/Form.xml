@@ -198,14 +198,14 @@
       and TENANT_ID_ = #{tenantId}
   </select>
   
-  <select id="selectFormsByKeyAndVersion" parameterType="org.activiti.form.engine.impl.db.ListQueryParameterObject" resultMap="formResultMap">
+  <select id="selectFormsByKeyAndVersion" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="formResultMap">
     select *
     from ${prefix}ACT_FO_FORM_DEFINITION 
     where KEY_ = #{parameter.formDefinitionKey} and VERSION_ = #{parameter.formVersion} and (TENANT_ID_ = '' or TENANT_ID_ is null)
   </select>
     
   
-   <select id="selectFormsByKeyAndVersionAndTenantId" parameterType="org.activiti.form.engine.impl.db.ListQueryParameterObject" resultMap="formResultMap">
+   <select id="selectFormsByKeyAndVersionAndTenantId" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="formResultMap">
     select *
     from ${prefix}ACT_FO_FORM_DEFINITION 
     where KEY_ = #{parameter.formDefinitionKey} and VERSION_ = #{parameter.formVersion} and TENANT_ID_ = #{parameter.tenantId}

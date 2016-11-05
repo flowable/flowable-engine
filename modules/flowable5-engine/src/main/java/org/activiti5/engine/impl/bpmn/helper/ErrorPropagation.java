@@ -16,7 +16,7 @@ package org.activiti5.engine.impl.bpmn.helper;
 import java.util.List;
 
 import org.activiti.bpmn.model.MapExceptionEntry;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.ActivitiActivityExecutionException;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.delegate.BpmnError;
@@ -73,7 +73,7 @@ public class ErrorPropagation {
         // dispatch process completed event
         if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
           Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                  ActivitiEventBuilder.createEntityEvent(ActivitiEventType.PROCESS_COMPLETED_WITH_ERROR_END_EVENT, execution));
+                  ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.PROCESS_COMPLETED_WITH_ERROR_END_EVENT, execution));
         }
       }
       execution = getSuperExecution(execution);
@@ -182,7 +182,7 @@ public class ErrorPropagation {
   private static void executeEventHandler(ActivityImpl borderEventActivity, ActivityExecution leavingExecution, String errorCode) {  
   	if(Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
   		Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-  				ActivitiEventBuilder.createErrorEvent(ActivitiEventType.ACTIVITY_ERROR_RECEIVED, borderEventActivity.getId(), errorCode, leavingExecution.getId(), leavingExecution.getProcessInstanceId(), leavingExecution.getProcessDefinitionId()));
+  				ActivitiEventBuilder.createErrorEvent(ActivitiEngineEventType.ACTIVITY_ERROR_RECEIVED, borderEventActivity.getId(), errorCode, leavingExecution.getId(), leavingExecution.getProcessInstanceId(), leavingExecution.getProcessDefinitionId()));
   	}
   	
   	// The current activity of the execution will be changed in the next lines.

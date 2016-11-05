@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.calendar.DurationHelper;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.Job;
@@ -138,9 +138,9 @@ public class JobRetryCmd implements Command<Object> {
     ActivitiEventDispatcher eventDispatcher = commandContext.getEventDispatcher();
     if (eventDispatcher.isEnabled()) {
       eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(
-          ActivitiEventType.ENTITY_UPDATED, newJobEntity));
+          ActivitiEngineEventType.ENTITY_UPDATED, newJobEntity));
       eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(
-          ActivitiEventType.JOB_RETRIES_DECREMENTED, newJobEntity));
+          ActivitiEngineEventType.JOB_RETRIES_DECREMENTED, newJobEntity));
     }
     
     return null;

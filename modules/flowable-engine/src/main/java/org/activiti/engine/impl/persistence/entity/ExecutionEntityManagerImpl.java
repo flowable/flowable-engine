@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.ActivitiObjectNotFoundException;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.history.DeleteReason;
 import org.activiti.engine.impl.ExecutionQueryImpl;
@@ -244,7 +244,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
     
     // Fire events
     if (getEventDispatcher().isEnabled()) {
-      getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_CREATED, processInstanceExecution));
+      getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_CREATED, processInstanceExecution));
     }
 
     return processInstanceExecution;
@@ -275,8 +275,8 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
     }
 
     if (getEventDispatcher().isEnabled()) {
-      getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_CREATED, childExecution));
-      getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_INITIALIZED, childExecution));
+      getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_CREATED, childExecution));
+      getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_INITIALIZED, childExecution));
     }
 
     return childExecution;
@@ -305,7 +305,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
     superExecutionEntity.setSubProcessInstance(subProcessInstance);
 
     if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-      Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_CREATED, subProcessInstance));
+      Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_CREATED, subProcessInstance));
     }
 
     return subProcessInstance;
@@ -423,7 +423,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
   
   @Override
   public void deleteProcessInstanceExecutionEntity(String processInstanceId, 
-      String currentFlowElementId, String deleteReason, boolean cascade, boolean cancel, boolean fireEvent) {
+      String currentFlowElementId, String deleteReason, boolean cascade, boolean cancel) {
     
     ExecutionEntity processInstanceEntity = findById(processInstanceId);
     
@@ -453,7 +453,12 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
     deleteExecutionAndRelatedData(processInstanceEntity, deleteReason, cancel);
     
     if (getEventDispatcher().isEnabled()) {
-      getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.PROCESS_COMPLETED, processInstanceEntity));
+      if (!cancel) {
+          getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.PROCESS_COMPLETED, processInstanceEntity));
+      } else {
+          getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createCancelledEvent(processInstanceEntity.getId(), 
+              processInstanceEntity.getId(), processInstanceEntity.getProcessDefinitionId(), deleteReason));
+      }
     }
 
     // TODO: what about delete reason?
@@ -588,7 +593,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
       for (TimerJobEntity job : timerJobsForExecution) {
         timerJobEntityManager.delete(job);
         if (getEventDispatcher().isEnabled()) {
-          getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.JOB_CANCELED, job));
+          getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.JOB_CANCELED, job));
         }
       }
     }
@@ -600,7 +605,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
       for (JobEntity job : jobsForExecution) {
         getJobEntityManager().delete(job);
         if (getEventDispatcher().isEnabled()) {
-          getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.JOB_CANCELED, job));
+          getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.JOB_CANCELED, job));
         }
       }
     }
@@ -612,7 +617,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
       for (SuspendedJobEntity job : suspendedJobsForExecution) {
         suspendedJobEntityManager.delete(job);
         if (getEventDispatcher().isEnabled()) {
-          getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.JOB_CANCELED, job));
+          getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.JOB_CANCELED, job));
         }
       }
     }
@@ -624,7 +629,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
       for (DeadLetterJobEntity job : deadLetterJobsForExecution) {
         deadLetterJobEntityManager.delete(job);
         if (getEventDispatcher().isEnabled()) {
-          getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.JOB_CANCELED, job));
+          getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.JOB_CANCELED, job));
         }
       }
     }
@@ -639,7 +644,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
 
         if (MessageEventSubscriptionEntity.EVENT_TYPE.equals(eventSubscription.getEventType())) {
           if (getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createMessageEvent(ActivitiEventType.ACTIVITY_MESSAGE_CANCELLED,
+            getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createMessageEvent(ActivitiEngineEventType.ACTIVITY_MESSAGE_CANCELLED,
                     eventSubscription.getActivityId(), eventSubscription.getEventName(), null, eventSubscription.getExecutionId(),
                     eventSubscription.getProcessInstanceId(), eventSubscription.getProcessDefinitionId()));
           }
@@ -676,7 +681,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
       getHistoryManager().updateProcessBusinessKeyInHistory(executionEntity);
 
       if (getEventDispatcher().isEnabled()) {
-        getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_UPDATED, executionEntity));
+        getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_UPDATED, executionEntity));
       }
 
       return businessKey;

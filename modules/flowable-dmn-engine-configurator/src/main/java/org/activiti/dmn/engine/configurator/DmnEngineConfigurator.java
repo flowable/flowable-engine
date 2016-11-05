@@ -15,10 +15,10 @@ package org.activiti.dmn.engine.configurator;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.dmn.engine.ActivitiDmnException;
 import org.activiti.dmn.engine.DmnEngine;
 import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.deployer.DmnDeployer;
+import org.activiti.engine.ActivitiException;
 import org.activiti.engine.cfg.AbstractProcessEngineConfigurator;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.persistence.deploy.Deployer;
@@ -53,7 +53,7 @@ public class DmnEngineConfigurator extends AbstractProcessEngineConfigurator {
   protected synchronized void initDmnEngine() {
     if (dmnEngine == null) {
       if (dmnEngineConfiguration == null) {
-        throw new ActivitiDmnException("DmnEngineConfiguration is required");
+        throw new ActivitiException("DmnEngineConfiguration is required");
       }
       
       dmnEngine = dmnEngineConfiguration.buildDmnEngine();

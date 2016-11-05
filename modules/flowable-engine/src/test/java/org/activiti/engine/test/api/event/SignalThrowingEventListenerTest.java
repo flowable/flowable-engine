@@ -15,7 +15,7 @@ package org.activiti.engine.test.api.event;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.bpmn.helper.SignalThrowingEventListener;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti.engine.runtime.Job;
@@ -38,7 +38,7 @@ public class SignalThrowingEventListenerTest extends PluggableActivitiTestCase {
       listener.setSignalName("Signal");
       listener.setProcessInstanceScope(true);
 
-      processEngineConfiguration.getEventDispatcher().addEventListener(listener, ActivitiEventType.TASK_ASSIGNED);
+      processEngineConfiguration.getEventDispatcher().addEventListener(listener, ActivitiEngineEventType.TASK_ASSIGNED);
 
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSignal");
       assertNotNull(processInstance);
@@ -91,7 +91,7 @@ public class SignalThrowingEventListenerTest extends PluggableActivitiTestCase {
       listener = new SignalThrowingEventListener();
       listener.setSignalName("Signal");
       listener.setProcessInstanceScope(true);
-      processEngineConfiguration.getEventDispatcher().addEventListener(listener, ActivitiEventType.TASK_ASSIGNED);
+      processEngineConfiguration.getEventDispatcher().addEventListener(listener, ActivitiEngineEventType.TASK_ASSIGNED);
 
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSignal");
       assertNotNull(processInstance);
@@ -125,7 +125,7 @@ public class SignalThrowingEventListenerTest extends PluggableActivitiTestCase {
       listener = new SignalThrowingEventListener();
       listener.setSignalName("Signal");
       listener.setProcessInstanceScope(true);
-      processEngineConfiguration.getEventDispatcher().addEventListener(listener, ActivitiEventType.JOB_RETRIES_DECREMENTED);
+      processEngineConfiguration.getEventDispatcher().addEventListener(listener, ActivitiEngineEventType.JOB_RETRIES_DECREMENTED);
 
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSignal");
       assertNotNull(processInstance);
@@ -171,7 +171,7 @@ public class SignalThrowingEventListenerTest extends PluggableActivitiTestCase {
       listener = new SignalThrowingEventListener();
       listener.setSignalName("Signal");
       listener.setProcessInstanceScope(true);
-      processEngineConfiguration.getEventDispatcher().addEventListener(listener, ActivitiEventType.JOB_EXECUTION_FAILURE);
+      processEngineConfiguration.getEventDispatcher().addEventListener(listener, ActivitiEngineEventType.JOB_EXECUTION_FAILURE);
 
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSignal");
       assertNotNull(processInstance);
@@ -218,7 +218,7 @@ public class SignalThrowingEventListenerTest extends PluggableActivitiTestCase {
       listener = new SignalThrowingEventListener();
       listener.setSignalName("Signal");
       listener.setProcessInstanceScope(false);
-      processEngineConfiguration.getEventDispatcher().addEventListener(listener, ActivitiEventType.TASK_ASSIGNED);
+      processEngineConfiguration.getEventDispatcher().addEventListener(listener, ActivitiEngineEventType.TASK_ASSIGNED);
 
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("globalSignalProcess");
       assertNotNull(processInstance);

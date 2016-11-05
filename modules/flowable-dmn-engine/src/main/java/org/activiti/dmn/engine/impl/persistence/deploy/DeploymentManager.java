@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.dmn.api.DecisionTable;
-import org.activiti.dmn.engine.ActivitiDmnException;
-import org.activiti.dmn.engine.ActivitiDmnObjectNotFoundException;
 import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.impl.DecisionTableQueryImpl;
 import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntity;
@@ -26,6 +24,8 @@ import org.activiti.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.activiti.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManager;
 import org.activiti.dmn.engine.impl.persistence.entity.ResourceEntity;
 import org.activiti.dmn.model.DmnDefinition;
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 
 /**
  * @author Tijs Rademakers
@@ -57,7 +57,7 @@ public class DeploymentManager {
 
   public DecisionTableEntity findDeployedDecisionById(String decisionId) {
     if (decisionId == null) {
-      throw new ActivitiDmnException("Invalid decision id : null");
+      throw new ActivitiException("Invalid decision id : null");
     }
 
     // first try the cache
@@ -67,7 +67,7 @@ public class DeploymentManager {
     if (decisionTable == null) {
       decisionTable = engineConfig.getDecisionTableEntityManager().findById(decisionId);
       if (decisionTable == null) {
-        throw new ActivitiDmnObjectNotFoundException("no deployed decision found with id '" + decisionId + "'");
+        throw new ActivitiObjectNotFoundException("no deployed decision found with id '" + decisionId + "'");
       }
       decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
     }
@@ -78,7 +78,7 @@ public class DeploymentManager {
     DecisionTableEntity decisionTable = decisionTableEntityManager.findLatestDecisionTableByKey(decisionKey);
 
     if (decisionTable == null) {
-      throw new ActivitiDmnObjectNotFoundException("no decisions deployed with key '" + decisionKey + "'");
+      throw new ActivitiObjectNotFoundException("no decisions deployed with key '" + decisionKey + "'");
     }
     decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
     return decisionTable;
@@ -88,7 +88,7 @@ public class DeploymentManager {
     DecisionTableEntity decisionTable = decisionTableEntityManager.findLatestDecisionTableByKeyAndTenantId(decisionKey, tenantId);
     
     if (decisionTable == null) {
-      throw new ActivitiDmnObjectNotFoundException("no decisions deployed with key '" + decisionKey + "' for tenant identifier '" + tenantId + "'");
+      throw new ActivitiObjectNotFoundException("no decisions deployed with key '" + decisionKey + "' for tenant identifier '" + tenantId + "'");
     }
     decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
     return decisionTable;
@@ -98,7 +98,7 @@ public class DeploymentManager {
     DecisionTableEntity decisionTable = decisionTableEntityManager.findLatestDecisionTableByKeyAndParentDeploymentId(decisionTableKey, parentDeploymentId);
     
     if (decisionTable == null) {
-      throw new ActivitiDmnObjectNotFoundException("no decisions deployed with key '" + decisionTableKey + 
+      throw new ActivitiObjectNotFoundException("no decisions deployed with key '" + decisionTableKey + 
           "' for parent deployment id '" + parentDeploymentId + "'");
     }
     decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
@@ -112,7 +112,7 @@ public class DeploymentManager {
         decisionTableKey, parentDeploymentId, tenantId);
     
     if (decisionTable == null) {
-      throw new ActivitiDmnObjectNotFoundException("no decisions deployed with key '" + decisionTableKey + 
+      throw new ActivitiObjectNotFoundException("no decisions deployed with key '" + decisionTableKey + 
           "' for parent deployment id '" + parentDeploymentId + "' and tenant identifier " + tenantId);
     }
     decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
@@ -123,7 +123,7 @@ public class DeploymentManager {
     DecisionTableEntity decisionTable = decisionTableEntityManager.findDecisionTableByKeyAndVersionAndTenantId(decisionKey, decisionVersion, tenantId);
     
     if (decisionTable == null) {
-      throw new ActivitiDmnObjectNotFoundException("no decisions deployed with key = '" + decisionKey + "' and version = '" + decisionVersion + "'");
+      throw new ActivitiObjectNotFoundException("no decisions deployed with key = '" + decisionKey + "' and version = '" + decisionVersion + "'");
     }
     
     decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
@@ -152,7 +152,7 @@ public class DeploymentManager {
       cachedDecision = decisionCache.get(decisionId);
 
       if (cachedDecision == null) {
-        throw new ActivitiDmnException("deployment '" + deploymentId + "' didn't put decision '" + decisionId + "' in the cache");
+        throw new ActivitiException("deployment '" + deploymentId + "' didn't put decision '" + decisionId + "' in the cache");
       }
     }
     return cachedDecision;
@@ -162,7 +162,7 @@ public class DeploymentManager {
 
     DmnDeploymentEntity deployment = deploymentEntityManager.findById(deploymentId);
     if (deployment == null) {
-      throw new ActivitiDmnObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.");
+      throw new ActivitiObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.");
     }
 
     // Remove any process definition from the cache

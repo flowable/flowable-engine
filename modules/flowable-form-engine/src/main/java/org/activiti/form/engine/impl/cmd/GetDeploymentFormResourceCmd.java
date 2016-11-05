@@ -16,7 +16,7 @@ package org.activiti.form.engine.impl.cmd;
 import java.io.InputStream;
 import java.io.Serializable;
 
-import org.activiti.form.engine.ActivitiFormIllegalArgumentException;
+import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.form.engine.impl.interceptor.Command;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
 import org.activiti.form.engine.impl.persistence.entity.FormEntity;
@@ -33,7 +33,7 @@ public class GetDeploymentFormResourceCmd implements Command<InputStream>, Seria
 
   public GetDeploymentFormResourceCmd(String formId) {
     if (formId == null || formId.length() < 1) {
-      throw new ActivitiFormIllegalArgumentException("The form id is mandatory, but '" + formId + "' has been provided.");
+      throw new ActivitiIllegalArgumentException("The form id is mandatory, but '" + formId + "' has been provided.");
     }
     this.formId = formId;
   }

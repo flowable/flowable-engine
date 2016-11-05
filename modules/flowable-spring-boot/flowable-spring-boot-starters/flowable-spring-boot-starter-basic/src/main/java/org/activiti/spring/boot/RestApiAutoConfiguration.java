@@ -15,8 +15,8 @@
  */
 package org.activiti.spring.boot;
 
-import org.activiti.rest.common.application.ContentTypeResolver;
-import org.activiti.rest.common.application.DefaultContentTypeResolver;
+import org.activiti.rest.application.ContentTypeResolver;
+import org.activiti.rest.application.DefaultContentTypeResolver;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;

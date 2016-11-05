@@ -15,7 +15,7 @@ package org.activiti.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
@@ -66,7 +66,7 @@ public class ExecuteAsyncJobCmd implements Command<Object>, Serializable {
 
     if (commandContext.getEventDispatcher().isEnabled()) {
       commandContext.getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEventType.JOB_EXECUTION_SUCCESS, job));
+          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.JOB_EXECUTION_SUCCESS, job));
     }
 
     return null;

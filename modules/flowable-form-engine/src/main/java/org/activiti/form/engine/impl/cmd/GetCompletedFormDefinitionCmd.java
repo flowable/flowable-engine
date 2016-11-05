@@ -20,10 +20,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.editor.form.converter.FormJsonConverter;
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.form.api.SubmittedForm;
 import org.activiti.form.api.SubmittedFormQuery;
-import org.activiti.form.engine.ActivitiFormException;
-import org.activiti.form.engine.ActivitiFormObjectNotFoundException;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.FormExpression;
 import org.activiti.form.engine.impl.interceptor.Command;
@@ -81,7 +81,7 @@ public class GetCompletedFormDefinitionCmd implements Command<CompletedFormDefin
 
   public CompletedFormDefinition execute(CommandContext commandContext) {
     if (taskId == null && processInstanceId == null) {
-      throw new ActivitiFormException("A task id or process instance id should be provided");
+      throw new ActivitiException("A task id or process instance id should be provided");
     }
     
     FormCacheEntry formCacheEntry = resolveForm(commandContext);
@@ -160,28 +160,28 @@ public class GetCompletedFormDefinitionCmd implements Command<CompletedFormDefin
 
       formEntity = deploymentManager.findDeployedFormById(formId);
       if (formEntity == null) {
-        throw new ActivitiFormObjectNotFoundException("No form found for id = '" + formId + "'", FormEntity.class);
+        throw new ActivitiObjectNotFoundException("No form found for id = '" + formId + "'", FormEntity.class);
       }
 
     } else if (formDefinitionKey != null && (tenantId == null || FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)) && parentDeploymentId == null) {
 
       formEntity = deploymentManager.findDeployedLatestFormByKey(formDefinitionKey);
       if (formEntity == null) {
-        throw new ActivitiFormObjectNotFoundException("No form found for key '" + formDefinitionKey + "'", FormEntity.class);
+        throw new ActivitiObjectNotFoundException("No form found for key '" + formDefinitionKey + "'", FormEntity.class);
       }
 
     } else if (formDefinitionKey != null && tenantId != null && !FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)  && parentDeploymentId == null) {
 
       formEntity = deploymentManager.findDeployedLatestFormByKeyAndTenantId(formDefinitionKey, tenantId);
       if (formEntity == null) {
-        throw new ActivitiFormObjectNotFoundException("No form found for key '" + formDefinitionKey + "' for tenant identifier " + tenantId, FormEntity.class);
+        throw new ActivitiObjectNotFoundException("No form found for key '" + formDefinitionKey + "' for tenant identifier " + tenantId, FormEntity.class);
       }
       
     } else if (formDefinitionKey != null && (tenantId == null || FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)) && parentDeploymentId != null) {
 
       formEntity = deploymentManager.findDeployedLatestFormByKeyAndParentDeploymentId(formDefinitionKey, parentDeploymentId);
       if (formEntity == null) {
-        throw new ActivitiFormObjectNotFoundException("No form found for key '" + formDefinitionKey + 
+        throw new ActivitiObjectNotFoundException("No form found for key '" + formDefinitionKey + 
             "' for parent deployment id " + parentDeploymentId, FormEntity.class);
       }
       
@@ -189,12 +189,12 @@ public class GetCompletedFormDefinitionCmd implements Command<CompletedFormDefin
 
       formEntity = deploymentManager.findDeployedLatestFormByKeyParentDeploymentIdAndTenantId(formDefinitionKey, parentDeploymentId, tenantId);
       if (formEntity == null) {
-        throw new ActivitiFormObjectNotFoundException("No form found for key '" + formDefinitionKey + 
+        throw new ActivitiObjectNotFoundException("No form found for key '" + formDefinitionKey + 
             "' for parent deployment id '" + parentDeploymentId + "' and for tenant identifier " + tenantId, FormEntity.class);
       }
 
     } else {
-      throw new ActivitiFormObjectNotFoundException("formDefinitionKey and formDefinitionId are null");
+      throw new ActivitiObjectNotFoundException("formDefinitionKey and formDefinitionId are null");
     }
 
     FormCacheEntry formCacheEntry = deploymentManager.resolveForm(formEntity);
@@ -214,13 +214,13 @@ public class GetCompletedFormDefinitionCmd implements Command<CompletedFormDefin
     List<SubmittedForm> submittedForms = submittedFormQuery.list();
     
     if (submittedForms.size() == 0) {
-      throw new ActivitiFormException("No submitted form could be found");
+      throw new ActivitiException("No submitted form could be found");
     }
     
     SubmittedForm submittedForm = null;
     if (taskId != null) {
       if (submittedForms.size() > 1) {
-        throw new ActivitiFormException("Multiple submitted forms are found for the same task");
+        throw new ActivitiException("Multiple submitted forms are found for the same task");
       }
       
       submittedForm = submittedForms.get(0);
@@ -235,7 +235,7 @@ public class GetCompletedFormDefinitionCmd implements Command<CompletedFormDefin
     }
     
     if (submittedForm == null) {
-      throw new ActivitiFormException("No submitted form could be found");
+      throw new ActivitiException("No submitted form could be found");
     }
     
     return submittedForm;
@@ -274,7 +274,7 @@ public class GetCompletedFormDefinitionCmd implements Command<CompletedFormDefin
           }
 
         } catch (Exception e) {
-          throw new ActivitiFormException("Error parsing submitted form " + submittedForm.getId());
+          throw new ActivitiException("Error parsing submitted form " + submittedForm.getId());
         }
       }
     }
@@ -309,7 +309,7 @@ public class GetCompletedFormDefinitionCmd implements Command<CompletedFormDefin
       }
 
     } catch (Exception e) {
-      throw new ActivitiFormException("Error parsing submitted form " + submittedForm.getId(), e);
+      throw new ActivitiException("Error parsing submitted form " + submittedForm.getId(), e);
     }
   }
   

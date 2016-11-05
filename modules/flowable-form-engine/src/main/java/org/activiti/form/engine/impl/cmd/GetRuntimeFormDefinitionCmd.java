@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.editor.form.converter.FormJsonConverter;
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.form.api.SubmittedForm;
-import org.activiti.form.engine.ActivitiFormException;
-import org.activiti.form.engine.ActivitiFormObjectNotFoundException;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.FormExpression;
 import org.activiti.form.engine.impl.interceptor.Command;
@@ -127,28 +127,28 @@ public class GetRuntimeFormDefinitionCmd implements Command<FormDefinition>, Ser
 
       formEntity = deploymentManager.findDeployedFormById(formId);
       if (formEntity == null) {
-        throw new ActivitiFormObjectNotFoundException("No form found for id = '" + formId + "'", FormEntity.class);
+        throw new ActivitiObjectNotFoundException("No form found for id = '" + formId + "'", FormEntity.class);
       }
 
     } else if (formDefinitionKey != null && (tenantId == null || FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)) && parentDeploymentId == null) {
 
       formEntity = deploymentManager.findDeployedLatestFormByKey(formDefinitionKey);
       if (formEntity == null) {
-        throw new ActivitiFormObjectNotFoundException("No form found for key '" + formDefinitionKey + "'", FormEntity.class);
+        throw new ActivitiObjectNotFoundException("No form found for key '" + formDefinitionKey + "'", FormEntity.class);
       }
 
     } else if (formDefinitionKey != null && tenantId != null && !FormEngineConfiguration.NO_TENANT_ID.equals(tenantId) && parentDeploymentId == null) {
 
       formEntity = deploymentManager.findDeployedLatestFormByKeyAndTenantId(formDefinitionKey, tenantId);
       if (formEntity == null) {
-        throw new ActivitiFormObjectNotFoundException("No form found for key '" + formDefinitionKey + "' for tenant identifier " + tenantId, FormEntity.class);
+        throw new ActivitiObjectNotFoundException("No form found for key '" + formDefinitionKey + "' for tenant identifier " + tenantId, FormEntity.class);
       }
       
     } else if (formDefinitionKey != null && (tenantId == null || FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)) && parentDeploymentId != null) {
 
       formEntity = deploymentManager.findDeployedLatestFormByKeyAndParentDeploymentId(formDefinitionKey, parentDeploymentId);
       if (formEntity == null) {
-        throw new ActivitiFormObjectNotFoundException("No form found for key '" + formDefinitionKey + 
+        throw new ActivitiObjectNotFoundException("No form found for key '" + formDefinitionKey + 
             "' for parent deployment id " + parentDeploymentId, FormEntity.class);
       }
       
@@ -156,12 +156,12 @@ public class GetRuntimeFormDefinitionCmd implements Command<FormDefinition>, Ser
 
       formEntity = deploymentManager.findDeployedLatestFormByKeyParentDeploymentIdAndTenantId(formDefinitionKey, parentDeploymentId, tenantId);
       if (formEntity == null) {
-        throw new ActivitiFormObjectNotFoundException("No form found for key '" + formDefinitionKey + 
+        throw new ActivitiObjectNotFoundException("No form found for key '" + formDefinitionKey + 
             "' for parent deployment id '" + parentDeploymentId + "' and for tenant identifier " + tenantId, FormEntity.class);
       }
 
     } else {
-      throw new ActivitiFormObjectNotFoundException("formDefinitionKey and formDefinitionId are null");
+      throw new ActivitiObjectNotFoundException("formDefinitionKey and formDefinitionId are null");
     }
 
     FormCacheEntry formCacheEntry = deploymentManager.resolveForm(formEntity);
@@ -197,7 +197,7 @@ public class GetRuntimeFormDefinitionCmd implements Command<FormDefinition>, Ser
           }
 
         } catch (Exception e) {
-          throw new ActivitiFormException("Error parsing submitted form " + otherForm.getId());
+          throw new ActivitiException("Error parsing submitted form " + otherForm.getId());
         }
       }
     }

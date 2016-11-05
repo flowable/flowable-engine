@@ -17,14 +17,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.dmn.api.DecisionTable;
-import org.activiti.dmn.engine.ActivitiDmnException;
 import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.impl.DecisionTableQueryImpl;
-import org.activiti.dmn.engine.impl.Page;
 import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntityImpl;
 import org.activiti.dmn.engine.impl.persistence.entity.data.AbstractDataManager;
 import org.activiti.dmn.engine.impl.persistence.entity.data.DecisionTableDataManager;
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.impl.Page;
 
 /**
  * @author Joram Barrez
@@ -117,7 +117,7 @@ public class MybatisDecisionTableDataManager extends AbstractDataManager<Decisio
     if (results.size() == 1) {
       return results.get(0);
     } else if (results.size() > 1) {
-      throw new ActivitiDmnException("There are " + results.size() + " decision tables with key = '" + decisionTableKey + "' and version = '" + decisionTableVersion + "'.");
+      throw new ActivitiException("There are " + results.size() + " decision tables with key = '" + decisionTableKey + "' and version = '" + decisionTableVersion + "'.");
     }
     return null;
   }
@@ -133,7 +133,7 @@ public class MybatisDecisionTableDataManager extends AbstractDataManager<Decisio
     if (results.size() == 1) {
       return results.get(0);
     } else if (results.size() > 1) {
-      throw new ActivitiDmnException("There are " + results.size() + " decision tables with key = '" + decisionTableKey + "' and version = '" + decisionTableVersion + "'.");
+      throw new ActivitiException("There are " + results.size() + " decision tables with key = '" + decisionTableKey + "' and version = '" + decisionTableVersion + "'.");
     }
     return null;
   }

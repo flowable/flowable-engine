@@ -16,12 +16,12 @@ package org.activiti.form.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.impl.Page;
+import org.activiti.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.form.api.Form;
 import org.activiti.form.api.FormDeployment;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.FormDeploymentQueryImpl;
-import org.activiti.form.engine.impl.Page;
-import org.activiti.form.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.form.engine.impl.persistence.entity.data.FormDeploymentDataManager;
 
 /**
@@ -44,7 +44,12 @@ public class FormDeploymentEntityManagerImpl extends AbstractEntityManager<FormD
   
   @Override
   public void insert(FormDeploymentEntity deployment) {
-    super.insert(deployment);
+    insert(deployment, true);
+  }
+  
+  @Override
+  public void insert(FormDeploymentEntity deployment, boolean fireEvent) {
+    super.insert(deployment, fireEvent);
 
     for (ResourceEntity resource : deployment.getResources().values()) {
       resource.setDeploymentId(deployment.getId());

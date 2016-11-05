@@ -16,7 +16,7 @@ import org.activiti.bpmn.model.SubProcess;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.Condition;
 import org.activiti.engine.impl.bpmn.helper.SkipExpressionUtil;
@@ -101,7 +101,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
       
       if (!(execution.getCurrentFlowElement() instanceof SubProcess)) {
         Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-            ActivitiEventBuilder.createActivityEvent(ActivitiEventType.ACTIVITY_COMPLETED, flowNode.getId(), flowNode.getName(),
+            ActivitiEventBuilder.createActivityEvent(ActivitiEngineEventType.ACTIVITY_COMPLETED, flowNode.getId(), flowNode.getName(),
                 execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
       }
       

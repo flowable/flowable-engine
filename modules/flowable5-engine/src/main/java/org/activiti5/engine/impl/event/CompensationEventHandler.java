@@ -15,7 +15,7 @@ package org.activiti5.engine.impl.event;
 
 import java.util.List;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.bpmn.helper.ScopeUtil;
@@ -64,7 +64,7 @@ public class CompensationEventHandler implements EventHandler {
 
       	if(commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       		commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-      				ActivitiEventBuilder.createActivityEvent(ActivitiEventType.ACTIVITY_COMPENSATE, 
+      				ActivitiEventBuilder.createActivityEvent(ActivitiEngineEventType.ACTIVITY_COMPENSATE, 
       						compensationHandler.getId(), 
       						(String) compensationHandler.getProperty("name"),
       						compensatingExecution.getId(), 

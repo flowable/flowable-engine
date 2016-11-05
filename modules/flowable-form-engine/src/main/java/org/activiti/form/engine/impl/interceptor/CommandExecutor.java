@@ -12,6 +12,8 @@
  */
 package org.activiti.form.engine.impl.interceptor;
 
+import org.activiti.engine.impl.interceptor.CommandConfig;
+
 /**
  * The command executor for internal usage.
  * 

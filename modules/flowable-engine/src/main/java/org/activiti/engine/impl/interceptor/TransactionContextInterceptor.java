@@ -15,6 +15,7 @@ package org.activiti.engine.impl.interceptor;
 
 import org.activiti.engine.impl.cfg.TransactionContext;
 import org.activiti.engine.impl.cfg.TransactionContextFactory;
+import org.activiti.engine.impl.cfg.TransactionListener;
 import org.activiti.engine.impl.context.Context;
 
 /**
@@ -22,12 +23,12 @@ import org.activiti.engine.impl.context.Context;
  */
 public class TransactionContextInterceptor extends AbstractCommandInterceptor {
   
-  protected TransactionContextFactory transactionContextFactory;
+  protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
 
   public TransactionContextInterceptor() {
   }
 
-  public TransactionContextInterceptor(TransactionContextFactory transactionContextFactory) {
+  public TransactionContextInterceptor(TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory) {
     this.transactionContextFactory = transactionContextFactory;
   }
 
@@ -40,7 +41,7 @@ public class TransactionContextInterceptor extends AbstractCommandInterceptor {
     try {
       
       if (transactionContextFactory != null && !isReused) {
-        TransactionContext transactionContext = transactionContextFactory.openTransactionContext(commandContext);
+        TransactionContext transactionContext = (TransactionContext) transactionContextFactory.openTransactionContext(commandContext);
         Context.setTransactionContext(transactionContext);
         commandContext.addCloseListener(new TransactionCommandContextCloseListener(transactionContext));
       }
@@ -55,11 +56,11 @@ public class TransactionContextInterceptor extends AbstractCommandInterceptor {
 
   }
 
-  public TransactionContextFactory getTransactionContextFactory() {
+  public TransactionContextFactory<TransactionListener, CommandContext> getTransactionContextFactory() {
     return transactionContextFactory;
   }
 
-  public void setTransactionContextFactory(TransactionContextFactory transactionContextFactory) {
+  public void setTransactionContextFactory(TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory) {
     this.transactionContextFactory = transactionContextFactory;
   }
 

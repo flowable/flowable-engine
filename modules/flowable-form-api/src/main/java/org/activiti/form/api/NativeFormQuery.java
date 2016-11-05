@@ -12,6 +12,8 @@
  */
 package org.activiti.form.api;
 
+import org.activiti.engine.query.NativeQuery;
+
 public interface NativeFormQuery extends NativeQuery<NativeFormQuery, Form> {
 
 }

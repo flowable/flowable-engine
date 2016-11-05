@@ -13,7 +13,7 @@
 package org.activiti.engine.impl.persistence.entity;
 
 import org.activiti.engine.ActivitiException;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.context.Context;
 
@@ -103,11 +103,11 @@ public interface SuspensionState {
 
     protected static void dispatchStateChangeEvent(Object entity, SuspensionState state) {
       if (Context.getCommandContext() != null && Context.getCommandContext().getEventDispatcher().isEnabled()) {
-        ActivitiEventType eventType = null;
+        ActivitiEngineEventType eventType = null;
         if (state == SuspensionState.ACTIVE) {
-          eventType = ActivitiEventType.ENTITY_ACTIVATED;
+          eventType = ActivitiEngineEventType.ENTITY_ACTIVATED;
         } else {
-          eventType = ActivitiEventType.ENTITY_SUSPENDED;
+          eventType = ActivitiEngineEventType.ENTITY_SUSPENDED;
         }
         Context.getCommandContext().getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(eventType, entity));
       }

@@ -16,9 +16,10 @@ package org.activiti.form.engine.impl;
 import java.io.Serializable;
 import java.util.List;
 
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.impl.Page;
 import org.activiti.form.api.FormDeployment;
 import org.activiti.form.api.FormDeploymentQuery;
-import org.activiti.form.engine.ActivitiFormIllegalArgumentException;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
 import org.activiti.form.engine.impl.interceptor.CommandExecutor;
 
@@ -55,7 +56,7 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
 
   public FormDeploymentQueryImpl deploymentId(String deploymentId) {
     if (deploymentId == null) {
-      throw new ActivitiFormIllegalArgumentException("Deployment id is null");
+      throw new ActivitiIllegalArgumentException("Deployment id is null");
     }
     this.deploymentId = deploymentId;
     return this;
@@ -63,7 +64,7 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
 
   public FormDeploymentQueryImpl deploymentName(String deploymentName) {
     if (deploymentName == null) {
-      throw new ActivitiFormIllegalArgumentException("deploymentName is null");
+      throw new ActivitiIllegalArgumentException("deploymentName is null");
     }
     this.name = deploymentName;
     return this;
@@ -71,7 +72,7 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
 
   public FormDeploymentQueryImpl deploymentNameLike(String nameLike) {
     if (nameLike == null) {
-      throw new ActivitiFormIllegalArgumentException("deploymentNameLike is null");
+      throw new ActivitiIllegalArgumentException("deploymentNameLike is null");
     }
     this.nameLike = nameLike;
     return this;
@@ -79,7 +80,7 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
 
   public FormDeploymentQueryImpl deploymentCategory(String deploymentCategory) {
     if (deploymentCategory == null) {
-      throw new ActivitiFormIllegalArgumentException("deploymentCategory is null");
+      throw new ActivitiIllegalArgumentException("deploymentCategory is null");
     }
     this.category = deploymentCategory;
     return this;
@@ -87,7 +88,7 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
 
   public FormDeploymentQueryImpl deploymentCategoryNotEquals(String deploymentCategoryNotEquals) {
     if (deploymentCategoryNotEquals == null) {
-      throw new ActivitiFormIllegalArgumentException("deploymentCategoryExclude is null");
+      throw new ActivitiIllegalArgumentException("deploymentCategoryExclude is null");
     }
     this.categoryNotEquals = deploymentCategoryNotEquals;
     return this;
@@ -95,7 +96,7 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
 
   public FormDeploymentQueryImpl parentDeploymentId(String parentDeploymentId) {
     if (parentDeploymentId == null) {
-      throw new ActivitiFormIllegalArgumentException("parentDeploymentId is null");
+      throw new ActivitiIllegalArgumentException("parentDeploymentId is null");
     }
     this.parentDeploymentId = parentDeploymentId;
     return this;
@@ -103,7 +104,7 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
 
   public FormDeploymentQueryImpl parentDeploymentIdLike(String parentDeploymentIdLike) {
     if (parentDeploymentIdLike == null) {
-      throw new ActivitiFormIllegalArgumentException("parentDeploymentIdLike is null");
+      throw new ActivitiIllegalArgumentException("parentDeploymentIdLike is null");
     }
     this.parentDeploymentIdLike = parentDeploymentIdLike;
     return this;
@@ -116,7 +117,7 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
   
   public FormDeploymentQueryImpl deploymentTenantId(String tenantId) {
     if (tenantId == null) {
-      throw new ActivitiFormIllegalArgumentException("deploymentTenantId is null");
+      throw new ActivitiIllegalArgumentException("deploymentTenantId is null");
     }
     this.tenantId = tenantId;
     return this;
@@ -124,7 +125,7 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
 
   public FormDeploymentQueryImpl deploymentTenantIdLike(String tenantIdLike) {
     if (tenantIdLike == null) {
-      throw new ActivitiFormIllegalArgumentException("deploymentTenantIdLike is null");
+      throw new ActivitiIllegalArgumentException("deploymentTenantIdLike is null");
     }
     this.tenantIdLike = tenantIdLike;
     return this;
@@ -132,7 +133,7 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
 
   public FormDeploymentQueryImpl formDefinitionKey(String key) {
     if (key == null) {
-      throw new ActivitiFormIllegalArgumentException("key is null");
+      throw new ActivitiIllegalArgumentException("key is null");
     }
     this.formDefinitionKey = key;
     return this;
@@ -140,7 +141,7 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
 
   public FormDeploymentQueryImpl formDefinitionKeyLike(String keyLike) {
     if (keyLike == null) {
-      throw new ActivitiFormIllegalArgumentException("keyLike is null");
+      throw new ActivitiIllegalArgumentException("keyLike is null");
     }
     this.formDefinitionKeyLike = keyLike;
     return this;

@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.EngineInfo;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,9 +41,9 @@ public abstract class IdmEngines {
 
   protected static boolean isInitialized;
   protected static Map<String, IdmEngine> idmEngines = new HashMap<String, IdmEngine>();
-  protected static Map<String, IdmEngineInfo> idmEngineInfosByName = new HashMap<String, IdmEngineInfo>();
-  protected static Map<String, IdmEngineInfo> idmEngineInfosByResourceUrl = new HashMap<String, IdmEngineInfo>();
-  protected static List<IdmEngineInfo> idmEngineInfos = new ArrayList<IdmEngineInfo>();
+  protected static Map<String, EngineInfo> idmEngineInfosByName = new HashMap<String, EngineInfo>();
+  protected static Map<String, EngineInfo> idmEngineInfosByResourceUrl = new HashMap<String, EngineInfo>();
+  protected static List<EngineInfo> idmEngineInfos = new ArrayList<EngineInfo>();
 
   /**
    * Initializes all idm engines that can be found on the classpath for resources <code>activiti.idm.cfg.xml</code> and for resources
@@ -59,7 +61,7 @@ public abstract class IdmEngines {
       try {
         resources = classLoader.getResources("activiti.idm.cfg.xml");
       } catch (IOException e) {
-        throw new ActivitiIdmException("problem retrieving activiti.idm.cfg.xml resources on the classpath: " + System.getProperty("java.class.path"), e);
+        throw new ActivitiException("problem retrieving activiti.idm.cfg.xml resources on the classpath: " + System.getProperty("java.class.path"), e);
       }
 
       // Remove duplicated configuration URL's using set. Some
@@ -71,7 +73,7 @@ public abstract class IdmEngines {
       for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext();) {
         URL resource = iterator.next();
         log.info("Initializing idm engine using configuration '{}'", resource.toString());
-        initFormEngineFromResource(resource);
+        initIdmEngineFromResource(resource);
       }
 
       /*
@@ -103,8 +105,8 @@ public abstract class IdmEngines {
     idmEngines.remove(idmEngine.getName());
   }
 
-  private static IdmEngineInfo initFormEngineFromResource(URL resourceUrl) {
-    IdmEngineInfo idmEngineInfo = idmEngineInfosByResourceUrl.get(resourceUrl.toString());
+  private static EngineInfo initIdmEngineFromResource(URL resourceUrl) {
+    EngineInfo idmEngineInfo = idmEngineInfosByResourceUrl.get(resourceUrl.toString());
     // if there is an existing idm engine info
     if (idmEngineInfo != null) {
       // remove that idm engine from the member fields
@@ -123,12 +125,12 @@ public abstract class IdmEngines {
       IdmEngine idmEngine = buildIdmEngine(resourceUrl);
       String idmEngineName = idmEngine.getName();
       log.info("initialised idm engine {}", idmEngineName);
-      idmEngineInfo = new IdmEngineInfo(idmEngineName, resourceUrlString, null);
+      idmEngineInfo = new EngineInfo(idmEngineName, resourceUrlString, null);
       idmEngines.put(idmEngineName, idmEngine);
       idmEngineInfosByName.put(idmEngineName, idmEngineInfo);
     } catch (Throwable e) {
       log.error("Exception while initializing idm engine: {}", e.getMessage(), e);
-      idmEngineInfo = new IdmEngineInfo(null, resourceUrlString, getExceptionString(e));
+      idmEngineInfo = new EngineInfo(null, resourceUrlString, getExceptionString(e));
     }
     idmEngineInfosByResourceUrl.put(resourceUrlString, idmEngineInfo);
     idmEngineInfos.add(idmEngineInfo);
@@ -150,14 +152,14 @@ public abstract class IdmEngines {
       return idmEngineConfiguration.buildIdmEngine();
 
     } catch (IOException e) {
-      throw new ActivitiIdmException("couldn't open resource stream: " + e.getMessage(), e);
+      throw new ActivitiException("couldn't open resource stream: " + e.getMessage(), e);
     } finally {
       IOUtils.closeQuietly(inputStream);
     }
   }
 
   /** Get initialization results. */
-  public static List<IdmEngineInfo> getIdmEngineInfos() {
+  public static List<EngineInfo> getIdmEngineInfos() {
     return idmEngineInfos;
   }
 
@@ -165,7 +167,7 @@ public abstract class IdmEngines {
    * Get initialization results. Only info will we available for form engines which were added in the {@link IdmEngines#init()}. No {@link IdmEngineInfo} is available for engines which were
    * registered programmatically.
    */
-  public static IdmEngineInfo getIdmEngineInfo(String idmEngineName) {
+  public static EngineInfo getIdmEngineInfo(String idmEngineName) {
     return idmEngineInfosByName.get(idmEngineName);
   }
 
@@ -189,12 +191,12 @@ public abstract class IdmEngines {
   /**
    * retries to initialize a idm engine that previously failed.
    */
-  public static IdmEngineInfo retry(String resourceUrl) {
+  public static EngineInfo retry(String resourceUrl) {
     log.debug("retying initializing of resource {}", resourceUrl);
     try {
-      return initFormEngineFromResource(new URL(resourceUrl));
+      return initIdmEngineFromResource(new URL(resourceUrl));
     } catch (MalformedURLException e) {
-      throw new ActivitiIdmException("invalid url: " + resourceUrl, e);
+      throw new ActivitiException("invalid url: " + resourceUrl, e);
     }
   }
 

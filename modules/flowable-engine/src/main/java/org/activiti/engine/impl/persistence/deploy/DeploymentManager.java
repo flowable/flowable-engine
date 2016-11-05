@@ -22,7 +22,7 @@ import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
 import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.ProcessDefinitionQueryImpl;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -160,7 +160,7 @@ public class DeploymentManager {
 
       // Since all process definitions are deleted by a single query, we should dispatch the events in this loop
       if (eventDispatcher.isEnabled()) {
-        eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_DELETED, processDefinition));
+        eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_DELETED, processDefinition));
       }
     }
 
@@ -169,7 +169,7 @@ public class DeploymentManager {
 
     // Since we use a delete by query, delete-events are not automatically dispatched
     if (eventDispatcher.isEnabled()) {
-      eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_DELETED, deployment));
+      eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_DELETED, deployment));
     }
 
     for (ProcessDefinition processDefinition : processDefinitions) {

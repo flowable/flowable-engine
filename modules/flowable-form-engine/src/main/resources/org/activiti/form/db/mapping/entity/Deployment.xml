@@ -98,7 +98,7 @@
     </where>
   </sql>
     
-  <select id="selectDeploymentsByName" parameterType="org.activiti.form.engine.impl.db.ListQueryParameterObject" resultMap="deploymentResultMap">
+  <select id="selectDeploymentsByName" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="deploymentResultMap">
     select * from ${prefix}ACT_FO_FORM_DEPLOYMENT D where NAME_=#{parameter} order by D.DEPLOY_TIME_ desc
   </select>
   

@@ -17,17 +17,17 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.activiti.engine.impl.persistence.entity.AbstractEntityNoRevision;
 import org.activiti.form.engine.FormEngineConfiguration;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class SubmittedFormEntityImpl implements SubmittedFormEntity, Serializable {
+public class SubmittedFormEntityImpl extends AbstractEntityNoRevision implements SubmittedFormEntity, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  protected String id;
   protected String formId;
   protected String taskId;
   protected String processInstanceId;
@@ -57,14 +57,6 @@ public class SubmittedFormEntityImpl implements SubmittedFormEntity, Serializabl
     this.formId = formId;
   }
   
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
   public String getTaskId() {
     return taskId;
   }

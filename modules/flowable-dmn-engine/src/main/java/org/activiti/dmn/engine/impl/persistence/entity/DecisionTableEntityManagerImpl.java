@@ -19,9 +19,9 @@ import java.util.Map;
 import org.activiti.dmn.api.DecisionTable;
 import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.impl.DecisionTableQueryImpl;
-import org.activiti.dmn.engine.impl.Page;
-import org.activiti.dmn.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.dmn.engine.impl.persistence.entity.data.DecisionTableDataManager;
+import org.activiti.engine.impl.Page;
+import org.activiti.engine.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Tijs Rademakers

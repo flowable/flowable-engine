@@ -12,17 +12,17 @@
  */
 package org.activiti.idm.engine.delegate.event.impl;
 
-import org.activiti.idm.api.event.ActivitiIdmEvent;
-import org.activiti.idm.api.event.ActivitiIdmEventDispatcher;
-import org.activiti.idm.api.event.ActivitiIdmEventListener;
-import org.activiti.idm.api.event.ActivitiIdmEventType;
+import org.activiti.engine.delegate.event.ActivitiEvent;
+import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
+import org.activiti.engine.delegate.event.ActivitiEventListener;
+import org.activiti.engine.delegate.event.ActivitiEventType;
 
 /**
  * Class capable of dispatching events.
  * 
  * @author Tijs Rademakers
  */
-public class ActivitiIdmEventDispatcherImpl implements ActivitiIdmEventDispatcher {
+public class ActivitiIdmEventDispatcherImpl implements ActivitiEventDispatcher {
 
   protected ActivitiIdmEventSupport eventSupport;
   protected boolean enabled = true;
@@ -40,22 +40,22 @@ public class ActivitiIdmEventDispatcherImpl implements ActivitiIdmEventDispatche
   }
 
   @Override
-  public void addEventListener(ActivitiIdmEventListener listenerToAdd) {
+  public void addEventListener(ActivitiEventListener listenerToAdd) {
     eventSupport.addEventListener(listenerToAdd);
   }
 
   @Override
-  public void addEventListener(ActivitiIdmEventListener listenerToAdd, ActivitiIdmEventType... types) {
+  public void addEventListener(ActivitiEventListener listenerToAdd, ActivitiEventType... types) {
     eventSupport.addEventListener(listenerToAdd, types);
   }
 
   @Override
-  public void removeEventListener(ActivitiIdmEventListener listenerToRemove) {
+  public void removeEventListener(ActivitiEventListener listenerToRemove) {
     eventSupport.removeEventListener(listenerToRemove);
   }
 
   @Override
-  public void dispatchEvent(ActivitiIdmEvent event) {
+  public void dispatchEvent(ActivitiEvent event) {
     if (enabled) {
       eventSupport.dispatchEvent(event);
     }

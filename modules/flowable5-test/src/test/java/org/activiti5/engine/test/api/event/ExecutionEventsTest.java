@@ -14,7 +14,7 @@ package org.activiti5.engine.test.api.event;
 
 import org.activiti.engine.delegate.event.ActivitiEntityEvent;
 import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
@@ -42,11 +42,11 @@ public class ExecutionEventsTest extends PluggableActivitiTestCase {
 			assertTrue(listener.getEventsReceived().get(0) instanceof ActivitiEntityEvent);
 			
 			ActivitiEntityEvent event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(ActivitiEventType.ENTITY_CREATED, event.getType());
+			assertEquals(ActivitiEngineEventType.ENTITY_CREATED, event.getType());
 			assertEquals(processInstance.getId(), ((org.activiti5.engine.runtime.Execution) event.getEntity()).getId());
 			
 			event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
-            assertEquals(ActivitiEventType.ENTITY_INITIALIZED, event.getType());
+            assertEquals(ActivitiEngineEventType.ENTITY_INITIALIZED, event.getType());
             assertEquals(processInstance.getId(), ((org.activiti5.engine.runtime.Execution) event.getEntity()).getId());
             listener.clearEventsReceived();
 			
@@ -57,9 +57,9 @@ public class ExecutionEventsTest extends PluggableActivitiTestCase {
 			assertEquals(2, listener.getEventsReceived().size());
 			event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
 			assertEquals(processInstance.getId(), ((org.activiti5.engine.runtime.Execution) event.getEntity()).getId());
-			assertEquals(ActivitiEventType.ENTITY_SUSPENDED, event.getType());
+			assertEquals(ActivitiEngineEventType.ENTITY_SUSPENDED, event.getType());
 			event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
-			assertEquals(ActivitiEventType.ENTITY_ACTIVATED, event.getType());
+			assertEquals(ActivitiEngineEventType.ENTITY_ACTIVATED, event.getType());
 			assertEquals(processInstance.getId(), ((org.activiti5.engine.runtime.Execution) event.getEntity()).getId());
 			listener.clearEventsReceived();
 			
@@ -70,9 +70,9 @@ public class ExecutionEventsTest extends PluggableActivitiTestCase {
 			assertEquals(2, listener.getEventsReceived().size());
 			event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
 			assertEquals(processInstance.getId(), ((org.activiti5.engine.runtime.ProcessInstance) event.getEntity()).getId());
-			assertEquals(ActivitiEventType.ENTITY_SUSPENDED, event.getType());
+			assertEquals(ActivitiEngineEventType.ENTITY_SUSPENDED, event.getType());
 			event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
-			assertEquals(ActivitiEventType.ENTITY_ACTIVATED, event.getType());
+			assertEquals(ActivitiEngineEventType.ENTITY_ACTIVATED, event.getType());
 			assertEquals(processInstance.getId(), ((org.activiti5.engine.runtime.Execution) event.getEntity()).getId());
 			listener.clearEventsReceived();
 			
@@ -81,13 +81,13 @@ public class ExecutionEventsTest extends PluggableActivitiTestCase {
 			assertEquals(1, listener.getEventsReceived().size());
 			event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
 			assertEquals(processInstance.getId(), ((org.activiti5.engine.runtime.Execution) event.getEntity()).getId());
-			assertEquals(ActivitiEventType.ENTITY_UPDATED, event.getType());
+			assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, event.getType());
 			listener.clearEventsReceived();
 			
 			runtimeService.deleteProcessInstance(processInstance.getId(), "Testing events");
 			
 			event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(ActivitiEventType.ENTITY_DELETED, event.getType());
+			assertEquals(ActivitiEngineEventType.ENTITY_DELETED, event.getType());
 			assertEquals(processInstance.getId(), ((org.activiti5.engine.runtime.Execution) event.getEntity()).getId());
 			listener.clearEventsReceived();
 	}

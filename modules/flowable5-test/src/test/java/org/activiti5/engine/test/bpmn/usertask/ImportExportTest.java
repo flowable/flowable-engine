@@ -5,11 +5,11 @@ import java.io.InputStream;
 
 import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.engine.impl.util.io.InputStreamSource;
+import org.activiti.engine.impl.util.io.StreamSource;
 import org.activiti.engine.repository.DeploymentProperties;
 import org.activiti.engine.runtime.Execution;
 import org.activiti5.engine.impl.test.ResourceActivitiTestCase;
-import org.activiti5.engine.impl.util.io.InputStreamSource;
-import org.activiti5.engine.impl.util.io.StreamSource;
 
 /**
  * Created by p3700487 on 23/02/15.

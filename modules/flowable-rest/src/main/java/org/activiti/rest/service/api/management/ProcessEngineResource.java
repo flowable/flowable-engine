@@ -19,7 +19,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngineInfo;
+import org.activiti.engine.EngineInfo;
 import org.activiti.engine.ProcessEngines;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -47,7 +47,7 @@ public class ProcessEngineResource {
     ProcessEngineInfoResponse response = new ProcessEngineInfoResponse();
 
     try {
-      ProcessEngineInfo engineInfo = ProcessEngines.getProcessEngineInfo(engine.getName());
+      EngineInfo engineInfo = ProcessEngines.getProcessEngineInfo(engine.getName());
       if (engineInfo != null) {
         response.setName(engineInfo.getName());
         response.setResourceUrl(engineInfo.getResourceUrl());

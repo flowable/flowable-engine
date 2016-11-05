@@ -245,14 +245,28 @@ activitiAdminApp
 
                 $translate.use('en');
 
-        		$rootScope.serverLoaded = false;
+        		$rootScope.serversLoaded = false;
         		
         		$rootScope.loadServerConfig = function(callbackAfterLoad) {
                     $http({method: 'GET', url: '/app/rest/server-configs'}).
                     success(function(data) {
                         if (data.length > 0) {
-                            $rootScope.activeServer = data[0];
-                            $rootScope.serverLoaded = true;
+
+                            $rootScope.activeServers = {};
+
+                            for (var i = 0; i < data.length; i++) {
+                                if (data[i].endpointType === 1) {
+                                    $rootScope.activeServers['process'] = data[i];
+                                } else if (data[i].endpointType === 2) {
+                                    $rootScope.activeServers['dmn'] = data[i];
+                                } else if (data[i].endpointType === 3) {
+                                    $rootScope.activeServers['form'] = data[i];
+                                } else {
+                                    console.log('Warning! Invalid endpoint type received: '+data[i].endpointType);
+                                }
+                            }
+
+                            $rootScope.serversLoaded = true;
                         } else {
                             console.log('Warning! No server configurations received');
                         }
@@ -271,18 +285,16 @@ activitiAdminApp
 		          	});
 
 	        	$rootScope.loadProcessDefinitionsCache = function() {
-                    if ($rootScope.activeServer && $rootScope.activeServer.id) {
-                        var promise = $http({
-                            method: 'GET',
-                            url: '/app/rest/activiti/process-definitions?size=100000000'
-                        }).success(function (data, status, headers, config) {
-                            return data;
-                        }).error(function (data, status, headers, config) {
-                            return {'status': false};
-                        });
+                    var promise = $http({
+                        method: 'GET',
+                        url: '/app/rest/activiti/process-definitions?size=100000000'
+                    }).success(function (data, status, headers, config) {
+                        return data;
+                    }).error(function (data, status, headers, config) {
+                        return {'status': false};
+                    });
 
-                        return promise;
-                    }
+                    return promise;
 	            };
 
 	            $rootScope.getProcessDefinitionFromCache = function(processDefId) {
@@ -350,11 +362,11 @@ activitiAdminApp
 	            };
 
 	            $rootScope.executeWhenReady = function(callback) {
-	                if ($rootScope.activeServer) {
+	                if ($rootScope.activeServers) {
 	                    callback();
 	                } else {
-	                    $rootScope.$watch('activeServer', function() {
-	                        if ($rootScope.activeServer) {
+	                    $rootScope.$watch('activeServers', function() {
+	                        if ($rootScope.activeServers) {
 	                            callback();
 	                        }
 	                    });

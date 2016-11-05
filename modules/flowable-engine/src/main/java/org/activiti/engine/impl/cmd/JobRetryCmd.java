@@ -23,7 +23,7 @@ import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.calendar.DurationHelper;
 import org.activiti.engine.impl.interceptor.Command;
@@ -127,8 +127,8 @@ public class JobRetryCmd implements Command<Object> {
     // Dispatch both an update and a retry-decrement event
     ActivitiEventDispatcher eventDispatcher = commandContext.getEventDispatcher();
     if (eventDispatcher.isEnabled()) {
-      eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_UPDATED, newJobEntity));
-      eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.JOB_RETRIES_DECREMENTED, newJobEntity));
+      eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_UPDATED, newJobEntity));
+      eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.JOB_RETRIES_DECREMENTED, newJobEntity));
     }
 
     return null;

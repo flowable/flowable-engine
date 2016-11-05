@@ -16,7 +16,7 @@ package org.activiti5.engine.impl.pvm.runtime;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
@@ -51,7 +51,7 @@ public class AtomicOperationProcessStart extends AbstractEventAtomicOperation {
   	    // We ignore the exception here, because it's only meant to include variables in the initialized event.
   	  }
     	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityWithVariablesEvent(ActivitiEventType.ENTITY_INITIALIZED, 
+    			ActivitiEventBuilder.createEntityWithVariablesEvent(ActivitiEngineEventType.ENTITY_INITIALIZED, 
     			    execution, variablesMap, false));
       Context.getProcessEngineConfiguration().getEventDispatcher()
               .dispatchEvent(ActivitiEventBuilder.createProcessStartedEvent(execution, variablesMap, false));
