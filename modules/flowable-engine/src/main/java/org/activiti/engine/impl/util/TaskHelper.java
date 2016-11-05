@@ -16,8 +16,8 @@ import java.util.Map;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.delegate.TaskListener;
-import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
+import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.identity.Authentication;
@@ -33,13 +33,8 @@ import org.activiti.engine.task.IdentityLinkType;
  */
 public class TaskHelper {
   
-  private final CommandContext commandContext;
-  
-  public TaskHelper(CommandContext commandContext) {
-    this.commandContext = commandContext;
-  }
-
-  public void completeTask(TaskEntity taskEntity, Map<String, Object> variables, Map<String, Object> transientVariables, boolean localScope) {
+  public static void completeTask(TaskEntity taskEntity, Map<String, Object> variables, 
+    Map<String, Object> transientVariables, boolean localScope, CommandContext commandContext) {
     // Task complete logic
     
     if (taskEntity.getDelegationState() != null && taskEntity.getDelegationState().equals(DelegationState.PENDING)) {

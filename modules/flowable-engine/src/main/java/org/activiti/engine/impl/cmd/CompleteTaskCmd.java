@@ -60,7 +60,7 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
       }
     }
     
-    new TaskHelper(commandContext).completeTask(task, variables, transientVariables, localScope);
+    TaskHelper.completeTask(task, variables, transientVariables, localScope, commandContext);
     return null;
   }
 
