@@ -14,101 +14,101 @@ package org.activiti.form.engine.impl;
 
 import java.util.Map;
 
+import org.activiti.form.api.FormInstance;
+import org.activiti.form.api.FormInstanceQuery;
 import org.activiti.form.api.FormService;
-import org.activiti.form.api.SubmittedForm;
-import org.activiti.form.api.SubmittedFormQuery;
-import org.activiti.form.engine.impl.cmd.GetCompletedFormDefinitionCmd;
-import org.activiti.form.engine.impl.cmd.GetRuntimeFormDefinitionCmd;
+import org.activiti.form.engine.impl.cmd.CreateFormInstanceCmd;
+import org.activiti.form.engine.impl.cmd.GetFormInstanceModelCmd;
+import org.activiti.form.engine.impl.cmd.GetFormModelWithVariablesCmd;
 import org.activiti.form.engine.impl.cmd.GetVariablesFromFormSubmissionCmd;
-import org.activiti.form.engine.impl.cmd.StoreSubmittedFormCmd;
-import org.activiti.form.model.CompletedFormDefinition;
-import org.activiti.form.model.FormDefinition;
+import org.activiti.form.model.FormInstanceModel;
+import org.activiti.form.model.FormModel;
 
 /**
  * @author Tijs Rademakers
  */
 public class FormServiceImpl extends ServiceImpl implements FormService {
 
-  public void completeForm(FormDefinition formDefinition) {
+  public void completeForm(FormModel formDefinition) {
 
   }
   
-  public Map<String, Object> getVariablesFromFormSubmission(FormDefinition formDefinition, Map<String, Object> values) {
-    return commandExecutor.execute(new GetVariablesFromFormSubmissionCmd(formDefinition, values));
+  public Map<String, Object> getVariablesFromFormSubmission(FormModel formModel, Map<String, Object> values) {
+    return commandExecutor.execute(new GetVariablesFromFormSubmissionCmd(formModel, values));
   }
 
-  public Map<String, Object> getVariablesFromFormSubmission(FormDefinition formDefinition, Map<String, Object> values, String outcome) {
-    return commandExecutor.execute(new GetVariablesFromFormSubmissionCmd(formDefinition, values, outcome));
+  public Map<String, Object> getVariablesFromFormSubmission(FormModel formModel, Map<String, Object> values, String outcome) {
+    return commandExecutor.execute(new GetVariablesFromFormSubmissionCmd(formModel, values, outcome));
   }
   
-  public SubmittedForm storeSubmittedForm(Map<String, Object> variables, FormDefinition formDefinition, String taskId, String processInstanceId) {
-    return commandExecutor.execute(new StoreSubmittedFormCmd(formDefinition, variables, taskId, processInstanceId));
+  public FormInstance createFormInstance(Map<String, Object> variables, FormModel formModel, String taskId, String processInstanceId) {
+    return commandExecutor.execute(new CreateFormInstanceCmd(formModel, variables, taskId, processInstanceId));
   }
   
-  public FormDefinition getTaskFormDefinitionById(String formId, String processInstanceId, Map<String, Object> variables) {
-    return commandExecutor.execute(new GetRuntimeFormDefinitionCmd(null, formId, processInstanceId, variables));
+  public FormModel getFormModelWithVariablesById(String formDefinitionId, String processInstanceId, Map<String, Object> variables) {
+    return commandExecutor.execute(new GetFormModelWithVariablesCmd(null, formDefinitionId, processInstanceId, variables));
   }
   
-  public FormDefinition getTaskFormDefinitionById(String formId, String processInstanceId, 
+  public FormModel getFormModelWithVariablesById(String formId, String processInstanceId, 
       Map<String, Object> variables, String tenantId) {
-    return commandExecutor.execute(new GetRuntimeFormDefinitionCmd(null, formId, processInstanceId, tenantId, variables));
+    return commandExecutor.execute(new GetFormModelWithVariablesCmd(null, formId, processInstanceId, tenantId, variables));
   }
   
-  public FormDefinition getTaskFormDefinitionByKey(String formDefinitionKey, String processInstanceId, Map<String, Object> variables) {
-    return commandExecutor.execute(new GetRuntimeFormDefinitionCmd(formDefinitionKey, null, processInstanceId, variables));
+  public FormModel getFormModelWithVariablesByKey(String formDefinitionKey, String processInstanceId, Map<String, Object> variables) {
+    return commandExecutor.execute(new GetFormModelWithVariablesCmd(formDefinitionKey, null, processInstanceId, variables));
   }
   
-  public FormDefinition getTaskFormDefinitionByKey(String formDefinitionKey, String processInstanceId, 
+  public FormModel getFormModelWithVariablesByKey(String formDefinitionKey, String processInstanceId, 
       Map<String, Object> variables, String tenantId) {
     
-    return commandExecutor.execute(new GetRuntimeFormDefinitionCmd(formDefinitionKey, null, null, processInstanceId, tenantId, variables));
+    return commandExecutor.execute(new GetFormModelWithVariablesCmd(formDefinitionKey, null, null, processInstanceId, tenantId, variables));
   }
   
-  public FormDefinition getTaskFormDefinitionByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, 
+  public FormModel getFormModelWithVariablesByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, 
       String processInstanceId, Map<String, Object> variables) {
     
-    return commandExecutor.execute(new GetRuntimeFormDefinitionCmd(formDefinitionKey, parentDeploymentId, null, processInstanceId, variables));
+    return commandExecutor.execute(new GetFormModelWithVariablesCmd(formDefinitionKey, parentDeploymentId, null, processInstanceId, variables));
   }
   
-  public FormDefinition getTaskFormDefinitionByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String processInstanceId, 
+  public FormModel getFormModelWithVariablesByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String processInstanceId, 
       Map<String, Object> variables, String tenantId) {
     
-    return commandExecutor.execute(new GetRuntimeFormDefinitionCmd(formDefinitionKey, parentDeploymentId, null, processInstanceId, tenantId, variables));
+    return commandExecutor.execute(new GetFormModelWithVariablesCmd(formDefinitionKey, parentDeploymentId, null, processInstanceId, tenantId, variables));
   }
   
-  public CompletedFormDefinition getCompletedTaskFormDefinitionById(String formId, String taskId, String processInstanceId, Map<String, Object> variables) {
-    return commandExecutor.execute(new GetCompletedFormDefinitionCmd(null, formId, taskId, processInstanceId, variables));
+  public FormInstanceModel getFormInstanceModelById(String formDefinitionId, String taskId, String processInstanceId, Map<String, Object> variables) {
+    return commandExecutor.execute(new GetFormInstanceModelCmd(null, formDefinitionId, taskId, processInstanceId, variables));
   }
   
-  public CompletedFormDefinition getCompletedTaskFormDefinitionById(String formId, String taskId, String processInstanceId, 
+  public FormInstanceModel getFormInstanceModelById(String formDefinitionId, String taskId, String processInstanceId, 
       Map<String, Object> variables, String tenantId) {
-    return commandExecutor.execute(new GetCompletedFormDefinitionCmd(null, formId, taskId, processInstanceId, tenantId, variables));
+    return commandExecutor.execute(new GetFormInstanceModelCmd(null, formDefinitionId, taskId, processInstanceId, tenantId, variables));
   }
   
-  public CompletedFormDefinition getCompletedTaskFormDefinitionByKey(String formDefinitionKey, String taskId, String processInstanceId, Map<String, Object> variables) {
-    return commandExecutor.execute(new GetCompletedFormDefinitionCmd(formDefinitionKey, null, taskId, processInstanceId, variables));
+  public FormInstanceModel getFormInstanceModelByKey(String formDefinitionKey, String taskId, String processInstanceId, Map<String, Object> variables) {
+    return commandExecutor.execute(new GetFormInstanceModelCmd(formDefinitionKey, null, taskId, processInstanceId, variables));
   }
   
-  public CompletedFormDefinition getCompletedTaskFormDefinitionByKey(String formDefinitionKey, String taskId, String processInstanceId, 
+  public FormInstanceModel getFormInstanceModelByKey(String formDefinitionKey, String taskId, String processInstanceId, 
       Map<String, Object> variables, String tenantId) {
     
-    return commandExecutor.execute(new GetCompletedFormDefinitionCmd(formDefinitionKey, null, null, taskId, processInstanceId, tenantId, variables));
+    return commandExecutor.execute(new GetFormInstanceModelCmd(formDefinitionKey, null, null, taskId, processInstanceId, tenantId, variables));
   }
   
-  public CompletedFormDefinition getCompletedTaskFormDefinitionByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId,
+  public FormInstanceModel getFormInstanceModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId,
       String taskId, String processInstanceId, Map<String, Object> variables) {
     
-    return commandExecutor.execute(new GetCompletedFormDefinitionCmd(formDefinitionKey, parentDeploymentId, null, taskId, processInstanceId, variables));
+    return commandExecutor.execute(new GetFormInstanceModelCmd(formDefinitionKey, parentDeploymentId, null, taskId, processInstanceId, variables));
   }
   
-  public CompletedFormDefinition getCompletedTaskFormDefinitionByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId,
+  public FormInstanceModel getFormInstanceModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId,
       String taskId, String processInstanceId, Map<String, Object> variables, String tenantId) {
     
-    return commandExecutor.execute(new GetCompletedFormDefinitionCmd(formDefinitionKey, parentDeploymentId, null, 
+    return commandExecutor.execute(new GetFormInstanceModelCmd(formDefinitionKey, parentDeploymentId, null, 
         taskId, processInstanceId, tenantId, variables));
   }
   
-  public SubmittedFormQuery createSubmittedFormQuery() {
-    return new SubmittedFormQueryImpl(commandExecutor);
+  public FormInstanceQuery createFormInstanceQuery() {
+    return new FormInstanceQueryImpl(commandExecutor);
   }
 }

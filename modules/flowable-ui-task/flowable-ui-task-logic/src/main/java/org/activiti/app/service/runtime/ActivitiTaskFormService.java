@@ -35,9 +35,9 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
 import org.activiti.form.api.FormRepositoryService;
 import org.activiti.form.api.FormService;
-import org.activiti.form.model.FormDefinition;
 import org.activiti.form.model.FormField;
 import org.activiti.form.model.FormFieldTypes;
+import org.activiti.form.model.FormModel;
 import org.activiti.idm.api.User;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -82,7 +82,7 @@ public class ActivitiTaskFormService {
   @Autowired
   protected ObjectMapper objectMapper;
 
-  public FormDefinition getTaskForm(String taskId) {
+  public FormModel getTaskForm(String taskId) {
     HistoricTaskInstance task = permissionService.validateReadPermissionOnTask(SecurityUtils.getCurrentUserObject(), taskId);
     
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -107,29 +107,29 @@ public class ActivitiTaskFormService {
       }
     }
     
-    FormDefinition formDefinition = null;
+    FormModel formModel = null;
     if (task.getEndTime() != null) {
-      formDefinition = formService.getCompletedTaskFormDefinitionByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId, 
+      formModel = formService.getFormInstanceModelByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId, 
           taskId, task.getProcessInstanceId(), variables, task.getTenantId());
       
     } else {
-      formDefinition = formService.getTaskFormDefinitionByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId, 
+      formModel = formService.getFormModelWithVariablesByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId, 
           task.getProcessInstanceId(), variables, task.getTenantId());
     }
 
     // If form does not exists, we don't want to leak out this info to just anyone
-    if (formDefinition == null) {
-      throw new NotFoundException("Form definition for task " + task.getTaskDefinitionKey() + " cannot be found for form key " + task.getFormKey());
+    if (formModel == null) {
+      throw new NotFoundException("Form model for task " + task.getTaskDefinitionKey() + " cannot be found for form key " + task.getFormKey());
     }
     
     
     // TODO: needs to be moved to form service, but currently form service doesn't know about related content
-    fetchRelatedContentInfoIfNeeded(formDefinition);
+    fetchRelatedContentInfoIfNeeded(formModel);
 
-    return formDefinition;
+    return formModel;
   }
   
-  protected void fetchRelatedContentInfoIfNeeded(FormDefinition formDefinition) {
+  protected void fetchRelatedContentInfoIfNeeded(FormModel formDefinition) {
     if (formDefinition.getFields() != null) {
       for (FormField formField : formDefinition.getFields()) {
         if (FormFieldTypes.UPLOAD.equals(formField.getType())) {
@@ -168,7 +168,7 @@ public class ActivitiTaskFormService {
       throw new NotFoundException("Task not found with id: " + taskId);
     }
     
-    FormDefinition formDefinition = formRepositoryService.getFormDefinitionById(completeTaskFormRepresentation.getFormId());
+    FormModel formModel = formRepositoryService.getFormModelById(completeTaskFormRepresentation.getFormId());
 
     User currentUser = SecurityUtils.getCurrentUserObject();
     if (!permissionService.isTaskOwnerOrAssignee(currentUser, taskId)) {
@@ -179,12 +179,12 @@ public class ActivitiTaskFormService {
     
 
     // Extract raw variables and complete the task
-    Map<String, Object> variables = formService.getVariablesFromFormSubmission(formDefinition, completeTaskFormRepresentation.getValues(),
+    Map<String, Object> variables = formService.getVariablesFromFormSubmission(formModel, completeTaskFormRepresentation.getValues(),
         completeTaskFormRepresentation.getOutcome());
     
-    formService.storeSubmittedForm(variables, formDefinition, task.getId(), task.getProcessInstanceId());
+    formService.createFormInstance(variables, formModel, task.getId(), task.getProcessInstanceId());
     
-    processUploadFieldsIfNeeded(currentUser, task, formDefinition, variables);
+    processUploadFieldsIfNeeded(currentUser, task, formModel, variables);
     
     taskService.complete(taskId, variables);
   }
@@ -194,7 +194,7 @@ public class ActivitiTaskFormService {
    * Now that the task is completed, we need to associate the field/taskId/processInstanceId 
    * with the related content so we can retrieve it later.
    */
-  protected void processUploadFieldsIfNeeded(User currentUser, Task task, FormDefinition formDefinition, Map<String, Object> variables) {
+  protected void processUploadFieldsIfNeeded(User currentUser, Task task, FormModel formDefinition, Map<String, Object> variables) {
     if (formDefinition != null && formDefinition.getFields() != null) {
       for (FormField formField : formDefinition.getFields()) {
         if (FormFieldTypes.UPLOAD.equals(formField.getType())) {

@@ -12,17 +12,17 @@
  */
 package org.activiti.rest.form;
 
-import org.activiti.form.api.Form;
-import org.activiti.form.api.FormDeployment;
-import org.activiti.form.model.CompletedFormDefinition;
-import org.activiti.form.model.FormDefinition;
-import org.activiti.rest.form.service.api.form.CompletedTaskFormDefinitionResponse;
-import org.activiti.rest.form.service.api.form.TaskFormDefinitionResponse;
-import org.activiti.rest.form.service.api.repository.FormDeploymentResponse;
-import org.activiti.rest.form.service.api.repository.FormResponse;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.activiti.form.api.FormDefinition;
+import org.activiti.form.api.FormDeployment;
+import org.activiti.form.model.FormInstanceModel;
+import org.activiti.form.model.FormModel;
+import org.activiti.rest.form.service.api.form.FormInstanceModelResponse;
+import org.activiti.rest.form.service.api.form.FormModelResponse;
+import org.activiti.rest.form.service.api.repository.FormDefinitionResponse;
+import org.activiti.rest.form.service.api.repository.FormDeploymentResponse;
 
 /**
  *
@@ -32,44 +32,44 @@ import java.util.List;
  */
 public class FormRestResponseFactory {
 
-  public TaskFormDefinitionResponse createRuntimeFormDefinitionResponse(FormDefinition runtimeFormDefinition) {
-    return createRuntimeFormDefinitionResponse(runtimeFormDefinition, createUrlBuilder());
+  public FormModelResponse createFormModelResponse(FormModel formModel) {
+    return createFormModelResponse(formModel, createUrlBuilder());
   }
 
-  public TaskFormDefinitionResponse createRuntimeFormDefinitionResponse(FormDefinition runtimeFormDefinition, FormRestUrlBuilder urlBuilder) {
-    TaskFormDefinitionResponse response = new TaskFormDefinitionResponse(runtimeFormDefinition);
+  public FormModelResponse createFormModelResponse(FormModel formModel, FormRestUrlBuilder urlBuilder) {
+    FormModelResponse response = new FormModelResponse(formModel);
     response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_RUNTIME_TASK_FORM));
 
     return response;
   }
 
-  public CompletedTaskFormDefinitionResponse createCompletedTaskFormDefinitionResponse(CompletedFormDefinition completedFormDefinition) {
-    return createCompletedTaskFormDefinitionResponse(completedFormDefinition, createUrlBuilder());
+  public FormInstanceModelResponse createFormInstanceModelResponse(FormInstanceModel formInstanceModel) {
+    return createFormInstanceModelResponse(formInstanceModel, createUrlBuilder());
   }
 
-  public CompletedTaskFormDefinitionResponse createCompletedTaskFormDefinitionResponse(CompletedFormDefinition completedFormDefinition, FormRestUrlBuilder urlBuilder) {
-    CompletedTaskFormDefinitionResponse response = new CompletedTaskFormDefinitionResponse(completedFormDefinition);
+  public FormInstanceModelResponse createFormInstanceModelResponse(FormInstanceModel formInstanceModel, FormRestUrlBuilder urlBuilder) {
+    FormInstanceModelResponse response = new FormInstanceModelResponse(formInstanceModel);
     response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_COMPLETED_TASK_FORM));
 
     return response;
   }
 
-  public FormResponse createFormResponse(Form form) {
-    return createFormResponse(form, createUrlBuilder());
+  public FormDefinitionResponse createFormDefinitionResponse(FormDefinition formDefinition) {
+    return createFormDefinitionResponse(formDefinition, createUrlBuilder());
   }
 
-  public FormResponse createFormResponse(Form form, FormRestUrlBuilder urlBuilder) {
-    FormResponse response = new FormResponse(form);
-    response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_FORM, form.getId()));
+  public FormDefinitionResponse createFormDefinitionResponse(FormDefinition formDefinition, FormRestUrlBuilder urlBuilder) {
+    FormDefinitionResponse response = new FormDefinitionResponse(formDefinition);
+    response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_FORM, formDefinition.getId()));
 
     return response;
   }
 
-  public List<FormResponse> createFormResponseList(List<Form> forms) {
+  public List<FormDefinitionResponse> createFormResponseList(List<FormDefinition> formDefinitions) {
     FormRestUrlBuilder urlBuilder = createUrlBuilder();
-    List<FormResponse> responseList = new ArrayList<>();
-    for (Form instance : forms) {
-      responseList.add(createFormResponse(instance, urlBuilder));
+    List<FormDefinitionResponse> responseList = new ArrayList<>();
+    for (FormDefinition formDefinition : formDefinitions) {
+      responseList.add(createFormDefinitionResponse(formDefinition, urlBuilder));
     }
     return responseList;
   }

@@ -26,7 +26,7 @@ import org.activiti.form.engine.impl.context.Context;
 import org.activiti.form.engine.impl.persistence.entity.FormDeploymentEntity;
 import org.activiti.form.engine.impl.persistence.entity.ResourceEntity;
 import org.activiti.form.engine.impl.persistence.entity.ResourceEntityManager;
-import org.activiti.form.model.FormDefinition;
+import org.activiti.form.model.FormModel;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -109,7 +109,7 @@ public class FormDeploymentBuilderImpl implements FormDeploymentBuilder, Seriali
     return this;
   }
 
-  public FormDeploymentBuilder addFormDefinition(String resourceName, FormDefinition formDefinition) {
+  public FormDeploymentBuilder addFormDefinition(String resourceName, FormModel formDefinition) {
     FormJsonConverter formConverter = new FormJsonConverter();
     String formJson = formConverter.convertToJson(formDefinition);
     addString(resourceName, formJson);

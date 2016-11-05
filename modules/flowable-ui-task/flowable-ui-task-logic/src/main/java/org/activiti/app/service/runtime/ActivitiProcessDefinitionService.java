@@ -36,8 +36,8 @@ import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.form.api.FormRepositoryService;
-import org.activiti.form.model.FormDefinition;
 import org.activiti.form.model.FormField;
+import org.activiti.form.model.FormModel;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +63,7 @@ public class ActivitiProcessDefinitionService {
   @Autowired
   protected ObjectMapper objectMapper;
 
-  public FormDefinition getProcessDefinitionStartForm(HttpServletRequest request) {
+  public FormModel getProcessDefinitionStartForm(HttpServletRequest request) {
 
     String[] requestInfoArray = parseRequest(request);
     String processDefinitionId = getProcessDefinitionId(requestInfoArray, requestInfoArray.length - 2);
@@ -104,25 +104,25 @@ public class ActivitiProcessDefinitionService {
     return result;
   }
 
-  protected FormDefinition getStartForm(ProcessDefinition processDefinition) {
-    FormDefinition formDefinition = null;
+  protected FormModel getStartForm(ProcessDefinition processDefinition) {
+    FormModel formModel = null;
     BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
     Process process = bpmnModel.getProcessById(processDefinition.getKey());
     FlowElement startElement = process.getInitialFlowElement();
     if (startElement instanceof StartEvent) {
       StartEvent startEvent = (StartEvent) startElement;
       if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
-        formDefinition = formRepositoryService.getFormDefinitionByKeyAndParentDeploymentId(startEvent.getFormKey(), 
+        formModel = formRepositoryService.getFormModelByKeyAndParentDeploymentId(startEvent.getFormKey(), 
             processDefinition.getDeploymentId(), processDefinition.getTenantId());
       }
     }
 
-    if (formDefinition == null) {
+    if (formModel == null) {
       // Definition found, but no form attached
       throw new NotFoundException("Process definition does not have a form defined: " + processDefinition.getId());
     }
 
-    return formDefinition;
+    return formModel;
   }
 
   protected ProcessDefinition getProcessDefinitionFromRequest(String[] requestInfoArray, boolean isTableRequest) {
@@ -138,7 +138,7 @@ public class ActivitiProcessDefinitionService {
   }
 
   protected FormField getFormFieldFromRequest(String[] requestInfoArray, ProcessDefinition processDefinition, boolean isTableRequest) {
-    FormDefinition form = getStartForm(processDefinition);
+    FormModel form = getStartForm(processDefinition);
     int paramPosition = requestInfoArray.length - 1;
     if (isTableRequest) {
       paramPosition--;
@@ -173,8 +173,8 @@ public class ActivitiProcessDefinitionService {
           boolean hasStartForm = false;
           for (StartEvent startEvent : startEvents) {
             if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
-              FormDefinition formDefinition = formRepositoryService.getFormDefinitionByKey(startEvent.getFormKey());
-              if (formDefinition != null) {
+              FormModel formModel = formRepositoryService.getFormModelByKey(startEvent.getFormKey());
+              if (formModel != null) {
                 hasStartForm = true;
                 break;
               }

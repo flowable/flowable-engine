@@ -15,28 +15,28 @@ package org.activiti.form.engine.impl;
 import java.io.InputStream;
 import java.util.List;
 
-import org.activiti.form.api.Form;
+import org.activiti.form.api.FormDefinition;
 import org.activiti.form.api.FormDeployment;
 import org.activiti.form.api.FormDeploymentBuilder;
 import org.activiti.form.api.FormDeploymentQuery;
-import org.activiti.form.api.FormQuery;
+import org.activiti.form.api.FormDefinitionQuery;
 import org.activiti.form.api.FormRepositoryService;
 import org.activiti.form.api.NativeFormDeploymentQuery;
-import org.activiti.form.api.NativeFormQuery;
+import org.activiti.form.api.NativeFormDefinitionQuery;
 import org.activiti.form.engine.impl.cmd.DeleteDeploymentCmd;
 import org.activiti.form.engine.impl.cmd.DeployCmd;
-import org.activiti.form.engine.impl.cmd.GetDeploymentFormCmd;
-import org.activiti.form.engine.impl.cmd.GetDeploymentFormResourceCmd;
+import org.activiti.form.engine.impl.cmd.GetFormDefinitionCmd;
+import org.activiti.form.engine.impl.cmd.GetFormDefinitionResourceCmd;
 import org.activiti.form.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.activiti.form.engine.impl.cmd.GetDeploymentResourceNamesCmd;
-import org.activiti.form.engine.impl.cmd.GetFormDefinitionCmd;
+import org.activiti.form.engine.impl.cmd.GetFormModelCmd;
 import org.activiti.form.engine.impl.cmd.SetDeploymentCategoryCmd;
 import org.activiti.form.engine.impl.cmd.SetDeploymentTenantIdCmd;
-import org.activiti.form.engine.impl.cmd.SetFormCategoryCmd;
+import org.activiti.form.engine.impl.cmd.SetFormDefinitionCategoryCmd;
 import org.activiti.form.engine.impl.interceptor.Command;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
 import org.activiti.form.engine.impl.repository.FormDeploymentBuilderImpl;
-import org.activiti.form.model.FormDefinition;
+import org.activiti.form.model.FormModel;
 
 /**
  * @author Tijs Rademakers
@@ -60,12 +60,12 @@ public class FormRepositoryServiceImpl extends ServiceImpl implements FormReposi
       commandExecutor.execute(new DeleteDeploymentCmd(deploymentId));
     }
     
-    public FormQuery createFormQuery() {
-      return new FormQueryImpl(commandExecutor);
+    public FormDefinitionQuery createFormDefinitionQuery() {
+      return new FormDefinitionQueryImpl(commandExecutor);
     }
 
-    public NativeFormQuery createNativeFormQuery() {
-      return new NativeFormQueryImpl(commandExecutor);
+    public NativeFormDefinitionQuery createNativeFormDefinitionQuery() {
+      return new NativeFormDefinitionQueryImpl(commandExecutor);
     }
     
     public List<String> getDeploymentResourceNames(String deploymentId) {
@@ -92,35 +92,35 @@ public class FormRepositoryServiceImpl extends ServiceImpl implements FormReposi
       return new NativeFormDeploymentQueryImpl(commandExecutor);
     }
     
-    public Form getForm(String formId) {
-      return commandExecutor.execute(new GetDeploymentFormCmd(formId));
+    public FormDefinition getFormDefinition(String formDefinitionId) {
+      return commandExecutor.execute(new GetFormDefinitionCmd(formDefinitionId));
     }
     
-    public FormDefinition getFormDefinitionById(String formId) {
-      return commandExecutor.execute(new GetFormDefinitionCmd(null, formId));
+    public FormModel getFormModelById(String formId) {
+      return commandExecutor.execute(new GetFormModelCmd(null, formId));
     }
     
-    public FormDefinition getFormDefinitionByKey(String formDefinitionKey) {
-      return commandExecutor.execute(new GetFormDefinitionCmd(formDefinitionKey, null));
+    public FormModel getFormModelByKey(String formDefinitionKey) {
+      return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null));
     }
     
-    public FormDefinition getFormDefinitionByKey(String formDefinitionKey, String tenantId) {
-      return commandExecutor.execute(new GetFormDefinitionCmd(formDefinitionKey, null, tenantId));
+    public FormModel getFormModelByKey(String formDefinitionKey, String tenantId) {
+      return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null, tenantId));
     }
     
-    public FormDefinition getFormDefinitionByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId) {
-      return commandExecutor.execute(new GetFormDefinitionCmd(formDefinitionKey, null, null, parentDeploymentId));
+    public FormModel getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId) {
+      return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null, null, parentDeploymentId));
     }
     
-    public FormDefinition getFormDefinitionByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String tenantId) {
-      return commandExecutor.execute(new GetFormDefinitionCmd(formDefinitionKey, null, tenantId, parentDeploymentId));
+    public FormModel getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String tenantId) {
+      return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null, tenantId, parentDeploymentId));
     }
     
-    public InputStream getFormResource(String formId) {
-      return commandExecutor.execute(new GetDeploymentFormResourceCmd(formId));
+    public InputStream getFormDefinitionResource(String formId) {
+      return commandExecutor.execute(new GetFormDefinitionResourceCmd(formId));
     }
     
-    public void setFormCategory(String formId, String category) {
-      commandExecutor.execute(new SetFormCategoryCmd(formId, category));
+    public void setFormDefinitionCategory(String formId, String category) {
+      commandExecutor.execute(new SetFormDefinitionCategoryCmd(formId, category));
     }
 }

@@ -15,8 +15,7 @@ package org.activiti.form.engine.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.activiti.form.api.Form;
-import org.activiti.form.engine.test.FormDeploymentAnnotation;
+import org.activiti.form.api.FormDefinition;
 import org.junit.Test;
 
 public class DeploymentTest extends AbstractActivitiFormTest {
@@ -24,11 +23,11 @@ public class DeploymentTest extends AbstractActivitiFormTest {
   @Test
   @FormDeploymentAnnotation(resources = "org/activiti/form/engine/test/deployment/simple.form")
   public void deploySingleForm() {
-    Form form = repositoryService.createFormQuery()
+    FormDefinition formDefinition = repositoryService.createFormDefinitionQuery()
         .latestVersion()
         .formDefinitionKey("form1")
         .singleResult();
-    assertNotNull(form);
-    assertEquals("form1", form.getKey());
+    assertNotNull(formDefinition);
+    assertEquals("form1", formDefinition.getKey());
   }
 }

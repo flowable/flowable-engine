@@ -15,7 +15,7 @@ package org.activiti.rest.form.service.api.repository;
 import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.form.api.FormRepositoryService;
 import org.activiti.form.api.FormService;
-import org.activiti.form.model.FormDefinition;
+import org.activiti.form.model.FormModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,12 +34,12 @@ public class FormModelResource {
   @Autowired
   protected FormRepositoryService formRepositoryService;
 
-  @RequestMapping(value = "/form-repository/forms/{formId}/model", method = RequestMethod.GET, produces = "application/json")
-  public FormDefinition getModelResource(@PathVariable String formId) {
-    FormDefinition formDefinition = formRepositoryService.getFormDefinitionById(formId);
+  @RequestMapping(value = "/form-repository/form-definitions/{formDefinitionId}/model", method = RequestMethod.GET, produces = "application/json")
+  public FormModel getModelResource(@PathVariable String formDefinitionId) {
+    FormModel formDefinition = formRepositoryService.getFormModelById(formDefinitionId);
 
     if (formDefinition == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a form definition with id '" + formId);
+      throw new ActivitiObjectNotFoundException("Could not find a form definition with id '" + formDefinitionId);
     }
 
     return formDefinition;

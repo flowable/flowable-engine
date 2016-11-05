@@ -14,15 +14,15 @@ package org.activiti.form.api;
 
 import java.util.Map;
 
-import org.activiti.form.model.CompletedFormDefinition;
-import org.activiti.form.model.FormDefinition;
+import org.activiti.form.model.FormInstanceModel;
+import org.activiti.form.model.FormModel;
 
 /**
  * @author Tijs Rademakers
  */
 public interface FormService {
 
-    void completeForm(FormDefinition formDefinition);
+    void completeForm(FormModel formDefinition);
     
     /**
      * @param definition form definition to use for type-conversion and validation
@@ -32,7 +32,7 @@ public interface FormService {
      * @return raw variables that can be used in the activiti engine, based on the filled in values and selected outcome.
      * @throws FormValidationException when a submitted value is not valid or a required value is missing.
      */
-    Map<String, Object> getVariablesFromFormSubmission(FormDefinition formDefinition, Map<String, Object> values, String outcome);
+    Map<String, Object> getVariablesFromFormSubmission(FormModel formModel, Map<String, Object> values, String outcome);
     
     /**
      * Store the submitted form values.
@@ -42,38 +42,38 @@ public interface FormService {
        * @param processInstanceId process instance id of the completed task
        * @param valuesNode json node with the values of the 
        */
-    SubmittedForm storeSubmittedForm(Map<String, Object> values, FormDefinition formDefinition, String taskId, String processInstanceId);
+    FormInstance createFormInstance(Map<String, Object> values, FormModel formModel, String taskId, String processInstanceId);
     
-    FormDefinition getTaskFormDefinitionById(String formId, String processInstanceId, Map<String, Object> variables);
+    FormModel getFormModelWithVariablesById(String formDefinitionId, String processInstanceId, Map<String, Object> variables);
     
-    FormDefinition getTaskFormDefinitionById(String formId, String processInstanceId, Map<String, Object> variables, String tenantId);
+    FormModel getFormModelWithVariablesById(String formDefinitionId, String processInstanceId, Map<String, Object> variables, String tenantId);
     
-    FormDefinition getTaskFormDefinitionByKey(String formDefinitionKey, String processInstanceId, Map<String, Object> variables);
+    FormModel getFormModelWithVariablesByKey(String formDefinitionKey, String processInstanceId, Map<String, Object> variables);
     
-    FormDefinition getTaskFormDefinitionByKey(String formDefinitionKey, String processInstanceId, 
+    FormModel getFormModelWithVariablesByKey(String formDefinitionKey, String processInstanceId, 
         Map<String, Object> variables, String tenantId);
     
-    FormDefinition getTaskFormDefinitionByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, 
+    FormModel getFormModelWithVariablesByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, 
         String processInstanceId, Map<String, Object> variables);
     
-    FormDefinition getTaskFormDefinitionByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String processInstanceId, 
+    FormModel getFormModelWithVariablesByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String processInstanceId, 
         Map<String, Object> variables, String tenantId);
     
-    CompletedFormDefinition getCompletedTaskFormDefinitionById(String formId, String taskId, String processInstanceId, Map<String, Object> variables);
+    FormInstanceModel getFormInstanceModelById(String formId, String taskId, String processInstanceId, Map<String, Object> variables);
     
-    CompletedFormDefinition getCompletedTaskFormDefinitionById(String formId, String taskId, String processInstanceId, 
+    FormInstanceModel getFormInstanceModelById(String formId, String taskId, String processInstanceId, 
         Map<String, Object> variables, String tenantId);
     
-    CompletedFormDefinition getCompletedTaskFormDefinitionByKey(String formDefinitionKey, String taskId, String processInstanceId, Map<String, Object> variables);
+    FormInstanceModel getFormInstanceModelByKey(String formDefinitionKey, String taskId, String processInstanceId, Map<String, Object> variables);
     
-    CompletedFormDefinition getCompletedTaskFormDefinitionByKey(String formDefinitionKey, String taskId, String processInstanceId, 
+    FormInstanceModel getFormInstanceModelByKey(String formDefinitionKey, String taskId, String processInstanceId, 
         Map<String, Object> variables, String tenantId);
     
-    CompletedFormDefinition getCompletedTaskFormDefinitionByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId,
+    FormInstanceModel getFormInstanceModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId,
         String taskId, String processInstanceId, Map<String, Object> variables);
     
-    CompletedFormDefinition getCompletedTaskFormDefinitionByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId,
+    FormInstanceModel getFormInstanceModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId,
         String taskId, String processInstanceId, Map<String, Object> variables, String tenantId);
     
-    SubmittedFormQuery createSubmittedFormQuery();
+    FormInstanceQuery createFormInstanceQuery();
 }

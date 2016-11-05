@@ -18,7 +18,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.activiti.engine.query.QueryProperty;
-import org.activiti.form.api.FormQuery;
+import org.activiti.form.api.FormDefinitionQuery;
 import org.activiti.form.api.FormRepositoryService;
 import org.activiti.form.engine.impl.FormQueryProperty;
 import org.activiti.rest.api.DataResponse;
@@ -55,56 +55,56 @@ public class FormCollectionResource {
 
   @RequestMapping(value = "/form-repository/forms", method = RequestMethod.GET, produces = "application/json")
   public DataResponse getForms(@RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
-    FormQuery formQuery = formRepositoryService.createFormQuery();
+    FormDefinitionQuery formDefinitionQuery = formRepositoryService.createFormDefinitionQuery();
 
     // Populate filter-parameters
     if (allRequestParams.containsKey("category")) {
-      formQuery.formCategory(allRequestParams.get("category"));
+      formDefinitionQuery.formCategory(allRequestParams.get("category"));
     }
     if (allRequestParams.containsKey("categoryLike")) {
-      formQuery.formCategoryLike(allRequestParams.get("categoryLike"));
+      formDefinitionQuery.formCategoryLike(allRequestParams.get("categoryLike"));
     }
     if (allRequestParams.containsKey("categoryNotEquals")) {
-      formQuery.formCategoryNotEquals(allRequestParams.get("categoryNotEquals"));
+      formDefinitionQuery.formCategoryNotEquals(allRequestParams.get("categoryNotEquals"));
     }
     if (allRequestParams.containsKey("key")) {
-      formQuery.formDefinitionKey(allRequestParams.get("key"));
+      formDefinitionQuery.formDefinitionKey(allRequestParams.get("key"));
     }
     if (allRequestParams.containsKey("keyLike")) {
-      formQuery.formDefinitionKeyLike(allRequestParams.get("keyLike"));
+      formDefinitionQuery.formDefinitionKeyLike(allRequestParams.get("keyLike"));
     }
     if (allRequestParams.containsKey("name")) {
-      formQuery.formName(allRequestParams.get("name"));
+      formDefinitionQuery.formName(allRequestParams.get("name"));
     }
     if (allRequestParams.containsKey("nameLike")) {
-      formQuery.formNameLike(allRequestParams.get("nameLike"));
+      formDefinitionQuery.formNameLike(allRequestParams.get("nameLike"));
     }
     if (allRequestParams.containsKey("resourceName")) {
-      formQuery.formResourceName(allRequestParams.get("resourceName"));
+      formDefinitionQuery.formResourceName(allRequestParams.get("resourceName"));
     }
     if (allRequestParams.containsKey("resourceNameLike")) {
-      formQuery.formResourceNameLike(allRequestParams.get("resourceNameLike"));
+      formDefinitionQuery.formResourceNameLike(allRequestParams.get("resourceNameLike"));
     }
     if (allRequestParams.containsKey("version")) {
-      formQuery.formVersion(Integer.valueOf(allRequestParams.get("version")));
+      formDefinitionQuery.formVersion(Integer.valueOf(allRequestParams.get("version")));
     }
 
     if (allRequestParams.containsKey("latest")) {
       Boolean latest = Boolean.valueOf(allRequestParams.get("latest"));
       if (latest != null && latest) {
-        formQuery.latestVersion();
+        formDefinitionQuery.latestVersion();
       }
     }
     if (allRequestParams.containsKey("deploymentId")) {
-      formQuery.deploymentId(allRequestParams.get("deploymentId"));
+      formDefinitionQuery.deploymentId(allRequestParams.get("deploymentId"));
     }
     if (allRequestParams.containsKey("tenantId")) {
-      formQuery.formTenantId(allRequestParams.get("tenantId"));
+      formDefinitionQuery.formTenantId(allRequestParams.get("tenantId"));
     }
     if (allRequestParams.containsKey("tenantIdLike")) {
-      formQuery.formTenantIdLike(allRequestParams.get("tenantIdLike"));
+      formDefinitionQuery.formTenantIdLike(allRequestParams.get("tenantIdLike"));
     }
 
-    return new FormPaginateList(formRestResponseFactory).paginateList(allRequestParams, formQuery, "name", properties);
+    return new FormPaginateList(formRestResponseFactory).paginateList(allRequestParams, formDefinitionQuery, "name", properties);
   }
 }

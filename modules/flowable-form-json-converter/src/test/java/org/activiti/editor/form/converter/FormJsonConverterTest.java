@@ -19,8 +19,8 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.activiti.form.model.FormDefinition;
 import org.activiti.form.model.FormField;
+import org.activiti.form.model.FormModel;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -44,7 +44,7 @@ public class FormJsonConverterTest {
     public void testSimpleJsonForm() throws Exception {
 
         String testJsonResource = readJsonToString(JSON_RESOURCE_1);
-        FormDefinition formDefinition = new FormJsonConverter().convertToForm(testJsonResource, "11", 1);
+        FormModel formDefinition = new FormJsonConverter().convertToFormModel(testJsonResource, "11", 1);
 
         assertNotNull(formDefinition);
         assertEquals("11", formDefinition.getId());
