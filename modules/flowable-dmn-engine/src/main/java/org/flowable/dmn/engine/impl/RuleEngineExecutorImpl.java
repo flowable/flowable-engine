@@ -92,7 +92,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
       throw new FlowableException("no execution context available");
     }
 
-    logger.debug("Start table evaluation: " + decisionTable.getId());
+    logger.debug("Start table evaluation: {}", decisionTable.getId());
 
     Map<String, Object> ruleResults = new HashMap<String, Object>();
     List<ValidRuleOutputEntries> validConclusionsStack = new ArrayList<ValidRuleOutputEntries>();
@@ -120,7 +120,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
       executionContext.getAuditContainer().setExceptionMessage(getExceptionMessage(ade));
     }
 
-    logger.debug("End table evaluation: " + decisionTable.getId());
+    logger.debug("End table evaluation: {}", decisionTable.getId());
 
     return executionContext.getResultVariables();
   }

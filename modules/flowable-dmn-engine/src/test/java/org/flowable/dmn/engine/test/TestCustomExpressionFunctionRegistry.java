@@ -45,7 +45,7 @@ public class TestCustomExpressionFunctionRegistry implements CustomExpressionFun
 
     protected static Method getMethod(Class classRef, String methodName, Class... methodParm) {
         try {
-            logger.debug("adding method to MVEL: "+classRef.getName() + " " +methodName+ " with " +methodParm.length + " parameters");
+            logger.debug("adding method to MVEL: {} {} with {} parameters", classRef.getName(), methodName, methodParam.length);
             return classRef.getMethod(methodName, methodParm);
         } catch (NoSuchMethodException nsme) {
             logger.error("Could not find method for name: "+methodName, nsme);

@@ -144,7 +144,7 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
   }
   
   protected void shutdownTenantExecutor(String tenantId) {
-    logger.info("Shutting down async executor for tenant " + tenantId);
+    logger.info("Shutting down async executor for tenant {}", tenantId);
     tenantExecutors.get(tenantId).shutdown();
   }
 

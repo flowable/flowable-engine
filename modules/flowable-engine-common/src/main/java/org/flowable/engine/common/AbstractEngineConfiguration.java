@@ -240,9 +240,9 @@ public abstract class AbstractEngineConfiguration {
 
         if (logger.isInfoEnabled()) {
           logger.info("Configuring Datasource with following properties (omitted password for security)");
-          logger.info("datasource driver: " + jdbcDriver);
-          logger.info("datasource url : " + jdbcUrl);
-          logger.info("datasource user name : " + jdbcUsername);
+          logger.info("datasource driver : {}", jdbcDriver);
+          logger.info("datasource url : {}", jdbcUrl);
+          logger.info("datasource user name : {}", jdbcUsername);
         }
 
         PooledDataSource pooledDataSource = new PooledDataSource(this.getClass().getClassLoader(), jdbcDriver, jdbcUrl, jdbcUsername, jdbcPassword);

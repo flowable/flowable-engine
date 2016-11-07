@@ -28,7 +28,7 @@ public class DebugInfoExecutionDeleted extends AbstractDebugInfo {
 
   @Override
   public void printOut(Logger logger) {
-    logger.info("Execution " + executionEntity.getId() + " deleted");
+    logger.info("Execution {} deleted", executionEntity.getId());
   }
 
 }

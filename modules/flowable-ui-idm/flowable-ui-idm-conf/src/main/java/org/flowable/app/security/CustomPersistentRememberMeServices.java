@@ -87,7 +87,7 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
 
     Integer tokenMaxAgeSeconds = env.getProperty("security.cookie.max-age", Integer.class);
     if (tokenMaxAgeSeconds != null) {
-      log.info("Cookie max-age set to " + tokenMaxAgeSeconds + " seconds");
+      log.info("Cookie max-age set to {} seconds", tokenMaxAgeSeconds);
     } else {
       tokenMaxAgeSeconds = 2678400; // Default: 31 days
     }
@@ -96,7 +96,7 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
 
     Integer tokenRefreshSeconds = env.getProperty("security.cookie.refresh-age", Integer.class);
     if (tokenRefreshSeconds != null) {
-      log.info("Cookie refresh age set to " + tokenRefreshSeconds + " seconds");
+      log.info("Cookie refresh age set to {} seconds", tokenRefreshSeconds);
     } else {
       tokenRefreshSeconds = 86400; // Default : 1 day
     }

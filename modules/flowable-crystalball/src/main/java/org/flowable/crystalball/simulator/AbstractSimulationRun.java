@@ -124,7 +124,7 @@ public abstract class AbstractSimulationRun implements SimulationRun, Simulation
 
   protected void executeEvent(SimulationEvent event) {
     // set simulation time to the next event for process engine too
-    log.debug("Simulation time:" + this.processEngine.getProcessEngineConfiguration().getClock().getCurrentTime());
+    log.debug("Simulation time: {}", this.processEngine.getProcessEngineConfiguration().getClock().getCurrentTime());
 
     SimulationEventHandler handler = eventHandlerMap.get(event.getType());
     if (handler != null) {

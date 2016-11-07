@@ -230,7 +230,7 @@ public class FlowableTaskQueryService {
       taskInfoQueryWrapper.getTaskInfoQuery().taskDueBefore(d);
       
     } catch (Exception e) {
-      logger.error("Error parsing due before date " + date + ", ignoring it");
+      logger.error("Error parsing due before date {}, ignoring it", date);
     }
   }
 
@@ -241,7 +241,7 @@ public class FlowableTaskQueryService {
       taskInfoQueryWrapper.getTaskInfoQuery().taskDueAfter(d);
       
     } catch (Exception e) {
-      logger.error("Error parsing due after date " + date + ", ignoring it");
+      logger.error("Error parsing due after date {}, ignoring it", date);
     }
   }
 

@@ -1131,7 +1131,7 @@ public class DbSqlSession implements Session {
           DatabaseMetaData databaseMetaData = connection.getMetaData();
           int majorVersion = databaseMetaData.getDatabaseMajorVersion();
           int minorVersion = databaseMetaData.getDatabaseMinorVersion();
-          log.info("Found MySQL: majorVersion=" + majorVersion + " minorVersion=" + minorVersion);
+          log.info("Found MySQL: majorVersion={} minorVersion=", majorVersion, minorVersion);
 
           // Special care for MySQL < 5.6
           if (majorVersion <= 5 && minorVersion < 6) {
@@ -1271,7 +1271,7 @@ public class DbSqlSession implements Session {
 
   public void performSchemaOperationsProcessEngineBuild() {
     String databaseSchemaUpdate = Context.getProcessEngineConfiguration().getDatabaseSchemaUpdate();
-    log.debug("Executing performSchemaOperationsProcessEngineBuild with setting " + databaseSchemaUpdate);
+    log.debug("Executing performSchemaOperationsProcessEngineBuild with setting {}", databaseSchemaUpdate);
     if (ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
       try {
         dbSchemaDrop();

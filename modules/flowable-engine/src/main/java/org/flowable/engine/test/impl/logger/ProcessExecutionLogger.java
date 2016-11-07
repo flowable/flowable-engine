@@ -124,7 +124,7 @@ public class ProcessExecutionLogger {
     for (String threadName : debugInfoMap.keySet()) {
 
       logger.info("");
-      logger.info("Thread '" + threadName + "':");
+      logger.info("Thread '{}:", threadName);
       logger.info("");
 
       for (DebugInfo debugInfo : debugInfoMap.get(threadName)) {

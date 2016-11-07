@@ -51,7 +51,7 @@ public class EndEventParseHandler extends AbstractActivityBpmnParseHandler<EndEv
       if (bpmnParse.getBpmnModel().containsErrorRef(errorDefinition.getErrorCode())) {
         String errorCode = bpmnParse.getBpmnModel().getErrors().get(errorDefinition.getErrorCode());
         if (StringUtils.isEmpty(errorCode)) {
-          logger.warn("errorCode is required for an error event " + endEvent.getId());
+          logger.warn("errorCode is required for an error event {}", endEvent.getId());
         }
         endEventActivity.setProperty("type", "errorEndEvent");
         errorDefinition.setErrorCode(errorCode);

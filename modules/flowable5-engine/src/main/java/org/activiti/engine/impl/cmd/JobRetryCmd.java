@@ -71,7 +71,7 @@ public class JobRetryCmd implements Command<Object> {
    
     AbstractJobEntity newJobEntity = null;
     if (activity == null || activity.getFailedJobRetryTimeCycleValue() == null) {
-      log.debug("activitiy or FailedJobRetryTimerCycleValue is null in job " + jobId + "'. only decrementing retries.");
+      log.debug("activitiy or FailedJobRetryTimerCycleValue is null in job '{}'. only decrementing retries.", jobId);
       
       if (job.getRetries() <= 1) {
         DeadLetterJobEntity deadLetterJob = new DeadLetterJobEntity(job);
@@ -115,10 +115,10 @@ public class JobRetryCmd implements Command<Object> {
         newJobEntity.setDuedate(durationHelper.getDateAfter());
          
         if (job.getExceptionMessage() == null) {  // is it the first exception 
-          log.debug("Applying JobRetryStrategy '" + failedJobRetryTimeCycle+ "' the first time for job " + job.getId() + " with "+ durationHelper.getTimes()+" retries");
+          log.debug("Applying JobRetryStrategy '{}' the first time for job {} with {} retries", failedJobRetryTimeCycle, job.getId(), durationHelper.getTimes);
           
         } else {
-          log.debug("Decrementing retries of JobRetryStrategy '" + failedJobRetryTimeCycle+ "' for job " + job.getId());
+          log.debug("Decrementing retries of JobRetryStrategy '{}' for job {}", failedJobRetryTimeCycle, job.getId());
         }
         newJobEntity.setRetries(jobRetries - 1);
          

@@ -42,7 +42,7 @@ public class ProcessParseHandler extends AbstractBpmnParseHandler<Process> {
 
   protected void executeParse(BpmnParse bpmnParse, Process process) {
     if (process.isExecutable() == false) {
-      LOGGER.info("Ignoring non-executable process with id='" + process.getId() + "'. Set the attribute isExecutable=\"true\" to deploy this process.");
+      LOGGER.info("Ignoring non-executable process with id='{}'. Set the attribute isExecutable=\"true\" to deploy this process.", process.getId());
     } else {
       bpmnParse.getProcessDefinitions().add(transformProcess(bpmnParse, process));
     }
