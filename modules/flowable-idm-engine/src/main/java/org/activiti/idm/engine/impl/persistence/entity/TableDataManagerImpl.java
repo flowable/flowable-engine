@@ -140,7 +140,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
 
   protected long getTableCount(String tableName) {
     log.debug("selecting table count for {}", tableName);
-    Long count = (Long) getDbSqlSession().selectOne("selectTableCount", Collections.singletonMap("tableName", tableName));
+    Long count = (Long) getDbSqlSession().selectOne("org.activiti.idm.engine.impl.TablePageMap.selectTableCount", Collections.singletonMap("tableName", tableName));
     return count;
   }
 

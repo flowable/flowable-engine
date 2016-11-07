@@ -93,16 +93,16 @@ public class ProcessEngineImpl implements ProcessEngine {
     }
 
     ProcessEngines.registerProcessEngine(this);
+    
+    if (processEngineConfiguration.getProcessEngineLifecycleListener() != null) {
+      processEngineConfiguration.getProcessEngineLifecycleListener().onProcessEngineBuilt(this);
+    }
+    
+    processEngineConfiguration.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createGlobalEvent(ActivitiEngineEventType.ENGINE_CREATED));
 
     if (asyncExecutor != null && asyncExecutor.isAutoActivate()) {
       asyncExecutor.start();
     }
-
-    if (processEngineConfiguration.getProcessEngineLifecycleListener() != null) {
-      processEngineConfiguration.getProcessEngineLifecycleListener().onProcessEngineBuilt(this);
-    }
-
-    processEngineConfiguration.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createGlobalEvent(ActivitiEngineEventType.ENGINE_CREATED));
   }
 
   public void close() {
@@ -110,8 +110,11 @@ public class ProcessEngineImpl implements ProcessEngine {
     if (asyncExecutor != null && asyncExecutor.isActive()) {
       asyncExecutor.shutdown();
     }
-
-    commandExecutor.execute(processEngineConfiguration.getSchemaCommandConfig(), new SchemaOperationProcessEngineClose());
+    
+    Runnable closeRunnable = processEngineConfiguration.getProcessEngineCloseRunnable();
+    if (closeRunnable != null) {
+      closeRunnable.run();
+    }
 
     if (processEngineConfiguration.getProcessEngineLifecycleListener() != null) {
       processEngineConfiguration.getProcessEngineLifecycleListener().onProcessEngineClosed(this);

@@ -13,6 +13,7 @@
 
 package org.activiti.engine.impl.interceptor;
 
+import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.cfg.TransactionContext;
 import org.activiti.engine.impl.cfg.TransactionContextFactory;
 import org.activiti.engine.impl.cfg.TransactionListener;

@@ -29,10 +29,6 @@ import org.activiti.form.model.FormModel;
  */
 public class FormServiceImpl extends ServiceImpl implements FormService {
 
-  public void completeForm(FormModel formDefinition) {
-
-  }
-  
   public Map<String, Object> getVariablesFromFormSubmission(FormModel formModel, Map<String, Object> values) {
     return commandExecutor.execute(new GetVariablesFromFormSubmissionCmd(formModel, values));
   }

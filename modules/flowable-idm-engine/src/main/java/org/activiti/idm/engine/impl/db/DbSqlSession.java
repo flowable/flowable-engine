@@ -34,6 +34,7 @@ import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.db.ListQueryParameterObject;
 import org.activiti.engine.impl.interceptor.Session;
 import org.activiti.engine.impl.persistence.entity.Entity;
+import org.activiti.engine.impl.transaction.ConnectionHolder;
 import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.idm.engine.IdmEngine;
 import org.activiti.idm.engine.IdmEngineConfiguration;
@@ -284,7 +285,7 @@ public class DbSqlSession implements Session {
   }
 
   protected String getDbVersion() {
-    String selectSchemaVersionStatement = dbSqlSessionFactory.mapStatement("selectDbSchemaVersion");
+    String selectSchemaVersionStatement = dbSqlSessionFactory.mapStatement("org.activiti.idm.engine.impl.persistence.entity.PropertyEntityImpl.selectDbSchemaVersion");
     return (String) sqlSession.selectOne(selectSchemaVersionStatement);
   }
 

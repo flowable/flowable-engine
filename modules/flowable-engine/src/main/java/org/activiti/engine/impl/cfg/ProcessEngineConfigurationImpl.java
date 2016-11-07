@@ -69,6 +69,7 @@ import org.activiti.engine.impl.ManagementServiceImpl;
 import org.activiti.engine.impl.ProcessEngineImpl;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.RuntimeServiceImpl;
+import org.activiti.engine.impl.SchemaOperationProcessEngineClose;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.impl.TaskServiceImpl;
 import org.activiti.engine.impl.agenda.DefaultFlowableEngineAgendaFactory;
@@ -155,6 +156,7 @@ import org.activiti.engine.impl.form.StringFormType;
 import org.activiti.engine.impl.history.DefaultHistoryManager;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.impl.history.HistoryManager;
+import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandContextFactory;
@@ -292,6 +294,7 @@ import org.activiti.engine.impl.scripting.ResolverFactory;
 import org.activiti.engine.impl.scripting.ScriptBindingsFactory;
 import org.activiti.engine.impl.scripting.ScriptingEngines;
 import org.activiti.engine.impl.scripting.VariableScopeResolverFactory;
+import org.activiti.engine.impl.transaction.ContextAwareJdbcTransactionFactory;
 import org.activiti.engine.impl.util.ProcessInstanceHelper;
 import org.activiti.engine.impl.util.ReflectUtil;
 import org.activiti.engine.impl.variable.BooleanType;
@@ -330,6 +333,7 @@ import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
+import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.apache.ibatis.type.JdbcType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1791,6 +1795,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       transactionContextFactory = new StandaloneMybatisTransactionContextFactory();
     }
   }
+  
+  public void initTransactionFactory() {
+    if (transactionFactory == null) {
+      if (transactionsExternallyManaged) {
+        transactionFactory = new ManagedTransactionFactory();
+      } else {
+        transactionFactory = new ContextAwareJdbcTransactionFactory(); // Special for process engine! ContextAware vs regular JdbcTransactionFactory
+      }
+    }
+  }
 
   public void initHelpers() {
     if (processInstanceHelper == null) {
@@ -2045,6 +2059,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       commandExecutor.execute(new ValidateExecutionRelatedEntityCountCfgCmd());
     }
   }
+  
+  public Runnable getProcessEngineCloseRunnable() {
+    return new Runnable() {
+      public void run() {
+        commandExecutor.execute(getSchemaCommandConfig(), new SchemaOperationProcessEngineClose());
+      }
+    };
+  }
+  
 
   // getters and setters
   // //////////////////////////////////////////////////////

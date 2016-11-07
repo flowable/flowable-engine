@@ -12,7 +12,12 @@
  */
 package org.activiti.engine.impl.cfg;
 
+import javax.sql.DataSource;
+
+import org.activiti.engine.ActivitiException;
 import org.activiti.engine.cfg.AbstractProcessEngineConfigurator;
+import org.activiti.engine.impl.transaction.TransactionContextAwareDataSource;
+import org.activiti.engine.impl.transaction.TransactionContextAwareTransactionFactory;
 import org.activiti.idm.engine.IdmEngine;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
@@ -22,48 +27,52 @@ import org.activiti.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
  */
 public class IdmEngineConfigurator extends AbstractProcessEngineConfigurator {
   
-  protected static IdmEngine idmEngine;
   protected IdmEngineConfiguration idmEngineConfiguration;
   
   @Override
-  public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
+  public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
     if (idmEngineConfiguration == null) {
       idmEngineConfiguration = new StandaloneIdmEngineConfiguration();
-      if (processEngineConfiguration.getDataSource() != null) {
-        idmEngineConfiguration.setDataSource(processEngineConfiguration.getDataSource());
-        
-      } else if (processEngineConfiguration.getDataSourceJndiName() != null) {
-        idmEngineConfiguration.setDataSourceJndiName(processEngineConfiguration.getDataSourceJndiName());
       
+      if (processEngineConfiguration.getDataSource() != null) {
+        DataSource originalDatasource = processEngineConfiguration.getDataSource();
+        if (processEngineConfiguration.isTransactionsExternallyManaged()) {
+          idmEngineConfiguration.setDataSource(originalDatasource);
+        } else {
+          idmEngineConfiguration.setDataSource(new TransactionContextAwareDataSource(originalDatasource));
+        }
+        
       } else {
-        idmEngineConfiguration.setJdbcUrl(processEngineConfiguration.getJdbcUrl());
-        idmEngineConfiguration.setJdbcDriver(processEngineConfiguration.getJdbcDriver());
-        idmEngineConfiguration.setJdbcUsername(processEngineConfiguration.getJdbcUsername());
-        idmEngineConfiguration.setJdbcPassword(processEngineConfiguration.getJdbcPassword());
+        throw new ActivitiException("A datasource is required for initializing the IDM engine ");
       }
       
       idmEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
       idmEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
       idmEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
+      
+      if (processEngineConfiguration.isTransactionsExternallyManaged()) {
+       idmEngineConfiguration.setTransactionsExternallyManaged(true);
+      } else {
+       idmEngineConfiguration.setTransactionFactory(
+            new TransactionContextAwareTransactionFactory<org.activiti.idm.engine.impl.cfg.TransactionContext>(
+                  org.activiti.idm.engine.impl.cfg.TransactionContext.class));
+      }
+      
+      if (processEngineConfiguration.getEventDispatcher() != null) {
+        idmEngineConfiguration.setEventDispatcher(processEngineConfiguration.getEventDispatcher());
+      }
+      
     }
     
-    initIdmEngine();
+    IdmEngine idmEngine = idmEngineConfiguration.buildIdmEngine();
     
     processEngineConfiguration.setIdmEngineInitialized(true);
     processEngineConfiguration.setIdmIdentityService(idmEngine.getIdmIdentityService());
   }
   
   @Override
-  public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    if (processEngineConfiguration.getEventDispatcher() != null) {
-      idmEngineConfiguration.setEventDispatcher(processEngineConfiguration.getEventDispatcher());
-    }
-  }
-
-  protected synchronized void initIdmEngine() {
-    if (idmEngine == null) {
-      idmEngine = idmEngineConfiguration.buildIdmEngine();
-    }
+  public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    // Nothing to do in the before init: we boot up the IDM engine once the process engine is ready
   }
 
   public IdmEngineConfiguration getIdmEngineConfiguration() {

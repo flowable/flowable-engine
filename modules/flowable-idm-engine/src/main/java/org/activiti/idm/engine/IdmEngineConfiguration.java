@@ -31,6 +31,7 @@ import org.activiti.engine.impl.cfg.IdGenerator;
 import org.activiti.engine.impl.cfg.TransactionContextFactory;
 import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.SessionFactory;
+import org.activiti.engine.impl.transaction.ContextAwareJdbcTransactionFactory;
 import org.activiti.engine.runtime.Clock;
 import org.activiti.idm.api.IdmIdentityService;
 import org.activiti.idm.api.IdmManagementService;
@@ -86,6 +87,8 @@ import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisTokenDat
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisUserDataManager;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
+import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
+import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
@@ -203,7 +206,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     initClock();
     initEventDispatcher();
   }
-
+  
   // services
   // /////////////////////////////////////////////////////////////////
 
@@ -346,12 +349,18 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
   public Collection<? extends CommandInterceptor> getDefaultCommandInterceptors() {
     List<CommandInterceptor> interceptors = new ArrayList<CommandInterceptor>();
     interceptors.add(new LogInterceptor());
-
-    interceptors.add(new CommandContextInterceptor(commandContextFactory, this));
     
     CommandInterceptor transactionInterceptor = createTransactionInterceptor();
     if (transactionInterceptor != null) {
       interceptors.add(transactionInterceptor);
+    }
+    
+    if (commandContextFactory != null) {
+      interceptors.add(new CommandContextInterceptor(commandContextFactory, this));
+    }
+    
+    if (transactionContextFactory != null) {
+      interceptors.add(new TransactionContextInterceptor(transactionContextFactory));
     }
     
     return interceptors;
@@ -375,11 +384,8 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
   }
 
   public CommandInterceptor createTransactionInterceptor() {
-    if (transactionContextFactory != null) {
-      return new TransactionContextInterceptor(transactionContextFactory);
-    } else {
-      return null;
-    }
+    // Should be overridden by subclasses
+    return null;
   }
 
   // OTHER
