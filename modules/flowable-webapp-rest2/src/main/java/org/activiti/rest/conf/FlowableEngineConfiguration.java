@@ -3,6 +3,8 @@ package org.activiti.rest.conf;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.activiti.dmn.engine.DmnEngineConfiguration;
+import org.activiti.dmn.engine.configurator.DmnEngineConfigurator;
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
@@ -13,6 +15,9 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.form.AbstractFormType;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.activiti.form.engine.FormEngine;
+import org.activiti.form.engine.FormEngineConfiguration;
+import org.activiti.form.engine.configurator.FormEngineConfigurator;
 import org.activiti.rest.form.MonthFormType;
 import org.activiti.rest.form.ProcessDefinitionFormType;
 import org.activiti.rest.form.UserFormType;
@@ -20,6 +25,7 @@ import org.activiti.spring.ProcessEngineFactoryBean;
 import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,6 +34,12 @@ import org.springframework.context.annotation.Configuration;
 public class FlowableEngineConfiguration extends BaseEngineConfiguration {
 
   private final Logger log = LoggerFactory.getLogger(FlowableEngineConfiguration.class);
+
+  @Autowired
+  protected DmnEngineConfiguration dmnEngineConfiguration;
+
+  @Autowired
+  protected FormEngineConfiguration formEngineConfiguration;
 
   @Bean(name = "processEngineFactoryBean")
   public ProcessEngineFactoryBean processEngineFactoryBean() {
@@ -63,6 +75,14 @@ public class FlowableEngineConfiguration extends BaseEngineConfiguration {
     formTypes.add(new ProcessDefinitionFormType());
     formTypes.add(new MonthFormType());
     processEngineConfiguration.setCustomFormTypes(formTypes);
+
+    FormEngineConfigurator formEngineConfigurator = new FormEngineConfigurator();
+    formEngineConfigurator.setFormEngineConfiguration(formEngineConfiguration);
+    processEngineConfiguration.addConfigurator(formEngineConfigurator);
+
+    DmnEngineConfigurator dmnEngineConfigurator = new DmnEngineConfigurator();
+    dmnEngineConfigurator.setDmnEngineConfiguration(dmnEngineConfiguration);
+    processEngineConfiguration.addConfigurator(dmnEngineConfigurator);
 
     return processEngineConfiguration;
   }
@@ -101,4 +121,5 @@ public class FlowableEngineConfiguration extends BaseEngineConfiguration {
   public ManagementService managementService() {
     return processEngine().getManagementService();
   }
+  
 }

@@ -26,21 +26,21 @@ import org.springframework.context.annotation.Configuration;
 public class FlowableDmnEngineConfiguration extends BaseEngineConfiguration {
 
   @Bean
-  public DmnEngine ruleEngine() {
+  public DmnEngineConfiguration ruleEngineConfiguration() {
     DmnEngineConfiguration dmnEngineConfiguration = new DmnEngineConfiguration();
     dmnEngineConfiguration.setDataSource(dataSource());
     dmnEngineConfiguration.setDatabaseSchemaUpdate(environment.getProperty("engine.dmn.schema.update", "true"));
 
-    return dmnEngineConfiguration.buildDmnEngine();
+    return dmnEngineConfiguration;
   }
 
   @Bean
   public DmnRepositoryService dmnRepositoryService() {
-    return ruleEngine().getDmnRepositoryService();
+    return ruleEngineConfiguration().getDmnRepositoryService();
   }
 
   @Bean
   public DmnRuleService dmnRuleService() {
-    return ruleEngine().getDmnRuleService();
+    return ruleEngineConfiguration().getDmnRuleService();
   }
 }

@@ -26,21 +26,21 @@ import org.springframework.context.annotation.Configuration;
 public class FlowableFormEngineConfiguration extends BaseEngineConfiguration {
 
   @Bean
-  public FormEngine formEngine() {
+  public FormEngineConfiguration formEngineConfiguration() {
     FormEngineConfiguration formEngineConfiguration = new FormEngineConfiguration();
     formEngineConfiguration.setDataSource(dataSource());
     formEngineConfiguration.setDatabaseSchemaUpdate(environment.getProperty("engine.form.schema.update", "true"));
 
-    return formEngineConfiguration.buildFormEngine();
+    return formEngineConfiguration;
   }
 
   @Bean
   public FormRepositoryService formRepositoryService() {
-    return formEngine().getFormRepositoryService();
+    return formEngineConfiguration().getFormRepositoryService();
   }
 
   @Bean
   public FormService dmnFormService() {
-    return formEngine().getFormService();
+    return formEngineConfiguration().getFormService();
   }
 }
