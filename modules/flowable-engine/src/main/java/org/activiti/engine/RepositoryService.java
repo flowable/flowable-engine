@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.dmn.api.DecisionTable;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.engine.repository.DeploymentQuery;
 import org.activiti.engine.repository.DiagramLayout;
@@ -460,5 +461,14 @@ public interface RepositoryService {
    * 
    */
   List<ValidationError> validateProcess(BpmnModel bpmnModel);
+
+  /**
+   * Retrieves the {@link DecisionTable}s associated with the given process definition.
+   *
+   * @param processDefinitionId
+   *          id of the process definition, cannot be null.
+   *
+   */
+  List<DecisionTable> getDecisionTablesForProcessDefinition(String processDefinitionId);
 
 }
