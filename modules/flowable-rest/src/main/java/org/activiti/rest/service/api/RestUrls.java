@@ -80,6 +80,7 @@ public final class RestUrls {
   public static final String SEGMENT_DIAGRAM = "diagram";
   public static final String SEGMENT_SIGNALS = "signals";
   public static final String SEGMENT_IMAGE = "image";
+  public static final String SEGMENT_DECISION_TABLES = "decision-tables";
 
   /**
    * URL template for the deployment collection: <i>repository/deployments</i>
@@ -140,6 +141,11 @@ public final class RestUrls {
    * URL template for the image of a process definition: <i>repository/process-definitions/{0:processDefinitionId}/image</i>
    */
   public static final String[] URL_PROCESS_DEFINITION_IMAGE = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_PROCESS_DEFINITION_RESOURCE, "{0}", SEGMENT_IMAGE };
+
+  /**
+   * URL template for the image of a process definition: <i>repository/process-definitions/{0:processDefinitionId}/decision-tables</i>
+   */
+  public static final String[] URL_PROCESS_DEFINITION_DECISION_TABLES_COLLECTION = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_PROCESS_DEFINITION_RESOURCE, "{0}", SEGMENT_DECISION_TABLES };
 
   /**
    * URL template for the model collection: <i>repository/models</i>

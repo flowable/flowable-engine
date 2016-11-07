@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.activiti.dmn.api.DecisionTable;
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.form.FormData;
 import org.activiti.engine.form.FormProperty;
@@ -77,6 +78,7 @@ import org.activiti.rest.service.api.identity.UserInfoResponse;
 import org.activiti.rest.service.api.identity.UserResponse;
 import org.activiti.rest.service.api.management.JobResponse;
 import org.activiti.rest.service.api.management.TableResponse;
+import org.activiti.rest.service.api.repository.DecisionTableResponse;
 import org.activiti.rest.service.api.repository.DeploymentResourceResponse;
 import org.activiti.rest.service.api.repository.DeploymentResponse;
 import org.activiti.rest.service.api.repository.ModelResponse;
@@ -1122,6 +1124,26 @@ public class RestResponseFactory {
     }
 
     return response;
+  }
+
+  public List<DecisionTableResponse> createDecisionTableResponseList(List<DecisionTable> decisionTables) {
+    RestUrlBuilder urlBuilder = createUrlBuilder();
+    List<DecisionTableResponse> responseList = new ArrayList<>();
+    for (DecisionTable decisionTable : decisionTables) {
+      responseList.add(createDecisionTableResponse(decisionTable, urlBuilder));
+    }
+    return responseList;
+  }
+
+  public DecisionTableResponse createDecisionTableResponse(DecisionTable decisionTable) {
+    return createDecisionTableResponse(decisionTable, createUrlBuilder());
+  }
+
+  public DecisionTableResponse createDecisionTableResponse(DecisionTable decisionTable, RestUrlBuilder urlBuilder) {
+    DecisionTableResponse decisionTableResponse = new DecisionTableResponse(decisionTable);
+    decisionTableResponse.setUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION_DECISION_TABLES_COLLECTION));
+
+    return decisionTableResponse;
   }
 
   /**
