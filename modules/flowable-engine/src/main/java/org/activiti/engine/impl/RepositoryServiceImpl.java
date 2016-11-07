@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.app.AppModel;
 import org.activiti.engine.impl.cmd.ActivateProcessDefinitionCmd;
 import org.activiti.engine.impl.cmd.AddEditorSourceExtraForModelCmd;
 import org.activiti.engine.impl.cmd.AddEditorSourceForModelCmd;
@@ -29,6 +30,8 @@ import org.activiti.engine.impl.cmd.DeleteDeploymentCmd;
 import org.activiti.engine.impl.cmd.DeleteIdentityLinkForProcessDefinitionCmd;
 import org.activiti.engine.impl.cmd.DeleteModelCmd;
 import org.activiti.engine.impl.cmd.DeployCmd;
+import org.activiti.engine.impl.cmd.GetAppResourceModelCmd;
+import org.activiti.engine.impl.cmd.GetAppResourceObjectCmd;
 import org.activiti.engine.impl.cmd.GetBpmnModelCmd;
 import org.activiti.engine.impl.cmd.GetDeploymentProcessDefinitionCmd;
 import org.activiti.engine.impl.cmd.GetDeploymentProcessDiagramCmd;
@@ -220,6 +223,14 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
 
   public DiagramLayout getProcessDiagramLayout(String processDefinitionId) {
     return commandExecutor.execute(new GetDeploymentProcessDiagramLayoutCmd(processDefinitionId));
+  }
+  
+  public Object getAppResourceObject(String deploymentId) {
+    return commandExecutor.execute(new GetAppResourceObjectCmd(deploymentId));
+  }
+  
+  public AppModel getAppResourceModel(String deploymentId) {
+    return commandExecutor.execute(new GetAppResourceModelCmd(deploymentId));
   }
 
   public Model newModel() {

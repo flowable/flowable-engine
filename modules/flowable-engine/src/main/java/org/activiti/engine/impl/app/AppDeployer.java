@@ -11,55 +11,46 @@
  * limitations under the License.
  */
 
-package org.activiti.engine.impl.rules;
+package org.activiti.engine.impl.app;
 
 import java.util.Map;
 
+import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.deploy.Deployer;
 import org.activiti.engine.impl.persistence.deploy.DeploymentManager;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.impl.persistence.entity.ResourceEntity;
-import org.drools.KnowledgeBase;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
-import org.drools.io.Resource;
-import org.drools.io.ResourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Tom Baeyens
+ * @author Tijs Rademakers
  */
-public class RulesDeployer implements Deployer {
+public class AppDeployer implements Deployer {
 
-  private static final Logger log = LoggerFactory.getLogger(RulesDeployer.class);
+  private static final Logger log = LoggerFactory.getLogger(AppDeployer.class);
 
   public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
-    log.debug("Processing rules deployment {}", deployment.getName());
+    log.debug("Processing app deployment {}", deployment.getName());
 
-    KnowledgeBuilder knowledgeBuilder = null;
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    DeploymentManager deploymentManager = processEngineConfiguration.getDeploymentManager();
 
-    DeploymentManager deploymentManager = Context.getProcessEngineConfiguration().getDeploymentManager();
-
+    Object appResourceObject = null;
     Map<String, ResourceEntity> resources = deployment.getResources();
     for (String resourceName : resources.keySet()) {
-      if (resourceName.endsWith(".drl")) { // is only parsing .drls sufficient? what about other rule dsl's? (@see ResourceType)
-        log.info("Processing rules resource {}", resourceName);
-        if (knowledgeBuilder == null) {
-          knowledgeBuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-        }
+      if (resourceName.endsWith(".app")) {
+        log.info("Processing app resource {}", resourceName);
+        
         ResourceEntity resourceEntity = resources.get(resourceName);
         byte[] resourceBytes = resourceEntity.getBytes();
-        Resource droolsResource = ResourceFactory.newByteArrayResource(resourceBytes);
-        knowledgeBuilder.add(droolsResource, ResourceType.DRL);
+        appResourceObject = processEngineConfiguration.getAppResourceConverter().convertAppResourceToModel(resourceBytes);
       }
     }
 
-    if (knowledgeBuilder != null) {
-      KnowledgeBase knowledgeBase = knowledgeBuilder.newKnowledgeBase();
-      deploymentManager.getKnowledgeBaseCache().add(deployment.getId(), knowledgeBase);
+    if (appResourceObject != null) {
+      deploymentManager.getAppResourceCache().add(deployment.getId(), appResourceObject);
     }
   }
 }

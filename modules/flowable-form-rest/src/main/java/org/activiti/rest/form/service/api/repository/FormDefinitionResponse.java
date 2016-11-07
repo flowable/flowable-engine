@@ -30,16 +30,16 @@ public class FormDefinitionResponse {
   protected String deploymentId;
   protected String tenantId;
 
-  public FormDefinitionResponse(FormDefinition form) {
-    setId(form.getId());
-    setCategory(form.getCategory());
-    setName(form.getName());
-    setKey(form.getKey());
-    setDescription(form.getDescription());
-    setVersion(form.getVersion());
-    setResourceName(form.getResourceName());
-    setDeploymentId(form.getDeploymentId());
-    setTenantId(form.getTenantId());
+  public FormDefinitionResponse(FormDefinition formDefinition) {
+    setId(formDefinition.getId());
+    setCategory(formDefinition.getCategory());
+    setName(formDefinition.getName());
+    setKey(formDefinition.getKey());
+    setDescription(formDefinition.getDescription());
+    setVersion(formDefinition.getVersion());
+    setResourceName(formDefinition.getResourceName());
+    setDeploymentId(formDefinition.getDeploymentId());
+    setTenantId(formDefinition.getTenantId());
   }
 
   public String getId() {

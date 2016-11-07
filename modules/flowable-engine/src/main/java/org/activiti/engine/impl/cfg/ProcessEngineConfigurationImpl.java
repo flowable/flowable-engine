@@ -51,6 +51,7 @@ import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.app.AppResourceConverter;
 import org.activiti.engine.cfg.ProcessEngineConfigurator;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandlerFactory;
@@ -71,6 +72,8 @@ import org.activiti.engine.impl.RuntimeServiceImpl;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.impl.TaskServiceImpl;
 import org.activiti.engine.impl.agenda.DefaultFlowableEngineAgendaFactory;
+import org.activiti.engine.impl.app.AppDeployer;
+import org.activiti.engine.impl.app.AppResourceConverterImpl;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.activiti.engine.impl.asyncexecutor.DefaultJobManager;
@@ -417,7 +420,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected TaskDataManager taskDataManager;
   protected VariableInstanceDataManager variableInstanceDataManager;
   
-  
   // ENTITY MANAGERS ///////////////////////////////////////////////////////////
   
   protected AttachmentEntityManager attachmentEntityManager;
@@ -472,6 +474,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // DEPLOYERS //////////////////////////////////////////////////////////////////
 
   protected BpmnDeployer bpmnDeployer;
+  protected AppDeployer appDeployer;
   protected BpmnParser bpmnParser;
   protected ParsedDeploymentBuilderFactory parsedDeploymentBuilderFactory;
   protected TimerManager timerManager;
@@ -492,6 +495,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected int knowledgeBaseCacheLimit = -1;
   protected DeploymentCache<Object> knowledgeBaseCache;
+  
+  protected int appResourceCacheLimit = -1;
+  protected DeploymentCache<Object> appResourceCache;
+  
+  protected AppResourceConverter appResourceConverter;
 
   // JOB EXECUTOR /////////////////////////////////////////////////////////////
 
@@ -904,6 +912,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initBpmnParser();
     initProcessDefinitionCache();
     initProcessDefinitionInfoCache();
+    initAppResourceCache();
     initKnowledgeBaseCache();
     initJobHandlers();
     initJobManager();
@@ -1416,6 +1425,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
   
+  public void initAppResourceCache() {
+    if (appResourceCache == null) {
+      if (appResourceCacheLimit <= 0) {
+        appResourceCache = new DefaultDeploymentCache<Object>();
+      } else {
+        appResourceCache = new DefaultDeploymentCache<Object>(appResourceCacheLimit);
+      }
+    }
+  }
+  
   public void initKnowledgeBaseCache() {
     if (knowledgeBaseCache == null) {
       if (knowledgeBaseCacheLimit <= 0) {
@@ -1444,10 +1463,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
       deploymentManager.setProcessDefinitionCache(processDefinitionCache);
       deploymentManager.setProcessDefinitionInfoCache(processDefinitionInfoCache);
+      deploymentManager.setAppResourceCache(appResourceCache);
       deploymentManager.setKnowledgeBaseCache(knowledgeBaseCache);
       deploymentManager.setProcessEngineConfiguration(this);
       deploymentManager.setProcessDefinitionEntityManager(processDefinitionEntityManager);
       deploymentManager.setDeploymentEntityManager(deploymentEntityManager);
+    }
+    
+    if (appResourceConverter == null) {
+      appResourceConverter = new AppResourceConverterImpl(objectMapper);
     }
   }
 
@@ -1503,6 +1527,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     bpmnDeployer.setProcessDefinitionDiagramHelper(processDefinitionDiagramHelper);
 
     defaultDeployers.add(bpmnDeployer);
+    
+    if (appDeployer == null) {
+      appDeployer = new AppDeployer();
+    }
+    
+    defaultDeployers.add(appDeployer);
+    
     return defaultDeployers;
   }
 
@@ -2824,6 +2855,33 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setKnowledgeBaseCache(DeploymentCache<Object> knowledgeBaseCache) {
     this.knowledgeBaseCache = knowledgeBaseCache;
+    return this;
+  }
+  
+  public DeploymentCache<Object> getAppResourceCache() {
+    return appResourceCache;
+  }
+
+  public ProcessEngineConfigurationImpl setAppResourceCache(DeploymentCache<Object> appResourceCache) {
+    this.appResourceCache = appResourceCache;
+    return this;
+  }
+  
+  public int getAppResourceCacheLimit() {
+    return appResourceCacheLimit;
+  }
+
+  public ProcessEngineConfigurationImpl setAppResourceCacheLimit(int appResourceCacheLimit) {
+    this.appResourceCacheLimit = appResourceCacheLimit;
+    return this;
+  }
+
+  public AppResourceConverter getAppResourceConverter() {
+    return appResourceConverter;
+  }
+
+  public ProcessEngineConfigurationImpl setAppResourceConverter(AppResourceConverter appResourceConverter) {
+    this.appResourceConverter = appResourceConverter;
     return this;
   }
 

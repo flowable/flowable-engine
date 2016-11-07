@@ -1,0 +1,4 @@
+{
+  "theme":"testTheme",
+  "icon":"testIcon"
+}
