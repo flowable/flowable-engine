@@ -28,16 +28,14 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Joram Barrez
  */
 @Service
+@Transactional
 public class DeploymentServiceImpl implements DeploymentService {
-
-  private static final Logger logger = LoggerFactory.getLogger(DeploymentServiceImpl.class);
 
   @Autowired
   protected RepositoryService repositoryService;
  
 
   @Override
-  @Transactional
   public void deleteAppDefinition(Long appDefinitionId) {
     // First test if deployment is still there, otherwhise the transaction will be rolled back
     List<Deployment> deployments = repositoryService.createDeploymentQuery().deploymentKey(String.valueOf(appDefinitionId)).list();

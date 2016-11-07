@@ -38,6 +38,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @author Frederik Heremans
  */
 @Service
+@Transactional
 public class RelatedContentService {
     
     @Autowired
@@ -81,7 +82,6 @@ public class RelatedContentService {
         return contentRepository.findAllByTaskIdAndField(taskId, field);
     }
 
-    @Transactional
     public RelatedContent createRelatedContent(User user, String name, String source, String sourceId, String taskId,
             String processId, String field, String mimeType, InputStream data, Long lengthHint) {
         
@@ -89,7 +89,6 @@ public class RelatedContentService {
                 mimeType, data, lengthHint, false, false, field);
     }
     
-    @Transactional
     public RelatedContent createRelatedContent(User user, String name, String source, String sourceId, String taskId,
             String processId, String mimeType, InputStream data, Long lengthHint, boolean relatedContent, boolean link) {
     
@@ -162,7 +161,6 @@ public class RelatedContentService {
         return content;
     }
     
-    @Transactional
     public void deleteRelatedContent(RelatedContent content) {
         if (content.getContentStoreId() != null) {
             final String storeId = content.getContentStoreId();
@@ -177,7 +175,6 @@ public class RelatedContentService {
         contentRepository.delete(content);
     }
 
-    @Transactional
     public boolean lockContent(RelatedContent content, int timeOut, User user) {
         content.setLockDate(clock.getCurrentTime());
         content.setLocked(true);
@@ -194,7 +191,6 @@ public class RelatedContentService {
         return true;
     }
 
-    @Transactional
     public boolean checkout(RelatedContent content, User user, boolean toLocal) {
         content.setCheckoutDate(clock.getCurrentTime());
         content.setCheckedOut(true);
@@ -205,7 +201,6 @@ public class RelatedContentService {
         return true;
     }
 
-    @Transactional
     public boolean unlock(RelatedContent content) {
         content.setLockDate(null);
         content.setLockExpirationDate(null);
@@ -216,7 +211,6 @@ public class RelatedContentService {
         return true;
     }
 
-    @Transactional
     public boolean uncheckout(RelatedContent content) {
         content.setCheckoutDate(null);
         content.setCheckedOut(false);
@@ -227,7 +221,6 @@ public class RelatedContentService {
         return true;
     }
 
-    @Transactional
     public boolean checkin(RelatedContent content, String comment, boolean keepCheckedOut) {
         if (!keepCheckedOut) {
             content.setCheckoutDate(null);
@@ -241,7 +234,6 @@ public class RelatedContentService {
         return false;
     }
 
-    @Transactional
     public void updateRelatedContentData(String relatedContentId, String contentStoreId, InputStream contentStream, Long lengthHint, User user) {
         Date timestamp = clock.getCurrentTime();
         
@@ -255,7 +247,6 @@ public class RelatedContentService {
         contentRepository.save(relatedContent);
     }
 
-    @Transactional
     public void updateName(String relatedContentId, String newName) {
         RelatedContent relatedContent = contentRepository.get(relatedContentId);
         relatedContent.setName(newName);
@@ -266,7 +257,6 @@ public class RelatedContentService {
      * Marks a piece of content as permanent and flags it being used as selected content in the given field,
      * for the given process instance id and (optional) task id.
      */
-    @Transactional
     public void setContentField(String relatedContentId, String field, String processInstanceId, String taskId) {
         final RelatedContent relatedContent = contentRepository.get(relatedContentId);
         if (relatedContent != null) {
@@ -278,7 +268,6 @@ public class RelatedContentService {
         }
     }
     
-    @Transactional
     public void storeRelatedContent(RelatedContent relatedContent) {
         contentRepository.save(relatedContent);
     }
@@ -292,7 +281,6 @@ public class RelatedContentService {
      * field content on tasks and all related content on tasks. The raw content data will also be removed from content storage
      * as well as all renditions and rendition data.
      */
-    @Transactional
     public void deleteContentForProcessInstance(String processInstanceId) {
         List<RelatedContent> contentList = contentRepository.findAllContentByProcessInstanceId(processInstanceId);
         final Set<String> storageIds = new HashSet<String>();

@@ -45,7 +45,6 @@ public class IdmEngineConfigurator extends AbstractProcessEngineConfigurator {
         
       } else {
         throw new ActivitiException("A datasource is required for initializing the IDM engine ");
-        
       }
       
       idmEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());

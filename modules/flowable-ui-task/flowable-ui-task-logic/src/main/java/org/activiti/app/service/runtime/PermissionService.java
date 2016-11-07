@@ -38,6 +38,7 @@ import org.activiti.idm.api.User;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Centralized service for all permission-checks.
@@ -45,6 +46,7 @@ import org.springframework.stereotype.Service;
  * @author Frederik Heremans
  */
 @Service
+@Transactional
 public class PermissionService {
 
   @Autowired

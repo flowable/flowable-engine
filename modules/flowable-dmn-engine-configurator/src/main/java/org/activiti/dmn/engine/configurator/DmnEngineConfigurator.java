@@ -15,29 +15,33 @@ package org.activiti.dmn.engine.configurator;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.activiti.dmn.engine.DmnEngine;
 import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.deployer.DmnDeployer;
+import org.activiti.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.cfg.AbstractProcessEngineConfigurator;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.persistence.deploy.Deployer;
+import org.activiti.engine.impl.transaction.TransactionContextAwareDataSource;
+import org.activiti.engine.impl.transaction.TransactionContextAwareTransactionFactory;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class DmnEngineConfigurator extends AbstractProcessEngineConfigurator {
   
-  protected static DmnEngine dmnEngine;
   protected DmnEngineConfiguration dmnEngineConfiguration;
   
   @Override
   public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    initDmnEngine();
     
-    processEngineConfiguration.setDmnEngineInitialized(true);
-    processEngineConfiguration.setDmnEngineRepositoryService(dmnEngine.getDmnRepositoryService());
-    processEngineConfiguration.setDmnEngineRuleService(dmnEngine.getDmnRuleService());
+    if (dmnEngineConfiguration == null) {
+      dmnEngineConfiguration = new StandaloneInMemDmnEngineConfiguration();
+    }
     
     List<Deployer> deployers = null;
     if (processEngineConfiguration.getCustomPostDeployers() != null) {
@@ -45,19 +49,46 @@ public class DmnEngineConfigurator extends AbstractProcessEngineConfigurator {
     } else {
       deployers = new ArrayList<Deployer>();
     }
-    
     deployers.add(new DmnDeployer());
     processEngineConfiguration.setCustomPostDeployers(deployers);
   }
-
-  protected synchronized void initDmnEngine() {
-    if (dmnEngine == null) {
-      if (dmnEngineConfiguration == null) {
-        throw new ActivitiException("DmnEngineConfiguration is required");
+  
+  @Override
+  public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    
+    if (processEngineConfiguration.getDataSource() != null) {
+      DataSource originalDatasource = processEngineConfiguration.getDataSource();
+      if (processEngineConfiguration.isTransactionsExternallyManaged()) {
+        dmnEngineConfiguration.setDataSource(originalDatasource);
+      } else {
+        dmnEngineConfiguration.setDataSource(new TransactionContextAwareDataSource(originalDatasource));
       }
       
-      dmnEngine = dmnEngineConfiguration.buildDmnEngine();
+    } else {
+      throw new ActivitiException("A datasource is required for initializing the IDM engine ");
     }
+    
+    dmnEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
+    dmnEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
+    dmnEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
+    
+    dmnEngineConfiguration.setTransactionFactory(
+        new TransactionContextAwareTransactionFactory<org.activiti.idm.engine.impl.cfg.TransactionContext>(
+              org.activiti.idm.engine.impl.cfg.TransactionContext.class));
+    
+    DmnEngine dmnEngine = initDmnEngine();
+    
+    processEngineConfiguration.setDmnEngineInitialized(true);
+    processEngineConfiguration.setDmnEngineRepositoryService(dmnEngine.getDmnRepositoryService());
+    processEngineConfiguration.setDmnEngineRuleService(dmnEngine.getDmnRuleService());
+  }
+
+  protected synchronized DmnEngine initDmnEngine() {
+    if (dmnEngineConfiguration == null) {
+      throw new ActivitiException("DmnEngineConfiguration is required");
+    }
+    
+    return dmnEngineConfiguration.buildDmnEngine();
   }
 
   public DmnEngineConfiguration getDmnEngineConfiguration() {

@@ -37,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Tijs Rademakers
  */
 @Service
+@Transactional
 public class ActivitiCommentService {
 
   @Autowired
@@ -152,7 +153,6 @@ public class ActivitiCommentService {
   /**
    * Deletes all comments related to the given process instance. Includes both comments on the process instance itself and any comments on the tasks in that process.
    */
-  @Transactional
   public void deleteAllCommentsForProcessInstance(String processInstanceId) {
     taskService.deleteComments(null, processInstanceId);
   }

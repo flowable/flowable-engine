@@ -22,8 +22,6 @@ import org.activiti.form.model.FormDefinition;
  */
 public interface FormService {
 
-    void completeForm(FormDefinition formDefinition);
-    
     /**
      * @param definition form definition to use for type-conversion and validation
      * @param values values submitted by the user
