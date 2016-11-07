@@ -42,8 +42,8 @@ import org.activiti.form.engine.impl.cfg.TransactionListener;
 import org.activiti.form.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.activiti.form.engine.impl.db.DbSqlSessionFactory;
 import org.activiti.form.engine.impl.deployer.CachingAndArtifactsManager;
-import org.activiti.form.engine.impl.deployer.FormDeployer;
-import org.activiti.form.engine.impl.deployer.FormDeploymentHelper;
+import org.activiti.form.engine.impl.deployer.FormDefinitionDeployer;
+import org.activiti.form.engine.impl.deployer.FormDefinitionDeploymentHelper;
 import org.activiti.form.engine.impl.deployer.ParsedDeploymentBuilderFactory;
 import org.activiti.form.engine.impl.el.ExpressionManager;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
@@ -54,33 +54,31 @@ import org.activiti.form.engine.impl.interceptor.CommandInterceptor;
 import org.activiti.form.engine.impl.interceptor.CommandInvoker;
 import org.activiti.form.engine.impl.interceptor.LogInterceptor;
 import org.activiti.form.engine.impl.interceptor.TransactionContextInterceptor;
-import org.activiti.form.engine.impl.parser.FormParseFactory;
+import org.activiti.form.engine.impl.parser.FormDefinitionParseFactory;
 import org.activiti.form.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.activiti.form.engine.impl.persistence.deploy.Deployer;
 import org.activiti.form.engine.impl.persistence.deploy.DeploymentCache;
 import org.activiti.form.engine.impl.persistence.deploy.DeploymentManager;
-import org.activiti.form.engine.impl.persistence.deploy.FormCacheEntry;
+import org.activiti.form.engine.impl.persistence.deploy.FormDefinitionCacheEntry;
+import org.activiti.form.engine.impl.persistence.entity.FormDefinitionEntityManager;
+import org.activiti.form.engine.impl.persistence.entity.FormDefinitionEntityManagerImpl;
 import org.activiti.form.engine.impl.persistence.entity.FormDeploymentEntityManager;
 import org.activiti.form.engine.impl.persistence.entity.FormDeploymentEntityManagerImpl;
-import org.activiti.form.engine.impl.persistence.entity.FormEntityManager;
-import org.activiti.form.engine.impl.persistence.entity.FormEntityManagerImpl;
+import org.activiti.form.engine.impl.persistence.entity.FormInstanceEntityManager;
+import org.activiti.form.engine.impl.persistence.entity.FormInstanceEntityManagerImpl;
 import org.activiti.form.engine.impl.persistence.entity.ResourceEntityManager;
 import org.activiti.form.engine.impl.persistence.entity.ResourceEntityManagerImpl;
-import org.activiti.form.engine.impl.persistence.entity.SubmittedFormEntityManager;
-import org.activiti.form.engine.impl.persistence.entity.SubmittedFormEntityManagerImpl;
-import org.activiti.form.engine.impl.persistence.entity.data.FormDataManager;
+import org.activiti.form.engine.impl.persistence.entity.data.FormDefinitionDataManager;
 import org.activiti.form.engine.impl.persistence.entity.data.FormDeploymentDataManager;
+import org.activiti.form.engine.impl.persistence.entity.data.FormInstanceDataManager;
 import org.activiti.form.engine.impl.persistence.entity.data.ResourceDataManager;
-import org.activiti.form.engine.impl.persistence.entity.data.SubmittedFormDataManager;
-import org.activiti.form.engine.impl.persistence.entity.data.impl.MybatisFormDataManager;
+import org.activiti.form.engine.impl.persistence.entity.data.impl.MybatisFormDefinitionDataManager;
 import org.activiti.form.engine.impl.persistence.entity.data.impl.MybatisFormDeploymentDataManager;
+import org.activiti.form.engine.impl.persistence.entity.data.impl.MybatisFormInstanceDataManager;
 import org.activiti.form.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
-import org.activiti.form.engine.impl.persistence.entity.data.impl.MybatisSubmittedFormDataManager;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
-import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
-import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
@@ -128,15 +126,15 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
   // DATA MANAGERS ///////////////////////////////////////////////////
 
   protected FormDeploymentDataManager deploymentDataManager;
-  protected FormDataManager formDataManager;
+  protected FormDefinitionDataManager formDefinitionDataManager;
   protected ResourceDataManager resourceDataManager;
-  protected SubmittedFormDataManager submittedFormDataManager;
+  protected FormInstanceDataManager formInstanceDataManager;
 
   // ENTITY MANAGERS /////////////////////////////////////////////////
   protected FormDeploymentEntityManager deploymentEntityManager;
-  protected FormEntityManager formEntityManager;
+  protected FormDefinitionEntityManager formDefinitionEntityManager;
   protected ResourceEntityManager resourceEntityManager;
-  protected SubmittedFormEntityManager submittedFormEntityManager;
+  protected FormInstanceEntityManager formInstanceEntityManager;
 
   protected CommandContextFactory commandContextFactory;
   protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
@@ -153,18 +151,18 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
   // DEPLOYERS
   // ////////////////////////////////////////////////////////////////
 
-  protected FormDeployer formDeployer;
-  protected FormParseFactory formParseFactory;
+  protected FormDefinitionDeployer formDeployer;
+  protected FormDefinitionParseFactory formParseFactory;
   protected ParsedDeploymentBuilderFactory parsedDeploymentBuilderFactory;
-  protected FormDeploymentHelper formDeploymentHelper;
+  protected FormDefinitionDeploymentHelper formDeploymentHelper;
   protected CachingAndArtifactsManager cachingAndArtifactsManager;
   protected List<Deployer> customPreDeployers;
   protected List<Deployer> customPostDeployers;
   protected List<Deployer> deployers;
   protected DeploymentManager deploymentManager;
 
-  protected int formCacheLimit = -1; // By default, no limit
-  protected DeploymentCache<FormCacheEntry> formCache;
+  protected int formDefinitionCacheLimit = -1; // By default, no limit
+  protected DeploymentCache<FormDefinitionCacheEntry> formDefinitionCache;
 
   public static FormEngineConfiguration createFormEngineConfigurationFromResourceDefault() {
     return createFormEngineConfigurationFromResource("activiti.form.cfg.xml", "formEngineConfiguration");
@@ -254,14 +252,14 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
     if (deploymentDataManager == null) {
       deploymentDataManager = new MybatisFormDeploymentDataManager(this);
     }
-    if (formDataManager == null) {
-      formDataManager = new MybatisFormDataManager(this);
+    if (formDefinitionDataManager == null) {
+      formDefinitionDataManager = new MybatisFormDefinitionDataManager(this);
     }
     if (resourceDataManager == null) {
       resourceDataManager = new MybatisResourceDataManager(this);
     }
-    if (submittedFormDataManager == null) {
-      submittedFormDataManager = new MybatisSubmittedFormDataManager(this);
+    if (formInstanceDataManager == null) {
+      formInstanceDataManager = new MybatisFormInstanceDataManager(this);
     }
   }
 
@@ -269,14 +267,14 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
     if (deploymentEntityManager == null) {
       deploymentEntityManager = new FormDeploymentEntityManagerImpl(this, deploymentDataManager);
     }
-    if (formEntityManager == null) {
-      formEntityManager = new FormEntityManagerImpl(this, formDataManager);
+    if (formDefinitionEntityManager == null) {
+      formDefinitionEntityManager = new FormDefinitionEntityManagerImpl(this, formDefinitionDataManager);
     }
     if (resourceEntityManager == null) {
       resourceEntityManager = new ResourceEntityManagerImpl(this, resourceDataManager);
     }
-    if (submittedFormEntityManager == null) {
-      submittedFormEntityManager = new SubmittedFormEntityManagerImpl(this, submittedFormDataManager);
+    if (formInstanceEntityManager == null) {
+      formInstanceEntityManager = new FormInstanceEntityManagerImpl(this, formInstanceDataManager);
     }
   }
   
@@ -428,7 +426,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
 
   protected void initDeployers() {
     if (formParseFactory == null) {
-      formParseFactory = new FormParseFactory();
+      formParseFactory = new FormDefinitionParseFactory();
     }
 
     if (this.formDeployer == null) {
@@ -443,25 +441,25 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
     }
 
     // Decision cache
-    if (formCache == null) {
-      if (formCacheLimit <= 0) {
-        formCache = new DefaultDeploymentCache<FormCacheEntry>();
+    if (formDefinitionCache == null) {
+      if (formDefinitionCacheLimit <= 0) {
+        formDefinitionCache = new DefaultDeploymentCache<FormDefinitionCacheEntry>();
       } else {
-        formCache = new DefaultDeploymentCache<FormCacheEntry>(formCacheLimit);
+        formDefinitionCache = new DefaultDeploymentCache<FormDefinitionCacheEntry>(formDefinitionCacheLimit);
       }
     }
 
-    deploymentManager = new DeploymentManager(formCache, this);
+    deploymentManager = new DeploymentManager(formDefinitionCache, this);
     deploymentManager.setDeployers(deployers);
     deploymentManager.setDeploymentEntityManager(deploymentEntityManager);
-    deploymentManager.setFormEntityManager(formEntityManager);
+    deploymentManager.setFormDefinitionEntityManager(formDefinitionEntityManager);
   }
 
   public Collection<? extends Deployer> getDefaultDeployers() {
     List<Deployer> defaultDeployers = new ArrayList<Deployer>();
 
     if (formDeployer == null) {
-      formDeployer = new FormDeployer();
+      formDeployer = new FormDefinitionDeployer();
     }
 
     initDmnDeployerDependencies();
@@ -484,7 +482,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
     }
 
     if (formDeploymentHelper == null) {
-      formDeploymentHelper = new FormDeploymentHelper();
+      formDeploymentHelper = new FormDefinitionDeploymentHelper();
     }
 
     if (cachingAndArtifactsManager == null) {
@@ -682,39 +680,39 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
     return this;
   }
 
-  public FormDeployer getFormDeployer() {
+  public FormDefinitionDeployer getFormDeployer() {
     return formDeployer;
   }
 
-  public FormEngineConfiguration setFormDeployer(FormDeployer formDeployer) {
+  public FormEngineConfiguration setFormDeployer(FormDefinitionDeployer formDeployer) {
     this.formDeployer = formDeployer;
     return this;
   }
 
-  public FormParseFactory getFormParseFactory() {
+  public FormDefinitionParseFactory getFormParseFactory() {
     return formParseFactory;
   }
 
-  public FormEngineConfiguration setFormParseFactory(FormParseFactory formParseFactory) {
+  public FormEngineConfiguration setFormParseFactory(FormDefinitionParseFactory formParseFactory) {
     this.formParseFactory = formParseFactory;
     return this;
   }
 
   public int getFormCacheLimit() {
-    return formCacheLimit;
+    return formDefinitionCacheLimit;
   }
 
-  public FormEngineConfiguration setFormCacheLimit(int formCacheLimit) {
-    this.formCacheLimit = formCacheLimit;
+  public FormEngineConfiguration setFormDefinitionCacheLimit(int formDefinitionCacheLimit) {
+    this.formDefinitionCacheLimit = formDefinitionCacheLimit;
     return this;
   }
 
-  public DeploymentCache<FormCacheEntry> getFormCache() {
-    return formCache;
+  public DeploymentCache<FormDefinitionCacheEntry> getFormDefinitionCache() {
+    return formDefinitionCache;
   }
 
-  public FormEngineConfiguration setFormCache(DeploymentCache<FormCacheEntry> formCache) {
-    this.formCache = formCache;
+  public FormEngineConfiguration setFormDefinitionCache(DeploymentCache<FormDefinitionCacheEntry> formDefinitionCache) {
+    this.formDefinitionCache = formDefinitionCache;
     return this;
   }
 
@@ -727,12 +725,12 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
     return this;
   }
 
-  public FormDataManager getFormDataManager() {
-    return formDataManager;
+  public FormDefinitionDataManager getFormDefinitionDataManager() {
+    return formDefinitionDataManager;
   }
 
-  public FormEngineConfiguration setFormDataManager(FormDataManager formDataManager) {
-    this.formDataManager = formDataManager;
+  public FormEngineConfiguration setFormDefinitionDataManager(FormDefinitionDataManager formDefinitionDataManager) {
+    this.formDefinitionDataManager = formDefinitionDataManager;
     return this;
   }
 
@@ -745,12 +743,12 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
     return this;
   }
 
-  public SubmittedFormDataManager getSubmittedFormDataManager() {
-    return submittedFormDataManager;
+  public FormInstanceDataManager getFormInstanceDataManager() {
+    return formInstanceDataManager;
   }
 
-  public FormEngineConfiguration setSubmittedFormDataManager(SubmittedFormDataManager submittedFormDataManager) {
-    this.submittedFormDataManager = submittedFormDataManager;
+  public FormEngineConfiguration setFormInstanceDataManager(FormInstanceDataManager formInstanceDataManager) {
+    this.formInstanceDataManager = formInstanceDataManager;
     return this;
   }
 
@@ -763,12 +761,12 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
     return this;
   }
 
-  public FormEntityManager getFormEntityManager() {
-    return formEntityManager;
+  public FormDefinitionEntityManager getFormDefinitionEntityManager() {
+    return formDefinitionEntityManager;
   }
 
-  public FormEngineConfiguration setFormEntityManager(FormEntityManager formEntityManager) {
-    this.formEntityManager = formEntityManager;
+  public FormEngineConfiguration setFormDefinitionEntityManager(FormDefinitionEntityManager formDefinitionEntityManager) {
+    this.formDefinitionEntityManager = formDefinitionEntityManager;
     return this;
   }
 
@@ -781,12 +779,12 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
     return this;
   }
   
-  public SubmittedFormEntityManager getSubmittedFormEntityManager() {
-    return submittedFormEntityManager;
+  public FormInstanceEntityManager getFormInstanceEntityManager() {
+    return formInstanceEntityManager;
   }
 
-  public FormEngineConfiguration setSubmittedFormEntityManager(SubmittedFormEntityManager submittedFormEntityManager) {
-    this.submittedFormEntityManager = submittedFormEntityManager;
+  public FormEngineConfiguration setFormInstanceEntityManager(FormInstanceEntityManager formInstanceEntityManager) {
+    this.formInstanceEntityManager = formInstanceEntityManager;
     return this;
   }
 

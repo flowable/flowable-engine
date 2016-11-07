@@ -15,7 +15,7 @@ package org.activiti.form.api;
 import java.io.InputStream;
 import java.util.List;
 
-import org.activiti.form.model.FormDefinition;
+import org.activiti.form.model.FormModel;
 
 /**
  * Service providing access to the repository of forms.
@@ -28,9 +28,9 @@ public interface FormRepositoryService {
 
     void deleteDeployment(String deploymentId);
     
-    FormQuery createFormQuery();
+    FormDefinitionQuery createFormDefinitionQuery();
     
-    NativeFormQuery createNativeFormQuery();
+    NativeFormDefinitionQuery createNativeFormDefinitionQuery();
 
     void setDeploymentCategory(String deploymentId, String category);
     
@@ -44,19 +44,19 @@ public interface FormRepositoryService {
     
     NativeFormDeploymentQuery createNativeDeploymentQuery();
     
-    Form getForm(String formId);
+    FormDefinition getFormDefinition(String formDefinitionId);
 
-    FormDefinition getFormDefinitionById(String formId);
+    FormModel getFormModelById(String formDefinitionId);
     
-    FormDefinition getFormDefinitionByKey(String formDefinitionKey);
+    FormModel getFormModelByKey(String formDefinitionKey);
     
-    FormDefinition getFormDefinitionByKey(String formDefinitionKey, String tenantId);
+    FormModel getFormModelByKey(String formDefinitionKey, String tenantId);
     
-    FormDefinition getFormDefinitionByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId);
+    FormModel getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId);
     
-    FormDefinition getFormDefinitionByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String tenantId);
+    FormModel getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String tenantId);
     
-    InputStream getFormResource(String formId);
+    InputStream getFormDefinitionResource(String formDefinitionId);
     
-    void setFormCategory(String formId, String category);
+    void setFormDefinitionCategory(String formDefinitionId, String category);
 }

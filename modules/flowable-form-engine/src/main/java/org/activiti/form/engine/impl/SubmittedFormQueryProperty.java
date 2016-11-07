@@ -30,10 +30,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.activiti.engine.query.QueryProperty;
-import org.activiti.form.api.SubmittedFormQuery;
+import org.activiti.form.api.FormInstanceQuery;
 
 /**
- * Contains the possible properties that can be used in a {@link SubmittedFormQuery}.
+ * Contains the possible properties that can be used in a {@link FormInstanceQuery}.
  * 
  * @author Tijs Rademakers
  */

@@ -80,6 +80,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Ser
   protected String formKey;
 
   protected boolean isDeleted;
+  protected boolean isCanceled;
 
   protected String eventName;
   protected ActivitiListener currentActivitiListener;
@@ -514,6 +515,14 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Ser
 
   public void setDeleted(boolean isDeleted) {
     this.isDeleted = isDeleted;
+  }
+  
+  public boolean isCanceled() {
+    return isCanceled;
+  }
+
+  public void setCanceled(boolean isCanceled) {
+    this.isCanceled = isCanceled;
   }
 
   public String getParentTaskId() {

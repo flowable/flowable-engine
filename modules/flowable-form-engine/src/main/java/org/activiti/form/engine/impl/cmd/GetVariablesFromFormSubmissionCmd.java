@@ -20,7 +20,7 @@ import java.util.Map;
 import org.activiti.form.engine.ActivitiFormValidationException;
 import org.activiti.form.engine.impl.interceptor.Command;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
-import org.activiti.form.model.FormDefinition;
+import org.activiti.form.model.FormModel;
 import org.activiti.form.model.FormField;
 import org.activiti.form.model.FormFieldTypes;
 import org.apache.commons.lang3.StringUtils;
@@ -34,16 +34,16 @@ public class GetVariablesFromFormSubmissionCmd implements Command<Map<String, Ob
 
   private static final long serialVersionUID = 1L;
 
-  protected FormDefinition formDefinition;
+  protected FormModel formDefinition;
   protected Map<String, Object> values;
   protected String outcome;
   
-  public GetVariablesFromFormSubmissionCmd(FormDefinition formDefinition, Map<String, Object> values) {
+  public GetVariablesFromFormSubmissionCmd(FormModel formDefinition, Map<String, Object> values) {
     this.formDefinition = formDefinition;
     this.values = values;
   }
 
-  public GetVariablesFromFormSubmissionCmd(FormDefinition formDefinition, Map<String, Object> values, String outcome) {
+  public GetVariablesFromFormSubmissionCmd(FormModel formDefinition, Map<String, Object> values, String outcome) {
     this(formDefinition, values);
     this.outcome = outcome;
   }

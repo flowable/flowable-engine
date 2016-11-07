@@ -21,12 +21,13 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.util.Activiti5Util;
 import org.activiti.engine.impl.util.FormHandlerUtil;
+import org.activiti.engine.impl.util.TaskHelper;
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class SubmitTaskFormCmd extends AbstractCompleteTaskCmd {
+public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Void> {
 
   private static final long serialVersionUID = 1L;
 
@@ -60,9 +61,8 @@ public class SubmitTaskFormCmd extends AbstractCompleteTaskCmd {
       taskFormHandler.submitFormProperties(properties, task.getExecution());
 
       if (completeTask) {
-        executeTaskComplete(commandContext, task, null, false);
+        TaskHelper.completeTask(task, null, null, false, commandContext);
       }
-
     }
     
     return null;

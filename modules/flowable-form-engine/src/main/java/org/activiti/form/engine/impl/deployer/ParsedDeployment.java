@@ -15,11 +15,11 @@ package org.activiti.form.engine.impl.deployer;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.form.engine.impl.parser.FormParse;
+import org.activiti.form.engine.impl.parser.FormDefinitionParse;
+import org.activiti.form.engine.impl.persistence.entity.FormDefinitionEntity;
 import org.activiti.form.engine.impl.persistence.entity.FormDeploymentEntity;
-import org.activiti.form.engine.impl.persistence.entity.FormEntity;
 import org.activiti.form.engine.impl.persistence.entity.ResourceEntity;
-import org.activiti.form.model.FormDefinition;
+import org.activiti.form.model.FormModel;
 
 /**
  * An intermediate representation of a DeploymentEntity which keeps track of all of the entity's
@@ -33,19 +33,19 @@ public class ParsedDeployment {
   
   protected FormDeploymentEntity deploymentEntity;
 
-  protected List<FormEntity> forms;
-  protected Map<FormEntity, FormParse> mapFormsToParses;
-  protected Map<FormEntity, ResourceEntity> mapFormsToResources;
+  protected List<FormDefinitionEntity> formDefinitions;
+  protected Map<FormDefinitionEntity, FormDefinitionParse> mapFormDefinitionsToParses;
+  protected Map<FormDefinitionEntity, ResourceEntity> mapFormDefinitionsToResources;
   
   public ParsedDeployment(
-      FormDeploymentEntity entity, List<FormEntity> forms,
-      Map<FormEntity, FormParse> mapFormsToParses,
-      Map<FormEntity, ResourceEntity> mapFormsToResources) {
+      FormDeploymentEntity entity, List<FormDefinitionEntity> formDefinitions,
+      Map<FormDefinitionEntity, FormDefinitionParse> mapFormDefinitionsToParses,
+      Map<FormDefinitionEntity, ResourceEntity> mapFormDefinitionsToResources) {
     
     this.deploymentEntity = entity;
-    this.forms = forms;
-    this.mapFormsToParses = mapFormsToParses;
-    this.mapFormsToResources = mapFormsToResources;
+    this.formDefinitions = formDefinitions;
+    this.mapFormDefinitionsToParses = mapFormDefinitionsToParses;
+    this.mapFormDefinitionsToResources = mapFormDefinitionsToResources;
   }
 
   
@@ -53,22 +53,22 @@ public class ParsedDeployment {
     return deploymentEntity;
   }
 
-  public List<FormEntity> getAllForms() {
-    return forms;
+  public List<FormDefinitionEntity> getAllFormDefinitions() {
+    return formDefinitions;
   }
 
-  public ResourceEntity getResourceForForm(FormEntity form) {
-    return mapFormsToResources.get(form);
+  public ResourceEntity getResourceForFormDefinition(FormDefinitionEntity formDefinition) {
+    return mapFormDefinitionsToResources.get(formDefinition);
   }
 
-  public FormParse getFormParseForForm(FormEntity form) {
-    return mapFormsToParses.get(form);
+  public FormDefinitionParse getFormDefinitionParseForFormDefinition(FormDefinitionEntity formDefinition) {
+    return mapFormDefinitionsToParses.get(formDefinition);
   }
 
-  public FormDefinition getFormDefinitionForForm(FormEntity form) {
-    FormParse parse = getFormParseForForm(form);
+  public FormModel getFormModelForFormDefinition(FormDefinitionEntity formDefinition) {
+    FormDefinitionParse parse = getFormDefinitionParseForFormDefinition(formDefinition);
     
-    return (parse == null ? null : parse.getFormDefinition());
+    return (parse == null ? null : parse.getFormModel());
   } 
 }
 

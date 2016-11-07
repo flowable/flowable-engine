@@ -16,10 +16,10 @@ import org.activiti.editor.form.converter.FormJsonConverter;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.context.Context;
 import org.activiti.form.engine.impl.persistence.deploy.DeploymentCache;
-import org.activiti.form.engine.impl.persistence.deploy.FormCacheEntry;
+import org.activiti.form.engine.impl.persistence.deploy.FormDefinitionCacheEntry;
+import org.activiti.form.engine.impl.persistence.entity.FormDefinitionEntity;
 import org.activiti.form.engine.impl.persistence.entity.FormDeploymentEntity;
-import org.activiti.form.engine.impl.persistence.entity.FormEntity;
-import org.activiti.form.model.FormDefinition;
+import org.activiti.form.model.FormModel;
 
 /**
  * Updates caches and artifacts for a deployment and its forms
@@ -34,17 +34,17 @@ public class CachingAndArtifactsManager {
    */
   public void updateCachingAndArtifacts(ParsedDeployment parsedDeployment) {
     final FormEngineConfiguration formEngineConfiguration = Context.getFormEngineConfiguration();
-    DeploymentCache<FormCacheEntry> formCache = formEngineConfiguration.getDeploymentManager().getFormCache();
+    DeploymentCache<FormDefinitionCacheEntry> formDefinitionCache = formEngineConfiguration.getDeploymentManager().getFormCache();
     FormDeploymentEntity deployment = parsedDeployment.getDeployment();
 
-    for (FormEntity form : parsedDeployment.getAllForms()) {
-      FormDefinition formDefinition = parsedDeployment.getFormDefinitionForForm(form);
-      formDefinition.setId(form.getId());
-      FormCacheEntry cacheEntry = new FormCacheEntry(form, formJsonConverter.convertToJson(formDefinition));
-      formCache.add(form.getId(), cacheEntry);
+    for (FormDefinitionEntity formDefinition : parsedDeployment.getAllFormDefinitions()) {
+      FormModel formModel = parsedDeployment.getFormModelForFormDefinition(formDefinition);
+      formModel.setId(formDefinition.getId());
+      FormDefinitionCacheEntry cacheEntry = new FormDefinitionCacheEntry(formDefinition, formJsonConverter.convertToJson(formModel));
+      formDefinitionCache.add(formDefinition.getId(), cacheEntry);
     
       // Add to deployment for further usage
-      deployment.addDeployedArtifact(form);
+      deployment.addDeployedArtifact(formDefinition);
     }
   }
 }

@@ -16,8 +16,8 @@ package org.activiti.form.engine.impl.persistence;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.context.Context;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
+import org.activiti.form.engine.impl.persistence.entity.FormDefinitionEntityManager;
 import org.activiti.form.engine.impl.persistence.entity.FormDeploymentEntityManager;
-import org.activiti.form.engine.impl.persistence.entity.FormEntityManager;
 import org.activiti.form.engine.impl.persistence.entity.ResourceEntityManager;
 
 /**
@@ -52,8 +52,8 @@ public abstract class AbstractManager {
     return getFormEngineConfiguration().getDeploymentEntityManager();
   }
   
-  protected FormEntityManager getFormEntityManager() {
-    return getFormEngineConfiguration().getFormEntityManager();
+  protected FormDefinitionEntityManager getFormDefinitionEntityManager() {
+    return getFormEngineConfiguration().getFormDefinitionEntityManager();
   }
 
   protected ResourceEntityManager getResourceEntityManager() {
