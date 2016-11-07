@@ -32,7 +32,6 @@ public class IdmEngineConfigurator extends AbstractProcessEngineConfigurator {
   @Override
   public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
     if (idmEngineConfiguration == null) {
-      
       idmEngineConfiguration = new StandaloneIdmEngineConfiguration();
       
       if (processEngineConfiguration.getDataSource() != null) {
@@ -51,9 +50,13 @@ public class IdmEngineConfigurator extends AbstractProcessEngineConfigurator {
       idmEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
       idmEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
       
-      idmEngineConfiguration.setTransactionFactory(
-          new TransactionContextAwareTransactionFactory<org.activiti.idm.engine.impl.cfg.TransactionContext>(
-                org.activiti.idm.engine.impl.cfg.TransactionContext.class));
+      if (processEngineConfiguration.isTransactionsExternallyManaged()) {
+       idmEngineConfiguration.setTransactionsExternallyManaged(true);
+      } else {
+       idmEngineConfiguration.setTransactionFactory(
+            new TransactionContextAwareTransactionFactory<org.activiti.idm.engine.impl.cfg.TransactionContext>(
+                  org.activiti.idm.engine.impl.cfg.TransactionContext.class));
+      }
       
       if (processEngineConfiguration.getEventDispatcher() != null) {
         idmEngineConfiguration.setEventDispatcher(processEngineConfiguration.getEventDispatcher());

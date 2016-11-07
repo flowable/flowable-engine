@@ -258,7 +258,7 @@
   <!-- mysql specific sql -->
   <select id="selectFormDefinitionCountByQueryCriteria" databaseId="mysql" parameterType="org.activiti.form.engine.impl.FormDefinitionQueryImpl" resultType="long">
     select distinct count(RES.ID_)
-    <include refid="selectFormsByQueryCriteriaSql"/>
+    <include refid="selectFormDefinitionsByQueryCriteriaSql"/>
   </select>
 
   <select id="selectFormDefinitionByNativeQuery" parameterType="java.util.Map" resultMap="formDefinitionResultMap">

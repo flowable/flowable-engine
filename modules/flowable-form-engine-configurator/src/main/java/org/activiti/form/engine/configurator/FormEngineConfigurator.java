@@ -39,10 +39,6 @@ public class FormEngineConfigurator extends AbstractProcessEngineConfigurator {
   @Override
   public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
     
-    if (formEngineConfiguration == null) {
-      formEngineConfiguration = new StandaloneFormEngineConfiguration();
-    }
-    
     // Custom deployers need to be added before the process engine boots
     List<Deployer> deployers = null;
     if (processEngineConfiguration.getCustomPostDeployers() != null) {
@@ -57,26 +53,34 @@ public class FormEngineConfigurator extends AbstractProcessEngineConfigurator {
   
   @Override
   public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    if (formEngineConfiguration == null) {
+      formEngineConfiguration = new StandaloneFormEngineConfiguration();
     
-    if (processEngineConfiguration.getDataSource() != null) {
-      DataSource originalDatasource = processEngineConfiguration.getDataSource();
-      if (processEngineConfiguration.isTransactionsExternallyManaged()) {
-        formEngineConfiguration.setDataSource(originalDatasource);
+      if (processEngineConfiguration.getDataSource() != null) {
+        DataSource originalDatasource = processEngineConfiguration.getDataSource();
+        if (processEngineConfiguration.isTransactionsExternallyManaged()) {
+          formEngineConfiguration.setDataSource(originalDatasource);
+        } else {
+          formEngineConfiguration.setDataSource(new TransactionContextAwareDataSource(originalDatasource));
+        }
+        
       } else {
-        formEngineConfiguration.setDataSource(new TransactionContextAwareDataSource(originalDatasource));
+        throw new ActivitiException("A datasource is required for initializing the Form engine ");
       }
       
-    } else {
-      throw new ActivitiException("A datasource is required for initializing the IDM engine ");
+      formEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
+      formEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
+      formEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
+      
+      if (processEngineConfiguration.isTransactionsExternallyManaged()) {
+        formEngineConfiguration.setTransactionsExternallyManaged(true);
+       } else {
+        formEngineConfiguration.setTransactionFactory(
+             new TransactionContextAwareTransactionFactory<org.activiti.idm.engine.impl.cfg.TransactionContext>(
+                   org.activiti.idm.engine.impl.cfg.TransactionContext.class));
+       }
+      
     }
-    
-    formEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
-    formEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
-    formEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
-    
-    formEngineConfiguration.setTransactionFactory(
-        new TransactionContextAwareTransactionFactory<org.activiti.idm.engine.impl.cfg.TransactionContext>(
-              org.activiti.idm.engine.impl.cfg.TransactionContext.class));
     
     FormEngine formEngine = initFormEngine();
     processEngineConfiguration.setFormEngineInitialized(true);

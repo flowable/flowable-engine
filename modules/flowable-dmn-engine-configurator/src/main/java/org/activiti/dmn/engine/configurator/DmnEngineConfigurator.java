@@ -39,10 +39,6 @@ public class DmnEngineConfigurator extends AbstractProcessEngineConfigurator {
   @Override
   public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
     
-    if (dmnEngineConfiguration == null) {
-      dmnEngineConfiguration = new StandaloneInMemDmnEngineConfiguration();
-    }
-    
     List<Deployer> deployers = null;
     if (processEngineConfiguration.getCustomPostDeployers() != null) {
       deployers = processEngineConfiguration.getCustomPostDeployers();
@@ -55,26 +51,33 @@ public class DmnEngineConfigurator extends AbstractProcessEngineConfigurator {
   
   @Override
   public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    if (dmnEngineConfiguration == null) {
+      dmnEngineConfiguration = new StandaloneInMemDmnEngineConfiguration();
     
-    if (processEngineConfiguration.getDataSource() != null) {
-      DataSource originalDatasource = processEngineConfiguration.getDataSource();
-      if (processEngineConfiguration.isTransactionsExternallyManaged()) {
-        dmnEngineConfiguration.setDataSource(originalDatasource);
+      if (processEngineConfiguration.getDataSource() != null) {
+        DataSource originalDatasource = processEngineConfiguration.getDataSource();
+        if (processEngineConfiguration.isTransactionsExternallyManaged()) {
+          dmnEngineConfiguration.setDataSource(originalDatasource);
+        } else {
+          dmnEngineConfiguration.setDataSource(new TransactionContextAwareDataSource(originalDatasource));
+        }
+        
       } else {
-        dmnEngineConfiguration.setDataSource(new TransactionContextAwareDataSource(originalDatasource));
+        throw new ActivitiException("A datasource is required for initializing the DMN engine ");
       }
       
-    } else {
-      throw new ActivitiException("A datasource is required for initializing the IDM engine ");
+      dmnEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
+      dmnEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
+      dmnEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
+      
+      if (processEngineConfiguration.isTransactionsExternallyManaged()) {
+        dmnEngineConfiguration.setTransactionsExternallyManaged(true);
+       } else {
+         dmnEngineConfiguration.setTransactionFactory(
+             new TransactionContextAwareTransactionFactory<org.activiti.idm.engine.impl.cfg.TransactionContext>(
+                   org.activiti.idm.engine.impl.cfg.TransactionContext.class));
+       }
     }
-    
-    dmnEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
-    dmnEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
-    dmnEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
-    
-    dmnEngineConfiguration.setTransactionFactory(
-        new TransactionContextAwareTransactionFactory<org.activiti.idm.engine.impl.cfg.TransactionContext>(
-              org.activiti.idm.engine.impl.cfg.TransactionContext.class));
     
     DmnEngine dmnEngine = initDmnEngine();
     

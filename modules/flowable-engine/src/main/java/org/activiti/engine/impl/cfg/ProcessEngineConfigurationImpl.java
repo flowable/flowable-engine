@@ -291,6 +291,7 @@ import org.activiti.engine.impl.scripting.ResolverFactory;
 import org.activiti.engine.impl.scripting.ScriptBindingsFactory;
 import org.activiti.engine.impl.scripting.ScriptingEngines;
 import org.activiti.engine.impl.scripting.VariableScopeResolverFactory;
+import org.activiti.engine.impl.transaction.ContextAwareJdbcTransactionFactory;
 import org.activiti.engine.impl.util.ProcessInstanceHelper;
 import org.activiti.engine.impl.util.ReflectUtil;
 import org.activiti.engine.impl.variable.BooleanType;
@@ -329,6 +330,7 @@ import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
+import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.apache.ibatis.type.JdbcType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1760,6 +1762,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public void initTransactionContextFactory() {
     if (transactionContextFactory == null) {
       transactionContextFactory = new StandaloneMybatisTransactionContextFactory();
+    }
+  }
+  
+  public void initTransactionFactory() {
+    if (transactionFactory == null) {
+      if (transactionsExternallyManaged) {
+        transactionFactory = new ManagedTransactionFactory();
+      } else {
+        transactionFactory = new ContextAwareJdbcTransactionFactory(); // Special for process engine! ContextAware vs regular JdbcTransactionFactory
+      }
     }
   }
 

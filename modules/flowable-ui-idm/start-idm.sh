@@ -1,5 +1,8 @@
 #!/bin/sh
 echo "Building all submodules"
+cd ../flowable-idm-engine
+mvn -T 1C clean install -DskipTests
+cd ../flowable-ui-idm
 mvn -T 1C clean install -DskipTests
 STATUS=$?
 if [ $STATUS -eq 0 ]
