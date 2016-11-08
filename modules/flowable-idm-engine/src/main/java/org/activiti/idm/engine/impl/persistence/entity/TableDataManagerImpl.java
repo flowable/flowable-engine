@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.persistence.entity.Entity;
+import org.activiti.idm.api.Capability;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.Token;
 import org.activiti.idm.api.User;
@@ -61,6 +62,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
     entityToTableNameMap.put(UserEntity.class, "ACT_ID_USER");
     entityToTableNameMap.put(IdentityInfoEntity.class, "ACT_ID_INFO");
     entityToTableNameMap.put(TokenEntity.class, "ACT_ID_TOKEN");
+    entityToTableNameMap.put(CapabilityEntity.class, "ACT_ID_CAPABILITY");
     
     // general
     entityToTableNameMap.put(PropertyEntity.class, "ACT_ID_PROPERTY");
@@ -69,6 +71,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
     apiTypeToTableNameMap.put(Group.class, "ACT_ID_GROUP");
     apiTypeToTableNameMap.put(User.class, "ACT_ID_USER");
     apiTypeToTableNameMap.put(Token.class, "ACT_ID_TOKEN");
+    apiTypeToTableNameMap.put(Capability.class, "ACT_ID_CAPABILITY");
   }
   
   protected DbSqlSession getDbSqlSession() {
