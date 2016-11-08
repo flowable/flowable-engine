@@ -1,8 +1,6 @@
 #!/bin/sh
 echo "Building all modeler ui submodules"
 mvn -T 1C clean install -DskipTests
-cd ../flowable-ui-modeler/
-mvn -T 1C clean install -DskipTests
 STATUS=$?
 if [ $STATUS -eq 0 ]
 then
