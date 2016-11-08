@@ -39,7 +39,7 @@ public class ProcessDefinitionDecisionTableResource extends BaseProcessDefinitio
       @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
   })
   @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/decision-tables", method = RequestMethod.GET, produces = "application/json")
-  public List<DecisionTableResponse> executeProcessDefinitionAction(
+  public List<DecisionTableResponse> getDecisionTablesForProcessDefinition(
       @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
       HttpServletRequest request) {
 
