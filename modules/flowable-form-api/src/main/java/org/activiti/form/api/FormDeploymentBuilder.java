@@ -14,7 +14,7 @@ package org.activiti.form.api;
 
 import java.io.InputStream;
 
-import org.activiti.form.model.FormDefinition;
+import org.activiti.form.model.FormModel;
 
 /**
  * Builder for creating new deployments.
@@ -38,7 +38,7 @@ public interface FormDeploymentBuilder {
   
   FormDeploymentBuilder addFormBytes(String resourceName, byte[] formBytes);
 
-  FormDeploymentBuilder addFormDefinition(String resourceName, FormDefinition formDefinition);
+  FormDeploymentBuilder addFormDefinition(String resourceName, FormModel formDefinition);
 
   /**
    * Gives the deployment the given name.

@@ -52,24 +52,25 @@ import com.google.common.cache.LoadingCache;
 
 @Component
 public class FlowableCookieFilter extends OncePerRequestFilter {
-  
+
   private final Logger logger = LoggerFactory.getLogger(FlowableCookieFilter.class);
-  
+
   protected static final String COOKIE_NAME = "FLOWABLE_REMEMBER_ME";
   protected static final String DELIMITER = ":";
-  
+
   @Autowired
   protected Environment env;
-  
+
   @Autowired
   protected IdmIdentityService idmIdentityService;
-  
-  // Caching the persistent tokens to avoid hitting the database too often (eg when doing multiple requests at the same time)
+
+  // Caching the persistent tokens to avoid hitting the database too often (eg
+  // when doing multiple requests at the same time)
   // (This happens a lot, when the page consists of multiple requests)
   protected LoadingCache<String, Token> tokenCache;
-  
+
   protected LoadingCache<String, ActivitiAppUser> userCache;
-  
+
   @PostConstruct
   protected void initTokenCache() {
     Long maxSize = env.getProperty("cache.login-tokens.max.size", Long.class, 2048l);
@@ -87,19 +88,19 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
           }
 
         });
-    
+
     Long userMaxSize = env.getProperty("cache.login-users.max.size", Long.class, 2048l);
     Long userMaxAge = env.getProperty("cache.login-users.max.age", Long.class, 30l);
-    userCache = CacheBuilder.newBuilder().maximumSize(userMaxSize).expireAfterWrite(userMaxAge, TimeUnit.SECONDS).recordStats()
-        .build(new CacheLoader<String, ActivitiAppUser>() {
+    userCache = CacheBuilder.newBuilder().maximumSize(userMaxSize).expireAfterWrite(userMaxAge, TimeUnit.SECONDS)
+        .recordStats().build(new CacheLoader<String, ActivitiAppUser>() {
 
           public ActivitiAppUser load(final String userId) throws Exception {
             User userFromToken = idmIdentityService.createUserQuery().userId(userId).singleResult();
-            
+
             if (userFromToken == null) {
               throw new ActivitiException("user not found " + userId);
             }
-            
+
             // Add capabilities to user object
             Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
 
@@ -123,32 +124,33 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
   }
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+      throws ServletException, IOException {
     if (skipAuthenticationCheck(request) == false) {
       boolean authenticated = checkAuthentication(request);
-      
+
       if (authenticated == false) {
         String idmAppUrl = env.getRequiredProperty("idm.app.url");
         if (idmAppUrl.endsWith("/") == false) {
           idmAppUrl += "/";
         }
-        
+
         response.sendRedirect(idmAppUrl + "#/login?redirectUrl=" + request.getRequestURL());
         return;
       }
     }
-    
+
     filterChain.doFilter(request, response);
   }
-  
+
   protected boolean checkAuthentication(HttpServletRequest request) {
     boolean authenticated = false;
     Cookie[] cookies = request.getCookies();
-    if (cookies != null){
+    if (cookies != null) {
       for (Cookie cookie : cookies) {
         if (COOKIE_NAME.equals(cookie.getName())) {
           String[] tokens = decodeCookie(cookie.getValue());
-          
+
           try {
             Token token = tokenCache.get(tokens[0]);
             if (token.getTokenValue().equals(tokens[1]) == false) {
@@ -158,43 +160,44 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
               if (token.getTokenValue().equals(tokens[1])) {
                 authenticated = true;
               }
-            
+
             } else {
               authenticated = true;
             }
-            
+
             ActivitiAppUser appUser = userCache.get(token.getUserId());
-            
-            SecurityContextHolder.getContext().setAuthentication(new RememberMeAuthenticationToken(token.getId(), 
-                appUser, appUser.getAuthorities()));
-            
+
+            SecurityContextHolder.getContext()
+                .setAuthentication(new RememberMeAuthenticationToken(token.getId(), appUser, appUser.getAuthorities()));
+
             Authentication.setAuthenticatedUserId(token.getUserId());
-            
+
             authenticated = true;
             break;
-            
+
           } catch (Exception e) {
-            logger.error("Error getting user from token", e);
+            logger.trace("Could not get user for token", e);
+            return false;
           }
         }
       }
     }
-    
+
     return authenticated;
   }
-  
+
   protected boolean skipAuthenticationCheck(HttpServletRequest request) {
     boolean skipAuthentication = false;
-    if (request.getRequestURI().endsWith(".css") || request.getRequestURI().endsWith(".js") ||
-        request.getRequestURI().endsWith(".html") || request.getRequestURI().endsWith(".map") ||
-        request.getRequestURI().endsWith(".woff") || request.getRequestURI().endsWith(".map") ||
-        request.getRequestURI().endsWith(".png") || request.getRequestURI().endsWith(".jpg")) {
-      
+    if (request.getRequestURI().endsWith(".css") || request.getRequestURI().endsWith(".js")
+        || request.getRequestURI().endsWith(".html") || request.getRequestURI().endsWith(".map")
+        || request.getRequestURI().endsWith(".woff") || request.getRequestURI().endsWith(".map")
+        || request.getRequestURI().endsWith(".png") || request.getRequestURI().endsWith(".jpg")) {
+
       skipAuthentication = true;
     }
     return skipAuthentication;
   }
-  
+
   protected String[] decodeCookie(String cookieValue) throws InvalidCookieException {
     for (int j = 0; j < cookieValue.length() % 4; j++) {
       cookieValue = cookieValue + "=";
@@ -218,5 +221,5 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
 
     return tokens;
   }
-  
+
 }

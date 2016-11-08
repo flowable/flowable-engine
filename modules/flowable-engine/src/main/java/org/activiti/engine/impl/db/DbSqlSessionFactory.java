@@ -89,6 +89,9 @@ public class DbSqlSessionFactory implements SessionFactory {
         throw new ActivitiException("Could not set database catalog on connection", e);
       }
     }
+    if (dbSqlSession.getSqlSession().getConnection() == null) {
+      throw new ActivitiException("Invalid dbSqlSession: no active connection found");
+    }
     return dbSqlSession;
   }
 

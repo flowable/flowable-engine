@@ -18,12 +18,15 @@ import javax.sql.DataSource;
 
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.impl.SchemaOperationProcessEngineClose;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.engine.impl.asyncexecutor.multitenant.ExecutorPerTenantAsyncExecutor;
 import org.activiti.engine.impl.asyncexecutor.multitenant.SharedExecutorServiceAsyncExecutor;
 import org.activiti.engine.impl.asyncexecutor.multitenant.TenantAwareAsyncExecutor;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.db.DbIdGenerator;
+import org.activiti.engine.impl.interceptor.Command;
+import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandInterceptor;
 import org.activiti.engine.impl.persistence.StrongUuidGenerator;
 import org.activiti.engine.repository.DeploymentBuilder;
@@ -166,6 +169,28 @@ public class MultiSchemaMultiTenantProcessEngineConfiguration extends ProcessEng
   @Override
   protected void postProcessEngineInitialisation() {
     // empty here. will be done in registerTenant
+  }
+  
+  @Override
+  public Runnable getProcessEngineCloseRunnable() {
+    return new Runnable() {
+      public void run() {
+        for (String tenantId : tenantInfoHolder.getAllTenants()) {
+          tenantInfoHolder.setCurrentTenantId(tenantId);
+          commandExecutor.execute(getProcessEngineCloseCommand());
+          tenantInfoHolder.clearCurrentTenantId();
+        }
+      }
+    };
+  }
+  
+  public Command<Void> getProcessEngineCloseCommand() {
+    return new Command<Void>() {
+      public Void execute(CommandContext commandContext) {
+        commandContext.getProcessEngineConfiguration().getCommandExecutor().execute(new SchemaOperationProcessEngineClose());
+        return null;
+      }
+    };
   }
 
   public TenantInfoHolder getTenantInfoHolder() {

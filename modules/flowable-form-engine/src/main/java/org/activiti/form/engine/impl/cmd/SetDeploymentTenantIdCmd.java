@@ -17,13 +17,14 @@ import java.util.List;
 
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.ActivitiObjectNotFoundException;
-import org.activiti.form.api.Form;
-import org.activiti.form.engine.impl.FormQueryImpl;
+import org.activiti.form.api.FormDefinition;
+import org.activiti.form.engine.impl.FormDefinitionQueryImpl;
 import org.activiti.form.engine.impl.interceptor.Command;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
 import org.activiti.form.engine.impl.persistence.entity.FormDeploymentEntity;
 
 /**
+ * @author Tijs Rademakers
  * @author Joram Barrez
  */
 public class SetDeploymentTenantIdCmd implements Command<Void>, Serializable {
@@ -52,14 +53,12 @@ public class SetDeploymentTenantIdCmd implements Command<Void>, Serializable {
     
     deployment.setTenantId(newTenantId);
 
-    // Doing process instances, executions and tasks with direct SQL updates
-    // (otherwise would not be performant)
-    commandContext.getFormEntityManager().updateFormTenantIdForDeployment(deploymentId, newTenantId);
+    commandContext.getFormDefinitionEntityManager().updateFormDefinitionTenantIdForDeployment(deploymentId, newTenantId);
 
     // Doing decision tables in memory, cause we need to clear the decision table cache
-    List<Form> forms = new FormQueryImpl().deploymentId(deploymentId).list();
-    for (Form form : forms) {
-      commandContext.getFormEngineConfiguration().getFormCache().remove(form.getId());
+    List<FormDefinition> formDefinitions = new FormDefinitionQueryImpl().deploymentId(deploymentId).list();
+    for (FormDefinition formDefinition : formDefinitions) {
+      commandContext.getFormEngineConfiguration().getFormDefinitionCache().remove(formDefinition.getId());
     }
     
     commandContext.getDeploymentEntityManager().update(deployment);

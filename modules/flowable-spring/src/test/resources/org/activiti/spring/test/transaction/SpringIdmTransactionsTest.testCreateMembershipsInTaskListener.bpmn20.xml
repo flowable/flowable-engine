@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- origin at X=0.0 Y=0.0 -->
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd http://www.omg.org/spec/DD/20100524/DI http://www.omg.org/spec/DD/20100524/DI-XMI http://www.omg.org/spec/DD/20100524/DC http://www.omg.org/spec/DD/20100524/DC-XMI http://www.omg.org/spec/BPMN/20100524/DI http://www.omg.org/spec/BPMN/20100524/DI-XMI" id="Definitions_1" exporter="org.eclipse.bpmn2.modeler.core" exporterVersion="1.2.3.CR2-v20160209-2002" targetNamespace="http://pcu.controlunion.com/bpmn">
+  <process id="clientApplication" name="Example Process" isExecutable="true">
+    <startEvent id="StartEvent_1" name="Start">
+      <outgoing>SequenceFlow_6</outgoing>
+    </startEvent>
+    <userTask id="UserTask_1" name="User Task">
+      <extensionElements>
+        <activiti:taskListener event="create" delegateExpression="${testCreateMembershipsTaskListener}" />
+      </extensionElements>
+      <incoming>SequenceFlow_6</incoming>
+      <outgoing>SequenceFlow_12</outgoing>
+    </userTask>
+    <endEvent id="EndEvent_1" name="End">
+      <incoming>SequenceFlow_12</incoming>
+    </endEvent>
+    <sequenceFlow id="SequenceFlow_12" sourceRef="UserTask_1" targetRef="EndEvent_1"/>
+    <sequenceFlow id="SequenceFlow_6" sourceRef="StartEvent_1" targetRef="UserTask_1"/>
+  </process>
+</definitions>

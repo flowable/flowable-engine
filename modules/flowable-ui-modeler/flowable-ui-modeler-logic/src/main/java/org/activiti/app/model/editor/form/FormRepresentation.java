@@ -16,7 +16,7 @@ import java.util.Date;
 
 import org.activiti.app.domain.editor.AbstractModel;
 import org.activiti.app.model.common.AbstractRepresentation;
-import org.activiti.form.model.FormDefinition;
+import org.activiti.form.model.FormModel;
 
 public class FormRepresentation extends AbstractRepresentation {
 
@@ -27,7 +27,7 @@ public class FormRepresentation extends AbstractRepresentation {
   protected Integer version;
   protected String lastUpdatedBy;
   protected Date lastUpdated;
-  protected FormDefinition formDefinition;
+  protected FormModel formDefinition;
 
   public FormRepresentation(AbstractModel model) {
     this.id = model.getId();
@@ -98,11 +98,11 @@ public class FormRepresentation extends AbstractRepresentation {
     this.lastUpdated = lastUpdated;
   }
 
-  public FormDefinition getFormDefinition() {
+  public FormModel getFormDefinition() {
     return formDefinition;
   }
 
-  public void setFormDefinition(FormDefinition formDefinition) {
+  public void setFormDefinition(FormModel formDefinition) {
     this.formDefinition = formDefinition;
   }
 }

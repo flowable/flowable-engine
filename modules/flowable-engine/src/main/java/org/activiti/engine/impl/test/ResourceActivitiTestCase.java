@@ -43,6 +43,7 @@ public abstract class ResourceActivitiTestCase extends AbstractActivitiTestCase 
     super.closeDownProcessEngine();
     ProcessEngines.unregister(processEngine);
     processEngine = null;
+    nullifyServices();
   }
 
   @Override

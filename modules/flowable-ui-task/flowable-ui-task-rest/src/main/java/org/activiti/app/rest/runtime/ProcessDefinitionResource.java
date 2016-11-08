@@ -15,7 +15,7 @@ package org.activiti.app.rest.runtime;
 import javax.servlet.http.HttpServletRequest;
 
 import org.activiti.app.service.runtime.ActivitiProcessDefinitionService;
-import org.activiti.form.model.FormDefinition;
+import org.activiti.form.model.FormModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,7 +28,7 @@ public class ProcessDefinitionResource {
   protected ActivitiProcessDefinitionService processDefinitionService;
 
   @RequestMapping(value = "/rest/process-definitions/{processDefinitionId}/start-form", method = RequestMethod.GET, produces = "application/json")
-  public FormDefinition getProcessDefinitionStartForm(HttpServletRequest request) {
+  public FormModel getProcessDefinitionStartForm(HttpServletRequest request) {
     return processDefinitionService.getProcessDefinitionStartForm(request);
   }
 }

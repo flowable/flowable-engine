@@ -374,6 +374,9 @@ public abstract class AbstractEngineConfiguration {
     if (transactionFactory == null) {
       if (transactionsExternallyManaged) {
         transactionFactory = new ManagedTransactionFactory();
+        Properties properties = new Properties();
+        properties.put("closeConnection", "false");
+        this.transactionFactory.setProperties(properties);
       } else {
         transactionFactory = new JdbcTransactionFactory();
       }

@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.dmn.api.DecisionTable;
+import org.activiti.engine.app.AppModel;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.engine.repository.DeploymentQuery;
 import org.activiti.engine.repository.DiagramLayout;
@@ -40,6 +41,7 @@ import org.activiti.validation.ValidationError;
  * @author Tijs Rademakers
  * @author Joram Barrez
  * @author Henry Yan
+ * @author Yvo Swillens
  */
 public interface RepositoryService {
 
@@ -329,6 +331,16 @@ public interface RepositoryService {
    *           when the process model or diagram doesn't exist.
    */
   DiagramLayout getProcessDiagramLayout(String processDefinitionId);
+  
+  /**
+   * Returns the app resource object (.app file) for a deployment.
+   */
+  Object getAppResourceObject(String deploymentId);
+  
+  /**
+   * Returns the app model object (.app file) for a deployment.
+   */
+  AppModel getAppResourceModel(String deploymentId);
 
   /**
    * Creates a new model. The model is transient and must be saved using {@link #saveModel(Model)}.

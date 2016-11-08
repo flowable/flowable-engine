@@ -16,13 +16,13 @@ import java.util.List;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiObjectNotFoundException;
-import org.activiti.form.api.Form;
+import org.activiti.form.api.FormDefinition;
 import org.activiti.form.engine.FormEngineConfiguration;
-import org.activiti.form.engine.impl.FormQueryImpl;
+import org.activiti.form.engine.impl.FormDefinitionQueryImpl;
+import org.activiti.form.engine.impl.persistence.entity.FormDefinitionEntity;
+import org.activiti.form.engine.impl.persistence.entity.FormDefinitionEntityManager;
 import org.activiti.form.engine.impl.persistence.entity.FormDeploymentEntity;
 import org.activiti.form.engine.impl.persistence.entity.FormDeploymentEntityManager;
-import org.activiti.form.engine.impl.persistence.entity.FormEntity;
-import org.activiti.form.engine.impl.persistence.entity.FormEntityManager;
 import org.activiti.form.engine.impl.persistence.entity.ResourceEntity;
 
 /**
@@ -32,13 +32,13 @@ import org.activiti.form.engine.impl.persistence.entity.ResourceEntity;
 public class DeploymentManager {
 
   protected FormEngineConfiguration engineConfig;
-  protected DeploymentCache<FormCacheEntry> formCache;
+  protected DeploymentCache<FormDefinitionCacheEntry> formCache;
   
   protected List<Deployer> deployers;
-  protected FormEntityManager formEntityManager;
+  protected FormDefinitionEntityManager formDefinitionEntityManager;
   protected FormDeploymentEntityManager deploymentEntityManager;
   
-  public DeploymentManager(DeploymentCache<FormCacheEntry> formCache, FormEngineConfiguration engineConfig) {
+  public DeploymentManager(DeploymentCache<FormDefinitionCacheEntry> formCache, FormEngineConfiguration engineConfig) {
     this.formCache = formCache;
     this.engineConfig = engineConfig;
   }
@@ -49,87 +49,87 @@ public class DeploymentManager {
     }
   }
 
-  public FormEntity findDeployedFormById(String formId) {
-    if (formId == null) {
-      throw new ActivitiException("Invalid form id : null");
+  public FormDefinitionEntity findDeployedFormDefinitionById(String formDefinitionId) {
+    if (formDefinitionId == null) {
+      throw new ActivitiException("Invalid form definition id : null");
     }
 
     // first try the cache
-    FormCacheEntry cacheEntry = formCache.get(formId);
-    FormEntity form = cacheEntry != null ? cacheEntry.getFormEntity() : null;
+    FormDefinitionCacheEntry cacheEntry = formCache.get(formDefinitionId);
+    FormDefinitionEntity formDefinition = cacheEntry != null ? cacheEntry.getFormDefinitionEntity() : null;
 
-    if (form == null) {
-      form = engineConfig.getFormEntityManager().findById(formId);
-      if (form == null) {
-        throw new ActivitiObjectNotFoundException("no deployed form found with id '" + formId + "'");
+    if (formDefinition == null) {
+      formDefinition = engineConfig.getFormDefinitionEntityManager().findById(formDefinitionId);
+      if (formDefinition == null) {
+        throw new ActivitiObjectNotFoundException("no deployed form definition found with id '" + formDefinitionId + "'");
       }
-      form = resolveForm(form).getFormEntity();
+      formDefinition = resolveFormDefinition(formDefinition).getFormDefinitionEntity();
     }
-    return form;
+    return formDefinition;
   }
 
-  public FormEntity findDeployedLatestFormByKey(String formDefinitionKey) {
-    FormEntity form = formEntityManager.findLatestFormByKey(formDefinitionKey);
+  public FormDefinitionEntity findDeployedLatestFormDefinitionByKey(String formDefinitionKey) {
+    FormDefinitionEntity formDefinition = formDefinitionEntityManager.findLatestFormDefinitionByKey(formDefinitionKey);
 
-    if (form == null) {
-      throw new ActivitiObjectNotFoundException("no forms deployed with key '" + formDefinitionKey + "'");
+    if (formDefinition == null) {
+      throw new ActivitiObjectNotFoundException("no form definitions deployed with key '" + formDefinitionKey + "'");
     }
-    form = resolveForm(form).getFormEntity();
-    return form;
+    formDefinition = resolveFormDefinition(formDefinition).getFormDefinitionEntity();
+    return formDefinition;
   }
 
-  public FormEntity findDeployedLatestFormByKeyAndTenantId(String formDefinitionKey, String tenantId) {
-    FormEntity form = formEntityManager.findLatestFormByKeyAndTenantId(formDefinitionKey, tenantId);
+  public FormDefinitionEntity findDeployedLatestFormDefinitionByKeyAndTenantId(String formDefinitionKey, String tenantId) {
+    FormDefinitionEntity formDefinition = formDefinitionEntityManager.findLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, tenantId);
     
-    if (form == null) {
-      throw new ActivitiObjectNotFoundException("no forms deployed with key '" + formDefinitionKey + "' for tenant identifier '" + tenantId + "'");
+    if (formDefinition == null) {
+      throw new ActivitiObjectNotFoundException("no form definitions deployed with key '" + formDefinitionKey + "' for tenant identifier '" + tenantId + "'");
     }
-    form = resolveForm(form).getFormEntity();
-    return form;
+    formDefinition = resolveFormDefinition(formDefinition).getFormDefinitionEntity();
+    return formDefinition;
   }
   
-  public FormEntity findDeployedLatestFormByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId) {
-    FormEntity form = formEntityManager.findLatestFormByKeyAndParentDeploymentId(formDefinitionKey, parentDeploymentId);
+  public FormDefinitionEntity findDeployedLatestFormDefinitionByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId) {
+    FormDefinitionEntity formDefinition = formDefinitionEntityManager.findLatestFormDefinitionByKeyAndParentDeploymentId(formDefinitionKey, parentDeploymentId);
     
-    if (form == null) {
-      throw new ActivitiObjectNotFoundException("no forms deployed with key '" + formDefinitionKey + 
+    if (formDefinition == null) {
+      throw new ActivitiObjectNotFoundException("no form definitions deployed with key '" + formDefinitionKey + 
           "' for parent deployment id '" + parentDeploymentId + "'");
     }
-    form = resolveForm(form).getFormEntity();
-    return form;
+    formDefinition = resolveFormDefinition(formDefinition).getFormDefinitionEntity();
+    return formDefinition;
   }
   
-  public FormEntity findDeployedLatestFormByKeyParentDeploymentIdAndTenantId(String formDefinitionKey, String parentDeploymentId, String tenantId) {
-    FormEntity form = formEntityManager.findLatestFormByKeyParentDeploymentIdAndTenantId(formDefinitionKey, parentDeploymentId, tenantId);
+  public FormDefinitionEntity findDeployedLatestFormDefinitionByKeyParentDeploymentIdAndTenantId(String formDefinitionKey, String parentDeploymentId, String tenantId) {
+    FormDefinitionEntity formDefinition = formDefinitionEntityManager.findLatestFormDefinitionByKeyParentDeploymentIdAndTenantId(formDefinitionKey, parentDeploymentId, tenantId);
     
-    if (form == null) {
-      throw new ActivitiObjectNotFoundException("no forms deployed with key '" + formDefinitionKey + 
+    if (formDefinition == null) {
+      throw new ActivitiObjectNotFoundException("no form definitions deployed with key '" + formDefinitionKey + 
           "' for parent deployment id '" + parentDeploymentId + "' and tenant identifier '" + tenantId + "'");
     }
-    form = resolveForm(form).getFormEntity();
-    return form;
+    formDefinition = resolveFormDefinition(formDefinition).getFormDefinitionEntity();
+    return formDefinition;
   }
 
-  public FormEntity findDeployedFormByKeyAndVersionAndTenantId(String formDefinitionKey, int formVersion, String tenantId) {
-    FormEntity form = formEntityManager.findFormByKeyAndVersionAndTenantId(formDefinitionKey, formVersion, tenantId);
+  public FormDefinitionEntity findDeployedFormDefinitionByKeyAndVersionAndTenantId(String formDefinitionKey, int formVersion, String tenantId) {
+    FormDefinitionEntity formDefinition = formDefinitionEntityManager.findFormDefinitionByKeyAndVersionAndTenantId(formDefinitionKey, formVersion, tenantId);
     
-    if (form == null) {
-      throw new ActivitiObjectNotFoundException("no decisions deployed with key = '" + formDefinitionKey + "' and version = '" + formVersion + "'");
+    if (formDefinition == null) {
+      throw new ActivitiObjectNotFoundException("no form definitions deployed with key = '" + formDefinitionKey + "' and version = '" + formVersion + "'");
     }
     
-    form = resolveForm(form).getFormEntity();
-    return form;
+    formDefinition = resolveFormDefinition(formDefinition).getFormDefinitionEntity();
+    return formDefinition;
   }
 
   /**
    * Resolving the decision will fetch the DMN, parse it and store the
    * {@link DmnDefinition} in memory.
    */
-  public FormCacheEntry resolveForm(Form form) {
-    String formId = form.getId();
-    String deploymentId = form.getDeploymentId();
+  public FormDefinitionCacheEntry resolveFormDefinition(FormDefinition formDefinition) {
+    String formDefinitionId = formDefinition.getId();
+    String deploymentId = formDefinition.getDeploymentId();
 
-    FormCacheEntry cachedForm = formCache.get(formId);
+    FormDefinitionCacheEntry cachedForm = formCache.get(formDefinitionId);
 
     if (cachedForm == null) {
       FormDeploymentEntity deployment = engineConfig.getDeploymentEntityManager().findById(deploymentId);
@@ -140,10 +140,10 @@ public class DeploymentManager {
       
       deployment.setNew(false);
       deploy(deployment);
-      cachedForm = formCache.get(formId);
+      cachedForm = formCache.get(formDefinitionId);
 
       if (cachedForm == null) {
-        throw new ActivitiException("deployment '" + deploymentId + "' didn't put form '" + formId + "' in the cache");
+        throw new ActivitiException("deployment '" + deploymentId + "' didn't put form definition '" + formDefinitionId + "' in the cache");
       }
     }
     return cachedForm;
@@ -157,12 +157,12 @@ public class DeploymentManager {
     }
 
     // Remove any process definition from the cache
-    List<Form> forms = new FormQueryImpl().deploymentId(deploymentId).list();
+    List<FormDefinition> forms = new FormDefinitionQueryImpl().deploymentId(deploymentId).list();
     
     // Delete data
     deploymentEntityManager.deleteDeployment(deploymentId);
 
-    for (Form form : forms) {
+    for (FormDefinition form : forms) {
       formCache.remove(form.getId());
     }
   }
@@ -175,20 +175,20 @@ public class DeploymentManager {
     this.deployers = deployers;
   }
 
-  public DeploymentCache<FormCacheEntry> getFormCache() {
+  public DeploymentCache<FormDefinitionCacheEntry> getFormCache() {
       return formCache;
   }
 
-  public void setFormCache(DeploymentCache<FormCacheEntry> formCache) {
+  public void setFormCache(DeploymentCache<FormDefinitionCacheEntry> formCache) {
       this.formCache = formCache;
   }
 
-  public FormEntityManager getFormEntityManager() {
-    return formEntityManager;
+  public FormDefinitionEntityManager getFormDefinitionEntityManager() {
+    return formDefinitionEntityManager;
   }
 
-  public void setFormEntityManager(FormEntityManager formEntityManager) {
-    this.formEntityManager = formEntityManager;
+  public void setFormDefinitionEntityManager(FormDefinitionEntityManager formDefinitionEntityManager) {
+    this.formDefinitionEntityManager = formDefinitionEntityManager;
   }
 
   public FormDeploymentEntityManager getDeploymentEntityManager() {

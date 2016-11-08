@@ -17,7 +17,7 @@ import java.util.List;
 import org.activiti.app.model.runtime.CompleteFormRepresentation;
 import org.activiti.app.model.runtime.ProcessInstanceVariableRepresentation;
 import org.activiti.app.service.runtime.ActivitiTaskFormService;
-import org.activiti.form.model.FormDefinition;
+import org.activiti.form.model.FormModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +38,7 @@ public class TaskFormResource {
   protected ActivitiTaskFormService taskFormService;
 
   @RequestMapping(value = "/{taskId}", method = RequestMethod.GET, produces = "application/json")
-  public FormDefinition getTaskForm(@PathVariable String taskId) {
+  public FormModel getTaskForm(@PathVariable String taskId) {
     return taskFormService.getTaskForm(taskId);
   }
 

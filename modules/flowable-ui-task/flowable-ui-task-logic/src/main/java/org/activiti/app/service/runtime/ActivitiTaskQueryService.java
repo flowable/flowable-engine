@@ -45,16 +45,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
-import com.fasterxml.jackson.databind.util.ISO8601Utils;
 
 /**
  * @author Tijs Rademakers
  */
 @Service
+@Transactional
 public class ActivitiTaskQueryService {
 
   private static final Logger logger = LoggerFactory.getLogger(ActivitiTaskQueryService.class);

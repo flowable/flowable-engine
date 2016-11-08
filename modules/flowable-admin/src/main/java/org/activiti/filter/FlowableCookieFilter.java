@@ -171,7 +171,8 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
             break;
             
           } catch (Exception e) {
-            logger.error("Error getting user from token", e);
+            logger.trace("Could not get user for token", e);
+            return false;
           }
         }
       }

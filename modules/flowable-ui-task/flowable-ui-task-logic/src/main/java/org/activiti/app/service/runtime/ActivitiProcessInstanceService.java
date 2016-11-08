@@ -36,18 +36,20 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.form.api.FormRepositoryService;
 import org.activiti.form.api.FormService;
-import org.activiti.form.model.FormDefinition;
+import org.activiti.form.model.FormModel;
 import org.activiti.idm.api.User;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Tijs Rademakers
  */
 @Service
+@Transactional
 public class ActivitiProcessInstanceService {
 
   private static final Logger logger = LoggerFactory.getLogger(ActivitiProcessInstanceService.class);
@@ -99,7 +101,7 @@ public class ActivitiProcessInstanceService {
 
     ProcessInstanceRepresentation processInstanceResult = new ProcessInstanceRepresentation(processInstance, processDefinition, processDefinition.isGraphicalNotationDefined(), userRep);
 
-    FormDefinition formDefinition = getStartFormDefinition(processInstance.getProcessDefinitionId(), processDefinition, processInstance.getId());
+    FormModel formDefinition = getStartFormDefinition(processInstance.getProcessDefinitionId(), processDefinition, processInstance.getId());
     if (formDefinition != null) {
       processInstanceResult.setStartFormDefined(true);
     }
@@ -107,7 +109,7 @@ public class ActivitiProcessInstanceService {
     return processInstanceResult;
   }
 
-  public FormDefinition getProcessInstanceStartForm(String processInstanceId, HttpServletResponse response) {
+  public FormModel getProcessInstanceStartForm(String processInstanceId, HttpServletResponse response) {
 
     HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 
@@ -125,7 +127,7 @@ public class ActivitiProcessInstanceService {
       throw new BadRequestException("Process definition id is required");
     }
     
-    FormDefinition formDefinition = null;
+    FormModel formModel = null;
     Map<String, Object> variables = null;
 
     ProcessDefinition processDefinition = repositoryService.getProcessDefinition(startRequest.getProcessDefinitionId());
@@ -137,9 +139,9 @@ public class ActivitiProcessInstanceService {
       if (startElement instanceof StartEvent) {
         StartEvent startEvent = (StartEvent) startElement;
         if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
-          formDefinition = formRepositoryService.getFormDefinitionByKey(startEvent.getFormKey());
-          if (formDefinition != null) {
-            variables = formService.getVariablesFromFormSubmission(formDefinition, startRequest.getValues(), startRequest.getOutcome());
+          formModel = formRepositoryService.getFormModelByKey(startEvent.getFormKey());
+          if (formModel != null) {
+            variables = formService.getVariablesFromFormSubmission(formModel, startRequest.getValues(), startRequest.getOutcome());
           }
         }
       }
@@ -168,8 +170,8 @@ public class ActivitiProcessInstanceService {
         }
       }*/
 
-    if (formDefinition != null) {
-      formService.storeSubmittedForm(variables, formDefinition, null, processInstance.getId());
+    if (formModel != null) {
+      formService.createFormInstance(variables, formModel, null, processInstance.getId());
     }
     
     User user = null;
@@ -216,15 +218,15 @@ public class ActivitiProcessInstanceService {
     }
   }
   
-  protected FormDefinition getStartFormDefinition(String processDefinitionId, ProcessDefinitionEntity processDefinition, String processInstanceId) {
-    FormDefinition formDefinition = null;
+  protected FormModel getStartFormDefinition(String processDefinitionId, ProcessDefinitionEntity processDefinition, String processInstanceId) {
+    FormModel formDefinition = null;
     BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionId);
     Process process = bpmnModel.getProcessById(processDefinition.getKey());
     FlowElement startElement = process.getInitialFlowElement();
     if (startElement instanceof StartEvent) {
       StartEvent startEvent = (StartEvent) startElement;
       if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
-        formDefinition = formService.getCompletedTaskFormDefinitionByKeyAndParentDeploymentId(startEvent.getFormKey(), 
+        formDefinition = formService.getFormInstanceModelByKeyAndParentDeploymentId(startEvent.getFormKey(), 
             processDefinition.getDeploymentId(), null, processInstanceId, null, processDefinition.getTenantId());
       }
     }

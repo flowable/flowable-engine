@@ -92,7 +92,19 @@ public abstract class AbstractActivitiTestCase extends AbstractTestCase {
   // Default: do nothing
   protected void closeDownProcessEngine() {
   }
-
+  
+  protected void nullifyServices() {
+    processEngineConfiguration = null;
+    repositoryService = null;
+    runtimeService = null;
+    taskService = null;
+    formService = null;
+    historyService = null;
+    identityService = null;
+    managementService = null;
+    dynamicBpmnService = null;
+  }
+  
   @Override
   public void runBare() throws Throwable {
     initializeProcessEngine();

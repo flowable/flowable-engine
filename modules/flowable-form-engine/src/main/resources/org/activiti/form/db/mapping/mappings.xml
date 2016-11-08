@@ -17,8 +17,8 @@
   <mappers>
     <mapper resource="org/activiti/form/db/mapping/common.xml" />
     <mapper resource="org/activiti/form/db/mapping/entity/Deployment.xml" />
-    <mapper resource="org/activiti/form/db/mapping/entity/Form.xml" />
+    <mapper resource="org/activiti/form/db/mapping/entity/FormDefinition.xml" />
     <mapper resource="org/activiti/form/db/mapping/entity/Resource.xml" />
-    <mapper resource="org/activiti/form/db/mapping/entity/SubmittedForm.xml" />
+    <mapper resource="org/activiti/form/db/mapping/entity/FormInstance.xml" />
   </mappers>
 </configuration>
