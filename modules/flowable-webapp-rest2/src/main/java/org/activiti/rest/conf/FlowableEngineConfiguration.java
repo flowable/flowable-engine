@@ -3,6 +3,9 @@ package org.activiti.rest.conf;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sql.DataSource;
+
+import org.activiti.dmn.engine.configurator.DmnEngineConfigurator;
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
@@ -13,6 +16,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.form.AbstractFormType;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.activiti.form.engine.configurator.FormEngineConfigurator;
 import org.activiti.rest.form.MonthFormType;
 import org.activiti.rest.form.ProcessDefinitionFormType;
 import org.activiti.rest.form.UserFormType;
@@ -20,14 +24,25 @@ import org.activiti.spring.ProcessEngineFactoryBean;
 import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
+import org.springframework.core.env.Environment;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-public class FlowableEngineConfiguration extends BaseEngineConfiguration {
+public class FlowableEngineConfiguration {
 
   private final Logger log = LoggerFactory.getLogger(FlowableEngineConfiguration.class);
+  
+  @Autowired
+  protected DataSource dataSource;
+  
+  @Autowired
+  protected PlatformTransactionManager transactionManager;
+  
+  @Autowired
+  protected Environment environment;
 
   @Bean(name = "processEngineFactoryBean")
   public ProcessEngineFactoryBean processEngineFactoryBean() {
@@ -38,10 +53,8 @@ public class FlowableEngineConfiguration extends BaseEngineConfiguration {
 
   @Bean(name = "processEngine")
   public ProcessEngine processEngine() {
-    // Safe to call the getObject() on the @Bean annotated
-    // processEngineFactoryBean(), will be
-    // the fully initialized object instanced from the factory and will NOT
-    // be created more than once
+    // Safe to call the getObject() on the @Bean annotated processEngineFactoryBean(), will be
+    // the fully initialized object instanced from the factory and will NOT be created more than once
     try {
       return processEngineFactoryBean().getObject();
     } catch (Exception e) {
@@ -52,9 +65,9 @@ public class FlowableEngineConfiguration extends BaseEngineConfiguration {
   @Bean(name = "processEngineConfiguration")
   public ProcessEngineConfigurationImpl processEngineConfiguration() {
     SpringProcessEngineConfiguration processEngineConfiguration = new SpringProcessEngineConfiguration();
-    processEngineConfiguration.setDataSource(dataSource());
+    processEngineConfiguration.setDataSource(dataSource);
     processEngineConfiguration.setDatabaseSchemaUpdate(environment.getProperty("engine.process.schema.update", "true"));
-    processEngineConfiguration.setTransactionManager(annotationDrivenTransactionManager());
+    processEngineConfiguration.setTransactionManager(transactionManager);
     processEngineConfiguration.setAsyncExecutorActivate(Boolean.valueOf(environment.getProperty("engine.process.asyncexecutor.activate", "true")));
     processEngineConfiguration.setHistory(environment.getProperty("engine.process.history.level", "full"));
 
@@ -63,6 +76,9 @@ public class FlowableEngineConfiguration extends BaseEngineConfiguration {
     formTypes.add(new ProcessDefinitionFormType());
     formTypes.add(new MonthFormType());
     processEngineConfiguration.setCustomFormTypes(formTypes);
+    
+    processEngineConfiguration.addConfigurator(new FormEngineConfigurator());
+    processEngineConfiguration.addConfigurator(new DmnEngineConfigurator());
 
     return processEngineConfiguration;
   }
