@@ -86,10 +86,10 @@ public class DebuggerTest extends ResourceActivitiTestCase {
         ProcessInstance pi = runtimeService.createProcessInstanceQuery().processDefinitionKey("setScriptVariableThroughExecution").singleResult();
         assertThat("Process has passed through the first groovy task. Variable must exist.",
                 runtimeService.hasVariable(pi.getId(), "myVar"), is(true));
+        assertThat("There is exactly one MyTask task present", taskService.createTaskQuery().singleResult().getName(), is("my task"));
         assertThat("Process instance has to be stopped at 'theTask'",
                 runtimeService.createExecutionQuery().parentId(pi.getId()).singleResult().getActivityId(),
                 is("theTask"));
-        assertThat("There is exactly one MyTask task present", taskService.createTaskQuery().singleResult().getName(), is("my task"));
     }
 
 }
