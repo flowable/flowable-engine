@@ -35,7 +35,7 @@ public class FormInstanceResource {
   @Autowired
   protected FormRestResponseFactory formRestResponseFactory;
 
-  @RequestMapping(value = "/form/submitted-form", method = RequestMethod.POST, produces = "application/json")
+  @RequestMapping(value = "/form/form-instance", method = RequestMethod.POST, produces = "application/json")
   public void storeFormInstance(@RequestBody FormDefinitionRequest formDefinitionRequest, HttpServletRequest request) {
 
     FormModel formModel;
