@@ -52,6 +52,6 @@ public class DecisionTablesClientResource extends AbstractClientResource {
      */
     @RequestMapping(value = "/rest/activiti/process-definition-decision-tables/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getProcessDefinitionDecisionTables(@PathVariable String processDefinitionId, HttpServletRequest request) {
-        return clientService.getProcessDefinitionDecisionTables(retrieveServerConfig(EndpointType.DMN), processDefinitionId);
+        return clientService.getProcessDefinitionDecisionTables(retrieveServerConfig(EndpointType.PROCESS), processDefinitionId);
     }
 }

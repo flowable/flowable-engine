@@ -52,7 +52,7 @@ public class DecisionTableService {
     }
     
     public JsonNode getProcessDefinitionDecisionTables(ServerConfig serverConfig, String processDefinitionId) {
-        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "enterprise/process-definitions/" + processDefinitionId + "/decision-tables"));
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "repository/process-definitions/{processDefinitionId}/decision-tables" + processDefinitionId + "/decision-tables"));
         return clientUtil.executeRequest(get, serverConfig);
     }
     
