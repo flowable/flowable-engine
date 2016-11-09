@@ -45,6 +45,7 @@ import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Event;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
+import org.activiti.form.api.FormDefinition;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.User;
 import org.activiti.rest.application.ContentTypeResolver;
@@ -81,6 +82,7 @@ import org.activiti.rest.service.api.management.TableResponse;
 import org.activiti.rest.service.api.repository.DecisionTableResponse;
 import org.activiti.rest.service.api.repository.DeploymentResourceResponse;
 import org.activiti.rest.service.api.repository.DeploymentResponse;
+import org.activiti.rest.service.api.repository.FormDefinitionResponse;
 import org.activiti.rest.service.api.repository.ModelResponse;
 import org.activiti.rest.service.api.repository.ProcessDefinitionResponse;
 import org.activiti.rest.service.api.runtime.process.ExecutionResponse;
@@ -1126,24 +1128,44 @@ public class RestResponseFactory {
     return response;
   }
 
-  public List<DecisionTableResponse> createDecisionTableResponseList(List<DecisionTable> decisionTables) {
+  public List<DecisionTableResponse> createDecisionTableResponseList(List<DecisionTable> decisionTables, String processDefinitionId) {
     RestUrlBuilder urlBuilder = createUrlBuilder();
     List<DecisionTableResponse> responseList = new ArrayList<>();
     for (DecisionTable decisionTable : decisionTables) {
-      responseList.add(createDecisionTableResponse(decisionTable, urlBuilder));
+      responseList.add(createDecisionTableResponse(decisionTable, processDefinitionId, urlBuilder));
     }
     return responseList;
   }
 
-  public DecisionTableResponse createDecisionTableResponse(DecisionTable decisionTable) {
-    return createDecisionTableResponse(decisionTable, createUrlBuilder());
+  public DecisionTableResponse createDecisionTableResponse(DecisionTable decisionTable, String processDefinitionId) {
+    return createDecisionTableResponse(decisionTable, processDefinitionId, createUrlBuilder());
   }
 
-  public DecisionTableResponse createDecisionTableResponse(DecisionTable decisionTable, RestUrlBuilder urlBuilder) {
+  public DecisionTableResponse createDecisionTableResponse(DecisionTable decisionTable, String processDefinitionId, RestUrlBuilder urlBuilder) {
     DecisionTableResponse decisionTableResponse = new DecisionTableResponse(decisionTable);
-    decisionTableResponse.setUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION_DECISION_TABLES_COLLECTION));
+    decisionTableResponse.setUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION_DECISION_TABLES_COLLECTION, processDefinitionId));
 
     return decisionTableResponse;
+  }
+
+  public List<FormDefinitionResponse> createFormDefinitionResponseList(List<FormDefinition> formDefinitions, String processDefinitionId) {
+    RestUrlBuilder urlBuilder = createUrlBuilder();
+    List<FormDefinitionResponse> responseList = new ArrayList<>();
+    for (FormDefinition formDefinition : formDefinitions) {
+      responseList.add(createFormDefinitionResponse(formDefinition, processDefinitionId, urlBuilder));
+    }
+    return responseList;
+  }
+
+  public FormDefinitionResponse createFormDefintionResponse(FormDefinition formDefinition, String processDefinitionId) {
+    return createFormDefinitionResponse(formDefinition, processDefinitionId, createUrlBuilder());
+  }
+
+  public FormDefinitionResponse createFormDefinitionResponse(FormDefinition formDefinition, String processDefinitionId, RestUrlBuilder urlBuilder) {
+    FormDefinitionResponse formDefinitionResponse = new FormDefinitionResponse(formDefinition);
+    formDefinitionResponse.setUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION_FORM_DEFINITIONS_COLLECTION, processDefinitionId));
+
+    return formDefinitionResponse;
   }
 
   /**
