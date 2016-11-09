@@ -14,6 +14,8 @@ package org.activiti.idm.engine.impl;
 
 import java.util.List;
 
+import org.activiti.idm.api.Capability;
+import org.activiti.idm.api.CapabilityQuery;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.GroupQuery;
 import org.activiti.idm.api.IdmIdentityService;
@@ -26,6 +28,8 @@ import org.activiti.idm.api.TokenQuery;
 import org.activiti.idm.api.User;
 import org.activiti.idm.api.UserQuery;
 import org.activiti.idm.engine.impl.cmd.CheckPassword;
+import org.activiti.idm.engine.impl.cmd.CreateCapabilityCmd;
+import org.activiti.idm.engine.impl.cmd.CreateCapabilityQueryCmd;
 import org.activiti.idm.engine.impl.cmd.CreateGroupCmd;
 import org.activiti.idm.engine.impl.cmd.CreateGroupQueryCmd;
 import org.activiti.idm.engine.impl.cmd.CreateMembershipCmd;
@@ -33,6 +37,7 @@ import org.activiti.idm.engine.impl.cmd.CreateTokenCmd;
 import org.activiti.idm.engine.impl.cmd.CreateTokenQueryCmd;
 import org.activiti.idm.engine.impl.cmd.CreateUserCmd;
 import org.activiti.idm.engine.impl.cmd.CreateUserQueryCmd;
+import org.activiti.idm.engine.impl.cmd.DeleteCapabilityCmd;
 import org.activiti.idm.engine.impl.cmd.DeleteGroupCmd;
 import org.activiti.idm.engine.impl.cmd.DeleteMembershipCmd;
 import org.activiti.idm.engine.impl.cmd.DeleteTokenCmd;
@@ -150,4 +155,20 @@ public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentitySe
   public void deleteUserInfo(String userId, String key) {
     commandExecutor.execute(new DeleteUserInfoCmd(userId, key));
   }
+
+  @Override
+  public Capability createCapability(String capabilityName, String userId, String groupId) {
+    return commandExecutor.execute(new CreateCapabilityCmd(capabilityName, userId, groupId));
+  }
+
+  @Override
+  public void deleteCapability(String capabilityId) {
+    commandExecutor.execute(new DeleteCapabilityCmd(capabilityId));
+  }
+
+  @Override
+  public CapabilityQuery createCapabilityQuery() {
+    return commandExecutor.execute(new CreateCapabilityQueryCmd());
+  }
+  
 }

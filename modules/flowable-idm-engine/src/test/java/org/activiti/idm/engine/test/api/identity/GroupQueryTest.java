@@ -52,14 +52,6 @@ public class GroupQueryTest extends PluggableActivitiIdmTestCase {
 
   }
 
-  private Group createGroup(String id, String name, String type) {
-    Group group = idmIdentityService.newGroup(id);
-    group.setName(name);
-    group.setType(type);
-    idmIdentityService.saveGroup(group);
-    return group;
-  }
-
   @Override
   protected void tearDown() throws Exception {
     idmIdentityService.deleteUser("kermit");
