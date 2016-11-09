@@ -136,6 +136,11 @@ public class FormDeploymentBuilderImpl implements FormDeploymentBuilder, Seriali
     deployment.setParentDeploymentId(parentDeploymentId);
     return this;
   }
+  
+  public FormDeploymentBuilder enableDuplicateFiltering() {
+    this.isDuplicateFilterEnabled = true;
+    return this;
+  }
 
   public FormDeployment deploy() {
     return repositoryService.deploy(this);

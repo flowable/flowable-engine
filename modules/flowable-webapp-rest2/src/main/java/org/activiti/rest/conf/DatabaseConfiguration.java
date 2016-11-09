@@ -72,8 +72,6 @@ public class DatabaseConfiguration {
     Integer maxPoolSize = environment.getProperty("datasource.connection.maxpoolsize", Integer.class);
     if (maxPoolSize != null) {
       dataSource.setMaximumPoolSize(maxPoolSize);
-    } else {
-      dataSource.setMaximumPoolSize(50);
     }
 
     return dataSource;

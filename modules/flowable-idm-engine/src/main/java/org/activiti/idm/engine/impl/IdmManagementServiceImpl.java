@@ -15,11 +15,11 @@ package org.activiti.idm.engine.impl;
 import java.sql.Connection;
 import java.util.Map;
 
+import org.activiti.engine.impl.cmd.CustomSqlExecution;
 import org.activiti.engine.impl.interceptor.CommandConfig;
+import org.activiti.engine.management.TableMetaData;
+import org.activiti.engine.management.TablePageQuery;
 import org.activiti.idm.api.IdmManagementService;
-import org.activiti.idm.api.management.IdmTableMetaData;
-import org.activiti.idm.api.management.IdmTablePageQuery;
-import org.activiti.idm.engine.impl.cmd.CustomSqlExecution;
 import org.activiti.idm.engine.impl.cmd.ExecuteCustomSqlCmd;
 import org.activiti.idm.engine.impl.cmd.GetPropertiesCmd;
 import org.activiti.idm.engine.impl.cmd.GetTableCountCmd;
@@ -43,11 +43,11 @@ public class IdmManagementServiceImpl extends ServiceImpl implements IdmManageme
     return commandExecutor.execute(new GetTableNameCmd(activitiEntityClass));
   }
 
-  public IdmTableMetaData getTableMetaData(String tableName) {
+  public TableMetaData getTableMetaData(String tableName) {
     return commandExecutor.execute(new GetTableMetaDataCmd(tableName));
   }
   
-  public IdmTablePageQuery createTablePageQuery() {
+  public TablePageQuery createTablePageQuery() {
     return new TablePageQueryImpl(commandExecutor);
   }
 

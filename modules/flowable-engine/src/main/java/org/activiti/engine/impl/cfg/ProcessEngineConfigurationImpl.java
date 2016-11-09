@@ -156,7 +156,6 @@ import org.activiti.engine.impl.form.StringFormType;
 import org.activiti.engine.impl.history.DefaultHistoryManager;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.impl.history.HistoryManager;
-import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandContextFactory;
@@ -475,6 +474,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected List<ProcessEngineConfigurator> configurators; // The injected configurators
   protected List<ProcessEngineConfigurator> allConfigurators; // Including auto-discovered configurators
 
+  protected ProcessEngineConfigurator idmProcessEngineConfigurator;
+  
   // DEPLOYERS //////////////////////////////////////////////////////////////////
 
   protected BpmnDeployer bpmnDeployer;
@@ -1341,7 +1342,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
     
     if (disableIdmEngine == false) {
-      allConfigurators.add(new IdmEngineConfigurator());
+      if (idmProcessEngineConfigurator != null) {
+        allConfigurators.add(idmProcessEngineConfigurator);
+      } else {
+        allConfigurators.add(new IdmEngineConfigurator());
+      }
     }
 
     // Auto discovery through ServiceLoader
@@ -2316,6 +2321,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public List<ProcessEngineConfigurator> getAllConfigurators() {
     return allConfigurators;
+  }
+  
+  public ProcessEngineConfigurator getIdmProcessEngineConfigurator() {
+    return idmProcessEngineConfigurator;
+  }
+  
+  public ProcessEngineConfigurationImpl setIdmProcessEngineConfigurator(ProcessEngineConfigurator idmProcessEngineConfigurator) {
+    this.idmProcessEngineConfigurator = idmProcessEngineConfigurator;
+    return this;
   }
 
   public BpmnDeployer getBpmnDeployer() {

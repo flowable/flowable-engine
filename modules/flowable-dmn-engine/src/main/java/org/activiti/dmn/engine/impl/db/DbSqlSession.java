@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
 public class DbSqlSession implements Session {
 
   private static final Logger log = LoggerFactory.getLogger(DbSqlSession.class);
+  
+  public static String[] JDBC_METADATA_TABLE_TYPES = { "TABLE" };
 
   protected SqlSession sqlSession;
   protected DbSqlSessionFactory dbSqlSessionFactory;

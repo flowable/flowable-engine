@@ -15,14 +15,14 @@ package org.activiti.idm.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.idm.api.management.IdmTableMetaData;
+import org.activiti.engine.management.TableMetaData;
 import org.activiti.idm.engine.impl.interceptor.Command;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
  */
-public class GetTableMetaDataCmd implements Command<IdmTableMetaData>, Serializable {
+public class GetTableMetaDataCmd implements Command<TableMetaData>, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected String tableName;
@@ -31,7 +31,7 @@ public class GetTableMetaDataCmd implements Command<IdmTableMetaData>, Serializa
     this.tableName = tableName;
   }
 
-  public IdmTableMetaData execute(CommandContext commandContext) {
+  public TableMetaData execute(CommandContext commandContext) {
     if (tableName == null) {
       throw new ActivitiIllegalArgumentException("tableName is null");
     }

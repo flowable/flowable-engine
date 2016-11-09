@@ -26,24 +26,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DmnEngineResource {
 
-    @RequestMapping(value = "/dmn-management/engine", method = RequestMethod.GET, produces = "application/json")
-    public DmnEngineInfoResponse getEngineInfo() {
-        DmnEngineInfoResponse response = new DmnEngineInfoResponse();
+  @RequestMapping(value = "/dmn-management/engine", method = RequestMethod.GET, produces = "application/json")
+  public DmnEngineInfoResponse getEngineInfo() {
+    DmnEngineInfoResponse response = new DmnEngineInfoResponse();
 
-        try {
-            EngineInfo dmnEngineInfo = DmnEngines.getDmnEngineInfo(DmnEngines.getDefaultDmnEngine().getName());
-            if (dmnEngineInfo != null) {
-                response.setName(dmnEngineInfo.getName());
-                response.setResourceUrl(dmnEngineInfo.getResourceUrl());
-                response.setException(dmnEngineInfo.getException());
-            }
-        } catch (Exception e) {
-            throw new ActivitiException("Error retrieving DMN engine info", e);
-        }
-
-        response.setVersion(DmnEngine.VERSION);
-
-        return response;
+    try {
+      EngineInfo dmnEngineInfo = DmnEngines.getDmnEngineInfo(DmnEngines.getDefaultDmnEngine().getName());
+      if (dmnEngineInfo != null) {
+        response.setName(dmnEngineInfo.getName());
+        response.setResourceUrl(dmnEngineInfo.getResourceUrl());
+        response.setException(dmnEngineInfo.getException());
+      }
+      
+    } catch (Exception e) {
+      throw new ActivitiException("Error retrieving DMN engine info", e);
     }
+
+    response.setVersion(DmnEngine.VERSION);
+
+    return response;
+  }
 
 }

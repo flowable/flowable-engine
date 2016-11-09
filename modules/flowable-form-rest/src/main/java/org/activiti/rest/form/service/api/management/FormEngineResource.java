@@ -16,7 +16,6 @@ import org.activiti.engine.ActivitiException;
 import org.activiti.engine.EngineInfo;
 import org.activiti.form.engine.FormEngine;
 import org.activiti.form.engine.FormEngines;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,14 +26,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class FormEngineResource {
 
-  @Autowired
-  protected FormEngine formEngine;
-
   @RequestMapping(value = "/form-management/engine", method = RequestMethod.GET, produces = "application/json")
   public FormEngineInfoResponse getEngineInfo() {
     FormEngineInfoResponse response = new FormEngineInfoResponse();
 
     try {
+      FormEngine formEngine = FormEngines.getDefaultFormEngine();
       EngineInfo formEngineInfo = FormEngines.getFormEngineInfo(formEngine.getName());
       if (formEngineInfo != null) {
         response.setName(formEngineInfo.getName());

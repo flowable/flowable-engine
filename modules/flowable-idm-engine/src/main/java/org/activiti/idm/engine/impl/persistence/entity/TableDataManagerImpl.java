@@ -25,11 +25,11 @@ import java.util.Map;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.persistence.entity.Entity;
+import org.activiti.engine.management.TableMetaData;
+import org.activiti.engine.management.TablePage;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.Token;
 import org.activiti.idm.api.User;
-import org.activiti.idm.api.management.IdmTableMetaData;
-import org.activiti.idm.api.management.IdmTablePage;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.TablePageQueryImpl;
 import org.activiti.idm.engine.impl.db.DbSqlSession;
@@ -146,9 +146,9 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
 
   @Override
   @SuppressWarnings("unchecked")
-  public IdmTablePage getTablePage(TablePageQueryImpl tablePageQuery, int firstResult, int maxResults) {
+  public TablePage getTablePage(TablePageQueryImpl tablePageQuery, int firstResult, int maxResults) {
 
-    IdmTablePage tablePage = new IdmTablePage();
+    TablePage tablePage = new TablePage();
 
     @SuppressWarnings("rawtypes")
     List tableData = getDbSqlSession().getSqlSession().selectList("selectTableData", tablePageQuery, new RowBounds(firstResult, maxResults));
@@ -179,8 +179,8 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
   }
 
   @Override
-  public IdmTableMetaData getTableMetaData(String tableName) {
-    IdmTableMetaData result = new IdmTableMetaData();
+  public TableMetaData getTableMetaData(String tableName) {
+    TableMetaData result = new TableMetaData();
     try {
       result.setTableName(tableName);
       DatabaseMetaData metaData = getDbSqlSession().getSqlSession().getConnection().getMetaData();

@@ -5,7 +5,9 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.activiti.dmn.engine.configurator.DmnEngineConfigurator;
+import org.activiti.dmn.api.DmnRepositoryService;
+import org.activiti.dmn.api.DmnRuleService;
+import org.activiti.dmn.spring.configurator.SpringDmnEngineConfigurator;
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
@@ -16,7 +18,8 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.form.AbstractFormType;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.form.engine.configurator.FormEngineConfigurator;
+import org.activiti.form.api.FormRepositoryService;
+import org.activiti.form.spring.configurator.SpringFormEngineConfigurator;
 import org.activiti.rest.form.MonthFormType;
 import org.activiti.rest.form.ProcessDefinitionFormType;
 import org.activiti.rest.form.UserFormType;
@@ -77,8 +80,8 @@ public class FlowableEngineConfiguration {
     formTypes.add(new MonthFormType());
     processEngineConfiguration.setCustomFormTypes(formTypes);
     
-    processEngineConfiguration.addConfigurator(new FormEngineConfigurator());
-    processEngineConfiguration.addConfigurator(new DmnEngineConfigurator());
+    processEngineConfiguration.addConfigurator(new SpringFormEngineConfigurator());
+    processEngineConfiguration.addConfigurator(new SpringDmnEngineConfigurator());
 
     return processEngineConfiguration;
   }
@@ -116,5 +119,25 @@ public class FlowableEngineConfiguration {
   @Bean
   public ManagementService managementService() {
     return processEngine().getManagementService();
+  }
+  
+  @Bean
+  public FormRepositoryService formRepositoryService() {
+    return processEngine().getFormEngineRepositoryService();
+  }
+  
+  @Bean
+  public org.activiti.form.api.FormService formEngineFormService() {
+    return processEngine().getFormEngineFormService();
+  }
+  
+  @Bean
+  public DmnRepositoryService dmnRepositoryService() {
+    return processEngine().getDmnRepositoryService();
+  }
+  
+  @Bean
+  public DmnRuleService dmnRuleService() {
+    return processEngine().getDmnRuleService();
   }
 }
