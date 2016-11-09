@@ -12,19 +12,24 @@
  */
 package org.activiti.rest.conf;
 
-import com.zaxxer.hikari.HikariDataSource;
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.sql.DataSource;
+import com.zaxxer.hikari.HikariDataSource;
 
 /**
  * @author Yvo Swillens
  */
-public class BaseEngineConfiguration {
+@Configuration
+@EnableTransactionManagement
+public class DatabaseConfiguration {
 
   @Autowired
   protected Environment environment;
@@ -67,6 +72,8 @@ public class BaseEngineConfiguration {
     Integer maxPoolSize = environment.getProperty("datasource.connection.maxpoolsize", Integer.class);
     if (maxPoolSize != null) {
       dataSource.setMaximumPoolSize(maxPoolSize);
+    } else {
+      dataSource.setMaximumPoolSize(50);
     }
 
     return dataSource;

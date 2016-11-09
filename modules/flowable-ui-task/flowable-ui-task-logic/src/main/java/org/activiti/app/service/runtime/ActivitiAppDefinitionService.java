@@ -21,6 +21,7 @@ import org.activiti.app.model.common.ResultListDataRepresentation;
 import org.activiti.app.model.runtime.AppDefinitionRepresentation;
 import org.activiti.app.service.exception.NotFoundException;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.app.AppModel;
 import org.activiti.engine.repository.Deployment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,6 +95,9 @@ public class ActivitiAppDefinitionService {
     resultAppDef.setDeploymentId(deployment.getId());
     resultAppDef.setDeploymentKey(deployment.getKey());
     resultAppDef.setName(deployment.getName());
+    AppModel appModel = repositoryService.getAppResourceModel(deployment.getId());
+    resultAppDef.setTheme(appModel.getTheme());
+    resultAppDef.setIcon(appModel.getIcon());
     return resultAppDef;
   }
 }
