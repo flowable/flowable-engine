@@ -31,6 +31,7 @@ import org.activiti.engine.repository.NativeProcessDefinitionQuery;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.task.IdentityLink;
+import org.activiti.form.api.FormDefinition;
 import org.activiti.validation.ValidationError;
 
 /**
@@ -482,5 +483,14 @@ public interface RepositoryService {
    *
    */
   List<DecisionTable> getDecisionTablesForProcessDefinition(String processDefinitionId);
+
+  /**
+   * Retrieves the {@link java.text.Normalizer.Form}s associated with the given process definition.
+   *
+   * @param processDefinitionId
+   *          id of the process definition, cannot be null.
+   *
+   */
+  List<FormDefinition> getFormDefinitionsForProcessDefinition(String processDefinitionId);
 
 }
