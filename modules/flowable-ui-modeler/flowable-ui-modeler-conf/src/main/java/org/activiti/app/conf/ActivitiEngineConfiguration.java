@@ -17,15 +17,13 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.activiti.dmn.engine.DmnEngineConfiguration;
-import org.activiti.dmn.engine.configurator.DmnEngineConfigurator;
+import org.activiti.dmn.spring.configurator.SpringDmnEngineConfigurator;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.parse.BpmnParseHandler;
-import org.activiti.form.engine.FormEngineConfiguration;
-import org.activiti.form.engine.configurator.FormEngineConfigurator;
+import org.activiti.form.spring.configurator.SpringFormEngineConfigurator;
 import org.activiti.idm.api.IdmIdentityService;
 import org.activiti.spring.ProcessEngineFactoryBean;
 import org.activiti.spring.SpringProcessEngineConfiguration;
@@ -82,19 +80,8 @@ public class ActivitiEngineConfiguration {
     	List<BpmnParseHandler> preParseHandlers = new ArrayList<BpmnParseHandler>();
     	processEngineConfiguration.setPreBpmnParseHandlers(preParseHandlers);
     	
-    	FormEngineConfiguration formEngineConfiguration = new FormEngineConfiguration();
-    	formEngineConfiguration.setDataSource(dataSource);
-    	
-    	FormEngineConfigurator formEngineConfigurator = new FormEngineConfigurator();
-    	formEngineConfigurator.setFormEngineConfiguration(formEngineConfiguration);
-    	processEngineConfiguration.addConfigurator(formEngineConfigurator);
-    	
-    	DmnEngineConfiguration dmnEngineConfiguration = new DmnEngineConfiguration();
-    	dmnEngineConfiguration.setDataSource(dataSource);
-      
-      DmnEngineConfigurator dmnEngineConfigurator = new DmnEngineConfigurator();
-      dmnEngineConfigurator.setDmnEngineConfiguration(dmnEngineConfiguration);
-      processEngineConfiguration.addConfigurator(dmnEngineConfigurator);
+    	processEngineConfiguration.addConfigurator(new SpringFormEngineConfigurator());
+    	processEngineConfiguration.addConfigurator(new SpringDmnEngineConfigurator());
     	
     	return processEngineConfiguration;
     }
