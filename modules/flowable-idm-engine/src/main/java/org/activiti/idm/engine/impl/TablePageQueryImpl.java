@@ -14,8 +14,8 @@ package org.activiti.idm.engine.impl;
 
 import java.io.Serializable;
 
-import org.activiti.idm.api.management.IdmTablePage;
-import org.activiti.idm.api.management.IdmTablePageQuery;
+import org.activiti.engine.management.TablePage;
+import org.activiti.engine.management.TablePageQuery;
 import org.activiti.idm.engine.impl.interceptor.Command;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 import org.activiti.idm.engine.impl.interceptor.CommandExecutor;
@@ -24,7 +24,7 @@ import org.activiti.idm.engine.impl.interceptor.CommandExecutor;
  * 
  * @author Joram Barrez
  */
-public class TablePageQueryImpl implements IdmTablePageQuery, Command<IdmTablePage>, Serializable {
+public class TablePageQueryImpl implements TablePageQuery, Command<TablePage>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -70,13 +70,13 @@ public class TablePageQueryImpl implements IdmTablePageQuery, Command<IdmTablePa
     order = order + column + " " + sortOrder;
   }
 
-  public IdmTablePage listPage(int firstResult, int maxResults) {
+  public TablePage listPage(int firstResult, int maxResults) {
     this.firstResult = firstResult;
     this.maxResults = maxResults;
     return commandExecutor.execute(this);
   }
 
-  public IdmTablePage execute(CommandContext commandContext) {
+  public TablePage execute(CommandContext commandContext) {
     return commandContext.getTableDataManager().getTablePage(this, firstResult, maxResults);
   }
 

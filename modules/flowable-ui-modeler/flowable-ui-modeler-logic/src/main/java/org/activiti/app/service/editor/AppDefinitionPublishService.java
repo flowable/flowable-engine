@@ -49,6 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Can't merge this with {@link AppDefinitionService}, as it doesn't have visibility of domain models needed to do the publication.
@@ -87,6 +88,8 @@ public class AppDefinitionPublishService {
       DeploymentBuilder deploymentBuilder = repositoryService.createDeployment()
           .name(appDefinitionModel.getName())
           .key(appDefinitionModel.getKey());
+      
+      deploymentBuilder.addString(appDefinitionModel.getKey() + ".app", getAppDefinitionJson(appDefinition));
       
       Map<String, Model> formMap = new HashMap<String, Model>();
       Map<String, Model> decisionTableMap = new HashMap<String, Model>();
@@ -195,4 +198,10 @@ public class AppDefinitionPublishService {
     }
   }
 
+  protected String getAppDefinitionJson(AppDefinition appDefinition) {
+    ObjectNode appDefinitionNode = objectMapper.createObjectNode();
+    appDefinitionNode.put("theme", appDefinition.getTheme());
+    appDefinitionNode.put("icon", appDefinition.getIcon());
+    return appDefinitionNode.toString();
+  }
 }

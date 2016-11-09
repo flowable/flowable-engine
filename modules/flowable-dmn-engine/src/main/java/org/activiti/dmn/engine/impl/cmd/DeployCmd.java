@@ -71,6 +71,13 @@ public class DeployCmd<T> implements Command<DmnDeployment>, Serializable {
       DmnDeploymentEntity existingDeployment = null;
       if (!existingDeployments.isEmpty()) {
         existingDeployment = (DmnDeploymentEntity) existingDeployments.get(0);
+        
+        Map<String, ResourceEntity> resourceMap = new HashMap<String, ResourceEntity>();
+        List<ResourceEntity> resourceList = commandContext.getResourceEntityManager().findResourcesByDeploymentId(existingDeployment.getId());
+        for (ResourceEntity resourceEntity : resourceList) {
+          resourceMap.put(resourceEntity.getName(), resourceEntity);
+        }
+        existingDeployment.setResources(resourceMap);
       }
 
       if ((existingDeployment != null) && !deploymentsDiffer(deployment, existingDeployment)) {

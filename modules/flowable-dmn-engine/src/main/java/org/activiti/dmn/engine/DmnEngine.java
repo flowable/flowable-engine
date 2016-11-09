@@ -12,6 +12,7 @@
  */
 package org.activiti.dmn.engine;
 
+import org.activiti.dmn.api.DmnManagementService;
 import org.activiti.dmn.api.DmnRepositoryService;
 import org.activiti.dmn.api.DmnRuleService;
 
@@ -29,6 +30,8 @@ public interface DmnEngine {
 
     void close();
 
+    DmnManagementService getDmnManagementService();
+    
     DmnRepositoryService getDmnRepositoryService();
 
     DmnRuleService getDmnRuleService();

@@ -499,19 +499,15 @@
     </dependency>
     <dependency>
       <groupId>org.flowable</groupId>
+      <artifactId>flowable-dmn-spring-configurator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.flowable</groupId>
       <artifactId>flowable-form-rest</artifactId>
     </dependency>
     <dependency>
       <groupId>org.flowable</groupId>
-      <artifactId>flowable-form-engine-configurator</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.flowable</groupId>
-      <artifactId>flowable-dmn-engine-configurator</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.flowable</groupId>
-      <artifactId>flowable-dmn-engine-configurator</artifactId>
+      <artifactId>flowable-form-spring-configurator</artifactId>
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>

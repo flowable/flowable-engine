@@ -14,10 +14,14 @@ package org.activiti.idm.api;
 
 import java.util.List;
 
+import org.activiti.engine.ActivitiIllegalArgumentException;
+
 /**
  * Service to manage {@link User}s and {@link Group}s.
  * 
  * @author Tom Baeyens
+ * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public interface IdmIdentityService {
 
@@ -180,4 +184,23 @@ public interface IdmIdentityService {
    * Delete an entry of the generic extensibility key-value pairs associated with a user
    */
   void deleteUserInfo(String userId, String key);
+  
+  /**
+   * Creates a new {@link Capability} with the provided name and user or group id.
+   * @param userId Needs to be non-null when groupId is null.
+   * @param groupId Needs to be non-null when userId is null.
+   * @throws ActivitiIllegalArgumentException if both capabilityName is null or if both userId/groupId are null.  
+   */
+  Capability createCapability(String capabilityName, String userId, String groupId);
+  
+  /**
+   * Deletes the capability with the given id.
+   */
+  void deleteCapability(String capabilityId);
+  
+  /**
+   * Creates a {@link CapabilityQuery} that allows to programmatically query capabilities. 
+   */
+  CapabilityQuery createCapabilityQuery();
+  
 }

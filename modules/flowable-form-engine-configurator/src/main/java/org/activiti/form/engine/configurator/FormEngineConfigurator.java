@@ -76,8 +76,8 @@ public class FormEngineConfigurator extends AbstractProcessEngineConfigurator {
         formEngineConfiguration.setTransactionsExternallyManaged(true);
        } else {
         formEngineConfiguration.setTransactionFactory(
-             new TransactionContextAwareTransactionFactory<org.activiti.idm.engine.impl.cfg.TransactionContext>(
-                   org.activiti.idm.engine.impl.cfg.TransactionContext.class));
+             new TransactionContextAwareTransactionFactory<org.activiti.form.engine.impl.cfg.TransactionContext>(
+                   org.activiti.form.engine.impl.cfg.TransactionContext.class));
        }
       
     }

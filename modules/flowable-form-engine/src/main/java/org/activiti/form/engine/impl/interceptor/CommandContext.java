@@ -22,6 +22,7 @@ import org.activiti.form.engine.impl.persistence.entity.FormDefinitionEntityMana
 import org.activiti.form.engine.impl.persistence.entity.FormDeploymentEntityManager;
 import org.activiti.form.engine.impl.persistence.entity.FormInstanceEntityManager;
 import org.activiti.form.engine.impl.persistence.entity.ResourceEntityManager;
+import org.activiti.form.engine.impl.persistence.entity.TableDataManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +67,10 @@ public class CommandContext extends AbstractCommandContext {
   
   public FormInstanceEntityManager getFormInstanceEntityManager() {
     return formEngineConfiguration.getFormInstanceEntityManager();
+  }
+  
+  public TableDataManager getTableDataManager() {
+    return formEngineConfiguration.getTableDataManager();
   }
 
   // getters and setters

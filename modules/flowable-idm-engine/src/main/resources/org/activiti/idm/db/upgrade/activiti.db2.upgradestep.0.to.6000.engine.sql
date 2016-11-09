@@ -30,3 +30,13 @@ create table ACT_ID_TOKEN (
     TOKEN_DATA_ varchar(2000),
     primary key (ID_)
 );
+
+create table ACT_ID_CAPABILITY (
+    ID_ varchar(64) not null,
+    USER_ID_ varchar(255),
+    GROUP_ID_ varchar(255),
+    CAPABILITY_ varchar(255),
+    primary key (ID_)
+);  
+    
+create index ACT_IDX_CAP_NAME on ACT_ID_CAPABILITY(CAPABILITY_);

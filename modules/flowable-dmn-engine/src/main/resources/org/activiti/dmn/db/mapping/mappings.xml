@@ -11,5 +11,6 @@
     <mapper resource="org/activiti/dmn/db/mapping/entity/DecisionTable.xml" />
     <mapper resource="org/activiti/dmn/db/mapping/entity/Deployment.xml" />
     <mapper resource="org/activiti/dmn/db/mapping/entity/Resource.xml" />
+    <mapper resource="org/activiti/dmn/db/mapping/entity/TableData.xml" />
   </mappers>
 </configuration>

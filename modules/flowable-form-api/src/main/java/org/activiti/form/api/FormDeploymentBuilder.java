@@ -59,6 +59,11 @@ public interface FormDeploymentBuilder {
    * Gives the deployment the given parent deployment id.
    */
   FormDeploymentBuilder parentDeploymentId(String parentDeploymentId);
+  
+  /**
+   * Allows to add a property to the deployment builder that influences the deployment.
+   */
+  FormDeploymentBuilder enableDuplicateFiltering();
 
   /**
    * Deploys all provided sources to the Activiti engine.

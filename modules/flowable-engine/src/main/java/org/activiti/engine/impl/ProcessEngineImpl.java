@@ -14,6 +14,8 @@ package org.activiti.engine.impl;
 
 import java.util.Map;
 
+import org.activiti.dmn.api.DmnRepositoryService;
+import org.activiti.dmn.api.DmnRuleService;
 import org.activiti.engine.DynamicBpmnService;
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
@@ -56,6 +58,8 @@ public class ProcessEngineImpl implements ProcessEngine {
   protected DynamicBpmnService dynamicBpmnService;
   protected FormRepositoryService formEngineRepositoryService;
   protected org.activiti.form.api.FormService formEngineFormService;
+  protected DmnRepositoryService dmnRepositoryService;
+  protected DmnRuleService dmnRuleService;
   protected IdmIdentityService idmIdentityService;
   protected AsyncExecutor asyncExecutor;
   protected CommandExecutor commandExecutor;
@@ -80,6 +84,8 @@ public class ProcessEngineImpl implements ProcessEngine {
     this.transactionContextFactory = processEngineConfiguration.getTransactionContextFactory();
     this.formEngineRepositoryService = processEngineConfiguration.getFormEngineRepositoryService();
     this.formEngineFormService = processEngineConfiguration.getFormEngineFormService();
+    this.dmnRepositoryService = processEngineConfiguration.getDmnEngineRepositoryService();
+    this.dmnRuleService = processEngineConfiguration.getDmnEngineRuleService();
     this.idmIdentityService = processEngineConfiguration.getIdmIdentityService();
 
     if (processEngineConfiguration.isUsingRelationalDatabase() && processEngineConfiguration.getDatabaseSchemaUpdate() != null) {
@@ -172,6 +178,14 @@ public class ProcessEngineImpl implements ProcessEngine {
   
   public org.activiti.form.api.FormService getFormEngineFormService() {
     return formEngineFormService;
+  }
+  
+  public DmnRepositoryService getDmnRepositoryService() {
+    return dmnRepositoryService;
+  }
+  
+  public DmnRuleService getDmnRuleService() {
+    return dmnRuleService;
   }
   
   public IdmIdentityService getIdmIdentityService() {

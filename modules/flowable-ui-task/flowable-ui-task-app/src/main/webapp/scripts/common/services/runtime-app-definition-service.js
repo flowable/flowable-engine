@@ -65,23 +65,7 @@ activitiApp.service('RuntimeAppDefinitionService', ['$http', '$q', '$location', 
                     var app = response.data[i];
                     if (app.defaultAppId !== undefined && app.defaultAppId !== null) {
 
-                        // Default app
-                        if (app.defaultAppId === 'kickstart') {
-
-                            defaultApps.push(
-                                {
-                                    id: 'kickstart',
-                                    titleKey: 'APP.KICKSTART.TITLE',
-                                    descriptionKey: 'APP.KICKSTART.DESCRIPTION',
-                                    defaultAppId : app.defaultAppId,
-                                    theme: 'theme-1',
-                                    icon: 'icon icon-choice',
-                                    fixedBaseUrl: urls.editor + '/#/',
-                                    fixedUrl: urls.editor,
-                                    pages: ['processes', 'forms', 'apps', 'stencils']
-                                });
-
-                        } else if (app.defaultAppId === 'tasks') {
+                        if (app.defaultAppId === 'tasks') {
 
                             defaultApps.push(
                                 {
@@ -100,9 +84,7 @@ activitiApp.service('RuntimeAppDefinitionService', ['$http', '$q', '$location', 
                     } else {
 
                         // Custom app
-                        //app.icon = 'glyphicon ' + app.icon;
-                        app.icon = 'icon icon-choice';
-                        app.theme = 'theme-1';
+                        app.icon = 'glyphicon ' + app.icon;
                         app.fixedBaseUrl = baseUrl + '/workflow/#/apps/' + app.deploymentKey + '/';
                         app.fixedUrl = app.fixedBaseUrl + 'tasks';
                         app.pages = [ 'tasks', 'processes' ];

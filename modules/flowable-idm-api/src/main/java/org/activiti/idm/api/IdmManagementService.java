@@ -15,9 +15,8 @@ package org.activiti.idm.api;
 import java.sql.Connection;
 import java.util.Map;
 
-import org.activiti.idm.api.management.IdmTableMetaData;
-import org.activiti.idm.api.management.IdmTablePage;
-import org.activiti.idm.api.management.IdmTablePageQuery;
+import org.activiti.engine.management.TableMetaData;
+import org.activiti.engine.management.TablePageQuery;
 
 /**
  * Service for admin and maintenance operations on the idm engine.
@@ -41,12 +40,12 @@ public interface IdmManagementService {
   /**
    * Gets the metadata (column names, column types, etc.) of a certain table. Returns null when no table exists with the given name.
    */
-  IdmTableMetaData getTableMetaData(String tableName);
+  TableMetaData getTableMetaData(String tableName);
 
   /**
    * Creates a {@link IdmTablePageQuery} that can be used to fetch {@link IdmTablePage} containing specific sections of table row data.
    */
-  IdmTablePageQuery createTablePageQuery();
+  TablePageQuery createTablePageQuery();
   
 
   /** get the list of properties. */

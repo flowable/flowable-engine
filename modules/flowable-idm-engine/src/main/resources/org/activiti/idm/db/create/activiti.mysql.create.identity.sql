@@ -68,6 +68,14 @@ create table ACT_ID_TOKEN (
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
+create table ACT_ID_CAPABILITY (
+    ID_ varchar(64) not null,
+    USER_ID_ varchar(255),
+    GROUP_ID_ varchar(255),
+    CAPABILITY_NAME_ varchar(255),
+    primary key (ID_)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+
 alter table ACT_ID_MEMBERSHIP 
     add constraint ACT_FK_MEMB_GROUP 
     foreign key (GROUP_ID_) 
@@ -77,3 +85,5 @@ alter table ACT_ID_MEMBERSHIP
     add constraint ACT_FK_MEMB_USER 
     foreign key (USER_ID_) 
     references ACT_ID_USER (ID_);
+    
+create index ACT_IDX_CAP_NAME on ACT_ID_CAPABILITY(CAPABILITY_NAME_);    

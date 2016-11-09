@@ -13,6 +13,11 @@
 
 package org.activiti.spring;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
+import javax.sql.DataSource;
+
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
@@ -26,16 +31,13 @@ import org.activiti.spring.autodeployment.AutoDeploymentStrategy;
 import org.activiti.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.activiti.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.activiti.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
+import org.activiti.spring.configurator.SpringIdmEngineConfigurator;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.springframework.transaction.PlatformTransactionManager;
-
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * @author Tom Baeyens
@@ -58,6 +60,7 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
     deploymentStrategies.add(new DefaultAutoDeploymentStrategy());
     deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy());
     deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy());
+    setIdmProcessEngineConfigurator(new SpringIdmEngineConfigurator());
   }
 
   @Override

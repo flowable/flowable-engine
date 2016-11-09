@@ -72,11 +72,11 @@ public class DmnEngineConfigurator extends AbstractProcessEngineConfigurator {
       
       if (processEngineConfiguration.isTransactionsExternallyManaged()) {
         dmnEngineConfiguration.setTransactionsExternallyManaged(true);
-       } else {
-         dmnEngineConfiguration.setTransactionFactory(
-             new TransactionContextAwareTransactionFactory<org.activiti.idm.engine.impl.cfg.TransactionContext>(
-                   org.activiti.idm.engine.impl.cfg.TransactionContext.class));
-       }
+      } else {
+        dmnEngineConfiguration.setTransactionFactory(
+             new TransactionContextAwareTransactionFactory<org.activiti.dmn.engine.impl.cfg.TransactionContext>(
+                   org.activiti.dmn.engine.impl.cfg.TransactionContext.class));
+      }
     }
     
     DmnEngine dmnEngine = initDmnEngine();

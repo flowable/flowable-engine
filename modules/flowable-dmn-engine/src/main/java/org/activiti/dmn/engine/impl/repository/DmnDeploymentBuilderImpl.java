@@ -145,6 +145,11 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
     deployment.setParentDeploymentId(parentDeploymentId);
     return this;
   }
+  
+  public DmnDeploymentBuilder enableDuplicateFiltering() {
+    isDuplicateFilterEnabled = true;
+    return this;
+  }
 
   public DmnDeployment deploy() {
     return repositoryService.deploy(this);
