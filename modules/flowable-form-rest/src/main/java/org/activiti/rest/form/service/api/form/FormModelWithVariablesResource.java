@@ -36,31 +36,31 @@ public class FormModelWithVariablesResource {
   protected FormRestResponseFactory formRestResponseFactory;
 
   @RequestMapping(value = "/form/model", method = RequestMethod.POST, produces = "application/json")
-  public FormModelResponse getRuntimeFormDefinition(@RequestBody FormDefinitionRequest formDefinitionRequest, HttpServletRequest request) {
+  public FormModelResponse getRuntimeFormDefinition(@RequestBody FormRequest formRequest, HttpServletRequest request) {
 
     FormModel formModel;
 
-    if (formDefinitionRequest.getParentDeploymentId() != null) {
+    if (formRequest.getParentDeploymentId() != null) {
       formModel = formService.getFormModelWithVariablesByKeyAndParentDeploymentId(
-          formDefinitionRequest.getParentDeploymentId(),
-          formDefinitionRequest.getFormDefinitionKey(),
-          formDefinitionRequest.getProcessInstanceId(),
-          formDefinitionRequest.getVariables(),
-          formDefinitionRequest.getTenantId()
+          formRequest.getParentDeploymentId(),
+          formRequest.getFormDefinitionKey(),
+          formRequest.getProcessInstanceId(),
+          formRequest.getVariables(),
+          formRequest.getTenantId()
       );
-    } else if (formDefinitionRequest.getFormDefinitionKey() != null) {
+    } else if (formRequest.getFormDefinitionKey() != null) {
       formModel = formService.getFormModelWithVariablesByKey(
-          formDefinitionRequest.getFormDefinitionKey(),
-          formDefinitionRequest.getProcessInstanceId(),
-          formDefinitionRequest.getVariables(),
-          formDefinitionRequest.getTenantId()
+          formRequest.getFormDefinitionKey(),
+          formRequest.getProcessInstanceId(),
+          formRequest.getVariables(),
+          formRequest.getTenantId()
       );
-    } else if (formDefinitionRequest.getFormId() != null) {
+    } else if (formRequest.getFormId() != null) {
       formModel = formService.getFormModelWithVariablesById(
-          formDefinitionRequest.getFormId(),
-          formDefinitionRequest.getProcessInstanceId(),
-          formDefinitionRequest.getVariables(),
-          formDefinitionRequest.getTenantId()
+          formRequest.getFormId(),
+          formRequest.getProcessInstanceId(),
+          formRequest.getVariables(),
+          formRequest.getTenantId()
       );
     } else {
       throw new ActivitiIllegalArgumentException("Either parent deployment key, form definition key or form id must be provided in the request");

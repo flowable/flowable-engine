@@ -36,23 +36,23 @@ public class FormInstanceResource {
   protected FormRestResponseFactory formRestResponseFactory;
 
   @RequestMapping(value = "/form/form-instance", method = RequestMethod.POST, produces = "application/json")
-  public void storeFormInstance(@RequestBody FormDefinitionRequest formDefinitionRequest, HttpServletRequest request) {
+  public void storeFormInstance(@RequestBody FormRequest formRequest, HttpServletRequest request) {
 
     FormModel formModel;
 
-    if (formDefinitionRequest.getFormDefinitionKey() != null) {
+    if (formRequest.getFormDefinitionKey() != null) {
       formModel = formService.getFormModelWithVariablesByKey(
-          formDefinitionRequest.getFormDefinitionKey(),
-          formDefinitionRequest.getProcessInstanceId(),
-          formDefinitionRequest.getVariables(),
-          formDefinitionRequest.getTenantId()
+          formRequest.getFormDefinitionKey(),
+          formRequest.getProcessInstanceId(),
+          formRequest.getVariables(),
+          formRequest.getTenantId()
       );
-    } else if (formDefinitionRequest.getFormId() != null) {
+    } else if (formRequest.getFormId() != null) {
       formModel = formService.getFormModelWithVariablesById(
-          formDefinitionRequest.getFormId(),
-          formDefinitionRequest.getProcessInstanceId(),
-          formDefinitionRequest.getVariables(),
-          formDefinitionRequest.getTenantId()
+          formRequest.getFormId(),
+          formRequest.getProcessInstanceId(),
+          formRequest.getVariables(),
+          formRequest.getTenantId()
       );
     } else {
       throw new ActivitiIllegalArgumentException("Either form definition key or form id must be provided in the request");
@@ -62,7 +62,7 @@ public class FormInstanceResource {
       throw new ActivitiObjectNotFoundException("Could not find a form definition");
     }
 
-    formService.createFormInstance(formDefinitionRequest.getVariables(), formModel, formDefinitionRequest.getTaskId(),
-        formDefinitionRequest.getProcessInstanceId());
+    formService.createFormInstance(formRequest.getVariables(), formModel, formRequest.getTaskId(),
+        formRequest.getProcessInstanceId());
   }
 }
