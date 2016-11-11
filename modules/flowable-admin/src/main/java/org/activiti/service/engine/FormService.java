@@ -42,7 +42,7 @@ public class FormService {
 	}
 
 	public JsonNode getForm(ServerConfig serverConfig, String formId) {
-		HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "enterprise/forms/" + formId));
+		HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "form-repository/form-definitions/" + formId));
 		return clientUtil.executeRequest(get, serverConfig);
 	}
 
@@ -57,7 +57,7 @@ public class FormService {
     }
     
     public JsonNode getProcessDefinitionForms(ServerConfig serverConfig, String processDefinitionId) {
-        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "enterprise/process-definitions/" + processDefinitionId + "/forms"));
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "repository/process-definitions/" + processDefinitionId + "/form-definitions"));
         return clientUtil.executeRequest(get, serverConfig);
     }
 }

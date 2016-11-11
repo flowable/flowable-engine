@@ -16,6 +16,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.SubmittedFormService;
@@ -35,70 +37,75 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RestController
 public class SubmittedFormsClientResource extends AbstractClientResource {
 
-    @Autowired
-    protected SubmittedFormService clientService;
+  @Autowired
+  protected SubmittedFormService clientService;
 
-    @RequestMapping(value = "/rest/activiti/submitted-forms", method = RequestMethod.GET, produces = "application/json")
-    public JsonNode listSubmittedForms(HttpServletRequest request) {
-        JsonNode resultNode = null;
-        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
-        Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
+  @Autowired
+  protected ObjectMapper objectMapper;
 
-        try {
-            resultNode = clientService.listSubmittedForms(serverConfig, parameterMap);
+  @RequestMapping(value = "/rest/activiti/submitted-forms", method = RequestMethod.GET, produces = "application/json")
+  public JsonNode listSubmittedForms(HttpServletRequest request) {
+    JsonNode resultNode = null;
+    ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+    Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
 
-        } catch (ActivitiServiceException e) {
-            throw new BadRequestException(e.getMessage());
-        }
+    try {
+      resultNode = clientService.listSubmittedForms(serverConfig, parameterMap);
 
-        return resultNode;
+    } catch (ActivitiServiceException e) {
+      throw new BadRequestException(e.getMessage());
     }
-    
-    @RequestMapping(value = "/rest/activiti/form-submitted-forms/{formId}", method = RequestMethod.GET, produces = "application/json")
-    public JsonNode listFomrSubmittedForms(HttpServletRequest request, @PathVariable String formId) {
-        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 
-        try {
-            return clientService.listFormSubmittedForms(serverConfig, formId, getRequestParametersWithoutServerId(request));
-        } catch (ActivitiServiceException e) {
-            throw new BadRequestException(e.getMessage());
-        }
+    return resultNode;
+  }
+
+  @RequestMapping(value = "/rest/activiti/form-submitted-forms/{formId}", method = RequestMethod.GET, produces = "application/json")
+  public JsonNode listFomrSubmittedForms(HttpServletRequest request, @PathVariable String formId) {
+    ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+
+    try {
+      return clientService.listFormSubmittedForms(serverConfig, formId, getRequestParametersWithoutServerId(request));
+    } catch (ActivitiServiceException e) {
+      throw new BadRequestException(e.getMessage());
     }
-    
-    @RequestMapping(value = "/rest/activiti/task-submitted-form/{taskId}", method = RequestMethod.GET, produces = "application/json")
-    public JsonNode getTaskSubmittedForm(@PathVariable String taskId) {
-        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+  }
 
-        try {
-            return clientService.getTaskSubmittedForm(serverConfig, taskId);
+  @RequestMapping(value = "/rest/activiti/task-submitted-form/{taskId}", method = RequestMethod.GET, produces = "application/json")
+  public JsonNode getTaskSubmittedForm(@PathVariable String taskId) {
+    ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 
-        } catch (ActivitiServiceException e) {
-            throw new BadRequestException(e.getMessage());
-        }
+    try {
+      return clientService.getTaskSubmittedForm(serverConfig, taskId);
 
+    } catch (ActivitiServiceException e) {
+      throw new BadRequestException(e.getMessage());
     }
-    
-    @RequestMapping(value = "/rest/activiti/process-submitted-forms/{processId}", method = RequestMethod.GET, produces = "application/json")
-    public JsonNode getProcessSubmittedForms(@PathVariable String processId) {
-        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 
-        try {
-            return clientService.getProcessSubmittedForms(serverConfig, processId);
+  }
 
-        } catch (ActivitiServiceException e) {
-            throw new BadRequestException(e.getMessage());
-        }
+  @RequestMapping(value = "/rest/activiti/process-submitted-forms/{processInstanceId}", method = RequestMethod.GET, produces = "application/json")
+  public JsonNode getProcessSubmittedForms(@PathVariable String processInstanceId) {
+
+    ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+    try {
+      ObjectNode bodyNode = objectMapper.createObjectNode();
+      bodyNode.put("processInstanceId", processInstanceId);
+
+      return clientService.getProcessSubmittedForms(serverConfig, bodyNode);
+    } catch (ActivitiServiceException e) {
+      throw new BadRequestException(e.getMessage());
     }
-    
-    @RequestMapping(value = "/rest/activiti/submitted-forms/{submittedFormId}", method = RequestMethod.GET, produces = "application/json")
-    public JsonNode getSubmittedForm(@PathVariable String submittedFormId) {
-        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+  }
 
-        try {
-            return clientService.getSubmittedForm(serverConfig, submittedFormId);
+  @RequestMapping(value = "/rest/activiti/submitted-forms/{submittedFormId}", method = RequestMethod.GET, produces = "application/json")
+  public JsonNode getSubmittedForm(@PathVariable String submittedFormId) {
+    ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 
-        } catch (ActivitiServiceException e) {
-            throw new BadRequestException(e.getMessage());
-        }
+    try {
+      return clientService.getSubmittedForm(serverConfig, submittedFormId);
+
+    } catch (ActivitiServiceException e) {
+      throw new BadRequestException(e.getMessage());
     }
+  }
 }

@@ -51,6 +51,6 @@ public class FormsClientResource extends AbstractClientResource {
      */
     @RequestMapping(value = "/rest/activiti/process-definition-forms/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getProcessDefinitionForms(@PathVariable String processDefinitionId, HttpServletRequest request) {
-        return clientService.getProcessDefinitionForms(retrieveServerConfig(EndpointType.FORM), processDefinitionId);
+        return clientService.getProcessDefinitionForms(retrieveServerConfig(EndpointType.PROCESS), processDefinitionId);
     }
 }

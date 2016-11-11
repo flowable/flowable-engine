@@ -32,7 +32,7 @@ public class DecisionTableService {
 	protected ActivitiClientService clientUtil;
 
 	public JsonNode listDecisionTables(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
-	    URIBuilder builder = clientUtil.createUriBuilder("enterprise/decisions/decision-tables");
+	    URIBuilder builder = clientUtil.createUriBuilder("dmn-repository/decision-tables");
 
 		for (String name : parameterMap.keySet()) {
 			builder.addParameter(name, parameterMap.get(name)[0]);
@@ -42,7 +42,7 @@ public class DecisionTableService {
 	}
 
 	public JsonNode getDecisionTable(ServerConfig serverConfig, String decisionTableId) {
-		HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "enterprise/decisions/decision-tables/" + decisionTableId));
+		HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "dmn-repository/decision-tables/" + decisionTableId));
 		return clientUtil.executeRequest(get, serverConfig);
 	}
 
@@ -52,7 +52,7 @@ public class DecisionTableService {
     }
     
     public JsonNode getProcessDefinitionDecisionTables(ServerConfig serverConfig, String processDefinitionId) {
-        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "repository/process-definitions/{processDefinitionId}/decision-tables" + processDefinitionId + "/decision-tables"));
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "repository/process-definitions/" + processDefinitionId + "/decision-tables"));
         return clientUtil.executeRequest(get, serverConfig);
     }
     

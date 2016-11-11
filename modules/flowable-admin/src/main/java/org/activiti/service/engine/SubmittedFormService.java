@@ -14,8 +14,11 @@ package org.activiti.service.engine;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.activiti.domain.ServerConfig;
+import org.activiti.service.engine.exception.ActivitiServiceException;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,44 +31,55 @@ import com.fasterxml.jackson.databind.JsonNode;
 @Service
 public class SubmittedFormService {
 
+  @Autowired
+  protected ActivitiClientService clientUtil;
 
-	@Autowired
-	protected ActivitiClientService clientUtil;
+  public JsonNode listSubmittedForms(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
+    URIBuilder builder = clientUtil.createUriBuilder("/enterprise/submitted-forms");
 
-	public JsonNode listSubmittedForms(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
-	    URIBuilder builder = clientUtil.createUriBuilder("/enterprise/submitted-forms");
-
-		for (String name : parameterMap.keySet()) {
-			builder.addParameter(name, parameterMap.get(name)[0]);
-		}
-		HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder.toString()));
-		return clientUtil.executeRequest(get, serverConfig);
-	}
-
-	public JsonNode listFormSubmittedForms(ServerConfig serverConfig, String formId, Map<String, String[]> parameterMap) {
-	    URIBuilder builder = clientUtil.createUriBuilder("/enterprise/form-submitted-forms/" + formId);
-        
-	    for (String name : parameterMap.keySet()) {
-            builder.addParameter(name, parameterMap.get(name)[0]);
-        }
-	    
-        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder.toString()));
-        return clientUtil.executeRequest(get, serverConfig);
+    for (String name : parameterMap.keySet()) {
+      builder.addParameter(name, parameterMap.get(name)[0]);
     }
-	
-	public JsonNode getSubmittedForm(ServerConfig serverConfig, String submittedFormId) {
-		HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "/enterprise/submitted-forms/" + submittedFormId));
-		return clientUtil.executeRequest(get, serverConfig);
-	}
-	
-	public JsonNode getTaskSubmittedForm(ServerConfig serverConfig, String taskId) {
-        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "/enterprise/task-submitted-form/" + taskId));
-        return clientUtil.executeRequest(get, serverConfig);
+    HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder.toString()));
+    return clientUtil.executeRequest(get, serverConfig);
+  }
+
+  public JsonNode listFormSubmittedForms(ServerConfig serverConfig, String formId, Map<String, String[]> parameterMap) {
+    URIBuilder builder = clientUtil.createUriBuilder("/enterprise/form-submitted-forms/" + formId);
+
+    for (String name : parameterMap.keySet()) {
+      builder.addParameter(name, parameterMap.get(name)[0]);
     }
-	
-	public JsonNode getProcessSubmittedForms(ServerConfig serverConfig, String processId) {
-        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "/enterprise/process-submitted-forms/" + processId));
-        return clientUtil.executeRequest(get, serverConfig);
+
+    HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder.toString()));
+    return clientUtil.executeRequest(get, serverConfig);
+  }
+
+  public JsonNode getSubmittedForm(ServerConfig serverConfig, String submittedFormId) {
+    HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "/enterprise/submitted-forms/" + submittedFormId));
+    return clientUtil.executeRequest(get, serverConfig);
+  }
+
+  public JsonNode getTaskSubmittedForm(ServerConfig serverConfig, String taskId) {
+    HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "/enterprise/task-submitted-form/" + taskId));
+    return clientUtil.executeRequest(get, serverConfig);
+  }
+
+  public JsonNode getProcessSubmittedForms(ServerConfig serverConfig, ObjectNode objectNode) {
+
+    JsonNode resultNode = null;
+
+    try {
+      URIBuilder builder = clientUtil.createUriBuilder("/query/form-instances");
+      HttpPost post = clientUtil.createPost(builder.toString(), serverConfig);
+      post.setEntity(clientUtil.createStringEntity(objectNode.toString()));
+
+      resultNode = clientUtil.executeRequest(post, serverConfig);
+    } catch (Exception ex) {
+      throw new ActivitiServiceException(ex.getMessage(), ex);
     }
+
+    return resultNode;
+  }
 
 }
