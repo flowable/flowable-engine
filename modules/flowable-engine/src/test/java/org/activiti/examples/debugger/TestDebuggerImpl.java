@@ -4,10 +4,12 @@ import org.activiti.engine.ActivitiException;
 import org.activiti.engine.Agenda;
 import org.activiti.engine.FlowableEngineAgendaFactory;
 import org.activiti.engine.impl.agenda.AbstractOperation;
+import org.activiti.engine.impl.cmd.NeedsActiveExecutionCmd;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
+import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.runtime.Debugger;
 import org.apache.commons.collections.Predicate;
 
@@ -79,26 +81,29 @@ public class TestDebuggerImpl implements Debugger {
         return this.agendaCopy;
     }
 
-    public static class RestoreContextCmd implements Command<Void> {
+    public static class RestoreContextCmd extends NeedsActiveExecutionCmd<Void> {
 
         private final Agenda agenda;
 
         public RestoreContextCmd(Agenda agenda) {
+            super(((AbstractOperation) agenda.peekOperation()).getExecution().getId());
             this.agenda = agenda;
         }
 
         @Override
-        public Void execute(CommandContext commandContext) {
+        protected Void execute(CommandContext commandContext, ExecutionEntity execution) {
             while (!this.agenda.isEmpty()) {
                 Runnable runnable = this.agenda.getNextOperation();
                 if (runnable instanceof AbstractOperation) {
                     AbstractOperation operation = (AbstractOperation) runnable;
+                    operation.setExecution(execution);
                     operation.setCommandContext(commandContext);
                 }
                 commandContext.getAgenda().planOperation(runnable);
             }
             return null;
         }
+
     }
 
 }

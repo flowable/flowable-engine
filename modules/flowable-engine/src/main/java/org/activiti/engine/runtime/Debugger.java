@@ -23,6 +23,7 @@ public interface Debugger {
      * Continue in the broken operation execution
      *
      * @param commandExecutor executor to run command with
+     * @param agenda          agenda to execute
      */
     void continueOperationExecution(CommandExecutor commandExecutor, Agenda agenda);
 
