@@ -756,7 +756,9 @@ public class DbSqlSession implements Session {
           Object originalState = cachedObject.getPersistentObjectState();
           if (persistentObject.getPersistentState() != null && 
           		!persistentObject.getPersistentState().equals(originalState)) {
+            
             updatedObjects.add(persistentObject);
+            
           } else {
             log.trace("loaded object '{}' was not updated", persistentObject);
           }

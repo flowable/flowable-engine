@@ -3,6 +3,7 @@
  */
 package org.activiti.engine.test.jobexecutor;
 
+import org.activiti.engine.impl.asyncexecutor.AbstractAsyncJobExecutor;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
@@ -26,6 +27,8 @@ public class JobExecutorCmdExceptionTest extends PluggableActivitiTestCase {
 
   public void tearDown() throws Exception {
     processEngineConfiguration.getJobHandlers().remove(tweetExceptionHandler.getType());
+    AbstractAsyncJobExecutor asyncExecutor = (AbstractAsyncJobExecutor) processEngineConfiguration.getAsyncExecutor();
+    asyncExecutor.clearTemporaryJobs();
   }
 
   public void testJobCommandsWith2Exceptions() {
@@ -62,6 +65,9 @@ public class JobExecutorCmdExceptionTest extends PluggableActivitiTestCase {
     assertEquals(1, job.getRetries());
     
     managementService.executeJob(job.getId());
+    
+    assertEquals(0, managementService.createJobQuery().count());
+    tweetExceptionHandler.setExceptionsRemaining(2);
   }
 
   public void testJobCommandsWith3Exceptions() {
@@ -110,6 +116,9 @@ public class JobExecutorCmdExceptionTest extends PluggableActivitiTestCase {
     assertEquals(0, job.getRetries());
     
     managementService.deleteJob(job.getId());
+    
+    assertEquals(0, managementService.createJobQuery().count());
+    tweetExceptionHandler.setExceptionsRemaining(2);
   }
 
   protected MessageEntity createTweetExceptionMessage() {

@@ -14,6 +14,7 @@
 package org.activiti.engine.impl.cmd;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.ActivitiObjectNotFoundException;
@@ -26,7 +27,7 @@ import org.activiti.engine.runtime.Job;
 
 
 /**
- * @author Falko Menge
+ * @author Tijs Rademakers
  */
 public class SetJobRetriesCmd implements Command<Void>, Serializable {
 
@@ -48,10 +49,14 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
 
   public Void execute(CommandContext commandContext) {
     JobEntity job = commandContext
-            .getJobEntityManager()
-            .findJobById(jobId);
+        .getJobEntityManager()
+        .findJobById(jobId);
+    
     if (job != null) {
       job.setRetries(retries);
+      if (job.getDuedate() == null) {
+        job.setDuedate(new Date());
+      }
       
       if(commandContext.getEventDispatcher().isEnabled()) {
       	commandContext.getEventDispatcher().dispatchEvent(

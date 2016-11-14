@@ -127,11 +127,13 @@ public abstract class JobEntity implements Job, PersistentObject, HasRevision, B
       execution.removeJob(this);
     }
 
-    if(Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+    if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
     	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
     			ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_DELETED, this));
     }
   }
+  
+  
 
   public void setExecution(ExecutionEntity execution) {
     executionId = execution.getId();

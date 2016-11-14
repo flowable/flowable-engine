@@ -37,4 +37,8 @@ public class TweetHandler implements JobHandler {
   public List<String> getMessages() {
     return messages;
   }
+  
+  public void resetMessages() {
+    messages = new ArrayList<String>();
+  }
 }

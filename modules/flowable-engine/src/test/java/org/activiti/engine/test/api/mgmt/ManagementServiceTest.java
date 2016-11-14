@@ -130,8 +130,7 @@ public class ManagementServiceTest extends PluggableActivitiTestCase {
   public void testSetJobRetries() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
 
-    // The execution is waiting in the first usertask. This contains a boundary
-    // timer event.
+    // The execution is waiting in the first usertask. This contains a boundary timer event.
     Job timerJob = managementService.createJobQuery()
       .processInstanceId(processInstance.getId())
       .singleResult();
@@ -148,6 +147,65 @@ public class ManagementServiceTest extends PluggableActivitiTestCase {
       .singleResult();
     assertEquals(5, timerJob.getRetries());
     assertEquals(duedate, timerJob.getDuedate());
+  }
+  
+  @Deployment(resources = {"org/activiti/engine/test/api/mgmt/ManagementServiceTest.testFailingAsyncJob.bpmn20.xml"})
+  public void testAsyncJobWithNoRetriesLeft() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
+
+    // The execution is waiting in the first async script task.
+    Job asyncJob = managementService.createJobQuery()
+      .processInstanceId(processInstance.getId())
+      .singleResult();
+
+    assertNotNull("No job found for process instance", asyncJob);
+    assertEquals(JobEntity.DEFAULT_RETRIES, asyncJob.getRetries());
+    
+    try {
+      managementService.executeJob(asyncJob.getId());
+      fail("Exception expected");
+    } catch (Exception e) {
+      // expected exception
+    }
+    
+    asyncJob = managementService.createJobQuery()
+        .processInstanceId(processInstance.getId())
+        .singleResult();
+    
+    assertEquals(2, asyncJob.getRetries());
+    
+    try {
+      managementService.executeJob(asyncJob.getId());
+      fail("Exception expected");
+    } catch (Exception e) {
+      // expected exception
+    }
+    
+    try {
+      managementService.executeJob(asyncJob.getId());
+      fail("Exception expected");
+    } catch (Exception e) {
+      // expected exception
+    }
+    
+    asyncJob = managementService.createJobQuery()
+        .processInstanceId(processInstance.getId())
+        .executable()
+        .singleResult();
+    
+    assertNull(asyncJob);
+    
+    asyncJob = managementService.createJobQuery()
+        .processInstanceId(processInstance.getId())
+        .singleResult();
+
+    managementService.setJobRetries(asyncJob.getId(), 5);
+
+    asyncJob = managementService.createJobQuery()
+      .processInstanceId(processInstance.getId())
+      .executable()
+      .singleResult();
+    assertEquals(5, asyncJob.getRetries());
   }
   
   public void testSetJobRetriesUnexistingJobId() {

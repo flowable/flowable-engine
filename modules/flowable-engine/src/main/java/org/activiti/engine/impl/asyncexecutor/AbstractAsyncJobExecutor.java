@@ -155,6 +155,11 @@ public abstract class AbstractAsyncJobExecutor implements AsyncExecutor {
     asyncJobsDueRunnable = null;
     isActive = false;
   }
+  
+  /** Clears the temporary jobs queue, mainly for testing purposes */
+  public void clearTemporaryJobs() {
+    this.temporaryJobQueue.clear();
+  }
 
   protected abstract void startExecutingAsyncJobs();
     

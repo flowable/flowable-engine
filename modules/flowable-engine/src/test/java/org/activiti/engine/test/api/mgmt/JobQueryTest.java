@@ -198,30 +198,30 @@ public class JobQueryTest extends PluggableActivitiTestCase {
   }
   
   public void testQueryByDuedateLowerThan() {
-    JobQuery query = managementService.createJobQuery().duedateLowerThan(testStartTime);
+    JobQuery query = managementService.createJobQuery().timers().duedateLowerThan(testStartTime);
     verifyQueryResults(query, 0);
     
-    query = managementService.createJobQuery().duedateLowerThan(new Date(timerOneFireTime.getTime() + ONE_SECOND));
+    query = managementService.createJobQuery().timers().duedateLowerThan(new Date(timerOneFireTime.getTime() + ONE_SECOND));
     verifyQueryResults(query, 1);
     
-    query = managementService.createJobQuery().duedateLowerThan(new Date(timerTwoFireTime.getTime() + ONE_SECOND));
+    query = managementService.createJobQuery().timers().duedateLowerThan(new Date(timerTwoFireTime.getTime() + ONE_SECOND));
     verifyQueryResults(query, 2);
     
-    query = managementService.createJobQuery().duedateLowerThan(new Date(timerThreeFireTime.getTime() + ONE_SECOND));
-    verifyQueryResults(query, 4);
+    query = managementService.createJobQuery().timers().duedateLowerThan(new Date(timerThreeFireTime.getTime() + ONE_SECOND));
+    verifyQueryResults(query, 3);
   }
   
   public void testQueryByDuedateHigherThan() {
-    JobQuery query = managementService.createJobQuery().duedateHigherThan(testStartTime);
-    verifyQueryResults(query, 4);
-    
-    query = managementService.createJobQuery().duedateHigherThan(timerOneFireTime);
+    JobQuery query = managementService.createJobQuery().timers().duedateHigherThan(testStartTime);
     verifyQueryResults(query, 3);
     
-    query = managementService.createJobQuery().duedateHigherThan(timerTwoFireTime);
+    query = managementService.createJobQuery().timers().duedateHigherThan(timerOneFireTime);
     verifyQueryResults(query, 2);
     
-    query = managementService.createJobQuery().duedateHigherThan(timerThreeFireTime);
+    query = managementService.createJobQuery().timers().duedateHigherThan(timerTwoFireTime);
+    verifyQueryResults(query, 1);
+    
+    query = managementService.createJobQuery().timers().duedateHigherThan(timerThreeFireTime);
     verifyQueryResults(query, 0);
   }
   

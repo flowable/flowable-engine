@@ -14,9 +14,9 @@ package org.activiti.engine.test.jobexecutor;
 
 import java.util.Date;
 
+import org.activiti.engine.impl.asyncexecutor.AbstractAsyncJobExecutor;
 import org.activiti.engine.impl.asyncexecutor.AcquiredJobEntities;
 import org.activiti.engine.impl.cmd.AcquireTimerJobsCmd;
-import org.activiti.engine.impl.cmd.ExecuteAsyncJobCmd;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
@@ -29,6 +29,11 @@ import org.activiti.engine.runtime.Job;
  * @author Tom Baeyens
  */
 public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
+  
+  public void tearDown() throws Exception {
+    AbstractAsyncJobExecutor asyncExecutor = (AbstractAsyncJobExecutor) processEngineConfiguration.getAsyncExecutor();
+    asyncExecutor.clearTemporaryJobs();
+  }
 
   public void testJobCommandsWithMessage() {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
@@ -52,6 +57,9 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
 
     assertEquals("i'm coding a test", tweetHandler.getMessages().get(0));
     assertEquals(1, tweetHandler.getMessages().size());
+    
+    assertEquals(0, managementService.createJobQuery().count());
+    tweetHandler.resetMessages();
   }
 
   static final long SOME_TIME = 928374923546L;
@@ -86,9 +94,12 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
 
     assertEquals(0, tweetHandler.getMessages().size());
 
-    commandExecutor.execute(new ExecuteAsyncJobCmd(job));
+    managementService.executeJob(job.getId());
 
     assertEquals("i'm coding a test", tweetHandler.getMessages().get(0));
     assertEquals(1, tweetHandler.getMessages().size());
+    
+    assertEquals(0, managementService.createJobQuery().count());
+    tweetHandler.resetMessages();
   }
 }

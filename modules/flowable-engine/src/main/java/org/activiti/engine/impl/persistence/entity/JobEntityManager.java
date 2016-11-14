@@ -49,12 +49,13 @@ public class JobEntityManager extends AbstractManager {
   	
   	if (processEngineConfiguration.isAsyncExecutorEnabled()) {
   	
-  		// If the async executor is enabled, we need to set the duedate of the job to the current date + the default lock time. 
+  	  // If the async executor is activated, we need to set the duedate of the job to the current date + the default lock time. 
   		// This is cope with the case where the async job executor or the process engine goes down
   		// before executing the job. This way, other async job executors can pick the job up after the max lock time.
   		Date dueDate = new Date(processEngineConfiguration.getClock().getCurrentTime().getTime() 
   				+ processEngineConfiguration.getAsyncExecutor().getAsyncJobLockTimeInMillis());
   		message.setDuedate(dueDate);
+  	  
   		message.setLockExpirationTime(null); // was set before, but to be quickly picked up needs to be set to null
   		
   	} else if (!processEngineConfiguration.isJobExecutorActivate()) {
