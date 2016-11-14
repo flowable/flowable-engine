@@ -56,13 +56,25 @@ public class SubmittedFormService {
   }
 
   public JsonNode getSubmittedForm(ServerConfig serverConfig, String submittedFormId) {
-    HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "/enterprise/submitted-forms/" + submittedFormId));
+    HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "/form/form-instance/" + submittedFormId));
     return clientUtil.executeRequest(get, serverConfig);
   }
 
-  public JsonNode getTaskSubmittedForm(ServerConfig serverConfig, String taskId) {
-    HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "/enterprise/task-submitted-form/" + taskId));
-    return clientUtil.executeRequest(get, serverConfig);
+  public JsonNode getTaskSubmittedForm(ServerConfig serverConfig, ObjectNode objectNode) {
+
+    JsonNode resultNode = null;
+
+    try {
+      URIBuilder builder = clientUtil.createUriBuilder("/query/form-instances");
+      HttpPost post = clientUtil.createPost(builder.toString(), serverConfig);
+      post.setEntity(clientUtil.createStringEntity(objectNode.toString()));
+
+      resultNode = clientUtil.executeRequest(post, serverConfig);
+    } catch (Exception ex) {
+      throw new ActivitiServiceException(ex.getMessage(), ex);
+    }
+
+    return resultNode;
   }
 
   public JsonNode getProcessSubmittedForms(ServerConfig serverConfig, ObjectNode objectNode) {

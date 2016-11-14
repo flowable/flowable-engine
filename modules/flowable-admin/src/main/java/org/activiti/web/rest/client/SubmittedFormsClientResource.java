@@ -75,7 +75,10 @@ public class SubmittedFormsClientResource extends AbstractClientResource {
     ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 
     try {
-      return clientService.getTaskSubmittedForm(serverConfig, taskId);
+      ObjectNode bodyNode = objectMapper.createObjectNode();
+      bodyNode.put("taskId", taskId);
+
+      return clientService.getTaskSubmittedForm(serverConfig, bodyNode);
 
     } catch (ActivitiServiceException e) {
       throw new BadRequestException(e.getMessage());

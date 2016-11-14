@@ -32,7 +32,7 @@ public class FormService {
 	protected ActivitiClientService clientUtil;
 
 	public JsonNode listForms(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
-	    URIBuilder builder = clientUtil.createUriBuilder("enterprise/forms");
+	    URIBuilder builder = clientUtil.createUriBuilder("form-repository/forms");
 
 		for (String name : parameterMap.keySet()) {
 			builder.addParameter(name, parameterMap.get(name)[0]);

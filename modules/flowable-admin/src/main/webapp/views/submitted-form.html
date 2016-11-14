@@ -21,10 +21,10 @@
                         </tr>
                         <tr class="property">
                         	<td class="property-name" translate="SUBMITTED-FORM.HEADER.PROCESS-ID"></td>
-                            <td ng-if="submittedForm.processId"><a ng-href="#/process-instance/{{submittedForm.processId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{submittedForm.processId}}</a></td>
-                            <td ng-if="!submittedForm.processId">{{submittedForm.processId | empty}}</td>
+                            <td ng-if="submittedForm.processId"><a ng-href="#/process-instance/{{submittedForm.processInstanceId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{submittedForm.processId}}</a></td>
+                            <td ng-if="!submittedForm.processId">{{submittedForm.processInstanceId | empty}}</td>
                             <td class="property-name" translate="SUBMITTED-FORM.HEADER.SUBMITTED"></td>
-                            <td>{{submittedForm.submitted | date}}</td>
+                            <td>{{submittedForm.submittedDate | date}}</td>
                         </tr>
                         <tr class="property">
                             <td class="property-name" translate="SUBMITTED-FORM.HEADER.SUBMITTED-BY"></td>

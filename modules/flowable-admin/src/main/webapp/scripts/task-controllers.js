@@ -210,8 +210,8 @@ activitiAdminApp.controller('TaskController', ['$scope', '$rootScope', '$http', 
 		    if($scope.task.endTime) {
 		        $http({method: 'GET', url: '/app/rest/activiti/task-submitted-form/' + $scope.task.id}).
 	            success(function(data, status, headers, config) {
-	                $rootScope.submittedForm = data; // saving fetched submitted form in root scope to avoid another fetch in submitted form controller
-	                $location.path("/submitted-form/" + data.id);
+	                $rootScope.submittedForm = data.data[0]; // saving fetched submitted form in root scope to avoid another fetch in submitted form controller
+	                $location.path("/submitted-form/" + data.data[0].id);
 	            });
 		    }
 		};
