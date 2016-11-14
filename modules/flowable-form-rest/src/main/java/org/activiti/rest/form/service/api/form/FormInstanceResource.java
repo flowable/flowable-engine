@@ -20,13 +20,16 @@ import org.activiti.form.api.FormService;
 import org.activiti.form.model.FormModel;
 import org.activiti.rest.form.FormRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Yvo Swillens
  */
+@RestController
 public class FormInstanceResource {
 
   @Autowired
@@ -34,6 +37,11 @@ public class FormInstanceResource {
 
   @Autowired
   protected FormRestResponseFactory formRestResponseFactory;
+
+  @RequestMapping(value = "/form/form-instance/{formInstanceId}", method = RequestMethod.GET, produces = "application/json")
+  public FormInstanceResponse getFormInstance(@PathVariable String formInstanceId, HttpServletRequest request) {
+    return formRestResponseFactory.createFormInstanceResponse(formService.createFormInstanceQuery().id(formInstanceId).singleResult());
+  }
 
   @RequestMapping(value = "/form/form-instance", method = RequestMethod.POST, produces = "application/json")
   public void storeFormInstance(@RequestBody FormRequest formRequest, HttpServletRequest request) {
