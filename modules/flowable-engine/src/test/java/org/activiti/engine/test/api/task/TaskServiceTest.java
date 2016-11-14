@@ -1321,8 +1321,20 @@ public class TaskServiceTest extends PluggableActivitiTestCase {
           .processInstanceId(processInstance.getId())
           .activityId("theTask").singleResult();
       assertNotNull(historicActivitiInstance);
-  
+      
       List<HistoricDetail> resultSet = historyService.createHistoricDetailQuery().variableUpdates()
+          .orderByTime()
+          .asc()
+          .list();
+      
+      assertEquals(2, resultSet.size());
+      assertEquals("variable1", ((HistoricVariableUpdate) resultSet.get(0)).getVariableName());
+      assertEquals("value1", ((HistoricVariableUpdate) resultSet.get(0)).getValue());
+      assertEquals("variable1", ((HistoricVariableUpdate) resultSet.get(1)).getVariableName());
+      assertEquals("value2", ((HistoricVariableUpdate) resultSet.get(1)).getValue());
+  
+      resultSet = historyService.createHistoricDetailQuery().variableUpdates()
+          .activityInstanceId(historicActivitiInstance.getId())
           .orderByTime()
           .asc()
           .list();
