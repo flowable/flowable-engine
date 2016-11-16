@@ -37,18 +37,18 @@ import org.activiti.form.api.FormInstanceQuery;
  * 
  * @author Tijs Rademakers
  */
-public class SubmittedFormQueryProperty implements QueryProperty {
+public class FormInstanceQueryProperty implements QueryProperty {
 
   private static final long serialVersionUID = 1L;
 
-  private static final Map<String, SubmittedFormQueryProperty> properties = new HashMap<String, SubmittedFormQueryProperty>();
+  private static final Map<String, FormInstanceQueryProperty> properties = new HashMap<String, FormInstanceQueryProperty>();
 
-  public static final SubmittedFormQueryProperty SUBMITTED_DATE = new SubmittedFormQueryProperty("RES.SUBMITTED_DATE_");
-  public static final SubmittedFormQueryProperty TENANT_ID = new SubmittedFormQueryProperty("RES.TENANT_ID_");
+  public static final FormInstanceQueryProperty SUBMITTED_DATE = new FormInstanceQueryProperty("RES.SUBMITTED_DATE_");
+  public static final FormInstanceQueryProperty TENANT_ID = new FormInstanceQueryProperty("RES.TENANT_ID_");
 
   private String name;
 
-  public SubmittedFormQueryProperty(String name) {
+  public FormInstanceQueryProperty(String name) {
     this.name = name;
     properties.put(name, this);
   }
@@ -57,7 +57,7 @@ public class SubmittedFormQueryProperty implements QueryProperty {
     return name;
   }
 
-  public static SubmittedFormQueryProperty findByName(String propertyName) {
+  public static FormInstanceQueryProperty findByName(String propertyName) {
     return properties.get(propertyName);
   }
 
