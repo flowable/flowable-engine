@@ -94,12 +94,6 @@ activitiAdminApp.controller('DeploymentController', ['$scope', '$rootScope', '$h
 		    $http({method: 'GET', url: '/app/rest/activiti/deployments/' + $routeParams.deploymentId}).
   	    	    success(function(data, status, headers, config) {
   	    	        $scope.deployment = data;
-  	    	        
-                    // $http({method: 'GET', url: '/app/rest/activiti/app?deploymentId=' + $routeParams.deploymentId}).
-                    // success(function(appData, status, headers, config) {
-                    //     $scope.appDeployment = appData;
-                    //     $scope.appId = appData.id;
-                    // });
   	    	    }).
   	    	    error(function(data, status, headers, config) {
                     if (data && data.message) {
