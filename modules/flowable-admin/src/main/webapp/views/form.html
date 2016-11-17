@@ -18,11 +18,10 @@
 							<td>{{form.name | empty}}</td>
 						</tr>
 						<tr class="property">
-							<td class="property-name" translate="FORM.APP-ID"></td>
-							<td ng-if="form.appDeploymentId"><a ng-href="#/app/{{form.appDeploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{form.appDeploymentId}}</a></td>
-							<td ng-if="!form.appDeploymentId">{{form.appDefinitionId | empty}}</td>
 							<td class="property-name" translate="FORM.DEPLOYMENT-ID"></td>
-							<td>{{form.appDefinitionId | empty}}</td>
+							<td>{{form.deploymentId | empty}}</td>
+							<td class="property-name" translate="FORM.PARENT-DEPLOYMENT-ID"></td>
+							<td><a ng-href="#/deployment/{{form.parentDeploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{form.parentDeploymentId}}</a></td>
 						</tr>
 						<tr class="property">
 							<td class="property-name" translate="FORM.DESCRIPTION"></td>

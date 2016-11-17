@@ -44,15 +44,20 @@ public class SubmittedFormService {
     return clientUtil.executeRequest(get, serverConfig);
   }
 
-  public JsonNode listFormSubmittedForms(ServerConfig serverConfig, String formId, Map<String, String[]> parameterMap) {
-    URIBuilder builder = clientUtil.createUriBuilder("/enterprise/form-submitted-forms/" + formId);
+  public JsonNode listFormSubmittedForms(ServerConfig serverConfig, ObjectNode objectNode) {
+    JsonNode resultNode = null;
 
-    for (String name : parameterMap.keySet()) {
-      builder.addParameter(name, parameterMap.get(name)[0]);
+    try {
+      URIBuilder builder = clientUtil.createUriBuilder("/query/form-instances");
+      HttpPost post = clientUtil.createPost(builder.toString(), serverConfig);
+      post.setEntity(clientUtil.createStringEntity(objectNode.toString()));
+
+      resultNode = clientUtil.executeRequest(post, serverConfig);
+    } catch (Exception ex) {
+      throw new ActivitiServiceException(ex.getMessage(), ex);
     }
 
-    HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder.toString()));
-    return clientUtil.executeRequest(get, serverConfig);
+    return resultNode;
   }
 
   public JsonNode getSubmittedForm(ServerConfig serverConfig, String submittedFormId) {

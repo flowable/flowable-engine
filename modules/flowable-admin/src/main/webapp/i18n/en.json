@@ -827,7 +827,7 @@
     "FORM": {
         "ID": "ID:",
         "NAME": "Name:",
-        "APP-ID": "APP ID:",
+        "PARENT-DEPLOYMENT-ID": "Parent Deployment ID:",
         "DEPLOYMENT-ID": "Deployment ID:",
         "DESCRIPTION": "Description:",
         "TENANT": "Tenant:",
@@ -870,7 +870,7 @@
             "PROCESS-ID": "Process Instance ID",
             "SUBMITTED": "Submitted on",
             "SUBMITTED-BY": "Submitted by",
-            "FORM-ID": "Form ID"
+            "FORM-DEFINITION-ID": "Form Definition ID"
         },
         "ACTION": {
         	"SHOW-SUBMITTED-FORM": "Show submitted form"

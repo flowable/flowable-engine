@@ -69,8 +69,8 @@ activitiAdminApp.controller('FormController', ['$scope', '$rootScope', '$http', 
                     columnDefs: [
                         {field: 'id', displayName: headers[0]},
                         {field: 'taskId', displayName: headers[1]},
-                        {field: 'processId', displayName: headers[2]},
-                        {field: 'submitted', displayName: headers[3], cellTemplate: gridConstants.dateTemplate},
+                        {field: 'processInstanceId', displayName: headers[2]},
+                        {field: 'submittedDate', displayName: headers[3], cellTemplate: gridConstants.dateTemplate},
                         {field: 'submittedBy', displayName: headers[4], cellTemplate: gridConstants.userObjectTemplate}
                     ]
                 };
