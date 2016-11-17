@@ -19,11 +19,13 @@ import org.activiti.idm.api.IdmIdentityService;
 import org.activiti.idm.api.IdmManagementService;
 import org.activiti.idm.engine.IdmEngine;
 import org.activiti.idm.engine.IdmEngineConfiguration;
+import org.activiti.idm.spring.SpringIdmEngineConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @ComponentScan(basePackages= {
@@ -36,6 +38,9 @@ public class ActivitiIdmEngineConfiguration {
     @Autowired
     private DataSource dataSource;
     
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+    
     @Bean(name="idmEngine")
     public IdmEngine idmEngine() {
         return idmEngineConfiguration().buildIdmEngine();
@@ -43,9 +48,10 @@ public class ActivitiIdmEngineConfiguration {
     
     @Bean(name="idmEngineConfiguration")
     public IdmEngineConfiguration idmEngineConfiguration() {
-      IdmEngineConfiguration idmEngineConfiguration = new IdmEngineConfiguration();
+      SpringIdmEngineConfiguration idmEngineConfiguration = new SpringIdmEngineConfiguration();
       idmEngineConfiguration.setDataSource(dataSource);
       idmEngineConfiguration.setDatabaseSchemaUpdate(IdmEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+      idmEngineConfiguration.setTransactionManager(transactionManager);
     	
     	return idmEngineConfiguration;
     }

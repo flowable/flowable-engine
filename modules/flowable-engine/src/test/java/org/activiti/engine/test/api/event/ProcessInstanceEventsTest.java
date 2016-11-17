@@ -441,10 +441,10 @@ public class ProcessInstanceEventsTest extends PluggableActivitiTestCase {
     Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTerminateTask").singleResult();
     taskService.complete(task.getId());
 
-    List<ActivitiEvent> processTerminatedEvents = listener.filterEvents(ActivitiEngineEventType.PROCESS_CANCELLED);
-    assertEquals("There should be exactly one ActivitiEventType.PROCESS_CANCELLED event after the task complete.", 1, processTerminatedEvents.size());
-    ActivitiProcessCancelledEventImpl activitiEvent = (ActivitiProcessCancelledEventImpl) processTerminatedEvents.get(0);
-    assertThat(activitiEvent.getProcessInstanceId(), is(pi.getProcessInstanceId()));
+    List<ActivitiEvent> processTerminatedEvents = listener.filterEvents(ActivitiEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT);
+    assertEquals("There should be exactly one ActivitiEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT event after the task complete.", 1, processTerminatedEvents.size());
+    ActivitiEngineEntityEvent processCompletedEvent = (ActivitiEngineEntityEvent) processTerminatedEvents.get(0);
+    assertThat(processCompletedEvent.getProcessInstanceId(), is(pi.getProcessInstanceId()));
 
     List<ActivitiEvent> activityTerminatedEvents = listener.filterEvents(ActivitiEngineEventType.ACTIVITY_CANCELLED);
     assertThat("There should be exactly two ActivitiEventType.ACTIVITY_CANCELLED event after the task complete.", activityTerminatedEvents.size(), is(2));
@@ -473,11 +473,11 @@ public class ProcessInstanceEventsTest extends PluggableActivitiTestCase {
     taskService.complete(task.getId());
 
     assertProcessEnded(pi.getId());
-    List<ActivitiEvent> processTerminatedEvents = listener.filterEvents(ActivitiEngineEventType.PROCESS_CANCELLED);
-    assertEquals("There should be exactly one ActivitiEventType.PROCESS_CANCELLED event after the task complete.", 1, processTerminatedEvents.size());
-    ActivitiProcessCancelledEventImpl processCancelledEvent = (ActivitiProcessCancelledEventImpl) processTerminatedEvents.get(0);
-    assertNotEquals(pi.getProcessInstanceId(), processCancelledEvent.getProcessInstanceId());
-    assertThat(processCancelledEvent.getProcessDefinitionId(), containsString("terminateEndEventSubprocessExample"));
+    List<ActivitiEvent> processTerminatedEvents = listener.filterEvents(ActivitiEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT);
+    assertEquals("There should be exactly one ActivitiEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT event after the task complete.", 1, processTerminatedEvents.size());
+    ActivitiEngineEntityEvent processCompletedEvent = (ActivitiEngineEntityEvent) processTerminatedEvents.get(0);
+    assertNotEquals(pi.getProcessInstanceId(), processCompletedEvent.getProcessInstanceId());
+    assertThat(processCompletedEvent.getProcessDefinitionId(), containsString("terminateEndEventSubprocessExample"));
 
   }
 
@@ -490,11 +490,11 @@ public class ProcessInstanceEventsTest extends PluggableActivitiTestCase {
     taskService.complete(task.getId());
 
     assertProcessEnded(pi.getId());
-    List<ActivitiEvent> processTerminatedEvents = listener.filterEvents(ActivitiEngineEventType.PROCESS_CANCELLED);
-    assertEquals("There should be exactly one ActivitiEventType.PROCESS_TERMINATED event after the task complete.", 1, processTerminatedEvents.size());
-    ActivitiProcessCancelledEventImpl processCancelledEvent = (ActivitiProcessCancelledEventImpl) processTerminatedEvents.get(0);
-    assertThat(processCancelledEvent.getProcessInstanceId(), is(pi.getProcessInstanceId()));
-    assertThat(processCancelledEvent.getProcessDefinitionId(), containsString("terminateParentProcess"));
+    List<ActivitiEvent> processTerminatedEvents = listener.filterEvents(ActivitiEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT);
+    assertEquals("There should be exactly one ActivitiEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT event after the task complete.", 1, processTerminatedEvents.size());
+    ActivitiEngineEntityEvent processCompletedEvent = (ActivitiEngineEntityEvent) processTerminatedEvents.get(0);
+    assertThat(processCompletedEvent.getProcessInstanceId(), is(pi.getProcessInstanceId()));
+    assertThat(processCompletedEvent.getProcessDefinitionId(), containsString("terminateParentProcess"));
 
     List<ActivitiEvent> activityTerminatedEvents = listener.filterEvents(ActivitiEngineEventType.ACTIVITY_CANCELLED);
     assertThat("3 activities must be cancelled.", activityTerminatedEvents.size(), is(3));

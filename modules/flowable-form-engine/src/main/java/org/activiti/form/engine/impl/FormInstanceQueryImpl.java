@@ -161,11 +161,11 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
   // sorting ////////////////////////////////////////////////////////
 
   public FormInstanceQuery orderBySubmittedDate() {
-    return orderBy(SubmittedFormQueryProperty.SUBMITTED_DATE);
+    return orderBy(FormInstanceQueryProperty.SUBMITTED_DATE);
   }
 
   public FormInstanceQuery orderByTenantId() {
-    return orderBy(SubmittedFormQueryProperty.TENANT_ID);
+    return orderBy(FormInstanceQueryProperty.TENANT_ID);
   }
 
   // results ////////////////////////////////////////////////////////

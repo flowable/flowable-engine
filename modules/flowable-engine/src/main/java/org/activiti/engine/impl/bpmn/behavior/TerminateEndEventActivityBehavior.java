@@ -72,7 +72,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
       ExecutionEntityManager executionEntityManager) {
     
     ExecutionEntity scopeExecutionEntity = executionEntityManager.findFirstScope((ExecutionEntity) execution);
-    sendProcessInstanceCancelledEvent(scopeExecutionEntity, execution.getCurrentFlowElement());
+    sendProcessInstanceCompletedEvent(scopeExecutionEntity, execution.getCurrentFlowElement());
 
     // If the scope is the process instance, we can just terminate it all
     // Special treatment is needed when the terminated activity is a subprocess (embedded/callactivity/..)
@@ -179,14 +179,13 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
     executionEntityManager.deleteExecutionAndRelatedData(rootExecutionEntity, deleteReason, false);
   }
 
-  protected void sendProcessInstanceCancelledEvent(DelegateExecution execution, FlowElement terminateEndEvent) {
+  protected void sendProcessInstanceCompletedEvent(DelegateExecution execution, FlowElement terminateEndEvent) {
     if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       if ((execution.isProcessInstanceType() && execution.getSuperExecutionId() == null) ||
           (execution.getParentId() == null && execution.getSuperExecutionId() != null)) {
         
         Context.getProcessEngineConfiguration().getEventDispatcher()
-            .dispatchEvent(ActivitiEventBuilder.createCancelledEvent(execution.getId(), execution.getProcessInstanceId(), 
-                execution.getProcessDefinitionId(), execution.getCurrentFlowElement()));
+            .dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT, execution));
       }
     }
 
