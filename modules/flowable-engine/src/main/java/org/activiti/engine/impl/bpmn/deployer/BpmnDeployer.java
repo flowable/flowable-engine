@@ -22,6 +22,7 @@ import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.ExtensionElement;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.Process;
+import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.UserTask;
 import org.activiti.bpmn.model.ValuedDataObject;
@@ -177,6 +178,14 @@ public class BpmnDeployer implements Deployer {
       
       processDefinition.setVersion(version);
       processDefinition.setId(getIdForNewProcessDefinition(processDefinition));
+      Process process = parsedDeployment.getProcessModelForProcessDefinition(processDefinition);
+      FlowElement initialElement = process.getInitialFlowElement();
+      if (initialElement != null && initialElement instanceof StartEvent) {
+        StartEvent startEvent = (StartEvent) initialElement;
+        if (startEvent.getFormKey() != null) {
+          processDefinition.setHasStartFormKey(true);
+        }
+      }
       
       if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
         commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_CREATED, processDefinition));

@@ -130,7 +130,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
         } else if (FormFieldTypes.UPLOAD.equals(field.getType())) {
           
           // Multiple docs are stored as comma-separated string ids,
-          // explicitely storing them as an array so they're seralized properly
+          // explicitely storing them as an array so they're serialized properly
           if (variables.containsKey(field.getId())) {
             String uploadValue = (String) variables.get(field.getId());
             if (uploadValue != null) {

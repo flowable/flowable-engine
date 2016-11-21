@@ -53,21 +53,21 @@ public class SpringFormEngineConfigurator extends AbstractProcessEngineConfigura
   public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
     if (formEngineConfiguration == null) {
       formEngineConfiguration = new SpringFormEngineConfiguration();
-    
-      if (processEngineConfiguration.getDataSource() != null) {
-        DataSource originalDatasource = processEngineConfiguration.getDataSource();
-        formEngineConfiguration.setDataSource(originalDatasource);
-        
-      } else {
-        throw new ActivitiException("A datasource is required for initializing the Form engine ");
-      }
-      
-      formEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
-      
-      formEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
-      formEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
-      formEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
     }
+    
+    if (processEngineConfiguration.getDataSource() != null) {
+      DataSource originalDatasource = processEngineConfiguration.getDataSource();
+      formEngineConfiguration.setDataSource(originalDatasource);
+      
+    } else {
+      throw new ActivitiException("A datasource is required for initializing the Form engine ");
+    }
+    
+    formEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
+    
+    formEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
+    formEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
+    formEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
     
     FormEngine formEngine = initFormEngine();
     processEngineConfiguration.setFormEngineInitialized(true);

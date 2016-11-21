@@ -12,8 +12,6 @@
  */
 package org.activiti.app.service.runtime;
 
-import java.util.Map;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.app.model.runtime.CreateProcessInstanceRepresentation;
@@ -23,10 +21,7 @@ import org.activiti.app.service.api.UserCache;
 import org.activiti.app.service.api.UserCache.CachedUser;
 import org.activiti.app.service.exception.BadRequestException;
 import org.activiti.app.service.exception.NotFoundException;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.Process;
-import org.activiti.bpmn.model.StartEvent;
+import org.activiti.content.api.ContentService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -73,7 +68,7 @@ public class ActivitiProcessInstanceService {
   protected PermissionService permissionService;
   
   @Autowired
-  protected RelatedContentService relatedContentService;
+  protected ContentService contentService;
   
   @Autowired
   protected ActivitiCommentService commentService;
@@ -101,8 +96,8 @@ public class ActivitiProcessInstanceService {
 
     ProcessInstanceRepresentation processInstanceResult = new ProcessInstanceRepresentation(processInstance, processDefinition, processDefinition.isGraphicalNotationDefined(), userRep);
 
-    FormModel formDefinition = getStartFormDefinition(processInstance.getProcessDefinitionId(), processDefinition, processInstance.getId());
-    if (formDefinition != null) {
+    FormModel formModel = runtimeService.getStartFormModel(processInstance.getProcessDefinitionId(), processInstance.getId());
+    if (formModel != null) {
       processInstanceResult.setStartFormDefined(true);
     }
 
@@ -117,9 +112,7 @@ public class ActivitiProcessInstanceService {
       throw new NotFoundException("Process with id: " + processInstanceId + " does not exist or is not available for this user");
     }
     
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
-
-    return getStartFormDefinition(processInstance.getProcessDefinitionId(), processDefinition, processInstance.getId());
+    return runtimeService.getStartFormModel(processInstance.getProcessDefinitionId(), processInstance.getId());
   }
   
   public ProcessInstanceRepresentation startNewProcessInstance(CreateProcessInstanceRepresentation startRequest) {
@@ -127,52 +120,9 @@ public class ActivitiProcessInstanceService {
       throw new BadRequestException("Process definition id is required");
     }
     
-    FormModel formModel = null;
-    Map<String, Object> variables = null;
-
     ProcessDefinition processDefinition = repositoryService.getProcessDefinition(startRequest.getProcessDefinitionId());
-
-    if (startRequest.getValues() != null || startRequest.getOutcome() != null) {
-      BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
-      Process process = bpmnModel.getProcessById(processDefinition.getKey());
-      FlowElement startElement = process.getInitialFlowElement();
-      if (startElement instanceof StartEvent) {
-        StartEvent startEvent = (StartEvent) startElement;
-        if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
-          formModel = formRepositoryService.getFormModelByKey(startEvent.getFormKey());
-          if (formModel != null) {
-            variables = formService.getVariablesFromFormSubmission(formModel, startRequest.getValues(), startRequest.getOutcome());
-          }
-        }
-      }
-    }
-    
-    // No need to pass the tenant id here, the process definition is already tenant based and the process instance will inherit it
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(startRequest.getProcessDefinitionId(), variables);
-    
-    // Can only set name in case process didn't end instantly
-    if (!processInstance.isEnded() && startRequest.getName() != null) {
-        runtimeService.setProcessInstanceName(processInstance.getId(), startRequest.getName());
-    }
-
-    // Mark any content created as part of the form-submission connected to the process instance
-    /*if (formSubmission != null) {
-      if (formSubmission.hasContent()) {
-        ObjectNode contentNode = objectMapper.createObjectNode();
-        submittedFormValuesJson.put("content", contentNode);
-        for (Entry<String, List<RelatedContent>> entry : formSubmission.getVariableContent().entrySet()) {
-          ArrayNode contentArray = objectMapper.createArrayNode();
-          for (RelatedContent content : entry.getValue()) {
-            relatedContentService.setContentField(content.getId(), entry.getKey(), processInstance.getId(), null);
-            contentArray.add(content.getId());
-          }
-          contentNode.put(entry.getKey(), contentArray);
-        }
-      }*/
-
-    if (formModel != null) {
-      formService.createFormInstance(variables, formModel, null, processInstance.getId());
-    }
+    ProcessInstance processInstance = runtimeService.startProcessInstanceWithForm(startRequest.getProcessDefinitionId(), 
+        startRequest.getOutcome(), startRequest.getValues(), startRequest.getName());
     
     User user = null;
     if (processInstance.getStartUserId() != null) {
@@ -181,7 +131,8 @@ public class ActivitiProcessInstanceService {
         user = cachedUser.getUser();
       }
     }
-    return new ProcessInstanceRepresentation(processInstance, processDefinition, ((ProcessDefinitionEntity) processDefinition).isGraphicalNotationDefined(), user);
+    return new ProcessInstanceRepresentation(processInstance, processDefinition, 
+        ((ProcessDefinitionEntity) processDefinition).isGraphicalNotationDefined(), user);
 
   }
 
@@ -205,7 +156,7 @@ public class ActivitiProcessInstanceService {
       }
 
       // Delete all content related to the process instance
-      relatedContentService.deleteContentForProcessInstance(processInstanceId);
+      contentService.deleteContentItemsByProcessInstanceId(processInstanceId);
       
       // Delete all comments on tasks and process instances
       commentService.deleteAllCommentsForProcessInstance(processInstanceId);
@@ -216,21 +167,5 @@ public class ActivitiProcessInstanceService {
     } else {
       runtimeService.deleteProcessInstance(processInstanceId, "Cancelled by " + SecurityUtils.getCurrentUserId());
     }
-  }
-  
-  protected FormModel getStartFormDefinition(String processDefinitionId, ProcessDefinitionEntity processDefinition, String processInstanceId) {
-    FormModel formDefinition = null;
-    BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionId);
-    Process process = bpmnModel.getProcessById(processDefinition.getKey());
-    FlowElement startElement = process.getInitialFlowElement();
-    if (startElement instanceof StartEvent) {
-      StartEvent startEvent = (StartEvent) startElement;
-      if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
-        formDefinition = formService.getFormInstanceModelByKeyAndParentDeploymentId(startEvent.getFormKey(), 
-            processDefinition.getDeploymentId(), null, processInstanceId, null, processDefinition.getTenantId());
-      }
-    }
-    
-    return formDefinition;
   }
 }

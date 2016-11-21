@@ -31,6 +31,7 @@ import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.NativeTaskQuery;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
+import org.activiti.form.model.FormModel;
 
 /**
  * Service which provides access to {@link Task} and form related operations.
@@ -246,6 +247,28 @@ public interface TaskService {
    *           when no task exists with the given id.
    */
   void complete(String taskId, Map<String, Object> variables, boolean localScope);
+  
+  /**
+   * 
+   */
+  void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables);
+  
+  /**
+   * 
+   */
+  void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, 
+      Map<String, Object> variables, Map<String, Object> transientVariables);
+  
+  /**
+   * 
+   */
+  void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, 
+      Map<String, Object> variables, boolean localScope);
+  
+  /**
+   * 
+   */
+  FormModel getTaskFormModel(String taskId);
 
   /**
    * Changes the assignee of the given task to the given userId. No check is done whether the user is known by the identity component.

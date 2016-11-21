@@ -12,6 +12,7 @@
  */
 package org.activiti.engine;
 
+import org.activiti.content.api.ContentService;
 import org.activiti.dmn.api.DmnRepositoryService;
 import org.activiti.dmn.api.DmnRuleService;
 import org.activiti.form.api.FormRepositoryService;
@@ -80,4 +81,6 @@ public interface ProcessEngine {
   DmnRuleService getDmnRuleService();
   
   IdmIdentityService getIdmIdentityService();
+  
+  ContentService getContentService();
 }

@@ -360,6 +360,31 @@
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
+				<artifactId>flowable-content-api</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.flowable</groupId>
+				<artifactId>flowable-content-engine</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.flowable</groupId>
+				<artifactId>flowable-content-spring</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.flowable</groupId>
+				<artifactId>flowable-content-engine-configurator</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.flowable</groupId>
+				<artifactId>flowable-content-spring-configurator</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.flowable</groupId>
 				<artifactId>flowable-camel</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -805,6 +830,7 @@
 		<module>modules/flowable-form-api</module>
 		<module>modules/flowable-dmn-model</module>
 		<module>modules/flowable-dmn-api</module>
+		<module>modules/flowable-content-api</module>
 		<module>modules/flowable-engine</module>
 	</modules>
 
@@ -946,6 +972,10 @@
 				<module>modules/flowable-form-spring</module>
 				<module>modules/flowable-form-spring-configurator</module>
 				<module>modules/flowable-form-rest</module>
+				<module>modules/flowable-content-engine</module>
+				<module>modules/flowable-content-engine-configurator</module>
+				<module>modules/flowable-content-spring</module>
+				<module>modules/flowable-content-spring-configurator</module>
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>
 				<module>modules/flowable-webapp-rest2</module>
@@ -1040,6 +1070,10 @@
 				<module>modules/flowable-dmn-spring</module>
 				<module>modules/flowable-dmn-spring-configurator</module>
 				<module>modules/flowable-dmn-rest</module>
+				<module>modules/flowable-content-engine</module>
+				<module>modules/flowable-content-engine-configurator</module>
+				<module>modules/flowable-content-spring</module>
+				<module>modules/flowable-content-spring-configurator</module>
 				<module>modules/flowable-jms-spring-executor</module>
 			</modules>
 		</profile>
@@ -1127,6 +1161,10 @@
 				<module>modules/flowable-form-spring</module>
 				<module>modules/flowable-form-spring-configurator</module>
 				<module>modules/flowable-idm-spring</module>
+				<module>modules/flowable-content-engine</module>
+				<module>modules/flowable-content-engine-configurator</module>
+				<module>modules/flowable-content-spring</module>
+				<module>modules/flowable-content-spring-configurator</module>
 				<module>modules/flowable-spring</module>
 				<module>modules/flowable5-engine</module>
 				<module>modules/flowable5-compatibility</module>

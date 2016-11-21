@@ -15,13 +15,13 @@ package org.activiti.app.service.runtime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.app.domain.runtime.RelatedContent;
 import org.activiti.app.service.exception.NotFoundException;
 import org.activiti.app.service.exception.NotPermittedException;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.ExtensionElement;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.UserTask;
+import org.activiti.content.api.ContentItem;
 import org.activiti.editor.language.json.converter.util.CollectionUtils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
@@ -205,7 +205,7 @@ public class PermissionService {
     return hasReadPermissionOnProcessInstance(user, processInstanceId);
   }
 
-  public boolean canDownloadContent(User currentUserObject, RelatedContent content) {
+  public boolean canDownloadContent(User currentUserObject, ContentItem content) {
     if (content.getTaskId() != null) {
       validateReadPermissionOnTask(currentUserObject, content.getTaskId());
       return true;
@@ -216,7 +216,7 @@ public class PermissionService {
     }
   }
 
-  public boolean hasWritePermissionOnRelatedContent(User user, RelatedContent content) {
+  public boolean hasWritePermissionOnRelatedContent(User user, ContentItem content) {
     if (content.getProcessInstanceId() != null) {
       return hasReadPermissionOnProcessInstance(user, content.getProcessInstanceId());
     } else {

@@ -14,6 +14,7 @@ package org.activiti.engine.impl;
 
 import java.util.Map;
 
+import org.activiti.content.api.ContentService;
 import org.activiti.dmn.api.DmnRepositoryService;
 import org.activiti.dmn.api.DmnRuleService;
 import org.activiti.engine.DynamicBpmnService;
@@ -61,6 +62,7 @@ public class ProcessEngineImpl implements ProcessEngine {
   protected DmnRepositoryService dmnRepositoryService;
   protected DmnRuleService dmnRuleService;
   protected IdmIdentityService idmIdentityService;
+  protected ContentService contentService;
   protected AsyncExecutor asyncExecutor;
   protected CommandExecutor commandExecutor;
   protected Map<Class<?>, SessionFactory> sessionFactories;
@@ -87,6 +89,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     this.dmnRepositoryService = processEngineConfiguration.getDmnEngineRepositoryService();
     this.dmnRuleService = processEngineConfiguration.getDmnEngineRuleService();
     this.idmIdentityService = processEngineConfiguration.getIdmIdentityService();
+    this.contentService = processEngineConfiguration.getContentService();
 
     if (processEngineConfiguration.isUsingRelationalDatabase() && processEngineConfiguration.getDatabaseSchemaUpdate() != null) {
       commandExecutor.execute(processEngineConfiguration.getSchemaCommandConfig(), new SchemaOperationsProcessEngineBuild());
@@ -190,5 +193,9 @@ public class ProcessEngineImpl implements ProcessEngine {
   
   public IdmIdentityService getIdmIdentityService() {
     return idmIdentityService;
+  }
+  
+  public ContentService getContentService() {
+    return contentService;
   }
 }

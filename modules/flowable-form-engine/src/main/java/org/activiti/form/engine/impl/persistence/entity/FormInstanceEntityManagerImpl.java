@@ -50,7 +50,7 @@ public class FormInstanceEntityManagerImpl extends AbstractEntityManager<FormIns
     return formInstanceDataManager;
   }
 
-  public FormInstanceDataManager getSubmittedFormDataManager() {
+  public FormInstanceDataManager getFormInstanceDataManager() {
     return formInstanceDataManager;
   }
 

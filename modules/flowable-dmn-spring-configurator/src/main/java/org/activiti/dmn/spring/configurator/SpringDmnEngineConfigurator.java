@@ -53,21 +53,21 @@ public class SpringDmnEngineConfigurator extends AbstractProcessEngineConfigurat
   public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
     if (dmnEngineConfiguration == null) {
       dmnEngineConfiguration = new SpringDmnEngineConfiguration();
-    
-      if (processEngineConfiguration.getDataSource() != null) {
-        DataSource originalDatasource = processEngineConfiguration.getDataSource();
-        dmnEngineConfiguration.setDataSource(originalDatasource);
-        
-      } else {
-        throw new ActivitiException("A datasource is required for initializing the DMN engine ");
-      }
-      
-      dmnEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
-      
-      dmnEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
-      dmnEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
-      dmnEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
     }
+    
+    if (processEngineConfiguration.getDataSource() != null) {
+      DataSource originalDatasource = processEngineConfiguration.getDataSource();
+      dmnEngineConfiguration.setDataSource(originalDatasource);
+      
+    } else {
+      throw new ActivitiException("A datasource is required for initializing the DMN engine ");
+    }
+    
+    dmnEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
+    
+    dmnEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
+    dmnEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
+    dmnEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
     
     DmnEngine dmnEngine = initDmnEngine();
     
