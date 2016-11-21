@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * Service for invoking Activiti REST services.
  */
 @Service
-public class FormService {
+public class FormDefinitionService {
 
 	@Autowired
 	protected ActivitiClientService clientUtil;
@@ -46,15 +46,15 @@ public class FormService {
 		return clientUtil.executeRequest(get, serverConfig);
 	}
 
-    public JsonNode getEditorJsonForForm(ServerConfig serverConfig, String formId) {
-        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "enterprise/forms/" + formId + "/editorJson"));
-        return clientUtil.executeRequest(get, serverConfig);
-    }
-    
-    public JsonNode getProcessDefinitionStartForm(ServerConfig serverConfig, String processDefinitionId) {
-        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "enterprise/process-definitions/" + processDefinitionId + "/start-form"));
-        return clientUtil.executeRequest(get, serverConfig);
-    }
+//    public JsonNode getEditorJsonForForm(ServerConfig serverConfig, String formId) {
+//        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "enterprise/forms/" + formId + "/editorJson"));
+//        return clientUtil.executeRequest(get, serverConfig);
+//    }
+//
+//    public JsonNode getProcessDefinitionStartForm(ServerConfig serverConfig, String processDefinitionId) {
+//        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "enterprise/process-definitions/" + processDefinitionId + "/start-form"));
+//        return clientUtil.executeRequest(get, serverConfig);
+//    }
     
     public JsonNode getProcessDefinitionForms(ServerConfig serverConfig, String processDefinitionId) {
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "repository/process-definitions/" + processDefinitionId + "/form-definitions"));

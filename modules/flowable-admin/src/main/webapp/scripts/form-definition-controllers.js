@@ -12,12 +12,12 @@
  */
 'use strict';
 
-activitiAdminApp.controller('FormController', ['$scope', '$rootScope', '$http', '$timeout', '$location', '$routeParams', '$modal', '$translate', '$q', 'gridConstants',
+activitiAdminApp.controller('FormDefinitionController', ['$scope', '$rootScope', '$http', '$timeout', '$location', '$routeParams', '$modal', '$translate', '$q', 'gridConstants',
     function ($scope, $rootScope, $http, $timeout, $location, $routeParams, $modal, $translate, $q, gridConstants) {
-        $rootScope.navigation = {selection: 'forms'};
+        $rootScope.navigation = {selection: 'process-definitions'};
         
         $scope.returnToList = function () {
-            $location.path("/forms");
+            $location.path("/form-definitions");
         };
 
         $scope.showForm = function () {
@@ -35,17 +35,11 @@ activitiAdminApp.controller('FormController', ['$scope', '$rootScope', '$http', 
 
         $scope.showSubmittedForm = function (submittedForm) {
             if (submittedForm && submittedForm.getProperty('id')) {
-                $location.path("/submitted-form/"+submittedForm.getProperty('id'));
+                $location.path("/form-instance/"+submittedForm.getProperty('id'));
             }
         };
-        
-        $scope.openApp = function(appId) {
-            if (appId) {
-                $location.path("/app/" + appId);
-            }
-        };
-        
-        $scope.openDeployment = function(deploymentId) {
+
+       $scope.openDeployment = function(deploymentId) {
             if (deploymentId) {
                 $location.path("/deployment/" + deploymentId);
             }
@@ -78,14 +72,14 @@ activitiAdminApp.controller('FormController', ['$scope', '$rootScope', '$http', 
 
         $scope.executeWhenReady(function () {
             // Load form
-            $http({method: 'GET', url: '/app/rest/activiti/forms/' + $routeParams.formId}).
+            $http({method: 'GET', url: '/app/rest/activiti/form-definitions/' + $routeParams.formId}).
             success(function (data, status, headers, config) {
                 $scope.form = data;
 
                 // Load form submitted forms
                 $http({
                     method: 'GET',
-                    url: '/app/rest/activiti/form-submitted-forms/' + $routeParams.formId
+                    url: '/app/rest/activiti/form-definition-form-instances/' + $routeParams.formId
                 }).
                 success(function (submittedFormsData, status, headers, config) {
                     $scope.submittedForms = submittedFormsData;
@@ -126,7 +120,7 @@ activitiAdminApp.controller('ShowFormPopupCrtl',
                 // Load form definition
                 $http({
                     method: 'GET',
-                    url: '/app/rest/activiti/forms/' + form.id + '/editorJson'
+                    url: '/app/rest/activiti/form-definitions/' + form.id + '/editorJson'
                 }).
                 success(function (data, status, headers, config) {
                     $scope.popup.currentForm = data;

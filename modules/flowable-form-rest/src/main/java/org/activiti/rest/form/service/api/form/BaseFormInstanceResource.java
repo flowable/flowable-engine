@@ -15,7 +15,7 @@ package org.activiti.rest.form.service.api.form;
 import org.activiti.engine.query.QueryProperty;
 import org.activiti.form.api.FormInstanceQuery;
 import org.activiti.form.api.FormService;
-import org.activiti.form.engine.impl.SubmittedFormQueryProperty;
+import org.activiti.form.engine.impl.FormInstanceQueryProperty;
 import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.form.FormRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +31,8 @@ public class BaseFormInstanceResource {
   private static Map<String, QueryProperty> allowedSortProperties = new HashMap<>();
 
   static {
-    allowedSortProperties.put("submittedDate", SubmittedFormQueryProperty.SUBMITTED_DATE);
-    allowedSortProperties.put("tenantId", SubmittedFormQueryProperty.TENANT_ID);
+    allowedSortProperties.put("submittedDate", FormInstanceQueryProperty.SUBMITTED_DATE);
+    allowedSortProperties.put("tenantId", FormInstanceQueryProperty.TENANT_ID);
   }
 
   @Autowired

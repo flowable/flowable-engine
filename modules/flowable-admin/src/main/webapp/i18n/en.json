@@ -60,13 +60,13 @@
         "JOBS-EMPTY": "Definition has no jobs running",
         "DECISION-TABLES-SIZE": "Definition has {{total}} decision tables.",
         "DECISION-TABLES-EMPTY": "Definition has no decision tables.",
-        "FORMS-SIZE": "Definition has {{total}} forms.",
-        "FORMS-EMPTY": "Definition has no forms.",
+        "FORMS-SIZE": "Definition has {{total}} form definitions.",
+        "FORMS-EMPTY": "Definition has no form definitions.",
         "TITLE": {
             "PROCESS-INSTANCES": "Process instances",
             "JOBS": "Jobs",
-            "DECISION-TABLES": "Decision Tables",
-            "FORMS": "Forms"
+            "DECISION-TABLES": "Decision tables",
+            "FORMS": "Form definitions"
         },
         "ACTION": {
             "EDIT-CATEGORY": "Edit category",
@@ -152,8 +152,8 @@
         "SUBPROCESSES-EMPTY": "This process instance has no subprocesses.",
         "DECISION-TABLES-SIZE": "This process instance has {{total}} decision tables.",
         "DECISION-TABLES-EMPTY": "This process instance has no decision tables.",
-        "FORMS-SIZE": "This process instance has {{total}} submitted forms.",
-        "FORMS-EMPTY": "This process instance has no submitted forms.",
+        "FORMS-SIZE": "This process instance has {{total}} form instances.",
+        "FORMS-EMPTY": "This process instance has no form instances.",
         "TITLE": {
             "TASKS": "Tasks",
             "VARIABLES": "Variables",
@@ -281,7 +281,7 @@
             "COMPLETE": "Complete task",
             "DELETE": "Delete task",
             "SHOW-ALL-SUBTASKS": "Show all subtasks",
-            "SHOW-SUBMITTED-FORM": "Show submitted form"
+            "SHOW-SUBMITTED-FORM": "Show form instance"
         },
         "TITLE": {
             "SUBTASKS": "Sub tasks",
@@ -642,56 +642,6 @@
             }
         }
     },
-    "APP-DEPLOYMENT": {
-        "APP-ID": "App ID:",
-        "DEPLOYMENT-ID": "Deployment ID:",
-        "DMN-DEPLOYMENT-ID": "DMN Deployment ID:",
-        "DEPLOYED-BY": "Deployed by:",
-        "DEPLOYED-ON": "Deployed on:",
-        "APP-NAME": "App Name:",
-        "VERSION": "Version:",
-        "DESCRIPTION": "Description:",
-        "KEY": "Key:",
-        "CATEGORY": "Category:",
-        "SUSPENDED": "Suspended:",
-        "DEPLOYMENT": "Deployment:",
-        "TENANT-ID": "Tenant ID:",
-        "START-FORM-DEFINED": "Start form defined:",
-        "GRAPHICAL-NOTATION-DEFINED": "Graphical notation defined:",
-        "PROCESS-DEFINITIONS-SIZE": "App definition has {{total}} process definitions",
-        "PROCESS-DEFINITIONS-SHOWING": ", showing {{size}} process definitions",
-        "PROCESS-DEFINITIONS-EMPTY": "App deployment has no process definitions",
-        "DECISION-TABLES-SIZE": "App deployment has {{total}} decision tables",
-        "DECISION-TABLES-SHOWING": ", showing {{size}} decision tables",
-        "DECISION-TABLES-EMPTY": "App deployment has no decision tables",
-        "FORMS-SIZE": "App deployment has {{total}} forms",
-        "FORMS-SHOWING": ", showing {{size}} forms",
-        "FORMS-EMPTY": "App deployment has no forms",
-        "TITLE": {
-            "PROCESS-DEFINITIONS": "Process definitions",
-            "DECISION-TABLES": "Decision tables",
-            "FORMS": "Forms"
-        },
-        "ACTION": {
-            "EDIT-CATEGORY": "Edit category",
-            "SHOW-ALL-PROCESS-DEFINITIONS": "Show all process definitions",
-            "SHOW-ALL-DECISION-TABLES": "Show all decision tables",
-            "SHOW-ALL-FORMS": "Show all forms",
-            "SHOW-DIAGRAM": "Show process diagram"
-        },
-        "POPUP": {
-            "EDIT-CATEGORY": {
-                "TITLE": "Edit category for definition",
-                "MESSAGE": "The initial category for the definition is populated from the targetNameSpace attribute in the BPMN 2.0 XML, but can be altered after deployment.",
-                "CATEGORY": "Category",
-                "CATEGORY-PLACEHOLDER": "Enter a category",
-                "CONFIRM": "Update category"
-            },
-            "SHOW-PROCESS-MODEL": {
-                "TITLE": "Process diagram"
-            }
-        }
-    },
     "VARIABLES": {
         "HEADER": {
             "NAME": "Name",
@@ -805,9 +755,9 @@
         }
     },
     "FORMS": {
-    	"TITLE": "Forms",
+    	"TITLE": "Form definitions",
         "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching forms.",
-        "LIST-MESSAGE-EMPTY": "No matching forms.",
+        "LIST-MESSAGE-EMPTY": "No matching form definitions.",
         "HEADER": {
             "ID": "ID",
             "NAME": "Name",
@@ -833,10 +783,10 @@
         "TENANT": "Tenant:",
         "MESSAGE-EMPTY": "(None)",
         "TITLE": {
-            "SUBMITTED-FORMS": "Submitted forms"
+            "SUBMITTED-FORMS": "Form instances"
         },
-        "SUBMITTED-FORMS-MESSAGE": "This form has {{total}} submitted forms, showing {{size}}.",
-        "SUBMITTED-FORMS-MESSAGE-EMPTY": "This form has no submitted forms",
+        "SUBMITTED-FORMS-MESSAGE": "This definition has {{total}} form instances, showing {{size}}.",
+        "SUBMITTED-FORMS-MESSAGE-EMPTY": "This definition has no form instances",
         "ACTION": {
             "EDIT-CATEGORY": "Edit category",
             "SHOW-ALL-JOBS": "Show all jobs",
@@ -874,61 +824,6 @@
         },
         "ACTION": {
         	"SHOW-SUBMITTED-FORM": "Show submitted form"
-        }
-    },
-    "APPS": {
-    	"ACTION": {
-            "UPLOAD": "Upload and publish an app",
-            "DOWNLOAD": "Download app",
-            "REDEPLOY": "Redeploy app to another cluster",
-            "DELETE": "Delete app"
-        },
-    	"POPUP": {
-    		"DELETE": {
-    			"CONFIRM-MESSAGE": "Delete app '{{appDefinition.name}}'?"
-    		},
-            "UPLOAD": {
-                "DESCRIPTION": "Select a .zip app file to deploy.",
-                "WARNING": "Uploading an app is only possible to an Activiti UI instance, not to an Activiti Core Engine instance.",
-                "DROPZONE": "Or drop a file here",
-                "NO-DROP": "File drop is not supported by your browser",
-                "CANCEL-UPLOAD": "Cancel upload",
-                "ERROR": "Could not upload this file"
-            },
-            "PUBLISH-MODEL": {
-            	"TITLE": "Publish app model",
-            	"PUBLISH" : "Publish",
-            	"ERROR": "Could not publish app",
-                "DESCRIPTION": "Select a .zip app file to deploy.",
-                "WARNING": "Uploading an app is only possible to an Activiti UI instance, not to an Activiti Core Engine instance.",
-                "DROPZONE": "Or drop a file here",
-                "NO-DROP": "File drop is not supported by your browser",
-                "LIST-MESSAGE": "Showing total of {{total}} matching app models.",
-        		"LIST-MESSAGE-EMPTY": "No matching app models.",
-        		"PUBLISH-ERROR": "Could not publish app",
-        		"EVERYONES-APPS": "Show everyone's apps",
-        		"APP-CONFLICT-ERROR": "App conflicts with existing app '{{name}}' created by '{{createdBy.firstName}} {{createdBy.lastName}}' ",
-        		"PUBLISH-TO-ANOTHER-CLUSTER": "Publish app to another cluster",
-            	"SELECT-CLUSTER": "Select cluster",
-            	"PUBLISH-TO-CLUSTER": "Publish app to {{name}}",
-            	"PUBLISH-AS-NEW-VERSION": "Publish as a new app version",
-        		"HEADER": {
-        			"ID": "ID",
-        			"NAME": "Name",
-        			"LAST-UPDATE": "Last update",
-        			"CREATED-BY": "Created by"
-        		}
-            },
-            "REDEPLOY": {
-            	"TITLE": "Redeploy app",
-            	"DESCRIPTION": "Select a cluster to redeploy '{{name}}' to",
-            	"ERROR": "Could not deploy app",
-            	"APP-CONFLICT-ERROR": "App conflicts with existing app '{{name}}' created by '{{createdBy.firstName}} {{createdBy.lastName}}' ",
-            	"SELECT-CLUSTER": "Select cluster",
-            	"DEPLOY-TO-CLUSTER": "Deploy app to {{name}}",
-            	"DEPLOY": "Deploy",
-            	"DEPLOY-AS-NEW-VERSION": "Deploy as a new app version"
-            }
         }
     }
 }

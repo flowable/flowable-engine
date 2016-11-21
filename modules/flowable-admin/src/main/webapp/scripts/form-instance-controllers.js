@@ -14,7 +14,7 @@
 
 /* Controllers */
 
-activitiAdminApp.controller('SubmittedFormController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', '$routeParams',
+activitiAdminApp.controller('FormInstanceController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', '$routeParams',
     function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, $modal, $routeParams) {
         
         $scope.returnToList = function () {
@@ -42,7 +42,7 @@ activitiAdminApp.controller('SubmittedFormController', ['$rootScope', '$scope', 
             }
             
             // Load submitted form
-            $http({method: 'GET', url: '/app/rest/activiti/submitted-forms/' + $routeParams.submittedFormId}).
+            $http({method: 'GET', url: '/app/rest/activiti/form-instances/' + $routeParams.formInstanceId}).
             success(function (data, status, headers, config) {
                 $scope.submittedForm = data;
             }).
@@ -81,7 +81,7 @@ activitiAdminApp.controller('ShowFormRenderPopupCrtl',
                         // Load form
                         $http({
                             method: 'GET',
-                            url: '/app/rest/activiti/submitted-forms/' + form.id
+                            url: '/app/rest/activiti/form-instances/' + form.id
                         }).
                         success(function (data, status, headers, config) {
                             $scope.popup.currentForm = data.form;

@@ -99,7 +99,7 @@ activitiAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
         
 		$scope.openSubmittedForm = function(submittedForm) {
             if (submittedForm && submittedForm.getProperty('id')) {
-                $location.path("/submitted-form/" + submittedForm.getProperty('id'));
+                $location.path("/form-instance/" + submittedForm.getProperty('id'));
             }
         };
 
@@ -367,7 +367,7 @@ activitiAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
         
         $scope.loadForms = function() {
             // Load forms
-            $http({method: 'GET', url: '/app/rest/activiti/process-submitted-forms/' + $scope.process.id}).
+            $http({method: 'GET', url: '/app/rest/activiti/process-form-instances/' + $scope.process.id}).
             success(function(data, status, headers, config) {
                 $scope.forms = data;
                 $scope.tabData.tabs[5].info = data.total;

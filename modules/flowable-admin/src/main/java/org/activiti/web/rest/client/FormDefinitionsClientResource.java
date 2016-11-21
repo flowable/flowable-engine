@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
-import org.activiti.service.engine.FormService;
+import org.activiti.service.engine.FormDefinitionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,17 +29,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author Bassam Al-Sarori
+ * @author Yvo Swillens
  */
 @RestController
-public class FormsClientResource extends AbstractClientResource {
+public class FormDefinitionsClientResource extends AbstractClientResource {
 
     @Autowired
-    protected FormService clientService;
+    protected FormDefinitionService clientService;
 
     /**
      * GET a list of deployed forms.
      */
-    @RequestMapping(value = "/rest/activiti/forms", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/rest/activiti/form-definitions", method = RequestMethod.GET, produces = "application/json")
     public JsonNode listForms(HttpServletRequest request) {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
         Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
@@ -49,7 +50,7 @@ public class FormsClientResource extends AbstractClientResource {
     /**
      * GET process definition's list of deployed forms.
      */
-    @RequestMapping(value = "/rest/activiti/process-definition-forms/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/rest/activiti/process-definition-form-definitions/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getProcessDefinitionForms(@PathVariable String processDefinitionId, HttpServletRequest request) {
         return clientService.getProcessDefinitionForms(retrieveServerConfig(EndpointType.PROCESS), processDefinitionId);
     }

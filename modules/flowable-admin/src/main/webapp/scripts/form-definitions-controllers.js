@@ -14,7 +14,7 @@
 
 /* Controllers */
 
-activitiAdminApp.controller('FormsController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', 'gridConstants',
+activitiAdminApp.controller('FormDefinitionsController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', 'gridConstants',
     function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, $modal, gridConstants) {
 
         $rootScope.navigation = {selection: 'forms'};
@@ -26,7 +26,7 @@ activitiAdminApp.controller('FormsController', ['$rootScope', '$scope', '$http',
         $scope.selectedForms = [];
 
         var filterConfig = {
-            url: '/app/rest/activiti/forms',
+            url: '/app/rest/activiti/form-definitions',
             method: 'GET',
             success: function (data, status, headers, config) {
                 $scope.formsData = data;

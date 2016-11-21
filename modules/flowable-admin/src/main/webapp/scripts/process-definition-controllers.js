@@ -93,7 +93,7 @@ activitiAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
     
     $scope.openForm = function (form) {
         if (form && form.getProperty('id')) {
-            $location.path("/form/" + form.getProperty('id'));
+            $location.path("/form-definition/" + form.getProperty('id'));
           }
     };
     
@@ -139,7 +139,7 @@ activitiAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
         
         function loadStartForm () {
             $scope.jobs = undefined;
-            $http({method: 'GET', url: '/app/rest/activiti/process-definition-start-form/' + $scope.definition.id}).
+            $http({method: 'GET', url: '/app/rest/activiti/process-definition-start-form-definition/' + $scope.definition.id}).
             success(function(data, status, headers, config) {
                 $scope.startForm = data;
             });
@@ -158,7 +158,7 @@ activitiAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
         
         $scope.loadForms = function() {
             // Load forms
-            $http({method: 'GET', url: '/app/rest/activiti/process-definition-forms/' + $scope.definition.id}).
+            $http({method: 'GET', url: '/app/rest/activiti/process-definition-form-definitions/' + $scope.definition.id}).
             success(function(data, status, headers, config) {
                 $scope.forms = data;
                 $scope.tabData.tabs[3].info = data.length;
@@ -348,7 +348,7 @@ activitiAdminApp.controller('ShowProcessDefinitionDiagramPopupCrtl',
 
   $timeout(function() {
     $("#bpmnModel").attr("data-definition-id", definition.id);
-    $("#bpmnModel").attr("data-server-id", $rootScope.activeServer.id);
+    $("#bpmnModel").attr("data-server-id", $rootScope.activeServers['process']);
     $("#bpmnModel").load("./display/displaymodel.html?definitionId=" + definition.id);
   }, 200);
 
