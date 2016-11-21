@@ -19,6 +19,7 @@ import org.activiti.content.api.ContentItemQuery;
 import org.activiti.content.api.ContentService;
 import org.activiti.content.engine.impl.cmd.CreateContentItemCmd;
 import org.activiti.content.engine.impl.cmd.DeleteContentItemCmd;
+import org.activiti.content.engine.impl.cmd.DeleteContentItemsCmd;
 import org.activiti.content.engine.impl.cmd.GetContentItemStreamCmd;
 import org.activiti.content.engine.impl.cmd.SaveContentItemCmd;
 
@@ -45,6 +46,14 @@ public class ContentServiceImpl extends ServiceImpl implements ContentService {
   
   public void deleteContentItem(String contentItemId) {
     commandExecutor.execute(new DeleteContentItemCmd(contentItemId));
+  }
+  
+  public void deleteContentItemsByProcessInstanceId(String processInstanceId) {
+    commandExecutor.execute(new DeleteContentItemsCmd(processInstanceId, null));
+  }
+
+  public void deleteContentItemsByTaskId(String taskId) {
+    commandExecutor.execute(new DeleteContentItemsCmd(null, taskId));
   }
   
   public ContentItemQuery createContentItemQuery() {

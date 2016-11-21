@@ -28,4 +28,8 @@ public interface ContentItemDataManager extends DataManager<ContentItemEntity> {
   long findContentItemCountByQueryCriteria(ContentItemQueryImpl contentItemQuery);
 
   List<ContentItem> findContentItemsByQueryCriteria(ContentItemQueryImpl contentItemQuery, Page page);
+  
+  void deleteContentItemsByTaskId(String taskId);
+
+  void deleteContentItemsByProcessInstanceId(String processInstanceId);
 }

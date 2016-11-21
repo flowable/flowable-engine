@@ -114,7 +114,7 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
         break;
   
       default:
-        contentId = UNCATEGORIZED_PREFIX + ".";
+        contentId = UNCATEGORIZED_PREFIX;
         break;
     }
     contentId += "." + uuid;
@@ -183,10 +183,16 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
   protected File getContentFile(String id) {
     String[] ids = id.split("\\.");
     String type = ids[0];
-    File subFolder = PROCESS_INSTANCE_PREFIX.equals(type) ? processInstanceFolder : (TASK_PREFIX.equals(type) ? taskFolder : uncategorizedFolder);
-    File idFolder = new File(subFolder, ids[1]);
-    File contentFile = new File(idFolder, ids[2]);
-    return contentFile;
+    if (PROCESS_INSTANCE_PREFIX.equals(type) || TASK_PREFIX.equals(type)) {
+      File subFolder = PROCESS_INSTANCE_PREFIX.equals(type) ? processInstanceFolder : taskFolder;
+      File idFolder = new File(subFolder, ids[1]);
+      File contentFile = new File(idFolder, ids[2]);
+      return contentFile;
+    
+    } else {
+      File contentFile = new File(uncategorizedFolder, ids[1]);
+      return contentFile;
+    }
   }
 
   @Override

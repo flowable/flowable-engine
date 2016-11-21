@@ -23,20 +23,11 @@ import org.activiti.engine.impl.persistence.entity.Entity;
  */
 public interface ContentItemEntity extends ContentItem, Entity {
 
-  void setContentStoreId(String contentStoreId);
-  
-  void setContentStoreName(String contentStoreName);
-  
   void setContentAvailable(boolean contentAvailable);
   
   void setContentSize(Long contentSize);
 
   void setCreated(Date created);
 
-  void setCreatedBy(String submittedBy);
-  
   void setLastModified(Date lastModified);
-
-  void setLastModifiedBy(String lastModifiedBy);
-  
 }

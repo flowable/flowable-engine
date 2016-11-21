@@ -69,15 +69,15 @@
             CONTENT_STORE_ID_=#{contentStoreId, jdbcType=VARCHAR},
             CONTENT_STORE_NAME_=#{contentStoreName, jdbcType=VARCHAR},
             FIELD_=#{field, jdbcType=VARCHAR},
-            CONTENT_AVAILABLE_=#{contentSize, jdbcType=BOOLEAN},
+            CONTENT_AVAILABLE_=#{contentAvailable, jdbcType=BOOLEAN},
             CONTENT_SIZE_=#{contentSize, jdbcType=BIGINT},
-            TENANT_ID_=#{contentSize, jdbcType=BIGINT},
+            TENANT_ID_=#{tenantId, jdbcType=BIGINT},
             CREATED_=#{created, jdbcType=TIMESTAMP},
             CREATED_BY_=#{createdBy, jdbcType=TIMESTAMP},
             LAST_MODIFIED_=#{lastModified, jdbcType=TIMESTAMP},
             LAST_MODIFIED_BY_=#{lastModifiedBy, jdbcType=VARCHAR}
         </set>
-        where id = #{id, jdbcType=VARCHAR}
+        where ID_ = #{id, jdbcType=VARCHAR}
     </update>
     
     <select id="selectContentItem" parameterType="string" resultMap="contentItemResultMap">
@@ -220,6 +220,10 @@
 	
 	<delete id="deleteContentItemsByProcessInstanceId" parameterType="string">
 	   delete from ${prefix}ACT_CO_CONTENT_ITEM where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+	</delete>
+	
+	<delete id="deleteContentItemsByTaskId" parameterType="string">
+	   delete from ${prefix}ACT_CO_CONTENT_ITEM where TASK_ID_ = #{taskId, jdbcType=VARCHAR}
 	</delete>
 	
 </mapper>

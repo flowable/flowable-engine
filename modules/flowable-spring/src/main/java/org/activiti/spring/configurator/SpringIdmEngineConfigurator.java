@@ -33,25 +33,24 @@ public class SpringIdmEngineConfigurator extends AbstractProcessEngineConfigurat
   public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
     if (idmEngineConfiguration == null) {
       idmEngineConfiguration = new SpringIdmEngineConfiguration();
+    }
+    
+    if (processEngineConfiguration.getDataSource() != null) {
+      DataSource originalDatasource = processEngineConfiguration.getDataSource();
+      idmEngineConfiguration.setDataSource(originalDatasource);
       
-      if (processEngineConfiguration.getDataSource() != null) {
-        DataSource originalDatasource = processEngineConfiguration.getDataSource();
-        idmEngineConfiguration.setDataSource(originalDatasource);
-        
-      } else {
-        throw new ActivitiException("A datasource is required for initializing the IDM engine ");
-      }
-      
-      idmEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
-      idmEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
-      idmEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
-      
-      idmEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
-      
-      if (processEngineConfiguration.getEventDispatcher() != null) {
-        idmEngineConfiguration.setEventDispatcher(processEngineConfiguration.getEventDispatcher());
-      }
-      
+    } else {
+      throw new ActivitiException("A datasource is required for initializing the IDM engine ");
+    }
+    
+    idmEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
+    idmEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
+    idmEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
+    
+    idmEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
+    
+    if (processEngineConfiguration.getEventDispatcher() != null) {
+      idmEngineConfiguration.setEventDispatcher(processEngineConfiguration.getEventDispatcher());
     }
     
     IdmEngine idmEngine = idmEngineConfiguration.buildIdmEngine();

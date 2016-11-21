@@ -43,7 +43,11 @@ public interface ContentItem {
 
   String getContentStoreId();
   
+  void setContentStoreId(String contentStoreId);
+  
   String getContentStoreName();
+  
+  void setContentStoreName(String contentStoreName);
   
   boolean isContentAvailable();
   
@@ -61,8 +65,11 @@ public interface ContentItem {
 
   String getCreatedBy();
   
+  void setCreatedBy(String createdBy);
+  
   Date getLastModified();
 
   String getLastModifiedBy();
-
+  
+  void setLastModifiedBy(String lastModifiedBy);
 }

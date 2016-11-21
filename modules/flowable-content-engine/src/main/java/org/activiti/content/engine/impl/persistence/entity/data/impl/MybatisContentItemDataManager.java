@@ -53,4 +53,14 @@ public class MybatisContentItemDataManager extends AbstractDataManager<ContentIt
     final String query = "selectContentItemsByQueryCriteria";
     return getDbSqlSession().selectList(query, contentItemQuery, page);
   }
+  
+  @Override
+  public void deleteContentItemsByTaskId(String taskId) {
+    getDbSqlSession().delete("deleteContentItemsByTaskId", taskId);
+  }
+
+  @Override
+  public void deleteContentItemsByProcessInstanceId(String processInstanceId) {
+    getDbSqlSession().delete("deleteContentItemsByProcessInstanceId", processInstanceId);
+  }
 }

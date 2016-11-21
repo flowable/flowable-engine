@@ -14,9 +14,7 @@ package org.activiti.app.service.runtime;
 
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -165,29 +163,10 @@ public class ActivitiProcessDefinitionService {
   }
   
   protected List<ProcessDefinitionRepresentation> convertDefinitionList(List<ProcessDefinition> definitions) {
-    Map<String, Boolean> startFormMap = new HashMap<String, Boolean>();
     List<ProcessDefinitionRepresentation> result = new ArrayList<ProcessDefinitionRepresentation>();
     if (CollectionUtils.isNotEmpty(definitions)) {
       for (ProcessDefinition processDefinition : definitions) {
-        if (startFormMap.containsKey(processDefinition.getId()) == false) {
-          BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
-          List<StartEvent> startEvents = bpmnModel.getMainProcess().findFlowElementsOfType(StartEvent.class, false);
-          boolean hasStartForm = false;
-          for (StartEvent startEvent : startEvents) {
-            if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
-              FormModel formModel = formRepositoryService.getFormModelByKey(startEvent.getFormKey());
-              if (formModel != null) {
-                hasStartForm = true;
-                break;
-              }
-            }
-          }
-
-          startFormMap.put(processDefinition.getId(), hasStartForm);
-        }
-        
         ProcessDefinitionRepresentation rep = new ProcessDefinitionRepresentation(processDefinition);
-        rep.setHasStartForm(startFormMap.get(processDefinition.getId()));
         result.add(rep);
       }
     }

@@ -28,6 +28,10 @@ public interface ContentService {
   InputStream getContentItemData(String contentItemId);
   
   void deleteContentItem(String contentItemId);
+  
+  void deleteContentItemsByProcessInstanceId(String processInstanceId);
+  
+  void deleteContentItemsByTaskId(String taskId);
 
   ContentItemQuery createContentItemQuery();
 }

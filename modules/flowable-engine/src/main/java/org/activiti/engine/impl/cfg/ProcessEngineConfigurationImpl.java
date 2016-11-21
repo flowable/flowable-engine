@@ -35,6 +35,7 @@ import java.util.concurrent.ConcurrentMap;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
+import org.activiti.content.api.ContentService;
 import org.activiti.dmn.api.DmnRepositoryService;
 import org.activiti.dmn.api.DmnRuleService;
 import org.activiti.engine.ActivitiException;
@@ -379,6 +380,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean dmnEngineInitialized;
   protected DmnRepositoryService dmnEngineRepositoryService;
   protected DmnRuleService dmnEngineRuleService;
+  
+  // CONTENT ENGINE SERVICES /////////////////////////////////////////////////////
+  protected boolean contentEngineInitialized;
+  protected ContentService contentService;
 
   // COMMAND EXECUTORS ////////////////////////////////////////////////////////
 
@@ -2286,6 +2291,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setDmnEngineRuleService(DmnRuleService dmnEngineRuleService) {
     this.dmnEngineRuleService = dmnEngineRuleService;
+    return this;
+  }
+  
+  public boolean isContentEngineInitialized() {
+    return contentEngineInitialized;
+  }
+
+  public ProcessEngineConfigurationImpl setContentEngineInitialized(boolean contentEngineInitialized) {
+    this.contentEngineInitialized = contentEngineInitialized;
+    return this;
+  }
+
+  public ContentService getContentService() {
+    return contentService;
+  }
+
+  public ProcessEngineConfigurationImpl setContentService(ContentService contentService) {
+    this.contentService = contentService;
     return this;
   }
 

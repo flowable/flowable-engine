@@ -179,20 +179,32 @@
 			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-security/target">
 				<include name="flowable-spring-boot-starter-security-*.jar" />
 			</fileset>
-			<fileset dir="../modules/flowable-ui/flowable-app-logic/target">
-				<include name="flowable-app-logic-*.jar" />
+			<fileset dir="../modules/flowable-ui-idm/flowable-ui-idm-conf/target">
+				<include name="flowable-ui-idm-conf-*.jar" />
 			</fileset>
-			<fileset dir="../modules/flowable-ui/flowable-app-model/target">
-				<include name="flowable-app-model-*.jar" />
+			<fileset dir="../modules/flowable-ui-idm/flowable-ui-idm-logic/target">
+				<include name="flowable-ui-idm-logic-*.jar" />
 			</fileset>
-			<fileset dir="../modules/flowable-ui/flowable-app-rest/target">
-				<include name="flowable-app-rest-*.jar" />
+			<fileset dir="../modules/flowable-ui-idm/flowable-ui-idm-rest/target">
+				<include name="flowable-ui-idm-rest-*.jar" />
 			</fileset>
-			<fileset dir="../modules/flowable-ui/flowable-content-storage-api/target">
-				<include name="content-storage-api-*.jar" />
+			<fileset dir="../modules/flowable-ui-modeler/flowable-ui-modeler-conf/target">
+				<include name="flowable-ui-modeler-conf-*.jar" />
 			</fileset>
-			<fileset dir="../modules/flowable-ui/flowable-content-storage-fs/target">
-				<include name="content-storage-fs-*.jar" />
+			<fileset dir="../modules/flowable-ui-modeler/flowable-ui-modeler-logic/target">
+				<include name="flowable-ui-modeler-logic-*.jar" />
+			</fileset>
+			<fileset dir="../modules/flowable-ui-modeler/flowable-ui-modeler-rest/target">
+				<include name="flowable-ui-modeler-rest-*.jar" />
+			</fileset>
+			<fileset dir="../modules/flowable-ui-task/flowable-ui-task-conf/target">
+				<include name="flowable-ui-task-conf-*.jar" />
+			</fileset>
+			<fileset dir="../modules/flowable-ui-task/flowable-ui-task-logic/target">
+				<include name="flowable-ui-task-logic-*.jar" />
+			</fileset>
+			<fileset dir="../modules/flowable-ui-task/flowable-ui-task-rest/target">
+				<include name="flowable-ui-task-rest-*.jar" />
 			</fileset>
 			<fileset dir="../modules/flowable-osgi/target">
 				<include name="flowable-osgi-*.jar" />

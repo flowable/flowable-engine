@@ -14,6 +14,9 @@ package org.activiti.app.conf;
 
 import javax.sql.DataSource;
 
+import org.activiti.content.api.ContentService;
+import org.activiti.content.spring.SpringContentEngineConfiguration;
+import org.activiti.content.spring.configurator.SpringContentEngineConfigurator;
 import org.activiti.dmn.spring.configurator.SpringDmnEngineConfigurator;
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
@@ -53,6 +56,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class ActivitiEngineConfiguration {
 
     private final Logger logger = LoggerFactory.getLogger(ActivitiEngineConfiguration.class);
+    
+    private static final String PROP_FS_ROOT = "contentstorage.fs.rootFolder";
+    private static final String PROP_FS_CREATE_ROOT = "contentstorage.fs.createRoot";
     
     @Autowired
     private DataSource dataSource;
@@ -109,6 +115,22 @@ public class ActivitiEngineConfiguration {
     	
     	processEngineConfiguration.addConfigurator(new SpringFormEngineConfigurator());
       processEngineConfiguration.addConfigurator(new SpringDmnEngineConfigurator());
+      
+      SpringContentEngineConfiguration contentEngineConfiguration = new SpringContentEngineConfiguration();
+      String contentRootFolder = environment.getProperty(PROP_FS_ROOT);
+      if (contentRootFolder != null) {
+        contentEngineConfiguration.setContentRootFolder(contentRootFolder);
+      }
+      
+      Boolean createRootFolder = environment.getProperty(PROP_FS_CREATE_ROOT, Boolean.class);
+      if (createRootFolder != null) {
+        contentEngineConfiguration.setCreateContentRootFolder(createRootFolder);
+      }
+      
+      SpringContentEngineConfigurator springContentEngineConfigurator = new SpringContentEngineConfigurator();
+      springContentEngineConfigurator.setContentEngineConfiguration(contentEngineConfiguration);
+      
+      processEngineConfiguration.addConfigurator(springContentEngineConfigurator);
     	
     	return processEngineConfiguration;
     }
@@ -175,5 +197,10 @@ public class ActivitiEngineConfiguration {
     @Bean
     public org.activiti.form.api.FormService formEngineFormService() {
       return processEngine().getFormEngineFormService();
+    }
+    
+    @Bean
+    public ContentService contentService() {
+      return processEngine().getContentService();
     }
 }

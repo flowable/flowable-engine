@@ -15,11 +15,11 @@
 	
         <dependency>
             <groupId>org.flowable</groupId>
-            <artifactId>flowable-content-storage-api</artifactId>
+            <artifactId>flowable-content-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
-            <artifactId>flowable-content-storage-fs</artifactId>
+            <artifactId>flowable-content-engine</artifactId>
         </dependency>
 
 		<!-- Activiti -->
@@ -99,20 +99,6 @@
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-joda</artifactId>
 		</dependency>
-
-		<!-- DATABASE -->
-		 <dependency>
-          <groupId>org.mybatis</groupId>
-          <artifactId>mybatis</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.mybatis</groupId>
-          <artifactId>mybatis-spring</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.uuid</groupId>
-            <artifactId>java-uuid-generator</artifactId>
-        </dependency>
 
 		<!-- COMMON dependencies -->
 		<dependency>

@@ -44,6 +44,16 @@ public class ContentItemEntityManagerImpl extends AbstractEntityManager<ContentI
   public List<ContentItem> findContentItemsByQueryCriteria(ContentItemQueryImpl contentItemQuery, Page page) {
     return contentItemDataManager.findContentItemsByQueryCriteria(contentItemQuery, page);
   }
+  
+  @Override
+  public void deleteContentItemsByTaskId(String taskId) {
+    contentItemDataManager.deleteContentItemsByTaskId(taskId);
+  }
+
+  @Override
+  public void deleteContentItemsByProcessInstanceId(String processInstanceId) {
+    contentItemDataManager.deleteContentItemsByProcessInstanceId(processInstanceId);
+  }
 
   @Override
   protected DataManager<ContentItemEntity> getDataManager() {

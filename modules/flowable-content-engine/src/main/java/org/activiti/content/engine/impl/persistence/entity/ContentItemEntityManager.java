@@ -27,4 +27,8 @@ public interface ContentItemEntityManager extends EntityManager<ContentItemEntit
   List<ContentItem> findContentItemsByQueryCriteria(ContentItemQueryImpl formInstanceQuery, Page page);
 
   long findContentItemCountByQueryCriteria(ContentItemQueryImpl contentItemQuery);
+  
+  void deleteContentItemsByTaskId(String taskId);
+
+  void deleteContentItemsByProcessInstanceId(String processInstanceId);
 }
