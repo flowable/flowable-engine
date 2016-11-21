@@ -27,11 +27,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ActivitiDmnEngineConfiguration {
 
-  @Bean
   public DmnEngine ruleEngine() {
     DmnEngineConfiguration dmnEngineConfiguration = new StandaloneInMemDmnEngineConfiguration();
     dmnEngineConfiguration.setDatabaseSchemaUpdate(AbstractEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
     return dmnEngineConfiguration.buildDmnEngine();
+  }
+
+  @Bean
+  public DmnEngineConfiguration dmnEngineConfiguration() {
+    return ruleEngine().getDmnEngineConfiguration();
   }
 
   @Bean

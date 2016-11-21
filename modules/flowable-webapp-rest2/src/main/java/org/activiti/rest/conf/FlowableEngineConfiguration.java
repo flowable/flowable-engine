@@ -120,7 +120,7 @@ public class FlowableEngineConfiguration {
   public ManagementService managementService() {
     return processEngine().getManagementService();
   }
-  
+
   @Bean
   public FormRepositoryService formRepositoryService() {
     return processEngine().getFormEngineRepositoryService();

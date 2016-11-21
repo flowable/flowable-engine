@@ -38,73 +38,74 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @RestController
 public class ProcessDefinitionClientResource extends AbstractClientResource {
 
-	@Autowired
-	protected ProcessDefinitionService clientService;
+  @Autowired
+  protected ProcessDefinitionService clientService;
 
-	@Autowired
-	private ProcessInstanceService processInstanceService;
+  @Autowired
+  private ProcessInstanceService processInstanceService;
 
-	@Autowired
-	private JobService jobService;
+  @Autowired
+  private JobService jobService;
 
-	protected ObjectMapper objectMapper = new ObjectMapper();
+  @Autowired
+  protected ObjectMapper objectMapper;
 
-	/**
-	 * GET /rest/authenticate -> check if the user is authenticated, and return
-	 * its login.
-	 */
-	@RequestMapping(value = "/rest/activiti/process-definitions/{definitionId}", method = RequestMethod.GET, produces = "application/json")
-	public JsonNode getProcessDefinition(@PathVariable String definitionId) throws BadRequestException {
+  /**
+   * GET /rest/authenticate -> check if the user is authenticated, and return
+   * its login.
+   */
+  @RequestMapping(value = "/rest/activiti/process-definitions/{definitionId}", method = RequestMethod.GET, produces = "application/json")
+  public JsonNode getProcessDefinition(@PathVariable String definitionId) throws BadRequestException {
 
-		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-		try {
-			return clientService.getProcessDefinition(serverConfig, definitionId);
-		} catch (ActivitiServiceException e) {
-			throw new BadRequestException(e.getMessage());
-		}
-	}
+    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+    try {
+      return clientService.getProcessDefinition(serverConfig, definitionId);
+    } catch (ActivitiServiceException e) {
+      throw new BadRequestException(e.getMessage());
+    }
+  }
 
-	@RequestMapping(value = "/rest/activiti/process-definitions/{definitionId}", method = RequestMethod.PUT, produces = "application/json")
-	public JsonNode updateProcessDefinitionCategory(@PathVariable String definitionId,
-		 @RequestBody ObjectNode updateBody) throws BadRequestException {
+  @RequestMapping(value = "/rest/activiti/process-definitions/{definitionId}", method = RequestMethod.PUT, produces = "application/json")
+  public JsonNode updateProcessDefinitionCategory(@PathVariable String definitionId,
+                                                  @RequestBody ObjectNode updateBody) throws BadRequestException {
 
-		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-		if(updateBody.has("category")) {
-			try {
+    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+    if (updateBody.has("category")) {
+      try {
 
-				String category = null;
-				if(!updateBody.get("category").isNull()) {
-					category = updateBody.get("category").asText();
-				}
-				return clientService.updateProcessDefinitionCategory(serverConfig, definitionId, category);
-			} catch (ActivitiServiceException e) {
-				e.printStackTrace();
-				throw new BadRequestException(e.getMessage());
-			}
-		} else {
-			throw new BadRequestException("Category is required in body");
-		}
-	}
+        String category = null;
+        if (!updateBody.get("category").isNull()) {
+          category = updateBody.get("category").asText();
+        }
+        return clientService.updateProcessDefinitionCategory(serverConfig, definitionId, category);
+      } catch (ActivitiServiceException e) {
+        e.printStackTrace();
+        throw new BadRequestException(e.getMessage());
+      }
+    } else {
+      throw new BadRequestException("Category is required in body");
+    }
+  }
 
-	@RequestMapping(value = "/rest/activiti/process-definitions/{definitionId}/process-instances", method = RequestMethod.GET, produces = "application/json")
-	public JsonNode getProcessInstances(@PathVariable String definitionId) throws BadRequestException {
-		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-		try {
-			ObjectNode bodyNode = objectMapper.createObjectNode();
-			bodyNode.put("processDefinitionId", definitionId);
-			return processInstanceService.listProcesInstancesForProcessDefinition(bodyNode, serverConfig);
-		} catch (ActivitiServiceException e) {
-			throw new BadRequestException(e.getMessage());
-		}
-	}
+  @RequestMapping(value = "/rest/activiti/process-definitions/{definitionId}/process-instances", method = RequestMethod.GET, produces = "application/json")
+  public JsonNode getProcessInstances(@PathVariable String definitionId) throws BadRequestException {
+    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+    try {
+      ObjectNode bodyNode = objectMapper.createObjectNode();
+      bodyNode.put("processDefinitionId", definitionId);
+      return processInstanceService.listProcesInstancesForProcessDefinition(bodyNode, serverConfig);
+    } catch (ActivitiServiceException e) {
+      throw new BadRequestException(e.getMessage());
+    }
+  }
 
-	@RequestMapping(value = "/rest/activiti/process-definitions/{definitionId}/jobs", method = RequestMethod.GET, produces = "application/json")
-	public JsonNode getJobs(@PathVariable String definitionId) throws BadRequestException {
-		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-		try {
-			return jobService.listJobs(serverConfig, Collections.singletonMap("processDefinitionId", new String[] {definitionId}));
-		} catch (ActivitiServiceException e) {
-			throw new BadRequestException(e.getMessage());
-		}
-	}
+  @RequestMapping(value = "/rest/activiti/process-definitions/{definitionId}/jobs", method = RequestMethod.GET, produces = "application/json")
+  public JsonNode getJobs(@PathVariable String definitionId) throws BadRequestException {
+    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+    try {
+      return jobService.listJobs(serverConfig, Collections.singletonMap("processDefinitionId", new String[]{definitionId}));
+    } catch (ActivitiServiceException e) {
+      throw new BadRequestException(e.getMessage());
+    }
+  }
 }

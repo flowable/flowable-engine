@@ -111,23 +111,23 @@
 					</div>
 					
 					<div class="grid-wrapper grid-wrapper-compact" ng-if="decisionTables && tabData.activeTab == tabData.tabs[2].id">
-						<div class="grid-message" ng-if="decisionTables.size > 0">
+						<div class="grid-message" ng-if="decisionTables.length > 0">
 	                        <span>{{'PROCESS-DEFINITION.DECISION-TABLES-SIZE' | translate:decisionTables}}</span>
 	                    </div>
-	                     <div class="grid-message" ng-if="decisionTables.size == 0">
+	                     <div class="grid-message" ng-if="decisionTables.length == 0">
 	                        <span>{{'PROCESS-DEFINITION.DECISION-TABLES-EMPTY' | translate}}</span>
 	                    </div>
-						<div ng-grid="gridDecisionTables" class="gridStyle" ng-if="decisionTables" ng-show="decisionTables.size > 0"></div>
+						<div ng-grid="gridDecisionTables" class="gridStyle" ng-if="decisionTables" ng-show="decisionTables.length > 0"></div>
 					</div>
 					
 					<div class="grid-wrapper grid-wrapper-compact" ng-if="forms && tabData.activeTab == tabData.tabs[3].id">
-						<div class="grid-message" ng-if="forms.size > 0">
+						<div class="grid-message" ng-if="forms.length > 0">
 	                        <span>{{'PROCESS-DEFINITION.FORMS-SIZE' | translate:forms}}</span>
 	                    </div>
-	                     <div class="grid-message" ng-if="forms.size == 0">
+	                     <div class="grid-message" ng-if="forms.length == 0">BBBB
 	                        <span>{{'PROCESS-DEFINITION.FORMS-EMPTY' | translate}}</span>
 	                    </div>
-						<div ng-grid="gridForms" class="gridStyle" ng-if="forms" ng-show="forms.size > 0"></div>
+						<div ng-grid="gridForms" class="gridStyle" ng-if="forms" ng-show="forms.length > 0"></div>
 					</div>
 
 	        	</div>

@@ -88,12 +88,6 @@ activitiAdminApp.controller('DecisionTableController', ['$scope', '$rootScope', 
                 success(function (auditsData, status, headers, config) {
                     $scope.decisionAudits = auditsData;
                 });
-                
-                $http({method: 'GET', url: '/app/rest/activiti/app?dmnDeploymentId=' + data.deploymentId}).
-                success(function(appData, status, headers, config) {
-                    $scope.appId = appData.id;
-                });
-                
             }).
             error(function (data, status, headers, config) {
                 if (data && data.message) {

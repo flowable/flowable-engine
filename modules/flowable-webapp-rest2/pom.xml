@@ -12,7 +12,7 @@
     <relativePath>../..</relativePath>
     <version>6.0.0.RC1-SNAPSHOT</version>
   </parent>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -475,7 +475,7 @@
       </build>
     </profile>
   </profiles>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.flowable</groupId>

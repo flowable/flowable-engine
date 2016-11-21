@@ -10,38 +10,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.rest.form.service.api.repository;
+package org.activiti.rest.service.api.repository;
 
-import org.activiti.form.api.FormDefinition;
+import org.activiti.dmn.api.DecisionTable;
 
 /**
  * @author Yvo Swillens
  */
-public class FormDefinitionResponse {
+public class DecisionTableResponse {
 
-  protected String id;
-  protected String url;
-  protected String category;
-  protected String name;
-  protected String key;
-  protected String description;
-  protected int version;
-  protected String resourceName;
-  protected String deploymentId;
-  protected String parentDeploymentId;
-  protected String tenantId;
+  private String id;
+  private String category;
+  private String name;
+  private String key;
+  private String description;
+  private int version;
+  private String resourceName;
+  private String deploymentId;
+  private String parentDeploymentId;
+  private String tenantId;
+  private String url;
 
-  public FormDefinitionResponse(FormDefinition formDefinition) {
-    setId(formDefinition.getId());
-    setCategory(formDefinition.getCategory());
-    setName(formDefinition.getName());
-    setKey(formDefinition.getKey());
-    setDescription(formDefinition.getDescription());
-    setVersion(formDefinition.getVersion());
-    setResourceName(formDefinition.getResourceName());
-    setDeploymentId(formDefinition.getDeploymentId());
-    setParentDeploymentId(formDefinition.getParentDeploymentId());
-    setTenantId(formDefinition.getTenantId());
+  public DecisionTableResponse(DecisionTable decisionTable) {
+    this.id = decisionTable.getId();
+    this.category = decisionTable.getCategory();
+    this.name = decisionTable.getName();
+    this.key = decisionTable.getKey();
+    this.description = decisionTable.getDescription();
+    this.version = decisionTable.getVersion();
+    this.resourceName = decisionTable.getResourceName();
+    this.deploymentId = decisionTable.getDeploymentId();
+    this.parentDeploymentId = decisionTable.getParentDeploymentId();
+    this.tenantId = decisionTable.getTenantId();
   }
 
   public String getId() {
@@ -50,14 +50,6 @@ public class FormDefinitionResponse {
 
   public void setId(String id) {
     this.id = id;
-  }
-
-  public String getUrl() {
-    return url;
-  }
-
-  public void setUrl(String url) {
-    this.url = url;
   }
 
   public String getCategory() {
@@ -130,5 +122,13 @@ public class FormDefinitionResponse {
 
   public void setTenantId(String tenantId) {
     this.tenantId = tenantId;
+  }
+
+  public String getUrl() {
+    return url;
+  }
+
+  public void setUrl(String url) {
+    this.url = url;
   }
 }

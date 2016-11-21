@@ -20,13 +20,16 @@ import org.activiti.form.api.FormService;
 import org.activiti.form.model.FormModel;
 import org.activiti.rest.form.FormRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Yvo Swillens
  */
+@RestController
 public class FormInstanceResource {
 
   @Autowired
@@ -35,24 +38,29 @@ public class FormInstanceResource {
   @Autowired
   protected FormRestResponseFactory formRestResponseFactory;
 
-  @RequestMapping(value = "/form/submitted-form", method = RequestMethod.POST, produces = "application/json")
-  public void storeFormInstance(@RequestBody FormDefinitionRequest formDefinitionRequest, HttpServletRequest request) {
+  @RequestMapping(value = "/form/form-instance/{formInstanceId}", method = RequestMethod.GET, produces = "application/json")
+  public FormInstanceResponse getFormInstance(@PathVariable String formInstanceId, HttpServletRequest request) {
+    return formRestResponseFactory.createFormInstanceResponse(formService.createFormInstanceQuery().id(formInstanceId).singleResult());
+  }
+
+  @RequestMapping(value = "/form/form-instance", method = RequestMethod.POST, produces = "application/json")
+  public void storeFormInstance(@RequestBody FormRequest formRequest, HttpServletRequest request) {
 
     FormModel formModel;
 
-    if (formDefinitionRequest.getFormDefinitionKey() != null) {
+    if (formRequest.getFormDefinitionKey() != null) {
       formModel = formService.getFormModelWithVariablesByKey(
-          formDefinitionRequest.getFormDefinitionKey(),
-          formDefinitionRequest.getProcessInstanceId(),
-          formDefinitionRequest.getVariables(),
-          formDefinitionRequest.getTenantId()
+          formRequest.getFormDefinitionKey(),
+          formRequest.getProcessInstanceId(),
+          formRequest.getVariables(),
+          formRequest.getTenantId()
       );
-    } else if (formDefinitionRequest.getFormId() != null) {
+    } else if (formRequest.getFormId() != null) {
       formModel = formService.getFormModelWithVariablesById(
-          formDefinitionRequest.getFormId(),
-          formDefinitionRequest.getProcessInstanceId(),
-          formDefinitionRequest.getVariables(),
-          formDefinitionRequest.getTenantId()
+          formRequest.getFormId(),
+          formRequest.getProcessInstanceId(),
+          formRequest.getVariables(),
+          formRequest.getTenantId()
       );
     } else {
       throw new ActivitiIllegalArgumentException("Either form definition key or form id must be provided in the request");
@@ -62,7 +70,7 @@ public class FormInstanceResource {
       throw new ActivitiObjectNotFoundException("Could not find a form definition");
     }
 
-    formService.createFormInstance(formDefinitionRequest.getVariables(), formModel, formDefinitionRequest.getTaskId(),
-        formDefinitionRequest.getProcessInstanceId());
+    formService.createFormInstance(formRequest.getVariables(), formModel, formRequest.getTaskId(),
+        formRequest.getProcessInstanceId());
   }
 }
