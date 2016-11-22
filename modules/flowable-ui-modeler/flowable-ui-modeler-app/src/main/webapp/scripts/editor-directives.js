@@ -186,16 +186,6 @@ angular.module('activitiModeler').directive('formBuilderElement', ['$rootScope',
 
                     $scope.newOption = {name: ''};
 
-                    if ($scope.formElement.type === 'radio-buttons' && options.length > 4) {
-                        $scope.formElement.sizeY = 3;
-
-                    } else if ($scope.formElement.type === 'radio-buttons' && options.length > 1) {
-                        $scope.formElement.sizeY = 2;
-
-                    } else {
-                        $scope.formElement.sizeY = 1;
-                    }
-
                     // if first additional option; first option is defaulted
                     if (options.length == 2) {
                         $scope.formElement.value = $scope.formElement.options[0].name;
@@ -250,10 +240,6 @@ angular.module('activitiModeler').directive('formBuilderElement', ['$rootScope',
                         // Update the element's name
                         $scope.formElement.name = newValue.name;
                     }
-
-                    $scope.formElement.sizeX = 1;
-                    $scope.formElement.sizeY = 1;
-
                 } else {
                     $scope.pristine = false;
                 }
