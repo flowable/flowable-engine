@@ -21,6 +21,7 @@ import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.activiti.engine.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.activiti.engine.impl.cfg.multitenant.TenantInfoHolder;
+import org.activiti.engine.impl.cmd.UnacquireOwnedJobsCmd;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
 import org.slf4j.Logger;
@@ -92,6 +93,15 @@ public class SharedExecutorServiceAsyncExecutor extends DefaultAsyncJobExecutor 
     stopThreadsForTenant(tenantId);
   }
   
+  @Override
+  protected void unlockOwnedJobs() {
+    for (String tenantId : timerJobAcquisitionThreads.keySet()) {
+      tenantInfoHolder.setCurrentTenantId(tenantId);
+      commandExecutor.execute(new UnacquireOwnedJobsCmd(lockOwner, tenantId));
+      tenantInfoHolder.clearCurrentTenantId();
+    }
+  }
+
   @Override
   protected void startJobAcquisitionThread() {
     for (String tenantId : timerJobAcquisitionThreads.keySet()) {

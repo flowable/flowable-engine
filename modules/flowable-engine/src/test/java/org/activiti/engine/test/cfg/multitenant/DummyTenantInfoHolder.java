@@ -58,9 +58,9 @@ public class DummyTenantInfoHolder implements TenantInfoHolder {
     return currentTenantId.get();
   }
   
- public void clearCurrentTenantId() {
-   currentTenantId.set(null);
-}
+  public void clearCurrentTenantId() {
+    currentTenantId.set(null);
+  }
   
   public void addTenant(String tenantId) {
     tenantToUserMapping.put(tenantId, new ArrayList<String>());

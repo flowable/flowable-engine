@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.activiti.engine.impl.asyncexecutor.AbstractAsyncJobExecutor;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.activiti.engine.impl.cfg.multitenant.TenantInfoHolder;
@@ -67,8 +68,8 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
       tenantExecutor = tenantAwareAyncExecutorFactory.createAsyncExecutor(tenantId);
     }
     
-    if (tenantExecutor instanceof DefaultAsyncJobExecutor) {
-      DefaultAsyncJobExecutor defaultAsyncJobExecutor = (DefaultAsyncJobExecutor) tenantExecutor;
+    if (tenantExecutor instanceof AbstractAsyncJobExecutor) {
+      AbstractAsyncJobExecutor defaultAsyncJobExecutor = (AbstractAsyncJobExecutor) tenantExecutor;
       defaultAsyncJobExecutor.setAsyncJobsDueRunnable(new TenantAwareAcquireAsyncJobsDueRunnable(defaultAsyncJobExecutor, tenantInfoHolder, tenantId));
       defaultAsyncJobExecutor.setTimerJobRunnable(new TenantAwareAcquireTimerJobsRunnable(defaultAsyncJobExecutor, tenantInfoHolder, tenantId));
       defaultAsyncJobExecutor.setExecuteAsyncRunnableFactory(new TenantAwareExecuteAsyncRunnableFactory(tenantInfoHolder, tenantId));
@@ -79,7 +80,7 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
     tenantExecutors.put(tenantId, tenantExecutor);
     
     if (startExecutor) {
-      tenantExecutor.start();
+      startTenantExecutor(tenantId);
     }
   }
   
@@ -95,6 +96,11 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
 
   public boolean executeAsyncJob(JobEntity job) {
     return determineAsyncExecutor().executeAsyncJob(job);
+  }
+  
+  @Override
+  public int getRemainingCapacity() {
+    return determineAsyncExecutor().getRemainingCapacity();
   }
 
   public void setCommandExecutor(CommandExecutor commandExecutor) {
@@ -122,10 +128,16 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
   }
 
   public void start() {
-    for (AsyncExecutor asyncExecutor : tenantExecutors.values()) {
-      asyncExecutor.start();
+    for (String tenantId : tenantExecutors.keySet()) {
+      startTenantExecutor(tenantId);
     }
     active = true;
+  }
+
+  private void startTenantExecutor(String tenantId) {
+    tenantInfoHolder.setCurrentTenantId(tenantId);
+    tenantExecutors.get(tenantId).start();
+    tenantInfoHolder.clearCurrentTenantId();
   }
 
   public synchronized void shutdown() {
