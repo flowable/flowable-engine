@@ -199,6 +199,18 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", "123");
     assertEquals(2, runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("123").count());
   }
+  
+  @Deployment(resources = { "org/activiti/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  public void testStartProcessInstanceFormWithoutFormKey() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("basicType", new DummySerializable());
+    
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    
+    runtimeService.startProcessInstanceWithForm(processDefinition.getId(), null, vars, null);
+    Task task = taskService.createTaskQuery().includeProcessVariables().singleResult();
+    assertNotNull(task.getProcessVariables());
+  }
 
   // some databases might react strange on having multiple times null for the
   // business key

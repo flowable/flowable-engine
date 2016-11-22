@@ -22,11 +22,11 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Tom Baeyens
  */
-public abstract class AbstractTestCase extends TestCase {
+public abstract class AbstractContentTestCase extends TestCase {
 
   protected static final String EMPTY_LINE = "\n";
 
-  protected static Logger log = LoggerFactory.getLogger(AbstractTestCase.class);
+  protected static Logger log = LoggerFactory.getLogger(AbstractContentTestCase.class);
 
   protected boolean isEmptyLinesEnabled = true;
 

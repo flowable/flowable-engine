@@ -73,15 +73,20 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     FormRepositoryService formRepositoryService = processEngineConfiguration.getFormEngineRepositoryService();
     FormModel formModel = formRepositoryService.getFormModelById(formDefinitionId);
 
-    // Extract raw variables and complete the task
-    FormService formService = processEngineConfiguration.getFormEngineFormService();
-    Map<String, Object> formVariables = formService.getVariablesFromFormSubmission(formModel, variables, outcome);
-    
-    formService.createFormInstance(formVariables, formModel, task.getId(), task.getProcessInstanceId());
-    
-    processUploadFieldsIfNeeded(formModel, task, commandContext);
-    
-    TaskHelper.completeTask(task, formVariables, transientVariables, localScope, commandContext);
+    if (formModel != null) {
+      // Extract raw variables and complete the task
+      FormService formService = processEngineConfiguration.getFormEngineFormService();
+      Map<String, Object> formVariables = formService.getVariablesFromFormSubmission(formModel, variables, outcome);
+      
+      formService.createFormInstance(formVariables, formModel, task.getId(), task.getProcessInstanceId());
+      
+      processUploadFieldsIfNeeded(formModel, task, commandContext);
+      
+      TaskHelper.completeTask(task, formVariables, transientVariables, localScope, commandContext);
+      
+    } else {
+      TaskHelper.completeTask(task, variables, transientVariables, localScope, commandContext);
+    }
     return null;
   }
   

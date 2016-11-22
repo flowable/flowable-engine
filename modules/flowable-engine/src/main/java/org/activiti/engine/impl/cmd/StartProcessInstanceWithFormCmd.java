@@ -96,9 +96,11 @@ public class StartProcessInstanceWithFormCmd implements Command<ProcessInstance>
     ProcessInstance processInstance = createAndStartProcessInstance(processDefinition, processInstanceName, 
         variables, commandContext);
     
-    formService.createFormInstance(formVariables, formModel, null, processInstance.getId());
-    
-    processUploadFieldsIfNeeded(formModel, processInstance.getId(), commandContext);
+    if (formModel != null) {
+      formService.createFormInstance(formVariables, formModel, null, processInstance.getId());
+      
+      processUploadFieldsIfNeeded(formModel, processInstance.getId(), commandContext);
+    }
 
     return processInstance;
   }
