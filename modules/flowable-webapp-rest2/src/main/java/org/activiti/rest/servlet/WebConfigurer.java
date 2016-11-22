@@ -17,6 +17,7 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
 /**
  * Configuration of web application with Servlet 3.0 APIs.
@@ -64,50 +65,34 @@ public class WebConfigurer implements ServletContextListener {
    * Initializes Process Spring and Spring MVC .
    */
   private ServletRegistration.Dynamic initSpringProcessRest(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
-    log.debug("Configuring Spring Web application context - Process REST");
-    AnnotationConfigWebApplicationContext dispatcherServletConfiguration = new AnnotationConfigWebApplicationContext();
-    dispatcherServletConfiguration.setParent(rootContext);
-    dispatcherServletConfiguration.register(ProcessDispatcherServletConfiguration.class);
-
-    log.debug("Registering Spring MVC Servlet - Process REST");
-    ServletRegistration.Dynamic dispatcherServlet = servletContext.addServlet("process-dispatcher", new DispatcherServlet(dispatcherServletConfiguration));
-    dispatcherServlet.addMapping("/service/*");
-    dispatcherServlet.setLoadOnStartup(1);
-    dispatcherServlet.setAsyncSupported(true);
-
-    return dispatcherServlet;
+    return initSpringRestComponent(servletContext, rootContext, "process", "", ProcessDispatcherServletConfiguration.class);
   }
 
   /**
    * Initializes DMN Spring and Spring MVC.
    */
-  private ServletRegistration.Dynamic initSpringDMNRest(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
-    log.debug("Configuring Spring Web application context - DMN REST");
-    AnnotationConfigWebApplicationContext dispatcherServletConfiguration = new AnnotationConfigWebApplicationContext();
-    dispatcherServletConfiguration.setParent(rootContext);
-    dispatcherServletConfiguration.register(DmnDispatcherServletConfiguration.class);
-
-    log.debug("Registering Spring MVC Servlet - DMN REST");
-    ServletRegistration.Dynamic dispatcherServlet = servletContext.addServlet("dmn-dispatcher", new DispatcherServlet(dispatcherServletConfiguration));
-    dispatcherServlet.addMapping("/dmn/service/*");
-    dispatcherServlet.setLoadOnStartup(1);
-    dispatcherServlet.setAsyncSupported(true);
-
-    return dispatcherServlet;
+  protected ServletRegistration.Dynamic initSpringDMNRest(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
+    return initSpringRestComponent(servletContext, rootContext, "dmn", "/dmn", DmnDispatcherServletConfiguration.class);
   }
 
   /**
    * Initializes Form Spring and Spring MVC.
    */
-  private ServletRegistration.Dynamic initSpringFormRest(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
-    log.debug("Configuring Spring Web application context - Form REST");
+  protected ServletRegistration.Dynamic initSpringFormRest(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
+    return initSpringRestComponent(servletContext, rootContext, "form", "/form", FormDispatcherServletConfiguration.class);
+  }
+  
+  protected ServletRegistration.Dynamic initSpringRestComponent(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext,
+      String name, String restContextRoot, Class<? extends WebMvcConfigurationSupport> webConfigClass) {
+    
+    log.debug("Configuring Spring Web application context - " + name + " REST");
     AnnotationConfigWebApplicationContext dispatcherServletConfiguration = new AnnotationConfigWebApplicationContext();
     dispatcherServletConfiguration.setParent(rootContext);
-    dispatcherServletConfiguration.register(FormDispatcherServletConfiguration.class);
+    dispatcherServletConfiguration.register(webConfigClass);
 
-    log.debug("Registering Spring MVC Servlet - Form REST");
-    ServletRegistration.Dynamic dispatcherServlet = servletContext.addServlet("form-dispatcher", new DispatcherServlet(dispatcherServletConfiguration));
-    dispatcherServlet.addMapping("/form/service/*");
+    log.debug("Registering Spring MVC Servlet - " + name + " REST");
+    ServletRegistration.Dynamic dispatcherServlet = servletContext.addServlet(name + "-dispatcher", new DispatcherServlet(dispatcherServletConfiguration));
+    dispatcherServlet.addMapping(restContextRoot + "/service/*");
     dispatcherServlet.setLoadOnStartup(1);
     dispatcherServlet.setAsyncSupported(true);
 
@@ -117,7 +102,7 @@ public class WebConfigurer implements ServletContextListener {
   /**
    * Initializes Spring Security.
    */
-  private void initSpringSecurity(ServletContext servletContext, EnumSet<DispatcherType> disps) {
+  protected void initSpringSecurity(ServletContext servletContext, EnumSet<DispatcherType> disps) {
     log.debug("Registering Spring Security Filter");
     FilterRegistration.Dynamic springSecurityFilter = servletContext.addFilter("springSecurityFilterChain", new DelegatingFilterProxy());
 

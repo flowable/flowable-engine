@@ -17,6 +17,8 @@ import javax.sql.DataSource;
 import org.activiti.content.api.ContentService;
 import org.activiti.content.spring.SpringContentEngineConfiguration;
 import org.activiti.content.spring.configurator.SpringContentEngineConfigurator;
+import org.activiti.dmn.api.DmnRepositoryService;
+import org.activiti.dmn.api.DmnRuleService;
 import org.activiti.dmn.spring.configurator.SpringDmnEngineConfigurator;
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
@@ -197,6 +199,16 @@ public class ActivitiEngineConfiguration {
     @Bean
     public org.activiti.form.api.FormService formEngineFormService() {
       return processEngine().getFormEngineFormService();
+    }
+    
+    @Bean
+    public DmnRepositoryService dmnRepositoryService() {
+      return processEngine().getDmnRepositoryService();
+    }
+    
+    @Bean
+    public DmnRuleService dmnRuleService() {
+      return processEngine().getDmnRuleService();
     }
     
     @Bean

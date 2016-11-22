@@ -7,19 +7,19 @@
 	<changeSet id="1" author="flowable">
 
         <createTable tableName="ACT_ADM_SERVER_CONFIG">
-            <column name="id" type="varchar(255)">
+            <column name="ID_" type="varchar(255)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
-            <column name="name" type="varchar(50)" />
-            <column name="description" type="varchar(255)" />
-            <column name="server_address" type="varchar(100)" />
-            <column name="port" type="integer" />
-            <column name="context_root" type="varchar(100)" />
-            <column name="rest_root" type="varchar(100)" />
-            <column name="user_name" type="varchar(100)" />
-            <column name="password" type="varchar(100)" />
-            <column name="endpoint_type" type="int" />
-            <column name="tenant_id" type="varchar(50)" />
+            <column name="NAME_" type="varchar(50)" />
+            <column name="DESCRIPTION_" type="varchar(255)" />
+            <column name="SERVER_ADDRESS_" type="varchar(100)" />
+            <column name="PORT_" type="integer" />
+            <column name="CONTEXT_ROOT_" type="varchar(100)" />
+            <column name="REST_ROOT_" type="varchar(100)" />
+            <column name="USER_NAME_" type="varchar(100)" />
+            <column name="PASSWORD_" type="varchar(100)" />
+            <column name="ENDPOINT_TYPE_" type="int" />
+            <column name="TENANT_ID_" type="varchar(50)" />
         </createTable>
 
 	</changeSet>

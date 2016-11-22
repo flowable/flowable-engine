@@ -118,10 +118,9 @@ public class SecurityConfiguration {
 					.and()
 				.csrf()
 					.disable()
-				.antMatcher("/api" + "/**")
-				.authorizeRequests()
-					.antMatchers("/api" + "/**").authenticated()
-					.and().httpBasic();
+				.antMatcher("/*-api/**").authorizeRequests()
+  			  .antMatchers("/*-api/**").authenticated()
+  			.and().httpBasic();
 		}
 	}
 }

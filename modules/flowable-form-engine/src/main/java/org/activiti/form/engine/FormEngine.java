@@ -21,7 +21,7 @@ public interface FormEngine {
     /**
      * the version of the activiti form library
      */
-    public static String VERSION = "6.0.0";
+    public static String VERSION = "6.0.0.0";
 
     /**
      * The name as specified in 'process-engine-name' in the activiti.cfg.xml configuration file. The default name for a process engine is 'default
