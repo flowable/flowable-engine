@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * @author Yvo Swillens
  */
-public class FormDefinitionRequest {
+public class FormRequest {
 
   private String formId;
   private String formDefinitionKey;

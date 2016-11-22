@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.dmn.api.DecisionTable;
 import org.activiti.engine.app.AppModel;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.engine.repository.DeploymentQuery;
@@ -30,6 +31,7 @@ import org.activiti.engine.repository.NativeProcessDefinitionQuery;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.task.IdentityLink;
+import org.activiti.form.api.FormDefinition;
 import org.activiti.validation.ValidationError;
 
 /**
@@ -40,6 +42,7 @@ import org.activiti.validation.ValidationError;
  * @author Tijs Rademakers
  * @author Joram Barrez
  * @author Henry Yan
+ * @author Yvo Swillens
  */
 public interface RepositoryService {
 
@@ -471,5 +474,23 @@ public interface RepositoryService {
    * 
    */
   List<ValidationError> validateProcess(BpmnModel bpmnModel);
+
+  /**
+   * Retrieves the {@link DecisionTable}s associated with the given process definition.
+   *
+   * @param processDefinitionId
+   *          id of the process definition, cannot be null.
+   *
+   */
+  List<DecisionTable> getDecisionTablesForProcessDefinition(String processDefinitionId);
+
+  /**
+   * Retrieves the {@link java.text.Normalizer.Form}s associated with the given process definition.
+   *
+   * @param processDefinitionId
+   *          id of the process definition, cannot be null.
+   *
+   */
+  List<FormDefinition> getFormDefinitionsForProcessDefinition(String processDefinitionId);
 
 }

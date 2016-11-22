@@ -105,16 +105,6 @@ activitiAdminApp
               	.when('/process-definitions-refresh', {
               		redirectTo: '/process-definitions'
               	})
-                .when('/apps', {
-                    templateUrl: 'views/app-deployments.html',
-                    controller: 'AppDeploymentsController',
-                    reloadOnSearch: true
-                })
-                .when('/app/:appId', {
-                    templateUrl: 'views/app-deployment.html',
-                    controller: 'AppDeploymentController',
-                    reloadOnSearch: true
-                })
                 .when('/decision-tables', {
                     templateUrl: 'views/decision-tables.html',
                     controller: 'DecisionTablesController',
@@ -125,19 +115,19 @@ activitiAdminApp
                     controller: 'DecisionTableController',
                     reloadOnSearch: true
                 })
-                .when('/forms', {
-                    templateUrl: 'views/forms.html',
-                    controller: 'FormsController',
+                .when('/form-definitions', {
+                    templateUrl: 'views/form-definitions.html',
+                    controller: 'FormDefinitionsController',
                     reloadOnSearch: true
                 })
-                .when('/form/:formId', {
-                    templateUrl: 'views/form.html',
-                    controller: 'FormController',
+                .when('/form-definition/:formId', {
+                    templateUrl: 'views/form-definition.html',
+                    controller: 'FormDefinitionController',
                     reloadOnSearch: true
                 })
-                .when('/submitted-form/:submittedFormId', {
-                    templateUrl: 'views/submitted-form.html',
-                    controller: 'SubmittedFormController',
+                .when('/form-instance/:formInstanceId', {
+                    templateUrl: 'views/form-instance.html',
+                    controller: 'FormInstanceController',
                     reloadOnSearch: true
                 })
                 .otherwise({

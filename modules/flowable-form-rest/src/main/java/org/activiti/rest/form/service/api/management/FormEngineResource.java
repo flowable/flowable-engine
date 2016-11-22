@@ -33,17 +33,16 @@ public class FormEngineResource {
     try {
       FormEngine formEngine = FormEngines.getDefaultFormEngine();
       EngineInfo formEngineInfo = FormEngines.getFormEngineInfo(formEngine.getName());
+
       if (formEngineInfo != null) {
         response.setName(formEngineInfo.getName());
         response.setResourceUrl(formEngineInfo.getResourceUrl());
         response.setException(formEngineInfo.getException());
-        
       } else {
         response.setName(formEngine.getName());
       }
-      
     } catch (Exception e) {
-        throw new ActivitiException("Error retrieving form engine info", e);
+      throw new ActivitiException("Error retrieving form engine info", e);
     }
 
     response.setVersion(FormEngine.VERSION);

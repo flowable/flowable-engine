@@ -95,7 +95,7 @@ activitiAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
     
     $scope.openForm = function (form) {
         if (form && form.getProperty('id')) {
-            $location.path("/form/" + form.getProperty('id'));
+            $location.path("/form-definition/" + form.getProperty('id'));
           }
     };
     
@@ -141,7 +141,7 @@ activitiAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
         
         function loadStartForm () {
             $scope.jobs = undefined;
-            $http({method: 'GET', url: '/app/rest/activiti/process-definition-start-form/' + $scope.definition.id}).
+            $http({method: 'GET', url: '/app/rest/activiti/process-definition-start-form-definition/' + $scope.definition.id}).
             success(function(data, status, headers, config) {
                 $scope.startForm = data;
             });
@@ -152,7 +152,7 @@ activitiAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
             $http({method: 'GET', url: '/app/rest/activiti/process-definition-decision-tables/' + $scope.definition.id}).
             success(function(data, status, headers, config) {
                 $scope.decisionTables = data;
-                $scope.tabData.tabs[2].info = data.total;
+                $scope.tabData.tabs[2].info = data.length;
             }).
             error(function(data, status, headers, config) {
             });
@@ -160,10 +160,10 @@ activitiAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
         
         $scope.loadForms = function() {
             // Load forms
-            $http({method: 'GET', url: '/app/rest/activiti/process-definition-forms/' + $scope.definition.id}).
+            $http({method: 'GET', url: '/app/rest/activiti/process-definition-form-definitions/' + $scope.definition.id}).
             success(function(data, status, headers, config) {
                 $scope.forms = data;
-                $scope.tabData.tabs[3].info = data.total;
+                $scope.tabData.tabs[3].info = data.length;
             }).
             error(function(data, status, headers, config) {
             });
@@ -254,7 +254,7 @@ activitiAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
 	            .then(function (headers) {
 	                // Config for grid
 	                $scope.gridDecisionTables = {
-	                    data: 'decisionTables.data',
+	                    data: 'decisionTables',
 	                    enableRowReordering: true,
 	                    multiSelect: false,
 	                    keepLastSelected: false,
@@ -276,7 +276,7 @@ activitiAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
 	            .then(function (headers) {
 	                // Config for grid
 	                $scope.gridForms = {
-	                    data: 'forms.data',
+	                    data: 'forms',
 	                    enableRowReordering: true,
 	                    multiSelect: false,
 	                    keepLastSelected: false,
@@ -285,7 +285,7 @@ activitiAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
 	                    columnDefs: [
 	                        {field: 'id', displayName: headers[0], cellTemplate: gridConstants.defaultTemplate},
 	                        {field: 'name', displayName: headers[1], cellTemplate: gridConstants.defaultTemplate},
-	                        {field: 'appDeploymentId', displayName: headers[2], cellTemplate: gridConstants.defaultTemplate},
+	                        {field: 'deploymentId', displayName: headers[2], cellTemplate: gridConstants.defaultTemplate},
 	                        {field: 'tenantId', displayName: headers[3], cellTemplate: gridConstants.defaultTemplate}]
 	                };
 	            });
@@ -350,7 +350,7 @@ activitiAdminApp.controller('ShowProcessDefinitionDiagramPopupCrtl',
 
   $timeout(function() {
     $("#bpmnModel").attr("data-definition-id", definition.id);
-    $("#bpmnModel").attr("data-server-id", $rootScope.activeServer.id);
+    $("#bpmnModel").attr("data-server-id", $rootScope.activeServers['process']);
     $("#bpmnModel").load("./display/displaymodel.html?definitionId=" + definition.id);
   }, 200);
 

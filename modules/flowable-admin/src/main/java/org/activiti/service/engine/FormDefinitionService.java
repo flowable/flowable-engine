@@ -26,13 +26,13 @@ import com.fasterxml.jackson.databind.JsonNode;
  * Service for invoking Activiti REST services.
  */
 @Service
-public class FormService {
+public class FormDefinitionService {
 
 	@Autowired
 	protected ActivitiClientService clientUtil;
 
 	public JsonNode listForms(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
-	    URIBuilder builder = clientUtil.createUriBuilder("enterprise/forms");
+	    URIBuilder builder = clientUtil.createUriBuilder("form-repository/forms");
 
 		for (String name : parameterMap.keySet()) {
 			builder.addParameter(name, parameterMap.get(name)[0]);
@@ -42,22 +42,22 @@ public class FormService {
 	}
 
 	public JsonNode getForm(ServerConfig serverConfig, String formId) {
-		HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "enterprise/forms/" + formId));
+		HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "form-repository/form-definitions/" + formId));
 		return clientUtil.executeRequest(get, serverConfig);
 	}
 
-    public JsonNode getEditorJsonForForm(ServerConfig serverConfig, String formId) {
-        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "enterprise/forms/" + formId + "/editorJson"));
-        return clientUtil.executeRequest(get, serverConfig);
-    }
-    
-    public JsonNode getProcessDefinitionStartForm(ServerConfig serverConfig, String processDefinitionId) {
-        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "enterprise/process-definitions/" + processDefinitionId + "/start-form"));
-        return clientUtil.executeRequest(get, serverConfig);
-    }
+//    public JsonNode getEditorJsonForForm(ServerConfig serverConfig, String formId) {
+//        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "enterprise/forms/" + formId + "/editorJson"));
+//        return clientUtil.executeRequest(get, serverConfig);
+//    }
+//
+//    public JsonNode getProcessDefinitionStartForm(ServerConfig serverConfig, String processDefinitionId) {
+//        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "enterprise/process-definitions/" + processDefinitionId + "/start-form"));
+//        return clientUtil.executeRequest(get, serverConfig);
+//    }
     
     public JsonNode getProcessDefinitionForms(ServerConfig serverConfig, String processDefinitionId) {
-        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "enterprise/process-definitions/" + processDefinitionId + "/forms"));
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "repository/process-definitions/" + processDefinitionId + "/form-definitions"));
         return clientUtil.executeRequest(get, serverConfig);
     }
 }

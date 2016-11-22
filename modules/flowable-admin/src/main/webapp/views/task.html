@@ -30,7 +30,6 @@
 							<td ng-if="!task.endTime && task.formKey">
 								<a ng-href="#/form/{{task.formKey}}"><i class="glyphicon glyphicon-zoom-in"></i> {{task.formKey}}</a>
 							</td>
-							<td ng-if="!isBpmSuite || !task.formKey">{{task.formKey | empty}}</td>
 						</tr>
 						<tr class="property">
 							<td class="property-name" translate="TASK.PRIORITY"></td>

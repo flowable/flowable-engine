@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.dmn.api.DecisionTable;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.app.AppModel;
 import org.activiti.engine.impl.cmd.ActivateProcessDefinitionCmd;
@@ -33,12 +34,14 @@ import org.activiti.engine.impl.cmd.DeployCmd;
 import org.activiti.engine.impl.cmd.GetAppResourceModelCmd;
 import org.activiti.engine.impl.cmd.GetAppResourceObjectCmd;
 import org.activiti.engine.impl.cmd.GetBpmnModelCmd;
+import org.activiti.engine.impl.cmd.GetDecisionTablesForProcessDefinitionCmd;
 import org.activiti.engine.impl.cmd.GetDeploymentProcessDefinitionCmd;
 import org.activiti.engine.impl.cmd.GetDeploymentProcessDiagramCmd;
 import org.activiti.engine.impl.cmd.GetDeploymentProcessDiagramLayoutCmd;
 import org.activiti.engine.impl.cmd.GetDeploymentProcessModelCmd;
 import org.activiti.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.activiti.engine.impl.cmd.GetDeploymentResourceNamesCmd;
+import org.activiti.engine.impl.cmd.GetFormDefinitionsForProcessDefinitionCmd;
 import org.activiti.engine.impl.cmd.GetIdentityLinksForProcessDefinitionCmd;
 import org.activiti.engine.impl.cmd.GetModelCmd;
 import org.activiti.engine.impl.cmd.GetModelEditorSourceCmd;
@@ -67,6 +70,7 @@ import org.activiti.engine.repository.NativeProcessDefinitionQuery;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.task.IdentityLink;
+import org.activiti.form.api.FormDefinition;
 import org.activiti.validation.ValidationError;
 
 /**
@@ -298,4 +302,11 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
     return commandExecutor.execute(new ValidateBpmnModelCmd(bpmnModel));
   }
 
+  public List<DecisionTable> getDecisionTablesForProcessDefinition(String processDefinitionId) {
+    return commandExecutor.execute(new GetDecisionTablesForProcessDefinitionCmd(processDefinitionId));
+  }
+
+  public List<FormDefinition> getFormDefinitionsForProcessDefinition(String processDefinitionId) {
+    return commandExecutor.execute(new GetFormDefinitionsForProcessDefinitionCmd(processDefinitionId));
+  }
 }
