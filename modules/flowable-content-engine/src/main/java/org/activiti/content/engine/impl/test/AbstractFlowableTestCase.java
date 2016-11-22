@@ -34,7 +34,7 @@ import junit.framework.AssertionFailedError;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public abstract class AbstractFlowableTestCase extends AbstractTestCase {
+public abstract class AbstractFlowableTestCase extends AbstractContentTestCase {
 
   private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = new ArrayList<String>();
   

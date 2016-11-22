@@ -14,6 +14,7 @@ package org.activiti.content.engine.impl.cmd;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -77,9 +78,18 @@ public class SaveContentItemCmd implements Command<Void>, Serializable {
       // underlying content storage to get file size
       contentItemEntity.setContentSize(createContentObject.getContentLength());
     }
+    
+    if (contentItemEntity.getLastModified() == null) {
+      contentItemEntity.setLastModified(new Date());
+    }
 
     if (contentItem.getId() == null) {
-      commandContext.getContentItemEntityManager().insert(contentItemEntity); 
+      if (contentItemEntity.getCreated() == null) {
+        contentItemEntity.setCreated(new Date());
+      }
+      
+      commandContext.getContentItemEntityManager().insert(contentItemEntity);
+      
     } else {
       commandContext.getContentItemEntityManager().update(contentItemEntity);
     }

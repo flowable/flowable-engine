@@ -1,8 +1,5 @@
 package org.activiti.rest.conf;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.sql.DataSource;
 
 import org.activiti.dmn.api.DmnRepositoryService;
@@ -16,13 +13,9 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.form.AbstractFormType;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.form.api.FormRepositoryService;
 import org.activiti.form.spring.configurator.SpringFormEngineConfigurator;
-import org.activiti.rest.form.MonthFormType;
-import org.activiti.rest.form.ProcessDefinitionFormType;
-import org.activiti.rest.form.UserFormType;
 import org.activiti.spring.ProcessEngineFactoryBean;
 import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.slf4j.Logger;
@@ -74,12 +67,6 @@ public class FlowableEngineConfiguration {
     processEngineConfiguration.setAsyncExecutorActivate(Boolean.valueOf(environment.getProperty("engine.process.asyncexecutor.activate", "true")));
     processEngineConfiguration.setHistory(environment.getProperty("engine.process.history.level", "full"));
 
-    List<AbstractFormType> formTypes = new ArrayList<AbstractFormType>();
-    formTypes.add(new UserFormType());
-    formTypes.add(new ProcessDefinitionFormType());
-    formTypes.add(new MonthFormType());
-    processEngineConfiguration.setCustomFormTypes(formTypes);
-    
     processEngineConfiguration.addConfigurator(new SpringFormEngineConfigurator());
     processEngineConfiguration.addConfigurator(new SpringDmnEngineConfigurator());
 

@@ -22,6 +22,7 @@ import org.activiti.content.api.ContentMetaDataKeys;
 import org.activiti.content.api.ContentObject;
 import org.activiti.content.api.ContentStorage;
 import org.activiti.content.api.ContentStorageException;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -189,10 +190,12 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
       File contentFile = new File(idFolder, ids[2]);
       return contentFile;
     
-    } else {
+    } else if (UNCATEGORIZED_PREFIX.equals(type)) {
       File contentFile = new File(uncategorizedFolder, ids[1]);
       return contentFile;
     }
+    
+    throw new ActivitiObjectNotFoundException("No content found for id " + id);
   }
 
   @Override

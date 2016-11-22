@@ -46,7 +46,9 @@ public class DeleteContentItemCmd implements Command<Void>, Serializable {
     
     if (contentItem.getContentStoreId() != null) {
       ContentStorage contentStorage = commandContext.getContentEngineConfiguration().getContentStorage();
-      contentStorage.deleteContentObject(contentItem.getContentStoreId());
+      if (contentItem.isContentAvailable()) {
+        contentStorage.deleteContentObject(contentItem.getContentStoreId());
+      }
     }
     
     commandContext.getContentItemEntityManager().delete(contentItem);
