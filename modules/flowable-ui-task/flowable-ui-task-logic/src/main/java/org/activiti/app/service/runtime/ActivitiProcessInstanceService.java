@@ -96,9 +96,11 @@ public class ActivitiProcessInstanceService {
 
     ProcessInstanceRepresentation processInstanceResult = new ProcessInstanceRepresentation(processInstance, processDefinition, processDefinition.isGraphicalNotationDefined(), userRep);
 
-    FormModel formModel = runtimeService.getStartFormModel(processInstance.getProcessDefinitionId(), processInstance.getId());
-    if (formModel != null) {
-      processInstanceResult.setStartFormDefined(true);
+    if (processDefinition.hasStartFormKey()) {
+      FormModel formModel = runtimeService.getStartFormModel(processInstance.getProcessDefinitionId(), processInstance.getId());
+      if (formModel != null) {
+        processInstanceResult.setStartFormDefined(true);
+      }
     }
 
     return processInstanceResult;
