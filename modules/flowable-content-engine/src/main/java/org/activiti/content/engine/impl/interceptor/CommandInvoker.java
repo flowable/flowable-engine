@@ -13,7 +13,7 @@
 package org.activiti.content.engine.impl.interceptor;
 
 import org.activiti.content.engine.impl.context.Context;
-import org.activiti.engine.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

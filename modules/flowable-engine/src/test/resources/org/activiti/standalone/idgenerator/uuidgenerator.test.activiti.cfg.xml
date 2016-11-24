@@ -12,7 +12,7 @@
 		<property name="databaseSchemaUpdate" value="true" />
 		
 		<property name="idGenerator">
-			<bean class="org.activiti.engine.impl.persistence.StrongUuidGenerator" />
+			<bean class="org.activiti.engine.common.impl.persistence.StrongUuidGenerator" />
 		</property>
 
 	</bean>

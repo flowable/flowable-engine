@@ -14,7 +14,7 @@ package org.activiti.test.ldap;
 
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.test.Deployment;
 import org.activiti.idm.api.User;
 import org.springframework.test.context.ContextConfiguration;

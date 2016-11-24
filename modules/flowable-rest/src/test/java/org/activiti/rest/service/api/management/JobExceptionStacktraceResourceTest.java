@@ -3,7 +3,7 @@ package org.activiti.rest.service.api.management;
 import java.util.Calendar;
 import java.util.Collections;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.runtime.Job;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.test.Deployment;

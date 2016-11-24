@@ -14,8 +14,8 @@ package org.activiti.dmn.api;
 
 import java.util.Map;
 
-import org.activiti.engine.management.TableMetaData;
-import org.activiti.engine.management.TablePageQuery;
+import org.activiti.engine.common.api.management.TableMetaData;
+import org.activiti.engine.common.api.management.TablePageQuery;
 
 /**
  * Service for admin and maintenance operations on the dmn engine.

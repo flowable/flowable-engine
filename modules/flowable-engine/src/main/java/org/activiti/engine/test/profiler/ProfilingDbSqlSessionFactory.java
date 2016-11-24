@@ -1,9 +1,9 @@
 package org.activiti.engine.test.profiler;
 
+import org.activiti.engine.common.impl.interceptor.AbstractCommandContext;
+import org.activiti.engine.common.impl.interceptor.Session;
 import org.activiti.engine.impl.db.DbSqlSessionFactory;
-import org.activiti.engine.impl.interceptor.AbstractCommandContext;
 import org.activiti.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.impl.interceptor.Session;
 
 /**
  * @author Joram Barrez

@@ -14,10 +14,10 @@ package org.activiti.engine.impl.cfg;
 
 import javax.sql.DataSource;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.cfg.AbstractProcessEngineConfigurator;
-import org.activiti.engine.impl.transaction.TransactionContextAwareDataSource;
-import org.activiti.engine.impl.transaction.TransactionContextAwareTransactionFactory;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.transaction.TransactionContextAwareDataSource;
+import org.activiti.engine.common.impl.transaction.TransactionContextAwareTransactionFactory;
 import org.activiti.idm.engine.IdmEngine;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;

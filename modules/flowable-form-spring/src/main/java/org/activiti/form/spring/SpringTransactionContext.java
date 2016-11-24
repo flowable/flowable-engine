@@ -13,7 +13,7 @@
 
 package org.activiti.form.spring;
 
-import org.activiti.engine.impl.cfg.TransactionState;
+import org.activiti.engine.common.impl.cfg.TransactionState;
 import org.activiti.form.engine.impl.cfg.TransactionContext;
 import org.activiti.form.engine.impl.cfg.TransactionListener;
 import org.activiti.form.engine.impl.interceptor.CommandContext;

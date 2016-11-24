@@ -13,8 +13,8 @@
 
 package org.activiti.spring;
 
+import org.activiti.engine.common.impl.cfg.TransactionContextFactory;
 import org.activiti.engine.impl.cfg.TransactionContext;
-import org.activiti.engine.impl.cfg.TransactionContextFactory;
 import org.activiti.engine.impl.cfg.TransactionListener;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.springframework.transaction.PlatformTransactionManager;

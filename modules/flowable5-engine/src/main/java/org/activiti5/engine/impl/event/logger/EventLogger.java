@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
+import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.runtime.Clock;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.event.logger.handler.ActivityCompensatedEventHandler;
 import org.activiti5.engine.impl.event.logger.handler.ActivityCompletedEventHandler;

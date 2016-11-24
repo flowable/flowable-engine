@@ -13,9 +13,9 @@
 
 package org.activiti5.engine.impl.test;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngines;
+import org.activiti.engine.common.api.ActivitiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

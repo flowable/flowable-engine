@@ -12,7 +12,7 @@
  */
 package org.activiti.dmn.engine;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 
 public class ActivitiDmnExpressionException extends ActivitiException {
 

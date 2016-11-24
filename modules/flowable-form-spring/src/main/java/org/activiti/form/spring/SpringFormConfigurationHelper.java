@@ -16,7 +16,7 @@ package org.activiti.form.spring;
 import java.net.URL;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.form.engine.FormEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

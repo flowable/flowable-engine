@@ -17,8 +17,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.cfg.AbstractProcessEngineConfigurator;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.persistence.deploy.Deployer;
 import org.activiti.form.engine.FormEngine;

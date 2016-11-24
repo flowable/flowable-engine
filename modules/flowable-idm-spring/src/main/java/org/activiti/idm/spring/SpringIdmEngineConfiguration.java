@@ -13,8 +13,8 @@
 
 package org.activiti.idm.spring;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
 import org.activiti.idm.engine.impl.interceptor.CommandInterceptor;

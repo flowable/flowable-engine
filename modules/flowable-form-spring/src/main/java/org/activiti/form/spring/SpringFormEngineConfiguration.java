@@ -18,8 +18,8 @@ import java.util.Collection;
 
 import javax.sql.DataSource;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.form.engine.FormEngine;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.FormEngines;

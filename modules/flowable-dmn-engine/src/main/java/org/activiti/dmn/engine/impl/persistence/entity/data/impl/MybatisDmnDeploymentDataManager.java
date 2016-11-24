@@ -22,7 +22,7 @@ import org.activiti.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.activiti.dmn.engine.impl.persistence.entity.DmnDeploymentEntityImpl;
 import org.activiti.dmn.engine.impl.persistence.entity.data.AbstractDataManager;
 import org.activiti.dmn.engine.impl.persistence.entity.data.DmnDeploymentDataManager;
-import org.activiti.engine.impl.Page;
+import org.activiti.engine.common.impl.Page;
 
 /**
  * @author Joram Barrez

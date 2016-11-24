@@ -18,8 +18,8 @@ import org.activiti.content.engine.ContentEngineConfiguration;
 import org.activiti.content.engine.impl.db.DbSqlSession;
 import org.activiti.content.engine.impl.persistence.entity.ContentItemEntityManager;
 import org.activiti.content.engine.impl.persistence.entity.TableDataManager;
-import org.activiti.engine.impl.interceptor.AbstractCommandContext;
-import org.activiti.engine.impl.interceptor.BaseCommandContextCloseListener;
+import org.activiti.engine.common.impl.interceptor.AbstractCommandContext;
+import org.activiti.engine.common.impl.interceptor.BaseCommandContextCloseListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

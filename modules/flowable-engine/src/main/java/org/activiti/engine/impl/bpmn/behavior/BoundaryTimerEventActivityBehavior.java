@@ -14,7 +14,7 @@ package org.activiti.engine.impl.bpmn.behavior;
 
 import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.TimerEventDefinition;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.impl.asyncexecutor.JobManager;
 import org.activiti.engine.impl.context.Context;

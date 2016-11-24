@@ -1,6 +1,6 @@
 package org.activiti.engine.repository;
 
-import org.activiti.engine.query.NativeQuery;
+import org.activiti.engine.common.api.query.NativeQuery;
 
 /**
  * Allows querying of {@link org.activiti.engine.repository.Model}s via native (SQL) queries

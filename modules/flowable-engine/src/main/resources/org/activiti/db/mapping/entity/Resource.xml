@@ -56,7 +56,7 @@
   
   <!-- RESOURCE SELECT -->
 
-  <select id="selectResourceNamesByDeploymentId" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultType="string">
+  <select id="selectResourceNamesByDeploymentId" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultType="string">
     select NAME_ from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
   </select>
   
@@ -66,7 +66,7 @@
           AND NAME_ = #{resourceName}
   </select>
 
-  <select id="selectResourcesByDeploymentId" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="resourceResultMap">
+  <select id="selectResourcesByDeploymentId" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="resourceResultMap">
     select * from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
   </select>  
   

@@ -47,7 +47,7 @@ import org.activiti.dmn.model.RuleInputClauseContainer;
 import org.activiti.dmn.model.RuleOutputClauseContainer;
 import org.activiti.dmn.xml.constants.DmnXMLConstants;
 import org.activiti.dmn.xml.exception.DmnXMLException;
-import org.activiti.engine.io.InputStreamProvider;
+import org.activiti.engine.common.api.io.InputStreamProvider;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

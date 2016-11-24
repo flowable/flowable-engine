@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.form.api.FormDeployment;
 import org.activiti.form.api.FormDeploymentBuilder;
 import org.activiti.form.api.FormRepositoryService;

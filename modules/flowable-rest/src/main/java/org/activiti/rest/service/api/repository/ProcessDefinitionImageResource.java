@@ -16,8 +16,9 @@ package org.activiti.rest.service.api.repository;
 import java.io.InputStream;
 
 import io.swagger.annotations.*;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpHeaders;

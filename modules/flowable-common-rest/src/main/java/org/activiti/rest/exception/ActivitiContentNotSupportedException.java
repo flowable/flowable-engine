@@ -1,6 +1,6 @@
 package org.activiti.rest.exception;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 
 public class ActivitiContentNotSupportedException extends ActivitiException {
 

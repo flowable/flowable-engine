@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.Set;
 
 import org.activiti.bpmn.model.ActivitiListener;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.IdentityLinkType;

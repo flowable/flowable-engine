@@ -16,8 +16,8 @@ import org.activiti.dmn.engine.impl.interceptor.Command;
 import org.activiti.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
 import org.activiti.dmn.engine.impl.persistence.deploy.DeploymentCache;
 import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntity;
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 
 /**
  * @author Joram Barrez

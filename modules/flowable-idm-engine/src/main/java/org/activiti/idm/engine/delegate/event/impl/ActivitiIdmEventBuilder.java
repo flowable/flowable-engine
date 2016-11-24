@@ -12,8 +12,8 @@
  */
 package org.activiti.idm.engine.delegate.event.impl;
 
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
 import org.activiti.idm.api.event.ActivitiIdmEventType;
 import org.activiti.idm.api.event.ActivitiIdmMembershipEvent;
 

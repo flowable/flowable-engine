@@ -19,7 +19,7 @@ import static org.junit.Assert.fail;
 import java.io.InputStream;
 
 import org.activiti.content.api.ContentItem;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 

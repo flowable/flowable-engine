@@ -23,8 +23,8 @@ import java.util.regex.Pattern;
 
 import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.impl.context.Context;
-import org.activiti.engine.ActivitiClassLoadingException;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiClassLoadingException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

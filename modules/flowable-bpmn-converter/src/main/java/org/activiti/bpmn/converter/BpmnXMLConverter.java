@@ -90,7 +90,7 @@ import org.activiti.bpmn.model.StringDataObject;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.TextAnnotation;
 import org.activiti.bpmn.model.Transaction;
-import org.activiti.engine.io.InputStreamProvider;
+import org.activiti.engine.common.api.io.InputStreamProvider;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

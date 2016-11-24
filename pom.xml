@@ -1160,11 +1160,13 @@
 				<module>modules/flowable-form-engine-configurator</module>
 				<module>modules/flowable-form-spring</module>
 				<module>modules/flowable-form-spring-configurator</module>
+				<module>modules/flowable-form-rest</module>
 				<module>modules/flowable-idm-spring</module>
 				<module>modules/flowable-content-engine</module>
 				<module>modules/flowable-content-engine-configurator</module>
 				<module>modules/flowable-content-spring</module>
 				<module>modules/flowable-content-spring-configurator</module>
+				<module>modules/flowable-content-rest</module>
 				<module>modules/flowable-spring</module>
 				<module>modules/flowable5-engine</module>
 				<module>modules/flowable5-compatibility</module>

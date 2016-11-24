@@ -20,8 +20,8 @@ import org.activiti.dmn.api.DmnDeployment;
 import org.activiti.dmn.api.DmnDeploymentQuery;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
 import org.activiti.dmn.engine.impl.interceptor.CommandExecutor;
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.impl.Page;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.impl.Page;
 
 /**
  * @author Tijs Rademakers

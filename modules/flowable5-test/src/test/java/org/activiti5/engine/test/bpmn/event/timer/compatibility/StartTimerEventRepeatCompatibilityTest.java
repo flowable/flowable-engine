@@ -16,10 +16,10 @@ package org.activiti5.engine.test.bpmn.event.timer.compatibility;
 import java.util.Calendar;
 import java.util.List;
 
-import org.activiti.engine.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.runtime.Clock;
 import org.activiti.engine.runtime.Job;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;

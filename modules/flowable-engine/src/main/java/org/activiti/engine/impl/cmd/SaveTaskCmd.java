@@ -15,7 +15,7 @@ package org.activiti.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
 import org.activiti.engine.delegate.TaskListener;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;

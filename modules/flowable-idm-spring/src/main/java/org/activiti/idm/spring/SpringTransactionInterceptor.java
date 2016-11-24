@@ -12,8 +12,8 @@
  */
 package org.activiti.idm.spring;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.idm.engine.impl.interceptor.AbstractCommandInterceptor;
 import org.activiti.idm.engine.impl.interceptor.Command;
 import org.slf4j.Logger;

@@ -12,13 +12,15 @@
  */
 package org.activiti.engine.impl.persistence.entity;
 
+import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
+import org.activiti.engine.common.impl.persistence.entity.EntityManager;
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.persistence.AbstractManager;
 import org.activiti.engine.impl.persistence.CountingExecutionEntity;
-import org.activiti.engine.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Joram Barrez

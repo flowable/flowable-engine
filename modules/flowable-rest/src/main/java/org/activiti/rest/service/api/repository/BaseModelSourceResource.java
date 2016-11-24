@@ -13,7 +13,7 @@
 
 package org.activiti.rest.service.api.repository;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.springframework.web.multipart.MultipartFile;
 
 /**

@@ -19,8 +19,8 @@ import java.util.List;
 import org.activiti.content.engine.ContentEngineConfiguration;
 import org.activiti.content.engine.impl.db.DbSqlSession;
 import org.activiti.content.engine.impl.persistence.AbstractManager;
-import org.activiti.engine.impl.persistence.entity.Entity;
-import org.activiti.engine.impl.persistence.entity.data.DataManager;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Joram Barrez

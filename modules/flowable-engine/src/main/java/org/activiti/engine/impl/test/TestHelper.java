@@ -22,9 +22,9 @@ import java.util.Map;
 
 import junit.framework.AssertionFailedError;
 
-import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.engine.impl.ProcessEngineImpl;
 import org.activiti.engine.impl.bpmn.deployer.ResourceNameUtil;
 import org.activiti.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;

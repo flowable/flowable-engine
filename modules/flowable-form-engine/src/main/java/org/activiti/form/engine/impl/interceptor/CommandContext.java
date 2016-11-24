@@ -14,8 +14,8 @@ package org.activiti.form.engine.impl.interceptor;
 
 import java.util.ArrayList;
 
-import org.activiti.engine.impl.interceptor.AbstractCommandContext;
-import org.activiti.engine.impl.interceptor.BaseCommandContextCloseListener;
+import org.activiti.engine.common.impl.interceptor.AbstractCommandContext;
+import org.activiti.engine.common.impl.interceptor.BaseCommandContextCloseListener;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.db.DbSqlSession;
 import org.activiti.form.engine.impl.persistence.entity.FormDefinitionEntityManager;

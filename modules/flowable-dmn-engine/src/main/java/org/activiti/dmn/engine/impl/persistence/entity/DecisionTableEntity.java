@@ -13,7 +13,7 @@
 package org.activiti.dmn.engine.impl.persistence.entity;
 
 import org.activiti.dmn.api.DecisionTable;
-import org.activiti.engine.impl.persistence.entity.Entity;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
 
 /**
  * @author Joram Barrez

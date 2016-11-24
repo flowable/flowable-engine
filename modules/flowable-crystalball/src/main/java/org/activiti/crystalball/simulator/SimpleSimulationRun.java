@@ -14,7 +14,7 @@ package org.activiti.crystalball.simulator;
  */
 
 import org.activiti.crystalball.simulator.impl.NoopEventHandler;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.delegate.VariableScope;
 import org.activiti.engine.impl.ProcessEngineImpl;
 

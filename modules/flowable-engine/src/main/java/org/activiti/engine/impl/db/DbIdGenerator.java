@@ -13,9 +13,10 @@
 
 package org.activiti.engine.impl.db;
 
-import org.activiti.engine.impl.cfg.IdGenerator;
+import org.activiti.engine.common.impl.cfg.IdGenerator;
+import org.activiti.engine.common.impl.db.IdBlock;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.cmd.GetNextIdBlockCmd;
-import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 
 /**

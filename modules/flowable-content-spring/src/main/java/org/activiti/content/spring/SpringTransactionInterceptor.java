@@ -14,8 +14,8 @@ package org.activiti.content.spring;
 
 import org.activiti.content.engine.impl.interceptor.AbstractCommandInterceptor;
 import org.activiti.content.engine.impl.interceptor.Command;
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.PlatformTransactionManager;

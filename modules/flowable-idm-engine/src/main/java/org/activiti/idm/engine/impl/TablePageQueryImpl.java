@@ -14,8 +14,8 @@ package org.activiti.idm.engine.impl;
 
 import java.io.Serializable;
 
-import org.activiti.engine.management.TablePage;
-import org.activiti.engine.management.TablePageQuery;
+import org.activiti.engine.common.api.management.TablePage;
+import org.activiti.engine.common.api.management.TablePageQuery;
 import org.activiti.idm.engine.impl.interceptor.Command;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 import org.activiti.idm.engine.impl.interceptor.CommandExecutor;

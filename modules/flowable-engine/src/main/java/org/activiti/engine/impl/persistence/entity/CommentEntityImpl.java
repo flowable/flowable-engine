@@ -19,6 +19,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.activiti.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
+
 /**
  * @author Tom Baeyens
  */

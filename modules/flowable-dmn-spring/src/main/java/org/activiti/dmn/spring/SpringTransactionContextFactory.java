@@ -16,7 +16,7 @@ package org.activiti.dmn.spring;
 import org.activiti.dmn.engine.impl.cfg.TransactionContext;
 import org.activiti.dmn.engine.impl.cfg.TransactionListener;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.impl.cfg.TransactionContextFactory;
+import org.activiti.engine.common.impl.cfg.TransactionContextFactory;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**

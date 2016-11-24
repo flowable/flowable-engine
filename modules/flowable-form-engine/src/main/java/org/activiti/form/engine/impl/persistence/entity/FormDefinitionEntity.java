@@ -12,7 +12,7 @@
  */
 package org.activiti.form.engine.impl.persistence.entity;
 
-import org.activiti.engine.impl.persistence.entity.Entity;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
 import org.activiti.form.api.FormDefinition;
 
 /**

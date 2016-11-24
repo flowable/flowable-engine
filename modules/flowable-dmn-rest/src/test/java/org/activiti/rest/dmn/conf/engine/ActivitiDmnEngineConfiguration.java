@@ -17,7 +17,7 @@ import org.activiti.dmn.api.DmnRuleService;
 import org.activiti.dmn.engine.DmnEngine;
 import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration;
-import org.activiti.engine.AbstractEngineConfiguration;
+import org.activiti.engine.common.AbstractEngineConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

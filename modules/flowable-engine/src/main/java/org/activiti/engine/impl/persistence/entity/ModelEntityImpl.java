@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.common.impl.persistence.entity.AbstractEntity;
 
 /**
  * @author Tijs Rademakers

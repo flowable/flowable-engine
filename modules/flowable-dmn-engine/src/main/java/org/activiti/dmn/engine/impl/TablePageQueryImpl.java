@@ -17,8 +17,8 @@ import java.io.Serializable;
 import org.activiti.dmn.engine.impl.interceptor.Command;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
 import org.activiti.dmn.engine.impl.interceptor.CommandExecutor;
-import org.activiti.engine.management.TablePage;
-import org.activiti.engine.management.TablePageQuery;
+import org.activiti.engine.common.api.management.TablePage;
+import org.activiti.engine.common.api.management.TablePageQuery;
 
 /**
  * 

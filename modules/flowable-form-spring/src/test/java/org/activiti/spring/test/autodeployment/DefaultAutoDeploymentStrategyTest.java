@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipInputStream;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.form.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.junit.Before;
 import org.junit.Test;

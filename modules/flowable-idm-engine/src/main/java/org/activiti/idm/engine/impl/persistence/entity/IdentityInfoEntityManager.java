@@ -15,7 +15,7 @@ package org.activiti.idm.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.persistence.entity.EntityManager;
+import org.activiti.engine.common.impl.persistence.entity.EntityManager;
 
 /**
  * @author Joram Barrez

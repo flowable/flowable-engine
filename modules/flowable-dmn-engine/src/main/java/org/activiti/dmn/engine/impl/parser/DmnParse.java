@@ -28,11 +28,11 @@ import org.activiti.dmn.model.DmnDefinition;
 import org.activiti.dmn.xml.constants.DmnXMLConstants;
 import org.activiti.dmn.xml.converter.DmnXMLConverter;
 import org.activiti.dmn.xml.exception.DmnXMLException;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.util.io.InputStreamSource;
-import org.activiti.engine.impl.util.io.StreamSource;
-import org.activiti.engine.impl.util.io.StringStreamSource;
-import org.activiti.engine.impl.util.io.UrlStreamSource;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.util.io.InputStreamSource;
+import org.activiti.engine.common.impl.util.io.StreamSource;
+import org.activiti.engine.common.impl.util.io.StringStreamSource;
+import org.activiti.engine.common.impl.util.io.UrlStreamSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -17,7 +17,7 @@ import java.net.URL;
 import java.util.Map;
 
 import org.activiti.dmn.engine.DmnEngine;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;

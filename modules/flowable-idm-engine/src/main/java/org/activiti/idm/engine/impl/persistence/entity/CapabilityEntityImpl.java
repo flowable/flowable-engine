@@ -15,7 +15,7 @@ package org.activiti.idm.engine.impl.persistence.entity;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.impl.persistence.entity.AbstractEntity;
+import org.activiti.engine.common.impl.persistence.entity.AbstractEntity;
 
 public class CapabilityEntityImpl extends AbstractEntity implements CapabilityEntity {
 

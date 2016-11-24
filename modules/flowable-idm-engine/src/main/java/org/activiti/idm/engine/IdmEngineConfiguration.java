@@ -23,15 +23,16 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.activiti.engine.AbstractEngineConfiguration;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
-import org.activiti.engine.impl.cfg.IdGenerator;
-import org.activiti.engine.impl.cfg.TransactionContextFactory;
-import org.activiti.engine.impl.interceptor.CommandConfig;
-import org.activiti.engine.impl.interceptor.SessionFactory;
-import org.activiti.engine.runtime.Clock;
+import org.activiti.engine.common.AbstractEngineConfiguration;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.activiti.engine.common.impl.cfg.BeansConfigurationHelper;
+import org.activiti.engine.common.impl.cfg.IdGenerator;
+import org.activiti.engine.common.impl.cfg.TransactionContextFactory;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.impl.interceptor.SessionFactory;
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.idm.api.IdmIdentityService;
 import org.activiti.idm.api.IdmManagementService;
 import org.activiti.idm.api.event.ActivitiIdmEventType;
@@ -92,7 +93,6 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.BeanFactory;
 
 public class IdmEngineConfiguration extends AbstractEngineConfiguration {
 
@@ -160,7 +160,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
   }
 
   public static IdmEngineConfiguration createIdmEngineConfigurationFromResource(String resource, String beanName) {
-    return (IdmEngineConfiguration) parseEngineConfigurationFromResource(resource, beanName);
+    return (IdmEngineConfiguration) BeansConfigurationHelper.parseEngineConfigurationFromResource(resource, beanName);
   }
 
   public static IdmEngineConfiguration createIdmEngineConfigurationFromInputStream(InputStream inputStream) {
@@ -168,7 +168,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
   }
 
   public static IdmEngineConfiguration createIdmEngineConfigurationFromInputStream(InputStream inputStream, String beanName) {
-    return (IdmEngineConfiguration) parseEngineConfigurationFromInputStream(inputStream, beanName);
+    return (IdmEngineConfiguration) BeansConfigurationHelper.parseEngineConfigurationFromInputStream(inputStream, beanName);
   }
 
   public static IdmEngineConfiguration createStandaloneIdmEngineConfiguration() {
@@ -200,6 +200,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
       initDataSource();
     }
     
+    initBeans();
     initTransactionFactory();
     initSqlSessionFactory();
     initSessionFactories();
@@ -561,8 +562,8 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     return this;
   }
 
-  public IdmEngineConfiguration setBeanFactory(BeanFactory beanFactory) {
-    this.beanFactory = beanFactory;
+  public IdmEngineConfiguration setBeans(Map<Object, Object> beans) {
+    this.beans = beans;
     return this;
   }
 

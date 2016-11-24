@@ -13,7 +13,7 @@
 
 package org.activiti.idm.engine.impl.interceptor;
 
-import org.activiti.engine.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.context.Context;
 import org.slf4j.Logger;

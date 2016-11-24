@@ -14,7 +14,7 @@ package org.activiti.rest.content.service.api.content;
 
 import org.activiti.content.api.ContentItem;
 import org.activiti.content.api.ContentService;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.rest.content.ContentRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;

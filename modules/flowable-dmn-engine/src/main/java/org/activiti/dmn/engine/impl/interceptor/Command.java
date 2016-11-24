@@ -12,7 +12,7 @@
  */
 package org.activiti.dmn.engine.impl.interceptor;
 
-import org.activiti.engine.impl.interceptor.BaseCommand;
+import org.activiti.engine.common.impl.interceptor.BaseCommand;
 
 /**
  * @author Tijs Rademakers

@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.form.api.FormDeploymentBuilder;
 import org.activiti.form.api.FormRepositoryService;
 import org.springframework.core.io.Resource;

@@ -14,8 +14,8 @@ package org.activiti.form.engine.impl;
 
 import java.io.Serializable;
 
-import org.activiti.engine.management.TablePage;
-import org.activiti.engine.management.TablePageQuery;
+import org.activiti.engine.common.api.management.TablePage;
+import org.activiti.engine.common.api.management.TablePageQuery;
 import org.activiti.form.engine.impl.interceptor.Command;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
 import org.activiti.form.engine.impl.interceptor.CommandExecutor;

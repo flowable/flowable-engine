@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.form.api.FormManagementService;
 import org.activiti.form.api.FormRepositoryService;
 import org.activiti.form.api.FormService;

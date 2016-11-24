@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.editor.form.converter.FormJsonConverter;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.form.api.FormInstance;
 import org.activiti.form.api.FormInstanceQuery;
 import org.activiti.form.engine.FormEngineConfiguration;

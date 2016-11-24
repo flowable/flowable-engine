@@ -18,6 +18,13 @@
 		<activiti.artifact>
 			org.activiti.engine.common.api
 		</activiti.artifact>
+		<activiti.osgi.export.additional>
+			org.activiti.engine.common.api,
+			org.activiti.engine.common.api.delegate.event,
+			org.activiti.engine.common.api.io,
+			org.activiti.engine.common.api.management,
+			org.activiti.engine.common.api.query,
+		</activiti.osgi.export.additional>
 	</properties>
 
 	<build>

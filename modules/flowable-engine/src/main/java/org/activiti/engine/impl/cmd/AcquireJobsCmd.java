@@ -16,7 +16,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.activiti.engine.impl.Page;
+import org.activiti.engine.common.impl.Page;
 import org.activiti.engine.impl.asyncexecutor.AcquiredJobEntities;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.engine.impl.interceptor.Command;

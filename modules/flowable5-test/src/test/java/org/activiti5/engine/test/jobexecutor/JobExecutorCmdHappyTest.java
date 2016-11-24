@@ -14,10 +14,10 @@ package org.activiti5.engine.test.jobexecutor;
 
 import java.util.Date;
 
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.engine.impl.asyncexecutor.AcquiredTimerJobEntities;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.engine.impl.cmd.AcquireTimerJobsCmd;
-import org.activiti.engine.runtime.Clock;
 import org.activiti.engine.runtime.Job;
 import org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti5.engine.impl.cmd.ExecuteAsyncJobCmd;

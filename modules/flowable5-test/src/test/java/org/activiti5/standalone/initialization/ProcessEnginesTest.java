@@ -15,8 +15,8 @@ package org.activiti5.standalone.initialization;
 import java.util.List;
 
 import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.EngineInfo;
 import org.activiti.engine.ProcessEngines;
+import org.activiti.engine.common.EngineInfo;
 import org.activiti5.engine.impl.test.PvmTestCase;
 
 /**

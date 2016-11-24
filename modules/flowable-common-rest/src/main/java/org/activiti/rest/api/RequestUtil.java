@@ -16,7 +16,7 @@ package org.activiti.rest.api;
 import java.util.Date;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.apache.commons.lang3.time.FastDateFormat;
 
 /**

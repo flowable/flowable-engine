@@ -15,8 +15,8 @@ package org.activiti.engine.test.api.identity;
 
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.GroupQuery;

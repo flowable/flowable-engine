@@ -14,8 +14,8 @@ package org.activiti.engine.impl.form;
 
 import java.io.UnsupportedEncodingException;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.engine.form.FormData;
 import org.activiti.engine.form.StartFormData;
 import org.activiti.engine.form.TaskFormData;

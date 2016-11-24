@@ -1,6 +1,6 @@
 package org.activiti.engine.runtime;
 
-import org.activiti.engine.query.NativeQuery;
+import org.activiti.engine.common.api.query.NativeQuery;
 
 /**
  * Allows querying of {@link ProcessInstance}s via native (SQL) queries

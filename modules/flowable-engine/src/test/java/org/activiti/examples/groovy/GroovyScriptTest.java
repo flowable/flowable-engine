@@ -16,8 +16,8 @@ package org.activiti.examples.groovy;
 import java.util.Date;
 import java.util.List;
 
+import org.activiti.engine.common.impl.util.CollectionUtil;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
-import org.activiti.engine.impl.util.CollectionUtil;
 import org.activiti.engine.runtime.Job;
 import org.activiti.engine.runtime.JobQuery;
 import org.activiti.engine.runtime.ProcessInstance;

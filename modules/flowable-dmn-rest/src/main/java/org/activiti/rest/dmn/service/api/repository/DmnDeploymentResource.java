@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.dmn.api.DmnDeployment;
 import org.activiti.dmn.api.DmnRepositoryService;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.rest.dmn.service.api.DmnRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

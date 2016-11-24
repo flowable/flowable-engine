@@ -14,7 +14,7 @@ package org.activiti.conf;
 
 import javax.sql.DataSource;
 
-import org.activiti.engine.runtime.Clock;
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.idm.api.IdmIdentityService;
 import org.activiti.idm.api.IdmManagementService;
 import org.activiti.idm.engine.IdmEngine;

@@ -12,7 +12,7 @@
  */
 package org.activiti.content.engine.impl.interceptor;
 
-import org.activiti.engine.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 
 /**
  * The command executor for internal usage.

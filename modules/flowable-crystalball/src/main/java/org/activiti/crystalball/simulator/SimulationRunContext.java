@@ -19,8 +19,8 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.engine.delegate.VariableScope;
-import org.activiti.engine.runtime.Clock;
 
 /**
  * Context in which simulation is run. It contains references to process engine, event calendar.

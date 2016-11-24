@@ -21,8 +21,8 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-import org.activiti.engine.ActivitiClassLoadingException;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiClassLoadingException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.context.Context;
 import org.slf4j.Logger;

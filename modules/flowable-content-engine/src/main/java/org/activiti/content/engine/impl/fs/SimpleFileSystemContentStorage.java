@@ -22,7 +22,7 @@ import org.activiti.content.api.ContentMetaDataKeys;
 import org.activiti.content.api.ContentObject;
 import org.activiti.content.api.ContentStorage;
 import org.activiti.content.api.ContentStorageException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

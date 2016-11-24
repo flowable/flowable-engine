@@ -12,7 +12,7 @@
  */
 package org.activiti.idm.api.event;
 
-import org.activiti.engine.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
 
 /**
  * An event related to group memberships.

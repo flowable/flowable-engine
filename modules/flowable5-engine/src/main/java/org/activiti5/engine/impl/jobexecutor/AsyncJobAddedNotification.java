@@ -13,8 +13,8 @@
 package org.activiti5.engine.impl.jobexecutor;
 
 
+import org.activiti.engine.common.impl.cfg.TransactionPropagation;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
-import org.activiti.engine.impl.cfg.TransactionPropagation;
 import org.activiti.engine.runtime.Job;
 import org.activiti5.engine.impl.interceptor.Command;
 import org.activiti5.engine.impl.interceptor.CommandConfig;

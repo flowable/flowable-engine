@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
 import org.activiti.engine.impl.context.Context;
 
 /**

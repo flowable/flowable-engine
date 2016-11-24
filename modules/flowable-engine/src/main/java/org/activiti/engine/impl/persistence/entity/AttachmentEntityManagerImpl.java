@@ -15,12 +15,12 @@ package org.activiti.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.persistence.entity.data.AttachmentDataManager;
-import org.activiti.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.engine.task.Attachment;
 import org.activiti.engine.task.Task;
 

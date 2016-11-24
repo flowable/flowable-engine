@@ -15,7 +15,7 @@ package org.activiti.idm.engine.impl;
 
 import java.util.List;
 
-import org.activiti.engine.impl.Page;
+import org.activiti.engine.common.impl.Page;
 import org.activiti.idm.api.Capability;
 import org.activiti.idm.api.CapabilityQuery;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;

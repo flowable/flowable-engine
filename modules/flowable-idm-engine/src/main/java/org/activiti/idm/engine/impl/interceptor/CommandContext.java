@@ -14,8 +14,8 @@ package org.activiti.idm.engine.impl.interceptor;
 
 import java.util.ArrayList;
 
-import org.activiti.engine.impl.interceptor.AbstractCommandContext;
-import org.activiti.engine.impl.interceptor.BaseCommandContextCloseListener;
+import org.activiti.engine.common.impl.interceptor.AbstractCommandContext;
+import org.activiti.engine.common.impl.interceptor.BaseCommandContextCloseListener;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.db.DbSqlSession;
 import org.activiti.idm.engine.impl.persistence.entity.ByteArrayEntityManager;

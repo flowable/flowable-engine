@@ -16,7 +16,7 @@ package org.activiti.dmn.spring;
 import org.activiti.dmn.engine.impl.cfg.TransactionContext;
 import org.activiti.dmn.engine.impl.cfg.TransactionListener;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.impl.cfg.TransactionState;
+import org.activiti.engine.common.impl.cfg.TransactionState;
 import org.springframework.core.Ordered;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronization;

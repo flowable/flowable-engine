@@ -15,8 +15,8 @@ package org.activiti.engine.impl.persistence.entity.data.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.common.impl.Page;
 import org.activiti.engine.impl.DeploymentQueryImpl;
-import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntityImpl;

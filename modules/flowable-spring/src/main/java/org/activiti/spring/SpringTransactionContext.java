@@ -13,9 +13,9 @@
 
 package org.activiti.spring;
 
+import org.activiti.engine.common.impl.cfg.TransactionState;
 import org.activiti.engine.impl.cfg.TransactionContext;
 import org.activiti.engine.impl.cfg.TransactionListener;
-import org.activiti.engine.impl.cfg.TransactionState;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.springframework.core.Ordered;
 import org.springframework.transaction.PlatformTransactionManager;

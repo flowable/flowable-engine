@@ -12,6 +12,8 @@
  */
 package org.activiti.engine.delegate.event;
 
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+
 /**
  * An {@link ActivitiEvent} related to an message being sent to an activity.
  * 

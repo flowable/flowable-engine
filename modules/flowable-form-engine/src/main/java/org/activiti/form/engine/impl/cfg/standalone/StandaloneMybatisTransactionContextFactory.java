@@ -12,7 +12,7 @@
  */
 package org.activiti.form.engine.impl.cfg.standalone;
 
-import org.activiti.engine.impl.cfg.TransactionContextFactory;
+import org.activiti.engine.common.impl.cfg.TransactionContextFactory;
 import org.activiti.form.engine.impl.cfg.TransactionContext;
 import org.activiti.form.engine.impl.cfg.TransactionListener;
 import org.activiti.form.engine.impl.interceptor.CommandContext;

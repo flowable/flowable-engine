@@ -14,7 +14,7 @@ package org.activiti.engine.impl.asyncexecutor;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.activiti.engine.ActivitiOptimisticLockingException;
+import org.activiti.engine.common.api.ActivitiOptimisticLockingException;
 import org.activiti.engine.impl.cmd.AcquireJobsCmd;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.JobEntity;

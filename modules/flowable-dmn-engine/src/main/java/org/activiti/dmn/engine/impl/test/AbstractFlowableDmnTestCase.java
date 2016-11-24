@@ -27,7 +27,7 @@ import org.activiti.dmn.engine.impl.interceptor.Command;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
 import org.activiti.dmn.engine.impl.interceptor.CommandExecutor;
 import org.activiti.dmn.engine.test.DmnTestHelper;
-import org.activiti.engine.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.junit.Assert;
 
 import junit.framework.AssertionFailedError;

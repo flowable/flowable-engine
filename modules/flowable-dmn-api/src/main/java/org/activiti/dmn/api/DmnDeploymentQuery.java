@@ -13,7 +13,7 @@
 
 package org.activiti.dmn.api;
 
-import org.activiti.engine.query.Query;
+import org.activiti.engine.common.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link DmnDeployment}s.

@@ -2,6 +2,8 @@ package org.activiti.engine.test.bpmn.event.timer.compatibility;
 
 import java.util.Date;
 
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
+
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +20,6 @@ import java.util.Date;
 import org.activiti.engine.impl.ProcessEngineImpl;
 import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.interceptor.Command;
-import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.jobexecutor.TimerEventHandler;

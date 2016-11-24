@@ -15,7 +15,7 @@ package org.activiti.engine.impl.bpmn.listener;
 import java.util.Map;
 
 import org.activiti.bpmn.model.FlowElement;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.delegate.TransactionDependentExecutionListener;
 import org.activiti.engine.impl.el.NoExecutionVariableScope;

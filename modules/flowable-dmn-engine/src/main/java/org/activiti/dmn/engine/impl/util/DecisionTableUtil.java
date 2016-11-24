@@ -19,7 +19,7 @@ import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
 import org.activiti.dmn.model.Decision;
 import org.activiti.dmn.model.DmnDefinition;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 
 /**
  * A utility class that hides the complexity of {@link DecisionTableEntity} and {@link Decision} lookup. 

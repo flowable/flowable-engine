@@ -71,19 +71,19 @@ import org.activiti.dmn.engine.impl.persistence.entity.data.ResourceDataManager;
 import org.activiti.dmn.engine.impl.persistence.entity.data.impl.MybatisDecisionTableDataManager;
 import org.activiti.dmn.engine.impl.persistence.entity.data.impl.MybatisDmnDeploymentDataManager;
 import org.activiti.dmn.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
-import org.activiti.engine.AbstractEngineConfiguration;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.cfg.TransactionContextFactory;
-import org.activiti.engine.impl.interceptor.CommandConfig;
-import org.activiti.engine.impl.interceptor.SessionFactory;
-import org.activiti.engine.runtime.Clock;
+import org.activiti.engine.common.AbstractEngineConfiguration;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.cfg.BeansConfigurationHelper;
+import org.activiti.engine.common.impl.cfg.TransactionContextFactory;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.impl.interceptor.SessionFactory;
+import org.activiti.engine.common.runtime.Clock;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.mvel2.integration.PropertyHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.BeanFactory;
 
 import liquibase.Liquibase;
 import liquibase.database.Database;
@@ -183,7 +183,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
   }
 
   public static DmnEngineConfiguration createDmnEngineConfigurationFromResource(String resource, String beanName) {
-    return (DmnEngineConfiguration) parseEngineConfigurationFromResource(resource, beanName);
+    return (DmnEngineConfiguration) BeansConfigurationHelper.parseEngineConfigurationFromResource(resource, beanName);
   }
 
   public static DmnEngineConfiguration createDmnEngineConfigurationFromInputStream(InputStream inputStream) {
@@ -191,7 +191,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
   }
 
   public static DmnEngineConfiguration createDmnEngineConfigurationFromInputStream(InputStream inputStream, String beanName) {
-    return (DmnEngineConfiguration) parseEngineConfigurationFromInputStream(inputStream, beanName);
+    return (DmnEngineConfiguration) BeansConfigurationHelper.parseEngineConfigurationFromInputStream(inputStream, beanName);
   }
 
   public static DmnEngineConfiguration createStandaloneDmnEngineConfiguration() {
@@ -218,8 +218,13 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
     initTransactionContextFactory();
     initCommandExecutors();
     initIdGenerator();
-    initDataSource();
-    initDbSchema();
+    
+    if (usingRelationalDatabase) {
+      initDataSource();
+      initDbSchema();
+    }
+    
+    initBeans();
     initTransactionFactory();
     initSqlSessionFactory();
     initSessionFactories();
@@ -622,8 +627,8 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
     return this;
   }
 
-  public DmnEngineConfiguration setBeanFactory(BeanFactory beanFactory) {
-    this.beanFactory = beanFactory;
+  public DmnEngineConfiguration setBeans(Map<Object, Object> beans) {
+    this.beans = beans;
     return this;
   }
 

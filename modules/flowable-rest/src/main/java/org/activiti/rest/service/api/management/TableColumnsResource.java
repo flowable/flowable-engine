@@ -14,9 +14,10 @@
 package org.activiti.rest.service.api.management;
 
 import io.swagger.annotations.*;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+
 import org.activiti.engine.ManagementService;
-import org.activiti.engine.management.TableMetaData;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.management.TableMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
