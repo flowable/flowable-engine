@@ -19,7 +19,7 @@
 activitiAdminApp.controller('FormDefinitionsController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', 'gridConstants',
     function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, $modal, gridConstants) {
 
-        $rootScope.navigation = {selection: 'forms'};
+        $rootScope.navigation = {main: 'form-engine', sub: 'definitions'};
         
         $scope.filter = {};
         $scope.formsData = {};

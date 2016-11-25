@@ -12,7 +12,7 @@
 body {
 	font-family: 'Open Sans', sans-serif;
 	background-color: #eef1f1;
-	padding-top: 60px;
+	padding-top: 90px;
 	padding-bottom: 20px;
 }
 
@@ -72,17 +72,19 @@ body {
 	background-color: #384042;
 	border: none;
 	min-height: 40px;
+	margin-bottom: 5px;
 }
 
 .nav.navbar-nav {
 	background-color: #384042;
 	color: #eef1f1;
 	border: none;
-	margin-left: 20px;
 }
 
 .navbar-header .navbar-brand {
+    position: relative
 	padding-top: 0px;
+	top: 25px;
 	line-height: 35px;
     height: 35px;
     background: url(../images/logo.png) no-repeat 15px center;
@@ -98,8 +100,23 @@ body {
 	font-size: 12px;
 }
 
-.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
-	background-color: #55ae4d;
+.navbar-inverse .navbar-nav > .active-process > a, .navbar-inverse .navbar-nav > .active-process > a:hover, .navbar-inverse .navbar-nav > .active-process > a:focus {
+	background: rgb(162,204,70);
+	color: #ffffff;
+}
+
+.navbar-inverse .navbar-nav > .active-form > a, .navbar-inverse .navbar-nav > .active-form > a:hover, .navbar-inverse .navbar-nav > .active-form > a:focus {
+    background: rgb(0,102,153);
+	color: #ffffff;
+}
+
+.navbar-inverse .navbar-nav > .active-dmn > a, .navbar-inverse .navbar-nav > .active-dmn > a:hover, .navbar-inverse .navbar-nav > .active-dmn > a:focus {
+    background: rgb(227,154,33);
+	color: #ffffff;
+}
+
+.navbar-inverse .navbar-nav > .active-content > a, .navbar-inverse .navbar-nav > .active-content > a:hover, .navbar-inverse .navbar-nav > .active-content > a:focus {
+    background: rgb(146,176,201);
 	color: #ffffff;
 }
 
@@ -124,8 +141,8 @@ body {
 	background-color: #384042;
 }
 
-.navbar .dropdown-menu>.active>a, .navbar .dropdown-menu>.active>a:hover, .navbar .dropdown-menu>.active>a:focus {
-	background-color: #55ae4d;
+.navbar .dropdown-menu>.active-process>a, .navbar .dropdown-menu>.active-process>a:hover, .navbar .dropdown-menu>.active-process>a:focus {
+	background: rgb(162,204,70);
 	color: #ffffff;
 }
 
@@ -133,6 +150,48 @@ body {
 	color: #ffffff;
 }
 
+.sub-navbar.active-process {
+	background: rgb(162,204,70);
+    background: linear-gradient(to right, rgba(162,204,70,1.0), rgba(162,204,70,1.0), rgba(162,204,70,0), rgba(162,204,70,0));
+}
+
+.sub-navbar.active-form {
+    background rgb(0,102,153);
+    background: linear-gradient(to right, rgba(0,102,153,1.0), rgba(0,102,153,1.0), rgba(0,102,153,0));
+}
+
+.sub-navbar.active-dmn {
+    background: rgb(227,154,33);
+    background: linear-gradient(to right, rgba(227,154,33,1.0), rgba(227,154,33,1.0), rgba(227,154,33,0));
+}
+
+.sub-navbar.active-content {
+    background: rgb(146,176,201);
+    background: linear-gradient(to right, rgba(146,176,201,1.0), rgba(146,176,201,1.0), rgba(146,176,201,0));
+}
+
+.sub-navbar .drop-menu {
+    background: none;
+}
+
+.sub-navbar .navbar-nav, .sub-navbar .navbar-nav, .sub-navbar .navbar-nav {
+    background: none;
+    color: #384042;
+}
+
+.sub-navbar .navbar-nav > .active > a, .sub-navbar .navbar-nav > .active > a:hover, .sub-navbar .navbar-nav > .active > a:focus {
+    background: none;
+    color: #ffffff; !important;
+}
+
+.sub-navbar .nav.navbar-nav li.active a{
+    color: #ffffff; !important;
+}
+
+.sub-navbar .nav.navbar-nav li a {
+    color: #384042;
+    background-color: none;
+}
 
 .tabs-wrapper {
 	margin-bottom: 20px;
@@ -146,7 +205,6 @@ body {
 .component .tabs-wrapper .title {
 	background: rgb(238,241,241);
 }
-
 
 .tabs {
 	padding: 0px;

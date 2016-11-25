@@ -37,24 +37,48 @@
                         <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a href="#users" translate="GENERAL.MENU.CONFIGURATION-USERS"></a></li>
+                        <li><a href="#engine" translate="GENERAL.MENU.CONFIGURATION"></a></li>
                         <li><a href="#logout" translate="GENERAL.ACTION.LOGOUT"></a></li>
                     </ul>
                 </div>
-
-                <div class="navbar-header">
+                <div class="navbar-header pull-right">
                     <a class="navbar-brand" title="{{'GENERAL.MAIN-TITLE' | translate}}"><span class="sr-only">{{'GENERAL.TITLE.MAIN' | translate}}</span></a>
                 </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav" ng-show="authenticated">
-                    	<li ng-class="{active: navigation.selection == 'deployments'}"><a href="#deployments" translate="GENERAL.MENU.DEPLOYMENTS"></a></li>
-                        <li ng-class="{active: navigation.selection == 'process-definitions'}"><a href="#process-definitions" translate="GENERAL.MENU.PROCESS-DEFINITIONS"></a></li>
-                        <li ng-class="{active: navigation.selection == 'process-instances'}"><a href="#process-instances" translate="GENERAL.MENU.PROCESS-INSTANCES"></a></li>
-                        <li ng-class="{active: navigation.selection == 'tasks'}"><a href="#tasks" translate="GENERAL.MENU.TASKS"></a></li>
-                        <li ng-class="{active: navigation.selection == 'jobs'}"><a href="#jobs" translate="GENERAL.MENU.JOBS"></a></li>
-                        <li ng-class="{active: navigation.selection == 'engine'}"><a href="#engine" translate="GENERAL.MENU.CONFIGURATION"></a></li>
+                        <li ng-class="{'active-process': navigation.main == 'process-engine'}"><a href="#process-engine" translate="GENERAL.MENU.PROCESS-ENGINE"></a></li>
+                        <li ng-class="{'active-form': navigation.main == 'form-engine'}"><a href="#form-engine" translate="GENERAL.MENU.FORM-ENGINE"></a></li>
+                        <li ng-class="{'active-dmn': navigation.main == 'dmn-engine'}"><a href="#dmn-engine" translate="GENERAL.MENU.DMN-ENGINE"></a></li>
+                        <li ng-class="{'active-content': navigation.main == 'content-engine'}"><a href="#content-engine" translate="GENERAL.MENU.CONTENT-ENGINE"></a></li>
                     </ul>
-                </div><!-- /.nav-collapse -->
+                </div>
+                <div class="sub-navbar" ng-class="{'active-process': navigation.main == 'process-engine', 'active-form': navigation.main == 'form-engine', 'active-dmn': navigation.main == 'dmn-engine', 'active-content': navigation.main == 'content-engine'}">
+                    <div class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav" ng-if="navigation.main == 'process-engine'">
+                            <li ng-class="{'active': navigation.sub == 'deployments'}"><a href="#deployments" translate="GENERAL.MENU.DEPLOYMENTS"></a></li>
+                            <li ng-class="{'active': navigation.sub == 'definitions'}"><a href="#process-definitions" translate="GENERAL.MENU.DEFINITIONS"></a></li>
+                            <li ng-class="{'active': navigation.sub == 'instances'}"><a href="#process-instances" translate="GENERAL.MENU.INSTANCES"></a></li>
+                            <li ng-class="{'active': navigation.sub == 'tasks'}"><a href="#tasks" translate="GENERAL.MENU.TASKS"></a></li>
+                            <li ng-class="{'active': navigation.sub == 'jobs'}"><a href="#jobs" translate="GENERAL.MENU.JOBS"></a></li>
+                        </ul>
+                        <ul class="nav navbar-nav" ng-if="navigation.main == 'form-engine'">
+                            <li ng-class="{active: navigation.sub == 'deployments'}"><a href="#deployments" translate="GENERAL.MENU.DEPLOYMENTS"></a></li>
+                            <li ng-class="{active: navigation.sub == 'definitions'}"><a href="#form-definitions" translate="GENERAL.MENU.DEFINITIONS"></a></li>
+                            <li ng-class="{active: navigation.sub == 'instances'}"><a href="#process-instances" translate="GENERAL.MENU.INSTANCES"></a></li>
+                        </ul>
+                        <ul class="nav navbar-nav" ng-if="navigation.main == 'dmn-engine'">
+                            <li ng-class="{active: navigation.sub == 'deployments'}"><a href="#deployments" translate="GENERAL.MENU.DEPLOYMENTS"></a></li>
+                            <li ng-class="{active: navigation.sub == 'decision-tables'}"><a href="#decision-tables" translate="GENERAL.MENU.DEFINITIONS"></a></li>
+                            <li ng-class="{active: navigation.sub == 'instances'}"><a href="#process-instances" translate="GENERAL.MENU.INSTANCES"></a></li>
+                        </ul>
+                        <ul class="nav navbar-nav" ng-if="navigation.main == 'content-engine'">
+                            <li ng-class="{active: navigation.sub == 'deployments'}"><a href="#deployments" translate="GENERAL.MENU.DEPLOYMENTS"></a></li
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- /.nav-collapse -->
+
             </div><!-- /.container -->
         </div><!-- /.navbar -->
 

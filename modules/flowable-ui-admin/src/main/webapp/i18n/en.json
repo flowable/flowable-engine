@@ -23,15 +23,17 @@
             "FILTERS": "Filters"
         },
         "MENU": {
+            "PROCESS-ENGINE": "PROCESS ENGINE",
+            "FORM-ENGINE": "FORM ENGINE",
+            "CONTENT-ENGINE": "CONTENT ENGINE",
+            "DMN-ENGINE": "DMN ENGINE",
             "DEPLOYMENTS": "Deployments",
-            "PROCESS-DEFINITIONS": "Definitions",
-            "PROCESS-INSTANCES": "Instances",
+            "DEFINITIONS": "Definitions",
+            "INSTANCES": "Instances",
             "TASKS": "Tasks",
             "JOBS": "Jobs",
             "CONFIGURATION": "Configuration",
-            "CONFIGURATION-ENGINE": "Engine",
-            "CONFIGURATION-USERS": "Configure users",
-            "APPS": "Apps"
+            "CONFIGURATION-ENGINE": "Engine"
         },
         "RESULT-SIZES": {
             "10": "10",

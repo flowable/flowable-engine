@@ -29,6 +29,26 @@ activitiAdminApp
             		templateUrl: 'views/login.html',
             		controller: 'LoginController'
             	})
+                .when('/process-engine', {
+                    templateUrl: 'views/deployments.html',
+                    controller: 'DeploymentsController',
+                    reloadOnSearch: true
+                })
+                .when('/form-engine', {
+                    templateUrl: 'views/form-definitions.html',
+                    controller: 'FormDefinitionsController',
+                    reloadOnSearch: true
+                })
+                .when('/dmn-engine', {
+                    templateUrl: 'views/decision-tables.html',
+                    controller: 'DecisionTablesController',
+                    reloadOnSearch: true
+                })
+                .when('/content-engine', {
+                    templateUrl: 'views/deployments.html',
+                    controller: 'DeploymentsController',
+                    reloadOnSearch: true
+                })
                 .when('/process-definitions', {
                     templateUrl: 'views/process-definitions.html',
                     controller: 'ProcessDefinitionsController',
