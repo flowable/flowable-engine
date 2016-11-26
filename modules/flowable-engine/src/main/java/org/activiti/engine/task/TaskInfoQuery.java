@@ -16,9 +16,9 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.query.Query;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
-import org.activiti.engine.query.Query;
 
 /**
  * Interface containing shared methods between the {@link TaskQuery} and the {@link HistoricTaskInstanceQuery}.

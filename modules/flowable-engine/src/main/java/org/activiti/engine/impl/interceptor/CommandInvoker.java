@@ -12,6 +12,7 @@
  */
 package org.activiti.engine.impl.interceptor;
 
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.agenda.AbstractOperation;
 import org.activiti.engine.impl.context.Context;
 import org.slf4j.Logger;

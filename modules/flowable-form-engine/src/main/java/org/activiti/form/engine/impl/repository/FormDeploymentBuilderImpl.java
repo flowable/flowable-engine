@@ -17,7 +17,7 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 
 import org.activiti.editor.form.converter.FormJsonConverter;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.form.api.FormDeployment;
 import org.activiti.form.api.FormDeploymentBuilder;
 import org.activiti.form.engine.FormEngineConfiguration;
@@ -134,6 +134,11 @@ public class FormDeploymentBuilderImpl implements FormDeploymentBuilder, Seriali
   
   public FormDeploymentBuilder parentDeploymentId(String parentDeploymentId) {
     deployment.setParentDeploymentId(parentDeploymentId);
+    return this;
+  }
+  
+  public FormDeploymentBuilder enableDuplicateFiltering() {
+    this.isDuplicateFilterEnabled = true;
     return this;
   }
 

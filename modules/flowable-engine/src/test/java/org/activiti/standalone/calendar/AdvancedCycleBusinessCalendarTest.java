@@ -5,10 +5,10 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import org.activiti.engine.common.impl.util.DefaultClockImpl;
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.engine.impl.calendar.AdvancedCycleBusinessCalendar;
 import org.activiti.engine.impl.test.AbstractTestCase;
-import org.activiti.engine.impl.util.DefaultClockImpl;
-import org.activiti.engine.runtime.Clock;
 
 public class AdvancedCycleBusinessCalendarTest extends AbstractTestCase {
 

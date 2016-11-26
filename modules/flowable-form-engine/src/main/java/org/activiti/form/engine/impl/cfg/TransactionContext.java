@@ -12,8 +12,8 @@
  */
 package org.activiti.form.engine.impl.cfg;
 
-import org.activiti.engine.impl.cfg.BaseTransactionContext;
-import org.activiti.engine.impl.cfg.TransactionState;
+import org.activiti.engine.common.impl.cfg.BaseTransactionContext;
+import org.activiti.engine.common.impl.cfg.TransactionState;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
 
 /**

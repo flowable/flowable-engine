@@ -16,7 +16,7 @@ package org.activiti.engine.impl.cmd;
 import java.io.InputStream;
 import java.io.Serializable;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.bpmn.diagram.ProcessDiagramLayoutFactory;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;

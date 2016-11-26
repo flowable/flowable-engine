@@ -28,7 +28,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.repository.DeploymentProperties;
 import org.activiti.engine.test.Deployment;

@@ -13,15 +13,10 @@
 package org.activiti.app.conf;
 
 import java.beans.PropertyVetoException;
-import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import org.activiti.engine.ActivitiException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.mybatis.spring.SqlSessionFactoryBean;
-import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +24,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.io.support.ResourcePatternUtils;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -37,21 +31,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
-import liquibase.Liquibase;
-import liquibase.database.Database;
-import liquibase.database.DatabaseConnection;
-import liquibase.database.DatabaseFactory;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.resource.ClassLoaderResourceAccessor;
-
 @Configuration
 @EnableTransactionManagement
 public class DatabaseConfiguration {
 
   private final Logger log = LoggerFactory.getLogger(DatabaseConfiguration.class);
   
-  protected static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_DE_";
-
   @Autowired
   protected Environment env;
   
@@ -158,49 +143,6 @@ public class DatabaseConfiguration {
     DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
     dataSourceTransactionManager.setDataSource(dataSource());
     return dataSourceTransactionManager;
-  }
-    
-  @Bean
-  public SqlSessionFactory sqlSessionFactory() {
-    SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-    sqlSessionFactoryBean.setDataSource(dataSource());
-    
-    try {
-      Properties properties = new Properties();
-      properties.put("prefix", env.getProperty("datasource.prefix", ""));
-      sqlSessionFactoryBean.setConfigurationProperties(properties);
-      sqlSessionFactoryBean
-        .setMapperLocations(ResourcePatternUtils.getResourcePatternResolver(resourceLoader).getResources("classpath:/META-INF/task-app-mybatis-mappings/*.xml"));
-      sqlSessionFactoryBean.afterPropertiesSet();
-      return sqlSessionFactoryBean.getObject();
-    } catch (Exception e) {
-      throw new RuntimeException("Could not create sqlSessionFactory", e);
-    }
-
-  }
-  
-  @Bean(destroyMethod="clearCache") // destroyMethod: see https://github.com/mybatis/old-google-code-issues/issues/778
-  public SqlSessionTemplate SqlSessionTemplate() {
-    return new SqlSessionTemplate(sqlSessionFactory());
-  }
-
-  @Bean(name = "liquibase")
-  public Liquibase liquibase() {
-    log.info("Configuring Liquibase");
-    
-    try {
-      DatabaseConnection connection = new JdbcConnection(dataSource().getConnection());
-      Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
-      database.setDatabaseChangeLogTableName(LIQUIBASE_CHANGELOG_PREFIX+database.getDatabaseChangeLogTableName());
-      database.setDatabaseChangeLogLockTableName(LIQUIBASE_CHANGELOG_PREFIX+database.getDatabaseChangeLogLockTableName());
-  
-      Liquibase liquibase = new Liquibase("META-INF/liquibase/flowable-task-app-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
-      liquibase.update("activiti");
-      return liquibase;
-      
-    } catch (Exception e) {
-      throw new ActivitiException("Error creating liquibase database", e);
-    }
   }
 
 }

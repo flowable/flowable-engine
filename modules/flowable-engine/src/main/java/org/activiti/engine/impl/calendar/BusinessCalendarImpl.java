@@ -1,6 +1,6 @@
 package org.activiti.engine.impl.calendar;
 
-import org.activiti.engine.runtime.ClockReader;
+import org.activiti.engine.common.runtime.ClockReader;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;
 

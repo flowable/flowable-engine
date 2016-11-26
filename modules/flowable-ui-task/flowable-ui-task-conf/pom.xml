@@ -23,11 +23,11 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
-            <artifactId>flowable-content-storage-api</artifactId>
+            <artifactId>flowable-content-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
-            <artifactId>flowable-content-storage-fs</artifactId>
+            <artifactId>flowable-content-engine</artifactId>
         </dependency>
 
 		<!-- Activiti -->
@@ -61,7 +61,7 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
-            <artifactId>flowable-form-engine-configurator</artifactId>
+            <artifactId>flowable-form-spring-configurator</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
@@ -77,7 +77,11 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
-            <artifactId>flowable-dmn-engine-configurator</artifactId>
+            <artifactId>flowable-form-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-dmn-spring-configurator</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
@@ -86,6 +90,18 @@
 		<dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-dmn-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-dmn-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-content-spring-configurator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-content-engine</artifactId>
         </dependency>
 
 		<!-- LOGGING -->
@@ -123,18 +139,6 @@
         </dependency>
 
         <!-- DATABASE -->
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis-spring</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-        </dependency>
         <dependency>
             <groupId>com.mchange</groupId>
             <artifactId>c3p0</artifactId>

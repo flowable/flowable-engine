@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 
 /**
  * A {@link DataSource} implementation that switches the currently used datasource based on the

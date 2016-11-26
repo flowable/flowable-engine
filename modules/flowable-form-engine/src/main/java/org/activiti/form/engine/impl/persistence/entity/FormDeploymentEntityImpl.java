@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.persistence.entity.AbstractEntityNoRevision;
+import org.activiti.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
 import org.activiti.form.engine.FormEngineConfiguration;
 
 /**

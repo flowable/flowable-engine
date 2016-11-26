@@ -15,8 +15,8 @@ package org.activiti.form.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.form.api.FormDefinition;
 import org.activiti.form.engine.impl.FormDefinitionQueryImpl;
 import org.activiti.form.engine.impl.interceptor.Command;

@@ -12,9 +12,9 @@
  */
 package org.activiti.examples.runtime;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.FlowableEngineAgenda;
 import org.activiti.engine.FlowableEngineAgendaFactory;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.agenda.DefaultFlowableEngineAgenda;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;

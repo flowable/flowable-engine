@@ -18,8 +18,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.idm.api.Token;
 import org.activiti.idm.api.TokenQuery;
 import org.activiti.idm.engine.impl.persistence.entity.TokenEntity;

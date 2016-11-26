@@ -14,9 +14,10 @@ package org.activiti.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.persistence.entity.EntityManager;
 import org.activiti.engine.delegate.VariableScope;
 import org.activiti.engine.impl.JobQueryImpl;
-import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.TimerJobQueryImpl;
 import org.activiti.engine.runtime.Job;
 

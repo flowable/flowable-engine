@@ -20,8 +20,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
+
+import org.activiti.engine.common.api.query.QueryProperty;
 import org.activiti.engine.impl.ModelQueryProperty;
-import org.activiti.engine.query.QueryProperty;
 import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ModelQuery;
 import org.activiti.rest.api.DataResponse;

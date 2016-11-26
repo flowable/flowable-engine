@@ -15,7 +15,7 @@ package org.activiti5.engine.test.api.event;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.ActivitiVariableEvent;
 import org.activiti.engine.runtime.Execution;

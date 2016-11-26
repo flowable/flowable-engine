@@ -2,9 +2,9 @@ package org.activiti.engine.test.bpmn.usertask;
 
 import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.*;
+import org.activiti.engine.common.impl.util.io.InputStreamSource;
+import org.activiti.engine.common.impl.util.io.StreamSource;
 import org.activiti.engine.impl.test.ResourceActivitiTestCase;
-import org.activiti.engine.impl.util.io.InputStreamSource;
-import org.activiti.engine.impl.util.io.StreamSource;
 import org.activiti.engine.runtime.Execution;
 
 import java.io.ByteArrayInputStream;

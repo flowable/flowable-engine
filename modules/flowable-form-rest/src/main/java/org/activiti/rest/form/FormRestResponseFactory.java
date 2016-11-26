@@ -17,9 +17,11 @@ import java.util.List;
 
 import org.activiti.form.api.FormDefinition;
 import org.activiti.form.api.FormDeployment;
+import org.activiti.form.api.FormInstance;
 import org.activiti.form.model.FormInstanceModel;
 import org.activiti.form.model.FormModel;
 import org.activiti.rest.form.service.api.form.FormInstanceModelResponse;
+import org.activiti.rest.form.service.api.form.FormInstanceResponse;
 import org.activiti.rest.form.service.api.form.FormModelResponse;
 import org.activiti.rest.form.service.api.repository.FormDefinitionResponse;
 import org.activiti.rest.form.service.api.repository.FormDeploymentResponse;
@@ -41,6 +43,37 @@ public class FormRestResponseFactory {
     response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_RUNTIME_TASK_FORM));
 
     return response;
+  }
+
+  public List<FormInstanceResponse> createFormInstanceResponse(List<FormInstance> formInstances) {
+    FormRestUrlBuilder urlBuilder = new FormRestUrlBuilder();
+    List<FormInstanceResponse> responseList = new ArrayList<>();
+    for (FormInstance formInstance : formInstances) {
+      responseList.add(createFormInstanceResponse(formInstance, urlBuilder));
+    }
+
+    return responseList;
+  }
+
+  public FormInstanceResponse createFormInstanceResponse(FormInstance formInstance) {
+    return createFormInstanceResponse(formInstance, createUrlBuilder());
+  }
+
+  public FormInstanceResponse createFormInstanceResponse(FormInstance formInstance, FormRestUrlBuilder urlBuilder) {
+    FormInstanceResponse response = new FormInstanceResponse(formInstance);
+    response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_FORM_INSTANCE_QUERY));
+
+    return response;
+  }
+
+  public List<FormInstanceModelResponse> createFormInstanceModelResponse(List<FormInstanceModel> formInstanceModels) {
+    FormRestUrlBuilder urlBuilder = new FormRestUrlBuilder();
+    List<FormInstanceModelResponse> responseList = new ArrayList<>();
+    for (FormInstanceModel formInstanceModel : formInstanceModels) {
+      responseList.add(createFormInstanceModelResponse(formInstanceModel, urlBuilder));
+    }
+
+    return responseList;
   }
 
   public FormInstanceModelResponse createFormInstanceModelResponse(FormInstanceModel formInstanceModel) {

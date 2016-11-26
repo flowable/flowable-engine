@@ -16,8 +16,8 @@ package org.activiti.engine.impl.variable;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.interceptor.Session;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.interceptor.Session;
 
 /**
  * @author Frederik Heremans

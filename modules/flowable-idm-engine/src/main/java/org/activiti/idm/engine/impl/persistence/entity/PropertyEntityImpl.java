@@ -14,8 +14,8 @@ package org.activiti.idm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.persistence.entity.AbstractEntity;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.persistence.entity.AbstractEntity;
 
 /**
  * @author Tijs Rademakers

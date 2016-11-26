@@ -13,12 +13,12 @@
 package org.activiti.engine.impl.bpmn.deployer;
 
 import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.common.impl.util.IoUtil;
 import org.activiti.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.persistence.entity.ResourceEntity;
-import org.activiti.engine.impl.util.IoUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -18,8 +18,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.impl.Page;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.impl.Page;
 import org.activiti.form.api.FormInstance;
 import org.activiti.form.api.FormInstanceQuery;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
@@ -161,11 +161,11 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
   // sorting ////////////////////////////////////////////////////////
 
   public FormInstanceQuery orderBySubmittedDate() {
-    return orderBy(SubmittedFormQueryProperty.SUBMITTED_DATE);
+    return orderBy(FormInstanceQueryProperty.SUBMITTED_DATE);
   }
 
   public FormInstanceQuery orderByTenantId() {
-    return orderBy(SubmittedFormQueryProperty.TENANT_ID);
+    return orderBy(FormInstanceQueryProperty.TENANT_ID);
   }
 
   // results ////////////////////////////////////////////////////////

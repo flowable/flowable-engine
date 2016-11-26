@@ -17,14 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.activiti.bpmn.model.Signal;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 import org.activiti.engine.impl.EventSubscriptionQueryImpl;
-import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.event.EventHandler;
 import org.activiti.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.activiti.engine.impl.persistence.CountingExecutionEntity;
-import org.activiti.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.engine.impl.persistence.entity.data.EventSubscriptionDataManager;
 
 /**

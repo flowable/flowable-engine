@@ -30,7 +30,7 @@ import javax.wsdl.extensions.schema.Schema;
 import javax.xml.namespace.QName;
 
 import org.activiti.bpmn.model.Import;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.bpmn.data.PrimitiveStructureDefinition;
 import org.activiti.engine.impl.bpmn.data.SimpleStructureDefinition;
 import org.activiti.engine.impl.bpmn.data.StructureDefinition;

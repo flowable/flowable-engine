@@ -14,14 +14,15 @@ package org.activiti.form.engine.impl.interceptor;
 
 import java.util.ArrayList;
 
-import org.activiti.engine.impl.interceptor.AbstractCommandContext;
-import org.activiti.engine.impl.interceptor.BaseCommandContextCloseListener;
+import org.activiti.engine.common.impl.interceptor.AbstractCommandContext;
+import org.activiti.engine.common.impl.interceptor.BaseCommandContextCloseListener;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.db.DbSqlSession;
 import org.activiti.form.engine.impl.persistence.entity.FormDefinitionEntityManager;
 import org.activiti.form.engine.impl.persistence.entity.FormDeploymentEntityManager;
 import org.activiti.form.engine.impl.persistence.entity.FormInstanceEntityManager;
 import org.activiti.form.engine.impl.persistence.entity.ResourceEntityManager;
+import org.activiti.form.engine.impl.persistence.entity.TableDataManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +67,10 @@ public class CommandContext extends AbstractCommandContext {
   
   public FormInstanceEntityManager getFormInstanceEntityManager() {
     return formEngineConfiguration.getFormInstanceEntityManager();
+  }
+  
+  public TableDataManager getTableDataManager() {
+    return formEngineConfiguration.getTableDataManager();
   }
 
   // getters and setters

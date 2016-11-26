@@ -21,8 +21,8 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.impl.Page;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.impl.Page;
 import org.activiti.idm.api.User;
 import org.activiti.idm.engine.impl.UserQueryImpl;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;

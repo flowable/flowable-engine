@@ -1,8 +1,8 @@
 package org.activiti.examples.debugger;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.Agenda;
 import org.activiti.engine.FlowableEngineAgendaFactory;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.agenda.AbstractOperation;
 import org.activiti.engine.impl.cmd.NeedsActiveExecutionCmd;
 import org.activiti.engine.impl.context.Context;

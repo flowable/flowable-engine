@@ -29,7 +29,7 @@
 
   <resultMap id="formInstanceResultMap" type="org.activiti.form.engine.impl.persistence.entity.FormInstanceEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="formDefinitionId" column="FORM_ID_" jdbcType="VARCHAR" />
+    <result property="formDefinitionId" column="FORM_DEFINITION_ID_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR"/>

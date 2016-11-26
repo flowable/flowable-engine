@@ -21,12 +21,12 @@ import org.activiti.dmn.engine.DmnEngine;
 import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.deployer.DmnDeployer;
 import org.activiti.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration;
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.cfg.AbstractProcessEngineConfigurator;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.transaction.TransactionContextAwareDataSource;
+import org.activiti.engine.common.impl.transaction.TransactionContextAwareTransactionFactory;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.persistence.deploy.Deployer;
-import org.activiti.engine.impl.transaction.TransactionContextAwareDataSource;
-import org.activiti.engine.impl.transaction.TransactionContextAwareTransactionFactory;
 
 /**
  * @author Tijs Rademakers
@@ -72,11 +72,11 @@ public class DmnEngineConfigurator extends AbstractProcessEngineConfigurator {
       
       if (processEngineConfiguration.isTransactionsExternallyManaged()) {
         dmnEngineConfiguration.setTransactionsExternallyManaged(true);
-       } else {
-         dmnEngineConfiguration.setTransactionFactory(
-             new TransactionContextAwareTransactionFactory<org.activiti.idm.engine.impl.cfg.TransactionContext>(
-                   org.activiti.idm.engine.impl.cfg.TransactionContext.class));
-       }
+      } else {
+        dmnEngineConfiguration.setTransactionFactory(
+             new TransactionContextAwareTransactionFactory<org.activiti.dmn.engine.impl.cfg.TransactionContext>(
+                   org.activiti.dmn.engine.impl.cfg.TransactionContext.class));
+      }
     }
     
     DmnEngine dmnEngine = initDmnEngine();

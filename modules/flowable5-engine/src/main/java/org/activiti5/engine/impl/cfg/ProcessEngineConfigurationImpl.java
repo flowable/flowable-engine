@@ -40,8 +40,9 @@ import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
 import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
+import org.activiti.engine.common.impl.util.DefaultClockImpl;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
-import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
 import org.activiti.engine.form.AbstractFormType;
 import org.activiti.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.activiti.engine.impl.bpmn.data.ItemInstance;
@@ -55,7 +56,6 @@ import org.activiti.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
 import org.activiti.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.activiti.engine.impl.persistence.deploy.DeploymentCache;
 import org.activiti.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
-import org.activiti.engine.impl.util.DefaultClockImpl;
 import org.activiti.engine.impl.variable.VariableType;
 import org.activiti.engine.impl.variable.VariableTypes;
 import org.activiti.idm.api.IdmIdentityService;

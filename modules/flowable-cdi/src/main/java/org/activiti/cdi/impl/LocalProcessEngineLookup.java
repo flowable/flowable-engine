@@ -12,9 +12,9 @@
  */
 package org.activiti.cdi.impl;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngines;
+import org.activiti.engine.common.api.ActivitiException;
 
 /**
  * {@link ProcessEngineLookup} for looking up or building a local {@link ProcessEngine} using the provided processEngineName ( {@link ProcessEngines#NAME_DEFAULT} is used as default value). Can be

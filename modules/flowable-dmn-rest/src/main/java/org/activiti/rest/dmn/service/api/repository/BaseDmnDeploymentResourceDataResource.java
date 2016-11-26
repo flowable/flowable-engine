@@ -19,9 +19,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.dmn.api.DmnDeployment;
 import org.activiti.dmn.api.DmnRepositoryService;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.rest.application.ContentTypeResolver;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;

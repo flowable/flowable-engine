@@ -13,7 +13,7 @@
 
 package org.activiti.idm.engine.impl.db;
 
-import org.activiti.engine.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.idm.engine.IdmEngine;
 import org.activiti.idm.engine.IdmEngines;
 import org.activiti.idm.engine.impl.interceptor.Command;

@@ -19,7 +19,7 @@ import java.io.Serializable;
 import org.activiti.dmn.engine.impl.interceptor.Command;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
 import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntity;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 
 /**
  * Gives access to a deployed decision table model, e.g., a DMN XML file, through a stream of bytes.

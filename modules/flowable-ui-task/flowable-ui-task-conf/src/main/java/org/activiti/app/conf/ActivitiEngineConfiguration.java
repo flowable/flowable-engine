@@ -14,7 +14,12 @@ package org.activiti.app.conf;
 
 import javax.sql.DataSource;
 
-import org.activiti.dmn.engine.configurator.DmnEngineConfigurator;
+import org.activiti.content.api.ContentService;
+import org.activiti.content.spring.SpringContentEngineConfiguration;
+import org.activiti.content.spring.configurator.SpringContentEngineConfigurator;
+import org.activiti.dmn.api.DmnRepositoryService;
+import org.activiti.dmn.api.DmnRuleService;
+import org.activiti.dmn.spring.configurator.SpringDmnEngineConfigurator;
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
@@ -24,12 +29,12 @@ import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.runtime.Clock;
 import org.activiti.form.api.FormRepositoryService;
-import org.activiti.form.engine.configurator.FormEngineConfigurator;
+import org.activiti.form.spring.configurator.SpringFormEngineConfigurator;
 import org.activiti.idm.api.IdmIdentityService;
 import org.activiti.spring.ProcessEngineFactoryBean;
 import org.activiti.spring.SpringProcessEngineConfiguration;
@@ -53,6 +58,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class ActivitiEngineConfiguration {
 
     private final Logger logger = LoggerFactory.getLogger(ActivitiEngineConfiguration.class);
+    
+    private static final String PROP_FS_ROOT = "contentstorage.fs.rootFolder";
+    private static final String PROP_FS_CREATE_ROOT = "contentstorage.fs.createRoot";
     
     @Autowired
     private DataSource dataSource;
@@ -107,8 +115,24 @@ public class ActivitiEngineConfiguration {
     	// Enable safe XML. See http://www.flowable.org/docs/userguide/index.html#advanced.safe.bpmn.xml
     	processEngineConfiguration.setEnableSafeBpmnXml(true);
     	
-    	processEngineConfiguration.addConfigurator(new FormEngineConfigurator());
-      processEngineConfiguration.addConfigurator(new DmnEngineConfigurator());
+    	processEngineConfiguration.addConfigurator(new SpringFormEngineConfigurator());
+      processEngineConfiguration.addConfigurator(new SpringDmnEngineConfigurator());
+      
+      SpringContentEngineConfiguration contentEngineConfiguration = new SpringContentEngineConfiguration();
+      String contentRootFolder = environment.getProperty(PROP_FS_ROOT);
+      if (contentRootFolder != null) {
+        contentEngineConfiguration.setContentRootFolder(contentRootFolder);
+      }
+      
+      Boolean createRootFolder = environment.getProperty(PROP_FS_CREATE_ROOT, Boolean.class);
+      if (createRootFolder != null) {
+        contentEngineConfiguration.setCreateContentRootFolder(createRootFolder);
+      }
+      
+      SpringContentEngineConfigurator springContentEngineConfigurator = new SpringContentEngineConfigurator();
+      springContentEngineConfigurator.setContentEngineConfiguration(contentEngineConfiguration);
+      
+      processEngineConfiguration.addConfigurator(springContentEngineConfigurator);
     	
     	return processEngineConfiguration;
     }
@@ -175,5 +199,20 @@ public class ActivitiEngineConfiguration {
     @Bean
     public org.activiti.form.api.FormService formEngineFormService() {
       return processEngine().getFormEngineFormService();
+    }
+    
+    @Bean
+    public DmnRepositoryService dmnRepositoryService() {
+      return processEngine().getDmnRepositoryService();
+    }
+    
+    @Bean
+    public DmnRuleService dmnRuleService() {
+      return processEngine().getDmnRuleService();
+    }
+    
+    @Bean
+    public ContentService contentService() {
+      return processEngine().getContentService();
     }
 }

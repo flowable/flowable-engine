@@ -17,12 +17,12 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.cfg.AbstractProcessEngineConfigurator;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.transaction.TransactionContextAwareDataSource;
+import org.activiti.engine.common.impl.transaction.TransactionContextAwareTransactionFactory;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.persistence.deploy.Deployer;
-import org.activiti.engine.impl.transaction.TransactionContextAwareDataSource;
-import org.activiti.engine.impl.transaction.TransactionContextAwareTransactionFactory;
 import org.activiti.form.engine.FormEngine;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.deployer.FormDeployer;
@@ -76,8 +76,8 @@ public class FormEngineConfigurator extends AbstractProcessEngineConfigurator {
         formEngineConfiguration.setTransactionsExternallyManaged(true);
        } else {
         formEngineConfiguration.setTransactionFactory(
-             new TransactionContextAwareTransactionFactory<org.activiti.idm.engine.impl.cfg.TransactionContext>(
-                   org.activiti.idm.engine.impl.cfg.TransactionContext.class));
+             new TransactionContextAwareTransactionFactory<org.activiti.form.engine.impl.cfg.TransactionContext>(
+                   org.activiti.form.engine.impl.cfg.TransactionContext.class));
        }
       
     }

@@ -12,10 +12,8 @@
  */
 package org.activiti.engine.impl.agenda;
 
-import java.util.LinkedList;
-
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.FlowableEngineAgenda;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.delegate.ActivityBehavior;
 import org.activiti.engine.impl.interceptor.Command;
@@ -24,6 +22,8 @@ import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.LinkedList;
 
 /**
  * For each API call (and thus {@link Command}) being executed, a new agenda instance is created.

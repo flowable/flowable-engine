@@ -1,5 +1,6 @@
 package org.activiti.idm.engine.impl.cmd;
 
+import org.activiti.engine.common.impl.cmd.CustomSqlExecution;
 import org.activiti.idm.engine.impl.interceptor.Command;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 

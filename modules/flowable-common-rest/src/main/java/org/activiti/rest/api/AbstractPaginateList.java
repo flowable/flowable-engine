@@ -13,12 +13,12 @@
 
 package org.activiti.rest.api;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.query.Query;
-import org.activiti.engine.query.QueryProperty;
-
 import java.util.List;
 import java.util.Map;
+
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.query.Query;
+import org.activiti.engine.common.api.query.QueryProperty;
 
 /**
  * @author Tijs Rademakers

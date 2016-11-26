@@ -15,7 +15,7 @@ package org.activiti.app.rest.runtime;
 import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.app.model.common.ResultListDataRepresentation;
-import org.activiti.app.model.runtime.RelatedContentRepresentation;
+import org.activiti.app.model.runtime.ContentItemRepresentation;
 import org.activiti.app.service.exception.InternalServerErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,125 +35,115 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RestController
 public class RelatedContentResource extends AbstractRelatedContentResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractRelatedContentResource.class);
+  private static final Logger logger = LoggerFactory.getLogger(AbstractRelatedContentResource.class);
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+  protected ObjectMapper objectMapper = new ObjectMapper();
 
-    @RequestMapping(value = "/rest/tasks/{taskId}/content", method = RequestMethod.GET)
-    public ResultListDataRepresentation getRelatedContentForTask(@PathVariable("taskId") String taskId) {
-        return super.getRelatedContentForTask(taskId);
+  @RequestMapping(value = "/rest/tasks/{taskId}/content", method = RequestMethod.GET)
+  public ResultListDataRepresentation getContentItemsForTask(@PathVariable("taskId") String taskId) {
+    return super.getContentItemsForTask(taskId);
+  }
+
+  @RequestMapping(value = "/rest/process-instances/{processInstanceId}/content", method = RequestMethod.GET)
+  public ResultListDataRepresentation getContentItemsForProcessInstance(@PathVariable("processInstanceId") String processInstanceId) {
+    return super.getContentItemsForProcessInstance(processInstanceId);
+  }
+
+  @RequestMapping(value = "/rest/tasks/{taskId}/raw-content", method = RequestMethod.POST)
+  public ContentItemRepresentation createContentItemOnTask(@PathVariable("taskId") String taskId, @RequestParam("file") MultipartFile file) {
+    return super.createContentItemOnTask(taskId, file);
+  }
+
+  /*
+   * specific endpoint for IE9 flash upload component
+   */
+  @RequestMapping(value = "/rest/tasks/{taskId}/raw-content/text", method = RequestMethod.POST)
+  public String createContentItemOnTaskText(@PathVariable("taskId") String taskId, @RequestParam("file") MultipartFile file) {
+    ContentItemRepresentation contentItem = super.createContentItemOnTask(taskId, file);
+    String contentItemJson = null;
+    try {
+      contentItemJson = objectMapper.writeValueAsString(contentItem);
+    } catch (Exception e) {
+      logger.error("Error while processing ContentItem representation json", e);
+      throw new InternalServerErrorException("ContentItem on task could not be saved");
     }
 
-    @RequestMapping(value = "/rest/process-instances/{processInstanceId}/content", method = RequestMethod.GET)
-    public ResultListDataRepresentation getRelatedContentForProcessInstance(@PathVariable("processInstanceId") String processInstanceId) {
-        return super.getRelatedContentForProcessInstance(processInstanceId);
+    return contentItemJson;
+  }
+
+  @RequestMapping(value = "/rest/tasks/{taskId}/content", method = RequestMethod.POST)
+  public ContentItemRepresentation createContentItemOnTask(@PathVariable("taskId") String taskId, @RequestBody ContentItemRepresentation contentItem) {
+    return super.createContentItemOnTask(taskId, contentItem);
+  }
+
+  @RequestMapping(value = "/rest/processes/{processInstanceId}/content", method = RequestMethod.POST)
+  public ContentItemRepresentation createContentItemOnProcessInstance(@PathVariable("processInstanceId") String processInstanceId, @RequestBody ContentItemRepresentation contentItem) {
+    return super.createContentItemOnProcessInstance(processInstanceId, contentItem);
+  }
+
+  @RequestMapping(value = "/rest/process-instances/{processInstanceId}/raw-content", method = RequestMethod.POST)
+  public ContentItemRepresentation createContentItemOnProcessInstance(@PathVariable("processInstanceId") String processInstanceId, @RequestParam("file") MultipartFile file) {
+    return super.createContentItemOnProcessInstance(processInstanceId, file);
+  }
+
+  /*
+   * specific endpoint for IE9 flash upload component
+   */
+  @RequestMapping(value = "/rest/process-instances/{processInstanceId}/raw-content/text", method = RequestMethod.POST)
+  public String createContentItemOnProcessInstanceText(@PathVariable("processInstanceId") String processInstanceId, @RequestParam("file") MultipartFile file) {
+    ContentItemRepresentation contentItem = super.createContentItemOnProcessInstance(processInstanceId, file);
+
+    String contentItemJson = null;
+    try {
+      contentItemJson = objectMapper.writeValueAsString(contentItem);
+    } catch (Exception e) {
+      logger.error("Error while processing ContentItem representation json", e);
+      throw new InternalServerErrorException("ContentItem on process instance could not be saved");
     }
 
-    @RequestMapping(value = "/rest/content/{source}/{sourceId}/process-instances", method = RequestMethod.GET)
-    public ResultListDataRepresentation getRelatedProcessInstancesForContent(@PathVariable("source") String source, @PathVariable("sourceId") String sourceId) {
-        return super.getRelatedProcessInstancesForContent(source, sourceId);
+    return contentItemJson;
+  }
+
+  @RequestMapping(value = "/rest/content/raw", method = RequestMethod.POST)
+  public ContentItemRepresentation createTemporaryRawContentItem(@RequestParam("file") MultipartFile file) {
+    return super.createTemporaryRawContentItem(file);
+  }
+
+  /*
+   * specific endpoint for IE9 flash upload component
+   */
+  @RequestMapping(value = "/rest/content/raw/text", method = RequestMethod.POST)
+  public String createTemporaryRawContentItemText(@RequestParam("file") MultipartFile file) {
+    ContentItemRepresentation contentItem = super.createTemporaryRawContentItem(file);
+    String contentItemJson = null;
+    try {
+      contentItemJson = objectMapper.writeValueAsString(contentItem);
+    } catch (Exception e) {
+      logger.error("Error while processing ContentItem representation json", e);
+      throw new InternalServerErrorException("ContentItem could not be saved");
     }
 
-    @RequestMapping(value = "/rest/tasks/{taskId}/raw-content", method = RequestMethod.POST)
-    public RelatedContentRepresentation createRelatedContentOnTask(@PathVariable("taskId") String taskId, @RequestParam("file") MultipartFile file) {
-        return super.createRelatedContentOnTask(taskId, file);
-    }
-            
-    /*
-     * specific endpoint for IE9 flash upload component
-     */
-    @RequestMapping(value = "/rest/tasks/{taskId}/raw-content/text", method = RequestMethod.POST)
-    public String createRelatedContentOnTaskText(@PathVariable("taskId") String taskId, @RequestParam("file") MultipartFile file) {
-        RelatedContentRepresentation relatedContentRepresentation = super.createRelatedContentOnTask(taskId, file);
-        String relatedContentJson = null;
-        try {
-            relatedContentJson = objectMapper.writeValueAsString(relatedContentRepresentation);
-        } catch (Exception e) {
-            logger.error("Error while processing RelatedContent representation json", e);
-            throw new InternalServerErrorException("Related Content on task could not be saved");
-        }
+    return contentItemJson;
+  }
 
-        return relatedContentJson;
-    }
+  @RequestMapping(value = "/rest/content", method = RequestMethod.POST)
+  public ContentItemRepresentation createTemporaryRelatedContent(@RequestBody ContentItemRepresentation contentItem) {
+    return addContentItem(contentItem, null, null, false);
+  }
 
-    @RequestMapping(value = "/rest/tasks/{taskId}/content", method = RequestMethod.POST)
-    public RelatedContentRepresentation createRelatedContentOnTask(@PathVariable("taskId") String taskId,
-            @RequestBody RelatedContentRepresentation relatedContent) {
-        return super.createRelatedContentOnTask(taskId, relatedContent);
-    }
+  @RequestMapping(value = "/rest/content/{contentId}", method = RequestMethod.DELETE)
+  public void deleteContent(@PathVariable("contentId") String contentId, HttpServletResponse response) {
+    super.deleteContent(contentId, response);
+  }
 
-    @RequestMapping(value = "/rest/processes/{processInstanceId}/content", method = RequestMethod.POST)
-    public RelatedContentRepresentation createRelatedContentOnProcessInstance(@PathVariable("processInstanceId") String processInstanceId,
-            @RequestBody RelatedContentRepresentation relatedContent) {
-        return super.createRelatedContentOnProcessInstance(processInstanceId, relatedContent);
-    }
-    
-    @RequestMapping(value = "/rest/process-instances/{processInstanceId}/raw-content", method = RequestMethod.POST)
-    public RelatedContentRepresentation createRelatedContentOnProcessInstance(@PathVariable("processInstanceId") String processInstanceId,
-            @RequestParam("file") MultipartFile file) {
-        return super.createRelatedContentOnProcessInstance(processInstanceId, file);
-    }
-    
-    /*
-     * specific endpoint for IE9 flash upload component
-     */
-    @RequestMapping(value = "/rest/process-instances/{processInstanceId}/raw-content/text", method = RequestMethod.POST)
-    public String createRelatedContentOnProcessInstanceText(@PathVariable("processInstanceId") String processInstanceId,
-            @RequestParam("file") MultipartFile file) {
-        RelatedContentRepresentation relatedContentRepresentation = super.createRelatedContentOnProcessInstance(processInstanceId, file);
-        
-        String relatedContentJson = null;
-        try {
-            relatedContentJson = objectMapper.writeValueAsString(relatedContentRepresentation);
-        } catch (Exception e) {
-            logger.error("Error while processing RelatedContent representation json", e);
-            throw new InternalServerErrorException("Related Content on process instance could not be saved");
-        }
+  @RequestMapping(value = "/rest/content/{contentId}", method = RequestMethod.GET)
+  public ContentItemRepresentation getContent(@PathVariable("contentId") String contentId) {
+    return super.getContent(contentId);
+  }
 
-        return relatedContentJson;
-    }
-
-    @RequestMapping(value = "/rest/content/raw", method = RequestMethod.POST)
-    public RelatedContentRepresentation createTemporaryRawRelatedContent(@RequestParam("file") MultipartFile file) {
-        return super.createTemporaryRawRelatedContent(file);
-    }
-    
-    /*
-     * specific endpoint for IE9 flash upload component
-     */
-    @RequestMapping(value = "/rest/content/raw/text", method = RequestMethod.POST)
-    public String createTemporaryRawRelatedContentText(@RequestParam("file") MultipartFile file) {
-        RelatedContentRepresentation relatedContentRepresentation = super.createTemporaryRawRelatedContent(file);
-        String relatedContentJson = null;
-        try {
-            relatedContentJson = objectMapper.writeValueAsString(relatedContentRepresentation);
-        } catch (Exception e) {
-            logger.error("Error while processing RelatedContent representation json", e);
-            throw new InternalServerErrorException("Related Content could not be saved");
-        }
-
-        return relatedContentJson;
-    }
-
-    @RequestMapping(value = "/rest/content", method = RequestMethod.POST)
-    public RelatedContentRepresentation createTemporaryRelatedContent(@RequestBody RelatedContentRepresentation relatedContent) {
-        return addRelatedContent(relatedContent, null, null, false);
-    }
-
-    @RequestMapping(value = "/rest/content/{contentId}", method = RequestMethod.DELETE)
-    public void deleteContent(@PathVariable("contentId") String contentId, HttpServletResponse response) {
-        super.deleteContent(contentId, response);
-    }
-
-    @RequestMapping(value = "/rest/content/{contentId}", method = RequestMethod.GET)
-    public RelatedContentRepresentation getContent(@PathVariable("contentId") String contentId) {
-        
-        return super.getContent(contentId);
-    }
-
-    @RequestMapping(value = "/rest/content/{contentId}/raw", method = RequestMethod.GET)
-    public void getRawContent(@PathVariable("contentId") String contentId, HttpServletResponse response) {
-        super.getRawContent(contentId, response);
-    }
+  @RequestMapping(value = "/rest/content/{contentId}/raw", method = RequestMethod.GET)
+  public void getRawContent(@PathVariable("contentId") String contentId, HttpServletResponse response) {
+    super.getRawContent(contentId, response);
+  }
 
 }

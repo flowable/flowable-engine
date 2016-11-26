@@ -35,9 +35,9 @@ import java.util.concurrent.ConcurrentMap;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
+import org.activiti.content.api.ContentService;
 import org.activiti.dmn.api.DmnRepositoryService;
 import org.activiti.dmn.api.DmnRuleService;
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.CandidateManager;
 import org.activiti.engine.DefaultCandidateManager;
 import org.activiti.engine.DynamicBpmnService;
@@ -53,12 +53,19 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.app.AppResourceConverter;
 import org.activiti.engine.cfg.ProcessEngineConfigurator;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.activiti.engine.common.impl.cfg.IdGenerator;
+import org.activiti.engine.common.impl.cfg.TransactionContextFactory;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.impl.interceptor.SessionFactory;
+import org.activiti.engine.common.impl.transaction.ContextAwareJdbcTransactionFactory;
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandlerFactory;
 import org.activiti.engine.compatibility.DefaultActiviti5CompatibilityHandlerFactory;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.delegate.event.impl.ActivitiEventDispatcherImpl;
 import org.activiti.engine.form.AbstractFormType;
 import org.activiti.engine.impl.DynamicBpmnServiceImpl;
@@ -282,7 +289,6 @@ import org.activiti.engine.impl.scripting.ResolverFactory;
 import org.activiti.engine.impl.scripting.ScriptBindingsFactory;
 import org.activiti.engine.impl.scripting.ScriptingEngines;
 import org.activiti.engine.impl.scripting.VariableScopeResolverFactory;
-import org.activiti.engine.impl.transaction.ContextAwareJdbcTransactionFactory;
 import org.activiti.engine.impl.util.ProcessInstanceHelper;
 import org.activiti.engine.impl.util.ReflectUtil;
 import org.activiti.engine.impl.variable.BooleanType;
@@ -310,7 +316,6 @@ import org.activiti.engine.impl.variable.UUIDType;
 import org.activiti.engine.impl.variable.VariableType;
 import org.activiti.engine.impl.variable.VariableTypes;
 import org.activiti.engine.parse.BpmnParseHandler;
-import org.activiti.engine.runtime.Clock;
 import org.activiti.form.api.FormRepositoryService;
 import org.activiti.idm.api.IdmIdentityService;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
@@ -368,6 +373,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean dmnEngineInitialized;
   protected DmnRepositoryService dmnEngineRepositoryService;
   protected DmnRuleService dmnEngineRuleService;
+
+  // CONTENT ENGINE SERVICES /////////////////////////////////////////////////////
+  protected boolean contentEngineInitialized;
+  protected ContentService contentService;
 
   // COMMAND EXECUTORS ////////////////////////////////////////////////////////
 
@@ -462,6 +471,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean enableConfiguratorServiceLoader = true; // Enabled by default. In certain environments this should be set to false (eg osgi)
   protected List<ProcessEngineConfigurator> configurators; // The injected configurators
   protected List<ProcessEngineConfigurator> allConfigurators; // Including auto-discovered configurators
+
+  protected ProcessEngineConfigurator idmProcessEngineConfigurator;
 
   // DEPLOYERS //////////////////////////////////////////////////////////////////
 
@@ -759,8 +770,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected CommandContextFactory commandContextFactory;
   protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
-
-  protected Map<Object, Object> beans;
 
   protected DelegateInterceptor delegateInterceptor;
 
@@ -1329,7 +1338,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     if (disableIdmEngine == false) {
-      allConfigurators.add(new IdmEngineConfigurator());
+      if (idmProcessEngineConfigurator != null) {
+        allConfigurators.add(idmProcessEngineConfigurator);
+      } else {
+        allConfigurators.add(new IdmEngineConfigurator());
+      }
     }
 
     // Auto discovery through ServiceLoader
@@ -2272,6 +2285,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  public boolean isContentEngineInitialized() {
+    return contentEngineInitialized;
+  }
+
+  public ProcessEngineConfigurationImpl setContentEngineInitialized(boolean contentEngineInitialized) {
+    this.contentEngineInitialized = contentEngineInitialized;
+    return this;
+  }
+
+  public ContentService getContentService() {
+    return contentService;
+  }
+
+  public ProcessEngineConfigurationImpl setContentService(ContentService contentService) {
+    this.contentService = contentService;
+    return this;
+  }
+
   public Map<Class<?>, SessionFactory> getSessionFactories() {
     return sessionFactories;
   }
@@ -2304,6 +2335,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public List<ProcessEngineConfigurator> getAllConfigurators() {
     return allConfigurators;
+  }
+
+  public ProcessEngineConfigurator getIdmProcessEngineConfigurator() {
+    return idmProcessEngineConfigurator;
+  }
+
+  public ProcessEngineConfigurationImpl setIdmProcessEngineConfigurator(ProcessEngineConfigurator idmProcessEngineConfigurator) {
+    this.idmProcessEngineConfigurator = idmProcessEngineConfigurator;
+    return this;
   }
 
   public BpmnDeployer getBpmnDeployer() {

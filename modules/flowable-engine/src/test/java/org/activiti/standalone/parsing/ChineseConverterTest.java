@@ -5,9 +5,9 @@ import java.io.InputStream;
 
 import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.engine.common.impl.util.io.InputStreamSource;
+import org.activiti.engine.common.impl.util.io.StreamSource;
 import org.activiti.engine.impl.test.ResourceActivitiTestCase;
-import org.activiti.engine.impl.util.io.InputStreamSource;
-import org.activiti.engine.impl.util.io.StreamSource;
 import org.activiti.engine.repository.Deployment;
 
 public class ChineseConverterTest extends ResourceActivitiTestCase {

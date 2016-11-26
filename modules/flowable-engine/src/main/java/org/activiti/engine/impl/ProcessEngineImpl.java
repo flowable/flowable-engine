@@ -14,6 +14,9 @@ package org.activiti.engine.impl;
 
 import java.util.Map;
 
+import org.activiti.content.api.ContentService;
+import org.activiti.dmn.api.DmnRepositoryService;
+import org.activiti.dmn.api.DmnRuleService;
 import org.activiti.engine.DynamicBpmnService;
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
@@ -24,15 +27,15 @@ import org.activiti.engine.ProcessEngines;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.common.impl.cfg.TransactionContextFactory;
+import org.activiti.engine.common.impl.interceptor.SessionFactory;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.cfg.TransactionContextFactory;
 import org.activiti.engine.impl.cfg.TransactionListener;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
-import org.activiti.engine.impl.interceptor.SessionFactory;
 import org.activiti.form.api.FormRepositoryService;
 import org.activiti.idm.api.IdmIdentityService;
 import org.slf4j.Logger;
@@ -56,7 +59,10 @@ public class ProcessEngineImpl implements ProcessEngine {
   protected DynamicBpmnService dynamicBpmnService;
   protected FormRepositoryService formEngineRepositoryService;
   protected org.activiti.form.api.FormService formEngineFormService;
+  protected DmnRepositoryService dmnRepositoryService;
+  protected DmnRuleService dmnRuleService;
   protected IdmIdentityService idmIdentityService;
+  protected ContentService contentService;
   protected AsyncExecutor asyncExecutor;
   protected CommandExecutor commandExecutor;
   protected Map<Class<?>, SessionFactory> sessionFactories;
@@ -80,7 +86,10 @@ public class ProcessEngineImpl implements ProcessEngine {
     this.transactionContextFactory = processEngineConfiguration.getTransactionContextFactory();
     this.formEngineRepositoryService = processEngineConfiguration.getFormEngineRepositoryService();
     this.formEngineFormService = processEngineConfiguration.getFormEngineFormService();
+    this.dmnRepositoryService = processEngineConfiguration.getDmnEngineRepositoryService();
+    this.dmnRuleService = processEngineConfiguration.getDmnEngineRuleService();
     this.idmIdentityService = processEngineConfiguration.getIdmIdentityService();
+    this.contentService = processEngineConfiguration.getContentService();
 
     if (processEngineConfiguration.isUsingRelationalDatabase() && processEngineConfiguration.getDatabaseSchemaUpdate() != null) {
       commandExecutor.execute(processEngineConfiguration.getSchemaCommandConfig(), new SchemaOperationsProcessEngineBuild());
@@ -174,7 +183,19 @@ public class ProcessEngineImpl implements ProcessEngine {
     return formEngineFormService;
   }
   
+  public DmnRepositoryService getDmnRepositoryService() {
+    return dmnRepositoryService;
+  }
+  
+  public DmnRuleService getDmnRuleService() {
+    return dmnRuleService;
+  }
+  
   public IdmIdentityService getIdmIdentityService() {
     return idmIdentityService;
+  }
+  
+  public ContentService getContentService() {
+    return contentService;
   }
 }

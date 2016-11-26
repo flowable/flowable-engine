@@ -26,7 +26,7 @@ import javax.interceptor.InvocationContext;
 import org.activiti.cdi.BusinessProcess;
 import org.activiti.cdi.annotation.ProcessVariable;
 import org.activiti.cdi.annotation.StartProcess;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 
 /**
  * implementation of the {@link StartProcess} annotation

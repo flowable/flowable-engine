@@ -16,8 +16,8 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.activiti.engine.ManagementService;
+import org.activiti.engine.common.api.management.TableMetaData;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
-import org.activiti.engine.management.TableMetaData;
 
 /**
  * Test case for the various operations of the {@link ManagementService}

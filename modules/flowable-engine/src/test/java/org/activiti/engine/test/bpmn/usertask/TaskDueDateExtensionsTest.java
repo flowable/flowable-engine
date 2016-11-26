@@ -19,9 +19,9 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.engine.impl.calendar.BusinessCalendar;
 import org.activiti.engine.impl.test.ResourceActivitiTestCase;
-import org.activiti.engine.runtime.Clock;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.test.Deployment;

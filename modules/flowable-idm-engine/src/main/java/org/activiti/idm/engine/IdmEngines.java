@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -27,9 +28,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.EngineInfo;
-import org.apache.commons.io.IOUtils;
+import org.activiti.engine.common.EngineInfo;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.util.IoUtil;
+import org.activiti.idm.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,17 +78,37 @@ public abstract class IdmEngines {
         initIdmEngineFromResource(resource);
       }
 
-      /*
-       * try { resources = classLoader.getResources("activiti-form-context.xml"); } catch (IOException e) { throw new ActivitiIdmException(
-       * "problem retrieving activiti-idm-context.xml resources on the classpath: " + System.getProperty("java.class.path"), e); } while (resources
-       * .hasMoreElements()) { URL resource =
-       * resources.nextElement(); log.info("Initializing idm engine using Spring configuration '{}'", resource.toString()); initIdmEngineFromSpringResource
-       * (resource); }
-       */
+      try { 
+        resources = classLoader.getResources("activiti-idm-context.xml"); 
+      } catch (IOException e) { 
+        throw new ActivitiException("problem retrieving activiti-idm-context.xml resources on the classpath: " + System.getProperty("java.class.path"), e); 
+      } 
+      
+      while (resources.hasMoreElements()) { 
+        URL resource = resources.nextElement(); 
+        log.info("Initializing idm engine using Spring configuration '{}'", resource.toString());
+        initIdmEngineFromSpringResource(resource); 
+      }
 
       setInitialized(true);
     } else {
       log.info("Idm engines already initialized");
+    }
+  }
+  
+  protected static void initIdmEngineFromSpringResource(URL resource) {
+    try {
+      Class<?> springConfigurationHelperClass = ReflectUtil.loadClass("org.activiti.idm.spring.SpringIdmConfigurationHelper");
+      Method method = springConfigurationHelperClass.getDeclaredMethod("buildDmnEngine", new Class<?>[] { URL.class });
+      IdmEngine idmEngine = (IdmEngine) method.invoke(null, new Object[] { resource });
+
+      String idmEngineName = idmEngine.getName();
+      EngineInfo idmEngineInfo = new EngineInfo(idmEngineName, resource.toString(), null);
+      idmEngineInfosByName.put(idmEngineName, idmEngineInfo);
+      idmEngineInfosByResourceUrl.put(resource.toString(), idmEngineInfo);
+
+    } catch (Exception e) {
+      throw new ActivitiException("couldn't initialize idm engine from spring configuration resource " + resource.toString() + ": " + e.getMessage(), e);
     }
   }
 
@@ -154,7 +176,7 @@ public abstract class IdmEngines {
     } catch (IOException e) {
       throw new ActivitiException("couldn't open resource stream: " + e.getMessage(), e);
     } finally {
-      IOUtils.closeQuietly(inputStream);
+      IoUtil.closeSilently(inputStream);
     }
   }
 

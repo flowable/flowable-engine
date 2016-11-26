@@ -21,7 +21,7 @@ import javax.el.MethodNotFoundException;
 import javax.el.PropertyNotFoundException;
 import javax.el.ValueExpression;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.form.engine.FormExpression;
 
 /**

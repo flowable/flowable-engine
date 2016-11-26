@@ -13,9 +13,11 @@
 
 package org.activiti.engine.impl.interceptor;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.cfg.TransactionContextFactory;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.impl.interceptor.TransactionCommandContextCloseListener;
 import org.activiti.engine.impl.cfg.TransactionContext;
-import org.activiti.engine.impl.cfg.TransactionContextFactory;
 import org.activiti.engine.impl.cfg.TransactionListener;
 import org.activiti.engine.impl.context.Context;
 

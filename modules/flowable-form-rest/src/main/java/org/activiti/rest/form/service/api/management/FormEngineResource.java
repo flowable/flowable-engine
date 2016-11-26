@@ -12,11 +12,10 @@
  */
 package org.activiti.rest.form.service.api.management;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.EngineInfo;
+import org.activiti.engine.common.EngineInfo;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.form.engine.FormEngine;
 import org.activiti.form.engine.FormEngines;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,26 +26,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class FormEngineResource {
 
-  @Autowired
-  protected FormEngine formEngine;
-
   @RequestMapping(value = "/form-management/engine", method = RequestMethod.GET, produces = "application/json")
   public FormEngineInfoResponse getEngineInfo() {
     FormEngineInfoResponse response = new FormEngineInfoResponse();
 
     try {
+      FormEngine formEngine = FormEngines.getDefaultFormEngine();
       EngineInfo formEngineInfo = FormEngines.getFormEngineInfo(formEngine.getName());
+
       if (formEngineInfo != null) {
         response.setName(formEngineInfo.getName());
         response.setResourceUrl(formEngineInfo.getResourceUrl());
         response.setException(formEngineInfo.getException());
-        
       } else {
         response.setName(formEngine.getName());
       }
-      
     } catch (Exception e) {
-        throw new ActivitiException("Error retrieving form engine info", e);
+      throw new ActivitiException("Error retrieving form engine info", e);
     }
 
     response.setVersion(FormEngine.VERSION);

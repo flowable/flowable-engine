@@ -22,7 +22,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.rest.exception.ActivitiConflictException;
 import org.activiti.rest.service.api.engine.variable.RestVariable;

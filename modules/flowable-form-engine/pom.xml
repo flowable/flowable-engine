@@ -17,6 +17,9 @@
 		<activiti.artifact>
 			org.activiti.form.engine
 		</activiti.artifact>
+		<activiti.osgi.import.additional>
+			org.springframework*;resolution:=optional,
+		</activiti.osgi.import.additional>
 	</properties>
 
     <dependencies>

@@ -3,8 +3,8 @@ package org.activiti.standalone.cfg;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.common.impl.cmd.CustomSqlExecution;
 import org.activiti.engine.impl.cmd.AbstractCustomSqlExecution;
-import org.activiti.engine.impl.cmd.CustomSqlExecution;
 import org.activiti.engine.impl.test.ResourceActivitiTestCase;
 import org.activiti.engine.task.Task;
 

@@ -24,7 +24,8 @@ import java.util.Set;
 
 import javax.el.ELContext;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.persistence.entity.AbstractEntity;
 import org.activiti.engine.delegate.VariableScope;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
@@ -691,7 +692,11 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
           VariableScopeImpl parent = getParentVariableScope();
           if (parent != null) {
-            parent.setVariable(variableName, value, sourceExecution, fetchAllVariables);
+            if (sourceExecution == null) {
+              parent.setVariable(variableName, value, fetchAllVariables);
+            } else {
+              parent.setVariable(variableName, value, sourceExecution, fetchAllVariables);
+            }
             return;
           }
 

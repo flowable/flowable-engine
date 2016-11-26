@@ -15,7 +15,7 @@ package org.activiti.dmn.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
-import org.activiti.engine.impl.persistence.entity.AbstractEntityNoRevision;
+import org.activiti.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
 
 /**
  * @author Tijs Rademakers

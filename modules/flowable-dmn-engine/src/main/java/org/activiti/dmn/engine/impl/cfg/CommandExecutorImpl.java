@@ -3,7 +3,7 @@ package org.activiti.dmn.engine.impl.cfg;
 import org.activiti.dmn.engine.impl.interceptor.Command;
 import org.activiti.dmn.engine.impl.interceptor.CommandExecutor;
 import org.activiti.dmn.engine.impl.interceptor.CommandInterceptor;
-import org.activiti.engine.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 
 /**
  * Command executor that passes commands to the first interceptor in the chain. If no {@link CommandConfig} is passed, the default configuration will be used.

@@ -15,16 +15,16 @@ package org.activiti.engine.test.api.mgmt;
 
 import java.util.Date;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.JobNotFoundException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.management.TableMetaData;
 import org.activiti.engine.impl.ProcessEngineImpl;
 import org.activiti.engine.impl.cmd.AcquireTimerJobsCmd;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
-import org.activiti.engine.management.TableMetaData;
 import org.activiti.engine.runtime.Job;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.test.Deployment;
@@ -137,6 +137,64 @@ public class ManagementServiceTest extends PluggableActivitiTestCase {
     timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
     assertEquals(5, timerJob.getRetries());
     assertEquals(duedate, timerJob.getDuedate());
+  }
+  
+  @Deployment(resources = {"org/activiti/engine/test/api/mgmt/ManagementServiceTest.testFailingAsyncJob.bpmn20.xml"})
+  public void testAsyncJobWithNoRetriesLeft() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
+
+    // The execution is waiting in the first async script task.
+    Job asyncJob = managementService.createJobQuery()
+      .processInstanceId(processInstance.getId())
+      .singleResult();
+
+    assertNotNull("No job found for process instance", asyncJob);
+    assertEquals(processEngineConfiguration.getAsyncExecutorNumberOfRetries(), asyncJob.getRetries());
+    
+    try {
+      managementService.executeJob(asyncJob.getId());
+      fail("Exception expected");
+    } catch (Exception e) {
+      // expected exception
+    }
+    
+    asyncJob = managementService.createTimerJobQuery()
+        .processInstanceId(processInstance.getId())
+        .singleResult();
+    
+    assertEquals(2, asyncJob.getRetries());
+    
+    try {
+      asyncJob = managementService.moveTimerToExecutableJob(asyncJob.getId());
+      managementService.executeJob(asyncJob.getId());
+      fail("Exception expected");
+    } catch (Exception e) {
+      // expected exception
+    }
+    
+    asyncJob = managementService.createTimerJobQuery()
+        .processInstanceId(processInstance.getId())
+        .singleResult();
+    
+    try {
+      asyncJob = managementService.moveTimerToExecutableJob(asyncJob.getId());
+      managementService.executeJob(asyncJob.getId());
+      fail("Exception expected");
+    } catch (Exception e) {
+      // expected exception
+    }
+    
+    asyncJob = managementService.createDeadLetterJobQuery()
+        .processInstanceId(processInstance.getId())
+        .singleResult();
+
+    managementService.moveDeadLetterJobToExecutableJob(asyncJob.getId(), 5);
+
+    asyncJob = managementService.createJobQuery()
+      .processInstanceId(processInstance.getId())
+      .singleResult();
+    
+    assertEquals(5, asyncJob.getRetries());
   }
 
   public void testSetJobRetriesUnexistingJobId() {

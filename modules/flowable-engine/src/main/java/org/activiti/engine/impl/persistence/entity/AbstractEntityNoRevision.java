@@ -12,6 +12,7 @@
  */
 package org.activiti.engine.impl.persistence.entity;
 
+import org.activiti.engine.common.impl.persistence.entity.Entity;
 
 /**
  * Abstract superclass for the common properties of all {@link Entity} implementations.

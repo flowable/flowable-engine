@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.activiti.idm.engine.impl.persistence.entity.CapabilityEntityImpl">
+
+  <resultMap id="capabilityResultMap" type="org.activiti.idm.engine.impl.persistence.entity.CapabilityEntityImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="capabilityName" column="CAPABILITY_NAME_" jdbcType="VARCHAR" />
+    <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
+    <result property="groupId" column="GROUP_ID_" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <insert id="insertCapability" parameterType="org.activiti.idm.engine.impl.persistence.entity.CapabilityEntityImpl">
+    insert into ${prefix}ACT_ID_CAPABILITY (ID_, CAPABILITY_NAME_, USER_ID_, GROUP_ID_)
+    values (
+      #{id ,jdbcType=VARCHAR},
+      #{capabilityName ,jdbcType=VARCHAR},
+      #{userId ,jdbcType=VARCHAR},
+      #{groupId ,jdbcType=VARCHAR}
+    )
+  </insert>
+
+  <insert id="bulkInsertCapability" parameterType="java.util.List">
+    insert into ${prefix}ACT_ID_CAPABILITY (ID_, CAPABILITY_NAME_, USER_ID_, GROUP_ID_) VALUES 
+      <foreach collection="list" item="capability" index="index" separator=",">
+        (#{capability.id ,jdbcType=VARCHAR},
+         #{capability.capabilityName ,jdbcType=VARCHAR},
+         #{capability.userId ,jdbcType=VARCHAR},
+         #{capability.groupId ,jdbcType=VARCHAR})
+      </foreach>
+  </insert>
+
+  <insert id="bulkInsertCapability" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL 
+      <foreach collection="list" item="capability" index="index">
+        insert into ${prefix}ACT_ID_CAPABILITY (ID_, CAPABILITY_NAME_, USER_ID_, GROUP_ID_) VALUES 
+        (#{capability.id ,jdbcType=VARCHAR},
+         #{capability.capabilityName ,jdbcType=VARCHAR},
+         #{capability.userId ,jdbcType=VARCHAR},
+         #{capability.groupId ,jdbcType=VARCHAR})
+      </foreach>
+    SELECT * FROM dual
+  </insert>
+
+  <delete id="deleteCapability" parameterType="org.activiti.idm.engine.impl.persistence.entity.CapabilityEntityImpl">
+    delete from ${prefix}ACT_ID_CAPABILITY where ID_ = #{id}
+  </delete>
+
+  <select id="selectCapability" parameterType="string" resultMap="capabilityResultMap">
+    select * from ${prefix}ACT_ID_CAPABILITY where ID_ = #{id,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectCapabilityByQueryCriteria" parameterType="org.activiti.idm.engine.impl.CapabilityQueryImpl" resultMap="capabilityResultMap">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectCapabilityByQueryCriteriaSql" />
+    ${orderBy}
+    ${limitAfter}
+  </select>
+  
+   <select id="selectCapabilityCountByQueryCriteria" parameterType="org.activiti.idm.engine.impl.CapabilityQueryImpl" resultType="long">
+    select count(RES.ID_)
+    <include refid="selectCapabilityByQueryCriteriaSql" />
+  </select>
+  
+  <sql id="selectCapabilityByQueryCriteriaSql">
+    from ${prefix}ACT_ID_CAPABILITY RES 
+    <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      <if test="capabilityName != null">
+        and RES.CAPABILITY_NAME_ = #{capabilityName}
+      </if>
+      <if test="userId != null">
+        and RES.USER_ID_ = #{userId}
+      </if>
+      <if test="groupId != null">
+        and RES.GROUP_ID_ = #{groupId}
+      </if>
+      <if test="groupIds != null">
+        and RES.GROUP_ID_ IN
+        <foreach item="id" index="index" collection="groupIds" 
+                 open="(" separator="," close=")">
+          #{id}
+        </foreach>
+      </if>
+    </where>
+  </sql>
+
+  <select id="selectCapabilityByNativeQuery" parameterType="java.util.Map" resultMap="capabilityResultMap">
+    <include refid="org.activiti.idm.engine.db.common.selectByNativeQuery"/>
+  </select>
+
+  <select id="selectCapabilityCountByNativeQuery" parameterType="java.util.Map" resultType="long">
+    ${sql}
+  </select>
+  
+</mapper>

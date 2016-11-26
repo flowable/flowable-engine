@@ -15,7 +15,7 @@ package org.activiti.form.engine.impl.persistence.entity.data.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.Page;
+import org.activiti.engine.common.impl.Page;
 import org.activiti.form.api.FormDeployment;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.FormDeploymentQueryImpl;

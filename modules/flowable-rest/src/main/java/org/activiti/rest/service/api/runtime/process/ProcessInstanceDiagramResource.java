@@ -20,9 +20,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.image.ProcessDiagramGenerator;

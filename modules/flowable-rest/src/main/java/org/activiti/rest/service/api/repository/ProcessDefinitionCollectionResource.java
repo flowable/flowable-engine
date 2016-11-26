@@ -20,8 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import io.swagger.annotations.*;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.common.api.query.QueryProperty;
 import org.activiti.engine.impl.ProcessDefinitionQueryProperty;
-import org.activiti.engine.query.QueryProperty;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;

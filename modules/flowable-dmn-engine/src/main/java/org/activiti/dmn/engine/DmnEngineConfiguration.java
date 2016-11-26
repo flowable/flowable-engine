@@ -23,9 +23,11 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.activiti.dmn.api.DmnManagementService;
 import org.activiti.dmn.api.DmnRepositoryService;
 import org.activiti.dmn.api.DmnRuleService;
 import org.activiti.dmn.engine.impl.DmnEngineImpl;
+import org.activiti.dmn.engine.impl.DmnManagementServiceImpl;
 import org.activiti.dmn.engine.impl.DmnRepositoryServiceImpl;
 import org.activiti.dmn.engine.impl.DmnRuleServiceImpl;
 import org.activiti.dmn.engine.impl.RuleEngineExecutorImpl;
@@ -61,25 +63,27 @@ import org.activiti.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManage
 import org.activiti.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManagerImpl;
 import org.activiti.dmn.engine.impl.persistence.entity.ResourceEntityManager;
 import org.activiti.dmn.engine.impl.persistence.entity.ResourceEntityManagerImpl;
+import org.activiti.dmn.engine.impl.persistence.entity.TableDataManager;
+import org.activiti.dmn.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.activiti.dmn.engine.impl.persistence.entity.data.DecisionTableDataManager;
 import org.activiti.dmn.engine.impl.persistence.entity.data.DmnDeploymentDataManager;
 import org.activiti.dmn.engine.impl.persistence.entity.data.ResourceDataManager;
 import org.activiti.dmn.engine.impl.persistence.entity.data.impl.MybatisDecisionTableDataManager;
 import org.activiti.dmn.engine.impl.persistence.entity.data.impl.MybatisDmnDeploymentDataManager;
 import org.activiti.dmn.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
-import org.activiti.engine.AbstractEngineConfiguration;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.cfg.TransactionContextFactory;
-import org.activiti.engine.impl.interceptor.CommandConfig;
-import org.activiti.engine.impl.interceptor.SessionFactory;
-import org.activiti.engine.runtime.Clock;
+import org.activiti.engine.common.AbstractEngineConfiguration;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.cfg.BeansConfigurationHelper;
+import org.activiti.engine.common.impl.cfg.TransactionContextFactory;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.impl.interceptor.SessionFactory;
+import org.activiti.engine.common.runtime.Clock;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.mvel2.integration.PropertyHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.BeanFactory;
 
 import liquibase.Liquibase;
 import liquibase.database.Database;
@@ -116,7 +120,8 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
   // SERVICES
   // /////////////////////////////////////////////////////////////////
 
-  protected DmnRepositoryService repositoryService = new DmnRepositoryServiceImpl();
+  protected DmnManagementService dmnManagementService = new DmnManagementServiceImpl();
+  protected DmnRepositoryService dmnRepositoryService = new DmnRepositoryServiceImpl();
   protected DmnRuleService ruleService = new DmnRuleServiceImpl();
   protected RuleEngineExecutor ruleEngineExecutor = new RuleEngineExecutorImpl();
 
@@ -130,6 +135,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
   protected DmnDeploymentEntityManager deploymentEntityManager;
   protected DecisionTableEntityManager decisionTableEntityManager;
   protected ResourceEntityManager resourceEntityManager;
+  protected TableDataManager tableDataManager;
 
   protected CommandContextFactory commandContextFactory;
   protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
@@ -177,7 +183,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
   }
 
   public static DmnEngineConfiguration createDmnEngineConfigurationFromResource(String resource, String beanName) {
-    return (DmnEngineConfiguration) parseEngineConfigurationFromResource(resource, beanName);
+    return (DmnEngineConfiguration) BeansConfigurationHelper.parseEngineConfigurationFromResource(resource, beanName);
   }
 
   public static DmnEngineConfiguration createDmnEngineConfigurationFromInputStream(InputStream inputStream) {
@@ -185,7 +191,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
   }
 
   public static DmnEngineConfiguration createDmnEngineConfigurationFromInputStream(InputStream inputStream, String beanName) {
-    return (DmnEngineConfiguration) parseEngineConfigurationFromInputStream(inputStream, beanName);
+    return (DmnEngineConfiguration) BeansConfigurationHelper.parseEngineConfigurationFromInputStream(inputStream, beanName);
   }
 
   public static DmnEngineConfiguration createStandaloneDmnEngineConfiguration() {
@@ -212,8 +218,13 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
     initTransactionContextFactory();
     initCommandExecutors();
     initIdGenerator();
-    initDataSource();
-    initDbSchema();
+    
+    if (usingRelationalDatabase) {
+      initDataSource();
+      initDbSchema();
+    }
+    
+    initBeans();
     initTransactionFactory();
     initSqlSessionFactory();
     initSessionFactories();
@@ -229,7 +240,8 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
   // /////////////////////////////////////////////////////////////////
 
   protected void initServices() {
-    initService(repositoryService);
+    initService(dmnManagementService);
+    initService(dmnRepositoryService);
     initService(ruleService);
   }
 
@@ -263,6 +275,9 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
     }
     if (resourceEntityManager == null) {
       resourceEntityManager = new ResourceEntityManagerImpl(this, resourceDataManager);
+    }
+    if (tableDataManager == null) {
+      tableDataManager = new TableDataManagerImpl(this);
     }
   }
 
@@ -612,8 +627,8 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
     return this;
   }
 
-  public DmnEngineConfiguration setBeanFactory(BeanFactory beanFactory) {
-    this.beanFactory = beanFactory;
+  public DmnEngineConfiguration setBeans(Map<Object, Object> beans) {
+    this.beans = beans;
     return this;
   }
 
@@ -666,17 +681,41 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
     this.commandExecutor = commandExecutor;
     return this;
   }
+  
+  public DmnManagementService getDmnManagementService() {
+    return dmnManagementService;
+  }
+  
+  public DmnEngineConfiguration setDmnManagementService(DmnManagementService dmnManagementService) {
+    this.dmnManagementService = dmnManagementService;
+    return this;
+  }
 
   public DmnRepositoryService getDmnRepositoryService() {
-    return repositoryService;
+    return dmnRepositoryService;
+  }
+  
+  public DmnEngineConfiguration setDmnRepositoryService(DmnRepositoryService dmnRepositoryService) {
+    this.dmnRepositoryService = dmnRepositoryService;
+    return this;
   }
 
   public DmnRuleService getDmnRuleService() {
     return ruleService;
   }
   
+  public DmnEngineConfiguration setDmnRuleService(DmnRuleService ruleService) {
+    this.ruleService = ruleService;
+    return this;
+  }
+  
   public RuleEngineExecutor getRuleEngineExecutor() {
     return ruleEngineExecutor;
+  }
+  
+  public DmnEngineConfiguration setRuleEngineExecutor(RuleEngineExecutor ruleEngineExecutor) {
+    this.ruleEngineExecutor = ruleEngineExecutor;
+    return this;
   }
 
   public DeploymentManager getDeploymentManager() {
@@ -774,6 +813,15 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
 
   public DmnEngineConfiguration setResourceEntityManager(ResourceEntityManager resourceEntityManager) {
     this.resourceEntityManager = resourceEntityManager;
+    return this;
+  }
+  
+  public TableDataManager getTableDataManager() {
+    return tableDataManager;
+  }
+
+  public DmnEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
+    this.tableDataManager = tableDataManager;
     return this;
   }
 

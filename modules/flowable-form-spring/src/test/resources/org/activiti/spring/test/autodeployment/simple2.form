@@ -1,0 +1,13 @@
+{
+    "key": "form2",
+    "name": "My second form",
+    "fields": [
+        {
+            "id": "input2",
+            "name": "Input2",
+            "type": "text",
+            "required": false,
+            "placeholder": "empty"
+        }
+    ]
+}

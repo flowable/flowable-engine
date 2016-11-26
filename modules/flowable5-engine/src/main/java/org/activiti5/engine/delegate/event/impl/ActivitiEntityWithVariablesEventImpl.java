@@ -14,8 +14,8 @@ package org.activiti5.engine.delegate.event.impl;
 
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
 import org.activiti.engine.delegate.event.ActivitiEntityWithVariablesEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 
 /**

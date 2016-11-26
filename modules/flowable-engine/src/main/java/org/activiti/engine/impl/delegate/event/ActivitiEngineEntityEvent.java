@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.impl.delegate.event;
 
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
 
 public interface ActivitiEngineEntityEvent extends ActivitiEntityEvent, ActivitiEngineEvent {
 

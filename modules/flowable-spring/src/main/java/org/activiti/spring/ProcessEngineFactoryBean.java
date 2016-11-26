@@ -14,8 +14,8 @@
 package org.activiti.spring;
 
 import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.common.impl.cfg.SpringBeanFactoryProxyMap;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.cfg.SpringBeanFactoryProxyMap;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;

@@ -15,8 +15,8 @@ package org.activiti.idm.engine.test.api.identity;
 
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.idm.api.User;
 import org.activiti.idm.api.UserQuery;
 import org.activiti.idm.engine.impl.persistence.entity.UserEntity;

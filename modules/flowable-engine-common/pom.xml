@@ -18,6 +18,24 @@
 		<activiti.artifact>
 			org.activiti.engine.common
 		</activiti.artifact>
+		<activiti.osgi.export.additional>
+			org.activiti.engine.common,
+			org.activiti.engine.common.impl,
+			org.activiti.engine.common.impl.cfg,
+			org.activiti.engine.common.impl.cmd,
+			org.activiti.engine.common.impl.db,
+			org.activiti.engine.common.impl.interceptor,
+			org.activiti.engine.common.impl.persistence,
+			org.activiti.engine.common.impl.persistence.entity,
+			org.activiti.engine.common.impl.persistence.entity.data,
+			org.activiti.engine.common.impl.transaction,
+			org.activiti.engine.common.impl.util,
+			org.activiti.engine.common.impl.util.io,
+			org.activiti.engine.common.runtime,
+		</activiti.osgi.export.additional>
+		<activiti.osgi.import.additional>
+			org.springframework*;resolution:=optional,
+		</activiti.osgi.import.additional>
 	</properties>
 
 	<build>

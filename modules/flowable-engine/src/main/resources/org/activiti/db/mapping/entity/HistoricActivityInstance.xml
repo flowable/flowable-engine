@@ -248,12 +248,12 @@
     ${sql}
   </select>
   
-  <select id="selectUnfinishedHistoricActivityInstanceExecutionIdAndActivityId" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="historicActivityInstanceResultMap">
+  <select id="selectUnfinishedHistoricActivityInstanceExecutionIdAndActivityId" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="historicActivityInstanceResultMap">
     select * from ${prefix}ACT_HI_ACTINST RES
     where EXECUTION_ID_ = #{parameter.executionId, jdbcType=VARCHAR} and ACT_ID_ = #{parameter.activityId, jdbcType=VARCHAR} and END_TIME_ is null
   </select>
   
-   <select id="selectUnfinishedHistoricActivityInstanceByProcessInstanceId" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="historicActivityInstanceResultMap">
+   <select id="selectUnfinishedHistoricActivityInstanceByProcessInstanceId" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="historicActivityInstanceResultMap">
     select * from ${prefix}ACT_HI_ACTINST RES
     where PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR} and END_TIME_ is null
   </select>

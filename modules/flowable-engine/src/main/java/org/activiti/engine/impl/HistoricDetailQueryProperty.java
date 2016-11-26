@@ -16,8 +16,8 @@ package org.activiti.engine.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.activiti.engine.common.api.query.QueryProperty;
 import org.activiti.engine.history.HistoricDetailQuery;
-import org.activiti.engine.query.QueryProperty;
 
 /**
  * Contains the possible properties which can be used in a {@link HistoricDetailQuery}.

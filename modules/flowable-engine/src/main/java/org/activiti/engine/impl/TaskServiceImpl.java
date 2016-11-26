@@ -21,13 +21,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.cmd.AddCommentCmd;
 import org.activiti.engine.impl.cmd.AddIdentityLinkCmd;
 import org.activiti.engine.impl.cmd.ClaimTaskCmd;
 import org.activiti.engine.impl.cmd.CompleteTaskCmd;
+import org.activiti.engine.impl.cmd.CompleteTaskWithFormCmd;
 import org.activiti.engine.impl.cmd.CreateAttachmentCmd;
 import org.activiti.engine.impl.cmd.DelegateTaskCmd;
 import org.activiti.engine.impl.cmd.DeleteAttachmentCmd;
@@ -48,6 +49,7 @@ import org.activiti.engine.impl.cmd.GetTaskDataObjectCmd;
 import org.activiti.engine.impl.cmd.GetTaskDataObjectsCmd;
 import org.activiti.engine.impl.cmd.GetTaskEventCmd;
 import org.activiti.engine.impl.cmd.GetTaskEventsCmd;
+import org.activiti.engine.impl.cmd.GetTaskFormModelCmd;
 import org.activiti.engine.impl.cmd.GetTaskVariableCmd;
 import org.activiti.engine.impl.cmd.GetTaskVariableInstanceCmd;
 import org.activiti.engine.impl.cmd.GetTaskVariableInstancesCmd;
@@ -73,6 +75,7 @@ import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.NativeTaskQuery;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
+import org.activiti.form.model.FormModel;
 
 /**
  * @author Tom Baeyens
@@ -193,6 +196,26 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
 
   public void complete(String taskId, Map<String, Object> variables, boolean localScope) {
     commandExecutor.execute(new CompleteTaskCmd(taskId, variables, localScope));
+  }
+  
+  public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables) {
+    commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables));
+  }
+  
+  public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, 
+      Map<String, Object> variables, Map<String, Object> transientVariables) {
+    
+    commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables, transientVariables));
+  }
+
+  public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, 
+      Map<String, Object> variables, boolean localScope) {
+    
+    commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables, localScope));
+  }
+  
+  public FormModel getTaskFormModel(String taskId) {
+    return commandExecutor.execute(new GetTaskFormModelCmd(taskId));
   }
 
   public void delegateTask(String taskId, String userId) {

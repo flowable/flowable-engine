@@ -23,15 +23,18 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import org.activiti.editor.form.converter.FormJsonConverter;
-import org.activiti.engine.AbstractEngineConfiguration;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.cfg.TransactionContextFactory;
-import org.activiti.engine.impl.interceptor.CommandConfig;
-import org.activiti.engine.impl.interceptor.SessionFactory;
-import org.activiti.engine.runtime.Clock;
+import org.activiti.engine.common.AbstractEngineConfiguration;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.cfg.BeansConfigurationHelper;
+import org.activiti.engine.common.impl.cfg.TransactionContextFactory;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.impl.interceptor.SessionFactory;
+import org.activiti.engine.common.runtime.Clock;
+import org.activiti.form.api.FormManagementService;
 import org.activiti.form.api.FormRepositoryService;
 import org.activiti.form.api.FormService;
 import org.activiti.form.engine.impl.FormEngineImpl;
+import org.activiti.form.engine.impl.FormManagementServiceImpl;
 import org.activiti.form.engine.impl.FormRepositoryServiceImpl;
 import org.activiti.form.engine.impl.FormServiceImpl;
 import org.activiti.form.engine.impl.ServiceImpl;
@@ -68,6 +71,8 @@ import org.activiti.form.engine.impl.persistence.entity.FormInstanceEntityManage
 import org.activiti.form.engine.impl.persistence.entity.FormInstanceEntityManagerImpl;
 import org.activiti.form.engine.impl.persistence.entity.ResourceEntityManager;
 import org.activiti.form.engine.impl.persistence.entity.ResourceEntityManagerImpl;
+import org.activiti.form.engine.impl.persistence.entity.TableDataManager;
+import org.activiti.form.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.activiti.form.engine.impl.persistence.entity.data.FormDefinitionDataManager;
 import org.activiti.form.engine.impl.persistence.entity.data.FormDeploymentDataManager;
 import org.activiti.form.engine.impl.persistence.entity.data.FormInstanceDataManager;
@@ -81,7 +86,6 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.BeanFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -120,7 +124,8 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
   // SERVICES
   // /////////////////////////////////////////////////////////////////
 
-  protected FormRepositoryService repositoryService = new FormRepositoryServiceImpl();
+  protected FormManagementService formManagementService = new FormManagementServiceImpl();
+  protected FormRepositoryService formRepositoryService = new FormRepositoryServiceImpl();
   protected FormService formService = new FormServiceImpl();
 
   // DATA MANAGERS ///////////////////////////////////////////////////
@@ -135,6 +140,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
   protected FormDefinitionEntityManager formDefinitionEntityManager;
   protected ResourceEntityManager resourceEntityManager;
   protected FormInstanceEntityManager formInstanceEntityManager;
+  protected TableDataManager tableDataManager;
 
   protected CommandContextFactory commandContextFactory;
   protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
@@ -173,7 +179,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
   }
 
   public static FormEngineConfiguration createFormEngineConfigurationFromResource(String resource, String beanName) {
-    return (FormEngineConfiguration) parseEngineConfigurationFromResource(resource, beanName);
+    return (FormEngineConfiguration) BeansConfigurationHelper.parseEngineConfigurationFromResource(resource, beanName);
   }
 
   public static FormEngineConfiguration createFormEngineConfigurationFromInputStream(InputStream inputStream) {
@@ -181,7 +187,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
   }
 
   public static FormEngineConfiguration createFormEngineConfigurationFromInputStream(InputStream inputStream, String beanName) {
-    return (FormEngineConfiguration) parseEngineConfigurationFromInputStream(inputStream, beanName);
+    return (FormEngineConfiguration) BeansConfigurationHelper.parseEngineConfigurationFromInputStream(inputStream, beanName);
   }
 
   public static FormEngineConfiguration createStandaloneFormEngineConfiguration() {
@@ -215,6 +221,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
       initDbSchema();
     }
     
+    initBeans();
     initTransactionFactory();
     initSqlSessionFactory();
     initSessionFactories();
@@ -229,7 +236,8 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
   // /////////////////////////////////////////////////////////////////
 
   protected void initServices() {
-    initService(repositoryService);
+    initService(formManagementService);
+    initService(formRepositoryService);
     initService(formService);
   }
 
@@ -275,6 +283,9 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
     }
     if (formInstanceEntityManager == null) {
       formInstanceEntityManager = new FormInstanceEntityManagerImpl(this, formInstanceDataManager);
+    }
+    if (tableDataManager == null) {
+      tableDataManager = new TableDataManagerImpl(this);
     }
   }
   
@@ -609,8 +620,8 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
     return this;
   }
 
-  public FormEngineConfiguration setBeanFactory(BeanFactory beanFactory) {
-    this.beanFactory = beanFactory;
+  public FormEngineConfiguration setBeans(Map<Object, Object> beans) {
+    this.beans = beans;
     return this;
   }
 
@@ -663,13 +674,32 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
     this.commandExecutor = commandExecutor;
     return this;
   }
+  
+  public FormManagementService getFormManagementService() {
+    return formManagementService;
+  }
+  
+  public FormEngineConfiguration setFormManagementService(FormManagementService formManagementService) {
+    this.formManagementService = formManagementService;
+    return this;
+  }
 
   public FormRepositoryService getFormRepositoryService() {
-    return repositoryService;
+    return formRepositoryService;
+  }
+  
+  public FormEngineConfiguration setFormRepositoryService(FormRepositoryService formRepositoryService) {
+    this.formRepositoryService = formRepositoryService;
+    return this;
   }
 
   public FormService getFormService() {
     return formService;
+  }
+  
+  public FormEngineConfiguration setFormService(FormService formService) {
+    this.formService = formService;
+    return this;
   }
 
   public DeploymentManager getDeploymentManager() {
@@ -785,6 +815,15 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
 
   public FormEngineConfiguration setFormInstanceEntityManager(FormInstanceEntityManager formInstanceEntityManager) {
     this.formInstanceEntityManager = formInstanceEntityManager;
+    return this;
+  }
+  
+  public TableDataManager getTableDataManager() {
+    return tableDataManager;
+  }
+
+  public FormEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
+    this.tableDataManager = tableDataManager;
     return this;
   }
 

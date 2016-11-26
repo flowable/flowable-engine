@@ -15,8 +15,8 @@ package org.activiti.form.api;
 
 import java.util.Set;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.query.Query;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link FormDefinition}s.

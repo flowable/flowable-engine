@@ -29,7 +29,7 @@ package org.activiti.form.engine.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.query.QueryProperty;
+import org.activiti.engine.common.api.query.QueryProperty;
 import org.activiti.form.api.FormDeploymentQuery;
 
 /**

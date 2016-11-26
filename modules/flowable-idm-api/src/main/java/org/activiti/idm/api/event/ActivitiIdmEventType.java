@@ -15,7 +15,7 @@ package org.activiti.idm.api.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventType;
 
 /**
  * Enumeration containing all possible types of {@link ActivitiIdmEvent}s.

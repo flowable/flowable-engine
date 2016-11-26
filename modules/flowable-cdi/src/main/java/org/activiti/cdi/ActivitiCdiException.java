@@ -12,7 +12,7 @@
  */
 package org.activiti.cdi;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 
 /**
  * Represents an exception in activiti cdi.

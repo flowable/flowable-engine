@@ -15,8 +15,8 @@ package org.activiti.form.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.activiti.engine.impl.Page;
-import org.activiti.engine.impl.persistence.entity.data.DataManager;
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 import org.activiti.form.api.FormInstance;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.FormInstanceQueryImpl;
@@ -50,7 +50,7 @@ public class FormInstanceEntityManagerImpl extends AbstractEntityManager<FormIns
     return formInstanceDataManager;
   }
 
-  public FormInstanceDataManager getSubmittedFormDataManager() {
+  public FormInstanceDataManager getFormInstanceDataManager() {
     return formInstanceDataManager;
   }
 

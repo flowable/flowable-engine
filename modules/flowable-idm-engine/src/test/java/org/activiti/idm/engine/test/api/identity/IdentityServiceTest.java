@@ -17,9 +17,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.ActivitiOptimisticLockingException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiOptimisticLockingException;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.Picture;
 import org.activiti.idm.api.Token;

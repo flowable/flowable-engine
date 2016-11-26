@@ -16,8 +16,8 @@ package org.activiti.form.engine.impl;
 import java.io.Serializable;
 import java.util.List;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.impl.Page;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.impl.Page;
 import org.activiti.form.api.FormDeployment;
 import org.activiti.form.api.FormDeploymentQuery;
 import org.activiti.form.engine.impl.interceptor.CommandContext;

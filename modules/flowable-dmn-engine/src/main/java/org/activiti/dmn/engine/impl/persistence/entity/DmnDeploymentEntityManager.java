@@ -17,8 +17,8 @@ import java.util.Map;
 
 import org.activiti.dmn.api.DmnDeployment;
 import org.activiti.dmn.engine.impl.DmnDeploymentQueryImpl;
-import org.activiti.engine.impl.Page;
-import org.activiti.engine.impl.persistence.entity.EntityManager;
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.persistence.entity.EntityManager;
 
 /**
  * @author Tijs Rademakers

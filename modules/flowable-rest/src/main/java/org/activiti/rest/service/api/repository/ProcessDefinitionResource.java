@@ -14,11 +14,10 @@
 package org.activiti.rest.service.api.repository;
 
 import java.util.Date;
-
 import javax.servlet.http.HttpServletRequest;
-
 import io.swagger.annotations.*;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.rest.exception.ActivitiConflictException;
 import org.springframework.web.bind.annotation.PathVariable;

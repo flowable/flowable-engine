@@ -13,7 +13,7 @@
 
 package org.activiti.engine.impl;
 
-import org.activiti.engine.query.QueryProperty;
+import org.activiti.engine.common.api.query.QueryProperty;
 
 /**
  * @author Daniel Meyer

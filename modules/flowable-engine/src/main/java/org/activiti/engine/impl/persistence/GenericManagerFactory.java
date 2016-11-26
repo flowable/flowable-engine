@@ -13,10 +13,10 @@
 
 package org.activiti.engine.impl.persistence;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.interceptor.AbstractCommandContext;
-import org.activiti.engine.impl.interceptor.Session;
-import org.activiti.engine.impl.interceptor.SessionFactory;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.interceptor.AbstractCommandContext;
+import org.activiti.engine.common.impl.interceptor.Session;
+import org.activiti.engine.common.impl.interceptor.SessionFactory;
 
 /**
  * @author Tom Baeyens

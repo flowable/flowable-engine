@@ -23,7 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.task.Task;
 import org.activiti.rest.exception.ActivitiConflictException;
 import org.activiti.rest.service.api.RestResponseFactory;

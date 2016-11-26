@@ -19,8 +19,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.activiti.engine.common.impl.util.IoUtil;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
-import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.repository.Deployment;
 
 /**

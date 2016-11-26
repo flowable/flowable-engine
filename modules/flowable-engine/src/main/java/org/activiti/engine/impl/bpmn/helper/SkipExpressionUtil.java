@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.impl.bpmn.helper;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.impl.interceptor.CommandContext;

@@ -17,12 +17,12 @@ import java.sql.Connection;
 import java.util.Collections;
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiOptimisticLockingException;
-import org.activiti.engine.impl.Page;
-import org.activiti.engine.impl.db.ListQueryParameterObject;
-import org.activiti.engine.impl.interceptor.Session;
-import org.activiti.engine.impl.persistence.entity.Entity;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiOptimisticLockingException;
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.db.ListQueryParameterObject;
+import org.activiti.engine.common.impl.interceptor.Session;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
 public class DbSqlSession implements Session {
 
   private static final Logger log = LoggerFactory.getLogger(DbSqlSession.class);
+  
+  public static String[] JDBC_METADATA_TABLE_TYPES = { "TABLE" };
 
   protected SqlSession sqlSession;
   protected DbSqlSessionFactory dbSqlSessionFactory;

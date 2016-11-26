@@ -12,6 +12,7 @@
  */
 package org.activiti.engine.impl.persistence.entity;
 
+import org.activiti.engine.common.impl.persistence.entity.EntityManager;
 
 /**
  * @author Tijs Rademakers

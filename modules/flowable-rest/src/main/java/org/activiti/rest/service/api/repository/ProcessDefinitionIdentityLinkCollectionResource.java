@@ -19,7 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.rest.service.api.engine.RestIdentityLink;

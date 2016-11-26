@@ -15,7 +15,8 @@ package org.activiti.engine.impl;
 
 import java.util.List;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.impl.Page;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricActivityInstanceQuery;
 import org.activiti.engine.impl.interceptor.CommandContext;
@@ -103,11 +104,13 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
 
   public HistoricActivityInstanceQueryImpl finished() {
     this.finished = true;
+    this.unfinished = false;
     return this;
   }
 
   public HistoricActivityInstanceQueryImpl unfinished() {
     this.unfinished = true;
+    this.finished = false;
     return this;
   }
   

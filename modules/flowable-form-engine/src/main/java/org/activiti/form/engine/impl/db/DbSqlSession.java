@@ -17,15 +17,24 @@ import java.sql.Connection;
 import java.util.Collections;
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiOptimisticLockingException;
-import org.activiti.engine.impl.Page;
-import org.activiti.engine.impl.db.ListQueryParameterObject;
-import org.activiti.engine.impl.interceptor.Session;
-import org.activiti.engine.impl.persistence.entity.Entity;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiOptimisticLockingException;
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.db.ListQueryParameterObject;
+import org.activiti.engine.common.impl.interceptor.Session;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
+import org.activiti.form.engine.FormEngineConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import liquibase.Liquibase;
+import liquibase.database.Database;
+import liquibase.database.DatabaseConnection;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.resource.ClassLoaderResourceAccessor;
 
 /**
  * @author Tijs Rademakers
@@ -34,6 +43,8 @@ import org.slf4j.LoggerFactory;
 public class DbSqlSession implements Session {
 
   private static final Logger log = LoggerFactory.getLogger(DbSqlSession.class);
+  
+  public static String[] JDBC_METADATA_TABLE_TYPES = { "TABLE" };
 
   protected SqlSession sqlSession;
   protected DbSqlSessionFactory dbSqlSessionFactory;
@@ -216,11 +227,21 @@ public class DbSqlSession implements Session {
   }
 
   public void dbSchemaCreate() {
-    
+    Liquibase liquibase = createLiquibaseInstance();
+    try {
+      liquibase.update("form");
+    } catch (Exception e) {
+      throw new ActivitiException("Error creating form engine tables", e);
+    }
   }
 
   public void dbSchemaDrop() {
-    
+    Liquibase liquibase = createLiquibaseInstance();
+    try {
+      liquibase.dropAll();
+    } catch (Exception e) {
+      throw new ActivitiException("Error dropping form engine tables", e);
+    }
   }
 
   public <T> T getCustomMapper(Class<T> type) {
@@ -235,8 +256,30 @@ public class DbSqlSession implements Session {
     return dbSqlSessionFactory.getDatabaseType().equals("oracle");
   }
 
-  // query factory methods
-  // ////////////////////////////////////////////////////
+  protected Liquibase createLiquibaseInstance() {
+   try {
+      DatabaseConnection connection = new JdbcConnection(sqlSession.getConnection());
+      Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
+      database.setDatabaseChangeLogTableName(FormEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX+database.getDatabaseChangeLogTableName());
+      database.setDatabaseChangeLogLockTableName(FormEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX+database.getDatabaseChangeLogLockTableName());
+      
+      if (StringUtils.isNotEmpty(sqlSession.getConnection().getSchema())) {
+        database.setDefaultSchemaName(sqlSession.getConnection().getSchema());
+        database.setLiquibaseSchemaName(sqlSession.getConnection().getSchema());
+      }
+      
+      if (StringUtils.isNotEmpty(sqlSession.getConnection().getCatalog())) {
+        database.setDefaultCatalogName(sqlSession.getConnection().getCatalog());
+        database.setLiquibaseCatalogName(sqlSession.getConnection().getCatalog());
+      }
+  
+      Liquibase liquibase = new Liquibase("org/activiti/form/db/liquibase/activiti-form-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
+      return liquibase;
+      
+    } catch (Exception e) {
+      throw new ActivitiException("Error dropping form engine tables", e);
+    }
+  }
 
 
   // getters and setters

@@ -16,12 +16,13 @@ package org.activiti.engine.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.query.Query;
+import org.activiti.engine.common.impl.Page;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.variable.VariableTypes;
-import org.activiti.engine.query.Query;
 
 /**
  * Abstract query class that adds methods to query for variable values.

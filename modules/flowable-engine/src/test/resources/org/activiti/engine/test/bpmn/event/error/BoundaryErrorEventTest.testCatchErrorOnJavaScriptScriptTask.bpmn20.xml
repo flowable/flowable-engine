@@ -14,7 +14,7 @@
         <scriptTask id="theScript" scriptFormat="JavaScript">
             <script><![CDATA[
 
-            var JvmUtil = Packages.org.activiti.engine.impl.util.JvmUtil;
+            var JvmUtil = Packages.org.activiti.engine.common.impl.util.JvmUtil;
             var BpmnError = Packages.org.activiti.engine.delegate.BpmnError;
 
             if (JvmUtil.isJDK8()) {

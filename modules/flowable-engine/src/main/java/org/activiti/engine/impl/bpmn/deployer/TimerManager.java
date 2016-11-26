@@ -21,6 +21,7 @@ import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.TimerEventDefinition;
 import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.common.impl.util.CollectionUtil;
 import org.activiti.engine.impl.asyncexecutor.JobManager;
 import org.activiti.engine.impl.cmd.CancelJobsCmd;
 import org.activiti.engine.impl.context.Context;
@@ -28,7 +29,6 @@ import org.activiti.engine.impl.jobexecutor.TimerEventHandler;
 import org.activiti.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.persistence.entity.TimerJobEntity;
-import org.activiti.engine.impl.util.CollectionUtil;
 
 /**
  * Manages timers for newly-deployed process definitions and their previous versions.

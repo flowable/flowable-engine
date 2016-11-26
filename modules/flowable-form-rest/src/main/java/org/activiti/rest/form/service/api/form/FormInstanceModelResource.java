@@ -14,8 +14,8 @@ package org.activiti.rest.form.service.api.form;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.form.api.FormService;
 import org.activiti.form.model.FormInstanceModel;
 import org.activiti.rest.form.FormRestResponseFactory;
@@ -23,10 +23,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Yvo Swillens
  */
+@RestController
 public class FormInstanceModelResource {
 
   @Autowired
@@ -35,35 +37,35 @@ public class FormInstanceModelResource {
   @Autowired
   protected FormRestResponseFactory formRestResponseFactory;
 
-  @RequestMapping(value = "/form/form-instance", method = RequestMethod.POST, produces = "application/json")
-  public FormInstanceModelResponse getCompletedTaskFormDefinition(@RequestBody FormDefinitionRequest formDefinitionRequest, HttpServletRequest request) {
+  @RequestMapping(value = "/form/form-instance-model", method = RequestMethod.GET, produces = "application/json")
+  public FormInstanceModelResponse getFormInstance(@RequestBody FormRequest formRequest, HttpServletRequest request) {
 
     FormInstanceModel formInstanceModel;
 
-    if (formDefinitionRequest.getParentDeploymentId() != null) {
+    if (formRequest.getParentDeploymentId() != null) {
       formInstanceModel = formService.getFormInstanceModelByKeyAndParentDeploymentId(
-          formDefinitionRequest.getParentDeploymentId(),
-          formDefinitionRequest.getFormDefinitionKey(),
-          formDefinitionRequest.getTaskId(),
-          formDefinitionRequest.getProcessInstanceId(),
-          formDefinitionRequest.getVariables(),
-          formDefinitionRequest.getTenantId()
+          formRequest.getParentDeploymentId(),
+          formRequest.getFormDefinitionKey(),
+          formRequest.getTaskId(),
+          formRequest.getProcessInstanceId(),
+          formRequest.getVariables(),
+          formRequest.getTenantId()
       );
-    } else if (formDefinitionRequest.getFormDefinitionKey() != null) {
+    } else if (formRequest.getFormDefinitionKey() != null) {
       formInstanceModel = formService.getFormInstanceModelByKey(
-          formDefinitionRequest.getFormDefinitionKey(),
-          formDefinitionRequest.getTaskId(),
-          formDefinitionRequest.getProcessInstanceId(),
-          formDefinitionRequest.getVariables(),
-          formDefinitionRequest.getTenantId()
+          formRequest.getFormDefinitionKey(),
+          formRequest.getTaskId(),
+          formRequest.getProcessInstanceId(),
+          formRequest.getVariables(),
+          formRequest.getTenantId()
       );
-    } else if (formDefinitionRequest.getFormId() != null) {
+    } else if (formRequest.getFormId() != null) {
       formInstanceModel = formService.getFormInstanceModelById(
-          formDefinitionRequest.getFormId(),
-          formDefinitionRequest.getTaskId(),
-          formDefinitionRequest.getProcessInstanceId(),
-          formDefinitionRequest.getVariables(),
-          formDefinitionRequest.getTenantId()
+          formRequest.getFormId(),
+          formRequest.getTaskId(),
+          formRequest.getProcessInstanceId(),
+          formRequest.getVariables(),
+          formRequest.getTenantId()
       );
     } else {
       throw new ActivitiIllegalArgumentException("Either parent deployment key, form definition key or form id must be provided in the request");

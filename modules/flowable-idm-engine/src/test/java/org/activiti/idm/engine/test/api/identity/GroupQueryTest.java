@@ -15,8 +15,8 @@ package org.activiti.idm.engine.test.api.identity;
 
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.GroupQuery;
 import org.activiti.idm.engine.impl.persistence.entity.GroupEntity;
@@ -50,14 +50,6 @@ public class GroupQueryTest extends PluggableActivitiIdmTestCase {
 
     idmIdentityService.createMembership("kermit", "admin");
 
-  }
-
-  private Group createGroup(String id, String name, String type) {
-    Group group = idmIdentityService.newGroup(id);
-    group.setName(name);
-    group.setType(type);
-    idmIdentityService.saveGroup(group);
-    return group;
   }
 
   @Override

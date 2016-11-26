@@ -1,5 +1,7 @@
 package org.activiti.engine.impl.interceptor;
 
+import org.activiti.engine.common.impl.interceptor.BaseCommandContextCloseListener;
+import org.activiti.engine.common.impl.interceptor.Session;
 import org.activiti.engine.impl.cfg.TransactionContext;
 
 /**

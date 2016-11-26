@@ -25,6 +25,7 @@ import org.activiti.dmn.api.DmnRepositoryService;
 import org.activiti.dmn.api.DmnRuleService;
 import org.activiti.dmn.engine.DmnEngine;
 import org.activiti.dmn.engine.DmnEngineConfiguration;
+import org.activiti.dmn.engine.DmnEngines;
 import org.activiti.dmn.engine.impl.test.AbstractDmnTestCase;
 import org.activiti.dmn.engine.test.DmnTestHelper;
 import org.activiti.rest.dmn.conf.ApplicationConfiguration;
@@ -93,10 +94,10 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
     URL_BUILDER = DmnRestUrlBuilder.usingBaseUrl(SERVER_URL_PREFIX);
 
     // Lookup services
-    dmnEngine = appContext.getBean(DmnEngine.class);
-    dmnEngineConfiguration = dmnEngine.getDmnEngineConfiguration();
-    dmnRepositoryService = dmnEngine.getDmnRepositoryService();
-    dmnRuleService = dmnEngine.getDmnRuleService();
+    dmnEngine = DmnEngines.getDefaultDmnEngine();
+    dmnEngineConfiguration = appContext.getBean(DmnEngineConfiguration.class);
+    dmnRepositoryService = dmnEngineConfiguration.getDmnRepositoryService();
+    dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
 
     // Create http client for all tests
     CredentialsProvider provider = new BasicCredentialsProvider();

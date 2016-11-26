@@ -17,9 +17,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.runtime.Clock;
 import org.activiti.engine.runtime.Job;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;

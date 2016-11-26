@@ -23,13 +23,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.persistence.entity.Entity;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.management.TableMetaData;
+import org.activiti.engine.common.api.management.TablePage;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
+import org.activiti.idm.api.Capability;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.Token;
 import org.activiti.idm.api.User;
-import org.activiti.idm.api.management.IdmTableMetaData;
-import org.activiti.idm.api.management.IdmTablePage;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.TablePageQueryImpl;
 import org.activiti.idm.engine.impl.db.DbSqlSession;
@@ -61,6 +62,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
     entityToTableNameMap.put(UserEntity.class, "ACT_ID_USER");
     entityToTableNameMap.put(IdentityInfoEntity.class, "ACT_ID_INFO");
     entityToTableNameMap.put(TokenEntity.class, "ACT_ID_TOKEN");
+    entityToTableNameMap.put(CapabilityEntity.class, "ACT_ID_CAPABILITY");
     
     // general
     entityToTableNameMap.put(PropertyEntity.class, "ACT_ID_PROPERTY");
@@ -69,6 +71,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
     apiTypeToTableNameMap.put(Group.class, "ACT_ID_GROUP");
     apiTypeToTableNameMap.put(User.class, "ACT_ID_USER");
     apiTypeToTableNameMap.put(Token.class, "ACT_ID_TOKEN");
+    apiTypeToTableNameMap.put(Capability.class, "ACT_ID_CAPABILITY");
   }
   
   protected DbSqlSession getDbSqlSession() {
@@ -146,9 +149,9 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
 
   @Override
   @SuppressWarnings("unchecked")
-  public IdmTablePage getTablePage(TablePageQueryImpl tablePageQuery, int firstResult, int maxResults) {
+  public TablePage getTablePage(TablePageQueryImpl tablePageQuery, int firstResult, int maxResults) {
 
-    IdmTablePage tablePage = new IdmTablePage();
+    TablePage tablePage = new TablePage();
 
     @SuppressWarnings("rawtypes")
     List tableData = getDbSqlSession().getSqlSession().selectList("selectTableData", tablePageQuery, new RowBounds(firstResult, maxResults));
@@ -179,8 +182,8 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
   }
 
   @Override
-  public IdmTableMetaData getTableMetaData(String tableName) {
-    IdmTableMetaData result = new IdmTableMetaData();
+  public TableMetaData getTableMetaData(String tableName) {
+    TableMetaData result = new TableMetaData();
     try {
       result.setTableName(tableName);
       DatabaseMetaData metaData = getDbSqlSession().getSqlSession().getConnection().getMetaData();

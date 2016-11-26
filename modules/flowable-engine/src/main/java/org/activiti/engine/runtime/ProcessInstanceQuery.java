@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.query.Query;
+import org.activiti.engine.common.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link ProcessInstance}s.

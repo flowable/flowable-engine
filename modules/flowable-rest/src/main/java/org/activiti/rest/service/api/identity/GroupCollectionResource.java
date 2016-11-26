@@ -19,9 +19,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.IdentityService;
-import org.activiti.engine.query.QueryProperty;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.query.QueryProperty;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.GroupQuery;
 import org.activiti.idm.api.GroupQueryProperty;

@@ -23,16 +23,16 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.activiti.engine.AbstractEngineConfiguration;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
-import org.activiti.engine.impl.cfg.IdGenerator;
-import org.activiti.engine.impl.cfg.TransactionContextFactory;
-import org.activiti.engine.impl.interceptor.CommandConfig;
-import org.activiti.engine.impl.interceptor.SessionFactory;
-import org.activiti.engine.impl.transaction.ContextAwareJdbcTransactionFactory;
-import org.activiti.engine.runtime.Clock;
+import org.activiti.engine.common.AbstractEngineConfiguration;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.activiti.engine.common.impl.cfg.BeansConfigurationHelper;
+import org.activiti.engine.common.impl.cfg.IdGenerator;
+import org.activiti.engine.common.impl.cfg.TransactionContextFactory;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.impl.interceptor.SessionFactory;
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.idm.api.IdmIdentityService;
 import org.activiti.idm.api.IdmManagementService;
 import org.activiti.idm.api.event.ActivitiIdmEventType;
@@ -57,6 +57,8 @@ import org.activiti.idm.engine.impl.interceptor.LogInterceptor;
 import org.activiti.idm.engine.impl.interceptor.TransactionContextInterceptor;
 import org.activiti.idm.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.activiti.idm.engine.impl.persistence.entity.ByteArrayEntityManagerImpl;
+import org.activiti.idm.engine.impl.persistence.entity.CapabilityEntityManager;
+import org.activiti.idm.engine.impl.persistence.entity.CapabilityEntityManagerImpl;
 import org.activiti.idm.engine.impl.persistence.entity.GroupEntityManager;
 import org.activiti.idm.engine.impl.persistence.entity.GroupEntityManagerImpl;
 import org.activiti.idm.engine.impl.persistence.entity.IdentityInfoEntityManager;
@@ -72,6 +74,7 @@ import org.activiti.idm.engine.impl.persistence.entity.TokenEntityManagerImpl;
 import org.activiti.idm.engine.impl.persistence.entity.UserEntityManager;
 import org.activiti.idm.engine.impl.persistence.entity.UserEntityManagerImpl;
 import org.activiti.idm.engine.impl.persistence.entity.data.ByteArrayDataManager;
+import org.activiti.idm.engine.impl.persistence.entity.data.CapabilityDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.GroupDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.IdentityInfoDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.MembershipDataManager;
@@ -79,6 +82,7 @@ import org.activiti.idm.engine.impl.persistence.entity.data.PropertyDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.TokenDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.UserDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisByteArrayDataManager;
+import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisCapabilityDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisGroupDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisIdentityInfoDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisMembershipDataManager;
@@ -87,11 +91,8 @@ import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisTokenDat
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisUserDataManager;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
-import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
-import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.BeanFactory;
 
 public class IdmEngineConfiguration extends AbstractEngineConfiguration {
 
@@ -131,6 +132,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
   protected PropertyDataManager propertyDataManager;
   protected TokenDataManager tokenDataManager;
   protected UserDataManager userDataManager;
+  protected CapabilityDataManager capabilityDataManager;
 
   // ENTITY MANAGERS /////////////////////////////////////////////////
   protected ByteArrayEntityManager byteArrayEntityManager;
@@ -141,6 +143,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
   protected TableDataManager tableDataManager;
   protected TokenEntityManager tokenEntityManager;
   protected UserEntityManager userEntityManager;
+  protected CapabilityEntityManager capabilityEntityManager;
 
   protected CommandContextFactory commandContextFactory;
   protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
@@ -157,7 +160,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
   }
 
   public static IdmEngineConfiguration createIdmEngineConfigurationFromResource(String resource, String beanName) {
-    return (IdmEngineConfiguration) parseEngineConfigurationFromResource(resource, beanName);
+    return (IdmEngineConfiguration) BeansConfigurationHelper.parseEngineConfigurationFromResource(resource, beanName);
   }
 
   public static IdmEngineConfiguration createIdmEngineConfigurationFromInputStream(InputStream inputStream) {
@@ -165,7 +168,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
   }
 
   public static IdmEngineConfiguration createIdmEngineConfigurationFromInputStream(InputStream inputStream, String beanName) {
-    return (IdmEngineConfiguration) parseEngineConfigurationFromInputStream(inputStream, beanName);
+    return (IdmEngineConfiguration) BeansConfigurationHelper.parseEngineConfigurationFromInputStream(inputStream, beanName);
   }
 
   public static IdmEngineConfiguration createStandaloneIdmEngineConfiguration() {
@@ -197,6 +200,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
       initDataSource();
     }
     
+    initBeans();
     initTransactionFactory();
     initSqlSessionFactory();
     initSessionFactories();
@@ -246,6 +250,9 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     if (userDataManager == null) {
     	userDataManager = new MybatisUserDataManager(this);
     }
+    if (capabilityDataManager == null) {
+      capabilityDataManager = new MybatisCapabilityDataManager(this);
+    }
   }
 
   public void initEntityManagers() {
@@ -272,6 +279,9 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     }
     if (userEntityManager == null) {
       userEntityManager = new UserEntityManagerImpl(this, userDataManager);
+    }
+    if (capabilityEntityManager == null) {
+      capabilityEntityManager = new CapabilityEntityManagerImpl(this, capabilityDataManager);
     }
   }
   
@@ -552,8 +562,8 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     return this;
   }
 
-  public IdmEngineConfiguration setBeanFactory(BeanFactory beanFactory) {
-    this.beanFactory = beanFactory;
+  public IdmEngineConfiguration setBeans(Map<Object, Object> beans) {
+    this.beans = beans;
     return this;
   }
 
@@ -691,6 +701,15 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     this.userDataManager = userDataManager;
     return this;
   }
+  
+  public CapabilityDataManager getCapabilityDataManager() {
+    return capabilityDataManager;
+  }
+
+  public IdmEngineConfiguration setCapabilityDataManager(CapabilityDataManager capabilityDataManager) {
+    this.capabilityDataManager = capabilityDataManager;
+    return this;
+  }
 
   public ByteArrayEntityManager getByteArrayEntityManager() {
     return byteArrayEntityManager;
@@ -755,6 +774,15 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     return this;
   }
   
+  public CapabilityEntityManager getCapabilityEntityManager() {
+    return capabilityEntityManager;
+  }
+
+  public IdmEngineConfiguration setCapabilityEntityManager(CapabilityEntityManager capabilityEntityManager) {
+    this.capabilityEntityManager = capabilityEntityManager;
+    return this;
+  }
+
   public TableDataManager getTableDataManager() {
     return tableDataManager;
   }

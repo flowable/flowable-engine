@@ -21,8 +21,8 @@ import org.activiti.dmn.api.DmnDeployment;
 import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.impl.DmnDeploymentQueryImpl;
 import org.activiti.dmn.engine.impl.persistence.entity.data.DmnDeploymentDataManager;
-import org.activiti.engine.impl.Page;
-import org.activiti.engine.impl.persistence.entity.data.DataManager;
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Tijs Rademakers

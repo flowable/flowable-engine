@@ -22,8 +22,8 @@ import org.activiti.dmn.engine.impl.context.Context;
 import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
 import org.activiti.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.apache.commons.lang3.StringUtils;
 
 /**

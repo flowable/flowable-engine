@@ -12,11 +12,11 @@
  */
 package org.activiti.idm.engine.impl.persistence.entity;
 
-import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.impl.db.HasRevision;
-import org.activiti.engine.impl.persistence.entity.Entity;
-import org.activiti.engine.impl.persistence.entity.EntityManager;
-import org.activiti.engine.impl.persistence.entity.data.DataManager;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
+import org.activiti.engine.common.impl.db.HasRevision;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
+import org.activiti.engine.common.impl.persistence.entity.EntityManager;
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 import org.activiti.idm.api.event.ActivitiIdmEventType;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.delegate.event.impl.ActivitiIdmEventBuilder;

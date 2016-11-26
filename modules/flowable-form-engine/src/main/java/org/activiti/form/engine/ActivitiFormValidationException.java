@@ -13,7 +13,7 @@
 
 package org.activiti.form.engine;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 
 /**
  * An exception indicating that a validation of a form field value resulted in an error.

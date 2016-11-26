@@ -23,7 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
@@ -128,6 +130,13 @@ public class DatabaseConfiguration {
 
       return ds;
     }
+  }
+  
+  @Bean
+  public PlatformTransactionManager annotationDrivenTransactionManager() {
+    DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
+    dataSourceTransactionManager.setDataSource(dataSource());
+    return dataSourceTransactionManager;
   }
 
 }

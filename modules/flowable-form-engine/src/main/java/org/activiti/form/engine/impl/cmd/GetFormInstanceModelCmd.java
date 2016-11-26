@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.editor.form.converter.FormJsonConverter;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.form.api.FormInstance;
 import org.activiti.form.api.FormInstanceQuery;
 import org.activiti.form.engine.FormEngineConfiguration;
@@ -130,7 +130,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
         } else if (FormFieldTypes.UPLOAD.equals(field.getType())) {
           
           // Multiple docs are stored as comma-separated string ids,
-          // explicitely storing them as an array so they're seralized properly
+          // explicitely storing them as an array so they're serialized properly
           if (variables.containsKey(field.getId())) {
             String uploadValue = (String) variables.get(field.getId());
             if (uploadValue != null) {

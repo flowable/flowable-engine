@@ -14,7 +14,7 @@ package org.activiti.cdi.impl.context;
 
 import java.util.Map;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.task.Task;
 

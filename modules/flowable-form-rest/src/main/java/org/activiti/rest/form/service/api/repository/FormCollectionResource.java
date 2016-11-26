@@ -17,7 +17,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.activiti.engine.query.QueryProperty;
+import org.activiti.engine.common.api.query.QueryProperty;
 import org.activiti.form.api.FormDefinitionQuery;
 import org.activiti.form.api.FormRepositoryService;
 import org.activiti.form.engine.impl.FormQueryProperty;

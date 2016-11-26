@@ -15,7 +15,9 @@ package org.activiti.engine.delegate.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventType;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.apache.commons.lang3.StringUtils;
@@ -228,7 +230,12 @@ public enum ActivitiEngineEventType implements ActivitiEventType {
    * A process has been completed. Dispatched after the last activity is ACTIVITY_COMPLETED. Process is completed when it reaches state in which process instance does not have any transition to take.
    */
   PROCESS_COMPLETED,
-  
+
+  /**
+   * A process has been completed with a terminate end event.
+   */
+  PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT,
+
   /**
    * A process has been completed with an error end event.
    */

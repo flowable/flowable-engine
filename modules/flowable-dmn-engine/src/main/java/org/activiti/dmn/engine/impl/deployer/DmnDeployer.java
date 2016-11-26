@@ -21,7 +21,7 @@ import org.activiti.dmn.engine.impl.persistence.deploy.Deployer;
 import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
 import org.activiti.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
-import org.activiti.engine.impl.cfg.IdGenerator;
+import org.activiti.engine.common.impl.cfg.IdGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

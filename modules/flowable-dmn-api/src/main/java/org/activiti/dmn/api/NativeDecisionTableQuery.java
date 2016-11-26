@@ -12,7 +12,7 @@
  */
 package org.activiti.dmn.api;
 
-import org.activiti.engine.query.NativeQuery;
+import org.activiti.engine.common.api.query.NativeQuery;
 
 public interface NativeDecisionTableQuery extends NativeQuery<NativeDecisionTableQuery, DecisionTable> {
 

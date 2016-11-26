@@ -19,8 +19,9 @@ import org.activiti.dmn.engine.impl.db.DbSqlSession;
 import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
 import org.activiti.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManager;
 import org.activiti.dmn.engine.impl.persistence.entity.ResourceEntityManager;
-import org.activiti.engine.impl.interceptor.AbstractCommandContext;
-import org.activiti.engine.impl.interceptor.BaseCommandContextCloseListener;
+import org.activiti.dmn.engine.impl.persistence.entity.TableDataManager;
+import org.activiti.engine.common.impl.interceptor.AbstractCommandContext;
+import org.activiti.engine.common.impl.interceptor.BaseCommandContextCloseListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +63,10 @@ public class CommandContext extends AbstractCommandContext {
 
   public ResourceEntityManager getResourceEntityManager() {
     return dmnEngineConfiguration.getResourceEntityManager();
+  }
+  
+  public TableDataManager getTableDataManager() {
+    return dmnEngineConfiguration.getTableDataManager();
   }
 
   // getters and setters

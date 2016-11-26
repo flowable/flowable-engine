@@ -25,9 +25,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.impl.util.CollectionUtil;
 import org.activiti.engine.history.DeleteReason;
 import org.activiti.engine.history.HistoricDetail;
 import org.activiti.engine.history.HistoricProcessInstance;
@@ -35,7 +36,6 @@ import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
-import org.activiti.engine.impl.util.CollectionUtil;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -198,6 +198,18 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     // Behaviour changed: https://activiti.atlassian.net/browse/ACT-1860
     runtimeService.startProcessInstanceByKey("oneTaskProcess", "123");
     assertEquals(2, runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("123").count());
+  }
+  
+  @Deployment(resources = { "org/activiti/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  public void testStartProcessInstanceFormWithoutFormKey() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("basicType", new DummySerializable());
+    
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    
+    runtimeService.startProcessInstanceWithForm(processDefinition.getId(), null, vars, null);
+    Task task = taskService.createTaskQuery().includeProcessVariables().singleResult();
+    assertNotNull(task.getProcessVariables());
   }
 
   // some databases might react strange on having multiple times null for the

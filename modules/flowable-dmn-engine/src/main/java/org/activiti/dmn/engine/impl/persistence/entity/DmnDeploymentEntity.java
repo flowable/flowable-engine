@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.dmn.api.DmnDeployment;
-import org.activiti.engine.impl.persistence.entity.Entity;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
 
 /**
  * @author Tijs Rademakers

@@ -15,7 +15,7 @@ package org.activiti.engine.history;
 
 import java.util.Set;
 
-import org.activiti.engine.query.Query;
+import org.activiti.engine.common.api.query.Query;
 
 /** 
  * Programmatic querying for {@link HistoricVariableInstance}s.

@@ -18,8 +18,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import io.swagger.annotations.*;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+
 import org.activiti.engine.ManagementService;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.runtime.DeadLetterJobQuery;
 import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.api.RequestUtil;

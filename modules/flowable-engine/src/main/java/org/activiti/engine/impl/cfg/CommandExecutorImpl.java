@@ -1,7 +1,7 @@
 package org.activiti.engine.impl.cfg;
 
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.Command;
-import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.interceptor.CommandInterceptor;
 

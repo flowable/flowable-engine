@@ -1,5 +1,7 @@
 package org.activiti.engine.impl.cmd;
 
+import org.activiti.engine.common.impl.cmd.CustomSqlExecution;
+
 /**
  * @author jbarrez
  */

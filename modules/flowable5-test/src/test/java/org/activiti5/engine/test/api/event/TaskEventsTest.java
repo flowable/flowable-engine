@@ -16,9 +16,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.impl.delegate.event.ActivitiEngineEntityEvent;
 import org.activiti.engine.impl.delegate.event.ActivitiEngineEvent;
 import org.activiti.engine.runtime.ProcessInstance;

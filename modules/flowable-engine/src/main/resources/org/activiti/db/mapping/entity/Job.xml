@@ -32,7 +32,7 @@
 		select * from ${prefix}ACT_RU_JOB where ID_ = #{id, jdbcType=VARCHAR}
 	</select>
 
-	<select id="selectJobsToExecute" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+	<select id="selectJobsToExecute" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 		${limitBefore}
 		select
 		RES.* ${limitBetween}
@@ -41,7 +41,7 @@
 		${limitAfter}
 	</select>
 
-	<select id="selectExpiredJobs" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+	<select id="selectExpiredJobs" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 	  	${limitBefore}
       	select
       	RES.* ${limitBetween} 
@@ -50,25 +50,25 @@
     	${limitAfter}
   </select>
 
-	<select id="selectJobsByTypeAndProcessDefinitionId" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+	<select id="selectJobsByTypeAndProcessDefinitionId" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 		select * from ${prefix}ACT_RU_JOB
 		where HANDLER_TYPE_ = #{parameter.handlerType}
 		and PROC_DEF_ID_ = #{parameter.processDefinitionId}
 	</select>
 
-	<select id="selectJobsByConfiguration" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+	<select id="selectJobsByConfiguration" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 		select * from ${prefix}ACT_RU_JOB
 		where HANDLER_TYPE_ = #{parameter.handlerType}
 		and HANDLER_CFG_ like #{parameter.handlerConfiguration}${wildcardEscapeClause}
 	</select>
 
-	<select id="selectJobsByExecutionId" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+	<select id="selectJobsByExecutionId" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 		select *
 		from ${prefix}ACT_RU_JOB J
 		where J.EXECUTION_ID_ = #{parameter}
 	</select>
 	
-	<select id="selectJobsByProcessInstanceId" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+	<select id="selectJobsByProcessInstanceId" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 		select *
 		from ${prefix}ACT_RU_JOB J
 		where J.PROCESS_INSTANCE_ID_ = #{parameter}
@@ -334,13 +334,13 @@
 		and REV_ = #{revision, jdbcType=INTEGER}
 	</update>
 	
-	<update id="resetExpiredJob" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject">
+	<update id="resetExpiredJob" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject">
     update ${prefix}ACT_RU_JOB
     set LOCK_OWNER_ = null, LOCK_EXP_TIME_ = null
     where ID_ = #{id,jdbcType=VARCHAR}
   </update>
   
-	<select id="selectTimersByExecutionId" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+	<select id="selectTimersByExecutionId" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 		select *
 		from ${prefix}ACT_RU_JOB
 		where (RETRIES_ &gt; 0)

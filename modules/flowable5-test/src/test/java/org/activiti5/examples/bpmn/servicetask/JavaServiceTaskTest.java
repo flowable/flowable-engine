@@ -15,8 +15,8 @@ package org.activiti5.examples.bpmn.servicetask;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiClassLoadingException;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiClassLoadingException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.repository.DeploymentProperties;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;

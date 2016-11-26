@@ -12,7 +12,7 @@
  */
 package org.activiti.idm.api;
 
-import org.activiti.engine.query.NativeQuery;
+import org.activiti.engine.common.api.query.NativeQuery;
 
 /**
  * Allows querying of {@link org.activiti.idm.api.Group}s via native (SQL) queries

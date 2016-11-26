@@ -48,10 +48,7 @@ activitiApp.controller('LandingController', ['$scope','$window', '$location', '$
                 }
 
                 $scope.urls = {
-                    editor: baseUrl + '/editor/',
-                    identity: baseUrl + '/idm/',
-                    workflow: baseUrl + '/workflow/',
-                    analytics: baseUrl + '/analytics/'
+                    workflow: baseUrl + '/workflow/'
                 };
 
 
