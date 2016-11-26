@@ -13,7 +13,7 @@
 
 package org.activiti.rest.service.api.history;
 
-import org.activiti.rest.common.api.PaginateRequest;
+import org.activiti.rest.api.PaginateRequest;
 
 /**
  * @author Tijs Rademakers

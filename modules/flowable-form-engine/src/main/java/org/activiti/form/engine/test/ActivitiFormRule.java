@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.activiti.engine.ActivitiException;
 import org.activiti.form.api.FormRepositoryService;
-import org.activiti.form.engine.ActivitiFormException;
 import org.activiti.form.engine.FormEngine;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.junit.internal.AssumptionViolatedException;
@@ -184,7 +184,7 @@ public class ActivitiFormRule implements TestRule {
     try {
       deploymentId = FormTestHelper.annotationDeploymentSetUp(formEngine, Class.forName(description.getClassName()), description.getMethodName());
     } catch (ClassNotFoundException e) {
-      throw new ActivitiFormException("Programmatic error: could not instantiate " + description.getClassName(), e);
+      throw new ActivitiException("Programmatic error: could not instantiate " + description.getClassName(), e);
     }
   }
 
@@ -207,7 +207,7 @@ public class ActivitiFormRule implements TestRule {
     try {
       FormTestHelper.annotationDeploymentTearDown(formEngine, deploymentId, Class.forName(description.getClassName()), description.getMethodName());
     } catch (ClassNotFoundException e) {
-      throw new ActivitiFormException("Programmatic error: could not instantiate " + description.getClassName(), e);
+      throw new ActivitiException("Programmatic error: could not instantiate " + description.getClassName(), e);
     }
   }
 

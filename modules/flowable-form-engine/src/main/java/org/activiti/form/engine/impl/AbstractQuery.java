@@ -15,13 +15,15 @@ package org.activiti.form.engine.impl;
 import java.io.Serializable;
 import java.util.List;
 
-import org.activiti.form.api.Query;
-import org.activiti.form.api.QueryProperty;
-import org.activiti.form.engine.ActivitiFormException;
-import org.activiti.form.engine.ActivitiFormIllegalArgumentException;
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.impl.Direction;
+import org.activiti.engine.impl.Page;
+import org.activiti.engine.impl.db.ListQueryParameterObject;
+import org.activiti.engine.query.Query;
+import org.activiti.engine.query.QueryProperty;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.context.Context;
-import org.activiti.form.engine.impl.db.ListQueryParameterObject;
 import org.activiti.form.engine.impl.interceptor.Command;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
 import org.activiti.form.engine.impl.interceptor.CommandExecutor;
@@ -53,10 +55,6 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
 
   protected QueryProperty orderProperty;
 
-  public static enum NullHandlingOnOrder {
-    NULLS_FIRST, NULLS_LAST
-  }
-
   protected NullHandlingOnOrder nullHandlingOnOrder;
 
   protected AbstractQuery() {
@@ -76,13 +74,11 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
     return this;
   }
 
-  @SuppressWarnings("unchecked")
   public T orderBy(QueryProperty property) {
     this.orderProperty = property;
     return (T) this;
   }
 
-  @SuppressWarnings("unchecked")
   public T orderBy(QueryProperty property, NullHandlingOnOrder nullHandlingOnOrder) {
     orderBy(property);
     this.nullHandlingOnOrder = nullHandlingOnOrder;
@@ -100,7 +96,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
   @SuppressWarnings("unchecked")
   public T direction(Direction direction) {
     if (orderProperty == null) {
-      throw new ActivitiFormIllegalArgumentException("You should call any of the orderBy methods first before specifying a direction");
+      throw new ActivitiIllegalArgumentException("You should call any of the orderBy methods first before specifying a direction");
     }
     addOrder(orderProperty.getName(), direction.getName(), nullHandlingOnOrder);
     orderProperty = null;
@@ -110,7 +106,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
 
   protected void checkQueryOk() {
     if (orderProperty != null) {
-      throw new ActivitiFormIllegalArgumentException("Invalid query: call asc() or desc() after using orderByXX()");
+      throw new ActivitiIllegalArgumentException("Invalid query: call asc() or desc() after using orderByXX()");
     }
   }
 
@@ -178,7 +174,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
     if (results.size() == 1) {
       return results.get(0);
     } else if (results.size() > 1) {
-      throw new ActivitiFormException("Query return " + results.size() + " results instead of max 1");
+      throw new ActivitiException("Query return " + results.size() + " results instead of max 1");
     }
     return null;
   }

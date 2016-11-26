@@ -13,7 +13,7 @@
 
 package org.activiti5.engine.impl.persistence.entity;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.db.DbSqlSession;
@@ -32,9 +32,9 @@ public class ProcessDefinitionInfoEntityManager extends AbstractManager {
     
     if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_CREATED, processDefinitionInfo));
+          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_CREATED, processDefinitionInfo));
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_INITIALIZED, processDefinitionInfo));
+          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_INITIALIZED, processDefinitionInfo));
     }
   }
 
@@ -45,7 +45,7 @@ public class ProcessDefinitionInfoEntityManager extends AbstractManager {
     
     if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_UPDATED, updatedProcessDefinitionInfo));
+          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_UPDATED, updatedProcessDefinitionInfo));
     }
   }
 
@@ -57,7 +57,7 @@ public class ProcessDefinitionInfoEntityManager extends AbstractManager {
       
       if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
         Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-            ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_DELETED, processDefinitionInfo));
+            ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_DELETED, processDefinitionInfo));
       }
     }
   }

@@ -17,16 +17,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.activiti.dmn.engine.DmnEngineConfiguration;
+import org.activiti.engine.impl.persistence.entity.AbstractEntityNoRevision;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class DecisionTableEntityImpl implements DecisionTableEntity, Serializable {
+public class DecisionTableEntityImpl extends AbstractEntityNoRevision implements DecisionTableEntity, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  protected String id;
   protected String name;
   protected String description;
   protected String key;
@@ -93,14 +93,6 @@ public class DecisionTableEntityImpl implements DecisionTableEntity, Serializabl
 
   public void setVersion(int version) {
     this.version = version;
-  }
-
-  public String getId() {
-    return id;
-  }
-  
-  public void setId(String id) {
-    this.id = id;
   }
 
   public String getResourceName() {

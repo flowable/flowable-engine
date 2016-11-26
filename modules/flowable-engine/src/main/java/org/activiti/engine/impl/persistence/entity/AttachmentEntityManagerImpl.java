@@ -16,7 +16,7 @@ package org.activiti.engine.impl.persistence.entity;
 import java.util.List;
 
 import org.activiti.engine.ActivitiException;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.persistence.entity.data.AttachmentDataManager;
@@ -85,7 +85,7 @@ public class AttachmentEntityManagerImpl extends AbstractEntityManager<Attachmen
       
       if (dispatchEvents) {
         getEventDispatcher().dispatchEvent(
-            ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_DELETED, attachment, executionId, processInstanceId, processDefinitionId));
+            ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_DELETED, attachment, executionId, processInstanceId, processDefinitionId));
       }
     }
   }

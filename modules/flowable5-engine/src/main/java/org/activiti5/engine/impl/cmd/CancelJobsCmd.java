@@ -17,7 +17,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.interceptor.Command;
 import org.activiti5.engine.impl.interceptor.CommandContext;
@@ -54,7 +54,7 @@ public class CancelJobsCmd implements Command<Void>, Serializable {
       if (jobToDelete != null) {
         if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
           commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-            ActivitiEventBuilder.createEntityEvent(ActivitiEventType.JOB_CANCELED, jobToDelete));
+            ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.JOB_CANCELED, jobToDelete));
         }
 
         jobToDelete.delete();
@@ -65,7 +65,7 @@ public class CancelJobsCmd implements Command<Void>, Serializable {
         if (timerJobToDelete != null) {
           if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                ActivitiEventBuilder.createEntityEvent(ActivitiEventType.JOB_CANCELED, timerJobToDelete));
+                ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.JOB_CANCELED, timerJobToDelete));
           }
 
           timerJobToDelete.delete();

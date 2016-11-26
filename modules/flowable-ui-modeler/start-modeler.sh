@@ -1,9 +1,4 @@
 #!/bin/sh
-echo "Building converters"
-cd ../flowable-bpmn-converter/
-mvn -T 1C clean install -DskipTests
-cd ../flowable-json-converter/
-mvn -T 1C clean install -DskipTests
 echo "Building all modeler ui submodules"
 mvn -T 1C clean install -DskipTests
 cd ../flowable-ui-modeler/

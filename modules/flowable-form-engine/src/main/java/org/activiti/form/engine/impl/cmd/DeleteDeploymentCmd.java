@@ -14,7 +14,7 @@ package org.activiti.form.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.activiti.form.engine.ActivitiFormIllegalArgumentException;
+import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.form.engine.impl.interceptor.Command;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
 
@@ -32,7 +32,7 @@ public class DeleteDeploymentCmd implements Command<Void>, Serializable {
 
   public Void execute(CommandContext commandContext) {
     if (deploymentId == null) {
-      throw new ActivitiFormIllegalArgumentException("deploymentId is null");
+      throw new ActivitiIllegalArgumentException("deploymentId is null");
     }
 
     // Remove forms from cache:

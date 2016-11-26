@@ -12,7 +12,7 @@
  */
 package org.activiti5.engine.delegate.event.impl;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.ActivitiMessageEvent;
 import org.activiti.engine.delegate.event.ActivitiSignalEvent;
 
@@ -26,7 +26,7 @@ public class ActivitiMessageEventImpl extends ActivitiActivityEventImpl implemen
 	protected String messageName;
 	protected Object messageData;
 	
-	public ActivitiMessageEventImpl(ActivitiEventType type) {
+	public ActivitiMessageEventImpl(ActivitiEngineEventType type) {
 	  super(type);
   }
 	

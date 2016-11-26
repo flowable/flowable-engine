@@ -15,6 +15,7 @@ package org.activiti.idm.engine.impl.persistence.entity;
 import java.io.Serializable;
 import java.util.Arrays;
 
+import org.activiti.engine.impl.persistence.entity.AbstractEntity;
 import org.apache.commons.lang3.StringUtils;
 
 /**

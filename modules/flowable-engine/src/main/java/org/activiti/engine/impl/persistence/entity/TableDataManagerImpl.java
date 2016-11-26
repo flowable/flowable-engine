@@ -202,7 +202,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
 
   protected long getTableCount(String tableName) {
     log.debug("selecting table count for {}", tableName);
-    Long count = (Long) getDbSqlSession().selectOne("selectTableCount", Collections.singletonMap("tableName", tableName));
+    Long count = (Long) getDbSqlSession().selectOne("org.activiti.engine.impl.TablePageMap.selectTableCount", Collections.singletonMap("tableName", tableName));
     return count;
   }
 
@@ -213,7 +213,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
     TablePage tablePage = new TablePage();
 
     @SuppressWarnings("rawtypes")
-    List tableData = getDbSqlSession().getSqlSession().selectList("selectTableData", tablePageQuery, new RowBounds(firstResult, maxResults));
+    List tableData = getDbSqlSession().getSqlSession().selectList("org.activiti.engine.impl.TablePageMap.selectTableData", tablePageQuery, new RowBounds(firstResult, maxResults));
 
     tablePage.setTableName(tablePageQuery.getTableName());
     tablePage.setTotal(getTableCount(tablePageQuery.getTableName()));

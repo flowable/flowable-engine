@@ -17,16 +17,16 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 
 import org.activiti.editor.form.converter.FormJsonConverter;
+import org.activiti.engine.ActivitiException;
 import org.activiti.form.api.FormDeployment;
 import org.activiti.form.api.FormDeploymentBuilder;
-import org.activiti.form.engine.ActivitiFormException;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.FormRepositoryServiceImpl;
 import org.activiti.form.engine.impl.context.Context;
 import org.activiti.form.engine.impl.persistence.entity.FormDeploymentEntity;
 import org.activiti.form.engine.impl.persistence.entity.ResourceEntity;
 import org.activiti.form.engine.impl.persistence.entity.ResourceEntityManager;
-import org.activiti.form.model.FormDefinition;
+import org.activiti.form.model.FormModel;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -52,18 +52,18 @@ public class FormDeploymentBuilderImpl implements FormDeploymentBuilder, Seriali
 
   public FormDeploymentBuilder addInputStream(String resourceName, InputStream inputStream) {
     if (inputStream == null) {
-      throw new ActivitiFormException("inputStream for resource '" + resourceName + "' is null");
+      throw new ActivitiException("inputStream for resource '" + resourceName + "' is null");
     }
 
     byte[] bytes = null;
     try {
       bytes = IOUtils.toByteArray(inputStream);
     } catch (Exception e) {
-      throw new ActivitiFormException("could not get byte array from resource '" + resourceName + "'");
+      throw new ActivitiException("could not get byte array from resource '" + resourceName + "'");
     }
 
     if (bytes == null) {
-      throw new ActivitiFormException("byte array for resource '" + resourceName + "' is null");
+      throw new ActivitiException("byte array for resource '" + resourceName + "' is null");
     }
 
     ResourceEntity resource = resourceEntityManager.create();
@@ -76,14 +76,14 @@ public class FormDeploymentBuilderImpl implements FormDeploymentBuilder, Seriali
   public FormDeploymentBuilder addClasspathResource(String resource) {
     InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource);
     if (inputStream == null) {
-      throw new ActivitiFormException("resource '" + resource + "' not found");
+      throw new ActivitiException("resource '" + resource + "' not found");
     }
     return addInputStream(resource, inputStream);
   }
 
   public FormDeploymentBuilder addString(String resourceName, String text) {
     if (text == null) {
-      throw new ActivitiFormException("text is null");
+      throw new ActivitiException("text is null");
     }
 
     ResourceEntity resource = resourceEntityManager.create();
@@ -91,7 +91,7 @@ public class FormDeploymentBuilderImpl implements FormDeploymentBuilder, Seriali
     try {
       resource.setBytes(text.getBytes(DEFAULT_ENCODING));
     } catch (UnsupportedEncodingException e) {
-      throw new ActivitiFormException("Unable to get process bytes.", e);
+      throw new ActivitiException("Unable to get process bytes.", e);
     }
     deployment.addResource(resource);
     return this;
@@ -99,7 +99,7 @@ public class FormDeploymentBuilderImpl implements FormDeploymentBuilder, Seriali
 
   public FormDeploymentBuilder addFormBytes(String resourceName, byte[] formBytes) {
     if (formBytes == null) {
-      throw new ActivitiFormException("form bytes is null");
+      throw new ActivitiException("form bytes is null");
     }
 
     ResourceEntity resource = resourceEntityManager.create();
@@ -109,7 +109,7 @@ public class FormDeploymentBuilderImpl implements FormDeploymentBuilder, Seriali
     return this;
   }
 
-  public FormDeploymentBuilder addFormDefinition(String resourceName, FormDefinition formDefinition) {
+  public FormDeploymentBuilder addFormDefinition(String resourceName, FormModel formDefinition) {
     FormJsonConverter formConverter = new FormJsonConverter();
     String formJson = formConverter.convertToJson(formDefinition);
     addString(resourceName, formJson);

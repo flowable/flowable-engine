@@ -15,7 +15,9 @@ package org.activiti.idm.engine.impl.context;
 
 import java.util.Stack;
 
+import org.activiti.engine.impl.transaction.TransactionContextHolder;
 import org.activiti.idm.engine.IdmEngineConfiguration;
+import org.activiti.idm.engine.impl.cfg.TransactionContext;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 
 /**
@@ -57,6 +59,18 @@ public class Context {
 
   public static void removeIdmEngineConfiguration() {
     getStack(idmEngineConfigurationStackThreadLocal).pop();
+  }
+  
+  public static TransactionContext getTransactionContext() {
+    return (TransactionContext) TransactionContextHolder.getTransactionContext();
+  }
+  
+  public static void setTransactionContext(TransactionContext transactionContext) {
+    TransactionContextHolder.setTransactionContext(transactionContext);
+  }
+  
+  public static void removeTransactionContext() {
+    TransactionContextHolder.removeTransactionContext();
   }
   
   protected static <T> Stack<T> getStack(ThreadLocal<Stack<T>> threadLocal) {

@@ -5,7 +5,7 @@
 	
 	<parent>
 		<groupId>org.flowable</groupId>
-		<artifactId>flowable-ui-root</artifactId>
+		<artifactId>flowable-ui-task</artifactId>
 		<version>6.0.0.RC1-SNAPSHOT</version>
 	</parent>
 	

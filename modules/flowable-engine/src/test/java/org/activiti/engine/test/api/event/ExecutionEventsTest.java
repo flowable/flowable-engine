@@ -13,7 +13,7 @@
 package org.activiti.engine.test.api.event;
 
 import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.ActivitiEntityEvent;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti.engine.runtime.Execution;
@@ -43,23 +43,23 @@ public class ExecutionEventsTest extends PluggableActivitiTestCase {
     assertTrue(listener.getEventsReceived().get(0) instanceof ActivitiEntityEvent);
 
     ActivitiEntityEvent event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-    assertEquals(ActivitiEventType.ENTITY_CREATED, event.getType());
+    assertEquals(ActivitiEngineEventType.ENTITY_CREATED, event.getType());
     assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
 
     event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
-    assertEquals(ActivitiEventType.PROCESS_CREATED, event.getType());
+    assertEquals(ActivitiEngineEventType.PROCESS_CREATED, event.getType());
     assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
 
     event = (ActivitiEntityEvent) listener.getEventsReceived().get(2);
-    assertEquals(ActivitiEventType.ENTITY_INITIALIZED, event.getType());
+    assertEquals(ActivitiEngineEventType.ENTITY_INITIALIZED, event.getType());
     assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
     
     event = (ActivitiEntityEvent) listener.getEventsReceived().get(3);
-    assertEquals(ActivitiEventType.ENTITY_CREATED, event.getType());
+    assertEquals(ActivitiEngineEventType.ENTITY_CREATED, event.getType());
     assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
 
     event = (ActivitiEntityEvent) listener.getEventsReceived().get(4);
-    assertEquals(ActivitiEventType.ENTITY_INITIALIZED, event.getType());
+    assertEquals(ActivitiEngineEventType.ENTITY_INITIALIZED, event.getType());
     assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
     listener.clearEventsReceived();
 
@@ -70,18 +70,18 @@ public class ExecutionEventsTest extends PluggableActivitiTestCase {
     assertEquals(4, listener.getEventsReceived().size());
     event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
     assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
-    assertEquals(ActivitiEventType.ENTITY_SUSPENDED, event.getType());
+    assertEquals(ActivitiEngineEventType.ENTITY_SUSPENDED, event.getType());
     
     event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
     assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
-    assertEquals(ActivitiEventType.ENTITY_SUSPENDED, event.getType());
+    assertEquals(ActivitiEngineEventType.ENTITY_SUSPENDED, event.getType());
     
     event = (ActivitiEntityEvent) listener.getEventsReceived().get(2);
-    assertEquals(ActivitiEventType.ENTITY_ACTIVATED, event.getType());
+    assertEquals(ActivitiEngineEventType.ENTITY_ACTIVATED, event.getType());
     assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
     
     event = (ActivitiEntityEvent) listener.getEventsReceived().get(3);
-    assertEquals(ActivitiEventType.ENTITY_ACTIVATED, event.getType());
+    assertEquals(ActivitiEngineEventType.ENTITY_ACTIVATED, event.getType());
     assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
     
     listener.clearEventsReceived();
@@ -95,18 +95,18 @@ public class ExecutionEventsTest extends PluggableActivitiTestCase {
     
     event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
     assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
-    assertEquals(ActivitiEventType.ENTITY_SUSPENDED, event.getType());
+    assertEquals(ActivitiEngineEventType.ENTITY_SUSPENDED, event.getType());
     
     event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
     assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
-    assertEquals(ActivitiEventType.ENTITY_SUSPENDED, event.getType());
+    assertEquals(ActivitiEngineEventType.ENTITY_SUSPENDED, event.getType());
     
     event = (ActivitiEntityEvent) listener.getEventsReceived().get(2);
-    assertEquals(ActivitiEventType.ENTITY_ACTIVATED, event.getType());
+    assertEquals(ActivitiEngineEventType.ENTITY_ACTIVATED, event.getType());
     assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
     
     event = (ActivitiEntityEvent) listener.getEventsReceived().get(3);
-    assertEquals(ActivitiEventType.ENTITY_ACTIVATED, event.getType());
+    assertEquals(ActivitiEngineEventType.ENTITY_ACTIVATED, event.getType());
     assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
     
     listener.clearEventsReceived();
@@ -116,13 +116,13 @@ public class ExecutionEventsTest extends PluggableActivitiTestCase {
     assertEquals(1, listener.getEventsReceived().size());
     event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
     assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getId());
-    assertEquals(ActivitiEventType.ENTITY_UPDATED, event.getType());
+    assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, event.getType());
     listener.clearEventsReceived();
 
     runtimeService.deleteProcessInstance(processInstance.getId(), "Testing events");
 
     event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-    assertEquals(ActivitiEventType.ENTITY_DELETED, event.getType());
+    assertEquals(ActivitiEngineEventType.ENTITY_DELETED, event.getType());
     assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
     listener.clearEventsReceived();
   }

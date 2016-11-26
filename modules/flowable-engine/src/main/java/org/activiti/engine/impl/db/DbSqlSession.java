@@ -62,6 +62,8 @@ import org.activiti.engine.impl.persistence.cache.EntityCache;
 import org.activiti.engine.impl.persistence.entity.Entity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.PropertyEntity;
+import org.activiti.engine.impl.persistence.entity.PropertyEntityImpl;
+import org.activiti.engine.impl.transaction.ConnectionHolder;
 import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.impl.util.ReflectUtil;
 import org.apache.ibatis.session.SqlSession;
@@ -783,7 +785,7 @@ public class DbSqlSession implements Session {
   }
 
   public void rollback() {
-    sqlSession.rollback();
+    sqlSession.rollback(true);
   }
 
   // schema operations
@@ -833,7 +835,7 @@ public class DbSqlSession implements Session {
   }
 
   protected String getDbVersion() {
-    String selectSchemaVersionStatement = dbSqlSessionFactory.mapStatement("selectDbSchemaVersion");
+    String selectSchemaVersionStatement = dbSqlSessionFactory.mapStatement("org.activiti.engine.impl.persistence.entity.PropertyEntityImpl.selectDbSchemaVersion");
     return (String) sqlSession.selectOne(selectSchemaVersionStatement);
   }
 
@@ -887,7 +889,7 @@ public class DbSqlSession implements Session {
 
     if (isEngineTablePresent()) {
 
-      PropertyEntity dbVersionProperty = selectById(PropertyEntity.class, "schema.version");
+      PropertyEntity dbVersionProperty = selectById(PropertyEntityImpl.class, "schema.version");
       String dbVersion = dbVersionProperty.getValue();
 
       // Determine index in the sequence of Activiti releases

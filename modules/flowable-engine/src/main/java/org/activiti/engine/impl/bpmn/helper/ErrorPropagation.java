@@ -34,7 +34,7 @@ import org.activiti.bpmn.model.StartEvent;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
@@ -84,12 +84,12 @@ public class ErrorPropagation {
               executionEntityManager.deleteProcessInstanceExecutionEntity(processInstanceEntity.getId(), 
                   execution.getCurrentFlowElement() != null ? execution.getCurrentFlowElement().getId() : null,
                   "ERROR_EVENT " + errorCode, 
-                  false, false, false);
+                  false, false);
 
               // Event
               if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
                 Context.getProcessEngineConfiguration().getEventDispatcher()
-                    .dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.PROCESS_COMPLETED_WITH_ERROR_END_EVENT, processInstanceEntity));
+                    .dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.PROCESS_COMPLETED_WITH_ERROR_END_EVENT, processInstanceEntity));
               }
             }
             executeCatch(eventMap, parentExecution, errorCode);
@@ -188,7 +188,7 @@ public class ErrorPropagation {
         }
         
         Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createErrorEvent(ActivitiEventType.ACTIVITY_ERROR_RECEIVED, event.getId(), errorId, errorCode, parentExecution.getId(),
+          ActivitiEventBuilder.createErrorEvent(ActivitiEngineEventType.ACTIVITY_ERROR_RECEIVED, event.getId(), errorId, errorCode, parentExecution.getId(),
               parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId()));
       }
     }

@@ -12,8 +12,8 @@
  */
 package org.activiti.idm.engine.impl.persistence.entity;
 
-import org.activiti.idm.engine.impl.db.Entity;
-import org.activiti.idm.engine.impl.db.HasRevision;
+import org.activiti.engine.impl.db.HasRevision;
+import org.activiti.engine.impl.persistence.entity.Entity;
 
 /**
  * @author Tijs Rademakers

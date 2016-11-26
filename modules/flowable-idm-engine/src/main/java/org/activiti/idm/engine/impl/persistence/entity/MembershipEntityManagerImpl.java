@@ -13,10 +13,10 @@
 
 package org.activiti.idm.engine.impl.persistence.entity;
 
+import org.activiti.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.idm.api.event.ActivitiIdmEventType;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.delegate.event.impl.ActivitiIdmEventBuilder;
-import org.activiti.idm.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.MembershipDataManager;
 
 /**

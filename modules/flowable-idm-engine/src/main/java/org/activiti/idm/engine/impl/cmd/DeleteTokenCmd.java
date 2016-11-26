@@ -14,7 +14,7 @@ package org.activiti.idm.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
+import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.idm.engine.impl.interceptor.Command;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 
@@ -32,7 +32,7 @@ public class DeleteTokenCmd implements Command<Void>, Serializable {
 
   public Void execute(CommandContext commandContext) {
     if (tokenId == null) {
-      throw new ActivitiIdmIllegalArgumentException("tokenId is null");
+      throw new ActivitiIllegalArgumentException("tokenId is null");
     }
     commandContext.getTokenEntityManager().delete(tokenId);
 

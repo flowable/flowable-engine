@@ -15,7 +15,7 @@ import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.Transaction;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.delegate.ExecutionListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.activiti.engine.impl.bpmn.helper.ScopeUtil;
@@ -84,9 +84,9 @@ public class EndExecutionOperation extends AbstractOperation {
     if (activeExecutions == 0) {
       logger.debug("No active executions found. Ending process instance {} ", processInstanceId);
       
-   // note the use of execution here vs processinstance execution for getting the flowelement
+      // note the use of execution here vs processinstance execution for getting the flow element
       executionEntityManager.deleteProcessInstanceExecutionEntity(processInstanceId, 
-          execution.getCurrentFlowElement() != null ? execution.getCurrentFlowElement().getId() : null, null, false, false, true);
+          execution.getCurrentFlowElement() != null ? execution.getCurrentFlowElement().getId() : null, null, false, false);
     } else {
       logger.debug("Active executions found. Process instance {} will not be ended.", processInstanceId);
     }
@@ -218,7 +218,7 @@ public class EndExecutionOperation extends AbstractOperation {
     executionEntityManager.deleteExecutionAndRelatedData(parentExecution, null, false);
     
     Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-        ActivitiEventBuilder.createActivityEvent(ActivitiEventType.ACTIVITY_COMPLETED, subProcess.getId(), subProcess.getName(),
+        ActivitiEventBuilder.createActivityEvent(ActivitiEngineEventType.ACTIVITY_COMPLETED, subProcess.getId(), subProcess.getName(),
             parentExecution.getId(), parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId(), subProcess));
     return executionToContinue;
   }

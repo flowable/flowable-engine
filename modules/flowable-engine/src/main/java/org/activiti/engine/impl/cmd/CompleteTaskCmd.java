@@ -18,11 +18,12 @@ import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.util.Activiti5Util;
+import org.activiti.engine.impl.util.TaskHelper;
 
 /**
  * @author Joram Barrez
  */
-public class CompleteTaskCmd extends AbstractCompleteTaskCmd {
+public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
 
   private static final long serialVersionUID = 1L;
   protected Map<String, Object> variables;
@@ -59,25 +60,7 @@ public class CompleteTaskCmd extends AbstractCompleteTaskCmd {
       }
     }
     
-    if (variables != null) {
-    	if (localScope) {
-    		task.setVariablesLocal(variables);
-    	} else if (task.getExecutionId() != null) {
-    		task.setExecutionVariables(variables);
-    	} else {
-    		task.setVariables(variables);
-    	}
-    }
-    
-    if (transientVariables != null) {
-      if (localScope) {
-        task.setTransientVariablesLocal(transientVariables);
-      } else {
-        task.setTransientVariables(transientVariables);
-      }
-    }
-
-    executeTaskComplete(commandContext, task, variables, localScope);
+    TaskHelper.completeTask(task, variables, transientVariables, localScope, commandContext);
     return null;
   }
 

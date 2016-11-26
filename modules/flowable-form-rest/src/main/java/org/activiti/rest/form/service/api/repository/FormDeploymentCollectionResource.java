@@ -12,16 +12,22 @@
  */
 package org.activiti.rest.form.service.api.repository;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.query.QueryProperty;
 import org.activiti.form.api.FormDeployment;
 import org.activiti.form.api.FormDeploymentBuilder;
 import org.activiti.form.api.FormDeploymentQuery;
 import org.activiti.form.api.FormRepositoryService;
-import org.activiti.form.api.QueryProperty;
-import org.activiti.form.engine.ActivitiFormException;
-import org.activiti.form.engine.ActivitiFormIllegalArgumentException;
 import org.activiti.form.engine.impl.DeploymentQueryProperty;
+import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.form.FormRestResponseFactory;
-import org.activiti.rest.form.common.DataResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,11 +36,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Yvo Swillens
@@ -94,13 +95,13 @@ public class FormDeploymentCollectionResource {
   public FormDeploymentResponse uploadDeployment(@RequestParam(value = "tenantId", required = false) String tenantId, HttpServletRequest request, HttpServletResponse response) {
 
     if (request instanceof MultipartHttpServletRequest == false) {
-      throw new ActivitiFormIllegalArgumentException("Multipart request is required");
+      throw new ActivitiIllegalArgumentException("Multipart request is required");
     }
 
     MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
 
     if (multipartRequest.getFileMap().size() == 0) {
-      throw new ActivitiFormIllegalArgumentException("Multipart request with file content is required");
+      throw new ActivitiIllegalArgumentException("Multipart request with file content is required");
     }
 
     MultipartFile file = multipartRequest.getFileMap().values().iterator().next();
@@ -115,7 +116,7 @@ public class FormDeploymentCollectionResource {
       if (fileName.endsWith(".form") || fileName.endsWith(".xml")) {
         deploymentBuilder.addInputStream(fileName, file.getInputStream());
       } else {
-        throw new ActivitiFormIllegalArgumentException("File must be of type .xml or .form");
+        throw new ActivitiIllegalArgumentException("File must be of type .xml or .form");
       }
       deploymentBuilder.name(fileName);
 
@@ -129,10 +130,10 @@ public class FormDeploymentCollectionResource {
       return formRestResponseFactory.createFormDeploymentResponse(deployment);
 
     } catch (Exception e) {
-      if (e instanceof ActivitiFormException) {
-        throw (ActivitiFormException) e;
+      if (e instanceof ActivitiException) {
+        throw (ActivitiException) e;
       }
-      throw new ActivitiFormException(e.getMessage(), e);
+      throw new ActivitiException(e.getMessage(), e);
     }
 
   }

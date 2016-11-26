@@ -17,7 +17,7 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 /**
  * @author Tom Baeyens
  */
-public interface TransactionListener {
+public interface TransactionListener extends BaseTransactionListener<CommandContext> {
 
   void execute(CommandContext commandContext);
 }

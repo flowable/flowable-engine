@@ -46,7 +46,7 @@ import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.User;
-import org.activiti.rest.common.application.ContentTypeResolver;
+import org.activiti.rest.application.ContentTypeResolver;
 import org.activiti.rest.service.api.engine.AttachmentResponse;
 import org.activiti.rest.service.api.engine.CommentResponse;
 import org.activiti.rest.service.api.engine.EventResponse;

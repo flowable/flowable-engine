@@ -13,12 +13,14 @@
 package org.activiti.engine.delegate.event.impl;
 
 import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.ActivitiEntityEvent;
 import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.engine.impl.context.Context;
+import org.activiti.engine.impl.delegate.event.ActivitiEngineEvent;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.util.ProcessDefinitionUtil;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -66,7 +68,7 @@ public class ActivitiEventDispatcherImpl implements ActivitiEventDispatcher {
       eventSupport.dispatchEvent(event);
     }
 
-    if (event.getType() == ActivitiEventType.ENTITY_DELETED && event instanceof ActivitiEntityEvent) {
+    if (event.getType() == ActivitiEngineEventType.ENTITY_DELETED && event instanceof ActivitiEntityEvent) {
       ActivitiEntityEvent entityEvent = (ActivitiEntityEvent) event;
       if (entityEvent.getEntity() instanceof ProcessDefinition) {
         // process definition deleted event doesn't need to be dispatched to event listeners
@@ -98,8 +100,10 @@ public class ActivitiEventDispatcherImpl implements ActivitiEventDispatcher {
   protected BpmnModel extractBpmnModelFromEvent(ActivitiEvent event) {
     BpmnModel result = null;
     
-    if (result == null && event.getProcessDefinitionId() != null) {
-      ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(event.getProcessDefinitionId(), true);
+    if (result == null && event instanceof ActivitiEngineEvent && ((ActivitiEngineEvent) event).getProcessDefinitionId() != null) {
+      ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(
+          ((ActivitiEngineEvent) event).getProcessDefinitionId(), true);
+      
       if (processDefinition != null) {
         result = Context.getProcessEngineConfiguration().getDeploymentManager().resolveProcessDefinition(processDefinition).getBpmnModel();
       }

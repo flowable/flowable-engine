@@ -16,11 +16,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiOptimisticLockingException;
 import org.activiti.engine.ActivitiTaskAlreadyClaimedException;
 import org.activiti.engine.FlowableEngineAgenda;
 import org.activiti.engine.JobNotFoundException;
@@ -58,7 +55,6 @@ import org.activiti.engine.impl.persistence.entity.TableDataManager;
 import org.activiti.engine.impl.persistence.entity.TaskEntityManager;
 import org.activiti.engine.impl.persistence.entity.TimerJobEntityManager;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceEntityManager;
-import org.activiti.engine.logging.LogMDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,225 +63,40 @@ import org.slf4j.LoggerFactory;
  * @author Agim Emruli
  * @author Joram Barrez
  */
-public class CommandContext {
+public class CommandContext extends AbstractCommandContext {
 
   private static Logger log = LoggerFactory.getLogger(CommandContext.class);
 
-  protected Command<?> command;
-  protected Map<Class<?>, SessionFactory> sessionFactories;
-  protected Map<Class<?>, Session> sessions = new HashMap<Class<?>, Session>();
-  protected Throwable exception;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected FailedJobCommandFactory failedJobCommandFactory;
-  protected List<CommandContextCloseListener> closeListeners;
-  protected Map<String, Object> attributes; // General-purpose storing of anything during the lifetime of a command context
-  protected boolean reused;
-
+  
   protected FlowableEngineAgenda agenda;
   protected Map<String, ExecutionEntity> involvedExecutions = new HashMap<String, ExecutionEntity>(1); // The executions involved with the command
   protected LinkedList<Object> resultStack = new LinkedList<Object>(); // needs to be a stack, as JavaDelegates can do api calls again
 
   public CommandContext(Command<?> command, ProcessEngineConfigurationImpl processEngineConfiguration) {
-    this.command = command;
+    super(command);
     this.processEngineConfiguration = processEngineConfiguration;
     this.failedJobCommandFactory = processEngineConfiguration.getFailedJobCommandFactory();
     this.sessionFactories = processEngineConfiguration.getSessionFactories();
     this.agenda = processEngineConfiguration.getAgendaFactory().createAgenda(this);
   }
 
-  public void close() {
-    
-    // The intention of this method is that all resources are closed properly, even if exceptions occur
-    // in close or flush methods of the sessions or the transaction context.
-
-    try {
-      try {
-        try {
-          executeCloseListenersClosing();
-          if (exception == null) {
-            flushSessions();
-          }
-        } catch (Throwable exception) {
-          exception(exception);
-        } finally {
-          
-          try {
-            if (exception == null) {
-              executeCloseListenersAfterSessionFlushed();
-            }
-          } catch (Throwable exception) {
-            exception(exception);
-          }
-          
-          if (exception != null) {
-            logException();
-            executeCloseListenersCloseFailure();
-          } else {
-            executeCloseListenersClosed();
-          }
-          
-        }
-      } catch (Throwable exception) {
-        // Catch exceptions during rollback
-        exception(exception);
-      } finally {
-        // Sessions need to be closed, regardless of exceptions/commit/rollback
-        closeSessions();
-      }
-    } catch (Throwable exception) {
-      // Catch exceptions during session closing
-      exception(exception);
-    }
-    
-    if (exception != null) {
-      rethrowExceptionIfNeeded();
-    }
-  }
-
   protected void logException() {
     if (exception instanceof JobNotFoundException || exception instanceof ActivitiTaskAlreadyClaimedException) {
       // reduce log level, because this may have been caused because of job deletion due to cancelActiviti="true"
       log.info("Error while closing command context", exception);
-    } else if (exception instanceof ActivitiOptimisticLockingException) {
-      // reduce log level, as normally we're not interested in logging this exception
-      log.debug("Optimistic locking exception : " + exception);
     } else {
-      log.error("Error while closing command context", exception);
+      super.logException();
     }
   }
-
-  protected void rethrowExceptionIfNeeded() throws Error {
-    if (exception instanceof Error) {
-      throw (Error) exception;
-    } else if (exception instanceof RuntimeException) {
-      throw (RuntimeException) exception;
-    } else {
-      throw new ActivitiException("exception while executing command " + command, exception);
-    }
-  }
-
+  
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public void addCloseListener(CommandContextCloseListener commandContextCloseListener) {
     if (closeListeners == null) {
-      closeListeners = new ArrayList<CommandContextCloseListener>(1);
+      closeListeners = new ArrayList<BaseCommandContextCloseListener<AbstractCommandContext>>(1);
     }
-    closeListeners.add(commandContextCloseListener);
-  }
-
-  public List<CommandContextCloseListener> getCloseListeners() {
-    return closeListeners;
-  }
-  
-  protected void executeCloseListenersClosing() {
-    if (closeListeners != null) {
-      try {
-        for (CommandContextCloseListener listener : closeListeners) {
-          listener.closing(this);
-        }
-      } catch (Throwable exception) {
-        exception(exception);
-      }
-    }
-  }
-  
-  protected void executeCloseListenersAfterSessionFlushed() {
-    if (closeListeners != null) {
-      try {
-        for (CommandContextCloseListener listener : closeListeners) {
-          listener.afterSessionsFlush(this);
-        }
-      } catch (Throwable exception) {
-        exception(exception);
-      }
-    }
-  }
-  
-  protected void executeCloseListenersClosed() {
-    if (closeListeners != null) {
-      try {
-        for (CommandContextCloseListener listener : closeListeners) {
-          listener.closed(this);
-        }
-      } catch (Throwable exception) {
-        exception(exception);
-      }
-    }
-  }
-  
-  protected void executeCloseListenersCloseFailure() {
-    if (closeListeners != null) {
-      try {
-        for (CommandContextCloseListener listener : closeListeners) {
-          listener.closeFailure(this);
-        }
-      } catch (Throwable exception) {
-        exception(exception);
-      }
-    }
-  }
-
-  protected void flushSessions() {
-    for (Session session : sessions.values()) {
-      session.flush();
-    }
-  }
-
-  protected void closeSessions() {
-    for (Session session : sessions.values()) {
-      try {
-        session.close();
-      } catch (Throwable exception) {
-        exception(exception);
-      }
-    }
-  }
-
-  /**
-   * Stores the provided exception on this {@link CommandContext} instance.
-   * That exception will be rethrown at the end of closing the {@link CommandContext} instance. 
-   * 
-   * If there is already an exception being stored, a 'masked exception' message will be logged.
-   */
-  public void exception(Throwable exception) {
-    if (this.exception == null) {
-      this.exception = exception;
-
-    } else {
-      log.error("masked exception in command context. for root cause, see below as it will be rethrown later.", exception);
-      LogMDC.clear();
-    }
-  }
-
-  public void addAttribute(String key, Object value) {
-    if (attributes == null) {
-      attributes = new HashMap<String, Object>(1);
-    }
-    attributes.put(key, value);
-  }
-
-  public Object getAttribute(String key) {
-    if (attributes != null) {
-      return attributes.get(key);
-    }
-    return null;
-  }
-
-  @SuppressWarnings({ "unchecked" })
-  public <T> T getSession(Class<T> sessionClass) {
-    Session session = sessions.get(sessionClass);
-    if (session == null) {
-      SessionFactory sessionFactory = sessionFactories.get(sessionClass);
-      if (sessionFactory == null) {
-        throw new ActivitiException("no session factory configured for " + sessionClass.getName());
-      }
-      session = sessionFactory.openSession(this);
-      sessions.put(sessionClass, session);
-    }
-
-    return (T) session;
-  }
-
-  public Map<Class<?>, SessionFactory> getSessionFactories() {
-    return sessionFactories;
+    closeListeners.add((BaseCommandContextCloseListener) commandContextCloseListener);
   }
 
   public DbSqlSession getDbSqlSession() {
@@ -427,18 +238,6 @@ public class CommandContext {
   // getters and setters
   // //////////////////////////////////////////////////////
 
-  public Command<?> getCommand() {
-    return command;
-  }
-
-  public Map<Class<?>, Session> getSessions() {
-    return sessions;
-  }
-
-  public Throwable getException() {
-    return exception;
-  }
-
   public FailedJobCommandFactory getFailedJobCommandFactory() {
     return failedJobCommandFactory;
   }
@@ -462,13 +261,4 @@ public class CommandContext {
   public void setResult(Object result) {
     resultStack.add(result);
   }
-
-  public boolean isReused() {
-    return reused;
-  }
-
-  public void setReused(boolean reused) {
-    this.reused = reused;
-  }
-  
 }

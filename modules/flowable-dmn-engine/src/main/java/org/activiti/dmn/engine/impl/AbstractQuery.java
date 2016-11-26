@@ -15,16 +15,18 @@ package org.activiti.dmn.engine.impl;
 import java.io.Serializable;
 import java.util.List;
 
-import org.activiti.dmn.api.Query;
-import org.activiti.dmn.api.QueryProperty;
-import org.activiti.dmn.engine.ActivitiDmnException;
-import org.activiti.dmn.engine.ActivitiDmnIllegalArgumentException;
 import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.impl.context.Context;
-import org.activiti.dmn.engine.impl.db.ListQueryParameterObject;
 import org.activiti.dmn.engine.impl.interceptor.Command;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
 import org.activiti.dmn.engine.impl.interceptor.CommandExecutor;
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.impl.Direction;
+import org.activiti.engine.impl.Page;
+import org.activiti.engine.impl.db.ListQueryParameterObject;
+import org.activiti.engine.query.Query;
+import org.activiti.engine.query.QueryProperty;
 
 /**
  * Abstract superclass for all query types.
@@ -52,10 +54,6 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
   protected ResultType resultType;
 
   protected QueryProperty orderProperty;
-
-  public static enum NullHandlingOnOrder {
-    NULLS_FIRST, NULLS_LAST
-  }
 
   protected NullHandlingOnOrder nullHandlingOnOrder;
 
@@ -100,7 +98,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
   @SuppressWarnings("unchecked")
   public T direction(Direction direction) {
     if (orderProperty == null) {
-      throw new ActivitiDmnIllegalArgumentException("You should call any of the orderBy methods first before specifying a direction");
+      throw new ActivitiIllegalArgumentException("You should call any of the orderBy methods first before specifying a direction");
     }
     addOrder(orderProperty.getName(), direction.getName(), nullHandlingOnOrder);
     orderProperty = null;
@@ -110,7 +108,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
 
   protected void checkQueryOk() {
     if (orderProperty != null) {
-      throw new ActivitiDmnIllegalArgumentException("Invalid query: call asc() or desc() after using orderByXX()");
+      throw new ActivitiIllegalArgumentException("Invalid query: call asc() or desc() after using orderByXX()");
     }
   }
 
@@ -178,7 +176,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
     if (results.size() == 1) {
       return results.get(0);
     } else if (results.size() > 1) {
-      throw new ActivitiDmnException("Query return " + results.size() + " results instead of max 1");
+      throw new ActivitiException("Query return " + results.size() + " results instead of max 1");
     }
     return null;
   }

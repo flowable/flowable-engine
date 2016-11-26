@@ -13,7 +13,7 @@
 package org.activiti.engine.delegate.event.impl;
 
 import org.activiti.engine.delegate.event.ActivitiCancelledEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 
 /**
  * An {@link org.activiti.engine.delegate.event.ActivitiCancelledEvent} implementation.
@@ -25,7 +25,7 @@ public class ActivitiProcessCancelledEventImpl extends ActivitiEventImpl impleme
   protected Object cause;
 
   public ActivitiProcessCancelledEventImpl() {
-    super(ActivitiEventType.PROCESS_CANCELLED);
+    super(ActivitiEngineEventType.PROCESS_CANCELLED);
   }
 
   public void setCause(Object cause) {

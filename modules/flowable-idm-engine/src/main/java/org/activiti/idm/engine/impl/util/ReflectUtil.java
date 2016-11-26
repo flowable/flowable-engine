@@ -21,8 +21,8 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-import org.activiti.idm.engine.ActivitiIdmClassLoadingException;
-import org.activiti.idm.engine.ActivitiIdmException;
+import org.activiti.engine.ActivitiClassLoadingException;
+import org.activiti.engine.ActivitiException;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.context.Context;
 import org.slf4j.Logger;
@@ -84,7 +84,7 @@ public abstract class ReflectUtil {
     }
 
     if (clazz == null) {
-      throw new ActivitiIdmClassLoadingException(className, throwable);
+      throw new ActivitiClassLoadingException(className, throwable);
     }
     return clazz;
   }
@@ -134,7 +134,7 @@ public abstract class ReflectUtil {
       Class<?> clazz = loadClass(className);
       return clazz.newInstance();
     } catch (Exception e) {
-      throw new ActivitiIdmException("couldn't instantiate class " + className, e);
+      throw new ActivitiException("couldn't instantiate class " + className, e);
     }
   }
 
@@ -145,7 +145,7 @@ public abstract class ReflectUtil {
       method.setAccessible(true);
       return method.invoke(target, args);
     } catch (Exception e) {
-      throw new ActivitiIdmException("couldn't invoke " + methodName + " on " + target, e);
+      throw new ActivitiException("couldn't invoke " + methodName + " on " + target, e);
     }
   }
 
@@ -164,10 +164,9 @@ public abstract class ReflectUtil {
     try {
       field = clazz.getDeclaredField(fieldName);
     } catch (SecurityException e) {
-      throw new ActivitiIdmException("not allowed to access field " + field + " on class " + clazz.getCanonicalName());
+      throw new ActivitiException("not allowed to access field " + field + " on class " + clazz.getCanonicalName());
     } catch (NoSuchFieldException e) {
-      // for some reason getDeclaredFields doesn't search superclasses
-      // (which getFields() does ... but that gives only public fields)
+      // for some reason getDeclaredFields doesn't search super classes (which getFields() does ... but that gives only public fields)
       Class<?> superClass = clazz.getSuperclass();
       if (superClass != null) {
         return getField(fieldName, superClass);
@@ -181,9 +180,9 @@ public abstract class ReflectUtil {
       field.setAccessible(true);
       field.set(object, value);
     } catch (IllegalArgumentException e) {
-      throw new ActivitiIdmException("Could not set field " + field.toString(), e);
+      throw new ActivitiException("Could not set field " + field.toString(), e);
     } catch (IllegalAccessException e) {
-      throw new ActivitiIdmException("Could not set field " + field.toString(), e);
+      throw new ActivitiException("Could not set field " + field.toString(), e);
     }
   }
 
@@ -206,7 +205,7 @@ public abstract class ReflectUtil {
       }
       return null;
     } catch (SecurityException e) {
-      throw new ActivitiIdmException("Not allowed to access method " + setterName + " on class " + clazz.getCanonicalName());
+      throw new ActivitiException("Not allowed to access method " + setterName + " on class " + clazz.getCanonicalName());
     }
   }
 
@@ -228,12 +227,12 @@ public abstract class ReflectUtil {
     Class<?> clazz = loadClass(className);
     Constructor<?> constructor = findMatchingConstructor(clazz, args);
     if (constructor == null) {
-      throw new ActivitiIdmException("couldn't find constructor for " + className + " with args " + Arrays.asList(args));
+      throw new ActivitiException("couldn't find constructor for " + className + " with args " + Arrays.asList(args));
     }
     try {
       return constructor.newInstance(args);
     } catch (Exception e) {
-      throw new ActivitiIdmException("couldn't find constructor for " + className + " with args " + Arrays.asList(args), e);
+      throw new ActivitiException("couldn't find constructor for " + className + " with args " + Arrays.asList(args), e);
     }
   }
 

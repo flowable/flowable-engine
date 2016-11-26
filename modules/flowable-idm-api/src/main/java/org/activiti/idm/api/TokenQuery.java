@@ -16,6 +16,8 @@ package org.activiti.idm.api;
 import java.util.Date;
 import java.util.List;
 
+import org.activiti.engine.query.Query;
+
 /**
  * Allows programmatic querying of {@link Token}
  * 

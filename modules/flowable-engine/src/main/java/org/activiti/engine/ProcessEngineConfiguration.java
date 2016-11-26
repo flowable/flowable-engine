@@ -75,25 +75,7 @@ import org.activiti.image.ProcessDiagramGenerator;
  * @see ProcessEngines
  * @author Tom Baeyens
  */
-public abstract class ProcessEngineConfiguration {
-
-  /**
-   * Checks the version of the DB schema against the library when the process engine is being created and throws an exception if the versions don't match.
-   */
-  public static final String DB_SCHEMA_UPDATE_FALSE = "false";
-
-  /**
-   * Creates the schema when the process engine is being created and drops the schema when the process engine is being closed.
-   */
-  public static final String DB_SCHEMA_UPDATE_CREATE_DROP = "create-drop";
-
-  /**
-   * Upon building of the process engine, a check is performed and an update of the schema is performed if it is necessary.
-   */
-  public static final String DB_SCHEMA_UPDATE_TRUE = "true";
-
-  /** The tenant id indicating 'no tenant' */
-  public static final String NO_TENANT_ID = "";
+public abstract class ProcessEngineConfiguration extends AbstractEngineConfiguration {
 
   protected String processEngineName = ProcessEngines.NAME_DEFAULT;
   protected int idBlockSize = 2500;
@@ -111,32 +93,14 @@ public abstract class ProcessEngineConfiguration {
   protected Map<String, MailServerInfo> mailServers = new HashMap<String, MailServerInfo>();
   protected Map<String, String> mailSessionsJndi = new HashMap<String, String>();
 
-  protected String databaseType;
-  protected String databaseSchemaUpdate = DB_SCHEMA_UPDATE_FALSE;
-  protected String jdbcDriver = "org.h2.Driver";
-  protected String jdbcUrl = "jdbc:h2:tcp://localhost/~/activiti";
-  protected String jdbcUsername = "sa";
-  protected String jdbcPassword = "";
-  protected String dataSourceJndiName;
   protected boolean isDbHistoryUsed = true;
   protected HistoryLevel historyLevel;
-  protected int jdbcMaxActiveConnections;
-  protected int jdbcMaxIdleConnections;
-  protected int jdbcMaxCheckoutTime;
-  protected int jdbcMaxWaitTime;
-  protected boolean jdbcPingEnabled;
-  protected String jdbcPingQuery;
-  protected int jdbcPingConnectionNotUsedFor;
-  protected int jdbcDefaultTransactionIsolationLevel;
-  protected DataSource dataSource;
-  protected boolean transactionsExternallyManaged;
 
   protected String jpaPersistenceUnitName;
   protected Object jpaEntityManagerFactory;
   protected boolean jpaHandleTransaction;
   protected boolean jpaCloseEntityManager;
 
-  protected Clock clock;
   protected AsyncExecutor asyncExecutor;
   /**
    * Define the default lock time for an async job in seconds. The lock time is used when creating an async job and when it expires the async executor assumes that the job has failed. It will be
@@ -153,60 +117,14 @@ public abstract class ProcessEngineConfiguration {
    */
   protected ProcessDiagramGenerator processDiagramGenerator;
 
-  /**
-   * Allows configuring a database table prefix which is used for all runtime operations of the process engine. For example, if you specify a prefix named 'PRE1.', activiti will query for executions
-   * in a table named 'PRE1.ACT_RU_EXECUTION_'.
-   * 
-   * <p />
-   * <strong>NOTE: the prefix is not respected by automatic database schema management. If you use {@link ProcessEngineConfiguration#DB_SCHEMA_UPDATE_CREATE_DROP} or
-   * {@link ProcessEngineConfiguration#DB_SCHEMA_UPDATE_TRUE}, activiti will create the database tables using the default names, regardless of the prefix configured here.</strong>
-   * 
-   * @since 5.9
-   */
-  protected String databaseTablePrefix = "";
-  
-  /**
-   * Escape character for doing wildcard searches.
-   * 
-   * This will be added at then end of queries that include for example a LIKE clause.
-   * For example: SELECT * FROM table WHERE column LIKE '%\%%' ESCAPE '\';
-   */
-  protected String databaseWildcardEscapeCharacter;
-
-  /**
-   * database catalog to use
-   */
-  protected String databaseCatalog = "";
-
-  /**
-   * In some situations you want to set the schema to use for table checks / generation if the database metadata doesn't return that correctly, see https://jira.codehaus.org/browse/ACT-1220,
-   * https://jira.codehaus.org/browse/ACT-1062
-   */
-  protected String databaseSchema;
-
-  /**
-   * Set to true in case the defined databaseTablePrefix is a schema-name, instead of an actual table name prefix. This is relevant for checking if Activiti-tables exist, the databaseTablePrefix will
-   * not be used here - since the schema is taken into account already, adding a prefix for the table-check will result in wrong table-names.
-   * 
-   * @since 5.15
-   */
-  protected boolean tablePrefixIsSchema;
-
   protected boolean isCreateDiagramOnDeploy = true;
-
-  protected String xmlEncoding = "UTF-8";
 
   protected String defaultCamelContext = "camelContext";
 
   protected String activityFontName = "Arial";
   protected String labelFontName = "Arial";
   protected String annotationFontName = "Arial";
-
-  protected ClassLoader classLoader;
-  /**
-   * Either use Class.forName or ClassLoader.loadClass for class loading. See http://forums.activiti.org/content/reflectutilloadclass-and-custom- classloader
-   */
-  protected boolean useClassForNameClassLoading = true;
+  
   protected ProcessEngineLifecycleListener processEngineLifecycleListener;
   
   protected boolean enableProcessDefinitionInfoCache = false;
@@ -270,11 +188,11 @@ public abstract class ProcessEngineConfiguration {
   // getters and setters
   // //////////////////////////////////////////////////////
 
-  public String getProcessEngineName() {
+  public String getEngineName() {
     return processEngineName;
   }
 
-  public ProcessEngineConfiguration setProcessEngineName(String processEngineName) {
+  public ProcessEngineConfiguration setEngineName(String processEngineName) {
     this.processEngineName = processEngineName;
     return this;
   }
@@ -395,17 +313,9 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
-  public String getDatabaseType() {
-    return databaseType;
-  }
-
   public ProcessEngineConfiguration setDatabaseType(String databaseType) {
     this.databaseType = databaseType;
     return this;
-  }
-
-  public String getDatabaseSchemaUpdate() {
-    return databaseSchemaUpdate;
   }
 
   public ProcessEngineConfiguration setDatabaseSchemaUpdate(String databaseSchemaUpdate) {
@@ -413,17 +323,9 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
-  public DataSource getDataSource() {
-    return dataSource;
-  }
-
   public ProcessEngineConfiguration setDataSource(DataSource dataSource) {
     this.dataSource = dataSource;
     return this;
-  }
-
-  public String getJdbcDriver() {
-    return jdbcDriver;
   }
 
   public ProcessEngineConfiguration setJdbcDriver(String jdbcDriver) {
@@ -431,17 +333,9 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
-  public String getJdbcUrl() {
-    return jdbcUrl;
-  }
-
   public ProcessEngineConfiguration setJdbcUrl(String jdbcUrl) {
     this.jdbcUrl = jdbcUrl;
     return this;
-  }
-
-  public String getJdbcUsername() {
-    return jdbcUsername;
   }
 
   public ProcessEngineConfiguration setJdbcUsername(String jdbcUsername) {
@@ -449,17 +343,9 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
-  public String getJdbcPassword() {
-    return jdbcPassword;
-  }
-
   public ProcessEngineConfiguration setJdbcPassword(String jdbcPassword) {
     this.jdbcPassword = jdbcPassword;
     return this;
-  }
-
-  public boolean isTransactionsExternallyManaged() {
-    return transactionsExternallyManaged;
   }
 
   public ProcessEngineConfiguration setTransactionsExternallyManaged(boolean transactionsExternallyManaged) {
@@ -485,17 +371,9 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
-  public int getJdbcMaxActiveConnections() {
-    return jdbcMaxActiveConnections;
-  }
-
   public ProcessEngineConfiguration setJdbcMaxActiveConnections(int jdbcMaxActiveConnections) {
     this.jdbcMaxActiveConnections = jdbcMaxActiveConnections;
     return this;
-  }
-
-  public int getJdbcMaxIdleConnections() {
-    return jdbcMaxIdleConnections;
   }
 
   public ProcessEngineConfiguration setJdbcMaxIdleConnections(int jdbcMaxIdleConnections) {
@@ -503,17 +381,9 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
-  public int getJdbcMaxCheckoutTime() {
-    return jdbcMaxCheckoutTime;
-  }
-
   public ProcessEngineConfiguration setJdbcMaxCheckoutTime(int jdbcMaxCheckoutTime) {
     this.jdbcMaxCheckoutTime = jdbcMaxCheckoutTime;
     return this;
-  }
-
-  public int getJdbcMaxWaitTime() {
-    return jdbcMaxWaitTime;
   }
 
   public ProcessEngineConfiguration setJdbcMaxWaitTime(int jdbcMaxWaitTime) {
@@ -521,17 +391,9 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
-  public boolean isJdbcPingEnabled() {
-    return jdbcPingEnabled;
-  }
-
   public ProcessEngineConfiguration setJdbcPingEnabled(boolean jdbcPingEnabled) {
     this.jdbcPingEnabled = jdbcPingEnabled;
     return this;
-  }
-
-  public String getJdbcPingQuery() {
-    return jdbcPingQuery;
   }
 
   public ProcessEngineConfiguration setJdbcPingQuery(String jdbcPingQuery) {
@@ -539,17 +401,9 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
-  public int getJdbcPingConnectionNotUsedFor() {
-    return jdbcPingConnectionNotUsedFor;
-  }
-
   public ProcessEngineConfiguration setJdbcPingConnectionNotUsedFor(int jdbcPingNotUsedFor) {
     this.jdbcPingConnectionNotUsedFor = jdbcPingNotUsedFor;
     return this;
-  }
-
-  public int getJdbcDefaultTransactionIsolationLevel() {
-    return jdbcDefaultTransactionIsolationLevel;
   }
 
   public ProcessEngineConfiguration setJdbcDefaultTransactionIsolationLevel(int jdbcDefaultTransactionIsolationLevel) {
@@ -566,17 +420,9 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
-  public ClassLoader getClassLoader() {
-    return classLoader;
-  }
-
   public ProcessEngineConfiguration setClassLoader(ClassLoader classLoader) {
     this.classLoader = classLoader;
     return this;
-  }
-
-  public boolean isUseClassForNameClassLoading() {
-    return useClassForNameClassLoading;
   }
 
   public ProcessEngineConfiguration setUseClassForNameClassLoading(boolean useClassForNameClassLoading) {
@@ -618,10 +464,6 @@ public abstract class ProcessEngineConfiguration {
   public ProcessEngineConfiguration setJpaPersistenceUnitName(String jpaPersistenceUnitName) {
     this.jpaPersistenceUnitName = jpaPersistenceUnitName;
     return this;
-  }
-
-  public String getDataSourceJndiName() {
-    return dataSourceJndiName;
   }
 
   public ProcessEngineConfiguration setDataSourceJndiName(String dataSourceJndiName) {
@@ -683,10 +525,6 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
-  public String getDatabaseTablePrefix() {
-    return databaseTablePrefix;
-  }
-
   public ProcessEngineConfiguration setDatabaseTablePrefix(String databaseTablePrefix) {
     this.databaseTablePrefix = databaseTablePrefix;
     return this;
@@ -697,21 +535,9 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
-  public boolean isTablePrefixIsSchema() {
-    return tablePrefixIsSchema;
-  }
-  
-  public String getDatabaseWildcardEscapeCharacter() {
-    return databaseWildcardEscapeCharacter;
-  }
-
   public ProcessEngineConfiguration setDatabaseWildcardEscapeCharacter(String databaseWildcardEscapeCharacter) {
     this.databaseWildcardEscapeCharacter = databaseWildcardEscapeCharacter;
     return this;
-  }
-
-  public String getDatabaseCatalog() {
-    return databaseCatalog;
   }
 
   public ProcessEngineConfiguration setDatabaseCatalog(String databaseCatalog) {
@@ -719,26 +545,14 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
-  public String getDatabaseSchema() {
-    return databaseSchema;
-  }
-
   public ProcessEngineConfiguration setDatabaseSchema(String databaseSchema) {
     this.databaseSchema = databaseSchema;
     return this;
   }
 
-  public String getXmlEncoding() {
-    return xmlEncoding;
-  }
-
   public ProcessEngineConfiguration setXmlEncoding(String xmlEncoding) {
     this.xmlEncoding = xmlEncoding;
     return this;
-  }
-
-  public Clock getClock() {
-    return clock;
   }
 
   public ProcessEngineConfiguration setClock(Clock clock) {

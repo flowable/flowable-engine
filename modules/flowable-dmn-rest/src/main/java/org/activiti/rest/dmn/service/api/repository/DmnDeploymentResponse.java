@@ -13,9 +13,9 @@
 package org.activiti.rest.dmn.service.api.repository;
 
 import org.activiti.dmn.api.DmnDeployment;
-import org.activiti.rest.dmn.common.DateToStringSerializer;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.activiti.rest.util.DateToStringSerializer;
 
 import java.util.Date;
 

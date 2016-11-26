@@ -12,11 +12,10 @@
  */
 package org.activiti.rest.dmn.service.api.management;
 
-import org.activiti.dmn.engine.ActivitiDmnException;
 import org.activiti.dmn.engine.DmnEngine;
-import org.activiti.dmn.engine.DmnEngineInfo;
 import org.activiti.dmn.engine.DmnEngines;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.EngineInfo;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,24 +26,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DmnEngineResource {
 
-    @Autowired
-    protected DmnEngine dmnEngine;
-
     @RequestMapping(value = "/dmn-management/engine", method = RequestMethod.GET, produces = "application/json")
     public DmnEngineInfoResponse getEngineInfo() {
         DmnEngineInfoResponse response = new DmnEngineInfoResponse();
 
         try {
-            DmnEngineInfo dmnEngineInfo = DmnEngines.getDmnEngineInfo(dmnEngine.getName());
+            EngineInfo dmnEngineInfo = DmnEngines.getDmnEngineInfo(DmnEngines.getDefaultDmnEngine().getName());
             if (dmnEngineInfo != null) {
                 response.setName(dmnEngineInfo.getName());
                 response.setResourceUrl(dmnEngineInfo.getResourceUrl());
                 response.setException(dmnEngineInfo.getException());
-            } else {
-                response.setName(dmnEngine.getName());
             }
         } catch (Exception e) {
-            throw new ActivitiDmnException("Error retrieving DMN engine info", e);
+            throw new ActivitiException("Error retrieving DMN engine info", e);
         }
 
         response.setVersion(DmnEngine.VERSION);

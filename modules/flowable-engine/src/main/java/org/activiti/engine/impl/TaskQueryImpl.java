@@ -109,6 +109,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
   protected List<TaskQueryImpl> orQueryObjects = new ArrayList<TaskQueryImpl>();
   protected TaskQueryImpl currentOrQueryObject = null;
   
+  private List<String> cachedCandidateGroups;
+  
   public TaskQueryImpl() {
   }
 
@@ -1095,7 +1097,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
   public Integer getTaskVariablesLimit() {
     return taskVariablesLimit;
   }
-
+  
   public List<String> getCandidateGroups() {
     if (candidateGroup != null) {
       List<String> candidateGroupList = new ArrayList<String>(1);
@@ -1106,10 +1108,16 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
       return candidateGroups;
     
     } else if (candidateUser != null) {
-      return getGroupsForCandidateUser(candidateUser);
+      if (cachedCandidateGroups == null) {
+        cachedCandidateGroups = getGroupsForCandidateUser(candidateUser);
+      }
+      return cachedCandidateGroups;
       
     } else if (userIdForCandidateAndAssignee != null) {
-      return getGroupsForCandidateUser(userIdForCandidateAndAssignee);
+      if (cachedCandidateGroups == null) {
+        return getGroupsForCandidateUser(userIdForCandidateAndAssignee);
+      }
+      return cachedCandidateGroups;
     }
     return null;
   }
@@ -1545,6 +1553,24 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
   public boolean isOrActive() {
     return orActive;
+  }
+  
+  @Override
+  public List<Task> list() {
+    cachedCandidateGroups = null;
+    return super.list();
+  }
+  
+  @Override
+  public List<Task> listPage(int firstResult, int maxResults) {
+    cachedCandidateGroups = null;
+    return super.listPage(firstResult, maxResults);
+  }
+  
+  @Override
+  public long count() {
+    cachedCandidateGroups = null;
+    return super.count();
   }
 
 }

@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.app.model.runtime.ProcessInstanceRepresentation;
 import org.activiti.app.service.runtime.ActivitiProcessInstanceService;
-import org.activiti.form.model.FormDefinition;
+import org.activiti.form.model.FormModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,7 +40,7 @@ public class ProcessInstanceResource {
   }
 
   @RequestMapping(value = "/rest/process-instances/{processInstanceId}/start-form", method = RequestMethod.GET, produces = "application/json")
-  public FormDefinition getProcessInstanceStartForm(@PathVariable String processInstanceId, HttpServletResponse response) {
+  public FormModel getProcessInstanceStartForm(@PathVariable String processInstanceId, HttpServletResponse response) {
     return processInstanceService.getProcessInstanceStartForm(processInstanceId, response);
   }
 

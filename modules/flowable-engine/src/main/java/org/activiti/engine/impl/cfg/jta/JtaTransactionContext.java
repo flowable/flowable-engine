@@ -66,6 +66,7 @@ public class JtaTransactionContext implements TransactionContext {
   }
 
   public void addTransactionListener(TransactionState transactionState, final TransactionListener transactionListener) {
+    
     Transaction transaction = getTransaction();
     CommandContext commandContext = Context.getCommandContext();
     try {

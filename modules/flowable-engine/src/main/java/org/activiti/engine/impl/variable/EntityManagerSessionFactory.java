@@ -16,7 +16,7 @@ package org.activiti.engine.impl.variable;
 import javax.persistence.EntityManagerFactory;
 
 import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.impl.interceptor.CommandContext;
+import org.activiti.engine.impl.interceptor.AbstractCommandContext;
 import org.activiti.engine.impl.interceptor.Session;
 import org.activiti.engine.impl.interceptor.SessionFactory;
 
@@ -46,7 +46,7 @@ public class EntityManagerSessionFactory implements SessionFactory {
     return EntityManagerSession.class;
   }
 
-  public Session openSession(CommandContext commandContext) {
+  public Session openSession(AbstractCommandContext commandContext) {
     return new EntityManagerSessionImpl(entityManagerFactory, handleTransactions, closeEntityManager);
   }
 

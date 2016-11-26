@@ -13,7 +13,7 @@
 package org.activiti5.engine.test.api.event;
 
 import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.ActivitiVariableEvent;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.task.Task;
@@ -42,7 +42,7 @@ public class StandaloneTaskVariableEventsTest extends PluggableActivitiTestCase 
 			
 			assertEquals(3, listener.getEventsReceived().size());
 			ActivitiVariableEvent event = (ActivitiVariableEvent) listener.getEventsReceived().get(0);
-			assertEquals(ActivitiEventType.VARIABLE_CREATED, event.getType());
+			assertEquals(ActivitiEngineEventType.VARIABLE_CREATED, event.getType());
 			assertNull(event.getProcessDefinitionId());
 			assertNull(event.getExecutionId());
 			assertNull(event.getProcessInstanceId());
@@ -51,7 +51,7 @@ public class StandaloneTaskVariableEventsTest extends PluggableActivitiTestCase 
 			assertEquals(123, event.getVariableValue());
 			
 			event = (ActivitiVariableEvent) listener.getEventsReceived().get(1);
-			assertEquals(ActivitiEventType.VARIABLE_UPDATED, event.getType());
+			assertEquals(ActivitiEngineEventType.VARIABLE_UPDATED, event.getType());
 			assertNull(event.getProcessDefinitionId());
 			assertNull(event.getExecutionId());
 			assertNull(event.getProcessInstanceId());
@@ -60,7 +60,7 @@ public class StandaloneTaskVariableEventsTest extends PluggableActivitiTestCase 
 			assertEquals(456, event.getVariableValue());
 			
 			event = (ActivitiVariableEvent) listener.getEventsReceived().get(2);
-			assertEquals(ActivitiEventType.VARIABLE_DELETED, event.getType());
+			assertEquals(ActivitiEngineEventType.VARIABLE_DELETED, event.getType());
 			assertNull(event.getProcessDefinitionId());
 			assertNull(event.getExecutionId());
 			assertNull(event.getProcessInstanceId());

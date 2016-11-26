@@ -15,7 +15,7 @@ package org.activiti.spring;
 
 import org.activiti.engine.impl.cfg.TransactionContext;
 import org.activiti.engine.impl.cfg.TransactionContextFactory;
-import org.activiti.engine.impl.interceptor.CommandContext;
+import org.activiti.engine.impl.interceptor.AbstractCommandContext;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -35,7 +35,7 @@ public class SpringTransactionContextFactory implements TransactionContextFactor
     this.transactionSynchronizationAdapterOrder = transactionSynchronizationAdapterOrder;
   }
 
-  public TransactionContext openTransactionContext(CommandContext commandContext) {
+  public TransactionContext openTransactionContext(AbstractCommandContext commandContext) {
     return new SpringTransactionContext(transactionManager, commandContext, transactionSynchronizationAdapterOrder);
   }
 

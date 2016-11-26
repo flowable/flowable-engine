@@ -12,7 +12,7 @@
  */
 package org.activiti5.engine.impl.jobexecutor;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.Job;
 import org.activiti5.engine.ActivitiException;
@@ -107,7 +107,7 @@ public class TimerStartEventJobHandler extends TimerEventHandler implements JobH
   protected void dispatchTimerFiredEvent(Job job, CommandContext commandContext) {
     if (commandContext.getEventDispatcher().isEnabled()) {
       commandContext.getEventDispatcher().dispatchEvent(
-        ActivitiEventBuilder.createEntityEvent(ActivitiEventType.TIMER_FIRED, job));
+        ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.TIMER_FIRED, job));
     }
   }
 

@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.EngineInfo;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,9 +41,9 @@ public abstract class DmnEngines {
 
     protected static boolean isInitialized;
     protected static Map<String, DmnEngine> dmnEngines = new HashMap<String, DmnEngine>();
-    protected static Map<String, DmnEngineInfo> dmnEngineInfosByName = new HashMap<String, DmnEngineInfo>();
-    protected static Map<String, DmnEngineInfo> dmnEngineInfosByResourceUrl = new HashMap<String, DmnEngineInfo>();
-    protected static List<DmnEngineInfo> dmnEngineInfos = new ArrayList<DmnEngineInfo>();
+    protected static Map<String, EngineInfo> dmnEngineInfosByName = new HashMap<String, EngineInfo>();
+    protected static Map<String, EngineInfo> dmnEngineInfosByResourceUrl = new HashMap<String, EngineInfo>();
+    protected static List<EngineInfo> dmnEngineInfos = new ArrayList<EngineInfo>();
 
     /**
      * Initializes all dmn engines that can be found on the classpath for
@@ -59,7 +61,7 @@ public abstract class DmnEngines {
             try {
                 resources = classLoader.getResources("activiti.dmn.cfg.xml");
             } catch (IOException e) {
-                throw new ActivitiDmnException("problem retrieving activiti.dmn.cfg.xml resources on the classpath: " + System.getProperty("java.class.path"),
+                throw new ActivitiException("problem retrieving activiti.dmn.cfg.xml resources on the classpath: " + System.getProperty("java.class.path"),
                         e);
             }
 
@@ -78,7 +80,7 @@ public abstract class DmnEngines {
             /*try {
                 resources = classLoader.getResources("activiti-dmn-context.xml");
             } catch (IOException e) {
-                throw new ActivitiDmnException("problem retrieving activiti-dmn-context.xml resources on the classpath: "
+                throw new ActivitiException("problem retrieving activiti-dmn-context.xml resources on the classpath: "
                         + System.getProperty("java.class.path"), e);
             }
             while (resources.hasMoreElements()) {
@@ -109,8 +111,8 @@ public abstract class DmnEngines {
         dmnEngines.remove(dmnEngine.getName());
     }
 
-    private static DmnEngineInfo initDmnEngineFromResource(URL resourceUrl) {
-        DmnEngineInfo dmnEngineInfo = dmnEngineInfosByResourceUrl.get(resourceUrl.toString());
+    private static EngineInfo initDmnEngineFromResource(URL resourceUrl) {
+      EngineInfo dmnEngineInfo = dmnEngineInfosByResourceUrl.get(resourceUrl.toString());
         // if there is an existing dmn engine info
         if (dmnEngineInfo != null) {
             // remove that dmn engine from the member fields
@@ -129,12 +131,12 @@ public abstract class DmnEngines {
             DmnEngine dmnEngine = buildDmnEngine(resourceUrl);
             String dmnEngineName = dmnEngine.getName();
             log.info("initialised dmn engine {}", dmnEngineName);
-            dmnEngineInfo = new DmnEngineInfo(dmnEngineName, resourceUrlString, null);
+            dmnEngineInfo = new EngineInfo(dmnEngineName, resourceUrlString, null);
             dmnEngines.put(dmnEngineName, dmnEngine);
             dmnEngineInfosByName.put(dmnEngineName, dmnEngineInfo);
         } catch (Throwable e) {
             log.error("Exception while initializing dmn engine: {}", e.getMessage(), e);
-            dmnEngineInfo = new DmnEngineInfo(null, resourceUrlString, getExceptionString(e));
+            dmnEngineInfo = new EngineInfo(null, resourceUrlString, getExceptionString(e));
         }
         dmnEngineInfosByResourceUrl.put(resourceUrlString, dmnEngineInfo);
         dmnEngineInfos.add(dmnEngineInfo);
@@ -156,14 +158,14 @@ public abstract class DmnEngines {
             return dmnEngineConfiguration.buildDmnEngine();
 
         } catch (IOException e) {
-            throw new ActivitiDmnException("couldn't open resource stream: " + e.getMessage(), e);
+            throw new ActivitiException("couldn't open resource stream: " + e.getMessage(), e);
         } finally {
             IOUtils.closeQuietly(inputStream);
         }
     }
 
     /** Get initialization results. */
-    public static List<DmnEngineInfo> getDmnEngineInfos() {
+    public static List<EngineInfo> getDmnEngineInfos() {
         return dmnEngineInfos;
     }
 
@@ -173,7 +175,7 @@ public abstract class DmnEngines {
      * {@link DmnEngineInfo} is available for engines which were registered
      * programmatically.
      */
-    public static DmnEngineInfo getDmnEngineInfo(String dmnEngineName) {
+    public static EngineInfo getDmnEngineInfo(String dmnEngineName) {
         return dmnEngineInfosByName.get(dmnEngineName);
     }
 
@@ -196,12 +198,12 @@ public abstract class DmnEngines {
     /**
      * retries to initialize a dmn engine that previously failed.
      */
-    public static DmnEngineInfo retry(String resourceUrl) {
+    public static EngineInfo retry(String resourceUrl) {
         log.debug("retying initializing of resource {}", resourceUrl);
         try {
             return initDmnEngineFromResource(new URL(resourceUrl));
         } catch (MalformedURLException e) {
-            throw new ActivitiDmnException("invalid url: " + resourceUrl, e);
+            throw new ActivitiException("invalid url: " + resourceUrl, e);
         }
     }
 

@@ -14,7 +14,7 @@ package org.activiti.dmn.engine.impl.mvel;
 
 import java.util.Date;
 
-import org.activiti.dmn.engine.ActivitiDmnException;
+import org.activiti.engine.ActivitiException;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -31,7 +31,7 @@ public class ExecutionVariableFactory {
 
         if (type == null || expressionResult == null) {
             logger.error("could not create result variable: type {} expresion result {}", type, expressionResult);
-            throw new ActivitiDmnException("could not create result variable");
+            throw new ActivitiException("could not create result variable");
         }
 
         Object executionVariable = null;
@@ -63,11 +63,11 @@ public class ExecutionVariableFactory {
                 }
             } else {
                 logger.error("could not create result variable: unrecognized mapping type");
-                throw new ActivitiDmnException("could not create result variable: unrecognized mapping type");
+                throw new ActivitiException("could not create result variable: unrecognized mapping type");
             }
         } catch (Exception e) {
             logger.error("could not create result variable", e);
-            throw new ActivitiDmnException("Could not create execution variable", e);
+            throw new ActivitiException("Could not create execution variable", e);
         }
 
         return executionVariable;

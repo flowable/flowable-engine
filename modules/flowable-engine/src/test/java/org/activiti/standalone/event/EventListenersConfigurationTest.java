@@ -13,7 +13,7 @@
 package org.activiti.standalone.event;
 
 import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventImpl;
 import org.activiti.engine.impl.test.ResourceActivitiTestCase;
 import org.activiti.engine.test.api.event.TestActivitiEventListener;
@@ -38,7 +38,7 @@ public class EventListenersConfigurationTest extends ResourceActivitiTestCase {
     listener.clearEventsReceived();
 
     // Dispatch a custom event
-    ActivitiEvent event = new ActivitiEventImpl(ActivitiEventType.CUSTOM);
+    ActivitiEvent event = new ActivitiEventImpl(ActivitiEngineEventType.CUSTOM);
     processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
 
     assertEquals(1, listener.getEventsReceived().size());

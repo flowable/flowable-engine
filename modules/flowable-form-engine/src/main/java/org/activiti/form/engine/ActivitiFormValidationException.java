@@ -13,12 +13,14 @@
 
 package org.activiti.form.engine;
 
+import org.activiti.engine.ActivitiException;
+
 /**
  * An exception indicating that a validation of a form field value resulted in an error.
  * 
  * @author Tijs Rademakers
  */
-public class ActivitiFormValidationException extends ActivitiFormException {
+public class ActivitiFormValidationException extends ActivitiException {
 
   private static final long serialVersionUID = 1L;
 

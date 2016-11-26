@@ -28,7 +28,7 @@ import org.activiti.app.service.api.ModelService;
 import org.activiti.app.service.editor.ActivitiModelQueryService;
 import org.activiti.app.service.exception.BadRequestException;
 import org.activiti.app.service.exception.InternalServerErrorException;
-import org.activiti.form.model.FormDefinition;
+import org.activiti.form.model.FormModel;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,7 +107,7 @@ public class ModelsResource {
     String json = null;
     if (modelRepresentation.getModelType() != null && modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_FORM)) {
       try {
-        json = objectMapper.writeValueAsString(new FormDefinition());
+        json = objectMapper.writeValueAsString(new FormModel());
       } catch (Exception e) {
         logger.error("Error creating form model", e);
         throw new InternalServerErrorException("Error creating form");

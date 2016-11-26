@@ -18,6 +18,6 @@ package org.activiti.dmn.engine.impl.cfg;
 public class StandaloneInMemDmnEngineConfiguration extends StandaloneDmnEngineConfiguration {
 
   public StandaloneInMemDmnEngineConfiguration() {
-    this.jdbcUrl = "jdbc:h2:mem:activiti";
+    setJdbcUrl("jdbc:h2:mem:activiti");
   }
 }

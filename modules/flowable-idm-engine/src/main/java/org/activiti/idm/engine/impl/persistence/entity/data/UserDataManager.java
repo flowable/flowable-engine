@@ -15,9 +15,10 @@ package org.activiti.idm.engine.impl.persistence.entity.data;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.impl.Page;
+import org.activiti.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.User;
-import org.activiti.idm.engine.impl.Page;
 import org.activiti.idm.engine.impl.UserQueryImpl;
 import org.activiti.idm.engine.impl.persistence.entity.UserEntity;
 

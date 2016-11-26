@@ -7,7 +7,7 @@ import org.activiti.engine.impl.cfg.TransactionContext;
  * 
  * @author Joram Barrez
  */
-public interface CommandContextCloseListener {
+public interface CommandContextCloseListener extends BaseCommandContextCloseListener<CommandContext> {
 
   /**
    * Called when the {@link CommandContext} is being closed, but no 'close logic' has been executed.

@@ -18,9 +18,10 @@ import java.util.Set;
 
 import org.activiti.dmn.api.DecisionTable;
 import org.activiti.dmn.api.DecisionTableQuery;
-import org.activiti.dmn.engine.ActivitiDmnIllegalArgumentException;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
 import org.activiti.dmn.engine.impl.interceptor.CommandExecutor;
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.impl.Page;
 
 /**
  * @author Tijs Rademakers
@@ -79,7 +80,7 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
   
   public DecisionTableQueryImpl decisionTableCategory(String category) {
     if (category == null) {
-      throw new ActivitiDmnIllegalArgumentException("category is null");
+      throw new ActivitiIllegalArgumentException("category is null");
     }
     this.category = category;
     return this;
@@ -87,7 +88,7 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
 
   public DecisionTableQueryImpl decisionTableCategoryLike(String categoryLike) {
     if (categoryLike == null) {
-      throw new ActivitiDmnIllegalArgumentException("categoryLike is null");
+      throw new ActivitiIllegalArgumentException("categoryLike is null");
     }
     this.categoryLike = categoryLike;
     return this;
@@ -95,7 +96,7 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
 
   public DecisionTableQueryImpl decisionTableCategoryNotEquals(String categoryNotEquals) {
     if (categoryNotEquals == null) {
-      throw new ActivitiDmnIllegalArgumentException("categoryNotEquals is null");
+      throw new ActivitiIllegalArgumentException("categoryNotEquals is null");
     }
     this.categoryNotEquals = categoryNotEquals;
     return this;
@@ -103,7 +104,7 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
 
   public DecisionTableQueryImpl decisionTableName(String name) {
     if (name == null) {
-      throw new ActivitiDmnIllegalArgumentException("name is null");
+      throw new ActivitiIllegalArgumentException("name is null");
     }
     this.name = name;
     return this;
@@ -111,7 +112,7 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
 
   public DecisionTableQueryImpl decisionTableNameLike(String nameLike) {
     if (nameLike == null) {
-      throw new ActivitiDmnIllegalArgumentException("nameLike is null");
+      throw new ActivitiIllegalArgumentException("nameLike is null");
     }
     this.nameLike = nameLike;
     return this;
@@ -119,7 +120,7 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
 
   public DecisionTableQueryImpl deploymentId(String deploymentId) {
     if (deploymentId == null) {
-      throw new ActivitiDmnIllegalArgumentException("id is null");
+      throw new ActivitiIllegalArgumentException("id is null");
     }
     this.deploymentId = deploymentId;
     return this;
@@ -127,7 +128,7 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
 
   public DecisionTableQueryImpl deploymentIds(Set<String> deploymentIds) {
     if (deploymentIds == null) {
-      throw new ActivitiDmnIllegalArgumentException("ids are null");
+      throw new ActivitiIllegalArgumentException("ids are null");
     }
     this.deploymentIds = deploymentIds;
     return this;
@@ -135,7 +136,7 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
   
   public DecisionTableQueryImpl parentDeploymentId(String parentDeploymentId) {
     if (parentDeploymentId == null) {
-      throw new ActivitiDmnIllegalArgumentException("parentDeploymentId is null");
+      throw new ActivitiIllegalArgumentException("parentDeploymentId is null");
     }
     this.parentDeploymentId = parentDeploymentId;
     return this;
@@ -143,7 +144,7 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
   
   public DecisionTableQueryImpl parentDeploymentIdLike(String parentDeploymentIdLike) {
     if (parentDeploymentIdLike == null) {
-      throw new ActivitiDmnIllegalArgumentException("parentDeploymentIdLike is null");
+      throw new ActivitiIllegalArgumentException("parentDeploymentIdLike is null");
     }
     this.parentDeploymentIdLike = parentDeploymentIdLike;
     return this;
@@ -151,7 +152,7 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
 
   public DecisionTableQueryImpl decisionTableKey(String key) {
     if (key == null) {
-      throw new ActivitiDmnIllegalArgumentException("key is null");
+      throw new ActivitiIllegalArgumentException("key is null");
     }
     this.key = key;
     return this;
@@ -159,7 +160,7 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
 
   public DecisionTableQueryImpl decisionTableKeyLike(String keyLike) {
     if (keyLike == null) {
-      throw new ActivitiDmnIllegalArgumentException("keyLike is null");
+      throw new ActivitiIllegalArgumentException("keyLike is null");
     }
     this.keyLike = keyLike;
     return this;
@@ -167,7 +168,7 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
 
   public DecisionTableQueryImpl decisionTableResourceName(String resourceName) {
     if (resourceName == null) {
-      throw new ActivitiDmnIllegalArgumentException("resourceName is null");
+      throw new ActivitiIllegalArgumentException("resourceName is null");
     }
     this.resourceName = resourceName;
     return this;
@@ -175,7 +176,7 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
 
   public DecisionTableQueryImpl decisionTableResourceNameLike(String resourceNameLike) {
     if (resourceNameLike == null) {
-      throw new ActivitiDmnIllegalArgumentException("resourceNameLike is null");
+      throw new ActivitiIllegalArgumentException("resourceNameLike is null");
     }
     this.resourceNameLike = resourceNameLike;
     return this;
@@ -213,9 +214,9 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
   
   protected void checkVersion(Integer version) {
     if (version == null) {
-      throw new ActivitiDmnIllegalArgumentException("version is null");
+      throw new ActivitiIllegalArgumentException("version is null");
     } else if (version <= 0) {
-      throw new ActivitiDmnIllegalArgumentException("version must be positive");
+      throw new ActivitiIllegalArgumentException("version must be positive");
     }
   }
 
@@ -226,7 +227,7 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
 
   public DecisionTableQuery decisionTableTenantId(String tenantId) {
     if (tenantId == null) {
-      throw new ActivitiDmnIllegalArgumentException("decision table tenantId is null");
+      throw new ActivitiIllegalArgumentException("decision table tenantId is null");
     }
     this.tenantId = tenantId;
     return this;
@@ -234,7 +235,7 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
 
   public DecisionTableQuery decisionTableTenantIdLike(String tenantIdLike) {
     if (tenantIdLike == null) {
-      throw new ActivitiDmnIllegalArgumentException("decision table tenantId is null");
+      throw new ActivitiIllegalArgumentException("decision table tenantId is null");
     }
     this.tenantIdLike = tenantIdLike;
     return this;

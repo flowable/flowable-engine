@@ -25,7 +25,7 @@ import org.activiti.app.security.SecurityUtils;
 import org.activiti.app.service.api.ModelService;
 import org.activiti.app.service.exception.BadRequestException;
 import org.activiti.app.service.exception.InternalServerErrorException;
-import org.activiti.form.model.FormDefinition;
+import org.activiti.form.model.FormModel;
 import org.activiti.idm.api.User;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -111,9 +111,9 @@ public class ActivitiFormService {
   }
   
   protected FormRepresentation createFormRepresentation(AbstractModel model) {
-    FormDefinition formDefinition = null;
+    FormModel formDefinition = null;
     try {
-      formDefinition = objectMapper.readValue(model.getModelEditorJson(), FormDefinition.class);
+      formDefinition = objectMapper.readValue(model.getModelEditorJson(), FormModel.class);
     } catch (Exception e) {
       logger.error("Error deserializing form", e);
       throw new InternalServerErrorException("Could not deserialize form definition");

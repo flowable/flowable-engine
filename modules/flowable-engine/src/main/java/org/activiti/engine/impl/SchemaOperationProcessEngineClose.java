@@ -19,9 +19,9 @@ import org.activiti.engine.impl.interceptor.CommandContext;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-final class SchemaOperationProcessEngineClose implements Command<Object> {
+public class SchemaOperationProcessEngineClose implements Command<Void> {
 
-  public Object execute(CommandContext commandContext) {
+  public Void execute(CommandContext commandContext) {
     commandContext.getDbSqlSession().performSchemaOperationsProcessEngineClose();
     return null;
   }

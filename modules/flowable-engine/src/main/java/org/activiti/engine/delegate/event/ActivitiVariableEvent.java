@@ -12,6 +12,7 @@
  */
 package org.activiti.engine.delegate.event;
 
+import org.activiti.engine.impl.delegate.event.ActivitiEngineEvent;
 import org.activiti.engine.impl.variable.VariableType;
 
 /**
@@ -20,7 +21,7 @@ import org.activiti.engine.impl.variable.VariableType;
  * @author Frederik Heremans
  * @author Joram Barrez
  */
-public interface ActivitiVariableEvent extends ActivitiEvent {
+public interface ActivitiVariableEvent extends ActivitiEngineEvent {
 
   /**
    * @return the name of the variable involved.
@@ -36,12 +37,6 @@ public interface ActivitiVariableEvent extends ActivitiEvent {
    * @return The {@link VariableType} of the variable.
    */
   VariableType getVariableType();
-
-  /**
-   * @return the id of the execution the variable is set on.
-   */
-  @Override
-  String getExecutionId();
 
   /**
    * @return the id of the task the variable has been set on.

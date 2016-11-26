@@ -12,12 +12,8 @@
  */
 package org.activiti.app.conf;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.sql.DataSource;
 
-import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.configurator.DmnEngineConfigurator;
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
@@ -31,10 +27,8 @@ import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.parse.BpmnParseHandler;
 import org.activiti.engine.runtime.Clock;
 import org.activiti.form.api.FormRepositoryService;
-import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.configurator.FormEngineConfigurator;
 import org.activiti.idm.api.IdmIdentityService;
 import org.activiti.spring.ProcessEngineFactoryBean;
@@ -110,25 +104,11 @@ public class ActivitiEngineConfiguration {
     	// Limit process definition cache
     	processEngineConfiguration.setProcessDefinitionCacheLimit(environment.getProperty("activiti.process-definitions.cache.max", Integer.class, 128));
     	
-    	// Enable safe XML. See http://activiti.org/userguide/index.html#advanced.safe.bpmn.xml
+    	// Enable safe XML. See http://www.flowable.org/docs/userguide/index.html#advanced.safe.bpmn.xml
     	processEngineConfiguration.setEnableSafeBpmnXml(true);
     	
-    	List<BpmnParseHandler> preParseHandlers = new ArrayList<BpmnParseHandler>();
-    	processEngineConfiguration.setPreBpmnParseHandlers(preParseHandlers);
-    	
-    	FormEngineConfiguration formEngineConfiguration = new FormEngineConfiguration();
-    	formEngineConfiguration.setDataSource(dataSource);
-    	
-    	FormEngineConfigurator formEngineConfigurator = new FormEngineConfigurator();
-    	formEngineConfigurator.setFormEngineConfiguration(formEngineConfiguration);
-    	processEngineConfiguration.addConfigurator(formEngineConfigurator);
-    	
-    	DmnEngineConfiguration dmnEngineConfiguration = new DmnEngineConfiguration();
-    	dmnEngineConfiguration.setDataSource(dataSource);
-      
-      DmnEngineConfigurator dmnEngineConfigurator = new DmnEngineConfigurator();
-      dmnEngineConfigurator.setDmnEngineConfiguration(dmnEngineConfiguration);
-      processEngineConfiguration.addConfigurator(dmnEngineConfigurator);
+    	processEngineConfiguration.addConfigurator(new FormEngineConfigurator());
+      processEngineConfiguration.addConfigurator(new DmnEngineConfigurator());
     	
     	return processEngineConfiguration;
     }

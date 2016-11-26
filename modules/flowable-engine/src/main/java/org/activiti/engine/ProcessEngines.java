@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.engine.impl.ProcessEngineInfoImpl;
 import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
@@ -58,9 +57,9 @@ public abstract class ProcessEngines {
 
   protected static boolean isInitialized;
   protected static Map<String, ProcessEngine> processEngines = new HashMap<String, ProcessEngine>();
-  protected static Map<String, ProcessEngineInfo> processEngineInfosByName = new HashMap<String, ProcessEngineInfo>();
-  protected static Map<String, ProcessEngineInfo> processEngineInfosByResourceUrl = new HashMap<String, ProcessEngineInfo>();
-  protected static List<ProcessEngineInfo> processEngineInfos = new ArrayList<ProcessEngineInfo>();
+  protected static Map<String, EngineInfo> processEngineInfosByName = new HashMap<String, EngineInfo>();
+  protected static Map<String, EngineInfo> processEngineInfosByResourceUrl = new HashMap<String, EngineInfo>();
+  protected static List<EngineInfo> processEngineInfos = new ArrayList<EngineInfo>();
 
   /**
    * Initializes all process engines that can be found on the classpath for resources <code>activiti.cfg.xml</code> (plain Activiti style configuration) and for resources
@@ -118,7 +117,7 @@ public abstract class ProcessEngines {
       ProcessEngine processEngine = (ProcessEngine) method.invoke(null, new Object[] { resource });
 
       String processEngineName = processEngine.getName();
-      ProcessEngineInfo processEngineInfo = new ProcessEngineInfoImpl(processEngineName, resource.toString(), null);
+      EngineInfo processEngineInfo = new EngineInfo(processEngineName, resource.toString(), null);
       processEngineInfosByName.put(processEngineName, processEngineInfo);
       processEngineInfosByResourceUrl.put(resource.toString(), processEngineInfo);
 
@@ -128,7 +127,7 @@ public abstract class ProcessEngines {
   }
 
   /**
-   * Registers the given process engine. No {@link ProcessEngineInfo} will be available for this process engine. An engine that is registered will be closed when the {@link ProcessEngines#destroy()}
+   * Registers the given process engine. No {@link EngineInfo} will be available for this process engine. An engine that is registered will be closed when the {@link ProcessEngines#destroy()}
    * is called.
    */
   public static void registerProcessEngine(ProcessEngine processEngine) {
@@ -142,8 +141,8 @@ public abstract class ProcessEngines {
     processEngines.remove(processEngine.getName());
   }
 
-  private static ProcessEngineInfo initProcessEnginFromResource(URL resourceUrl) {
-    ProcessEngineInfo processEngineInfo = processEngineInfosByResourceUrl.get(resourceUrl.toString());
+  private static EngineInfo initProcessEnginFromResource(URL resourceUrl) {
+    EngineInfo processEngineInfo = processEngineInfosByResourceUrl.get(resourceUrl.toString());
     // if there is an existing process engine info
     if (processEngineInfo != null) {
       // remove that process engine from the member fields
@@ -162,12 +161,12 @@ public abstract class ProcessEngines {
       ProcessEngine processEngine = buildProcessEngine(resourceUrl);
       String processEngineName = processEngine.getName();
       log.info("initialised process engine {}", processEngineName);
-      processEngineInfo = new ProcessEngineInfoImpl(processEngineName, resourceUrlString, null);
+      processEngineInfo = new EngineInfo(processEngineName, resourceUrlString, null);
       processEngines.put(processEngineName, processEngine);
       processEngineInfosByName.put(processEngineName, processEngineInfo);
     } catch (Throwable e) {
       log.error("Exception while initializing process engine: {}", e.getMessage(), e);
-      processEngineInfo = new ProcessEngineInfoImpl(null, resourceUrlString, getExceptionString(e));
+      processEngineInfo = new EngineInfo(null, resourceUrlString, getExceptionString(e));
     }
     processEngineInfosByResourceUrl.put(resourceUrlString, processEngineInfo);
     processEngineInfos.add(processEngineInfo);
@@ -196,15 +195,15 @@ public abstract class ProcessEngines {
   }
 
   /** Get initialization results. */
-  public static List<ProcessEngineInfo> getProcessEngineInfos() {
+  public static List<EngineInfo> getProcessEngineInfos() {
     return processEngineInfos;
   }
 
   /**
-   * Get initialization results. Only info will we available for process engines which were added in the {@link ProcessEngines#init()}. No {@link ProcessEngineInfo} is available for engines which were
+   * Get initialization results. Only info will we available for process engines which were added in the {@link ProcessEngines#init()}. No {@link EngineInfo} is available for engines which were
    * registered programatically.
    */
-  public static ProcessEngineInfo getProcessEngineInfo(String processEngineName) {
+  public static EngineInfo getProcessEngineInfo(String processEngineName) {
     return processEngineInfosByName.get(processEngineName);
   }
 
@@ -228,7 +227,7 @@ public abstract class ProcessEngines {
   /**
    * retries to initialize a process engine that previously failed.
    */
-  public static ProcessEngineInfo retry(String resourceUrl) {
+  public static EngineInfo retry(String resourceUrl) {
     log.debug("retying initializing of resource {}", resourceUrl);
     try {
       return initProcessEnginFromResource(new URL(resourceUrl));

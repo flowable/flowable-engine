@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.dmn.api.DmnDeployment;
 import org.activiti.dmn.api.DmnRepositoryService;
-import org.activiti.dmn.engine.ActivitiDmnObjectNotFoundException;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.rest.dmn.service.api.DmnRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -42,7 +42,7 @@ public class DmnDeploymentResource {
     DmnDeployment deployment = dmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
 
     if (deployment == null) {
-      throw new ActivitiDmnObjectNotFoundException("Could not find a DMN deployment with id '" + deploymentId);
+      throw new ActivitiObjectNotFoundException("Could not find a DMN deployment with id '" + deploymentId);
     }
 
     return dmnRestResponseFactory.createDmnDeploymentResponse(deployment);

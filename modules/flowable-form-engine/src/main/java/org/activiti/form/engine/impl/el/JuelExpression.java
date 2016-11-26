@@ -21,7 +21,7 @@ import javax.el.MethodNotFoundException;
 import javax.el.PropertyNotFoundException;
 import javax.el.ValueExpression;
 
-import org.activiti.form.engine.ActivitiFormException;
+import org.activiti.engine.ActivitiException;
 import org.activiti.form.engine.FormExpression;
 
 /**
@@ -50,13 +50,13 @@ public class JuelExpression implements FormExpression {
       return valueExpression.getValue(elContext);
       
     } catch (PropertyNotFoundException pnfe) {
-      throw new ActivitiFormException("Unknown property used in expression: " + expressionText, pnfe);
+      throw new ActivitiException("Unknown property used in expression: " + expressionText, pnfe);
     } catch (MethodNotFoundException mnfe) {
-      throw new ActivitiFormException("Unknown method used in expression: " + expressionText, mnfe);
+      throw new ActivitiException("Unknown method used in expression: " + expressionText, mnfe);
     } catch (ELException ele) {
-      throw new ActivitiFormException("Error while evaluating expression: " + expressionText, ele);
+      throw new ActivitiException("Error while evaluating expression: " + expressionText, ele);
     } catch (Exception e) {
-      throw new ActivitiFormException("Error while evaluating expression: " + expressionText, e);
+      throw new ActivitiException("Error while evaluating expression: " + expressionText, e);
     }
   }
 

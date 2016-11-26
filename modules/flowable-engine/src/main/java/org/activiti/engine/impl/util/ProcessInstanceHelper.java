@@ -29,7 +29,7 @@ import org.activiti.bpmn.model.ValuedDataObject;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
 import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
@@ -159,7 +159,7 @@ public class ProcessInstanceHelper {
     boolean eventDispatcherEnabled = Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled();
     if (eventDispatcherEnabled) {
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEventType.PROCESS_CREATED, processInstance));
+          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.PROCESS_CREATED, processInstance));
     }
     
     processInstance.setVariables(processDataObjects(process.getDataObjects()));
@@ -185,7 +185,7 @@ public class ProcessInstanceHelper {
     // Fire events
     if (eventDispatcherEnabled) {
       Context.getProcessEngineConfiguration().getEventDispatcher()
-        .dispatchEvent(ActivitiEventBuilder.createEntityWithVariablesEvent(ActivitiEventType.ENTITY_INITIALIZED, processInstance, variables, false));
+        .dispatchEvent(ActivitiEventBuilder.createEntityWithVariablesEvent(ActivitiEngineEventType.ENTITY_INITIALIZED, processInstance, variables, false));
     }
 
     // Create the first execution that will visit all the process definition elements
@@ -246,7 +246,7 @@ public class ProcessInstanceHelper {
 
       for (MessageEventSubscriptionEntity messageEventSubscription : messageEventSubscriptions) {
         commandContext.getProcessEngineConfiguration().getEventDispatcher()
-            .dispatchEvent(ActivitiEventBuilder.createMessageEvent(ActivitiEventType.ACTIVITY_MESSAGE_WAITING, messageEventSubscription.getActivityId(),
+            .dispatchEvent(ActivitiEventBuilder.createMessageEvent(ActivitiEngineEventType.ACTIVITY_MESSAGE_WAITING, messageEventSubscription.getActivityId(),
                 messageEventSubscription.getEventName(), null, messageEventSubscription.getExecution().getId(),
                 messageEventSubscription.getProcessInstanceId(), messageEventSubscription.getProcessDefinitionId()));
       }

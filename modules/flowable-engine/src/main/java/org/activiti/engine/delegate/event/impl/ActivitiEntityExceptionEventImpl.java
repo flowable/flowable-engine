@@ -13,22 +13,22 @@
 package org.activiti.engine.delegate.event.impl;
 
 import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.engine.delegate.event.ActivitiExceptionEvent;
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.impl.delegate.event.ActivitiEngineEntityEvent;
 
 /**
  * Base class for all {@link ActivitiEvent} implementations, represents an exception occurred, related to an entity.
  * 
  * @author Frederik Heremans
  */
-public class ActivitiEntityExceptionEventImpl extends ActivitiEventImpl implements ActivitiEntityEvent, ActivitiExceptionEvent {
+public class ActivitiEntityExceptionEventImpl extends ActivitiEventImpl implements ActivitiEngineEntityEvent, ActivitiExceptionEvent {
 
   protected Object entity;
   protected Throwable cause;
 
-  public ActivitiEntityExceptionEventImpl(Object entity, ActivitiEventType type, Throwable cause) {
+  public ActivitiEntityExceptionEventImpl(Object entity, ActivitiEngineEventType type, Throwable cause) {
     super(type);
     if (entity == null) {
       throw new ActivitiIllegalArgumentException("Entity cannot be null.");

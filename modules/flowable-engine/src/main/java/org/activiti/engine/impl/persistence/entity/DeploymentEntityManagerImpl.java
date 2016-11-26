@@ -25,7 +25,7 @@ import org.activiti.bpmn.model.SignalEventDefinition;
 import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.TimerEventDefinition;
 import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.DeploymentQueryImpl;
 import org.activiti.engine.impl.ModelQueryImpl;
@@ -140,7 +140,7 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
     if (timerStartJobs != null && timerStartJobs.size() > 0) {
       for (TimerJobEntity timerStartJob : timerStartJobs) {
         if (getEventDispatcher().isEnabled()) {
-          getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.JOB_CANCELED, timerStartJob, null, null, processDefinition.getId()));
+          getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.JOB_CANCELED, timerStartJob, null, null, processDefinition.getId()));
         }
 
         getTimerJobEntityManager().delete(timerStartJob);

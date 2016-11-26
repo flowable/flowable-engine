@@ -13,7 +13,7 @@
 
 package org.activiti5.engine.impl.event;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -36,7 +36,7 @@ public class MessageEventHandler extends AbstractEventHandler {
   	// As stated in the ActivitiEventType java-doc, the message-event is thrown before the actual message has been sent
   	if(commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
     	commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createMessageEvent(ActivitiEventType.ACTIVITY_MESSAGE_RECEIVED, eventSubscription.getActivityId(), eventSubscription.getEventName(), 
+    			ActivitiEventBuilder.createMessageEvent(ActivitiEngineEventType.ACTIVITY_MESSAGE_RECEIVED, eventSubscription.getActivityId(), eventSubscription.getEventName(), 
     					payload, eventSubscription.getExecutionId(), eventSubscription.getProcessInstanceId(), eventSubscription.getExecution().getProcessDefinitionId()));
     }
   	

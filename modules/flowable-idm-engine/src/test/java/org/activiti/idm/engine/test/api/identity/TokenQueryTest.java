@@ -18,10 +18,10 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.idm.api.Token;
 import org.activiti.idm.api.TokenQuery;
-import org.activiti.idm.engine.ActivitiIdmException;
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
 import org.activiti.idm.engine.impl.persistence.entity.TokenEntity;
 import org.activiti.idm.engine.test.PluggableActivitiIdmTestCase;
 
@@ -84,7 +84,7 @@ public class TokenQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createTokenQuery().tokenId(null).singleResult();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -103,7 +103,7 @@ public class TokenQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createTokenQuery().tokenValue(null).singleResult();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
   
@@ -146,7 +146,7 @@ public class TokenQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createTokenQuery().ipAddress(null).singleResult();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -165,7 +165,7 @@ public class TokenQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createTokenQuery().ipAddressLike(null).singleResult();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
   
@@ -184,7 +184,7 @@ public class TokenQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createTokenQuery().userAgent(null).singleResult();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -203,7 +203,7 @@ public class TokenQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createTokenQuery().userAgentLike(null).singleResult();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
   
@@ -222,7 +222,7 @@ public class TokenQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createTokenQuery().userId(null).singleResult();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -241,7 +241,7 @@ public class TokenQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createTokenQuery().userIdLike(null).singleResult();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
   
@@ -260,7 +260,7 @@ public class TokenQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createTokenQuery().tokenData(null).singleResult();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -276,7 +276,7 @@ public class TokenQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createTokenQuery().tokenDataLike(null).singleResult();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -301,13 +301,13 @@ public class TokenQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createTokenQuery().orderByTokenId().list();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
 
     try {
       idmIdentityService.createTokenQuery().orderByTokenId().orderByTokenDate().list();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -328,7 +328,7 @@ public class TokenQueryTest extends PluggableActivitiIdmTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ActivitiIdmException e) {
+    } catch (ActivitiException e) {
     }
   }
 

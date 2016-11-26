@@ -50,7 +50,7 @@ public abstract class ResourceActivitiIdmTestCase extends AbstractActivitiIdmTes
     IdmEngineConfiguration config = IdmEngineConfiguration.createIdmEngineConfigurationFromResource(activitiIdmConfigurationResource);
     if (idmEngineName != null) {
       logger.info("Initializing idm engine with name '" + idmEngineName + "'");
-      config.setIdmEngineName(idmEngineName);
+      config.setEngineName(idmEngineName);
     }
     additionalConfiguration(config);
     idmEngine = config.buildIdmEngine();

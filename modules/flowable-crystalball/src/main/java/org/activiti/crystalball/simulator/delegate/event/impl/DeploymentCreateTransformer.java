@@ -16,7 +16,7 @@ package org.activiti.crystalball.simulator.delegate.event.impl;
 import org.activiti.crystalball.simulator.SimulationEvent;
 import org.activiti.engine.delegate.event.ActivitiEntityEvent;
 import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 
@@ -38,7 +38,7 @@ public class DeploymentCreateTransformer extends Activiti2SimulationEventFunctio
 
   @Override
   public SimulationEvent apply(ActivitiEvent event) {
-    if (ActivitiEventType.ENTITY_CREATED.equals(event.getType()) && (event instanceof ActivitiEntityEvent) && ((ActivitiEntityEvent) event).getEntity() instanceof DeploymentEntity) {
+    if (ActivitiEngineEventType.ENTITY_CREATED.equals(event.getType()) && (event instanceof ActivitiEntityEvent) && ((ActivitiEntityEvent) event).getEntity() instanceof DeploymentEntity) {
 
       DeploymentEntity deploymentEntity = (DeploymentEntity) ((ActivitiEntityEvent) event).getEntity();
 

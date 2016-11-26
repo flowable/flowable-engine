@@ -12,10 +12,12 @@
  */
 package org.activiti.engine.impl.cfg;
 
+import org.activiti.engine.impl.interceptor.CommandContext;
+
 /**
  * @author Tom Baeyens
  */
-public interface TransactionContext {
+public interface TransactionContext extends BaseTransactionContext<TransactionListener, CommandContext> {
 
   void commit();
 

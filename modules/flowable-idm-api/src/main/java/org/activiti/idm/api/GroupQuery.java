@@ -15,6 +15,8 @@ package org.activiti.idm.api;
 
 import java.util.List;
 
+import org.activiti.engine.query.Query;
+
 /**
  * Allows to programmatically query for {@link Group}s.
  * 

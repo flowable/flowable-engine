@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.rest.common.api.DataResponse;
+import org.activiti.rest.api.DataResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
