@@ -16,9 +16,10 @@
 
 activitiAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScope', '$http', '$timeout','$location','$routeParams', '$modal', '$translate', '$q', 'gridConstants',
     function ($scope, $rootScope, $http, $timeout, $location, $routeParams, $modal, $translate, $q, gridConstants) {
-		$rootScope.navigation = {selection: 'process-definitions'};
-        
-		$scope.tabData = {
+
+        $rootScope.navigation = {main: 'process-engine', sub: 'definitions'};
+
+        $scope.tabData = {
 		    tabs: [
 		       {id: 'processInstances', name: 'PROCESS-DEFINITION.TITLE.PROCESS-INSTANCES'},
 		       {id: 'jobs', name: 'PROCESS-DEFINITION.TITLE.JOBS'}
@@ -269,10 +270,10 @@ activitiAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
 	                };
 	            });
 		    
-		    $q.all([$translate('FORMS.HEADER.ID'),
-	                $translate('FORMS.HEADER.NAME'),
-	                $translate('FORMS.HEADER.APPID'),
-	                $translate('FORMS.HEADER.TENANTID')])
+		    $q.all([$translate('FORM-DEFINITIONS.HEADER.ID'),
+	                $translate('FORM-DEFINITIONS.HEADER.NAME'),
+	                $translate('FORM-DEFINITIONS.HEADER.APPID'),
+	                $translate('FORM-DEFINITIONS.HEADER.TENANTID')])
 	            .then(function (headers) {
 	                // Config for grid
 	                $scope.gridForms = {

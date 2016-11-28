@@ -16,8 +16,8 @@
 
 activitiAdminApp.controller('DeploymentController', ['$scope', '$rootScope', '$http', '$timeout','$location','$routeParams', '$modal', '$translate', '$q',
     function ($scope, $rootScope, $http, $timeout, $location, $routeParams, $modal, $translate, $q) {
-		
-        $rootScope.navigation = {selection: 'deployments'};
+
+        $rootScope.navigation = {main: 'process-engine', sub: 'deployments'};
         
 		$scope.returnToList = function() {
 			$location.path("/deployments");
