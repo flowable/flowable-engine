@@ -16,22 +16,22 @@
 
 /* Controllers */
 
-activitiAdminApp.controller('FormDefinitionsController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', 'gridConstants',
+activitiAdminApp.controller('FormInstancesController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', 'gridConstants',
     function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, $modal, gridConstants) {
 
-        $rootScope.navigation = {main: 'form-engine', sub: 'definitions'};
+        $rootScope.navigation = {main: 'form-engine', sub: 'instances'};
         
         $scope.filter = {};
-        $scope.formsData = {};
+        $scope.formInstancesData = {};
 
         // Array to contain selected properties (yes - we only can select one, but ng-grid isn't smart enough)
         $scope.selectedForms = [];
 
         var filterConfig = {
-            url: '/app/rest/activiti/form-definitions',
+            url: '/app/rest/activiti/form-instances',
             method: 'GET',
             success: function (data, status, headers, config) {
-                $scope.formsData = data;
+                $scope.formInstancesData = data;
             },
             error: function (data, status, headers, config) {
                 if (data && data.message) {
@@ -44,40 +44,40 @@ activitiAdminApp.controller('FormDefinitionsController', ['$rootScope', '$scope'
             },
 
             sortObjects: [
-                {name: 'FORM-DEFINITIONS.SORT.ID', id: 'id'},
-                {name: 'FORM-DEFINITIONS.SORT.NAME', id: 'name'}
+                {name: 'FORM-INSTANCES.SORT.SUBMITTED-DATE', id: 'submittedDate'}
             ],
 
             supportedProperties: [
-                {id: 'nameLike', name: 'FORM-DEFINITIONS.FILTER.NAME', showByDefault: true},
-                {id: 'appId', name: 'FORM-DEFINITIONS.FILTER.APPID', showByDefault: true},
-                {id: 'tenantId', name: 'FORM-DEFINITIONS.FILTER.TENANTID', showByDefault: true}
+                {id: 'nameLike', name: 'FORM-INSTANCES.FILTER.NAME', showByDefault: true},
+                {id: 'tenantId', name: 'FORM-INSTANCES.FILTER.TENANTID', showByDefault: true}
             ]
         };
 
-        if ($rootScope.filters && $rootScope.filters.formFilter) {
+        if ($rootScope.filters && $rootScope.filters.formInstanceFilter) {
             // Reuse the existing filter
-            $scope.filter = $rootScope.filters.formFilter;
+            $scope.filter = $rootScope.filters.formInstanceFilter;
             $scope.filter.config = filterConfig;
         } else {
             $scope.filter = new ActivitiAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
-            $rootScope.filters.formFilter = $scope.filter;
+            $rootScope.filters.formInstanceFilter = $scope.filter;
         }
 
         $scope.formSelected = function (form) {
             if (form && form.getProperty('id')) {
-                $location.path('/form-definition/' + form.getProperty('id'));
+                $location.path('/form-instance/' + form.getProperty('id'));
             }
         };
 
-        $q.all([$translate('FORM-DEFINITIONS.HEADER.ID'),
-                $translate('FORM-DEFINITIONS.HEADER.NAME'),
-                $translate('FORM-DEFINITIONS.HEADER.APPID'),
-                $translate('FORM-DEFINITIONS.HEADER.TENANTID')])
+        $q.all([$translate('FORM-INSTANCES.HEADER.ID'),
+                $translate('FORM-INSTANCES.HEADER.TASK-ID'),
+                $translate('FORM-INSTANCES.HEADER.PROCESS-INSTANCE-ID'),
+                $translate('FORM-INSTANCES.HEADER.SUBMITTED-ON'),
+                $translate('FORM-INSTANCES.HEADER.SUBMITTED-BY'),
+                $translate('FORM-INSTANCES.HEADER.TENANT-ID')])
             .then(function (headers) {
                 // Config for grid
-                $scope.gridForms = {
-                    data: 'formsData.data',
+                $scope.gridFormInstances = {
+                    data: 'formInstancesData.data',
                     enableRowReordering: true,
                     multiSelect: false,
                     keepLastSelected: false,
@@ -85,9 +85,11 @@ activitiAdminApp.controller('FormDefinitionsController', ['$rootScope', '$scope'
                     afterSelectionChange: $scope.formSelected,
                     columnDefs: [
                         {field: 'id', displayName: headers[0], cellTemplate: gridConstants.defaultTemplate},
-                        {field: 'name', displayName: headers[1], cellTemplate: gridConstants.defaultTemplate},
-                        {field: 'appDeploymentId', displayName: headers[2], cellTemplate: gridConstants.defaultTemplate},
-                        {field: 'tenantId', displayName: headers[3], cellTemplate: gridConstants.defaultTemplate}]
+                        {field: 'taskId', displayName: headers[1], cellTemplate: gridConstants.defaultTemplate},
+                        {field: 'processInstanceId', displayName: headers[2], cellTemplate: gridConstants.defaultTemplate},
+                        {field: 'submittedDate', displayName: headers[3], cellTemplate: gridConstants.dateTemplate},
+                        {field: 'submittedBy', displayName: headers[4], cellTemplate: gridConstants.defaultTemplate},
+                        {field: 'tenantId', displayName: headers[5], cellTemplate: gridConstants.defaultTemplate}]
                 };
             });
 

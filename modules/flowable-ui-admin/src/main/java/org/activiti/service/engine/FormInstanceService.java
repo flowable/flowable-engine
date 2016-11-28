@@ -23,6 +23,8 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.Map;
+
 /**
  * Service for invoking Activiti REST services.
  */
@@ -32,9 +34,19 @@ public class FormInstanceService {
   @Autowired
   protected ActivitiClientService clientUtil;
 
+  public JsonNode listFormInstances(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
+    URIBuilder builder = clientUtil.createUriBuilder("form/form-instances");
+
+    for (String name : parameterMap.keySet()) {
+      builder.addParameter(name, parameterMap.get(name)[0]);
+    }
+    HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder.toString()));
+    return clientUtil.executeRequest(get, serverConfig);
+  }
+
 
   public JsonNode getFormInstance(ServerConfig serverConfig, String formInstanceId) {
-    HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "/form/form-instance/" + formInstanceId));
+    HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "form/form-instance/" + formInstanceId));
     return clientUtil.executeRequest(get, serverConfig);
   }
 
@@ -43,7 +55,7 @@ public class FormInstanceService {
     JsonNode resultNode = null;
 
     try {
-      URIBuilder builder = clientUtil.createUriBuilder("/query/form-instances");
+      URIBuilder builder = clientUtil.createUriBuilder("query/form-instances");
       HttpPost post = clientUtil.createPost(builder.toString(), serverConfig);
       post.setEntity(clientUtil.createStringEntity(objectNode.toString()));
 

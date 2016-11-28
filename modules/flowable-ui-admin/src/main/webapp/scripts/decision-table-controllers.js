@@ -16,7 +16,7 @@
 
 activitiAdminApp.controller('DecisionTableController', ['$scope', '$rootScope', '$http', '$timeout', '$location', '$routeParams', '$modal', '$translate', '$q', 'gridConstants',
     function ($scope, $rootScope, $http, $timeout, $location, $routeParams, $modal, $translate, $q, gridConstants) {
-        $rootScope.navigation = {selection: 'decision-tables'};
+        $rootScope.navigation = {main: 'dmn-engine', sub: 'decision-tables'};
         
         $scope.returnToList = function () {
             $location.path("/decision-tables");

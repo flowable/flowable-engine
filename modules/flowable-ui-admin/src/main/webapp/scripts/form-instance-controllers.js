@@ -18,9 +18,11 @@
 
 activitiAdminApp.controller('FormInstanceController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', '$routeParams',
     function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, $modal, $routeParams) {
-        
+
+        $rootScope.navigation = {main: 'form-engine', sub: 'instances'};
+
         $scope.returnToList = function () {
-            $location.path("/forms");
+            $location.path("/form-instances");
         };
 
         $scope.showSubmittedForm = function () {
@@ -37,16 +39,16 @@ activitiAdminApp.controller('FormInstanceController', ['$rootScope', '$scope', '
         };
         
         $scope.executeWhenReady(function () {
-            if ($rootScope.submittedForm) {
-                $scope.submittedForm = $rootScope.submittedForm;
-                $rootScope.submittedForm = undefined;
+            if ($rootScope.formInstance) {
+                $scope.formInstance = $rootScope.formInstance;
+                $rootScope.formInstance = undefined;
                 return;
             }
             
             // Load submitted form
             $http({method: 'GET', url: '/app/rest/activiti/form-instances/' + $routeParams.formInstanceId}).
             success(function (data, status, headers, config) {
-                $scope.submittedForm = data;
+                $scope.formInstance = data;
             }).
             error(function (data, status, headers, config) {
                 if (data && data.message) {

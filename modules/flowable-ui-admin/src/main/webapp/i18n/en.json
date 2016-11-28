@@ -33,7 +33,8 @@
             "TASKS": "Tasks",
             "JOBS": "Jobs",
             "CONFIGURATION": "Configuration",
-            "CONFIGURATION-ENGINE": "Engine"
+            "CONFIGURATION-ENGINE": "Engine",
+            "DECISION-TABLES": "Decision tables"
         },
         "RESULT-SIZES": {
             "10": "10",
@@ -402,7 +403,6 @@
         "POPUP": {
             "UPLOAD": {
                 "DESCRIPTION": "Select a .bpmn, .bpmn20.xml process file to deploy or upload a package of processes (with assets) contained in .zip or .bar file.",
-                "WARNING": "Uploading a process is only possible to an Activiti Core Engine, not to an Activiti 6 UI instance. Processes in the Activiti 6 UI should be deployed using an app that is shared with individuals or groups.",
                 "DROPZONE": "Or drop a file here",
                 "NO-DROP": "File drop is not supported by your browser",
                 "CANCEL-UPLOAD": "Cancel upload",
@@ -703,6 +703,46 @@
         	"DELETE-ERROR": "Could not delete app. {{message || ''}}"
         }
     },
+    "DECISION-TABLE-DEPLOYMENTS": {
+        "TITLE": "Decision Table Deployments",
+        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching deployments.",
+        "LIST-MESSAGE-EMPTY": "No matching deployments.",
+        "FILTER": {
+            "NAME": "Name (case sensitive)",
+            "TENANTID": "Tenant identifier (case sensitive)"
+        },
+        "SORT": {
+            "ID": "ID",
+            "NAME": "Name"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "NAME": "Name",
+            "DEPLOY-TIME": "Deploy time",
+            "CATEGORY": "Category",
+            "TENANT": "Tenant"
+        },
+        "ACTION": {
+            "DELETE": "Delete deployment"
+        }
+    },
+    "DECISION-TABLE-DEPLOYMENT": {
+        "ID": "ID:",
+        "NAME": "Name:",
+        "TIME": "Deployment time:",
+        "CATEGORY": "Category:",
+        "TENANTID": "Tenant identifier:",
+        "DECISION-TABLES-MESSAGE": "This deployment has {{total}} decision tables, showing {{size}}.",
+        "DECISION-TABLES-MESSAGE-EMPTY": "This deployment has no decision tables.",
+        "PARENT-DEPLOYMENT-ID": "Parent deployment ID",
+        "TITLE": {
+            "DECISION-TABLES": "Decision Tables",
+            "RESOURCES": "Resources"
+        },
+        "ACTION": {
+            "SHOW-ALL-DEFINITIONS": "Show all decision tables"
+        }
+    },
     "DECISION-TABLES": {
         "TITLE": "Decision tables",
         "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching decision tables.",
@@ -756,7 +796,7 @@
             }
         }
     },
-    "FORMS": {
+    "FORM-DEFINITIONS": {
     	"TITLE": "Form definitions",
         "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching forms.",
         "LIST-MESSAGE-EMPTY": "No matching form definitions.",
@@ -764,7 +804,9 @@
             "ID": "ID",
             "NAME": "Name",
             "APPID": "App ID",
-            "TENANTID": "Tenant ID"
+            "TENANTID": "Tenant ID",
+            "KEY": "Key",
+            "VERSION": "Version"
         },
         "FILTER": {
             "NAME": "Name",
@@ -776,7 +818,7 @@
             "NAME": "Name"
         }
     },
-    "FORM": {
+    "FORM-DEFINITION": {
         "ID": "ID:",
         "NAME": "Name:",
         "PARENT-DEPLOYMENT-ID": "Parent Deployment ID:",
@@ -785,10 +827,10 @@
         "TENANT": "Tenant:",
         "MESSAGE-EMPTY": "(None)",
         "TITLE": {
-            "SUBMITTED-FORMS": "Form instances"
+            "FORM-INSTANCES": "Form instances"
         },
-        "SUBMITTED-FORMS-MESSAGE": "This definition has {{total}} form instances, showing {{size}}.",
-        "SUBMITTED-FORMS-MESSAGE-EMPTY": "This definition has no form instances",
+        "FORM-INSTANCES-MESSAGE": "This definition has {{total}} form instances, showing {{size}}.",
+        "FORM-INSTANCES-MESSAGE-EMPTY": "This definition has no form instances",
         "ACTION": {
             "EDIT-CATEGORY": "Edit category",
             "SHOW-ALL-JOBS": "Show all jobs",
@@ -815,8 +857,67 @@
         	"SELECT-GROUP": "Select a group"
         	}
     },
-    "SUBMITTED-FORM": {
-    	"HEADER": {
+    "FORM-DEPLOYMENTS": {
+        "TITLE": "Form Deployments",
+        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching form deployments.",
+        "LIST-MESSAGE-EMPTY": "No matching form deployments.",
+        "FILTER": {
+            "NAME": "Name (case sensitive)",
+            "TENANTID": "Tenant identifier (case sensitive)"
+        },
+        "SORT": {
+            "ID": "ID",
+            "NAME": "Name"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "NAME": "Name",
+            "DEPLOY-TIME": "Deploy time",
+            "CATEGORY": "Category",
+            "TENANT": "Tenant"
+        },
+        "ACTION": {
+            "DELETE": "Delete deployment"
+        }
+    },
+    "FORM-DEPLOYMENT": {
+        "ID": "ID:",
+        "NAME": "Name:",
+        "TIME": "Deployment time:",
+        "CATEGORY": "Category:",
+        "TENANTID": "Tenant identifier:",
+        "DEFINITIONS-MESSAGE": "This deployment has {{total}} form definitions, showing {{size}}.",
+        "DEFINITIONS-MESSAGE-EMPTY": "This deployment has no form definitions.",
+        "TITLE": {
+            "FORM-DEFINITIONS": "Form Definitions",
+            "RESOURCES": "Resources"
+        },
+        "ACTION": {
+            "SHOW-ALL-DEFINITIONS": "Show all form definitions"
+        }
+    },
+    "FORM-INSTANCES": {
+        "TITLE": "Form instances",
+        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching form instances.",
+        "LIST-MESSAGE-EMPTY": "No matching form instances.",
+        "HEADER": {
+            "ID": "ID",
+            "PROCESS-INSTANCE-ID": "Process Instance ID",
+            "TASK-ID": "Task ID",
+            "SUBMITTED-ON": "Submitted Date",
+            "SUBMITTED-BY": "Submitted By",
+            "TENANT-ID": "Tenant ID"
+        },
+        "FILTER": {
+            "NAME": "Name",
+            "TENANTID": "Tenant identifier"
+        },
+        "SORT": {
+            "SUBMITTED-DATE": "Submitted On"
+        }
+    },
+    "FORM-INSTANCE": {
+        "HEADER": {
             "ID": "ID",
             "TASK-ID": "Task ID",
             "PROCESS-ID": "Process Instance ID",
@@ -825,7 +926,7 @@
             "FORM-DEFINITION-ID": "Form Definition ID"
         },
         "ACTION": {
-        	"SHOW-SUBMITTED-FORM": "Show submitted form"
+            "SHOW-FORM-INSTANCE": "Show form instance"
         }
     }
 }

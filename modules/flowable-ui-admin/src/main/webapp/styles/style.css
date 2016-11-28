@@ -157,17 +157,17 @@ body {
 
 .sub-navbar.active-form {
     background rgb(0,102,153);
-    background: linear-gradient(to right, rgba(0,102,153,1.0), rgba(0,102,153,1.0), rgba(0,102,153,0));
+    background: linear-gradient(to right, rgba(0,102,153,1.0), rgba(0,102,153,1.0), rgba(0,102,153,0), rgba(0,102,153,0));
 }
 
 .sub-navbar.active-dmn {
     background: rgb(227,154,33);
-    background: linear-gradient(to right, rgba(227,154,33,1.0), rgba(227,154,33,1.0), rgba(227,154,33,0));
+    background: linear-gradient(to right, rgba(227,154,33,1.0), rgba(227,154,33,1.0), rgba(227,154,33,0), rgba(227,154,33,0));
 }
 
 .sub-navbar.active-content {
     background: rgb(146,176,201);
-    background: linear-gradient(to right, rgba(146,176,201,1.0), rgba(146,176,201,1.0), rgba(146,176,201,0));
+    background: linear-gradient(to right, rgba(146,176,201,1.0), rgba(146,176,201,1.0), rgba(146,176,201,0), rgba(146,176,201,0));
 }
 
 .sub-navbar .drop-menu {

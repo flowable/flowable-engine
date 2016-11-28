@@ -35,13 +35,13 @@ activitiAdminApp
                     reloadOnSearch: true
                 })
                 .when('/form-engine', {
-                    templateUrl: 'views/form-definitions.html',
-                    controller: 'FormDefinitionsController',
+                    templateUrl: 'views/form-deployments.html',
+                    controller: 'FormDeploymentsController',
                     reloadOnSearch: true
                 })
                 .when('/dmn-engine', {
-                    templateUrl: 'views/decision-tables.html',
-                    controller: 'DecisionTablesController',
+                    templateUrl: 'views/decision-table-deployments.html',
+                    controller: 'DecisionTableDeploymentsController',
                     reloadOnSearch: true
                 })
                 .when('/content-engine', {
@@ -125,6 +125,16 @@ activitiAdminApp
               	.when('/process-definitions-refresh', {
               		redirectTo: '/process-definitions'
               	})
+                .when('/decision-table-deployments', {
+                    templateUrl: 'views/decision-table-deployments.html',
+                    controller: 'DecisionTableDeploymentsController',
+                    reloadOnSearch: true
+                })
+                .when('/decision-table-deployment/:deploymentId', {
+                    templateUrl: 'views/decision-table-deployment.html',
+                    controller: 'DecisionTableDeploymentController',
+                    reloadOnSearch: true
+                })
                 .when('/decision-tables', {
                     templateUrl: 'views/decision-tables.html',
                     controller: 'DecisionTablesController',
@@ -135,9 +145,24 @@ activitiAdminApp
                     controller: 'DecisionTableController',
                     reloadOnSearch: true
                 })
+                .when('/form-deployments', {
+                    templateUrl: 'views/form-deployments.html',
+                    controller: 'FormDeploymentsController',
+                    reloadOnSearch: true
+                })
+                .when('/form-deployment/:formDeploymentId', {
+                    templateUrl: 'views/form-deployment.html',
+                    controller: 'FormDeploymentController',
+                    reloadOnSearch: true
+                })
                 .when('/form-definitions', {
                     templateUrl: 'views/form-definitions.html',
                     controller: 'FormDefinitionsController',
+                    reloadOnSearch: true
+                })
+                .when('/form-instances', {
+                    templateUrl: 'views/form-instances.html',
+                    controller: 'FormInstancesController',
                     reloadOnSearch: true
                 })
                 .when('/form-definition/:formId', {

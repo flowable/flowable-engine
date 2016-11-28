@@ -37,23 +37,23 @@
                     <div class="pull-right loading" ng-show="filter.loading">
                     	<i class="glyphicon glyphicon-refresh"></i>
                     </div>
-                    <h2 translate="FORM-DEFINITIONS.TITLE"></h2>
+                    <h2 translate="DECISION-TABLE-DEPLOYMENTS.TITLE"></h2>
                 </div>
 
-                <div class="grid-wrapper" id="forms">
-                    <div class="grid-message" ng-if="formsData.size > 0">
-                        <span>{{'FORM-DEFINITIONS.LIST-MESSAGE' | translate:formsData}}</span>
+                <div class="grid-wrapper" id="deployments">
+                    <div class="grid-message" ng-if="deploymentsData.size > 0">
+                        <span>{{'DEPLOYMENTS.LIST-MESSAGE' | translate:deploymentsData}}</span>
                     </div>
-                     <div class="grid-message" ng-if="formsData.size == 0">
-                        <span>{{'FORM-DEFINITIONS.LIST-MESSAGE-EMPTY' | translate}}</span>
+                     <div class="grid-message" ng-if="deploymentsData.size == 0">
+                        <span>{{'DEPLOYMENTS.LIST-MESSAGE-EMPTY' | translate}}</span>
                     </div>
-                    <div ng-grid="gridForms" class="gridStyle" ng-if="gridForms && formsData.data"/>
+                    <div ng-grid="gridDeployments" class="gridStyle" ng-if="gridDeployments && deploymentsData.data"/>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
 
-            <!-- forms filters -->
+            <!-- Deployment filters -->
             <div class="component tip-left">
                 <div class="title">
                     <div class="pull-right">
@@ -62,26 +62,25 @@
                     <h2 translate="GENERAL.TITLE.FILTERS"></h2>
                 </div>
                 <div class="section" ng-if="filter.properties.nameLike !== undefined">
-                    <div class="subtitle"><label for="filter-nameLike" translate="FORM-DEFINITIONS.FILTER.NAME"></label> </div>
+                    <div class="subtitle"><label for="filter-nameLike" translate="DECISION-TABLE-DEPLOYMENTS.FILTER.NAME"></label> </div>
                     <div class="input-group input-group-sm">
                         <input id="filter-nameLike" type="text" class="form-control" value="" ng-model="filter.properties.nameLike" ng-change="filter.refreshDelayed()">
                     </div>
                 </div>
-                <div class="section" ng-if="filter.properties.appId !== undefined">
-                    <div class="subtitle"><label for="filter-appId" translate="FORM-DEFINITIONS.FILTER.APPID"></label> </div>
+                <div class="section" ng-if="filter.properties.tenantIdLike !== undefined">
+                    <div class="subtitle"><label for="filter-tenantIdLike" translate="DECISION-TABLE-DEPLOYMENTS.FILTER.TENANTID"></label> </div>
                     <div class="input-group input-group-sm">
-                        <input id="filter-appId" type="text" number-input-check class="form-control" value="" ng-model="filter.properties.appId" ng-change="filter.refreshDelayed()">
-                    </div>
-                </div>
-                <div class="section" ng-if="filter.properties.tenantId !== undefined">
-                    <div class="subtitle"><label for="filter-tenantId" translate="APP-DEPLOYMENTS.FILTER.TENANTID"></label> </div>
-                    <div class="input-group input-group-sm">
-                        <input id="filter-tenantId" type="text" class="form-control" value="" number-input-check ng-model="filter.properties.tenantId" ng-change="filter.refreshDelayed()">
+                        <input id="filter-tenantIdLike" type="text" class="form-control" value="" ng-model="filter.properties.tenantIdLike" ng-change="filter.refreshDelayed()">
                     </div>
                 </div>
             </div>
 
-        </div>
+            <!-- Actions -->
+            <!--<div class="component no-min-height">-->
+                <!--<div class="title">-->
+                    <!--<h2 translate="GENERAL.TITLE.ACTIONS"></h2>-->
+                <!--</div>-->
+            <!--</div>-->
 
         </div>
     </div>
