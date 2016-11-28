@@ -2,6 +2,8 @@ package org.activiti.rest.conf;
 
 import javax.sql.DataSource;
 
+import org.activiti.content.api.ContentService;
+import org.activiti.content.spring.configurator.SpringContentEngineConfigurator;
 import org.activiti.dmn.api.DmnRepositoryService;
 import org.activiti.dmn.api.DmnRuleService;
 import org.activiti.dmn.spring.configurator.SpringDmnEngineConfigurator;
@@ -69,6 +71,7 @@ public class FlowableEngineConfiguration {
 
     processEngineConfiguration.addConfigurator(new SpringFormEngineConfigurator());
     processEngineConfiguration.addConfigurator(new SpringDmnEngineConfigurator());
+    processEngineConfiguration.addConfigurator(new SpringContentEngineConfigurator());
 
     return processEngineConfiguration;
   }
@@ -126,5 +129,10 @@ public class FlowableEngineConfiguration {
   @Bean
   public DmnRuleService dmnRuleService() {
     return processEngine().getDmnRuleService();
+  }
+
+  @Bean
+  public ContentService contentService() {
+    return processEngine().getContentService();
   }
 }
