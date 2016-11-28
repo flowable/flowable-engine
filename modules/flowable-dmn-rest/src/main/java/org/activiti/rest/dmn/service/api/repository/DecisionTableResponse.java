@@ -28,6 +28,7 @@ public class DecisionTableResponse {
   protected int version;
   protected String resourceName;
   protected String deploymentId;
+  protected String parentDeploymentId;
   protected String tenantId;
 
   public DecisionTableResponse(DecisionTable decisionTable) {
@@ -39,6 +40,7 @@ public class DecisionTableResponse {
     setVersion(decisionTable.getVersion());
     setResourceName(decisionTable.getResourceName());
     setDeploymentId(decisionTable.getDeploymentId());
+    setParentDeploymentId(decisionTable.getParentDeploymentId());
     setTenantId(decisionTable.getTenantId());
   }
 
@@ -112,6 +114,14 @@ public class DecisionTableResponse {
 
   public void setDeploymentId(String deploymentId) {
     this.deploymentId = deploymentId;
+  }
+
+  public String getParentDeploymentId() {
+    return parentDeploymentId;
+  }
+
+  public void setParentDeploymentId(String parentDeploymentId) {
+    this.parentDeploymentId = parentDeploymentId;
   }
 
   public String getTenantId() {
