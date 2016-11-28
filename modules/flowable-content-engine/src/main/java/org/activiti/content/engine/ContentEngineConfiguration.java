@@ -710,6 +710,10 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration {
     this.databaseSchemaUpdate = databaseSchemaUpdate;
     return this;
   }
+  
+  public Clock getClock() {
+    return clock;
+  }
 
   public ContentEngineConfiguration setClock(Clock clock) {
     this.clock = clock;

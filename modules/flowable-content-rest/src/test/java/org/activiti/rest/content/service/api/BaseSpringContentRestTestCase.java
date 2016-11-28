@@ -63,6 +63,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import junit.framework.AssertionFailedError;
 
@@ -86,6 +87,8 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
 
   protected static CloseableHttpClient client;
   protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<CloseableHttpResponse>();
+  
+  protected ISO8601DateFormat ISO_DATE_FORMAT = new ISO8601DateFormat();
 
   static {
 
@@ -254,6 +257,10 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
     }
     assertTrue("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
   }
+  
+  protected void assertResultsPresentInPostDataResponse(String url, ObjectNode body, String... expectedResourceIds) throws JsonProcessingException, IOException {
+    assertResultsPresentInPostDataResponseWithStatusCheck(url, body, HttpStatus.SC_OK, expectedResourceIds);
+  }
 
   protected void assertResultsPresentInPostDataResponseWithStatusCheck(String url, ObjectNode body, int expectedStatusCode, String... expectedResourceIds) throws JsonProcessingException, IOException {
     int numberOfResultsExpected = 0;
@@ -287,6 +294,16 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
     closeResponse(response);
   }
   
+  protected void assertEmptyResultsPresentInDataResponse(String url) throws JsonProcessingException, IOException {
+    // Do the actual call
+    CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+    // Check status and size
+    JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
+    closeResponse(response);
+    assertEquals(0, dataNode.size());
+  }
+  
   /**
    * Extract a date from the given string. Assertion fails when invalid date has been provided.
    */
@@ -298,6 +315,10 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
       fail("Illegal date provided: " + isoString);
       return null;
     }
+  }
+  
+  protected String getISODateString(Date time) {
+    return ISO_DATE_FORMAT.format(time);
   }
   
   protected String createContentItem(String name, String mimeType, String taskId, String processInstanceId,

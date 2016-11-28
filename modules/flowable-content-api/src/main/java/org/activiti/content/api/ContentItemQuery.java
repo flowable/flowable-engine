@@ -36,6 +36,16 @@ public interface ContentItemQuery extends Query<ContentItemQuery, ContentItem> {
   ContentItemQuery ids(Set<String> ids);
   
   /**
+   * Only select content items with the given name.
+   */
+  ContentItemQuery name(String name);
+
+  /**
+   * Only select content items with a name like the given string.
+   */
+  ContentItemQuery nameLike(String nameLike);
+  
+  /**
    * Only select content items with the given mime type.
    */
   ContentItemQuery mimeType(String mimeType);
@@ -104,6 +114,16 @@ public interface ContentItemQuery extends Query<ContentItemQuery, ContentItem> {
    * Only select content items with the given maximum content size.
    */
   ContentItemQuery maxContentSize(Long maxContentSize);
+  
+  /**
+   * Only select content items with the given field.
+   */
+  ContentItemQuery field(String field);
+
+  /**
+   * Only select content items with a field like the given string.
+   */
+  ContentItemQuery fieldLike(String fieldLike);
   
   /**
    * Only select content items created on the given time

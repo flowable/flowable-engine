@@ -34,6 +34,8 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
   private static final long serialVersionUID = 1L;
   protected String id;
   protected Set<String> ids;
+  protected String name;
+  protected String nameLike;
   protected String mimeType;
   protected String mimeTypeLike;
   protected String taskId;
@@ -82,6 +84,16 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
   
   public ContentItemQueryImpl ids(Set<String> ids) {
     this.ids = ids;
+    return this;
+  }
+  
+  public ContentItemQueryImpl name(String name) {
+    this.name = name;
+    return this;
+  }
+  
+  public ContentItemQueryImpl nameLike(String nameLike) {
+    this.nameLike = nameLike;
     return this;
   }
   

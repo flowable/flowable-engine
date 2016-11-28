@@ -92,7 +92,7 @@
 	    ${limitAfter}
     </select>
 	
-	<select id="selectContentItemsCountByQueryCriteria" parameterType="org.activiti.content.engine.impl.ContentItemQueryImpl" resultType="long">
+	<select id="selectContentItemCountByQueryCriteria" parameterType="org.activiti.content.engine.impl.ContentItemQueryImpl" resultType="long">
 	    select count(RES.ID_)
 	    <include refid="selectContentItemsByQueryCriteriaSql"/>
 	</select>
@@ -108,6 +108,12 @@
 	        <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
 	          #{item}
 	        </foreach>
+	      </if>
+	      <if test="name != null">
+	        and RES.NAME_ = #{name}
+	      </if>
+	      <if test="nameLike != null">
+	        and RES.NAME_ like #{nameLike}
 	      </if>
 	      <if test="mimeType != null">
 	        and RES.MIME_TYPE_ = #{mimeType}
@@ -208,7 +214,7 @@
 	    ${limitAfter}
 	</select>
 	
-	  <!-- mysql specific sql -->
+	<!-- mysql specific sql -->
 	<select id="selectContentItemCountByQueryCriteria" databaseId="mysql" parameterType="org.activiti.content.engine.impl.persistence.entity.ContentItemEntityImpl" resultType="long">
 	   	select distinct count(RES.ID_)
 	    <include refid="selectContentItemsByQueryCriteriaSql"/>
