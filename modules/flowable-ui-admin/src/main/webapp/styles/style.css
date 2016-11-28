@@ -50,7 +50,7 @@ body {
 	margin-bottom: 5px;
 }
 
-.inline-button:lastchild {
+.inline-button:last-child {
 	margin-bottom: 0;
 }
 
@@ -82,7 +82,7 @@ body {
 }
 
 .navbar-header .navbar-brand {
-    position: relative
+    position: relative;
 	padding-top: 0px;
 	top: 25px;
 	line-height: 35px;
@@ -156,7 +156,7 @@ body {
 }
 
 .sub-navbar.active-form {
-    background rgb(0,102,153);
+    background: rgb(0,102,153);
     background: linear-gradient(to right, rgba(0,102,153,1.0), rgba(0,102,153,1.0), rgba(0,102,153,0), rgba(0,102,153,0));
 }
 
@@ -190,7 +190,7 @@ body {
 
 .sub-navbar .nav.navbar-nav li a {
     color: #384042;
-    background-color: none;
+    background-color: unset;
 }
 
 .tabs-wrapper {
@@ -940,7 +940,7 @@ only screen and (min-resolution: 192dpi) {
 .process-model-wrapper .process-model {
     width: 33%;
     padding: 0;
-    maring: 0;
+    margin: 0;
     float: left;
 }
 
@@ -1139,7 +1139,7 @@ only screen and (min-resolution: 192dpi) {
   position: relative;
   margin:0;
   padding:0;
-  background: #fc6
+  background: #fc6;
   border:1px solid #999;
   height:100px;
   width:500px;
@@ -1183,7 +1183,7 @@ only screen and (min-resolution: 192dpi) {
   position: relative;
   margin:0;
   padding:0;
-  background: #fc6
+  background: #fc6;
   border:1px solid #999;
   height:100px;
   width:182px;
@@ -1382,7 +1382,7 @@ only screen and (min-resolution: 192dpi) {
 }
 
 .decision-table .ui-grid-row-selected .customRowHeader {
-	background-color: #c9dde1
+	background-color: #c9dde1;
 	color: #ffffff;
 	border-bottom: 1px solid rgba(43, 37, 37, 0.22);
 }

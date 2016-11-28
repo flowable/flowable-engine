@@ -34,7 +34,8 @@
             "JOBS": "Jobs",
             "CONFIGURATION": "Configuration",
             "CONFIGURATION-ENGINE": "Engine",
-            "DECISION-TABLES": "Decision tables"
+            "DECISION-TABLES": "Decision tables",
+            "CONTENT-ITEMS": "Content items"
         },
         "RESULT-SIZES": {
             "10": "10",
