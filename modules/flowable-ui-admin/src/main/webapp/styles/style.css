@@ -84,7 +84,7 @@ body {
 .navbar-header .navbar-brand {
     position: relative;
 	padding-top: 0px;
-	top: 25px;
+	top: 2px;
 	line-height: 35px;
     height: 35px;
     background: url(../images/logo.png) no-repeat 15px center;
