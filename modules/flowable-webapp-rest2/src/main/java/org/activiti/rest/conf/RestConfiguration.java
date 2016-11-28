@@ -2,6 +2,7 @@ package org.activiti.rest.conf;
 
 import org.activiti.rest.application.ContentTypeResolver;
 import org.activiti.rest.application.DefaultContentTypeResolver;
+import org.activiti.rest.content.ContentRestResponseFactory;
 import org.activiti.rest.dmn.service.api.DmnRestResponseFactory;
 import org.activiti.rest.form.FormRestResponseFactory;
 import org.activiti.rest.service.api.RestResponseFactory;
@@ -39,4 +40,9 @@ public class RestConfiguration {
         return restResponseFactory;
     }
 
+    @Bean()
+    public ContentRestResponseFactory contentResponseFactory() {
+        ContentRestResponseFactory restResponseFactory = new ContentRestResponseFactory();
+        return restResponseFactory;
+    }
 }

@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 /**
  *
  * Combined Spring MVC Exception handler
- * includes all engine (process, dmn, form) specific exceptions
+ * includes all engine (process, dmn, form and content) specific exceptions
  *
  * @author Yvo Swillens
  */
