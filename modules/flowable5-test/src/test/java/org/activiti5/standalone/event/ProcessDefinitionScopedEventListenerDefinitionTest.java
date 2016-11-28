@@ -14,9 +14,9 @@ package org.activiti5.standalone.event;
 
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.repository.DeploymentProperties;
 import org.activiti.engine.repository.ProcessDefinition;

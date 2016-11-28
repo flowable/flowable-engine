@@ -14,7 +14,8 @@ package org.activiti.engine.impl.persistence.entity.data;
 
 import java.util.List;
 
-import org.activiti.engine.impl.Page;
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 import org.activiti.engine.impl.TimerJobQueryImpl;
 import org.activiti.engine.impl.persistence.entity.TimerJobEntity;
 import org.activiti.engine.runtime.Job;

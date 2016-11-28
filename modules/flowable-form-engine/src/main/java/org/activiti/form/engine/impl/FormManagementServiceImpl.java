@@ -14,9 +14,9 @@ package org.activiti.form.engine.impl;
 
 import java.util.Map;
 
-import org.activiti.engine.impl.cmd.CustomSqlExecution;
-import org.activiti.engine.management.TableMetaData;
-import org.activiti.engine.management.TablePageQuery;
+import org.activiti.engine.common.api.management.TableMetaData;
+import org.activiti.engine.common.api.management.TablePageQuery;
+import org.activiti.engine.common.impl.cmd.CustomSqlExecution;
 import org.activiti.form.api.FormManagementService;
 import org.activiti.form.engine.impl.cmd.ExecuteCustomSqlCmd;
 import org.activiti.form.engine.impl.cmd.GetTableCountCmd;

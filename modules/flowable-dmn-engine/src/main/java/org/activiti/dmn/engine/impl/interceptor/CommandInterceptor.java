@@ -13,7 +13,7 @@
 
 package org.activiti.dmn.engine.impl.interceptor;
 
-import org.activiti.engine.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 
 /**
  * @author Tom Baeyens

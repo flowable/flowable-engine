@@ -17,9 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.cfg.TransactionPropagation;
-import org.activiti.engine.impl.cfg.TransactionState;
-import org.activiti.engine.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.impl.cfg.TransactionPropagation;
+import org.activiti.engine.common.impl.cfg.TransactionState;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.idm.engine.impl.cfg.TransactionContext;
 import org.activiti.idm.engine.impl.cfg.TransactionListener;
 import org.activiti.idm.engine.impl.db.DbSqlSession;

@@ -13,8 +13,8 @@
 
 package org.activiti.rest.service.api.repository;
 
-import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.rest.service.api.RestResponseFactory;

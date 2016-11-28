@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.activiti.bpmn.model.FormProperty;
 import org.activiti.bpmn.model.FormValue;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.form.AbstractFormType;
 import org.apache.commons.lang3.StringUtils;
 

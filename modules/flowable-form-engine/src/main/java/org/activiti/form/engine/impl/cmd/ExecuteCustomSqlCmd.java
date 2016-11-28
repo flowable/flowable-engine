@@ -1,6 +1,6 @@
 package org.activiti.form.engine.impl.cmd;
 
-import org.activiti.engine.impl.cmd.CustomSqlExecution;
+import org.activiti.engine.common.impl.cmd.CustomSqlExecution;
 import org.activiti.form.engine.impl.interceptor.Command;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
 

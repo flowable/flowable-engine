@@ -16,7 +16,7 @@ package org.activiti.engine.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.query.QueryProperty;
+import org.activiti.engine.common.api.query.QueryProperty;
 import org.activiti.engine.repository.ModelQuery;
 
 /**

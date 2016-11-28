@@ -1,8 +1,8 @@
 package org.activiti.engine.impl.app;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.app.AppModel;
 import org.activiti.engine.app.AppResourceConverter;
+import org.activiti.engine.common.api.ActivitiException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

@@ -12,8 +12,9 @@
  */
 package org.activiti.engine.impl.interceptor;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiOptimisticLockingException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiOptimisticLockingException;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

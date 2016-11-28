@@ -24,7 +24,7 @@ import org.activiti.dmn.api.DmnRepositoryService;
 import org.activiti.dmn.engine.DmnEngine;
 import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.impl.deployer.ParsedDeploymentBuilder;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

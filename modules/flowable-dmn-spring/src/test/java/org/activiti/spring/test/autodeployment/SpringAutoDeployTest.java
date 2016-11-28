@@ -23,7 +23,7 @@ import org.activiti.dmn.api.DmnDeployment;
 import org.activiti.dmn.api.DmnDeploymentQuery;
 import org.activiti.dmn.api.DmnRepositoryService;
 import org.activiti.dmn.engine.impl.test.AbstractDmnTestCase;
-import org.activiti.engine.impl.util.IoUtil;
+import org.activiti.engine.common.impl.util.IoUtil;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

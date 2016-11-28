@@ -12,7 +12,7 @@
  */
 package org.activiti.spring.test.taskassignment;
 
-import org.activiti.engine.impl.util.CollectionUtil;
+import org.activiti.engine.common.impl.util.CollectionUtil;
 import org.activiti.engine.test.Deployment;
 import org.activiti.spring.impl.test.SpringActivitiTestCase;
 import org.springframework.test.context.ContextConfiguration;

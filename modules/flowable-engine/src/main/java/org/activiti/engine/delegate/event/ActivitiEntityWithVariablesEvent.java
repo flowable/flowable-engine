@@ -14,6 +14,8 @@ package org.activiti.engine.delegate.event;
 
 import java.util.Map;
 
+import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
+
 /**
  * An {@link ActivitiEntityEvent} related to a single entity.
  * 

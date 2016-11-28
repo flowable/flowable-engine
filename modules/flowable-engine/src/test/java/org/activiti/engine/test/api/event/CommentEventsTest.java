@@ -12,8 +12,8 @@
  */
 package org.activiti.engine.test.api.event;
 
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.impl.delegate.event.ActivitiEngineEntityEvent;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;

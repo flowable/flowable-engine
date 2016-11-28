@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.apache.camel.Exchange;
 import org.apache.camel.TypeConversionException;
 import org.apache.commons.lang3.StringUtils;

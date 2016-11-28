@@ -18,8 +18,8 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.runtime.ClockReader;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.runtime.ClockReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

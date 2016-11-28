@@ -12,7 +12,7 @@
  */
 package org.activiti.rest.form.service.api.form;
 
-import org.activiti.engine.query.QueryProperty;
+import org.activiti.engine.common.api.query.QueryProperty;
 import org.activiti.form.api.FormInstanceQuery;
 import org.activiti.form.api.FormService;
 import org.activiti.form.engine.impl.FormInstanceQueryProperty;

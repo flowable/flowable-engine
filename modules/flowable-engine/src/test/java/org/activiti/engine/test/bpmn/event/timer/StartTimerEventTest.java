@@ -18,10 +18,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.activiti.engine.common.impl.util.IoUtil;
 import org.activiti.engine.impl.cmd.CancelJobsCmd;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
-import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.Job;

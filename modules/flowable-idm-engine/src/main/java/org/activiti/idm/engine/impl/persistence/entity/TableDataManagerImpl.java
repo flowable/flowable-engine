@@ -23,10 +23,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.persistence.entity.Entity;
-import org.activiti.engine.management.TableMetaData;
-import org.activiti.engine.management.TablePage;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.management.TableMetaData;
+import org.activiti.engine.common.api.management.TablePage;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
 import org.activiti.idm.api.Capability;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.Token;

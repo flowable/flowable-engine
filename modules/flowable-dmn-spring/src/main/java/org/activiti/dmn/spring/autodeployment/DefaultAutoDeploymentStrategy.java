@@ -17,7 +17,7 @@ import java.io.IOException;
 
 import org.activiti.dmn.api.DmnDeploymentBuilder;
 import org.activiti.dmn.api.DmnRepositoryService;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.springframework.core.io.Resource;
 
 /**

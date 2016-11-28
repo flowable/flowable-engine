@@ -16,7 +16,7 @@ import java.io.Serializable;
 
 import org.activiti.dmn.engine.impl.interceptor.Command;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 
 /**
  * @author Joram Barrez

@@ -26,7 +26,7 @@ import org.activiti.dmn.engine.impl.persistence.entity.ResourceEntity;
 import org.activiti.dmn.engine.impl.persistence.entity.ResourceEntityManager;
 import org.activiti.dmn.model.DmnDefinition;
 import org.activiti.dmn.xml.converter.DmnXMLConverter;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.apache.commons.io.IOUtils;
 
 /**

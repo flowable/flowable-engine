@@ -16,7 +16,7 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 
 public class BeanManagerLookup {
 

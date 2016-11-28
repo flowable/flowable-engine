@@ -12,8 +12,8 @@
  */
 package org.activiti.engine.test.impl.logger;
 
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.BaseEntityEventListener;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 

@@ -4,11 +4,11 @@ import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
 
+import org.activiti.engine.common.impl.persistence.entity.Entity;
 import org.activiti.engine.impl.db.BulkDeleteOperation;
 import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.db.DbSqlSessionFactory;
 import org.activiti.engine.impl.persistence.cache.EntityCache;
-import org.activiti.engine.impl.persistence.entity.Entity;
 
 /**
  * @author Joram Barrez

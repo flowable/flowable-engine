@@ -18,6 +18,7 @@ import javax.sql.DataSource;
 
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.common.impl.persistence.StrongUuidGenerator;
 import org.activiti.engine.impl.SchemaOperationProcessEngineClose;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.engine.impl.asyncexecutor.multitenant.ExecutorPerTenantAsyncExecutor;
@@ -28,7 +29,6 @@ import org.activiti.engine.impl.db.DbIdGenerator;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandInterceptor;
-import org.activiti.engine.impl.persistence.StrongUuidGenerator;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

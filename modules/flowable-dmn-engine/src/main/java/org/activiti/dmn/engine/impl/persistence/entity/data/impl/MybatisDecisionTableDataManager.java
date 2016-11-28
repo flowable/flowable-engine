@@ -23,8 +23,8 @@ import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntityImpl;
 import org.activiti.dmn.engine.impl.persistence.entity.data.AbstractDataManager;
 import org.activiti.dmn.engine.impl.persistence.entity.data.DecisionTableDataManager;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.Page;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.Page;
 
 /**
  * @author Joram Barrez

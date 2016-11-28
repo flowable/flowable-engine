@@ -96,7 +96,7 @@
 		</where>
 	</sql>
 
-	<select id="selectTimerJobsToExecute" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+	<select id="selectTimerJobsToExecute" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 	    ${limitBefore}
 		select
 		RES.* ${limitBetween} 
@@ -233,26 +233,26 @@
 		and REV_ = #{revision, jdbcType=INTEGER}
 	</update>
 
-	<select id="selectTimerJobByTypeAndProcessDefinitionId" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+	<select id="selectTimerJobByTypeAndProcessDefinitionId" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 		select J.*
 		from ${prefix}ACT_RU_TIMER_JOB J
 		where J.HANDLER_TYPE_ = #{parameter.handlerType}
 		and J.PROC_DEF_ID_ = #{parameter.processDefinitionId}
 	</select>
 	
-	<select id="selectTimerJobsByProcessInstanceId" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+	<select id="selectTimerJobsByProcessInstanceId" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 		select *
 		from ${prefix}ACT_RU_TIMER_JOB J
 		where J.PROCESS_INSTANCE_ID_ = #{parameter}
 	</select>
 
-	<select id="selectTimerJobsByExecutionId" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+	<select id="selectTimerJobsByExecutionId" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 		select *
 		from ${prefix}ACT_RU_TIMER_JOB J
 		where J.EXECUTION_ID_ = #{parameter}
 	</select>
 
-	<select id="selectTimerJobByTypeAndProcessDefinitionKeyNoTenantId" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+	<select id="selectTimerJobByTypeAndProcessDefinitionKeyNoTenantId" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 		select J.*
 		from ${prefix}ACT_RU_TIMER_JOB J
 		inner join ${prefix}ACT_RE_PROCDEF P on J.PROC_DEF_ID_ = P.ID_
@@ -261,7 +261,7 @@
 		and (P.TENANT_ID_ = '' or P.TENANT_ID_ is null)
 	</select>
 
-	<select id="selectTimerJobByTypeAndProcessDefinitionKeyAndTenantId" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+	<select id="selectTimerJobByTypeAndProcessDefinitionKeyAndTenantId" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 		select J.*
 		from ${prefix}ACT_RU_TIMER_JOB J
 		inner join ${prefix}ACT_RE_PROCDEF P on J.PROC_DEF_ID_ = P.ID_

@@ -13,10 +13,10 @@
 
 package org.activiti.engine.impl.jobexecutor;
 
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.interceptor.Command;
-import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandContextCloseListener;
 import org.activiti.engine.impl.interceptor.CommandExecutor;

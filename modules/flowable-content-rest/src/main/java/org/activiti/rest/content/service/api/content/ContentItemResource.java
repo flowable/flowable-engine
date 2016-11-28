@@ -12,9 +12,7 @@
  */
 package org.activiti.rest.content.service.api.content;
 
-import org.activiti.content.api.ContentItem;
 import org.activiti.content.api.ContentService;
-import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.rest.content.ContentRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +31,7 @@ import io.swagger.annotations.ApiResponses;
  */
 @RestController
 @Api(tags = { "Content item" }, description = "Manages Content item")
-public class ContentItemResource {
+public class ContentItemResource extends ContentItemBaseResource {
 
   @Autowired
   protected ContentService contentService;
@@ -49,13 +47,5 @@ public class ContentItemResource {
   @RequestMapping(value = "/content-service/content-items/{contentItemId}", method = RequestMethod.GET, produces = "application/json")
   public ContentItemResponse getContentItem(@ApiParam(name = "contentItemId") @PathVariable String contentItemId) {
     return contentRestResponseFactory.createContentItemResponse(getContentItemFromRequest(contentItemId));
-  }
-  
-  protected ContentItem getContentItemFromRequest(String contentItemId) {
-    ContentItem contentItem = contentService.createContentItemQuery().id(contentItemId).singleResult();
-    if (contentItem == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a content item with id '" + contentItemId + "'.", ContentItem.class);
-    }
-    return contentItem;
   }
 }

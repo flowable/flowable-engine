@@ -21,11 +21,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.query.QueryProperty;
 import org.activiti.engine.impl.DeploymentQueryProperty;
-import org.activiti.engine.query.QueryProperty;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.engine.repository.DeploymentQuery;

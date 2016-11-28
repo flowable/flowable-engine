@@ -13,7 +13,7 @@
 
 package org.activiti.engine.test.bpmn.event.compensate.helper;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
 

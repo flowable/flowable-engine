@@ -20,13 +20,13 @@ import org.activiti.content.engine.impl.context.Context;
 import org.activiti.content.engine.impl.interceptor.Command;
 import org.activiti.content.engine.impl.interceptor.CommandContext;
 import org.activiti.content.engine.impl.interceptor.CommandExecutor;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.impl.Direction;
-import org.activiti.engine.impl.Page;
-import org.activiti.engine.impl.db.ListQueryParameterObject;
-import org.activiti.engine.query.Query;
-import org.activiti.engine.query.QueryProperty;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.query.Query;
+import org.activiti.engine.common.api.query.QueryProperty;
+import org.activiti.engine.common.impl.Direction;
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.db.ListQueryParameterObject;
 
 /**
  * Abstract superclass for all query types.

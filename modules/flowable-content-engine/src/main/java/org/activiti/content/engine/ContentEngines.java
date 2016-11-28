@@ -29,8 +29,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.activiti.content.engine.impl.util.ReflectUtil;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.EngineInfo;
+import org.activiti.engine.common.EngineInfo;
+import org.activiti.engine.common.api.ActivitiException;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

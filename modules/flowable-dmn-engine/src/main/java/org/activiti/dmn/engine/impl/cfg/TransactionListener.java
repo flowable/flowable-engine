@@ -13,7 +13,7 @@
 package org.activiti.dmn.engine.impl.cfg;
 
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.impl.cfg.BaseTransactionListener;
+import org.activiti.engine.common.impl.cfg.BaseTransactionListener;
 
 /**
  * @author Tijs Rademakers

@@ -12,8 +12,8 @@
  */
 package org.activiti5.engine.test.api.event;
 
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.BpmnError;
-import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 

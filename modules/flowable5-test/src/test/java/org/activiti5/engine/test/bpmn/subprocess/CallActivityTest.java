@@ -20,13 +20,13 @@ import java.util.Map;
 
 import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.util.io.InputStreamSource;
+import org.activiti.engine.common.impl.util.io.StreamSource;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricActivityInstanceQuery;
 import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.history.HistoricVariableInstanceQuery;
-import org.activiti.engine.impl.util.io.InputStreamSource;
-import org.activiti.engine.impl.util.io.StreamSource;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.DeploymentProperties;
 import org.activiti.engine.repository.ProcessDefinition;

@@ -18,7 +18,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.calendar.DurationHelper;
 import org.activiti.engine.repository.ProcessDefinition;

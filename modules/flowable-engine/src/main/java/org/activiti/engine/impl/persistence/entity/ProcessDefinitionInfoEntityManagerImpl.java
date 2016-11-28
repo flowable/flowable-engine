@@ -13,8 +13,8 @@
 
 package org.activiti.engine.impl.persistence.entity;
 
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.engine.impl.persistence.entity.data.ProcessDefinitionInfoDataManager;
 
 

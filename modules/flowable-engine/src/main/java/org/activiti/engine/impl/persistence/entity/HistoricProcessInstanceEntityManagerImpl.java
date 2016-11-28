@@ -17,10 +17,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.engine.impl.persistence.entity.data.HistoricProcessInstanceDataManager;
 
 /**

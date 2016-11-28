@@ -15,7 +15,7 @@ package org.activiti.form.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.activiti.editor.form.converter.FormJsonConverter;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.interceptor.Command;
 import org.activiti.form.engine.impl.interceptor.CommandContext;

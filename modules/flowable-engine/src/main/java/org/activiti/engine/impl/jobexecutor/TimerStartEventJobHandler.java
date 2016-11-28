@@ -13,7 +13,7 @@
 package org.activiti.engine.impl.jobexecutor;
 
 import org.activiti.bpmn.model.FlowElement;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.cmd.StartProcessInstanceCmd;

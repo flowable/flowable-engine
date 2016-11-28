@@ -17,10 +17,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.activiti.engine.common.impl.Page;
 import org.activiti.engine.delegate.VariableScope;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
-import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.TimerJobQueryImpl;
 import org.activiti.engine.impl.calendar.BusinessCalendar;
 import org.activiti.engine.impl.calendar.CycleBusinessCalendar;

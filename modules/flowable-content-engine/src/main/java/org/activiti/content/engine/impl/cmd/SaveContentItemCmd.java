@@ -14,7 +14,6 @@ package org.activiti.content.engine.impl.cmd;
 
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,10 +21,11 @@ import org.activiti.content.api.ContentItem;
 import org.activiti.content.api.ContentMetaDataKeys;
 import org.activiti.content.api.ContentObject;
 import org.activiti.content.api.ContentStorage;
+import org.activiti.content.engine.ContentEngineConfiguration;
 import org.activiti.content.engine.impl.interceptor.Command;
 import org.activiti.content.engine.impl.interceptor.CommandContext;
 import org.activiti.content.engine.impl.persistence.entity.ContentItemEntity;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 
 /**
  * @author Tijs Rademakers
@@ -57,6 +57,8 @@ public class SaveContentItemCmd implements Command<Void>, Serializable {
     
     ContentItemEntity contentItemEntity = (ContentItemEntity) contentItem;
     
+    ContentEngineConfiguration contentEngineConfiguration = commandContext.getContentEngineConfiguration();
+    
     if (inputStream != null) {
       // Stream given, write to store and save a reference to the content object
       Map<String, Object> metaData = new HashMap<String, Object>();
@@ -68,7 +70,7 @@ public class SaveContentItemCmd implements Command<Void>, Serializable {
         }
       }
       
-      ContentStorage contentStorage = commandContext.getContentEngineConfiguration().getContentStorage();
+      ContentStorage contentStorage = contentEngineConfiguration.getContentStorage();
       ContentObject createContentObject = contentStorage.createContentObject(inputStream, metaData);
       contentItemEntity.setContentStoreId(createContentObject.getId());
       contentItemEntity.setContentStoreName(contentStorage.getContentStoreName());
@@ -80,12 +82,12 @@ public class SaveContentItemCmd implements Command<Void>, Serializable {
     }
     
     if (contentItemEntity.getLastModified() == null) {
-      contentItemEntity.setLastModified(new Date());
+      contentItemEntity.setLastModified(contentEngineConfiguration.getClock().getCurrentTime());
     }
 
     if (contentItem.getId() == null) {
       if (contentItemEntity.getCreated() == null) {
-        contentItemEntity.setCreated(new Date());
+        contentItemEntity.setCreated(contentEngineConfiguration.getClock().getCurrentTime());
       }
       
       commandContext.getContentItemEntityManager().insert(contentItemEntity);

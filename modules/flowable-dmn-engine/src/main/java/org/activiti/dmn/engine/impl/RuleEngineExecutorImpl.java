@@ -32,7 +32,7 @@ import org.activiti.dmn.model.HitPolicy;
 import org.activiti.dmn.model.LiteralExpression;
 import org.activiti.dmn.model.RuleInputClauseContainer;
 import org.activiti.dmn.model.RuleOutputClauseContainer;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.apache.commons.lang3.StringUtils;
 import org.mvel2.integration.PropertyHandler;
 import org.slf4j.Logger;

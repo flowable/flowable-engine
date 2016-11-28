@@ -15,9 +15,10 @@ package org.activiti.engine.impl.persistence.entity.data;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 import org.activiti.engine.history.HistoricDetail;
 import org.activiti.engine.impl.HistoricDetailQueryImpl;
-import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.persistence.entity.HistoricDetailAssignmentEntity;
 import org.activiti.engine.impl.persistence.entity.HistoricDetailEntity;
 import org.activiti.engine.impl.persistence.entity.HistoricDetailTransitionInstanceEntity;

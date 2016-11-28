@@ -16,7 +16,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.form.api.FormInstance;
 import org.activiti.form.engine.impl.interceptor.Command;
 import org.activiti.form.engine.impl.interceptor.CommandContext;

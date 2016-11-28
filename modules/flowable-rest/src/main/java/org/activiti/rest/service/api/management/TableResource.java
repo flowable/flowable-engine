@@ -19,8 +19,9 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 
 import io.swagger.annotations.*;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+
 import org.activiti.engine.ManagementService;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;

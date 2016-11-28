@@ -15,8 +15,8 @@ package org.activiti.engine.impl.scripting;
 import java.util.Arrays;
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.delegate.VariableScope;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;

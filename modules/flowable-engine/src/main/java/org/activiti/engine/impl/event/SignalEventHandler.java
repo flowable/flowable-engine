@@ -16,7 +16,7 @@ package org.activiti.engine.impl.event;
 import java.util.Map;
 
 import org.activiti.bpmn.model.FlowElement;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.activiti.engine.impl.util.ProcessDefinitionUtil;

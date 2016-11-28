@@ -17,11 +17,11 @@ import javax.sql.DataSource;
 import org.activiti.content.engine.ContentEngine;
 import org.activiti.content.engine.ContentEngineConfiguration;
 import org.activiti.content.engine.impl.cfg.StandaloneContentEngineConfiguration;
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.cfg.AbstractProcessEngineConfigurator;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.transaction.TransactionContextAwareDataSource;
+import org.activiti.engine.common.impl.transaction.TransactionContextAwareTransactionFactory;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.transaction.TransactionContextAwareDataSource;
-import org.activiti.engine.impl.transaction.TransactionContextAwareTransactionFactory;
 
 /**
  * @author Tijs Rademakers

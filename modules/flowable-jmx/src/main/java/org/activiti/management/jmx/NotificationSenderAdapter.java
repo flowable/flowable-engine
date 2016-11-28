@@ -15,7 +15,7 @@ package org.activiti.management.jmx;
 import javax.management.Notification;
 import javax.management.modelmbean.ModelMBeanNotificationBroadcaster;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 
 /**
  * @author Saeid Mirzaei

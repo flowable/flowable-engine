@@ -21,8 +21,8 @@ import org.activiti.content.engine.impl.context.Context;
 import org.activiti.content.engine.impl.interceptor.Command;
 import org.activiti.content.engine.impl.interceptor.CommandContext;
 import org.activiti.content.engine.impl.interceptor.CommandExecutor;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.query.NativeQuery;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.query.NativeQuery;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 

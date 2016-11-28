@@ -19,7 +19,7 @@ import java.lang.reflect.Method;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 
 /**
  * Scans class and creates {@link EntityMetaData} based on it.

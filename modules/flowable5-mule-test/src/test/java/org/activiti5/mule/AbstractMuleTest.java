@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.ProcessEngineImpl;
 import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.interceptor.Command;
-import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.junit.Assert;

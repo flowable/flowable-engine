@@ -19,13 +19,16 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.content.api.ContentItem;
 import org.activiti.content.api.ContentService;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.rest.api.DataResponse;
+import org.activiti.rest.api.RequestUtil;
 import org.activiti.rest.content.ContentRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -33,7 +36,10 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
@@ -42,7 +48,7 @@ import io.swagger.annotations.ApiResponses;
  */
 @RestController
 @Api(tags = { "Content item" }, description = "Manages Content item")
-public class ContentItemCollectionResource {
+public class ContentItemCollectionResource extends ContentItemBaseResource {
 
   @Autowired
   protected ContentService contentService;
@@ -52,6 +58,181 @@ public class ContentItemCollectionResource {
 
   @Autowired
   protected ObjectMapper objectMapper;
+  
+  @ApiOperation(value = "Get all content items", tags = {"Content item"})
+  @ApiImplicitParams({
+    @ApiImplicitParam(name = "id", dataType = "string", value = "Only return content items with the given id.", paramType = "query"),
+    @ApiImplicitParam(name = "name", dataType = "string", value = "Only return content items with the given name.", paramType = "query"),
+    @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return content items with a name like the given value.", paramType = "query"),
+    @ApiImplicitParam(name = "mimeType", dataType = "string", value = "Only return content items with the given mime type.", paramType = "query"),
+    @ApiImplicitParam(name = "mimeTypeLike", dataType = "string", value = "Only return content items with a mime type like the given value.", paramType = "query"),
+    @ApiImplicitParam(name = "taskId", dataType = "string", value = "Only return content items with the given task id.", paramType = "query"),
+    @ApiImplicitParam(name = "taskIdLike", dataType = "string", value = "Only return content items with a task like the given value.", paramType = "query"),
+    @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "Only return content items with the given process instance id.", paramType = "query"),
+    @ApiImplicitParam(name = "processInstanceIdLike", dataType = "string", value = "Only return content items with a process instance like the given value.", paramType = "query"),
+    @ApiImplicitParam(name = "contentStoreId", dataType = "string", value = "Only return content items with the given content store id.", paramType = "query"),
+    @ApiImplicitParam(name = "contentStoreIdLike", dataType = "string", value = "Only return content items with a content store id like the given value.", paramType = "query"),
+    @ApiImplicitParam(name = "contentStoreName", dataType = "string", value = "Only return content items with the given content store name.", paramType = "query"),
+    @ApiImplicitParam(name = "contentStoreNameLike", dataType = "string", value = "Only return content items with a content store name like the given value.", paramType = "query"),
+    @ApiImplicitParam(name = "contentAvailable", dataType = "boolean", value = "Only return content items with or without content available.", paramType = "query"),
+    @ApiImplicitParam(name = "contentSize", dataType = "long", value = "Only return content items with the given content size.", paramType = "query"),
+    @ApiImplicitParam(name = "minimumContentSize", dataType = "long", value = "Only return content items with the a minimum content size of the given value.", paramType = "query"),
+    @ApiImplicitParam(name = "maximumContentSize", dataType = "long", value = "Only return content items with the a maximum content size of the given value.", paramType = "query"),
+    @ApiImplicitParam(name = "field", dataType = "string", value = "Only return content items with the given field.", paramType = "query"),
+    @ApiImplicitParam(name = "fieldLike", dataType = "string", value = "Only return content items with a field like the given value.", paramType = "query"),
+    @ApiImplicitParam(name = "createdOn", dataType = "date", value = "Only return content items with the given create date.", paramType = "query"),
+    @ApiImplicitParam(name = "createdBefore", dataType = "date", value = "Only return content items before given create date.", paramType = "query"),
+    @ApiImplicitParam(name = "createdAfter", dataType = "date", value = "Only return content items after given create date.", paramType = "query"),
+    @ApiImplicitParam(name = "createdBy", dataType = "string", value = "Only return content items with the given created by.", paramType = "query"),
+    @ApiImplicitParam(name = "createdByLike", dataType = "string", value = "Only return content items with a created by like the given value.", paramType = "query"),
+    @ApiImplicitParam(name = "lastModifiedOn", dataType = "date", value = "Only return content items with the given last modified date.", paramType = "query"),
+    @ApiImplicitParam(name = "lastModifiedBefore", dataType = "date", value = "Only return content items before given last modified date.", paramType = "query"),
+    @ApiImplicitParam(name = "lastModifiedAfter", dataType = "date", value = "Only return content items after given last modified date.", paramType = "query"),
+    @ApiImplicitParam(name = "lastModifiedBy", dataType = "string", value = "Only return content items with the given last modified by.", paramType = "query"),
+    @ApiImplicitParam(name = "lastModifiedByLike", dataType = "string", value = "Only return content items with a last modified by like the given value.", paramType = "query"),
+    @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return content items with the given tenantId.", paramType = "query"),
+    @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return content items with a tenantId like the given value.", paramType = "query"),
+    @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns content items without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
+  })
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "The content items are returned.")
+  })
+  @RequestMapping(value = "/content-service/content-items", method = RequestMethod.GET, produces = "application/json")
+  public DataResponse getContentItems(@ApiParam(hidden = true) @RequestParam Map<String, String> requestParams, HttpServletRequest httpRequest) {
+    // Create a Content item query request
+    ContentItemQueryRequest request = new ContentItemQueryRequest();
+
+    // Populate filter-parameters
+    if (requestParams.containsKey("id")) {
+      request.setId(requestParams.get("id"));
+    }
+    
+    if (requestParams.containsKey("name")) {
+      request.setName(requestParams.get("name"));
+    }
+
+    if (requestParams.containsKey("nameLike")) {
+      request.setNameLike(requestParams.get("nameLike"));
+    }
+
+    if (requestParams.containsKey("mimeType")) {
+      request.setMimeType(requestParams.get("mimeType"));
+    }
+
+    if (requestParams.containsKey("mimeTypeLike")) {
+      request.setMimeTypeLike(requestParams.get("mimeTypeLike"));
+    }
+    
+    if (requestParams.containsKey("taskId")) {
+      request.setTaskId(requestParams.get("taskId"));
+    }
+
+    if (requestParams.containsKey("taskIdLike")) {
+      request.setTaskIdLike(requestParams.get("taskIdLike"));
+    }
+    
+    if (requestParams.containsKey("processInstanceId")) {
+      request.setProcessInstanceId(requestParams.get("processInstanceId"));
+    }
+
+    if (requestParams.containsKey("processInstanceIdLike")) {
+      request.setProcessInstanceIdLike(requestParams.get("processInstanceIdLike"));
+    }
+    
+    if (requestParams.containsKey("contentStoreId")) {
+      request.setContentStoreId(requestParams.get("contentStoreId"));
+    }
+
+    if (requestParams.containsKey("contentStoreIdLike")) {
+      request.setContentStoreIdLike(requestParams.get("contentStoreIdLike"));
+    }
+    
+    if (requestParams.containsKey("contentStoreName")) {
+      request.setContentStoreName(requestParams.get("contentStoreName"));
+    }
+
+    if (requestParams.containsKey("contentStoreNameLike")) {
+      request.setContentStoreNameLike(requestParams.get("contentStoreNameLike"));
+    }
+    
+    if (requestParams.containsKey("contentSize")) {
+      request.setContentSize(Long.valueOf(requestParams.get("contentSize")));
+    }
+
+    if (requestParams.containsKey("minimumContentSize")) {
+      request.setMinimumContentSize(Long.valueOf(requestParams.get("minimumContentSize")));
+    }
+
+    if (requestParams.containsKey("maximumContentSize")) {
+      request.setMaximumContentSize(Long.valueOf(requestParams.get("maximumContentSize")));
+    }
+    
+    if (requestParams.containsKey("contentAvailable")) {
+      request.setContentAvailable(Boolean.valueOf(requestParams.get("contentAvailable")));
+    }
+    
+    if (requestParams.containsKey("field")) {
+      request.setField(requestParams.get("field"));
+    }
+
+    if (requestParams.containsKey("fieldLike")) {
+      request.setFieldLike(requestParams.get("fieldLike"));
+    }
+    
+    if (requestParams.containsKey("createdOn")) {
+      request.setCreatedOn(RequestUtil.getDate(requestParams, "createdOn"));
+    }
+
+    if (requestParams.containsKey("createdBefore")) {
+      request.setCreatedBefore(RequestUtil.getDate(requestParams, "createdBefore"));
+    }
+
+    if (requestParams.containsKey("createdAfter")) {
+      request.setCreatedAfter(RequestUtil.getDate(requestParams, "createdAfter"));
+    }
+    
+    if (requestParams.containsKey("createdBy")) {
+      request.setCreatedBy(requestParams.get("createdBy"));
+    }
+
+    if (requestParams.containsKey("createdByLike")) {
+      request.setCreatedByLike(requestParams.get("createdByLike"));
+    }
+    
+    if (requestParams.containsKey("lastModifiedOn")) {
+      request.setLastModifiedOn(RequestUtil.getDate(requestParams, "lastModifiedOn"));
+    }
+
+    if (requestParams.containsKey("lastModifiedBefore")) {
+      request.setLastModifiedBefore(RequestUtil.getDate(requestParams, "lastModifiedBefore"));
+    }
+
+    if (requestParams.containsKey("lastModifiedAfter")) {
+      request.setLastModifiedAfter(RequestUtil.getDate(requestParams, "lastModifiedAfter"));
+    }
+    
+    if (requestParams.containsKey("lastModifiedBy")) {
+      request.setLastModifiedBy(requestParams.get("lastModifiedBy"));
+    }
+
+    if (requestParams.containsKey("lastModifiedByLike")) {
+      request.setLastModifiedByLike(requestParams.get("lastModifiedByLike"));
+    }
+
+    if (requestParams.containsKey("tenantId")) {
+      request.setTenantId(requestParams.get("tenantId"));
+    }
+
+    if (requestParams.containsKey("tenantIdLike")) {
+      request.setTenantIdLike(requestParams.get("tenantIdLike"));
+    }
+
+    if (requestParams.containsKey("withoutTenantId") && Boolean.valueOf(requestParams.get("withoutTenantId"))) {
+      request.setWithoutTenantId(Boolean.TRUE);
+    }
+
+    return getContentItemsFromQueryRequest(request, requestParams);
+  }
   
   @ApiOperation(value = "Create a new content item, with content item information and an optional attached file", tags = {"Content item"},
       notes="## Create a new content item, with content item information\n\n"

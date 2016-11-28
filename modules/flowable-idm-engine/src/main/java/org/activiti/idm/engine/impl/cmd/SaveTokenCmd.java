@@ -14,8 +14,8 @@ package org.activiti.idm.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.impl.persistence.entity.Entity;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
 import org.activiti.idm.api.Token;
 import org.activiti.idm.engine.impl.interceptor.Command;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;

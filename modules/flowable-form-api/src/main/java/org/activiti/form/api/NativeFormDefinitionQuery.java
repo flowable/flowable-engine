@@ -12,7 +12,7 @@
  */
 package org.activiti.form.api;
 
-import org.activiti.engine.query.NativeQuery;
+import org.activiti.engine.common.api.query.NativeQuery;
 
 public interface NativeFormDefinitionQuery extends NativeQuery<NativeFormDefinitionQuery, FormDefinition> {
 

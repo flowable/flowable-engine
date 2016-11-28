@@ -23,12 +23,13 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import org.activiti.editor.form.converter.FormJsonConverter;
-import org.activiti.engine.AbstractEngineConfiguration;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.cfg.TransactionContextFactory;
-import org.activiti.engine.impl.interceptor.CommandConfig;
-import org.activiti.engine.impl.interceptor.SessionFactory;
-import org.activiti.engine.runtime.Clock;
+import org.activiti.engine.common.AbstractEngineConfiguration;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.cfg.BeansConfigurationHelper;
+import org.activiti.engine.common.impl.cfg.TransactionContextFactory;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.impl.interceptor.SessionFactory;
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.form.api.FormManagementService;
 import org.activiti.form.api.FormRepositoryService;
 import org.activiti.form.api.FormService;
@@ -85,7 +86,6 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.BeanFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -179,7 +179,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
   }
 
   public static FormEngineConfiguration createFormEngineConfigurationFromResource(String resource, String beanName) {
-    return (FormEngineConfiguration) parseEngineConfigurationFromResource(resource, beanName);
+    return (FormEngineConfiguration) BeansConfigurationHelper.parseEngineConfigurationFromResource(resource, beanName);
   }
 
   public static FormEngineConfiguration createFormEngineConfigurationFromInputStream(InputStream inputStream) {
@@ -187,7 +187,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
   }
 
   public static FormEngineConfiguration createFormEngineConfigurationFromInputStream(InputStream inputStream, String beanName) {
-    return (FormEngineConfiguration) parseEngineConfigurationFromInputStream(inputStream, beanName);
+    return (FormEngineConfiguration) BeansConfigurationHelper.parseEngineConfigurationFromInputStream(inputStream, beanName);
   }
 
   public static FormEngineConfiguration createStandaloneFormEngineConfiguration() {
@@ -221,6 +221,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
       initDbSchema();
     }
     
+    initBeans();
     initTransactionFactory();
     initSqlSessionFactory();
     initSessionFactories();
@@ -619,8 +620,8 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
     return this;
   }
 
-  public FormEngineConfiguration setBeanFactory(BeanFactory beanFactory) {
-    this.beanFactory = beanFactory;
+  public FormEngineConfiguration setBeans(Map<Object, Object> beans) {
+    this.beans = beans;
     return this;
   }
 

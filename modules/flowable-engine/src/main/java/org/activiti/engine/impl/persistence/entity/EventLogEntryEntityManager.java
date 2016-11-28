@@ -14,6 +14,7 @@ package org.activiti.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.activiti.engine.common.impl.persistence.entity.EntityManager;
 import org.activiti.engine.event.EventLogEntry;
 
 /**

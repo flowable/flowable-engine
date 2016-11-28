@@ -18,8 +18,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import io.swagger.annotations.*;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.rest.application.ContentTypeResolver;
 import org.activiti.rest.service.api.RestResponseFactory;

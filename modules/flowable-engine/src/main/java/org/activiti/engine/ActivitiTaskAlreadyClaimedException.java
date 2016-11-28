@@ -1,5 +1,7 @@
 package org.activiti.engine;
 
+import org.activiti.engine.common.api.ActivitiException;
+
 /**
  * This exception is thrown when you try to claim a task that is already claimed by someone else.
  * 

@@ -12,6 +12,9 @@
  */
 package org.activiti.rest.content;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.activiti.content.api.ContentItem;
 import org.activiti.rest.content.service.api.content.ContentItemResponse;
 
@@ -31,6 +34,15 @@ public class ContentRestResponseFactory {
     ContentItemResponse response = new ContentItemResponse(contentItem, 
         urlBuilder.buildUrl(ContentRestUrls.URL_CONTENT_ITEM, contentItem.getId()));
     return response;
+  }
+  
+  public List<ContentItemResponse> createContentItemResponseList(List<ContentItem> contentItems) {
+    ContentRestUrlBuilder urlBuilder = createUrlBuilder();
+    List<ContentItemResponse> responseList = new ArrayList<ContentItemResponse>();
+    for (ContentItem contentItem : contentItems) {
+      responseList.add(createContentItemResponse(contentItem, urlBuilder));
+    }
+    return responseList;
   }
 
   protected ContentRestUrlBuilder createUrlBuilder() {

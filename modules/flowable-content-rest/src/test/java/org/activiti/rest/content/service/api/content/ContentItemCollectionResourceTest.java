@@ -14,6 +14,7 @@ package org.activiti.rest.content.service.api.content;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -144,5 +145,182 @@ public class ContentItemCollectionResourceTest extends BaseSpringContentRestTest
         ContentRestUrls.URL_CONTENT_ITEM_COLLECTION));
     httpPost.setEntity(new StringEntity(requestNode.toString()));
     closeResponse(executeBinaryRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
+  }
+  
+  public void testGetContentItems() throws Exception {
+    try {
+      Calendar contentItemCreateCal = Calendar.getInstance();
+      contentItemCreateCal.set(Calendar.MILLISECOND, 0);
+
+      Calendar contentItem2CreateCal = Calendar.getInstance();
+      contentItem2CreateCal.add(Calendar.HOUR, 2);
+      contentItem2CreateCal.set(Calendar.MILLISECOND, 0);
+      
+      Calendar inBetweenCreateCal = Calendar.getInstance();
+      inBetweenCreateCal.add(Calendar.HOUR, 1);
+
+      contentEngineConfiguration.getClock().setCurrentTime(contentItemCreateCal.getTime());
+      ContentItem contentItem = contentService.newContentItem();
+      contentItem.setName("one.pdf");
+      contentItem.setMimeType("application/pdf");
+      contentItem.setTaskId("task1");
+      contentItem.setProcessInstanceId("process1");
+      contentItem.setContentStoreId("value1");
+      contentItem.setContentStoreName("store1");
+      contentItem.setField("name");
+      contentItem.setCreatedBy("test1");
+      contentItem.setLastModifiedBy("test1");
+      contentItem.setTenantId("tenant1");
+      
+      contentService.saveContentItem(contentItem);
+      
+      contentEngineConfiguration.getClock().setCurrentTime(contentItem2CreateCal.getTime());
+      ContentItem contentItem2 = contentService.newContentItem();
+      contentItem2.setName("two.pdf");
+      contentItem2.setMimeType("application/text");
+      contentItem2.setTaskId("task1");
+      contentItem2.setField("name2");
+      contentItem2.setCreatedBy("test1");
+      contentItem2.setLastModifiedBy("test3");
+      
+      contentService.saveContentItem(contentItem2, this.getClass().getClassLoader().getResourceAsStream("test.txt"));
+      long contentItem2Size = contentItem2.getContentSize();
+
+      String url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION);
+      assertResultsPresentInDataResponse(url, contentItem.getId(), contentItem2.getId());
+
+      // Name filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?name=one.pdf";
+      assertResultsPresentInDataResponse(url, contentItem.getId());
+
+      // Name like filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?nameLike=" + encode("%.pdf");
+      assertResultsPresentInDataResponse(url, contentItem.getId(), contentItem2.getId());
+
+      // Mime type filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?mimeType=" + encode("application/pdf");
+      assertResultsPresentInDataResponse(url, contentItem.getId());
+      
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?mimeType=" + encode("nonexisting");
+      assertEmptyResultsPresentInDataResponse(url);
+
+      // Mime type like filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?mimeTypeLike=" + encode("%pdf");
+      assertResultsPresentInDataResponse(url, contentItem.getId());
+      
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?mimeTypeLike=" + encode("%nonexisting");
+      assertEmptyResultsPresentInDataResponse(url);
+      
+      // Task id filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?taskId=task1";
+      assertResultsPresentInDataResponse(url, contentItem.getId(), contentItem2.getId());
+
+      // Task id like filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?taskIdLike=" + encode("task%");
+      assertResultsPresentInDataResponse(url, contentItem.getId(), contentItem2.getId());
+      
+      // Process instance id filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?processInstanceId=process1";
+      assertResultsPresentInDataResponse(url, contentItem.getId());
+
+      // Process instance id like filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?processInstanceIdLike=" + encode("process%");
+      assertResultsPresentInDataResponse(url, contentItem.getId());
+      
+      // Content store id filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?contentStoreId=value1";
+      assertResultsPresentInDataResponse(url, contentItem.getId());
+
+      // Content store id like filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?contentStoreIdLike=" + encode("value%");
+      assertResultsPresentInDataResponse(url, contentItem.getId());
+      
+      // Content store name filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?contentStoreName=file";
+      assertResultsPresentInDataResponse(url, contentItem2.getId());
+
+      // Content store name like filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?contentStoreNameLike=" + encode("fi%");
+      assertResultsPresentInDataResponse(url, contentItem2.getId());
+
+      // Content size filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?contentSize=" + contentItem2Size;
+      assertResultsPresentInDataResponse(url, contentItem2.getId());
+
+      // Minimum content size filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?minimumContentSize=1";
+      assertResultsPresentInDataResponse(url, contentItem2.getId());
+
+      // Maximum content size filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?maximumContentSize=999999";
+      assertResultsPresentInDataResponse(url, contentItem2.getId());
+      
+      // Field filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?field=name";
+      assertResultsPresentInDataResponse(url, contentItem.getId());
+
+      // Field like filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?fieldLike=" + encode("name%");
+      assertResultsPresentInDataResponse(url, contentItem.getId(), contentItem2.getId());
+
+      // CreatedOn filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?createdOn=" + getISODateString(contentItemCreateCal.getTime());
+      assertResultsPresentInDataResponse(url, contentItem.getId());
+
+      // CreatedAfter filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?createdAfter=" + getISODateString(inBetweenCreateCal.getTime());
+      assertResultsPresentInDataResponse(url, contentItem2.getId());
+
+      // CreatedBefore filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?createdBefore=" + getISODateString(inBetweenCreateCal.getTime());
+      assertResultsPresentInDataResponse(url, contentItem.getId());
+      
+      // Created by filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?createdBy=test1";
+      assertResultsPresentInDataResponse(url, contentItem.getId(), contentItem2.getId());
+
+      // Created by like filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?createdByLike=" + encode("test%");
+      assertResultsPresentInDataResponse(url, contentItem.getId(), contentItem2.getId());
+      
+      // LastModifiedOn filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?lastModifiedOn=" + getISODateString(contentItemCreateCal.getTime());
+      assertResultsPresentInDataResponse(url, contentItem.getId());
+
+      // LastModifiedAfter filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?lastModifiedAfter=" + getISODateString(inBetweenCreateCal.getTime());
+      assertResultsPresentInDataResponse(url, contentItem2.getId());
+
+      // LastModifiedBefore filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?lastModifiedBefore=" + getISODateString(inBetweenCreateCal.getTime());
+      assertResultsPresentInDataResponse(url, contentItem.getId());
+      
+      // LastModified by filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?lastModifiedBy=test3";
+      assertResultsPresentInDataResponse(url, contentItem2.getId());
+
+      // LastModified by like filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?lastModifiedByLike=" + encode("test%");
+      assertResultsPresentInDataResponse(url, contentItem.getId(), contentItem2.getId());
+
+      // Without tenantId filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?withoutTenantId=true";
+      assertResultsPresentInDataResponse(url, contentItem2.getId());
+
+      // Tenant id filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?tenantId=tenant1";
+      assertResultsPresentInDataResponse(url, contentItem.getId());
+
+      // Tenant id like filtering
+      url = ContentRestUrls.createRelativeResourceUrl(ContentRestUrls.URL_CONTENT_ITEM_COLLECTION) + "?tenantIdLike=" + encode("%enant1");
+      assertResultsPresentInDataResponse(url, contentItem.getId());
+
+    } finally {
+      // Clean content items even if test fails
+      List<ContentItem> contentItems = contentService.createContentItemQuery().list();
+      for (ContentItem contentItem : contentItems) {
+        contentService.deleteContentItem(contentItem.getId());
+      }
+    }
   }
 }

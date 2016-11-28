@@ -12,10 +12,10 @@
  */
 package org.activiti.engine.impl.jobexecutor;
 
+import org.activiti.engine.common.impl.cfg.TransactionPropagation;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
-import org.activiti.engine.impl.cfg.TransactionPropagation;
 import org.activiti.engine.impl.interceptor.Command;
-import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandContextCloseListener;
 import org.activiti.engine.impl.interceptor.CommandExecutor;

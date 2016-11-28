@@ -12,8 +12,8 @@
  */
 package org.activiti.idm.engine.impl.cfg;
 
-import org.activiti.engine.impl.cfg.BaseTransactionContext;
-import org.activiti.engine.impl.cfg.TransactionState;
+import org.activiti.engine.common.impl.cfg.BaseTransactionContext;
+import org.activiti.engine.common.impl.cfg.TransactionState;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 
 /**

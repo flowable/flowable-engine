@@ -15,7 +15,7 @@ package org.activiti.engine.impl.persistence.entity.data.impl;
 import java.util.HashMap;
 import java.util.List;
 
-import org.activiti.engine.impl.Page;
+import org.activiti.engine.common.impl.Page;
 import org.activiti.engine.impl.SuspendedJobQueryImpl;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.persistence.CachedEntityMatcher;

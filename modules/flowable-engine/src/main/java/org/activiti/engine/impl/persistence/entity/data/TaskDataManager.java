@@ -15,6 +15,7 @@ package org.activiti.engine.impl.persistence.entity.data;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 import org.activiti.engine.impl.TaskQueryImpl;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.task.Task;

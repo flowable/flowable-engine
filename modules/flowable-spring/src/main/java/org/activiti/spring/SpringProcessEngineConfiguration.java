@@ -18,13 +18,13 @@ import java.util.Collection;
 
 import javax.sql.DataSource;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.ProcessEngines;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.CommandInterceptor;
 import org.activiti.engine.impl.variable.EntityManagerSession;
 import org.activiti.spring.autodeployment.AutoDeploymentStrategy;

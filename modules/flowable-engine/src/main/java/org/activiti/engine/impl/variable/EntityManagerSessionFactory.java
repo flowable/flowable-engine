@@ -15,10 +15,10 @@ package org.activiti.engine.impl.variable;
 
 import javax.persistence.EntityManagerFactory;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.impl.interceptor.AbstractCommandContext;
-import org.activiti.engine.impl.interceptor.Session;
-import org.activiti.engine.impl.interceptor.SessionFactory;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.impl.interceptor.AbstractCommandContext;
+import org.activiti.engine.common.impl.interceptor.Session;
+import org.activiti.engine.common.impl.interceptor.SessionFactory;
 
 /**
  * @author Frederik Heremans

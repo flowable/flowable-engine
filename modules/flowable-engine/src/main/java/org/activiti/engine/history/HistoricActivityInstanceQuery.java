@@ -13,7 +13,7 @@
 
 package org.activiti.engine.history;
 
-import org.activiti.engine.query.Query;
+import org.activiti.engine.common.api.query.Query;
 
 /**
  * Programmatic querying for {@link HistoricActivityInstance}s.

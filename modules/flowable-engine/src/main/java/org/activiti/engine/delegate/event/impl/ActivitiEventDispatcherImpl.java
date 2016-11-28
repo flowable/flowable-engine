@@ -13,12 +13,12 @@
 package org.activiti.engine.delegate.event.impl;
 
 import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventType;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.delegate.event.ActivitiEngineEvent;
 import org.activiti.engine.impl.interceptor.CommandContext;

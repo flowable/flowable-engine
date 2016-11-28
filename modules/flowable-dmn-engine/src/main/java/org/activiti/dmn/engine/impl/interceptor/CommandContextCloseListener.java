@@ -1,6 +1,6 @@
 package org.activiti.dmn.engine.impl.interceptor;
 
-import org.activiti.engine.impl.interceptor.BaseCommandContextCloseListener;
+import org.activiti.engine.common.impl.interceptor.BaseCommandContextCloseListener;
 
 /**
  * A listener that can be used to be notified of lifecycle events of the command context.

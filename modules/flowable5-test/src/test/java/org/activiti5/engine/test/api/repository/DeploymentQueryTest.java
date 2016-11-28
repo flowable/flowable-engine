@@ -15,8 +15,8 @@ package org.activiti5.engine.test.api.repository;
 
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.DeploymentProperties;

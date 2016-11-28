@@ -23,7 +23,7 @@ import javax.annotation.PostConstruct;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.impl.util.IoUtil;
+import org.activiti.engine.common.impl.util.IoUtil;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.activiti.idm.api.Group;

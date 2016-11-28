@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,9 +12,8 @@
  */
 package org.activiti.engine.impl.agenda;
 
-import java.util.LinkedList;
-
 import org.activiti.engine.FlowableEngineAgenda;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.delegate.ActivityBehavior;
 import org.activiti.engine.impl.interceptor.Command;
@@ -24,16 +23,18 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.LinkedList;
+
 /**
  * For each API call (and thus {@link Command}) being executed, a new agenda instance is created.
  * On this agenda, operations are put, which the {@link CommandExecutor} will keep executing until
  * all are executed.
- * 
- * The agenda also gives easy access to methods to plan new operations when writing 
+ *
+ * The agenda also gives easy access to methods to plan new operations when writing
  * {@link ActivityBehavior} implementations.
- * 
+ *
  * During a {@link Command} execution, the agenda can always be fetched using {@link Context#getAgenda()}.
- * 
+ *
  * @author Joram Barrez
  */
 public class DefaultFlowableEngineAgenda implements FlowableEngineAgenda {
@@ -53,7 +54,19 @@ public class DefaultFlowableEngineAgenda implements FlowableEngineAgenda {
   }
 
   public Runnable getNextOperation() {
+    assertOperationsNotEmpty();
     return operations.poll();
+  }
+
+  public Runnable peekOperation() {
+    assertOperationsNotEmpty();
+    return operations.peek();
+  }
+
+  private void assertOperationsNotEmpty() {
+    if (operations.isEmpty()) {
+      throw new ActivitiException("Unable to peek empty agenda.");
+    }
   }
 
   /**
@@ -84,11 +97,11 @@ public class DefaultFlowableEngineAgenda implements FlowableEngineAgenda {
   public void planContinueProcessSynchronousOperation(ExecutionEntity execution) {
     planOperation(new ContinueProcessOperation(commandContext, execution, true, false), execution);
   }
-  
+
   public void planContinueProcessInCompensation(ExecutionEntity execution) {
     planOperation(new ContinueProcessOperation(commandContext, execution, false, true), execution);
   }
-  
+
   public void planContinueMultiInstanceOperation(ExecutionEntity execution) {
     planOperation(new ContinueMultiInstanceOperation(commandContext, execution), execution);
   }
@@ -96,7 +109,7 @@ public class DefaultFlowableEngineAgenda implements FlowableEngineAgenda {
   public void planTakeOutgoingSequenceFlowsOperation(ExecutionEntity execution, boolean evaluateConditions) {
     planOperation(new TakeOutgoingSequenceFlowsOperation(commandContext, execution, evaluateConditions), execution);
   }
-  
+
   public void planEndExecutionOperation(ExecutionEntity execution) {
     planOperation(new EndExecutionOperation(commandContext, execution), execution);
   }
@@ -108,7 +121,7 @@ public class DefaultFlowableEngineAgenda implements FlowableEngineAgenda {
   public void planDestroyScopeOperation(ExecutionEntity execution) {
     planOperation(new DestroyScopeOperation(commandContext, execution), execution);
   }
-  
+
   public void planExecuteInactiveBehaviorsOperation() {
     planOperation(new ExecuteInactiveBehaviorsOperation(commandContext));
   }

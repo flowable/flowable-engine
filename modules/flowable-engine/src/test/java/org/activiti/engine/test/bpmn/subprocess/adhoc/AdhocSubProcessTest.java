@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.bpmn.model.FlowNode;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;

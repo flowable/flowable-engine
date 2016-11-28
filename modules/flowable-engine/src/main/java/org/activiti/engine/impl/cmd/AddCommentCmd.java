@@ -13,8 +13,8 @@
 
 package org.activiti.engine.impl.cmd;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
 import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.engine.impl.interceptor.Command;

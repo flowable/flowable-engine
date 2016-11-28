@@ -14,8 +14,8 @@ package org.activiti.spring.configurator;
 
 import javax.sql.DataSource;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.cfg.AbstractProcessEngineConfigurator;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.idm.engine.IdmEngine;
 import org.activiti.idm.engine.IdmEngineConfiguration;

@@ -12,7 +12,7 @@
  */
 package org.activiti.rest.form.service.api.repository;
 
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.form.api.FormRepositoryService;
 import org.activiti.form.api.FormService;
 import org.activiti.form.model.FormModel;

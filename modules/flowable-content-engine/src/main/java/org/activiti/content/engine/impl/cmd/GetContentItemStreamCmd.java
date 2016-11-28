@@ -20,8 +20,8 @@ import org.activiti.content.api.ContentObject;
 import org.activiti.content.api.ContentStorage;
 import org.activiti.content.engine.impl.interceptor.Command;
 import org.activiti.content.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 
 /**
  * @author Tijs Rademakers

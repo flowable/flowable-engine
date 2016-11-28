@@ -16,6 +16,8 @@ package org.activiti.engine.impl.persistence.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.activiti.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
+
 /**
  * @author Tom Baeyens
  * @author Joram Barrez

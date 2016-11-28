@@ -13,8 +13,8 @@
 
 package org.activiti.rest.form;
 
-import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.ProcessEngines;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.engine.form.AbstractFormType;
 import org.activiti.idm.api.User;
 

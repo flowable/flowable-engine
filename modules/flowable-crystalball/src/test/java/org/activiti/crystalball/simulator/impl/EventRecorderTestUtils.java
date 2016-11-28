@@ -13,10 +13,10 @@
 package org.activiti.crystalball.simulator.impl;
 
 import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.engine.impl.ProcessEngineImpl;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.runtime.Clock;
 
 import java.util.Calendar;
 

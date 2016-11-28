@@ -29,8 +29,8 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.bpmn.parser.BpmnParser;
 import org.activiti.engine.repository.DiagramElement;
 import org.activiti.engine.repository.DiagramLayout;

@@ -16,10 +16,10 @@ package org.activiti.standalone.calendar;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.activiti.engine.common.impl.util.DefaultClockImpl;
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.engine.impl.calendar.CycleBusinessCalendar;
 import org.activiti.engine.impl.test.AbstractTestCase;
-import org.activiti.engine.impl.util.DefaultClockImpl;
-import org.activiti.engine.runtime.Clock;
 
 public class CycleBusinessCalendarTest extends AbstractTestCase {
 

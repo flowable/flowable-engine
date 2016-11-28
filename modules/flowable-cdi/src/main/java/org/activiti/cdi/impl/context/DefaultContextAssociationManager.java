@@ -28,8 +28,8 @@ import javax.inject.Scope;
 
 import org.activiti.cdi.ActivitiCdiException;
 import org.activiti.cdi.impl.util.ProgrammaticBeanLookup;
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.context.ExecutionContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;

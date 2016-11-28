@@ -14,8 +14,8 @@ package org.activiti5.engine.test.api.event;
 
 import java.io.ByteArrayInputStream;
 
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.impl.delegate.event.ActivitiEngineEntityEvent;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.impl.identity.Authentication;

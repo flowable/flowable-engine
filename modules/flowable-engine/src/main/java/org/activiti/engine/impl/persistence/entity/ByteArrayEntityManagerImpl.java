@@ -15,9 +15,9 @@ package org.activiti.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.persistence.entity.data.ByteArrayDataManager;
-import org.activiti.engine.impl.persistence.entity.data.DataManager;
 
 
 /**

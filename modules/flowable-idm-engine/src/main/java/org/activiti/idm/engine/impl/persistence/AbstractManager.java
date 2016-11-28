@@ -13,7 +13,7 @@
 
 package org.activiti.idm.engine.impl.persistence;
 
-import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.context.Context;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;

@@ -14,16 +14,16 @@ package org.activiti5.engine.delegate.event.impl;
 
 import java.util.Map;
 
+import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiExceptionEvent;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.event.ActivitiActivityCancelledEvent;
 import org.activiti.engine.delegate.event.ActivitiActivityEvent;
 import org.activiti.engine.delegate.event.ActivitiCancelledEvent;
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
 import org.activiti.engine.delegate.event.ActivitiEntityWithVariablesEvent;
 import org.activiti.engine.delegate.event.ActivitiErrorEvent;
-import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.delegate.event.ActivitiExceptionEvent;
 import org.activiti.engine.delegate.event.ActivitiMessageEvent;
 import org.activiti.engine.delegate.event.ActivitiProcessStartedEvent;
 import org.activiti.engine.delegate.event.ActivitiSequenceFlowTakenEvent;

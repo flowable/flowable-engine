@@ -6,7 +6,7 @@ import java.util.Date;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.IntermediateCatchEvent;
 import org.activiti.bpmn.model.TimerEventDefinition;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.delegate.VariableScope;
 import org.activiti.engine.impl.calendar.BusinessCalendar;

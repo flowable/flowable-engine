@@ -16,7 +16,7 @@ package org.activiti.idm.spring;
 import java.net.URL;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.idm.engine.IdmEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

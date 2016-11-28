@@ -12,7 +12,7 @@
  */
 package org.activiti5.engine.test.api.event;
 
-import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.BaseEntityEventListener;
 import org.activiti.engine.delegate.event.impl.ActivitiEventDispatcherImpl;

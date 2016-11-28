@@ -1135,7 +1135,7 @@ public class VariablesTest extends PluggableActivitiTestCase {
     } catch (Exception e) {
       runtimeService.deleteProcessInstance(processInstance.getId(), "intentional exception in script task");
 
-      assertEquals("class org.activiti.engine.ActivitiException", e.getClass().toString());
+      assertEquals("class org.activiti.engine.common.api.ActivitiException", e.getClass().toString());
     }
 
     // No we put null property, This should be put into the variable. We do not expect exceptions

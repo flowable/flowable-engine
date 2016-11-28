@@ -15,8 +15,8 @@ package org.activiti5.engine.test.api.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
 import org.activiti5.engine.impl.persistence.entity.TaskEntity;
 import org.activiti5.engine.task.Task;
 

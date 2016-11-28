@@ -15,7 +15,7 @@ package org.activiti.content.engine.impl.persistence.entity;
 import java.util.Date;
 
 import org.activiti.content.api.ContentItem;
-import org.activiti.engine.impl.persistence.entity.Entity;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
 
 /**
  * @author Joram Barrez

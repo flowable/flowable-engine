@@ -22,8 +22,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.runtime.process.SignalEventReceivedRequest;

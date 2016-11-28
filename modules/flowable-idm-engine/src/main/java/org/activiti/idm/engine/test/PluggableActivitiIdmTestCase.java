@@ -15,7 +15,7 @@ package org.activiti.idm.engine.test;
 
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.idm.api.Capability;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.User;

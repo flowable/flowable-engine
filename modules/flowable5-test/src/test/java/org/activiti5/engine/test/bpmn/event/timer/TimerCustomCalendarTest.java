@@ -7,7 +7,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.util.Date;
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.calendar.BusinessCalendar;
 import org.activiti.engine.runtime.Job;
 import org.activiti.engine.runtime.ProcessInstance;

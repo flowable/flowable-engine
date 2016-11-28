@@ -14,7 +14,7 @@ package org.activiti.dmn.engine.impl.mvel;
 
 import java.util.Date;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;

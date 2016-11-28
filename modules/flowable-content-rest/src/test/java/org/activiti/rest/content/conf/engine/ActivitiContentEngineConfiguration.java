@@ -16,7 +16,7 @@ import org.activiti.content.api.ContentService;
 import org.activiti.content.engine.ContentEngine;
 import org.activiti.content.engine.ContentEngineConfiguration;
 import org.activiti.content.engine.impl.cfg.StandaloneInMemContentEngineConfiguration;
-import org.activiti.engine.AbstractEngineConfiguration;
+import org.activiti.engine.common.AbstractEngineConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

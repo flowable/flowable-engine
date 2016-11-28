@@ -14,7 +14,7 @@ package org.activiti.spring.test.fieldinjection;
 
 import java.util.Map;
 
-import org.activiti.engine.impl.util.CollectionUtil;
+import org.activiti.engine.common.impl.util.CollectionUtil;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.test.Deployment;
 import org.activiti.spring.impl.test.SpringActivitiTestCase;

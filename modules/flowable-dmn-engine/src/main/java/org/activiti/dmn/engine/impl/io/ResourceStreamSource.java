@@ -15,8 +15,8 @@ package org.activiti.dmn.engine.impl.io;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.util.io.StreamSource;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.util.io.StreamSource;
 
 
 /**

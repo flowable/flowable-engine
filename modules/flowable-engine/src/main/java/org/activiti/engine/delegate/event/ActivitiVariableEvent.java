@@ -12,6 +12,7 @@
  */
 package org.activiti.engine.delegate.event;
 
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
 import org.activiti.engine.impl.delegate.event.ActivitiEngineEvent;
 import org.activiti.engine.impl.variable.VariableType;
 

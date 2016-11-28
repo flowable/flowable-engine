@@ -16,6 +16,7 @@ package org.activiti.engine.impl.persistence.entity;
 import java.util.Date;
 import java.util.List;
 
+import org.activiti.engine.common.impl.persistence.entity.Entity;
 import org.activiti.engine.history.HistoricTaskInstance;
 
 /**

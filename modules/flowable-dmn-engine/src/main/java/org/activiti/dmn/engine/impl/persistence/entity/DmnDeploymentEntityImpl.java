@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.dmn.engine.DmnEngineConfiguration;
-import org.activiti.engine.impl.persistence.entity.AbstractEntityNoRevision;
+import org.activiti.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
 
 /**
  * @author Tijs Rademakers

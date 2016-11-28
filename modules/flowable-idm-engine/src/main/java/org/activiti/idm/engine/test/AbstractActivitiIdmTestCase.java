@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.idm.api.IdmIdentityService;
 import org.activiti.idm.api.IdmManagementService;
 import org.activiti.idm.engine.IdmEngine;

@@ -12,6 +12,10 @@
  */
 package org.activiti.engine.delegate.event;
 
+import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+
 /**
  * Base event listener that can be used when implementing an {@link ActivitiEventListener} to get notified when an entity is created, updated, deleted or if another entity-related event occurs.
  * 

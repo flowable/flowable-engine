@@ -16,10 +16,10 @@ package org.activiti.camel;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.common.api.ActivitiException;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Consumer;
 import org.apache.camel.Exchange;

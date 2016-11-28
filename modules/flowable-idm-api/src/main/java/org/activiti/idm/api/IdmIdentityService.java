@@ -14,7 +14,7 @@ package org.activiti.idm.api;
 
 import java.util.List;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 
 /**
  * Service to manage {@link User}s and {@link Group}s.
@@ -49,7 +49,7 @@ public interface IdmIdentityService {
   UserQuery createUserQuery();
 
   /**
-   * Returns a new {@link org.activiti.engine.query.NativeQuery} for tasks.
+   * Returns a new {@link org.activiti.engine.common.api.query.NativeQuery} for tasks.
    */
   NativeUserQuery createNativeUserQuery();
 
@@ -73,7 +73,7 @@ public interface IdmIdentityService {
   GroupQuery createGroupQuery();
 
   /**
-   * Returns a new {@link org.activiti.engine.query.NativeQuery} for tasks.
+   * Returns a new {@link org.activiti.engine.common.api.query.NativeQuery} for tasks.
    */
   NativeGroupQuery createNativeGroupQuery();
 

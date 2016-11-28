@@ -18,7 +18,7 @@ import org.activiti.dmn.engine.impl.interceptor.Command;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
 import org.activiti.dmn.engine.impl.util.DecisionTableUtil;
 import org.activiti.dmn.model.DmnDefinition;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 
 /**
  * @author Joram Barrez

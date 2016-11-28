@@ -28,10 +28,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.EngineInfo;
+import org.activiti.engine.common.EngineInfo;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.util.IoUtil;
 import org.activiti.idm.engine.impl.util.ReflectUtil;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -176,7 +176,7 @@ public abstract class IdmEngines {
     } catch (IOException e) {
       throw new ActivitiException("couldn't open resource stream: " + e.getMessage(), e);
     } finally {
-      IOUtils.closeQuietly(inputStream);
+      IoUtil.closeSilently(inputStream);
     }
   }
 

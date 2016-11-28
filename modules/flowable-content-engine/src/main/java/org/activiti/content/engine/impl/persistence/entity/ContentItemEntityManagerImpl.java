@@ -19,8 +19,8 @@ import org.activiti.content.api.ContentItem;
 import org.activiti.content.engine.ContentEngineConfiguration;
 import org.activiti.content.engine.impl.ContentItemQueryImpl;
 import org.activiti.content.engine.impl.persistence.entity.data.ContentItemDataManager;
-import org.activiti.engine.impl.Page;
-import org.activiti.engine.impl.persistence.entity.data.DataManager;
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Tijs Rademakers

@@ -24,8 +24,8 @@ import org.activiti.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.activiti.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManager;
 import org.activiti.dmn.engine.impl.persistence.entity.ResourceEntity;
 import org.activiti.dmn.model.DmnDefinition;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 
 /**
  * @author Tijs Rademakers

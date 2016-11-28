@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.app.security.ActivitiAppUser;
 import org.activiti.app.security.AuthoritiesConstants;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.IdmIdentityService;

@@ -16,7 +16,7 @@ package org.activiti.engine.impl.form;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.form.AbstractFormType;
 import org.activiti.engine.form.FormProperty;

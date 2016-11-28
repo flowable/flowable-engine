@@ -15,7 +15,7 @@ package org.activiti.engine.impl;
 
 import java.io.Serializable;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.activiti.engine.impl.variable.ByteArrayType;

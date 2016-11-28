@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.activiti.engine.RepositoryService;
-import org.activiti.engine.impl.util.IoUtil;
+import org.activiti.engine.common.impl.util.IoUtil;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.DeploymentQuery;
 import org.activiti.engine.repository.ProcessDefinition;

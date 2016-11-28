@@ -15,7 +15,7 @@ package org.activiti5.engine.impl.util.io;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 
-import org.activiti.engine.impl.util.io.StreamSource;
+import org.activiti.engine.common.impl.util.io.StreamSource;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.impl.util.ReflectUtil;
 

@@ -25,8 +25,8 @@ import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.TimerEventDefinition;
 import org.activiti.bpmn.model.UserTask;
+import org.activiti.engine.common.impl.util.io.InputStreamSource;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
-import org.activiti.engine.impl.util.io.InputStreamSource;
 import org.activiti.engine.repository.Deployment;
 
 /**

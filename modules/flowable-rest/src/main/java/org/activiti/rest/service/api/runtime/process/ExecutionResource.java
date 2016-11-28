@@ -17,7 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.runtime.Execution;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;

@@ -2,7 +2,7 @@ package org.activiti.content.engine.impl.cmd;
 
 import org.activiti.content.engine.impl.interceptor.Command;
 import org.activiti.content.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.impl.cmd.CustomSqlExecution;
+import org.activiti.engine.common.impl.cmd.CustomSqlExecution;
 
 /**
  * @author jbarrez

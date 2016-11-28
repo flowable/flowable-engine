@@ -20,6 +20,8 @@ import java.util.List;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.dmn.api.DecisionTable;
 import org.activiti.engine.app.AppModel;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.engine.repository.DeploymentQuery;
 import org.activiti.engine.repository.DiagramLayout;
@@ -132,7 +134,7 @@ public interface RepositoryService {
   ProcessDefinitionQuery createProcessDefinitionQuery();
 
   /**
-   * Returns a new {@link org.activiti.engine.query.NativeQuery} for process definitions.
+   * Returns a new {@link org.activiti.engine.common.api.query.NativeQuery} for process definitions.
    */
   NativeProcessDefinitionQuery createNativeProcessDefinitionQuery();
 
@@ -140,7 +142,7 @@ public interface RepositoryService {
   DeploymentQuery createDeploymentQuery();
 
   /**
-   * Returns a new {@link org.activiti.engine.query.NativeQuery} for deployment.
+   * Returns a new {@link org.activiti.engine.common.api.query.NativeQuery} for deployment.
    */
   NativeDeploymentQuery createNativeDeploymentQuery();
 
@@ -382,7 +384,7 @@ public interface RepositoryService {
   public ModelQuery createModelQuery();
 
   /**
-   * Returns a new {@link org.activiti.engine.query.NativeQuery} for process definitions.
+   * Returns a new {@link org.activiti.engine.common.api.query.NativeQuery} for process definitions.
    */
   NativeModelQuery createNativeModelQuery();
 

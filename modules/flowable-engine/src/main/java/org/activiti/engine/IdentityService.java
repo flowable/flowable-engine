@@ -14,6 +14,7 @@ package org.activiti.engine;
 
 import java.util.List;
 
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.GroupQuery;
 import org.activiti.idm.api.NativeGroupQuery;
@@ -53,7 +54,7 @@ public interface IdentityService {
   UserQuery createUserQuery();
 
   /**
-   * Returns a new {@link org.activiti.engine.query.NativeQuery} for tasks.
+   * Returns a new {@link org.activiti.engine.common.api.query.NativeQuery} for tasks.
    */
   NativeUserQuery createNativeUserQuery();
 
@@ -77,7 +78,7 @@ public interface IdentityService {
   GroupQuery createGroupQuery();
 
   /**
-   * Returns a new {@link org.activiti.engine.query.NativeQuery} for tasks.
+   * Returns a new {@link org.activiti.engine.common.api.query.NativeQuery} for tasks.
    */
   NativeGroupQuery createNativeGroupQuery();
   

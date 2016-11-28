@@ -16,7 +16,7 @@ import java.text.ParseException;
 import java.util.Date;
 
 import org.activiti.app.model.runtime.RestVariable;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;

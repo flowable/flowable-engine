@@ -20,12 +20,13 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.activiti.engine.cfg.MailServerInfo;
+import org.activiti.engine.common.AbstractEngineConfiguration;
+import org.activiti.engine.common.impl.cfg.BeansConfigurationHelper;
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
-import org.activiti.engine.impl.cfg.BeansConfigurationHelper;
 import org.activiti.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.runtime.Clock;
 import org.activiti.image.ProcessDiagramGenerator;
 
 /**
@@ -144,7 +145,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
   }
 
   public static ProcessEngineConfiguration createProcessEngineConfigurationFromResource(String resource, String beanName) {
-    return BeansConfigurationHelper.parseProcessEngineConfigurationFromResource(resource, beanName);
+    return (ProcessEngineConfiguration) BeansConfigurationHelper.parseEngineConfigurationFromResource(resource, beanName);
   }
 
   public static ProcessEngineConfiguration createProcessEngineConfigurationFromInputStream(InputStream inputStream) {
@@ -152,7 +153,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
   }
 
   public static ProcessEngineConfiguration createProcessEngineConfigurationFromInputStream(InputStream inputStream, String beanName) {
-    return BeansConfigurationHelper.parseProcessEngineConfigurationFromInputStream(inputStream, beanName);
+    return (ProcessEngineConfiguration) BeansConfigurationHelper.parseEngineConfigurationFromInputStream(inputStream, beanName);
   }
 
   public static ProcessEngineConfiguration createStandaloneProcessEngineConfiguration() {

@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.activiti.content.engine.ContentEngineConfiguration;
-import org.activiti.engine.impl.persistence.entity.AbstractEntityNoRevision;
+import org.activiti.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
 
 /**
  * @author Joram Barrez

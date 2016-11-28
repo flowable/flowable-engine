@@ -15,6 +15,7 @@ package org.activiti.engine.impl;
 
 import java.util.List;
 
+import org.activiti.engine.common.impl.Page;
 import org.activiti.engine.history.HistoricDetail;
 import org.activiti.engine.history.HistoricDetailQuery;
 import org.activiti.engine.impl.interceptor.CommandContext;

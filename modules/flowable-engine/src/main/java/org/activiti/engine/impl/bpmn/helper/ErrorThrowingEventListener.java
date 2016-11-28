@@ -12,10 +12,10 @@
  */
 package org.activiti.engine.impl.bpmn.helper;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.delegate.event.ActivitiEngineEvent;
 import org.activiti.engine.impl.interceptor.CommandContext;

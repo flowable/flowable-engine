@@ -15,7 +15,7 @@ package org.activiti.engine.impl.calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 
 /**
  * @author Tom Baeyens

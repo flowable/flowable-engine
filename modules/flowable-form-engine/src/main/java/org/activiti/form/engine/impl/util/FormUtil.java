@@ -12,7 +12,7 @@
  */
 package org.activiti.form.engine.impl.util;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.context.Context;
 import org.activiti.form.engine.impl.persistence.deploy.DeploymentManager;

@@ -3,8 +3,8 @@ package org.activiti5.engine.impl.event.logger.handler;
 import java.util.Date;
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
 import org.activiti.engine.impl.persistence.deploy.DeploymentCache;
 import org.activiti.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.activiti.engine.repository.ProcessDefinition;

@@ -25,7 +25,7 @@ import org.activiti.content.engine.impl.db.DbSqlSession;
 import org.activiti.content.engine.impl.interceptor.Command;
 import org.activiti.content.engine.impl.interceptor.CommandContext;
 import org.activiti.content.engine.impl.interceptor.CommandExecutor;
-import org.activiti.engine.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.junit.Assert;
 
 import junit.framework.AssertionFailedError;

@@ -16,9 +16,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.common.impl.interceptor.Session;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
 import org.activiti.engine.impl.interceptor.Command;
-import org.activiti.engine.impl.interceptor.Session;
-import org.activiti.engine.impl.persistence.entity.Entity;
 
 /**
  * This is a cache for {@link Entity} instances during the execution of one {@link Command}.

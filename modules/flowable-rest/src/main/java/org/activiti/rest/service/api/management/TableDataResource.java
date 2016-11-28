@@ -16,11 +16,12 @@ package org.activiti.rest.service.api.management;
 import java.util.Map;
 
 import io.swagger.annotations.*;
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+
 import org.activiti.engine.ManagementService;
-import org.activiti.engine.management.TablePage;
-import org.activiti.engine.management.TablePageQuery;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.management.TablePage;
+import org.activiti.engine.common.api.management.TablePageQuery;
 import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;

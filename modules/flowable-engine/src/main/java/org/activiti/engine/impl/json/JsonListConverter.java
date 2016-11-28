@@ -16,7 +16,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.util.json.JSONArray;
 
 /**

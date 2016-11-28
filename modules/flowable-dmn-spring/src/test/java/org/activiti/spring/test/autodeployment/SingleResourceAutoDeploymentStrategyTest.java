@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.activiti.dmn.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

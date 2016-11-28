@@ -16,8 +16,8 @@ import java.util.List;
 
 import org.activiti.content.api.ContentItem;
 import org.activiti.content.engine.impl.ContentItemQueryImpl;
-import org.activiti.engine.impl.Page;
-import org.activiti.engine.impl.persistence.entity.EntityManager;
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.persistence.entity.EntityManager;
 
 /**
  * @author Joram Barrez

@@ -17,11 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

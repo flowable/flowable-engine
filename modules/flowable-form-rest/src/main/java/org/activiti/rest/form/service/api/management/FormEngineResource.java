@@ -12,8 +12,8 @@
  */
 package org.activiti.rest.form.service.api.management;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.EngineInfo;
+import org.activiti.engine.common.EngineInfo;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.form.engine.FormEngine;
 import org.activiti.form.engine.FormEngines;
 import org.springframework.web.bind.annotation.RequestMapping;

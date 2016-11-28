@@ -18,8 +18,8 @@ import java.util.Map;
 import org.activiti.dmn.api.DecisionTable;
 import org.activiti.dmn.engine.impl.DecisionTableQueryImpl;
 import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntity;
-import org.activiti.engine.impl.Page;
-import org.activiti.engine.impl.persistence.entity.data.DataManager;
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Joram Barrez

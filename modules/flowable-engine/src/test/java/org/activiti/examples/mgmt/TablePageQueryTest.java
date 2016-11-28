@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.common.api.management.TablePage;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
-import org.activiti.engine.management.TablePage;
 import org.activiti.engine.task.Task;
 
 /**

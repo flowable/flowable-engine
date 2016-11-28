@@ -16,6 +16,8 @@ package org.activiti.engine.impl.persistence.entity;
 
 import java.util.Date;
 
+import org.activiti.engine.common.impl.persistence.entity.Entity;
+
 /**
  * @author Joram Barrez
  */

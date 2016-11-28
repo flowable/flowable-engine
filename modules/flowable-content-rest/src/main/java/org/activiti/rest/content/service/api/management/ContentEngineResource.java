@@ -14,8 +14,8 @@ package org.activiti.rest.content.service.api.management;
 
 import org.activiti.content.engine.ContentEngine;
 import org.activiti.content.engine.ContentEngines;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.EngineInfo;
+import org.activiti.engine.common.EngineInfo;
+import org.activiti.engine.common.api.ActivitiException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;

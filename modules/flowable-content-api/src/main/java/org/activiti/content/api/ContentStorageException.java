@@ -12,7 +12,7 @@
  */
 package org.activiti.content.api;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 
 /**
  * @author Frederik Heremans

@@ -2,7 +2,7 @@ package org.activiti.form.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.form.engine.impl.interceptor.Command;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
 

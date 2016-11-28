@@ -18,8 +18,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.impl.Page;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.impl.Page;
 import org.activiti.form.api.FormInstance;
 import org.activiti.form.api.FormInstanceQuery;
 import org.activiti.form.engine.impl.interceptor.CommandContext;

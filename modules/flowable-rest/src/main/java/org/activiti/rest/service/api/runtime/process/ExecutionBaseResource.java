@@ -17,11 +17,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.query.QueryProperty;
 import org.activiti.engine.impl.ExecutionQueryProperty;
-import org.activiti.engine.query.QueryProperty;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ExecutionQuery;
 import org.activiti.rest.api.DataResponse;

@@ -12,9 +12,9 @@
  */
 package org.activiti.engine.delegate.event.impl;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.impl.delegate.event.ActivitiEngineEntityEvent;
 
 /**

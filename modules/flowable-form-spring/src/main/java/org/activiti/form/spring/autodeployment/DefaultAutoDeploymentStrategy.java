@@ -15,7 +15,7 @@ package org.activiti.form.spring.autodeployment;
 
 import java.io.IOException;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.form.api.FormDeploymentBuilder;
 import org.activiti.form.api.FormRepositoryService;
 import org.springframework.core.io.Resource;

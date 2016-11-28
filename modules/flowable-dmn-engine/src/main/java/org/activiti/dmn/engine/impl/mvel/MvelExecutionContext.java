@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.activiti.dmn.api.DecisionExecutionAuditContainer;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.apache.commons.lang3.StringUtils;
 import org.mvel2.ParserContext;
 import org.mvel2.integration.PropertyHandler;

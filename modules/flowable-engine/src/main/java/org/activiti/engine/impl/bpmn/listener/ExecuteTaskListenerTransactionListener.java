@@ -12,12 +12,12 @@
  */
 package org.activiti.engine.impl.bpmn.listener;
 
+import org.activiti.engine.common.impl.cfg.TransactionPropagation;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.TransactionDependentTaskListener;
 import org.activiti.engine.impl.cfg.TransactionListener;
-import org.activiti.engine.impl.cfg.TransactionPropagation;
 import org.activiti.engine.impl.interceptor.Command;
-import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 

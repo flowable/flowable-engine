@@ -17,11 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
 import org.activiti.engine.delegate.VariableScope;
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.persistence.entity.VariableInstance;
 import org.activiti.engine.task.IdentityLink;

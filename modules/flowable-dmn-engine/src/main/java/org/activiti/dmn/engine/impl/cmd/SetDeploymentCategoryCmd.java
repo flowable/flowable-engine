@@ -15,8 +15,8 @@ package org.activiti.dmn.engine.impl.cmd;
 import org.activiti.dmn.engine.impl.interceptor.Command;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
 import org.activiti.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 
 /**
  * @author Tijs Rademakers

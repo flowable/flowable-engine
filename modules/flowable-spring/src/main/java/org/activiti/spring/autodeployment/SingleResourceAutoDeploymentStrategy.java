@@ -13,8 +13,8 @@
 
 package org.activiti.spring.autodeployment;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.springframework.core.io.Resource;
 

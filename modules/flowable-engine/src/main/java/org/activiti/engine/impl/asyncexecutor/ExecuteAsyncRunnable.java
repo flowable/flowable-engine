@@ -12,7 +12,8 @@
  */
 package org.activiti.engine.impl.asyncexecutor;
 
-import org.activiti.engine.ActivitiOptimisticLockingException;
+import org.activiti.engine.common.api.ActivitiOptimisticLockingException;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
@@ -22,7 +23,6 @@ import org.activiti.engine.impl.cmd.LockExclusiveJobCmd;
 import org.activiti.engine.impl.cmd.UnlockExclusiveJobCmd;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.Command;
-import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.jobexecutor.FailedJobCommandFactory;
 import org.activiti.engine.impl.persistence.entity.JobEntity;

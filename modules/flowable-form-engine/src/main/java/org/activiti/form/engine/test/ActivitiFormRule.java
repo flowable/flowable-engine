@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.form.api.FormRepositoryService;
 import org.activiti.form.engine.FormEngine;
 import org.activiti.form.engine.FormEngineConfiguration;

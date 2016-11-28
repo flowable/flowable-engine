@@ -14,7 +14,7 @@ package org.activiti.rest.form.service.api.repository;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.form.api.FormDefinition;
 import org.activiti.form.api.FormRepositoryService;
 import org.activiti.rest.form.FormRestResponseFactory;

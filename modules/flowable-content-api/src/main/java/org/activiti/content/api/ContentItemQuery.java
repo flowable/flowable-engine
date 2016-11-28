@@ -16,7 +16,7 @@ package org.activiti.content.api;
 import java.util.Date;
 import java.util.Set;
 
-import org.activiti.engine.query.Query;
+import org.activiti.engine.common.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link ContentItem}s.
@@ -34,6 +34,16 @@ public interface ContentItemQuery extends Query<ContentItemQuery, ContentItem> {
    * Only select content items with the given ids.
    */
   ContentItemQuery ids(Set<String> ids);
+  
+  /**
+   * Only select content items with the given name.
+   */
+  ContentItemQuery name(String name);
+
+  /**
+   * Only select content items with a name like the given string.
+   */
+  ContentItemQuery nameLike(String nameLike);
   
   /**
    * Only select content items with the given mime type.
@@ -104,6 +114,16 @@ public interface ContentItemQuery extends Query<ContentItemQuery, ContentItem> {
    * Only select content items with the given maximum content size.
    */
   ContentItemQuery maxContentSize(Long maxContentSize);
+  
+  /**
+   * Only select content items with the given field.
+   */
+  ContentItemQuery field(String field);
+
+  /**
+   * Only select content items with a field like the given string.
+   */
+  ContentItemQuery fieldLike(String fieldLike);
   
   /**
    * Only select content items created on the given time

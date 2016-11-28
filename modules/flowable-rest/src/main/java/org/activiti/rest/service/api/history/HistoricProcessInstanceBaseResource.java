@@ -18,11 +18,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.HistoryService;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.query.QueryProperty;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.impl.HistoricProcessInstanceQueryProperty;
-import org.activiti.engine.query.QueryProperty;
 import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.QueryVariable;

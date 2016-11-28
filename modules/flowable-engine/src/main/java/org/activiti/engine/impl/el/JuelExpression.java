@@ -19,7 +19,7 @@ import javax.el.MethodNotFoundException;
 import javax.el.PropertyNotFoundException;
 import javax.el.ValueExpression;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.delegate.VariableScope;
 import org.activiti.engine.impl.context.Context;

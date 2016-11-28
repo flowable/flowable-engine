@@ -20,8 +20,8 @@ import org.activiti.bpmn.model.EventSubProcess;
 import org.activiti.bpmn.model.Message;
 import org.activiti.bpmn.model.MessageEventDefinition;
 import org.activiti.bpmn.model.StartEvent;
+import org.activiti.engine.common.impl.util.CollectionUtil;
 import org.activiti.engine.impl.bpmn.parser.BpmnParse;
-import org.activiti.engine.impl.util.CollectionUtil;
 
 /**
  * @author Joram Barrez

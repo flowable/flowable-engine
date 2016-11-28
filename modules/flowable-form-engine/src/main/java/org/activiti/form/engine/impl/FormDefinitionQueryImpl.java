@@ -16,8 +16,8 @@ package org.activiti.form.engine.impl;
 import java.util.List;
 import java.util.Set;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.impl.Page;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.impl.Page;
 import org.activiti.form.api.FormDefinition;
 import org.activiti.form.api.FormDefinitionQuery;
 import org.activiti.form.engine.impl.interceptor.CommandContext;

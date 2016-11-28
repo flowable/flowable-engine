@@ -23,8 +23,8 @@ import org.activiti.dmn.engine.impl.interceptor.CommandContext;
 import org.activiti.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
 import org.activiti.dmn.engine.impl.persistence.deploy.DeploymentManager;
 import org.activiti.dmn.model.DmnDefinition;
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 
 /**

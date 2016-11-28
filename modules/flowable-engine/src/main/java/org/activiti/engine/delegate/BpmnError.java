@@ -13,8 +13,8 @@
 
 package org.activiti.engine.delegate;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.bpmn.parser.Error;
 
 /**

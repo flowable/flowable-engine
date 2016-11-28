@@ -13,8 +13,8 @@
 
 package org.activiti.engine.impl.history;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 
 /**
  * Enum that contains all possible history-levels.

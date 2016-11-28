@@ -20,7 +20,7 @@ import java.util.Map;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.ValuedDataObject;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.delegate.DelegateExecution;
 
 /**

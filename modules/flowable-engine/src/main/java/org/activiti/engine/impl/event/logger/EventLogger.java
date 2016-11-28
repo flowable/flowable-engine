@@ -5,9 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
+import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.event.logger.handler.ActivityCompensatedEventHandler;
@@ -29,7 +30,6 @@ import org.activiti.engine.impl.event.logger.handler.VariableUpdatedEventHandler
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandContextCloseListener;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.activiti.engine.runtime.Clock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

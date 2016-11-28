@@ -15,7 +15,7 @@ package org.activiti.idm.engine.impl.persistence.entity.data.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.Page;
+import org.activiti.engine.common.impl.Page;
 import org.activiti.idm.api.Token;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.TokenQueryImpl;

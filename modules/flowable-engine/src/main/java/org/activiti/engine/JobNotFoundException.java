@@ -1,5 +1,6 @@
 package org.activiti.engine;
 
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.engine.runtime.Job;
 
 /**

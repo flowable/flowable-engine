@@ -12,7 +12,7 @@
  */
 package org.activiti.form.engine.impl.cfg;
 
-import org.activiti.engine.impl.cfg.BaseTransactionListener;
+import org.activiti.engine.common.impl.cfg.BaseTransactionListener;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
 
 /**

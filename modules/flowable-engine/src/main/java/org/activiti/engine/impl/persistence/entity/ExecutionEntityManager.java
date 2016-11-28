@@ -16,8 +16,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.persistence.entity.EntityManager;
 import org.activiti.engine.impl.ExecutionQueryImpl;
-import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.ProcessInstanceQueryImpl;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.Execution;

@@ -51,18 +51,18 @@ import org.activiti.content.engine.impl.persistence.entity.TableDataManager;
 import org.activiti.content.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.activiti.content.engine.impl.persistence.entity.data.ContentItemDataManager;
 import org.activiti.content.engine.impl.persistence.entity.data.impl.MybatisContentItemDataManager;
-import org.activiti.engine.AbstractEngineConfiguration;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.cfg.TransactionContextFactory;
-import org.activiti.engine.impl.interceptor.CommandConfig;
-import org.activiti.engine.impl.interceptor.SessionFactory;
-import org.activiti.engine.runtime.Clock;
+import org.activiti.engine.common.AbstractEngineConfiguration;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.cfg.BeansConfigurationHelper;
+import org.activiti.engine.common.impl.cfg.TransactionContextFactory;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
+import org.activiti.engine.common.impl.interceptor.SessionFactory;
+import org.activiti.engine.common.runtime.Clock;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.BeanFactory;
 
 import liquibase.Liquibase;
 import liquibase.database.Database;
@@ -131,7 +131,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration {
   }
 
   public static ContentEngineConfiguration createContentEngineConfigurationFromResource(String resource, String beanName) {
-    return (ContentEngineConfiguration) parseEngineConfigurationFromResource(resource, beanName);
+    return (ContentEngineConfiguration) BeansConfigurationHelper.parseEngineConfigurationFromResource(resource, beanName);
   }
 
   public static ContentEngineConfiguration createContentEngineConfigurationFromInputStream(InputStream inputStream) {
@@ -139,7 +139,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration {
   }
 
   public static ContentEngineConfiguration createContentEngineConfigurationFromInputStream(InputStream inputStream, String beanName) {
-    return (ContentEngineConfiguration) parseEngineConfigurationFromInputStream(inputStream, beanName);
+    return (ContentEngineConfiguration) BeansConfigurationHelper.parseEngineConfigurationFromInputStream(inputStream, beanName);
   }
 
   public static ContentEngineConfiguration createStandaloneContentEngineConfiguration() {
@@ -172,6 +172,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration {
       initDbSchema();
     }
     
+    initBeans();
     initTransactionFactory();
     initSqlSessionFactory();
     initSessionFactories();
@@ -495,11 +496,6 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration {
     return this;
   }
 
-  public ContentEngineConfiguration setBeanFactory(BeanFactory beanFactory) {
-    this.beanFactory = beanFactory;
-    return this;
-  }
-
   public ContentEngineConfiguration setDefaultCommandConfig(CommandConfig defaultCommandConfig) {
     this.defaultCommandConfig = defaultCommandConfig;
     return this;
@@ -713,6 +709,10 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration {
   public ContentEngineConfiguration setDatabaseSchemaUpdate(String databaseSchemaUpdate) {
     this.databaseSchemaUpdate = databaseSchemaUpdate;
     return this;
+  }
+  
+  public Clock getClock() {
+    return clock;
   }
 
   public ContentEngineConfiguration setClock(Clock clock) {

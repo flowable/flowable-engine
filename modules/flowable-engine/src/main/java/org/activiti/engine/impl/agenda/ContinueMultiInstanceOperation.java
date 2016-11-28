@@ -2,6 +2,7 @@ package org.activiti.engine.impl.agenda;
 
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.FlowNode;
+import org.activiti.engine.common.impl.util.CollectionUtil;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
@@ -12,7 +13,6 @@ import org.activiti.engine.impl.delegate.ActivityBehavior;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
-import org.activiti.engine.impl.util.CollectionUtil;
 import org.activiti.engine.logging.LogMDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

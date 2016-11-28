@@ -12,8 +12,8 @@
  */
 package org.activiti.idm.engine.impl.persistence.entity;
 
-import org.activiti.engine.impl.db.HasRevision;
-import org.activiti.engine.impl.persistence.entity.Entity;
+import org.activiti.engine.common.impl.db.HasRevision;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
 import org.activiti.idm.api.Picture;
 import org.activiti.idm.api.User;
 

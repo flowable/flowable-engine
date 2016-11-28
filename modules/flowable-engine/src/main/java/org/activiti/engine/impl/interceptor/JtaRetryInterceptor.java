@@ -16,7 +16,8 @@ import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

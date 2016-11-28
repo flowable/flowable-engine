@@ -19,8 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.query.NativeQuery;
 import org.activiti.engine.impl.persistence.entity.VariableInstance;
-import org.activiti.engine.query.NativeQuery;
 import org.activiti.engine.runtime.DataObject;
 import org.activiti.engine.task.Attachment;
 import org.activiti.engine.task.Comment;

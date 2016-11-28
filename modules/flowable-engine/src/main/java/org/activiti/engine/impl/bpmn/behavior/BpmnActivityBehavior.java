@@ -16,7 +16,7 @@ package org.activiti.engine.impl.bpmn.behavior;
 import java.io.Serializable;
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.context.Context;

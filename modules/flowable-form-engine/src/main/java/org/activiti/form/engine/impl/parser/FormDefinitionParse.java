@@ -20,11 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.activiti.editor.form.converter.FormJsonConverter;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.util.io.InputStreamSource;
-import org.activiti.engine.impl.util.io.StreamSource;
-import org.activiti.engine.impl.util.io.StringStreamSource;
-import org.activiti.engine.impl.util.io.UrlStreamSource;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.util.io.InputStreamSource;
+import org.activiti.engine.common.impl.util.io.StreamSource;
+import org.activiti.engine.common.impl.util.io.StringStreamSource;
+import org.activiti.engine.common.impl.util.io.UrlStreamSource;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.context.Context;
 import org.activiti.form.engine.impl.io.ResourceStreamSource;

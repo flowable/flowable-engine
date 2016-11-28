@@ -14,8 +14,8 @@
 package org.activiti.spring.test.autodeployment;
 
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.common.impl.util.IoUtil;
 import org.activiti.engine.impl.test.AbstractTestCase;
-import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.DeploymentQuery;
 import org.activiti.engine.repository.ProcessDefinition;

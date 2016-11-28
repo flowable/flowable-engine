@@ -13,7 +13,7 @@
 package org.activiti.app.rest.runtime.variable;
 
 import org.activiti.app.model.runtime.RestVariable;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.springframework.stereotype.Component;
 
 

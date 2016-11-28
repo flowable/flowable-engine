@@ -14,8 +14,8 @@ package org.activiti.rest.form.service.api.form;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.form.api.FormService;
 import org.activiti.form.model.FormInstanceModel;
 import org.activiti.rest.form.FormRestResponseFactory;
