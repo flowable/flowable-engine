@@ -142,7 +142,7 @@
     <!-- BUILD -->
     <build>
 
-        <finalName>flowable-idm-app</finalName>
+        <finalName>flowable-idm</finalName>
 
         <resources>
             <resource>
