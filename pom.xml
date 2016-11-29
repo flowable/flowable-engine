@@ -981,6 +981,7 @@
 				<module>modules/flowable-content-engine-configurator</module>
 				<module>modules/flowable-content-spring</module>
 				<module>modules/flowable-content-spring-configurator</module>
+				<module>modules/flowable-content-rest</module>
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>
 				<module>modules/flowable-webapp-rest2</module>
@@ -999,6 +1000,10 @@
 				<module>modules/flowable-ldap</module>
 				<module>modules/flowable-jmx</module>
 				<module>modules/flowable-jms-spring-executor</module>
+				<module>modules/flowable-ui-idm</module>
+				<module>modules/flowable-ui-modeler</module>
+				<module>modules/flowable-ui-task</module>
+				<module>modules/flowable-ui-admin</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 			<build>
@@ -1231,6 +1236,18 @@
 			</modules>
 		</profile>
 		<profile>
+			<id>databasecontent</id>
+			<activation>
+				<property>
+					<name>databasecontent</name>
+				</property>
+			</activation>
+			<modules>
+				<module>modules/flowable-content-api</module>
+				<module>modules/flowable-content-engine</module>
+			</modules>
+		</profile>
+		<profile>
 			<id>databasewithschemaform</id>
 			<activation>
 				<property>
@@ -1254,6 +1271,18 @@
 				<module>modules/flowable-dmn-model</module>
 				<module>modules/flowable-dmn-api</module>
 				<module>modules/flowable-dmn-engine</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>databasewithschemacontent</id>
+			<activation>
+				<property>
+					<name>databasewithschemacontent</name>
+				</property>
+			</activation>
+			<modules>
+				<module>modules/flowable-content-api</module>
+				<module>modules/flowable-content-engine</module>
 			</modules>
 		</profile>
 		<profile>
@@ -1289,6 +1318,12 @@
 				<module>modules/flowable-form-spring-configurator</module>
 				<module>modules/flowable-form-json-converter</module>
 				<module>modules/flowable-form-rest</module>
+				<module>modules/flowable-content-api</module>
+				<module>modules/flowable-content-engine</module>
+				<module>modules/flowable-content-engine-configurator</module>
+				<module>modules/flowable-content-spring</module>
+				<module>modules/flowable-content-spring-configurator</module>
+				<module>modules/flowable-content-rest</module>
 			</modules>
 			<properties>
 				<skipTests>true</skipTests>
