@@ -45,6 +45,10 @@ activitiAdminApp.controller('EngineController', ['$rootScope', '$scope', '$http'
             editEndpointConfig(3);
         };
 
+        $scope.editContentEndpointConfig = function () {
+            editEndpointConfig(4);
+        };
+
         var editEndpointConfig = function (endpointType) {
 
             var selectedServer;
@@ -55,6 +59,8 @@ activitiAdminApp.controller('EngineController', ['$rootScope', '$scope', '$http'
                 selectedServer = $rootScope.activeServers['dmn'];
             } else if (endpointType === 3) {
                 selectedServer = $rootScope.activeServers['form'];
+            } else if (endpointType === 4) {
+                selectedServer = $rootScope.activeServers['content'];
             }
 
             if (selectedServer) {
@@ -108,6 +114,10 @@ activitiAdminApp.controller('EngineController', ['$rootScope', '$scope', '$http'
 
         $scope.checkFormEndpointConfig = function () {
             checkEndpointConfig(3);
+        };
+
+        $scope.checkContentEndpointConfig = function () {
+            checkEndpointConfig(4);
         };
 
         var checkEndpointConfig = function (endpointType) {

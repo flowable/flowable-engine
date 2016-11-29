@@ -315,6 +315,8 @@ activitiAdminApp
                                     $rootScope.activeServers['dmn'] = data[i];
                                 } else if (data[i].endpointType === 3) {
                                     $rootScope.activeServers['form'] = data[i];
+                                } else if (data[i].endpointType === 4) {
+                                    $rootScope.activeServers['content'] = data[i];
                                 } else {
                                     console.log('Warning! Invalid endpoint type received: '+data[i].endpointType);
                                 }

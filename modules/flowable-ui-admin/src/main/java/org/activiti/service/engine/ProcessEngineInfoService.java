@@ -40,6 +40,7 @@ public class ProcessEngineInfoService {
     public static final String PROCESS_ENGINE_INFO_URL = "management/engine";
     public static final String DMN_ENGINE_INFO_URL = "dmn-management/engine";
     public static final String FORM_ENGINE_INFO_URL = "form-management/engine";
+    public static final String CONTENT_ENGINE_INFO_URL = "content-management/engine";
 
     @Autowired
     protected ActivitiClientService clientUtil;
@@ -65,6 +66,10 @@ public class ProcessEngineInfoService {
 
             case FORM:
                 builder = clientUtil.createUriBuilder(FORM_ENGINE_INFO_URL);
+                break;
+
+            case CONTENT:
+                builder = clientUtil.createUriBuilder(CONTENT_ENGINE_INFO_URL);
                 break;
         }
 

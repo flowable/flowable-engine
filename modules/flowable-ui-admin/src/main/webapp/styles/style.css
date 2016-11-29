@@ -21,6 +21,10 @@ body {
   min-width: 1024px;
 }
 
+.no-top-gutter {
+	margin-top: -40px; !important;
+}
+
 .error-text {
     color: red;
 }

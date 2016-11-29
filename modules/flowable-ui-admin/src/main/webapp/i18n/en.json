@@ -585,7 +585,8 @@
         "TITLE": {
             "PROCESS-ENDPOINT": "Process API Endpoint configuration",
             "DMN-ENDPOINT": "DMN API Endpoint configuration",
-            "FORM-ENDPOINT": "Form API Endpoint configuration"
+            "FORM-ENDPOINT": "Form API Endpoint configuration",
+            "COMTENT-ENDPOINT": "Content API Endpoint configuration"
         },
         "POPUP": {
             "EDIT-ENDPOINT": {
@@ -948,7 +949,7 @@
             "TENANTID": "Tenant identifier"
         },
         "SORT": {
-            "LAST-MODIFIED-DATE": "Submitted On"
+            "CREATED": "Created On"
         }
     },
     "CONTENT-ITEM": {
@@ -960,7 +961,7 @@
             "CREATED-BY": "Created by",
             "LAST-MODIFIED-ON": "Last Modified Date",
             "LAST-MODIFIED-BY": "Last Modified By",
-            "CONTENT-SIZE": "Form Definition ID"
+            "CONTENT-STORE-ID": "Content store ID"
         },
         "ACTION": {
             "SHOW-CONTENT-ITEM": "Show content item"

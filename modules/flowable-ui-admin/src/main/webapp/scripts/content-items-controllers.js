@@ -44,7 +44,7 @@ activitiAdminApp.controller('ContentItemsController', ['$rootScope', '$scope', '
             },
 
             sortObjects: [
-                {name: 'CONTENT-ITEMS.SORT.SUBMITTED-DATE', id: 'submittedDate'}
+                {name: 'CONTENT-ITEMS.SORT.CREATED', id: 'created'}
             ],
 
             supportedProperties: [
@@ -53,13 +53,13 @@ activitiAdminApp.controller('ContentItemsController', ['$rootScope', '$scope', '
             ]
         };
 
-        if ($rootScope.filters && $rootScope.filters.formInstanceFilter) {
+        if ($rootScope.filters && $rootScope.filters.contentItemFilter) {
             // Reuse the existing filter
-            $scope.filter = $rootScope.filters.formInstanceFilter;
+            $scope.filter = $rootScope.filters.contentItemFilter;
             $scope.filter.config = filterConfig;
         } else {
             $scope.filter = new ActivitiAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
-            $rootScope.filters.formInstanceFilter = $scope.filter;
+            $rootScope.filters.contentItemFilter = $scope.filter;
         }
 
         $scope.itemSelected = function (contentItem) {
@@ -69,14 +69,15 @@ activitiAdminApp.controller('ContentItemsController', ['$rootScope', '$scope', '
         };
 
         $q.all([$translate('CONTENT-ITEMS.HEADER.ID'),
+                $translate('CONTENT-ITEMS.HEADER.NAME'),
                 $translate('CONTENT-ITEMS.HEADER.TASK-ID'),
                 $translate('CONTENT-ITEMS.HEADER.PROCESS-INSTANCE-ID'),
-                $translate('CONTENT-ITEMS.HEADER.SUBMITTED-ON'),
-                $translate('CONTENT-ITEMS.HEADER.SUBMITTED-BY'),
+                $translate('CONTENT-ITEMS.HEADER.LAST-MODIFIED-ON'),
+                $translate('CONTENT-ITEMS.HEADER.LAST-MODIFIED-BY'),
                 $translate('CONTENT-ITEMS.HEADER.TENANT-ID')])
             .then(function (headers) {
                 // Config for grid
-                $scope.gridFormInstances = {
+                $scope.gridContentItems = {
                     data: 'contentItemsData.data',
                     enableRowReordering: true,
                     multiSelect: false,
@@ -85,11 +86,12 @@ activitiAdminApp.controller('ContentItemsController', ['$rootScope', '$scope', '
                     afterSelectionChange: $scope.itemSelected,
                     columnDefs: [
                         {field: 'id', displayName: headers[0], cellTemplate: gridConstants.defaultTemplate},
-                        {field: 'taskId', displayName: headers[1], cellTemplate: gridConstants.defaultTemplate},
-                        {field: 'processInstanceId', displayName: headers[2], cellTemplate: gridConstants.defaultTemplate},
-                        {field: 'submittedDate', displayName: headers[3], cellTemplate: gridConstants.dateTemplate},
-                        {field: 'submittedBy', displayName: headers[4], cellTemplate: gridConstants.defaultTemplate},
-                        {field: 'tenantId', displayName: headers[5], cellTemplate: gridConstants.defaultTemplate}]
+                        {field: 'name', displayName: headers[1], cellTemplate: gridConstants.defaultTemplate},
+                        {field: 'taskId', displayName: headers[2], cellTemplate: gridConstants.defaultTemplate},
+                        {field: 'processInstanceId', displayName: headers[3], cellTemplate: gridConstants.defaultTemplate},
+                        {field: 'lastModified', displayName: headers[4], cellTemplate: gridConstants.dateTemplate},
+                        {field: 'lastModifiedBy', displayName: headers[5], cellTemplate: gridConstants.defaultTemplate},
+                        {field: 'tenantId', displayName: headers[6], cellTemplate: gridConstants.defaultTemplate}]
                 };
             });
 
