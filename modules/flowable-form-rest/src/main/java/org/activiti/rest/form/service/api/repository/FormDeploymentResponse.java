@@ -29,6 +29,7 @@ public class FormDeploymentResponse {
   protected Date deploymentTime;
   protected String category;
   protected String url;
+  protected String parentDeploymentId;
   protected String tenantId;
 
   public FormDeploymentResponse(FormDeployment deployment, String url) {
@@ -37,6 +38,7 @@ public class FormDeploymentResponse {
     setDeploymentTime(deployment.getDeploymentTime());
     setCategory(deployment.getCategory());
     setTenantId(deployment.getTenantId());
+    setParentDeploymentId(deployment.getParentDeploymentId());
     setUrl(url);
   }
 
@@ -78,6 +80,14 @@ public class FormDeploymentResponse {
 
   public void setUrl(String url) {
     this.url = url;
+  }
+
+  public String getParentDeploymentId() {
+    return parentDeploymentId;
+  }
+
+  public void setParentDeploymentId(String parentDeploymentId) {
+    this.parentDeploymentId = parentDeploymentId;
   }
 
   public String getTenantId() {
