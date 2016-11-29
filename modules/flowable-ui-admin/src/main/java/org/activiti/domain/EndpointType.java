@@ -22,7 +22,8 @@ public enum EndpointType {
 
   PROCESS(1),
   DMN(2),
-  FORM(3);
+  FORM(3),
+  CONTENT(4);
 
   private static Map<Integer, EndpointType> map = new HashMap<>();
 

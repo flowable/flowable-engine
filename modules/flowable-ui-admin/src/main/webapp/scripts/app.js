@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 'use strict';
 
 /* App Module */
@@ -45,8 +45,8 @@ activitiAdminApp
                     reloadOnSearch: true
                 })
                 .when('/content-engine', {
-                    templateUrl: 'views/deployments.html',
-                    controller: 'DeploymentsController',
+                    templateUrl: 'views/content-items.html',
+                    controller: 'ContentItemsController',
                     reloadOnSearch: true
                 })
                 .when('/process-definitions', {
@@ -175,6 +175,16 @@ activitiAdminApp
                     controller: 'FormInstanceController',
                     reloadOnSearch: true
                 })
+                .when('/content-items', {
+                    templateUrl: 'views/content-items.html',
+                    controller: 'ContentItemsController',
+                    reloadOnSearch: true
+                })
+                .when('/content-item/:contentItemId', {
+                    templateUrl: 'views/content-item.html',
+                    controller: 'ContentItemController',
+                    reloadOnSearch: true
+                })
                 .otherwise({
                 	templateUrl: 'views/login.html',
                     controller: 'LoginController',
@@ -290,7 +300,7 @@ activitiAdminApp
                 $translate.use('en');
 
         		$rootScope.serversLoaded = false;
-        		
+
         		$rootScope.loadServerConfig = function(callbackAfterLoad) {
                     $http({method: 'GET', url: '/app/rest/server-configs'}).
                     success(function(data) {
@@ -320,7 +330,7 @@ activitiAdminApp
                     });
 
                 };
-        		
+
         		$http.get('/app/rest/account')
 		        	.success(function (data, status, headers, config) {
 		              	$rootScope.account = data;

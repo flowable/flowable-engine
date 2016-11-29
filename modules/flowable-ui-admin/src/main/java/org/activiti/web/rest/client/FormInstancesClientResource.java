@@ -56,7 +56,6 @@ public class FormInstancesClientResource extends AbstractClientResource {
     ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 
     try {
-
       ObjectNode bodyNode = objectMapper.createObjectNode();
       bodyNode.put("formDefinitionId", formDefinitionId);
 

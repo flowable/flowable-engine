@@ -116,7 +116,7 @@ body {
 }
 
 .navbar-inverse .navbar-nav > .active-content > a, .navbar-inverse .navbar-nav > .active-content > a:hover, .navbar-inverse .navbar-nav > .active-content > a:focus {
-    background: rgb(146,176,201);
+    background: rgb(102,153,255);
 	color: #ffffff;
 }
 
@@ -152,22 +152,22 @@ body {
 
 .sub-navbar.active-process {
 	background: rgb(162,204,70);
-    background: linear-gradient(to right, rgba(162,204,70,1.0), rgba(162,204,70,1.0), rgba(162,204,70,0), rgba(162,204,70,0));
+    background: linear-gradient(to right, rgba(162,204,70,1.0), rgba(162,204,70,1.0), rgba(162,204,70,1.0), rgba(162,204,70,0), rgba(162,204,70,0));
 }
 
 .sub-navbar.active-form {
     background: rgb(0,102,153);
-    background: linear-gradient(to right, rgba(0,102,153,1.0), rgba(0,102,153,1.0), rgba(0,102,153,0), rgba(0,102,153,0));
+    background: linear-gradient(to right, rgba(0,102,153,1.0), rgba(0,102,153,1.0), rgba(0,102,153,1.0), rgba(0,102,153,0), rgba(0,102,153,0));
 }
 
 .sub-navbar.active-dmn {
     background: rgb(227,154,33);
-    background: linear-gradient(to right, rgba(227,154,33,1.0), rgba(227,154,33,1.0), rgba(227,154,33,0), rgba(227,154,33,0));
+    background: linear-gradient(to right, rgba(227,154,33,1.0), rgba(227,154,33,1.0), rgba(227,154,33,1.0), rgba(227,154,33,0), rgba(227,154,33,0));
 }
 
 .sub-navbar.active-content {
-    background: rgb(146,176,201);
-    background: linear-gradient(to right, rgba(146,176,201,1.0), rgba(146,176,201,1.0), rgba(146,176,201,0), rgba(146,176,201,0));
+    background: rgb(102,153,255);
+    background: linear-gradient(to right, rgba(102,153,255,1.0), rgba(102,153,255,1.0), rgba(102,153,255,1.0), rgba(102,153,255,0), rgba(102,153,255,0));
 }
 
 .sub-navbar .drop-menu {
@@ -1232,7 +1232,7 @@ only screen and (min-resolution: 192dpi) {
 }
 
 .type-ahead-scrollable .dropdown-menu a .user-label {
-	padding-left: 8px; 
+	padding-left: 8px;
 }
 
 .decision-table-grid {

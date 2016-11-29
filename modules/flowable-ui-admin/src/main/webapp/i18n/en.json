@@ -929,5 +929,41 @@
         "ACTION": {
             "SHOW-FORM-INSTANCE": "Show form instance"
         }
+    },
+    "CONTENT-ITEMS": {
+        "TITLE": "Content items",
+        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching content items.",
+        "LIST-MESSAGE-EMPTY": "No matching content items.",
+        "HEADER": {
+            "ID": "ID",
+            "NAME": "Name",
+            "PROCESS-INSTANCE-ID": "Process Instance ID",
+            "TASK-ID": "Task ID",
+            "LAST-MODIFIED-ON": "Last Modified Date",
+            "LAST-MODIFIED-BY": "Last Modified By",
+            "TENANT-ID": "Tenant ID"
+        },
+        "FILTER": {
+            "NAME": "Name",
+            "TENANTID": "Tenant identifier"
+        },
+        "SORT": {
+            "LAST-MODIFIED-DATE": "Submitted On"
+        }
+    },
+    "CONTENT-ITEM": {
+        "HEADER": {
+            "ID": "ID",
+            "TASK-ID": "Task ID",
+            "PROCESS-INSTANCE-ID": "Process Instance ID",
+            "CREATED-ON": "Created on",
+            "CREATED-BY": "Created by",
+            "LAST-MODIFIED-ON": "Last Modified Date",
+            "LAST-MODIFIED-BY": "Last Modified By",
+            "CONTENT-SIZE": "Form Definition ID"
+        },
+        "ACTION": {
+            "SHOW-CONTENT-ITEM": "Show content item"
+        }
     }
 }
