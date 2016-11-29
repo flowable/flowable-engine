@@ -72,7 +72,7 @@ activitiAdminApp.controller('FormDefinitionsController', ['$rootScope', '$scope'
 
         $q.all([$translate('FORM-DEFINITIONS.HEADER.ID'),
                 $translate('FORM-DEFINITIONS.HEADER.NAME'),
-                $translate('FORM-DEFINITIONS.HEADER.APPID'),
+                $translate('FORM-DEFINITIONS.HEADER.DEPLOYMENTID'),
                 $translate('FORM-DEFINITIONS.HEADER.TENANTID')])
             .then(function (headers) {
                 // Config for grid
@@ -86,7 +86,7 @@ activitiAdminApp.controller('FormDefinitionsController', ['$rootScope', '$scope'
                     columnDefs: [
                         {field: 'id', displayName: headers[0], cellTemplate: gridConstants.defaultTemplate},
                         {field: 'name', displayName: headers[1], cellTemplate: gridConstants.defaultTemplate},
-                        {field: 'appDeploymentId', displayName: headers[2], cellTemplate: gridConstants.defaultTemplate},
+                        {field: 'deploymentId', displayName: headers[2], cellTemplate: gridConstants.defaultTemplate},
                         {field: 'tenantId', displayName: headers[3], cellTemplate: gridConstants.defaultTemplate}]
                 };
             });

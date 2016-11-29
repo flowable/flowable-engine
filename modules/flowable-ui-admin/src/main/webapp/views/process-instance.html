@@ -161,14 +161,14 @@
 						<div ng-grid="gridDecisionTables" class="gridStyle" ng-if="decisionTables" ng-show="decisionTables.size > 0"></div>
 					</div>
 					
-					<div class="grid-wrapper grid-wrapper-compact" ng-if="forms && tabData.activeTab == tabData.tabs[5].id">
-						<div class="grid-message" ng-if="forms.size > 0">
-	                        <span>{{'PROCESS-INSTANCE.FORMS-SIZE' | translate:forms}}</span>
+					<div class="grid-wrapper grid-wrapper-compact" ng-if="formInstances && tabData.activeTab == tabData.tabs[5].id">
+						<div class="grid-message" ng-if="formInstances.size > 0">
+	                        <span>{{'PROCESS-INSTANCE.FORM-INSTANCES-SIZE' | translate:formInstances}}</span>
 	                    </div>
-	                     <div class="grid-message" ng-if="forms.size == 0">
-	                        <span>{{'PROCESS-INSTANCE.FORMS-EMPTY' | translate}}</span>
+	                     <div class="grid-message" ng-if="formInstances.size == 0">
+	                        <span>{{'PROCESS-INSTANCE.FORM-INSTANCES-EMPTY' | translate}}</span>
 	                    </div>
-						<div ng-grid="gridForms" class="gridStyle" ng-if="forms" ng-show="forms.size > 0"></div>
+						<div ng-grid="gridFormInstances" class="gridStyle" ng-if="formInstances" ng-show="formInstances.size > 0"></div>
 					</div>
 
 		        </div>

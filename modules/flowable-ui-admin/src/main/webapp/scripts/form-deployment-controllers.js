@@ -95,7 +95,7 @@ activitiAdminApp.controller('FormDeploymentController', ['$scope', '$rootScope',
 		    // Load deployment
 		    $http({method: 'GET', url: '/app/rest/activiti/form-deployments/' + $routeParams.formDeploymentId}).
   	    	    success(function(data, status, headers, config) {
-  	    	        $scope.deployment = data;
+  	    	        $scope.formDeployment = data;
   	    	    }).
   	    	    error(function(data, status, headers, config) {
                     if (data && data.message) {

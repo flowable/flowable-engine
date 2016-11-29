@@ -6,7 +6,7 @@
 					<div class="pull-right">
 						<a ng-click="returnToList()" class="action">&larr; {{'GENERAL.ACTION.RETURN-TO-LIST' | translate}}</a>
 					</div>
-					<h2>{{deployment.name + " - " + deployment.id}}</h2>
+					<h2>{{deployment.name || deployment.id}}</h2>
 				</div>
 
 				<div class="property-wrapper">

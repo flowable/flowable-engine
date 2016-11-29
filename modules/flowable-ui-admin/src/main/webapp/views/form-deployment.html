@@ -1,12 +1,12 @@
 <div class="container" id="detail-container">
 	<div class="row">
 		<div class="col-md-9">
-			<div class="component" ng-show="deployment">
+			<div class="component" ng-show="formDeployment">
 				<div class="title">
 					<div class="pull-right">
 						<a ng-click="returnToList()" class="action">&larr; {{'GENERAL.ACTION.RETURN-TO-LIST' | translate}}</a>
 					</div>
-					<h2>{{deployment.name + " - " + deployment.id}}</h2>
+					<h2>{{formDeployment.name || formDeployment.id}}</h2>
 				</div>
 
 				<div class="property-wrapper">
@@ -15,19 +15,19 @@
 							<td class="property-name" translate="FORM-DEPLOYMENT.ID"></td>
 							<td>{{formDeployment.id}}</td>
 							<td class="property-name" translate="FORM-DEPLOYMENT.NAME"></td>
-							<td>{{formDeployment.name}}</td>
+							<td>{{formDeployment.name | empty}}</td>
 						</tr>
 						<tr class="property">
 							<td class="property-name" translate="FORM-DEPLOYMENT.TIME"></td>
-							<td>{{formDeployment.deploymentTime | dateformat:'full'}}</td>
+							<td>{{formDeployment.deploymentTime | dateformat}}</td>
 							<td class="property-name" translate="FORM-DEPLOYMENT.CATEGORY"></td>
 							<td>{{formDeployment.category | empty}}</td>
 						</tr>
 						<tr class="property">
                             <td class="property-name" translate="FORM-DEPLOYMENT.TENANTID"></td>
                             <td>{{formDeployment.tenantId | empty}}</td>
-                            <td ng-if="parentDeploymentId" class="property-name" translate="FORM-DEPLOYMENT.PARENT-DEPLOYMENT-ID"></td>
-                            <td ng-if="parentDeploymentId"><a ng-href="#/deployments/{{parentDeploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{parentDeploymentId}}</a></td>
+                            <td ng-if="formDeployment.parentDeploymentId" class="property-name" translate="FORM-DEPLOYMENT.PARENT-DEPLOYMENT-ID"></td>
+                            <td ng-if="formDeployment.parentDeploymentId"><a ng-href="#/deployment/{{formDeployment.parentDeploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{formDeployment.parentDeploymentId}}</a></td>
                         </tr>
 					</table>
 				</div>

@@ -16,13 +16,13 @@
                             <td class="property-name" translate="FORM-INSTANCE.HEADER.ID"></td>
                             <td>{{formInstance.id}}</td>
                             <td class="property-name" translate="FORM-INSTANCE.HEADER.TASK-ID"></td>
-                            <td ng-if="submittedForm.taskId"><a ng-href="#/task/{{formInstance.taskId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{formInstance.taskId}}</a></td>
-                            <td ng-if="!submittedForm.taskId">{{formInstance.taskId | empty}}</td>
+                            <td ng-if="formInstance.taskId"><a ng-href="#/task/{{formInstance.taskId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{formInstance.taskId}}</a></td>
+                            <td ng-if="!formInstance.taskId">{{formInstance.taskId | empty}}</td>
                         </tr>
                         <tr class="property">
                         	<td class="property-name" translate="FORM-INSTANCE.HEADER.PROCESS-ID"></td>
-                            <td ng-if="submittedForm.processId"><a ng-href="#/process-instance/{{formInstance.processInstanceId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{formInstance.processId}}</a></td>
-                            <td ng-if="!submittedForm.processId">{{formInstance.processInstanceId | empty}}</td>
+                            <td ng-if="formInstance.processInstanceId"><a ng-href="#/process-instance/{{formInstance.processInstanceId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{formInstance.processInstanceId}}</a></td>
+                            <td ng-if="!formInstance.processInstanceId">{{formInstance.processInstanceId | empty}}</td>
                             <td class="property-name" translate="FORM-INSTANCE.HEADER.SUBMITTED"></td>
                             <td>{{formInstance.submittedDate | date}}</td>
                         </tr>
@@ -43,9 +43,9 @@
                 </div>
                 <ul class="list-group">
                     <li>
-                        <button type="button" class="btn btn-sm btn-default" ng-click="showFormInstance()">
-                            <i class="glyphicon glyphicon-zoom-in"></i>{{'FORM-INSTANCE.ACTION.SHOW-FORM-INSTANCE' | translate}}
-                        </button>
+                        <!--TODO: <button type="button" class="btn btn-sm btn-default" ng-click="showFormInstance()">-->
+                            <!--<i class="glyphicon glyphicon-zoom-in"></i>{{'FORM-INSTANCE.ACTION.SHOW-FORM-INSTANCE' | translate}}-->
+                        <!--</button>-->
                     </li>
                 </ul>
             </div>

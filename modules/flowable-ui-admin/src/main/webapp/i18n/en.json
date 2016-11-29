@@ -156,15 +156,15 @@
         "SUBPROCESSES-EMPTY": "This process instance has no subprocesses.",
         "DECISION-TABLES-SIZE": "This process instance has {{total}} decision tables.",
         "DECISION-TABLES-EMPTY": "This process instance has no decision tables.",
-        "FORMS-SIZE": "This process instance has {{total}} form instances.",
-        "FORMS-EMPTY": "This process instance has no form instances.",
+        "FORM-INSTANCES-SIZE": "This process instance has {{total}} form instances.",
+        "FORM-INSTANCES-EMPTY": "This process instance has no form instances.",
         "TITLE": {
             "TASKS": "Tasks",
             "VARIABLES": "Variables",
             "JOBS": "Jobs",
             "SUBPROCESSES": "Subprocesses",
             "DECISION-TABLES": "Decision Tables",
-            "FORMS": "Forms"
+            "FORM-INSTANCES": "Form instances"
         },
         "ACTION": {
             "DELETE": "Delete process instance",
@@ -805,7 +805,7 @@
         "HEADER": {
             "ID": "ID",
             "NAME": "Name",
-            "APPID": "App ID",
+            "DEPLOYMENTID": "Deployment ID",
             "TENANTID": "Tenant ID",
             "KEY": "Key",
             "VERSION": "Version"
@@ -888,6 +888,7 @@
         "TIME": "Deployment time:",
         "CATEGORY": "Category:",
         "TENANTID": "Tenant identifier:",
+        "PARENT-DEPLOYMENT-ID": "Parent Deployment ID",
         "DEFINITIONS-MESSAGE": "This deployment has {{total}} form definitions, showing {{size}}.",
         "DEFINITIONS-MESSAGE-EMPTY": "This deployment has no form definitions.",
         "TITLE": {
