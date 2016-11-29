@@ -402,6 +402,23 @@ body {
 	margin-right: 2px;
 }
 
+.component .title.process {
+	color: rgb(162,204,70)
+}
+
+.component .title.dmn {
+	color: rgb(227,154,33)
+}
+
+.component .title.form {
+	color: rgb(0,102,153)
+}
+
+.component .title.content {
+	color: rgb(102,153,255)
+}
+
+
 .component .input-group {
 	width: 100%;
 }

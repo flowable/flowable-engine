@@ -23,10 +23,10 @@
             "FILTERS": "Filters"
         },
         "MENU": {
-            "PROCESS-ENGINE": "PROCESS ENGINE",
-            "FORM-ENGINE": "FORM ENGINE",
-            "CONTENT-ENGINE": "CONTENT ENGINE",
-            "DMN-ENGINE": "DMN ENGINE",
+            "PROCESS-ENGINE": "Process Engine",
+            "FORM-ENGINE": "Form Engine",
+            "CONTENT-ENGINE": "Content Engine",
+            "DMN-ENGINE": "DMN Engine",
             "DEPLOYMENTS": "Deployments",
             "DEFINITIONS": "Definitions",
             "INSTANCES": "Instances",
@@ -586,7 +586,7 @@
             "PROCESS-ENDPOINT": "Process API Endpoint configuration",
             "DMN-ENDPOINT": "DMN API Endpoint configuration",
             "FORM-ENDPOINT": "Form API Endpoint configuration",
-            "COMTENT-ENDPOINT": "Content API Endpoint configuration"
+            "CONTENT-ENDPOINT": "Content API Endpoint configuration"
         },
         "POPUP": {
             "EDIT-ENDPOINT": {
