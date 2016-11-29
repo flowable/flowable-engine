@@ -98,6 +98,7 @@ public class WebConfigurer implements ServletContextListener {
     initSpringProcessRest(servletContext, rootContext);
     initSpringDMNRest(servletContext, rootContext);
     initSpringFormRest(servletContext, rootContext);
+    initSpringContentRest(servletContext, rootContext);
   }
   
   /**
@@ -119,6 +120,13 @@ public class WebConfigurer implements ServletContextListener {
    */
   protected ServletRegistration.Dynamic initSpringFormRest(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
     return initSpringRestComponent(servletContext, rootContext, "form-api", FormDispatcherServletConfiguration.class);
+  }
+  
+  /**
+   * Initializes Content Spring and Spring MVC.
+   */
+  protected ServletRegistration.Dynamic initSpringContentRest(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
+    return initSpringRestComponent(servletContext, rootContext, "content-api", ContentDispatcherServletConfiguration.class);
   }
   
   protected ServletRegistration.Dynamic initSpringRestComponent(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext,
