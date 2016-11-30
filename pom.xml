@@ -1248,6 +1248,18 @@
 			</modules>
 		</profile>
 		<profile>
+			<id>databaseidm</id>
+			<activation>
+				<property>
+					<name>databaseidm</name>
+				</property>
+			</activation>
+			<modules>
+				<module>modules/flowable-idm-api</module>
+				<module>modules/flowable-idm-engine</module>
+			</modules>
+		</profile>
+		<profile>
 			<id>databasewithschemaform</id>
 			<activation>
 				<property>
@@ -1283,6 +1295,18 @@
 			<modules>
 				<module>modules/flowable-content-api</module>
 				<module>modules/flowable-content-engine</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>databasewithschemaidm</id>
+			<activation>
+				<property>
+					<name>databasewithschemaidm</name>
+				</property>
+			</activation>
+			<modules>
+				<module>modules/flowable-idm-api</module>
+				<module>modules/flowable-idm-engine</module>
 			</modules>
 		</profile>
 		<profile>

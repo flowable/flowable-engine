@@ -277,7 +277,7 @@
 								<configuration>
 									<tasks>
 										<echo message="updating activiti content configuration to db ${databasewithschemacontent}" />
-										<copy file="${basedir}/../../qa/db/schema/activiti.form.cfg.xml"
+										<copy file="${basedir}/../../qa/db/schema/activiti.content.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset
 												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasewithschemacontent}.properties" />
@@ -294,7 +294,7 @@
 								<configuration>
 									<tasks>
 										<echo message="dropping schema in ${databasewithschemacontent}" />
-										<java classname="org.activiti.form.engine.impl.db.DbSchemaDrop"
+										<java classname="org.activiti.content.engine.impl.db.DbSchemaDrop"
 											classpathref="maven.test.classpath" />
 									</tasks>
 								</configuration>
