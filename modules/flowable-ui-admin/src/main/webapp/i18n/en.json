@@ -64,8 +64,8 @@
         "JOBS-EMPTY": "Definition has no jobs running",
         "DECISION-TABLES-SIZE": "Definition has {{total}} decision tables.",
         "DECISION-TABLES-EMPTY": "Definition has no decision tables.",
-        "FORMS-SIZE": "Definition has {{total}} form definitions.",
-        "FORMS-EMPTY": "Definition has no form definitions.",
+        "FORM-DEFINITIONS-SIZE": "Definition has {{total}} form definitions.",
+        "FORM-DEFINITIONS-EMPTY": "Definition has no form definitions.",
         "TITLE": {
             "PROCESS-INSTANCES": "Process instances",
             "JOBS": "Jobs",
@@ -928,8 +928,19 @@
             "SUBMITTED-BY": "Submitted by",
             "FORM-DEFINITION-ID": "Form Definition ID"
         },
+        "FORM-FIELD-VALUES-MESSAGE": "This instance has {{total}} form field values, showing {{size}}",
+        "FORM-FIELD-VALUES-MESSAGE-EMPTY": "This instance has no form field values",
         "ACTION": {
             "SHOW-FORM-INSTANCE": "Show form instance"
+        },
+        "TITLE": {
+            "FORM-FIELD-VALUES": "Form field values"
+        },
+        "FORM-FIELD-VALUES": {
+            "ID": "Form field ID",
+            "NAME": "Form field name",
+            "TYPE": "Form field type",
+            "VALUE": "Form field value"
         }
     },
     "CONTENT-ITEMS": {

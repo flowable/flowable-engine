@@ -23,7 +23,7 @@ activitiAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
 		    tabs: [
 		       {id: 'processInstances', name: 'PROCESS-DEFINITION.TITLE.PROCESS-INSTANCES'},
 		       {id: 'jobs', name: 'PROCESS-DEFINITION.TITLE.JOBS'}
-		    ],
+		    ]
 		};
 		$scope.tabData.activeTab = $scope.tabData.tabs[0].id;
 
@@ -94,7 +94,7 @@ activitiAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
         }
     };
     
-    $scope.openForm = function (form) {
+    $scope.openFormDefinition = function (form) {
         if (form && form.getProperty('id')) {
             $location.path("/form-definition/" + form.getProperty('id'));
           }
@@ -159,11 +159,11 @@ activitiAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
             });
         };
         
-        $scope.loadForms = function() {
+        $scope.loadFormDefinitions = function() {
             // Load forms
             $http({method: 'GET', url: '/app/rest/activiti/process-definition-form-definitions/' + $scope.definition.id}).
             success(function(data, status, headers, config) {
-                $scope.forms = data;
+                $scope.formDefinitions = data;
                 $scope.tabData.tabs[3].info = data.length;
             }).
             error(function(data, status, headers, config) {
@@ -183,7 +183,7 @@ activitiAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
                     loadStartForm();
                 }
                 $scope.loadDecisionTables();
-                $scope.loadForms();
+                $scope.loadFormDefinitions();
 		    }).
 		    error(function(data, status, headers, config) {
 		        if (data && data.message) {
@@ -272,17 +272,17 @@ activitiAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
 		    
 		    $q.all([$translate('FORM-DEFINITIONS.HEADER.ID'),
 	                $translate('FORM-DEFINITIONS.HEADER.NAME'),
-	                $translate('FORM-DEFINITIONS.HEADER.APPID'),
+	                $translate('FORM-DEFINITIONS.HEADER.DEPLOYMENTID'),
 	                $translate('FORM-DEFINITIONS.HEADER.TENANTID')])
 	            .then(function (headers) {
 	                // Config for grid
-	                $scope.gridForms = {
-	                    data: 'forms',
+	                $scope.gridFormDefinitions = {
+	                    data: 'formDefinitions',
 	                    enableRowReordering: true,
 	                    multiSelect: false,
 	                    keepLastSelected: false,
 	                    rowHeight: 36,
-	                    afterSelectionChange: $scope.openForm,
+	                    afterSelectionChange: $scope.openFormDefinition,
 	                    columnDefs: [
 	                        {field: 'id', displayName: headers[0], cellTemplate: gridConstants.defaultTemplate},
 	                        {field: 'name', displayName: headers[1], cellTemplate: gridConstants.defaultTemplate},

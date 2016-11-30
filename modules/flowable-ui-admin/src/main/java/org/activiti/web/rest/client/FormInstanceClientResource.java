@@ -12,8 +12,7 @@
  */
 package org.activiti.web.rest.client;
 
-import javax.servlet.http.HttpServletRequest;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.activiti.domain.EndpointType;
@@ -27,16 +26,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
- * @author Bassam Al-Sarori
  * @author Yvo Swillens
  */
 @RestController
-public class FormInstancesClientResource extends AbstractClientResource {
+public class FormInstanceClientResource extends AbstractClientResource {
 
   @Autowired
   protected FormInstanceService clientService;
@@ -44,40 +41,31 @@ public class FormInstancesClientResource extends AbstractClientResource {
   @Autowired
   protected ObjectMapper objectMapper;
 
-  @RequestMapping(value = "/rest/activiti/form-definition-form-instances/{formDefinitionId}", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode listFormSubmittedForms(HttpServletRequest request, @PathVariable String formDefinitionId) {
+  @RequestMapping(value = "/rest/activiti/form-instances/{formInstanceId}", method = RequestMethod.GET, produces = "application/json")
+  public JsonNode getFormInstance(HttpServletRequest request, @PathVariable String formInstanceId) {
+    ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+    return clientService.getFormInstance(serverConfig, formInstanceId);
+  }
+
+  @RequestMapping(value = "/rest/activiti/task-form-instance/{taskId}", method = RequestMethod.GET, produces = "application/json")
+  public JsonNode getTaskSubmittedForm(@PathVariable String taskId) {
     ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 
     try {
       ObjectNode bodyNode = objectMapper.createObjectNode();
-      bodyNode.put("formDefinitionId", formDefinitionId);
+      bodyNode.put("taskId", taskId);
 
       return clientService.getFormInstances(serverConfig, bodyNode);
+
     } catch (ActivitiServiceException e) {
       throw new BadRequestException(e.getMessage());
     }
   }
 
-  @RequestMapping(value = "/rest/activiti/process-form-instances/{processInstanceId}", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode getProcessSubmittedForms(@PathVariable String processInstanceId) {
+  @RequestMapping(value = "/rest/activiti/form-instances/{formInstanceId}/form-field-values", method = RequestMethod.GET, produces = "application/json")
+  public JsonNode getFormInstanceFormFieldValues(HttpServletRequest request, @PathVariable String formInstanceId) {
     ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
-
-    try {
-      ObjectNode bodyNode = objectMapper.createObjectNode();
-      bodyNode.put("processInstanceId", processInstanceId);
-
-      return clientService.getFormInstances(serverConfig, bodyNode);
-    } catch (ActivitiServiceException e) {
-      throw new BadRequestException(e.getMessage());
-    }
+    return clientService.getFormInstanceFormFieldValues(serverConfig, formInstanceId);
   }
 
-  @RequestMapping(value = "/rest/activiti/form-instances", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode getSubmittedForm(HttpServletRequest request) {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
-
-    Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
-
-    return clientService.listFormInstances(serverConfig, parameterMap);
-  }
 }
