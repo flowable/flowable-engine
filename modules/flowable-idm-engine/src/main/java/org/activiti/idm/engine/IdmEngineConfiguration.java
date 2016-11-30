@@ -57,8 +57,10 @@ import org.activiti.idm.engine.impl.interceptor.LogInterceptor;
 import org.activiti.idm.engine.impl.interceptor.TransactionContextInterceptor;
 import org.activiti.idm.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.activiti.idm.engine.impl.persistence.entity.ByteArrayEntityManagerImpl;
-import org.activiti.idm.engine.impl.persistence.entity.CapabilityEntityManager;
-import org.activiti.idm.engine.impl.persistence.entity.CapabilityEntityManagerImpl;
+import org.activiti.idm.engine.impl.persistence.entity.PrivilegeEntityManager;
+import org.activiti.idm.engine.impl.persistence.entity.PrivilegeEntityManagerImpl;
+import org.activiti.idm.engine.impl.persistence.entity.PrivilegeMappingEntityManager;
+import org.activiti.idm.engine.impl.persistence.entity.PrivilegeMappingEntityManagerImpl;
 import org.activiti.idm.engine.impl.persistence.entity.GroupEntityManager;
 import org.activiti.idm.engine.impl.persistence.entity.GroupEntityManagerImpl;
 import org.activiti.idm.engine.impl.persistence.entity.IdentityInfoEntityManager;
@@ -74,7 +76,8 @@ import org.activiti.idm.engine.impl.persistence.entity.TokenEntityManagerImpl;
 import org.activiti.idm.engine.impl.persistence.entity.UserEntityManager;
 import org.activiti.idm.engine.impl.persistence.entity.UserEntityManagerImpl;
 import org.activiti.idm.engine.impl.persistence.entity.data.ByteArrayDataManager;
-import org.activiti.idm.engine.impl.persistence.entity.data.CapabilityDataManager;
+import org.activiti.idm.engine.impl.persistence.entity.data.PrivilegeDataManager;
+import org.activiti.idm.engine.impl.persistence.entity.data.PrivilegeMappingDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.GroupDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.IdentityInfoDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.MembershipDataManager;
@@ -82,7 +85,8 @@ import org.activiti.idm.engine.impl.persistence.entity.data.PropertyDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.TokenDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.UserDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisByteArrayDataManager;
-import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisCapabilityDataManager;
+import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisPrivilegeDataManager;
+import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisPrivilegeMappingDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisGroupDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisIdentityInfoDataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.impl.MybatisMembershipDataManager;
@@ -132,7 +136,8 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
   protected PropertyDataManager propertyDataManager;
   protected TokenDataManager tokenDataManager;
   protected UserDataManager userDataManager;
-  protected CapabilityDataManager capabilityDataManager;
+  protected PrivilegeDataManager privilegeDataManager;
+  protected PrivilegeMappingDataManager privilegeMappingDataManager;
 
   // ENTITY MANAGERS /////////////////////////////////////////////////
   protected ByteArrayEntityManager byteArrayEntityManager;
@@ -143,7 +148,8 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
   protected TableDataManager tableDataManager;
   protected TokenEntityManager tokenEntityManager;
   protected UserEntityManager userEntityManager;
-  protected CapabilityEntityManager capabilityEntityManager;
+  protected PrivilegeEntityManager privilegeEntityManager;
+  protected PrivilegeMappingEntityManager privilegeMappingEntityManager;
 
   protected CommandContextFactory commandContextFactory;
   protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
@@ -250,8 +256,11 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     if (userDataManager == null) {
     	userDataManager = new MybatisUserDataManager(this);
     }
-    if (capabilityDataManager == null) {
-      capabilityDataManager = new MybatisCapabilityDataManager(this);
+    if (privilegeDataManager == null) {
+      privilegeDataManager = new MybatisPrivilegeDataManager(this);
+    }
+    if (privilegeMappingDataManager == null) {
+      privilegeMappingDataManager = new MybatisPrivilegeMappingDataManager(getIdmEngineConfiguration());
     }
   }
 
@@ -280,8 +289,11 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     if (userEntityManager == null) {
       userEntityManager = new UserEntityManagerImpl(this, userDataManager);
     }
-    if (capabilityEntityManager == null) {
-      capabilityEntityManager = new CapabilityEntityManagerImpl(this, capabilityDataManager);
+    if (privilegeEntityManager == null) {
+      privilegeEntityManager = new PrivilegeEntityManagerImpl(this, privilegeDataManager);
+    }
+    if (privilegeMappingEntityManager == null) {
+      privilegeMappingEntityManager = new PrivilegeMappingEntityManagerImpl(this, privilegeMappingDataManager);
     }
   }
   
@@ -702,12 +714,21 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     return this;
   }
   
-  public CapabilityDataManager getCapabilityDataManager() {
-    return capabilityDataManager;
+  public PrivilegeDataManager getPrivilegeDataManager() {
+    return privilegeDataManager;
   }
 
-  public IdmEngineConfiguration setCapabilityDataManager(CapabilityDataManager capabilityDataManager) {
-    this.capabilityDataManager = capabilityDataManager;
+  public IdmEngineConfiguration setPrivilegeDataManager(PrivilegeDataManager privilegeDataManager) {
+    this.privilegeDataManager = privilegeDataManager;
+    return this;
+  }
+  
+  public PrivilegeMappingDataManager getPrivilegeMappingDataManager() {
+    return privilegeMappingDataManager;
+  }
+
+  public IdmEngineConfiguration setPrivilegeMappingDataManager(PrivilegeMappingDataManager privilegeMappingDataManager) {
+    this.privilegeMappingDataManager = privilegeMappingDataManager;
     return this;
   }
 
@@ -774,12 +795,21 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     return this;
   }
   
-  public CapabilityEntityManager getCapabilityEntityManager() {
-    return capabilityEntityManager;
+  public PrivilegeEntityManager getPrivilegeEntityManager() {
+    return privilegeEntityManager;
   }
 
-  public IdmEngineConfiguration setCapabilityEntityManager(CapabilityEntityManager capabilityEntityManager) {
-    this.capabilityEntityManager = capabilityEntityManager;
+  public IdmEngineConfiguration setPrivilegeEntityManager(PrivilegeEntityManager privilegeEntityManager) {
+    this.privilegeEntityManager = privilegeEntityManager;
+    return this;
+  }
+  
+  public PrivilegeMappingEntityManager getPrivilegeMappingEntityManager() {
+    return privilegeMappingEntityManager;
+  }
+
+  public IdmEngineConfiguration setPrivilegeMappingEntityManager(PrivilegeMappingEntityManager privilegeMappingEntityManager) {
+    this.privilegeMappingEntityManager = privilegeMappingEntityManager;
     return this;
   }
 

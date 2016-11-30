@@ -178,10 +178,10 @@
 		</profile>
 		<!-- database qa profile -->
 		<profile>
-			<id>databaseform</id>
+			<id>databaseidm</id>
 			<activation>
 				<property>
-					<name>databaseform</name>
+					<name>databaseidm</name>
 				</property>
 			</activation>
 			<build>
@@ -200,11 +200,11 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<echo message="updating activiti form configuration to db ${databaseform}" />
-										<copy file="${basedir}/../../qa/db/activiti.form.cfg.xml"
+										<echo message="updating activiti idm configuration to db ${databaseidm}" />
+										<copy file="${basedir}/../../qa/db/activiti.idm.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset
-												filtersfile="${user.home}/.activiti/jdbc/build.activiti6.${databaseform}.properties" />
+												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databaseidm}.properties" />
 										</copy>
 									</tasks>
 								</configuration>
@@ -217,8 +217,8 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<echo message="dropping schema in ${databaseform}" />
-										<java classname="org.activiti.form.engine.impl.db.DbSchemaDrop"
+										<echo message="dropping schema in ${databaseidm}" />
+										<java classname="org.activiti.idm.engine.impl.db.DbSchemaDrop"
 											classpathref="maven.test.classpath" />
 									</tasks>
 								</configuration>
@@ -230,10 +230,10 @@
 		</profile>
 
 		<profile>
-			<id>databasewithschemaform</id>
+			<id>databasewithschemaidm</id>
 			<activation>
 				<property>
-					<name>databasewithschemaform</name>
+					<name>databasewithschemaidm</name>
 				</property>
 			</activation>
 			<build>
@@ -252,11 +252,11 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<echo message="updating activiti form configuration to db ${databasewithschemaform}" />
-										<copy file="${basedir}/../../qa/db/schema/activiti.form.cfg.xml"
+										<echo message="updating activiti idm configuration to db ${databasewithschemaidm}" />
+										<copy file="${basedir}/../../qa/db/schema/activiti.idm.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset
-												filtersfile="${user.home}/.activiti/jdbc/build.activiti6.${databasewithschemaform}.properties" />
+												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasewithschemaidm}.properties" />
 										</copy>
 									</tasks>
 								</configuration>
@@ -269,8 +269,8 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<echo message="dropping schema in ${databasewithschemaform}" />
-										<java classname="org.activiti.form.engine.impl.db.DbSchemaDrop"
+										<echo message="dropping schema in ${databasewithschemaidm}" />
+										<java classname="org.activiti.idm.engine.impl.db.DbSchemaDrop"
 											classpathref="maven.test.classpath" />
 									</tasks>
 								</configuration>
@@ -285,7 +285,7 @@
 			<id>oracle</id>
 			<activation>
 				<property>
-					<name>databaseform</name>
+					<name>databaseidm</name>
 					<value>oracle</value>
 				</property>
 			</activation>
@@ -299,10 +299,10 @@
 		</profile>
 
 		<profile>
-			<id>oraclewithschemaform</id>
+			<id>oraclewithschemaidm</id>
 			<activation>
 				<property>
-					<name>databasewithschemaform</name>
+					<name>databasewithschemaidm</name>
 					<value>oracle</value>
 				</property>
 			</activation>
@@ -319,7 +319,7 @@
 			<id>db2</id>
 			<activation>
 				<property>
-					<name>databaseform</name>
+					<name>databaseidm</name>
 					<value>db2</value>
 				</property>
 			</activation>
@@ -336,7 +336,7 @@
 			<id>mssql</id>
 			<activation>
 				<property>
-					<name>databaseform</name>
+					<name>databaseidm</name>
 					<value>mssql</value>
 				</property>
 			</activation>
@@ -353,7 +353,7 @@
 			<id>mysql</id>
 			<activation>
 				<property>
-					<name>databaseform</name>
+					<name>databaseidm</name>
 					<value>mysql</value>
 				</property>
 			</activation>
@@ -370,7 +370,7 @@
 			<id>hsql</id>
 			<activation>
 				<property>
-					<name>databaseform</name>
+					<name>databaseidm</name>
 					<value>hsql</value>
 				</property>
 			</activation>

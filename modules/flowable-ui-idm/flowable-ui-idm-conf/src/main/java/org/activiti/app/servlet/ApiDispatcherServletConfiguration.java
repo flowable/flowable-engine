@@ -29,7 +29,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import java.util.List;
 
 @Configuration
-@ComponentScan(value = {"org.activiti.rest"})
+@ComponentScan(value = {"org.activiti.app.rest.api", "org.activiti.app.rest.exception"})
 @EnableAsync
 public class ApiDispatcherServletConfiguration extends WebMvcConfigurationSupport {
 

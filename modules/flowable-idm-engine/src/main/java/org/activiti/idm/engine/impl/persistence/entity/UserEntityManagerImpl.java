@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.activiti.engine.common.impl.Page;
 import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
-import org.activiti.idm.api.Group;
 import org.activiti.idm.api.Picture;
 import org.activiti.idm.api.User;
 import org.activiti.idm.api.UserQuery;
@@ -93,10 +92,6 @@ public class UserEntityManagerImpl extends AbstractEntityManager<UserEntity> imp
     return userDataManager.findUserCountByQueryCriteria(query);
   }
 
-  public List<Group> findGroupsByUser(String userId) {
-    return userDataManager.findGroupsByUser(userId);
-  }
-
   public UserQuery createNewUserQuery() {
     return new UserQueryImpl(getCommandExecutor());
   }
@@ -138,6 +133,11 @@ public class UserEntityManagerImpl extends AbstractEntityManager<UserEntity> imp
     UserEntity userEntity = (UserEntity) user;
     userEntity.setPicture(picture);
     userDataManager.update(userEntity);
+  }
+  
+  @Override
+  public List<User> findUsersByPrivilegeId(String name) {
+    return userDataManager.findUsersByPrivilegeId(name);
   }
 
   public UserDataManager getUserDataManager() {

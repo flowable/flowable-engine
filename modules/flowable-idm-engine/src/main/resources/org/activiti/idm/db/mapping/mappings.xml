@@ -24,6 +24,7 @@
     <mapper resource="org/activiti/idm/db/mapping/entity/TableData.xml" />
     <mapper resource="org/activiti/idm/db/mapping/entity/Token.xml" />
     <mapper resource="org/activiti/idm/db/mapping/entity/User.xml" />
-    <mapper resource="org/activiti/idm/db/mapping/entity/Capability.xml" />
+    <mapper resource="org/activiti/idm/db/mapping/entity/Privilege.xml" />
+    <mapper resource="org/activiti/idm/db/mapping/entity/PrivilegeMapping.xml" />
   </mappers>
 </configuration>

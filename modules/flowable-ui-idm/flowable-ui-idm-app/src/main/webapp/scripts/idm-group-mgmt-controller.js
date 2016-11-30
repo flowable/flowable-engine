@@ -13,13 +13,9 @@
 activitiApp.controller('GroupMgmtController', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$modal', '$popover', 'IdmService',
     function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal, $popover, IdmService) {
 
-        if (!$scope.hasAdminCapability()) {
-            $scope.backToLanding();
-        }
-
         var validUser = true;
 
-        $rootScope.setMainPageById('functionalGroupMgmt');
+        $rootScope.setMainPageById('groupMgmt');
 
         $scope.model = {
             loading: true,

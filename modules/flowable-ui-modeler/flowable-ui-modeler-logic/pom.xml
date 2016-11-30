@@ -13,7 +13,11 @@
 
 	<dependencies>
 	
-        <!-- Activiti -->
+        <!-- Flowable -->
+        <dependency>
+           <groupId>org.flowable</groupId>
+           <artifactId>flowable-ui-common</artifactId>
+        </dependency>
         <dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-engine</artifactId>
@@ -88,10 +92,6 @@
 		  <groupId>org.mybatis</groupId>
 		  <artifactId>mybatis-spring</artifactId>
 	    </dependency>
-        <dependency>
-            <groupId>com.fasterxml.uuid</groupId>
-            <artifactId>java-uuid-generator</artifactId>
-        </dependency>
 
 		<!-- COMMON dependencies -->
 		<dependency>
@@ -114,10 +114,6 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
 		</dependency>
 		<dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -187,6 +183,13 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
 		</dependency>
+    
+        <!-- Servlet -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
 	</dependencies>
 
 	<!-- BUILD -->

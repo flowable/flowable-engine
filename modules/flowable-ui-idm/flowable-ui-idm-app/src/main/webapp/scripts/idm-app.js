@@ -92,13 +92,6 @@ activitiApp
                 verify: authRouteResolver
             }
         })
-        .when('/system-group-mgmt', {
-            controller: 'IdmSystemGroupMgmtController',
-            templateUrl: appResourceRoot + 'views/idm-system-group-mgmt.html',
-            resolve: {
-                verify: authRouteResolver
-            }
-        })
         .when('/group-mgmt', {
             controller: 'GroupMgmtController',
             templateUrl: appResourceRoot + 'views/idm-group-mgmt.html',
@@ -106,9 +99,9 @@ activitiApp
                 verify: authRouteResolver
             }
         })
-        .when('/profile', {
-            controller: 'IdmProfileMgmtController',
-            templateUrl: appResourceRoot + 'views/idm-profile-mgmt.html',
+        .when('/privilege-mgmt', {
+            controller: 'PrivilegeMgmtController',
+            templateUrl: appResourceRoot + 'views/idm-privilege-mgmt.html',
             resolve: {
                 verify: authRouteResolver
             }
@@ -118,7 +111,7 @@ activitiApp
             controller: 'LogoutController'
         })
         .otherwise({
-            redirectTo: FLOWABLE.CONFIG.appDefaultRoute || '/profile'
+            redirectTo: FLOWABLE.CONFIG.appDefaultRoute || '/user-mgmt'
         });
     
         // Initialize angular-translate
@@ -180,36 +173,23 @@ activitiApp
 
             updateWindowSize();
 
-            $rootScope.hasAdminCapability = function() {
-                return AuthenticationSharedService.hasAdminCapability();
-            };
-
             // Main navigation depends on the account being fetched
             $rootScope.$watch('account', function() {
                 $rootScope.mainNavigation = [
                     {
                         id: 'userMgmt',
                         title: 'IDM.GENERAL.NAVIGATION.USER-MGMT',
-                        path: '/user-mgmt',
-                        isVisible: function() {
-                            return AuthenticationSharedService.hasAdminCapability();
-                        }
+                        path: '/user-mgmt'
                     },
                     {
-                        id: 'functionalGroupMgmt',
+                        id: 'groupMgmt',
                         title: 'IDM.GENERAL.NAVIGATION.GROUP-MGMT',
-                        path: '/group-mgmt',
-                        isVisible: function() {
-                            return AuthenticationSharedService.hasAdminCapability();
-                        }
+                        path: '/group-mgmt'
                     },
                     {
-                        id: 'profile',
-                        title: 'IDM.GENERAL.NAVIGATION.PROFILE',
-                        path: '/profile',
-                        isVisible: function() {
-                            return true; // Visible for everyone
-                        }
+                        id: 'privilegeMgmt',
+                        title: 'IDM.GENERAL.NAVIGATION.PRIVILEGE-MGMT',
+                        path: '/privilege-mgmt'
                     }
                 ];
 
@@ -337,8 +317,6 @@ activitiApp
 
         updateWindowSize();
 
-        /* Capabilities */
-
         $rootScope.logout = function() {
             AuthenticationSharedService.logout();
         };
@@ -349,6 +327,7 @@ activitiApp
             $rootScope.authenticationChecked = true;
             if (FLOWABLE.CONFIG.loginUrl) {
                 $window.location.href = FLOWABLE.CONFIG.loginUrl.replace("{url}", $location.absUrl());
+                $window.reload();
             }
             else {
                 $location.path('/login').replace();

@@ -43,4 +43,6 @@ public interface GroupEntityManager extends EntityManager<GroupEntity> {
 
   boolean isNewGroup(Group group);
 
+  List<Group> findGroupsByPrivilegeId(String privilegeId);
+  
 }

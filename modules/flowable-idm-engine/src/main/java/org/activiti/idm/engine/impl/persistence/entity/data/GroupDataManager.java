@@ -31,6 +31,8 @@ public interface GroupDataManager extends DataManager<GroupEntity> {
   long findGroupCountByQueryCriteria(GroupQueryImpl query);
 
   List<Group> findGroupsByUser(String userId);
+  
+  List<Group> findGroupsByPrivilegeId(String privilegeId);
 
   List<Group> findGroupsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
 

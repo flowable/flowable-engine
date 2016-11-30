@@ -34,7 +34,6 @@ import org.activiti.engine.common.impl.Page;
 import org.activiti.engine.common.impl.db.ListQueryParameterObject;
 import org.activiti.engine.common.impl.interceptor.Session;
 import org.activiti.engine.common.impl.persistence.entity.Entity;
-import org.activiti.engine.common.impl.transaction.ConnectionHolder;
 import org.activiti.engine.common.impl.util.IoUtil;
 import org.activiti.idm.engine.IdmEngine;
 import org.activiti.idm.engine.IdmEngineConfiguration;
@@ -253,7 +252,7 @@ public class DbSqlSession implements Session {
       }
 
       String errorMessage = null;
-      if (!isIdmTablePresent()) {
+      if (!isIdmPropertyTablePresent()) {
         errorMessage = addMissingComponent(errorMessage, "engine");
       }
 
@@ -290,13 +289,20 @@ public class DbSqlSession implements Session {
   }
 
   public void dbSchemaCreate() {
-    if (isIdmTablePresent()) {
+    if (isIdmPropertyTablePresent()) {
       String dbVersion = getDbVersion();
       if (!IdmEngine.VERSION.equals(dbVersion)) {
         throw new ActivitiWrongDbException(IdmEngine.VERSION, dbVersion);
       }
     } else {
-      dbSchemaCreateIdmEngine();
+      // User and Group tables can already have been created by the process engine in an earlier version
+      if (isIdmGroupTablePresent()) {
+        // Engine upgrade
+        dbSchemaUpgrade("engine", -1);
+        
+      } else {
+        dbSchemaCreateIdmEngine();
+      }
     }
   }
 
@@ -318,7 +324,7 @@ public class DbSqlSession implements Session {
     boolean isUpgradeNeeded = false;
     int matchingVersionIndex = -1;
 
-    if (isIdmTablePresent()) {
+    if (isIdmPropertyTablePresent()) {
 
       PropertyEntity dbVersionProperty = selectById(PropertyEntity.class, "schema.version");
       String dbVersion = dbVersionProperty.getValue();
@@ -336,15 +342,7 @@ public class DbSqlSession implements Session {
       if (isUpgradeNeeded) {
         dbVersionProperty.setValue(IdmEngine.VERSION);
 
-        PropertyEntity dbHistoryProperty;
-        if ("5.0".equals(dbVersion)) {
-          dbHistoryProperty = Context.getCommandContext().getPropertyEntityManager().create();
-          dbHistoryProperty.setName("schema.history");
-          dbHistoryProperty.setValue("create(5.0)");
-          insert(dbHistoryProperty);
-        } else {
-          dbHistoryProperty = selectById(PropertyEntity.class, "schema.history");
-        }
+        PropertyEntity dbHistoryProperty = selectById(PropertyEntity.class, "schema.history");
 
         // Set upgrade history
         String dbHistoryValue = dbHistoryProperty.getValue() + " upgrade(" + dbVersion + "->" + IdmEngine.VERSION + ")";
@@ -352,11 +350,19 @@ public class DbSqlSession implements Session {
 
         // Engine upgrade
         dbSchemaUpgrade("engine", matchingVersionIndex);
-        feedback = "upgraded Activiti IDM from " + dbVersion + " to " + IdmEngine.VERSION;
+        feedback = "upgraded Flowable IDM from " + dbVersion + " to " + IdmEngine.VERSION;
       }
 
     } else {
-      dbSchemaCreate();
+      // User and Group tables can already have been created by the process engine in an earlier version
+      if (isIdmGroupTablePresent()) {
+        // Engine upgrade
+        dbSchemaUpgrade("engine", -1);
+        feedback = "upgraded Flowable IDM to " + IdmEngine.VERSION;
+        
+      } else {
+        dbSchemaCreate();
+      }
     }
 
     return feedback;
@@ -379,8 +385,12 @@ public class DbSqlSession implements Session {
     return matchingVersionIndex;
   }
 
-  public boolean isIdmTablePresent() {
+  public boolean isIdmPropertyTablePresent() {
     return isTablePresent("ACT_ID_PROPERTY");
+  }
+  
+  public boolean isIdmGroupTablePresent() {
+    return isTablePresent("ACT_ID_GROUP");
   }
 
   public boolean isTablePresent(String tableName) {

@@ -924,8 +924,8 @@ activitiModule.
     }]);
 
 activitiModule.
-directive('selectFunctionalGroupPopover', ['$rootScope', '$http', '$popover','appResourceRoot', 'FunctionalGroupService', '$parse',
-    function($rootScope, $http, $popover, appResourceRoot, FunctionalGroupService, $parse) {
+directive('selectGroupPopover', ['$rootScope', '$http', '$popover','appResourceRoot', 'GroupService', '$parse',
+    function($rootScope, $http, $popover, appResourceRoot, GroupService, $parse) {
 
     var directive = {};
     directive.restrict = 'A';
@@ -953,11 +953,11 @@ directive('selectFunctionalGroupPopover', ['$rootScope', '$http', '$popover','ap
         }
 
         if ($scope.ignoreContainer) {
-            $scope.popover = $popover($element, {template: appResourceRoot + '/views/common/popover/select-functional-group-popover.html?' +
+            $scope.popover = $popover($element, {template: appResourceRoot + '/views/common/popover/select--group-popover.html?' +
                 Date.now(), placement: placement});
 
         } else {
-            $scope.popover = $popover($element, {template: appResourceRoot + '/views/common/popover/select-functional-group-popover.html?' +
+            $scope.popover = $popover($element, {template: appResourceRoot + '/views/common/popover/select-group-popover.html?' +
                 Date.now(), placement: placement, container: 'body'});
         }
 
@@ -980,12 +980,7 @@ directive('selectFunctionalGroupPopover', ['$rootScope', '$http', '$popover','ap
         popoverScope.$watch('popupModel.filter', function() {
             if (popoverScope.popupModel.filter && popoverScope.popupModel.filter.length > 0) {
 
-                var tenantId;
-                if ($rootScope.common !== null && $rootScope.common !== undefined && $rootScope.common.selectedTenantId !== null && $rootScope.common.selectedTenantId !== undefined) {
-                    tenantId = $rootScope.common.selectedTenantId > 0 ? $rootScope.common.selectedTenantId : undefined;
-                }
-
-               FunctionalGroupService.getFilteredGroups(popoverScope.popupModel.filter, $scope.restrictWithGroup, tenantId).then(function(result) {
+               GroupService.getFilteredGroups(popoverScope.popupModel.filter, $scope.restrictWithGroup).then(function(result) {
                     var groups = [];
                     if ($scope.excludeGroupId != null && $scope.excludeGroupId) {
                         for (var groupIndex=0; groupIndex < result.data.length; groupIndex++) {
@@ -1000,7 +995,7 @@ directive('selectFunctionalGroupPopover', ['$rootScope', '$http', '$popover','ap
                             }
                         }
                     } else {
-                        groups = result.data;
+                        groups = result;
                     }
                     popoverScope.popupModel.groupResults = groups;
                     popoverScope.resetSelection();

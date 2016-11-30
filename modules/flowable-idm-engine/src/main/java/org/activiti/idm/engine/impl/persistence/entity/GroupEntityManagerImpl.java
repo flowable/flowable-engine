@@ -94,6 +94,11 @@ public class GroupEntityManagerImpl extends AbstractEntityManager<GroupEntity> i
   public boolean isNewGroup(Group group) {
     return ((GroupEntity) group).getRevision() == 0;
   }
+  
+  @Override
+  public List<Group> findGroupsByPrivilegeId(String privilegeId) {
+    return groupDataManager.findGroupsByPrivilegeId(privilegeId);
+  }
 
   public GroupDataManager getGroupDataManager() {
     return groupDataManager;

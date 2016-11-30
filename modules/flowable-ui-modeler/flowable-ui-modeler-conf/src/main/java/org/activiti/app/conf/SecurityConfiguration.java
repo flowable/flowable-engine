@@ -14,12 +14,12 @@ package org.activiti.app.conf;
 
 import org.activiti.app.filter.FlowableCookieFilter;
 import org.activiti.app.security.AjaxLogoutSuccessHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.activiti.app.security.ClearFlowableCookieLogoutHandler;
+import org.activiti.app.security.DefaultPrivileges;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -37,23 +37,14 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
 @EnableWebSecurity
 public class SecurityConfiguration {
 	
-	private static final Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
-
-	@Autowired
-	private Environment env;
-	
-	//
-	// REGULAR WEBAP CONFIG
-	//
+	@Bean
+	public FlowableCookieFilter flowableCookieFilter() {
+	  return new FlowableCookieFilter();
+	}
 	
 	@Configuration
-	@Order(10) // API config first (has Order(1))
+	@Order(10)
   public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
-
-	private static final Logger logger = LoggerFactory.getLogger(FormLoginWebSecurityConfigurerAdapter.class);
-	
-    @Autowired
-    protected Environment env;
 
     @Autowired
     protected FlowableCookieFilter flowableCookieFilter;
@@ -71,14 +62,17 @@ public class SecurityConfiguration {
           .logout()
               .logoutUrl("/app/logout")
               .logoutSuccessHandler(ajaxLogoutSuccessHandler)
-              .deleteCookies("JSESSIONID")
+              .addLogoutHandler(new ClearFlowableCookieLogoutHandler())
               .and()
           .csrf()
               .disable() // Disabled, cause enabling it will cause sessions
           .headers()
               .frameOptions()
               	.sameOrigin()
-              	.addHeaderWriter(new XXssProtectionHeaderWriter());
+              	.addHeaderWriter(new XXssProtectionHeaderWriter())
+              	.and()
+          .authorizeRequests()
+            .antMatchers("/app/rest/**").hasAuthority(DefaultPrivileges.ACCESS_MODELER);
     }
 	}
 }

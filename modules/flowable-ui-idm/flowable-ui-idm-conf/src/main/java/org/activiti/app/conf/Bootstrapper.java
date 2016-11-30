@@ -12,10 +12,9 @@
  */
 package org.activiti.app.conf;
 
-import org.activiti.app.constant.GroupIds;
-import org.activiti.app.constant.GroupTypes;
-import org.activiti.idm.api.Group;
+import org.activiti.app.security.DefaultPrivileges;
 import org.activiti.idm.api.IdmIdentityService;
+import org.activiti.idm.api.Privilege;
 import org.activiti.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +54,7 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
     if (identityService.createUserQuery().count() == 0) {
       log.info("No users found, initializing default entities");
       User user = initializeSuperUser();
-      initializeSuperUserGroups(user);
+      initializeDefaultPrivileges(user.getId());
     }
   }
 
@@ -71,14 +70,16 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
     identityService.saveUser(admin);
     return admin;
   }
-
-  protected void initializeSuperUserGroups(User superUser) {
-    String superUserGroupName = env.getRequiredProperty("admin.group");
-    Group group = identityService.newGroup(GroupIds.ROLE_ADMIN);
-    group.setName(superUserGroupName);
-    group.setType(GroupTypes.TYPE_SECURITY_ROLE);
-    identityService.saveGroup(group);
-    identityService.createMembership(superUser.getId(), group.getId());
-  }
   
+  protected void initializeDefaultPrivileges(String adminId) {
+    Privilege idmAppPrivilege = identityService.createPrivilege(DefaultPrivileges.ACCESS_IDM);
+    identityService.addUserPrivilegeMapping(idmAppPrivilege.getId(), adminId);
+    
+    Privilege adminAppPrivilege = identityService.createPrivilege(DefaultPrivileges.ACCESS_ADMIN);
+    identityService.addUserPrivilegeMapping(adminAppPrivilege.getId(), adminId);
+    
+    Privilege modelerAppPrivilege = identityService.createPrivilege(DefaultPrivileges.ACCESS_MODELER);
+    identityService.addUserPrivilegeMapping(modelerAppPrivilege.getId(), adminId);
+  }
+
 }

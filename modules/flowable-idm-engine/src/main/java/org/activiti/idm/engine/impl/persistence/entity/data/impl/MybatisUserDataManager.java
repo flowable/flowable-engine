@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.common.impl.Page;
-import org.activiti.idm.api.Group;
 import org.activiti.idm.api.User;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.UserQueryImpl;
@@ -53,9 +52,10 @@ public class MybatisUserDataManager extends AbstractDataManager<UserEntity> impl
     return (Long) getDbSqlSession().selectOne("selectUserCountByQueryCriteria", query);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
-  public List<Group> findGroupsByUser(String userId) {
-    return getDbSqlSession().selectList("selectGroupsByUserId", userId);
+  public List<User> findUsersByPrivilegeId(String privilegeId) {
+    return getDbSqlSession().selectList("selectUsersWithPrivilegeId", privilegeId);
   }
 
   @SuppressWarnings("unchecked")

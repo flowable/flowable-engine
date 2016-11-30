@@ -15,20 +15,19 @@ package org.activiti.app.conf;
 import org.activiti.app.security.AjaxAuthenticationFailureHandler;
 import org.activiti.app.security.AjaxAuthenticationSuccessHandler;
 import org.activiti.app.security.AjaxLogoutSuccessHandler;
+import org.activiti.app.security.ClearFlowableCookieLogoutHandler;
 import org.activiti.app.security.CustomDaoAuthenticationProvider;
 import org.activiti.app.security.CustomPersistentRememberMeServices;
+import org.activiti.app.security.DefaultPrivileges;
 import org.activiti.app.security.Http401UnauthorizedEntryPoint;
 import org.activiti.app.web.CustomFormLoginConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Condition;
-import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
-import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.RememberMeAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -55,9 +54,7 @@ public class SecurityConfiguration {
 	
 	private static final Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
 	
-	public static final String KEY_LDAP_ENABLED = "ldap.authentication.enabled";
-
-    //
+  //
 	// GLOBAL CONFIG
 	//
 
@@ -78,11 +75,7 @@ public class SecurityConfiguration {
 	@Bean
 	public UserDetailsService userDetailsService() {
 		org.activiti.app.security.UserDetailsService userDetailsService = new org.activiti.app.security.UserDetailsService();
-
-		// Undocumented setting to configure the amount of time user data is cached before a new check for validity is made
-		// Use <= 0 for always do a check
 		userDetailsService.setUserValidityPeriod(env.getProperty("cache.users.recheck.period", Long.class, 30000L));
-
 		return userDetailsService;
 	}
 
@@ -107,8 +100,6 @@ public class SecurityConfiguration {
 	@Order(10) // API config first (has Order(1))
     public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
-		private static final Logger logger = LoggerFactory.getLogger(FormLoginWebSecurityConfigurerAdapter.class);
-		
 	    @Autowired
 	    private Environment env;
 
@@ -140,7 +131,7 @@ public class SecurityConfiguration {
 	            .logout()
 	                .logoutUrl("/app/logout")
 	                .logoutSuccessHandler(ajaxLogoutSuccessHandler)
-	                .deleteCookies("JSESSIONID")
+	                .addLogoutHandler(new ClearFlowableCookieLogoutHandler())
 	                .permitAll()
 	                .and()
 	            .csrf()
@@ -153,12 +144,7 @@ public class SecurityConfiguration {
 	            .authorizeRequests()
 	                .antMatchers("/*").permitAll()
 	                .antMatchers("/app/rest/authenticate").permitAll()
-	                .antMatchers("/app/rest/integration/login").permitAll()
-	                .antMatchers("/app/rest/temporary/example-options").permitAll()
-	                .antMatchers("/app/rest/idm/email-actions/*").permitAll()
-	                .antMatchers("/app/rest/idm/signups").permitAll()
-	                .antMatchers("/app/rest/idm/passwords").permitAll()
-	                .antMatchers("/app/**").authenticated();
+	                .antMatchers("/app/**").hasAuthority(DefaultPrivileges.ACCESS_IDM);
 
 	        // Custom login form configurer to allow for non-standard HTTP-methods (eg. LOCK)
 	        CustomFormLoginConfig<HttpSecurity> loginConfig = new CustomFormLoginConfig<HttpSecurity>();
@@ -204,15 +190,6 @@ public class SecurityConfiguration {
 					.antMatchers("/api" + "/**").authenticated()
 					.and().httpBasic();
 		}
-	}
-
-	public static class LdapAuthenticationEnabledCondition implements Condition {
-
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-			return context.getEnvironment().getProperty(KEY_LDAP_ENABLED, Boolean.class, false);
-		}
-
 	}
 
 }

@@ -260,7 +260,7 @@
     <!-- BUILD -->
     <build>
 
-        <finalName>flowable-app</finalName>
+        <finalName>flowable-task</finalName>
 
         <resources>
             <resource>

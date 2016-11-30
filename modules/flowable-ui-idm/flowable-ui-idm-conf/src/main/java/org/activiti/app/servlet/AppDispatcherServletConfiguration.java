@@ -14,13 +14,14 @@ package org.activiti.app.servlet;
 
 import java.util.List;
 
+import org.activiti.app.rest.idm.remote.RemoteAccountResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -32,7 +33,10 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
-@ComponentScan(value = {"org.activiti.app.rest"})
+@ComponentScan(
+    value = {"org.activiti.app.rest.idm", "org.activiti.app.rest.exception"},
+    excludeFilters = @ComponentScan.Filter(type=FilterType.ASSIGNABLE_TYPE, value=RemoteAccountResource.class)
+)
 @EnableAsync
 public class AppDispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
@@ -41,9 +45,6 @@ public class AppDispatcherServletConfiguration extends WebMvcConfigurationSuppor
     @Autowired
     private ObjectMapper objectMapper;
     
-    @Autowired
-    private Environment environment;
-
     @Bean
     public SessionLocaleResolver localeResolver() {
         return new SessionLocaleResolver();

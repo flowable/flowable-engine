@@ -8,9 +8,6 @@ create table ACT_ID_PROPERTY (
 insert into ACT_ID_PROPERTY
 values ('schema.version', '6.0.0.0', 1);
 
-insert into ACT_ID_PROPERTY
-values ('next.dbid', '1', 1);
-
 create table ACT_ID_BYTEARRAY (
     ID_ NVARCHAR2(64),
     REV_ INTEGER,
@@ -68,17 +65,23 @@ create table ACT_ID_TOKEN (
     primary key (ID_)
 );
 
-create table ACT_ID_CAPABILITY (
+create table ACT_ID_PRIV (
     ID_ NVARCHAR2(64) not null,
+    NAME_ NVARCHAR2(255),
+    primary key (ID_)
+);
+
+create table ACT_ID_PRIV_MAPPING (
+    ID_ NVARCHAR2(64) not null,
+    PRIV_ID_ NVARCHAR2(64) not null,
     USER_ID_ NVARCHAR2(255),
     GROUP_ID_ NVARCHAR2(255),
-    CAPABILITY_NAME_ NVARCHAR2(255),
     primary key (ID_)
 );
 
 create index ACT_IDX_MEMB_GROUP on ACT_ID_MEMBERSHIP(GROUP_ID_);
 alter table ACT_ID_MEMBERSHIP 
-    add constraint ACT_FK_MEMB_GROUP 
+    add constraint ACT_FK_MEMB_GROUP
     foreign key (GROUP_ID_) 
     references ACT_ID_GROUP (ID_);
 
@@ -87,5 +90,12 @@ alter table ACT_ID_MEMBERSHIP
     add constraint ACT_FK_MEMB_USER
     foreign key (USER_ID_) 
     references ACT_ID_USER (ID_);
+
+create index ACT_IDX_PRIV_MAPPING on ACT_ID_PRIV_MAPPING(PRIV_ID_);    
+alter table ACT_ID_PRIV_MAPPING 
+    add constraint ACT_FK_PRIV_MAPPING 
+    foreign key (PRIV_ID_) 
+    references ACT_ID_PRIV (ID_);
     
-create index ACT_IDX_CAP_NAME on ACT_ID_CAPABILITY(CAPABILITY_NAME_);
+create index ACT_IDX_PRIV_USER on ACT_ID_PRIV_MAPPING(USER_ID_);
+create index ACT_IDX_PRIV_GROUP on ACT_ID_PRIV_MAPPING(GROUP_ID_);   

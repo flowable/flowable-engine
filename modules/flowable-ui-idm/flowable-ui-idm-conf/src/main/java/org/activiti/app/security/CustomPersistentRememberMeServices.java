@@ -20,7 +20,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.activiti.app.service.idm.PersistentTokenService;
+import org.activiti.app.idm.service.PersistentTokenService;
 import org.activiti.idm.api.IdmIdentityService;
 import org.activiti.idm.api.Token;
 import org.activiti.idm.api.User;
@@ -66,8 +66,6 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
 
   private final Logger log = LoggerFactory.getLogger(CustomPersistentRememberMeServices.class);
 
-  public static final String COOKIE_NAME = "FLOWABLE_REMEMBER_ME";
-
   @Autowired
   private PersistentTokenService persistentTokenService;
 
@@ -104,7 +102,7 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
     }
     tokenRefreshDurationInMilliseconds = tokenRefreshSeconds.longValue() * 1000L;
 
-    setCookieName(COOKIE_NAME);
+    setCookieName(CookieConstants.COOKIE_NAME);
   }
 
   @Override

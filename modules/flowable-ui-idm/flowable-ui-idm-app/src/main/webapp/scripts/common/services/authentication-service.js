@@ -56,7 +56,8 @@
             var interceptor = ['$rootScope', '$q', 'httpBuffer', '$translate', function($rootScope, $q, httpBuffer, $translate) {
                 return {
                     responseError: function(response) {
-                        if (response.status === 401 && !response.config.ignoreAuthModule) {
+                        if ( (response.status === 401 || response.status === 403) && !response.config.ignoreAuthModule) {
+                            $rootScope.invalidCredentials = true;
                             var deferred = $q.defer();
                             httpBuffer.append(response.config, deferred);
                             $rootScope.$broadcast('event:auth-loginRequired', response);
@@ -156,25 +157,27 @@ activitiApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'auth
           var deferred = $q.defer();
           $http.get(FLOWABLE.CONFIG.contextRoot + '/app/rest/authenticate', {ignoreErrors: true, ignoreAuthModule: 'ignoreAuthModule'})
               .success(function (data, status, headers, config) {
-              
-                  var authUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/account';
-                  if (FLOWABLE.CONFIG.integrationProfile) {
-                      authUrl += '?includeApps=true';
-                  }
-                  
-                  $http.get(authUrl)
-                      .success(function (data, status, headers, config) {
-                          $rootScope.account = data;
-                          $rootScope.invalidCredentials = false;
-                          $rootScope.$broadcast('event:auth-authConfirmed');
 
-                          deferred.resolve();
-                      })
-                      .error(function(data, status, headers, config) {
-                          // Reject promise and broadcast login required event
-                          deferred.reject(data);
-                          $rootScope.$broadcast('event:auth-loginRequired');
-                      });
+                  var redirectOnAuthSuccess = $location.search().redirectOnAuthSuccess;
+                  if (!redirectOnAuthSuccess) {
+                    var authUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/account';
+                    $http.get(authUrl)
+                        .success(function (data, status, headers, config) {
+                            $rootScope.account = data;
+                            $rootScope.invalidCredentials = false;
+                            $rootScope.$broadcast('event:auth-authConfirmed');
+
+                            deferred.resolve();
+                        })
+                        .error(function(data, status, headers, config) {
+                            // Reject promise and broadcast login required event
+                            deferred.reject(data);
+                            $rootScope.$broadcast('event:auth-loginRequired');
+                        });
+                  } else {
+                      $rootScope.$broadcast('event:auth-authConfirmed');
+                      deferred.resolve();
+                  }
               })
               .error(function(data, status, headers, config) {
                   // Reject promise and broadcast login required event
@@ -217,18 +220,6 @@ activitiApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'auth
                     $rootScope.authenticated = false;
                     authService.loginCancelled({isFromLogout: true});
                 });
-        },
-
-        hasAdminCapability: function() {
-            if ($rootScope.account && $rootScope.account.groups) {
-                for (var groupIndex = 0; groupIndex < $rootScope.account.groups.length; groupIndex++) {
-                    var group = $rootScope.account.groups[groupIndex];
-                    if (group.type !== null && group.type !== undefined && group.type.toLowerCase() === 'security-role') {
-                        return group.id !== null && group.id !== undefined && group.id.toLowerCase() === 'role_admin';
-                    }
-                }
-            }
-            return false;
         }
 
       };

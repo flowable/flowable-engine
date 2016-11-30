@@ -224,11 +224,11 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<echo message="updating activiti form configuration to db ${databasecontent}" />
+										<echo message="updating activiti content configuration to db ${databasecontent}" />
 										<copy file="${basedir}/../../qa/db/activiti.content.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset
-												filtersfile="${user.home}/.flowable/jdbc/build.activiti6.${databasecontent}.properties" />
+												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasecontent}.properties" />
 										</copy>
 									</tasks>
 								</configuration>
@@ -254,10 +254,10 @@
 		</profile>
 
 		<profile>
-			<id>databasewithschemaform</id>
+			<id>databasewithschemacontent</id>
 			<activation>
 				<property>
-					<name>databasewithschemaform</name>
+					<name>databasewithschemacontent</name>
 				</property>
 			</activation>
 			<build>
@@ -276,11 +276,11 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<echo message="updating activiti form configuration to db ${databasewithschemaform}" />
-										<copy file="${basedir}/../../qa/db/schema/activiti.form.cfg.xml"
+										<echo message="updating activiti content configuration to db ${databasewithschemacontent}" />
+										<copy file="${basedir}/../../qa/db/schema/activiti.content.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset
-												filtersfile="${user.home}/.activiti/jdbc/build.activiti6.${databasewithschemaform}.properties" />
+												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasewithschemacontent}.properties" />
 										</copy>
 									</tasks>
 								</configuration>
@@ -293,8 +293,8 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<echo message="dropping schema in ${databasewithschemaform}" />
-										<java classname="org.activiti.form.engine.impl.db.DbSchemaDrop"
+										<echo message="dropping schema in ${databasewithschemacontent}" />
+										<java classname="org.activiti.content.engine.impl.db.DbSchemaDrop"
 											classpathref="maven.test.classpath" />
 									</tasks>
 								</configuration>
@@ -309,7 +309,7 @@
 			<id>oracle</id>
 			<activation>
 				<property>
-					<name>databaseform</name>
+					<name>databasecontent</name>
 					<value>oracle</value>
 				</property>
 			</activation>
@@ -323,10 +323,10 @@
 		</profile>
 
 		<profile>
-			<id>oraclewithschemaform</id>
+			<id>oraclewithschemacontent</id>
 			<activation>
 				<property>
-					<name>databasewithschemaform</name>
+					<name>databasewithschemacontent</name>
 					<value>oracle</value>
 				</property>
 			</activation>
@@ -343,7 +343,7 @@
 			<id>db2</id>
 			<activation>
 				<property>
-					<name>databaseform</name>
+					<name>databasecontent</name>
 					<value>db2</value>
 				</property>
 			</activation>
@@ -360,7 +360,7 @@
 			<id>mssql</id>
 			<activation>
 				<property>
-					<name>databaseform</name>
+					<name>databasecontent</name>
 					<value>mssql</value>
 				</property>
 			</activation>
@@ -377,7 +377,7 @@
 			<id>mysql</id>
 			<activation>
 				<property>
-					<name>databaseform</name>
+					<name>databasecontent</name>
 					<value>mysql</value>
 				</property>
 			</activation>
@@ -394,7 +394,7 @@
 			<id>hsql</id>
 			<activation>
 				<property>
-					<name>databaseform</name>
+					<name>databasecontent</name>
 					<value>hsql</value>
 				</property>
 			</activation>

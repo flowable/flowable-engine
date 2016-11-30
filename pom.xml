@@ -118,6 +118,11 @@
 				<version>1.2.2</version>
 			</dependency>
 			<dependency>
+			    <groupId>commons-codec</groupId>
+			    <artifactId>commons-codec</artifactId>
+			    <version>1.10</version>
+			</dependency>
+			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpclient</artifactId>
 				<version>4.3.5</version>
@@ -140,8 +145,8 @@
 			</dependency>
 			<dependency>
 				<groupId>javax.servlet</groupId>
-				<artifactId>servlet-api</artifactId>
-				<version>2.5</version>
+				<artifactId>javax.servlet-api</artifactId>
+				<version>3.0.1</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.mail</groupId>
@@ -453,6 +458,11 @@
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-jmx</artifactId>
 				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+			    <groupId>org.flowable</groupId>
+			    <artifactId>flowable-ui-common</artifactId>
+			    <version>${project.version}</version>
 			</dependency>
 			<!-- EMAIL -->
 			<dependency>
@@ -981,6 +991,7 @@
 				<module>modules/flowable-content-engine-configurator</module>
 				<module>modules/flowable-content-spring</module>
 				<module>modules/flowable-content-spring-configurator</module>
+				<module>modules/flowable-content-rest</module>
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>
 				<module>modules/flowable-webapp-rest2</module>
@@ -999,6 +1010,10 @@
 				<module>modules/flowable-ldap</module>
 				<module>modules/flowable-jmx</module>
 				<module>modules/flowable-jms-spring-executor</module>
+				<module>modules/flowable-ui-idm</module>
+				<module>modules/flowable-ui-modeler</module>
+				<module>modules/flowable-ui-task</module>
+				<module>modules/flowable-ui-admin</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 			<build>
@@ -1191,6 +1206,7 @@
 				<module>modules/flowable-jms-spring-executor</module>
 				<module>modules/flowable-crystalball</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
+				<module>modules/flowable-ui-common</module>
 			</modules>
 		</profile>
 		<profile>
@@ -1231,6 +1247,30 @@
 			</modules>
 		</profile>
 		<profile>
+			<id>databasecontent</id>
+			<activation>
+				<property>
+					<name>databasecontent</name>
+				</property>
+			</activation>
+			<modules>
+				<module>modules/flowable-content-api</module>
+				<module>modules/flowable-content-engine</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>databaseidm</id>
+			<activation>
+				<property>
+					<name>databaseidm</name>
+				</property>
+			</activation>
+			<modules>
+				<module>modules/flowable-idm-api</module>
+				<module>modules/flowable-idm-engine</module>
+			</modules>
+		</profile>
+		<profile>
 			<id>databasewithschemaform</id>
 			<activation>
 				<property>
@@ -1254,6 +1294,30 @@
 				<module>modules/flowable-dmn-model</module>
 				<module>modules/flowable-dmn-api</module>
 				<module>modules/flowable-dmn-engine</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>databasewithschemacontent</id>
+			<activation>
+				<property>
+					<name>databasewithschemacontent</name>
+				</property>
+			</activation>
+			<modules>
+				<module>modules/flowable-content-api</module>
+				<module>modules/flowable-content-engine</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>databasewithschemaidm</id>
+			<activation>
+				<property>
+					<name>databasewithschemaidm</name>
+				</property>
+			</activation>
+			<modules>
+				<module>modules/flowable-idm-api</module>
+				<module>modules/flowable-idm-engine</module>
 			</modules>
 		</profile>
 		<profile>

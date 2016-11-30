@@ -291,12 +291,12 @@ ul.filter-list li.current a:hover, ul.filter-list li.current a:focus {
     margin-right: 5px;
 }
 
-.potential-group-member, .potential-capability {
+.potential-group-member { 
     cursor: pointer;
     font-size: 16px;
 }
 
-.potential-group-member-selected, .potential-capability-selected {
+.potential-group-member-selected {
     color: #36a7c4;
 }
 
