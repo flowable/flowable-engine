@@ -13,7 +13,11 @@
 
 	<dependencies>
 
-		<!-- Activiti -->
+		<!-- Flowable -->
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-ui-common</artifactId>
+        </dependency>
 		<dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-idm-engine</artifactId>

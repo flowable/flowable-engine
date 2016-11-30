@@ -80,6 +80,8 @@ public class ActivitiEngineConfiguration {
     	List<BpmnParseHandler> preParseHandlers = new ArrayList<BpmnParseHandler>();
     	processEngineConfiguration.setPreBpmnParseHandlers(preParseHandlers);
     	
+    	processEngineConfiguration.setDisableIdmEngine(true); // No need to boot IDM engine for Modeler
+    	
     	processEngineConfiguration.addConfigurator(new SpringFormEngineConfigurator());
     	processEngineConfiguration.addConfigurator(new SpringDmnEngineConfigurator());
     	

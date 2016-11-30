@@ -56,6 +56,12 @@ public class MybatisGroupDataManager extends AbstractDataManager<GroupEntity> im
   public List<Group> findGroupsByUser(String userId) {
     return getDbSqlSession().selectList("selectGroupsByUserId", userId);
   }
+  
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<Group> findGroupsByPrivilegeId(String privilegeId) {
+    return getDbSqlSession().selectList("selectGroupsWithPrivilegeId", privilegeId);
+  }
 
   @SuppressWarnings("unchecked")
   public List<Group> findGroupsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {

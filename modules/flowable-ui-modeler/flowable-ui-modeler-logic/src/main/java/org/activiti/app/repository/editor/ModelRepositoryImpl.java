@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.app.domain.editor.Model;
+import org.activiti.app.repository.UuidIdGenerator;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

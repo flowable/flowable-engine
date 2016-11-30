@@ -84,22 +84,4 @@ activitiModule.service('UserService', ['$http', '$q',
             )
         };
 
-        /*
-         * Get all recent users
-         */
-        this.getRecentUsers = function (username, taskId) {
-            var params = {};
-            if(taskId) {
-                params.excludeTaskId = taskId;
-            }
-
-            return httpAsPromise(
-                {
-                    method: 'GET',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/workflow-users/' + username + '/recent-users',
-                    params: params
-                }
-            );
-        };
-
     }]);

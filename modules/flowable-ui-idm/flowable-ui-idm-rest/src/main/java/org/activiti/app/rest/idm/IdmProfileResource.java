@@ -12,26 +12,23 @@
  */
 package org.activiti.app.rest.idm;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.List;
+import java.io.InputStream;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
-import org.activiti.app.model.idm.ChangePasswordRepresentation;
-import org.activiti.app.model.idm.GroupRepresentation;
-import org.activiti.app.model.idm.UserRepresentation;
+import org.activiti.app.idm.model.ChangePasswordRepresentation;
+import org.activiti.app.idm.service.GroupService;
+import org.activiti.app.idm.service.ProfileService;
+import org.activiti.app.model.common.GroupRepresentation;
+import org.activiti.app.model.common.UserRepresentation;
 import org.activiti.app.security.SecurityUtils;
-import org.activiti.app.service.exception.BadRequestException;
 import org.activiti.app.service.exception.InternalServerErrorException;
 import org.activiti.app.service.exception.NotFoundException;
 import org.activiti.idm.api.Group;
-import org.activiti.idm.api.IdmIdentityService;
-import org.activiti.idm.api.Picture;
 import org.activiti.idm.api.User;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,61 +49,47 @@ import org.springframework.web.multipart.MultipartFile;
 public class IdmProfileResource {
   
   @Autowired
-  protected IdmIdentityService identityService;
+  protected ProfileService profileService;
+  
+  @Autowired
+  protected GroupService groupService;
 
   @RequestMapping(value = "/profile", method = RequestMethod.GET, produces = "application/json")
   public UserRepresentation getProfile() {
     User user = SecurityUtils.getCurrentActivitiAppUser().getUserObject();
-    
     UserRepresentation userRepresentation = new UserRepresentation(user);
-    
-    List<Group> groups = identityService.createGroupQuery().groupMember(user.getId()).list();
-    for (Group group : groups) {
+    for (Group group : groupService.getGroupsForUser(user.getId())) {
       userRepresentation.getGroups().add(new GroupRepresentation(group));
     }
-    
     return userRepresentation;
   }
 
   @RequestMapping(value = "/profile", method = RequestMethod.POST, produces = "application/json")
   public UserRepresentation updateProfile(@RequestBody UserRepresentation userRepresentation) {
-    User currentUser = SecurityUtils.getCurrentUserObject();
-
-    // If user is not externally managed, we need the email address for login, so an empty email is not allowed
-    if (StringUtils.isEmpty(userRepresentation.getEmail())) {
-      throw new BadRequestException("Empty email is not allowed");
-    }
-    
-    User user = identityService.createUserQuery().userId(currentUser.getId()).singleResult();
-    user.setFirstName(userRepresentation.getFirstName());
-    user.setLastName(userRepresentation.getLastName());
-    user.setEmail(userRepresentation.getEmail());
-    identityService.saveUser(user);
-    return new UserRepresentation(user);
+    return new UserRepresentation(profileService.updateProfile(userRepresentation.getFirstName(), 
+        userRepresentation.getLastName(), 
+        userRepresentation.getEmail()));
   }
   
   @ResponseStatus(value = HttpStatus.OK)
   @RequestMapping(value = "/profile-password", method = RequestMethod.POST, produces = "application/json")
   public void changePassword(@RequestBody ChangePasswordRepresentation changePasswordRepresentation) {
-    User user = identityService.createUserQuery().userId(SecurityUtils.getCurrentUserId()).singleResult();
-    if (!user.getPassword().equals(changePasswordRepresentation.getOriginalPassword())) {
-      throw new NotFoundException();
-    }
-    user.setPassword(changePasswordRepresentation.getNewPassword());
-    identityService.saveUser(user);
+    profileService.changePassword(changePasswordRepresentation.getOriginalPassword(), changePasswordRepresentation.getNewPassword());
   }
   
   @RequestMapping(value = "/profile-picture", method = RequestMethod.GET)
   public void getProfilePicture(HttpServletResponse response) {
     try {
-      Picture picture = identityService.getUserPicture(SecurityUtils.getCurrentUserId());
-      response.setContentType(picture.getMimeType());
+      Pair<String, InputStream> picture = profileService.getProfilePicture();
+      if (picture == null) {
+        throw new NotFoundException();
+      }
+      response.setContentType(picture.getLeft());
       ServletOutputStream servletOutputStream = response.getOutputStream();
-      BufferedInputStream in = new BufferedInputStream(  new ByteArrayInputStream(picture.getBytes()));
   
       byte[] buffer = new byte[32384];
       while (true) {
-        int count = in.read(buffer);
+        int count = picture.getRight().read(buffer);
         if (count == -1)
           break;
         servletOutputStream.write(buffer, 0, count);
@@ -123,13 +106,11 @@ public class IdmProfileResource {
   @ResponseStatus(value = HttpStatus.OK)
   @RequestMapping(value = "/profile-picture", method = RequestMethod.POST, produces = "application/json")
   public void uploadProfilePicture(@RequestParam("file") MultipartFile file) {
-    Picture picture = null;
     try {
-      picture = new Picture(file.getBytes(), file.getContentType());
+      profileService.uploadProfilePicture(file.getContentType(), file.getBytes());
     } catch (IOException e) {
       throw new InternalServerErrorException(e.getMessage(), e);
     }
-    identityService.setUserPicture(SecurityUtils.getCurrentUserId(), picture);
   }
   
 }

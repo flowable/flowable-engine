@@ -72,27 +72,6 @@
                         </blockquote>
                     </div>
 
-                    <!-- Sync details -->
-                    <div class="section" style="min-height: 0" ng-if="model.selectedGroup.externalId != null && model.selectedGroup.externalId != undefined">
-
-                        <h3 style="margin-bottom: 10px;">
-                            {{'IDM.FUNCTIONAL-GROUP-MGMT.SYNC-DETAILS' | translate}}
-                        </h3>
-
-                        <table>
-                            <tr>
-                                <td style="padding-right: 10px;">{{'IDM.FUNCTIONAL-GROUP-MGMT.EXTERNAL-ID' | translate}}</td>
-                                <td>{{model.selectedGroup.externalId}}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding-right:10px;">{{'IDM.FUNCTIONAL-GROUP-MGMT.LAST-SYNC-TIME' | translate}}</td>
-                                <td>{{model.selectedGroup.lastSyncTimeStamp | dateformat}}</td>
-                            </tr>
-                        </table>
-
-                    </div>
-
-
                     <!-- Users -->
                     <div class="section" style="min-height: 0">
 

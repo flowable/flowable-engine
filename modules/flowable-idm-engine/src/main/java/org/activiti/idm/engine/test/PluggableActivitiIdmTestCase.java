@@ -16,8 +16,8 @@ package org.activiti.idm.engine.test;
 import java.util.List;
 
 import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.idm.api.Capability;
 import org.activiti.idm.api.Group;
+import org.activiti.idm.api.Privilege;
 import org.activiti.idm.api.User;
 import org.activiti.idm.engine.IdmEngine;
 import org.activiti.idm.engine.IdmEngines;
@@ -66,10 +66,10 @@ public abstract class PluggableActivitiIdmTestCase extends AbstractActivitiIdmTe
   
   protected void clearAllUsersAndGroups() {
     
-    // Capabilities
-    List<Capability> capabilities = idmIdentityService.createCapabilityQuery().list();
-    for (Capability capability : capabilities) {
-      idmIdentityService.deleteCapability(capability.getId());
+    // Privileges
+    List<Privilege> privileges = idmIdentityService.createPrivilegeQuery().list();
+    for (Privilege privilege : privileges) {
+      idmIdentityService.deletePrivilege(privilege.getId());
     }
     
     // Groups

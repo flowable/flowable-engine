@@ -99,7 +99,6 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
               throw new ActivitiException("user not found " + userId);
             }
             
-            // Add capabilities to user object
             Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
 
             // add default authority

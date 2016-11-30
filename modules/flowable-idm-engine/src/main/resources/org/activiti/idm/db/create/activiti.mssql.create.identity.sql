@@ -68,22 +68,34 @@ create table ACT_ID_TOKEN (
     primary key (ID_)
 );
 
-create table ACT_ID_CAPABILITY (
+create table ACT_ID_PRIV (
     ID_ nvarchar(64) not null,
-    USER_ID_ nvarchar(255),
-    GROUP_ID_ nvarchar(255),
-    CAPABILITY_NAME_ nvarchar(255),
+    NAME_ nvarchar(255),
     primary key (ID_)
 );
 
-alter table ACT_ID_MEMBERSHIP 
-    add constraint ACT_FK_MEMB_GROUP 
-    foreign key (GROUP_ID_) 
-    references ACT_ID_GROUP (ID_);
+create table ACT_ID_PRIV_MAPPING (
+    ID_ nvarchar(64) not null,
+    PRIV_ID_ nvarchar(64) not null,
+    USER_ID_ nvarchar(255),
+    GROUP_ID_ nvarchar(255),
+    primary key (ID_)
+);
 
-alter table ACT_ID_MEMBERSHIP 
-    add constraint ACT_FK_MEMB_USER 
-    foreign key (USER_ID_) 
+alter table ACT_ID_MEMBERSHIP
+    add constraint ACT_FK_MEMB_GROUP
+    foreign key (GROUP_ID_)
+    references ACT_ID_GROUP;
+
+alter table ACT_ID_MEMBERSHIP
+    add constraint ACT_FK_MEMB_USER
+    foreign key (USER_ID_)
     references ACT_ID_USER (ID_);
+
+alter table ACT_ID_PRIV_MAPPING 
+    add constraint ACT_FK_PRIV_MAPPING 
+    foreign key (PRIV_ID_) 
+    references ACT_ID_PRIV (ID_);
     
-create index ACT_IDX_CAP_NAME on ACT_ID_CAPABILITY(CAPABILITY_NAME_);    
+create index ACT_IDX_PRIV_USER on ACT_ID_PRIV_MAPPING(USER_ID_);
+create index ACT_IDX_PRIV_GROUP on ACT_ID_PRIV_MAPPING(GROUP_ID_);      

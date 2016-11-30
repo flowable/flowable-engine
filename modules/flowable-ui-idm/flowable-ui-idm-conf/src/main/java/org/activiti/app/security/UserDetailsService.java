@@ -15,14 +15,13 @@ package org.activiti.app.security;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.activiti.app.service.api.UserCache;
-import org.activiti.app.service.api.UserCache.CachedUser;
-import org.activiti.idm.api.Group;
+import org.activiti.app.idm.cache.UserCache;
+import org.activiti.app.idm.cache.UserCache.CachedUser;
+import org.activiti.app.idm.model.UserInformation;
+import org.activiti.app.idm.service.UserService;
 import org.activiti.idm.api.IdmIdentityService;
 import org.activiti.idm.api.User;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,10 +39,10 @@ public class UserDetailsService implements org.springframework.security.core.use
   private UserCache userCache;
 
   @Autowired
-  private IdmIdentityService identityService;
-
+  protected IdmIdentityService identityService;
+  
   @Autowired
-  private Environment env;
+  protected UserService userService;
 
   private long userValidityPeriod;
 
@@ -66,23 +65,13 @@ public class UserDetailsService implements org.springframework.security.core.use
       throw new UsernameNotFoundException("User " + actualLogin + " was not found in the database");
     }
 
-    // Add capabilities to user object
     Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
-
-    // add default authority
-    grantedAuthorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.USER));
-
-    // check if user is in super user group
-    String superUserGroupName = env.getRequiredProperty("admin.group");
-    for (Group group : identityService.createGroupQuery().groupMember(userFromDatabase.getId()).list()) {
-      if (StringUtils.equals(superUserGroupName, group.getName())) {
-        grantedAuthorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN));
-      }
+    UserInformation userInformation = userService.getUserInformation(userFromDatabase.getId());
+    for (String privilege : userInformation.getPrivileges()) {
+      grantedAuthorities.add(new SimpleGrantedAuthority(privilege));
     }
     
-    // Adding it manually to cache
     userCache.putUser(userFromDatabase.getId(), new CachedUser(userFromDatabase, grantedAuthorities));
-
     return new ActivitiAppUser(userFromDatabase, actualLogin, grantedAuthorities);
   }
 

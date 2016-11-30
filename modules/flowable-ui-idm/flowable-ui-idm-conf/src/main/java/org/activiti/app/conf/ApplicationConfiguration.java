@@ -25,10 +25,9 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 })
 @ComponentScan(basePackages = {
         "org.activiti.app.conf",
-        "org.activiti.app.repository",
-        "org.activiti.app.service",
         "org.activiti.app.security",
-        "org.activiti.app.model.component"})
+        "org.activiti.app.idm",
+        "org.activiti.app.service"})
 public class ApplicationConfiguration {
 	
 	/**

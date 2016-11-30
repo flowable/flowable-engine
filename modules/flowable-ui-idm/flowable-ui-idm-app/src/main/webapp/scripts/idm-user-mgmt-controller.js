@@ -16,10 +16,6 @@
 activitiApp.controller('IdmUserMgmtController', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$modal',
     function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal) {
 
-        if (!$scope.hasAdminCapability()) {
-            $scope.backToLanding();
-        }
-
         $rootScope.setMainPageById('userMgmt');
 
         $scope.model = {
@@ -62,10 +58,6 @@ activitiApp.controller('IdmUserMgmtController', ['$rootScope', '$scope', '$trans
                 }).
                 error(function(data, status, headers, config) {
                     $scope.model.loading = false;
-
-                    if(status == 403) {
-                        console.log('Forbidden!');
-                    }
                 });
         };
 
@@ -230,10 +222,6 @@ activitiApp.controller('IdmUserMgmtController', ['$rootScope', '$scope', '$trans
 activitiApp.controller('IdmCreateUserPopupController', ['$rootScope', '$scope', '$http',
     function ($rootScope, $scope, $http) {
 
-        if (!$scope.hasAdminCapability()) {
-            $scope.backToLanding();
-        }
-
 
         if ($scope.model.user === null || $scope.model.user === undefined) {
             $scope.model.user = {};
@@ -337,10 +325,6 @@ activitiApp.controller('IdmCreateUserPopupController', ['$rootScope', '$scope', 
 activitiApp.controller('IdmUserBulkUpdatePopupController', ['$rootScope', '$scope', '$http',
   function ($rootScope, $scope, $http) {
 
-      if (!$scope.hasAdminCapability()) {
-          $scope.backToLanding();
-      }
-
       if ($scope.model.mode == 'password') {
           $scope.model.updateUsers = {
               password: ''
@@ -382,9 +366,6 @@ activitiApp.controller('IdmUserBulkUpdatePopupController', ['$rootScope', '$scop
               $rootScope.addAlert('Error while updating user status', 'error');
             }
             $scope.$hide();
-            if(status == 403) {
-                console.log('Not permitted!');
-            }
          });
     };
 

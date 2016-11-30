@@ -118,6 +118,11 @@
 				<version>1.2.2</version>
 			</dependency>
 			<dependency>
+			    <groupId>commons-codec</groupId>
+			    <artifactId>commons-codec</artifactId>
+			    <version>1.10</version>
+			</dependency>
+			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpclient</artifactId>
 				<version>4.3.5</version>
@@ -140,8 +145,8 @@
 			</dependency>
 			<dependency>
 				<groupId>javax.servlet</groupId>
-				<artifactId>servlet-api</artifactId>
-				<version>2.5</version>
+				<artifactId>javax.servlet-api</artifactId>
+				<version>3.0.1</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.mail</groupId>
@@ -453,6 +458,11 @@
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-jmx</artifactId>
 				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+			    <groupId>org.flowable</groupId>
+			    <artifactId>flowable-ui-common</artifactId>
+			    <version>${project.version}</version>
 			</dependency>
 			<!-- EMAIL -->
 			<dependency>
@@ -1196,6 +1206,7 @@
 				<module>modules/flowable-jms-spring-executor</module>
 				<module>modules/flowable-crystalball</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
+				<module>modules/flowable-ui-common</module>
 			</modules>
 		</profile>
 		<profile>

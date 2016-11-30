@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.activiti.engine.common.impl.Page;
 import org.activiti.engine.common.impl.persistence.entity.EntityManager;
-import org.activiti.idm.api.Group;
 import org.activiti.idm.api.Picture;
 import org.activiti.idm.api.User;
 import org.activiti.idm.api.UserQuery;
@@ -37,8 +36,6 @@ public interface UserEntityManager extends EntityManager<UserEntity> {
 
   long findUserCountByQueryCriteria(UserQueryImpl query);
 
-  List<Group> findGroupsByUser(String userId);
-
   UserQuery createNewUserQuery();
 
   Boolean checkPassword(String userId, String password);
@@ -54,5 +51,7 @@ public interface UserEntityManager extends EntityManager<UserEntity> {
   void setUserPicture(User user, Picture picture);
   
   void deletePicture(User user);
+  
+  List<User> findUsersByPrivilegeId(String privilegeId);
 
 }

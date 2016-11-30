@@ -72,7 +72,8 @@
         "NAVIGATION": {
             "PROFILE": "Personal",
             "USER-MGMT": "Users",
-            "GROUP-MGMT": "Groups"
+            "GROUP-MGMT": "Groups",
+            "PRIVILEGE-MGMT": "Privileges"
         },
         "ACTION": {
           "CANCEL": "Cancel",
@@ -201,6 +202,22 @@
                 "EDIT-TITLE": "Edit group"
             }
         },
+      "PRIVILEGE-MGMT": {
+          "access-idm": "Access identity management application",
+          "access-admin": "Access admin application",
+          "access-modeler": "Access modeler application",
+          "NO-SELECTION": "No privilege selected",
+          "USERS": "Users",
+          "GROUPS": "Groups",
+          "NO-USERS": "No users found. Click here to add a user.",
+          "NO-GROUPS": "No groups found. Click here to add a new group",
+          "ADD-USER": "Add a user",
+          "ADD-GROUP": "Add a group",
+          "POPOVER-SELECT-USER-TITLE": "Select user",
+          "POPOVER-SELECT-GROUP-TITLE": "Select group",
+          "GROUP-ID": "Group id",
+          "GROUP-NAME": "Group name"
+      },
       "PROFILE-MGMT": {
          "CREATED": "Registered since",
          "CHANGE-PASSWORD": "Change password",
