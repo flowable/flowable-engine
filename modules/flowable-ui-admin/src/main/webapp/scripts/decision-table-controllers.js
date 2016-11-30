@@ -79,13 +79,13 @@ activitiAdminApp.controller('DecisionTableController', ['$scope', '$rootScope', 
                 $scope.decisionTable = data;
 
                 // Load decision audits
-                $http({
-                    method: 'GET',
-                    url: '/app/rest/activiti/decision-audits?decisionKey=' + data.key + '&dmnDeploymentId=' + data.deploymentId
-                }).
-                success(function (auditsData, status, headers, config) {
-                    $scope.decisionAudits = auditsData;
-                });
+                // $http({
+                //     method: 'GET',
+                //     url: '/app/rest/activiti/decision-audits?decisionKey=' + data.key + '&dmnDeploymentId=' + data.deploymentId
+                // }).
+                // success(function (auditsData, status, headers, config) {
+                //     $scope.decisionAudits = auditsData;
+                // });
             }).
             error(function (data, status, headers, config) {
                 if (data && data.message) {
