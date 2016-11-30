@@ -19,7 +19,8 @@ import java.util.Map;
  */
 public class FormRequest {
 
-  private String formId;
+  private String formInstanceId;
+  private String formDefinitionId;
   private String formDefinitionKey;
   private String processInstanceId;
   private String taskId;
@@ -27,12 +28,20 @@ public class FormRequest {
   private String parentDeploymentId;
   private Map<String, Object> variables;
 
-  public String getFormId() {
-    return formId;
+  public String getFormInstanceId() {
+    return formInstanceId;
   }
 
-  public void setFormId(String formId) {
-    this.formId = formId;
+  public void setFormInstanceId(String formInstanceId) {
+    this.formInstanceId = formInstanceId;
+  }
+
+  public String getFormDefinitionId() {
+    return formDefinitionId;
+  }
+
+  public void setFormDefinitionId(String formDefinitionId) {
+    this.formDefinitionId = formDefinitionId;
   }
 
   public String getFormDefinitionKey() {

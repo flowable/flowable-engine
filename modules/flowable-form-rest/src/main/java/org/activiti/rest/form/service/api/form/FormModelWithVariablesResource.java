@@ -55,15 +55,15 @@ public class FormModelWithVariablesResource {
           formRequest.getVariables(),
           formRequest.getTenantId()
       );
-    } else if (formRequest.getFormId() != null) {
+    } else if (formRequest.getFormDefinitionId() != null) {
       formModel = formService.getFormModelWithVariablesById(
-          formRequest.getFormId(),
+          formRequest.getFormDefinitionId(),
           formRequest.getProcessInstanceId(),
           formRequest.getVariables(),
           formRequest.getTenantId()
       );
     } else {
-      throw new ActivitiIllegalArgumentException("Either parent deployment key, form definition key or form id must be provided in the request");
+      throw new ActivitiIllegalArgumentException("Either parent deployment key, form definition key or form definition id must be provided in the request");
     }
 
     if (formModel == null) {
