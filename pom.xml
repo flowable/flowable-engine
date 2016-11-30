@@ -410,7 +410,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
-				<artifactId>flowable-webapp-rest2</artifactId>
+				<artifactId>flowable-app-rest</artifactId>
 				<type>war</type>
 				<version>${project.version}</version>
 			</dependency>
@@ -994,7 +994,7 @@
 				<module>modules/flowable-content-rest</module>
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>
-				<module>modules/flowable-webapp-rest2</module>
+				<module>modules/flowable-app-rest</module>
 				<module>modules/flowable-idm-spring</module>
 				<module>modules/flowable-spring</module>
 				<module>modules/flowable5-engine</module>
@@ -1073,7 +1073,7 @@
 				<module>modules/flowable-spring-boot</module>
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>
-				<module>modules/flowable-webapp-rest2</module>
+				<module>modules/flowable-app-rest</module>
 				<module>modules/flowable-cxf</module>
 				<module>modules/flowable-secure-javascript</module>
 				<module>modules/flowable-form-json-converter</module>
@@ -1112,7 +1112,7 @@
 				<module>modules/flowable-spring</module>
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>
-				<module>modules/flowable-webapp-rest2</module>
+				<module>modules/flowable-app-rest</module>
 				<module>modules/flowable-cxf</module>
 				<module>modules/flowable-secure-javascript</module>
 			</modules>
@@ -1195,7 +1195,7 @@
 				<module>modules/flowable-spring-boot</module>
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>
-				<module>modules/flowable-webapp-rest2</module>
+				<module>modules/flowable-app-rest</module>
 				<module>modules/flowable-cxf</module>
 				<module>modules/flowable-osgi</module>
 				<module>modules/flowable-camel</module>
