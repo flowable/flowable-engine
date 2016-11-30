@@ -34,13 +34,13 @@ create table ACT_ID_PRIV (
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
-create table ACT_ID_PRIV_MAPPING {
+create table ACT_ID_PRIV_MAPPING (
     ID_ varchar(64) not null,
     PRIV_ID_ varchar(64) not null,
     USER_ID_ varchar(255),
     GROUP_ID_ varchar(255),
     primary key (ID_)
-} ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
 alter table ACT_ID_PRIV_MAPPING 
     add constraint ACT_FK_PRIV_MAPPING 

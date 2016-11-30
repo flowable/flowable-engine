@@ -60,7 +60,7 @@ public class DbSqlSession implements Session {
   static {
 
     /* Previous */
-
+    ACTIVITI_IDM_VERSIONS.add(new ActivitiIdmVersion("0"));
     
     /* Current */
     ACTIVITI_IDM_VERSIONS.add(new ActivitiIdmVersion(IdmEngine.VERSION));
@@ -298,7 +298,7 @@ public class DbSqlSession implements Session {
       // User and Group tables can already have been created by the process engine in an earlier version
       if (isIdmGroupTablePresent()) {
         // Engine upgrade
-        dbSchemaUpgrade("engine", -1);
+        dbSchemaUpgrade("engine", 0);
         
       } else {
         dbSchemaCreateIdmEngine();
@@ -357,7 +357,7 @@ public class DbSqlSession implements Session {
       // User and Group tables can already have been created by the process engine in an earlier version
       if (isIdmGroupTablePresent()) {
         // Engine upgrade
-        dbSchemaUpgrade("engine", -1);
+        dbSchemaUpgrade("engine", 0);
         feedback = "upgraded Flowable IDM to " + IdmEngine.VERSION;
         
       } else {

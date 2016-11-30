@@ -34,13 +34,13 @@ create table ACT_ID_PRIV (
     primary key (ID_)
 );
 
-create table ACT_ID_PRIV_MAPPING {
+create table ACT_ID_PRIV_MAPPING (
     ID_ varchar(64) not null,
     PRIV_ID_ varchar(64) not null,
     USER_ID_ varchar(255),
     GROUP_ID_ varchar(255),
     primary key (ID_)
-};
+);
 
 alter table ACT_ID_PRIV_MAPPING 
     add constraint ACT_FK_PRIV_MAPPING 

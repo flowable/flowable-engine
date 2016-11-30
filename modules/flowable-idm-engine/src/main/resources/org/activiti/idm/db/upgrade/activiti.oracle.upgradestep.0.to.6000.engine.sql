@@ -34,13 +34,13 @@ create table ACT_ID_PRIV (
     primary key (ID_)
 );
 
-create table ACT_ID_PRIV_MAPPING {
+create table ACT_ID_PRIV_MAPPING (
     ID_ NVARCHAR2(64) not null,
     PRIV_ID_ NVARCHAR2(64) not null,
     USER_ID_ NVARCHAR2(255),
     GROUP_ID_ NVARCHAR2(255),
     primary key (ID_)
-};
+);
 
 create index ACT_IDX_PRIV_MAPPING on ACT_ID_PRIV_MAPPING(PRIV_ID_);    
 alter table ACT_ID_PRIV_MAPPING 
