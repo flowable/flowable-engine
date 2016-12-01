@@ -16,6 +16,7 @@ package org.activiti.compatibility.wrapper;
 import java.util.Date;
 import java.util.Map;
 
+import org.activiti.bpmn.model.FlowElement;
 import org.activiti.engine.runtime.ProcessInstance;
 
 /**
@@ -53,6 +54,11 @@ public class Activiti5ProcessInstanceWrapper implements ProcessInstance {
   
   @Override
   public String getRootProcessInstanceId() {
+    return null;
+  }
+  
+  @Override
+  public FlowElement getCurrentFlowElement() {
     return null;
   }
 

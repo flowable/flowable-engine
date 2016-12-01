@@ -35,6 +35,7 @@ import org.activiti.engine.impl.cmd.DeleteProcessInstanceCmd;
 import org.activiti.engine.impl.cmd.DispatchEventCommand;
 import org.activiti.engine.impl.cmd.ExecuteActivityForAdhocSubProcessCmd;
 import org.activiti.engine.impl.cmd.FindActiveActivityIdsCmd;
+import org.activiti.engine.impl.cmd.GetActiveAdhocSubProcessesCmd;
 import org.activiti.engine.impl.cmd.GetDataObjectCmd;
 import org.activiti.engine.impl.cmd.GetDataObjectsCmd;
 import org.activiti.engine.impl.cmd.GetEnabledActivitiesForAdhocSubProcessCmd;
@@ -517,6 +518,11 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   @Override
   public List<Event> getProcessInstanceEvents(String processInstanceId) {
     return commandExecutor.execute(new GetProcessInstanceEventsCmd(processInstanceId));
+  }
+  
+  @Override
+  public List<Execution> getAdhocSubProcessExecutions(String processInstanceId) {
+    return commandExecutor.execute(new GetActiveAdhocSubProcessesCmd(processInstanceId));
   }
   
   @Override
