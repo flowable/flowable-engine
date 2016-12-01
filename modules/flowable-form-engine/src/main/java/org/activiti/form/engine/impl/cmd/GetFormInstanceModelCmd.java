@@ -31,6 +31,7 @@ import org.activiti.form.engine.impl.interceptor.CommandContext;
 import org.activiti.form.engine.impl.persistence.deploy.DeploymentManager;
 import org.activiti.form.engine.impl.persistence.deploy.FormDefinitionCacheEntry;
 import org.activiti.form.engine.impl.persistence.entity.FormDefinitionEntity;
+import org.activiti.form.engine.impl.persistence.entity.FormInstanceEntity;
 import org.activiti.form.model.ExpressionFormField;
 import org.activiti.form.model.FormField;
 import org.activiti.form.model.FormFieldTypes;
@@ -53,6 +54,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
   
   private static final long serialVersionUID = 1L;
 
+  protected String formInstanceId;
   protected String formDefinitionKey;
   protected String parentDeploymentId;
   protected String formDefinitionId;
@@ -60,7 +62,12 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
   protected String processInstanceId;
   protected String tenantId;
   protected Map<String, Object> variables;
-  
+
+  public GetFormInstanceModelCmd(String formInstanceId, Map<String, Object> variables) {
+    initializeValues(null, null, null, null, null, null, variables);
+    this.formInstanceId = formInstanceId;
+  }
+
   public GetFormInstanceModelCmd(String formDefinitionKey, String formDefinitionId, String taskId, 
       String processInstanceId, Map<String, Object> variables) {
     
@@ -80,8 +87,8 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
   }
 
   public FormInstanceModel execute(CommandContext commandContext) {
-    if (taskId == null && processInstanceId == null) {
-      throw new ActivitiException("A task id or process instance id should be provided");
+    if (formInstanceId == null && (taskId == null && processInstanceId == null)) {
+      throw new ActivitiException("A processtask id or process instance id should be provided");
     }
     
     FormDefinitionCacheEntry formDefinitionCacheEntry = resolveFormDefinition(commandContext);
@@ -156,7 +163,20 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
 
     // Find the form definition
     FormDefinitionEntity formDefinitionEntity = null;
-    if (formDefinitionId != null) {
+
+    if (formInstanceId != null) {
+
+      FormInstanceEntity formInstanceEntity = commandContext.getFormEngineConfiguration().getFormInstanceDataManager().findById(formInstanceId);
+      if (formInstanceEntity == null) {
+        throw new ActivitiObjectNotFoundException("No form instance found for id = '" + formInstanceId + "'", FormInstanceEntity.class);
+      }
+
+      formDefinitionEntity = deploymentManager.findDeployedFormDefinitionById(formInstanceEntity.getFormDefinitionId());
+      if (formDefinitionEntity == null) {
+        throw new ActivitiObjectNotFoundException("No form definition found for id = '" + formDefinitionId + "'", FormDefinitionEntity.class);
+      }
+
+    } else if (formDefinitionId != null) {
 
       formDefinitionEntity = deploymentManager.findDeployedFormDefinitionById(formDefinitionId);
       if (formDefinitionEntity == null) {

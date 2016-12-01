@@ -45,27 +45,4 @@ public class FormDefinitionClientResource extends AbstractClientResource {
             throw new BadRequestException(e.getMessage());
         }
     }
-
-//    @RequestMapping(value = "/rest/activiti/form-definitions/{formDefinitionId}/editorJson", method = RequestMethod.GET, produces = "application/json")
-//    public JsonNode getEditorJsonForForm(@PathVariable String formDefinitionId) throws BadRequestException {
-//
-//        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
-//        try {
-//            return clientService.getEditorJsonForForm(serverConfig, formDefinitionId);
-//        } catch (ActivitiServiceException e) {
-//            throw new BadRequestException(e.getMessage());
-//        }
-//    }
-//
-//    @RequestMapping(value = "/rest/activiti/process-definition-start-form-definition/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
-//    public JsonNode getProcessDefinitionStartForm(@PathVariable String processDefinitionId) throws BadRequestException {
-//
-//        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
-//        try {
-//            return clientService.getProcessDefinitionStartForm(serverConfig, processDefinitionId);
-//        } catch (ActivitiServiceException e) {
-//            throw new BadRequestException(e.getMessage());
-//        }
-//    }
-
 }

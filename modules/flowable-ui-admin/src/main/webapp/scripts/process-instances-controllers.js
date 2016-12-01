@@ -19,7 +19,7 @@
 activitiAdminApp.controller('ProcessInstancesController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', 'gridConstants',
     function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, gridConstants) {
 
-		$rootScope.navigation = {selection: 'process-instances'};
+		$rootScope.navigation = {main: 'process-engine', sub: 'instances'};
 		
 		$scope.filter = {};
 		$scope.processInstances = {};

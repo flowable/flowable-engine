@@ -10,15 +10,19 @@
 */
 
 body {
-	font-family: 'Open Sans', sans-serif;
+	font-family: 'Ubuntu', sans-serif;
 	background-color: #eef1f1;
-	padding-top: 60px;
+	padding-top: 90px;
 	padding-bottom: 20px;
 }
 
 .container {
   margin: 0 auto;
   min-width: 1024px;
+}
+
+.no-top-gutter {
+	margin-top: -40px; !important;
 }
 
 .error-text {
@@ -50,7 +54,7 @@ body {
 	margin-bottom: 5px;
 }
 
-.inline-button:lastchild {
+.inline-button:last-child {
 	margin-bottom: 0;
 }
 
@@ -72,17 +76,19 @@ body {
 	background-color: #384042;
 	border: none;
 	min-height: 40px;
+	margin-bottom: 5px;
 }
 
 .nav.navbar-nav {
 	background-color: #384042;
 	color: #eef1f1;
 	border: none;
-	margin-left: 20px;
 }
 
 .navbar-header .navbar-brand {
+    position: relative;
 	padding-top: 0px;
+	top: 2px;
 	line-height: 35px;
     height: 35px;
     background: url(../images/logo.png) no-repeat 15px center;
@@ -98,8 +104,23 @@ body {
 	font-size: 12px;
 }
 
-.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
-	background-color: #55ae4d;
+.navbar-inverse .navbar-nav > .active-process > a, .navbar-inverse .navbar-nav > .active-process > a:hover, .navbar-inverse .navbar-nav > .active-process > a:focus {
+	background: rgb(162,204,70);
+	color: #ffffff;
+}
+
+.navbar-inverse .navbar-nav > .active-form > a, .navbar-inverse .navbar-nav > .active-form > a:hover, .navbar-inverse .navbar-nav > .active-form > a:focus {
+    background: rgb(0,102,153);
+	color: #ffffff;
+}
+
+.navbar-inverse .navbar-nav > .active-dmn > a, .navbar-inverse .navbar-nav > .active-dmn > a:hover, .navbar-inverse .navbar-nav > .active-dmn > a:focus {
+    background: rgb(227,154,33);
+	color: #ffffff;
+}
+
+.navbar-inverse .navbar-nav > .active-content > a, .navbar-inverse .navbar-nav > .active-content > a:hover, .navbar-inverse .navbar-nav > .active-content > a:focus {
+    background: rgb(102,153,255);
 	color: #ffffff;
 }
 
@@ -124,8 +145,8 @@ body {
 	background-color: #384042;
 }
 
-.navbar .dropdown-menu>.active>a, .navbar .dropdown-menu>.active>a:hover, .navbar .dropdown-menu>.active>a:focus {
-	background-color: #55ae4d;
+.navbar .dropdown-menu>.active-process>a, .navbar .dropdown-menu>.active-process>a:hover, .navbar .dropdown-menu>.active-process>a:focus {
+	background: rgb(162,204,70);
 	color: #ffffff;
 }
 
@@ -133,6 +154,48 @@ body {
 	color: #ffffff;
 }
 
+.sub-navbar.active-process {
+	background: rgb(162,204,70);
+    background: linear-gradient(to right, rgba(162,204,70,1.0), rgba(162,204,70,1.0), rgba(162,204,70,1.0), rgba(162,204,70,0), rgba(162,204,70,0));
+}
+
+.sub-navbar.active-form {
+    background: rgb(0,102,153);
+    background: linear-gradient(to right, rgba(0,102,153,1.0), rgba(0,102,153,1.0), rgba(0,102,153,1.0), rgba(0,102,153,0), rgba(0,102,153,0));
+}
+
+.sub-navbar.active-dmn {
+    background: rgb(227,154,33);
+    background: linear-gradient(to right, rgba(227,154,33,1.0), rgba(227,154,33,1.0), rgba(227,154,33,1.0), rgba(227,154,33,0), rgba(227,154,33,0));
+}
+
+.sub-navbar.active-content {
+    background: rgb(102,153,255);
+    background: linear-gradient(to right, rgba(102,153,255,1.0), rgba(102,153,255,1.0), rgba(102,153,255,1.0), rgba(102,153,255,0), rgba(102,153,255,0));
+}
+
+.sub-navbar .drop-menu {
+    background: none;
+}
+
+.sub-navbar .navbar-nav, .sub-navbar .navbar-nav, .sub-navbar .navbar-nav {
+    background: none;
+    color: #384042;
+}
+
+.sub-navbar .navbar-nav > .active > a, .sub-navbar .navbar-nav > .active > a:hover, .sub-navbar .navbar-nav > .active > a:focus {
+    background: none;
+    color: #ffffff; !important;
+}
+
+.sub-navbar .nav.navbar-nav li.active a{
+    color: #ffffff; !important;
+}
+
+.sub-navbar .nav.navbar-nav li a {
+    color: #384042;
+    background-color: unset;
+}
 
 .tabs-wrapper {
 	margin-bottom: 20px;
@@ -146,7 +209,6 @@ body {
 .component .tabs-wrapper .title {
 	background: rgb(238,241,241);
 }
-
 
 .tabs {
 	padding: 0px;
@@ -339,6 +401,23 @@ body {
 	margin-top: 2px;
 	margin-right: 2px;
 }
+
+.component .title.process {
+	color: rgb(162,204,70)
+}
+
+.component .title.dmn {
+	color: rgb(227,154,33)
+}
+
+.component .title.form {
+	color: rgb(0,102,153)
+}
+
+.component .title.content {
+	color: rgb(102,153,255)
+}
+
 
 .component .input-group {
 	width: 100%;
@@ -882,7 +961,7 @@ only screen and (min-resolution: 192dpi) {
 .process-model-wrapper .process-model {
     width: 33%;
     padding: 0;
-    maring: 0;
+    margin: 0;
     float: left;
 }
 
@@ -1081,7 +1160,7 @@ only screen and (min-resolution: 192dpi) {
   position: relative;
   margin:0;
   padding:0;
-  background: #fc6
+  background: #fc6;
   border:1px solid #999;
   height:100px;
   width:500px;
@@ -1125,7 +1204,7 @@ only screen and (min-resolution: 192dpi) {
   position: relative;
   margin:0;
   padding:0;
-  background: #fc6
+  background: #fc6;
   border:1px solid #999;
   height:100px;
   width:182px;
@@ -1174,7 +1253,7 @@ only screen and (min-resolution: 192dpi) {
 }
 
 .type-ahead-scrollable .dropdown-menu a .user-label {
-	padding-left: 8px; 
+	padding-left: 8px;
 }
 
 .decision-table-grid {
@@ -1324,7 +1403,7 @@ only screen and (min-resolution: 192dpi) {
 }
 
 .decision-table .ui-grid-row-selected .customRowHeader {
-	background-color: #c9dde1
+	background-color: #c9dde1;
 	color: #ffffff;
 	border-bottom: 1px solid rgba(43, 37, 37, 0.22);
 }

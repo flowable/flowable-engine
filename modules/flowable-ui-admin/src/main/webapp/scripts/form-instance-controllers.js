@@ -1,5 +1,5 @@
 /* Copyright 2005-2015 Alfresco Software, Ltd.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,35 +18,56 @@
 
 activitiAdminApp.controller('FormInstanceController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', '$routeParams',
     function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, $modal, $routeParams) {
-        
+
+        $rootScope.navigation = {main: 'form-engine', sub: 'instances'};
+
         $scope.returnToList = function () {
-            $location.path("/forms");
+            $location.path("/form-instances");
         };
 
-        $scope.showSubmittedForm = function () {
-            $modal.open({
-                templateUrl: 'views/form-render-popup.html',
-                windowClass: 'modal modal-full-width',
-                controller: 'ShowFormRenderPopupCrtl',
-                resolve: {
-                    form: function () {
-                        return $scope.submittedForm;
-                    }
-                }
+        $q.all([$translate('FORM-INSTANCE.FORM-FIELD-VALUES.ID'),
+            $translate('FORM-INSTANCE.FORM-FIELD-VALUES.NAME'),
+            $translate('FORM-INSTANCE.FORM-FIELD-VALUES.TYPE'),
+            $translate('FORM-INSTANCE.FORM-FIELD-VALUES.VALUE')])
+            .then(function (headers) {
+
+                $scope.gridFormFieldValues = {
+                    data: 'formFieldValues.data',
+                    enableRowReordering: false,
+                    multiSelect: false,
+                    keepLastSelected: false,
+                    enableSorting: false,
+                    rowHeight: 36,
+                    afterSelectionChange: $scope.showFormInstance,
+                    columnDefs: [
+                        {field: 'id', displayName: headers[0]},
+                        {field: 'name', displayName: headers[1]},
+                        {field: 'type', displayName: headers[2]},
+                        {field: 'value', displayName: headers[3], cellFilter: 'empty'}
+                    ]
+                };
             });
-        };
         
         $scope.executeWhenReady(function () {
-            if ($rootScope.submittedForm) {
-                $scope.submittedForm = $rootScope.submittedForm;
-                $rootScope.submittedForm = undefined;
+            if ($rootScope.formInstance) {
+                $scope.formInstance = $rootScope.formInstance;
+                $rootScope.formInstance = undefined;
                 return;
             }
             
             // Load submitted form
             $http({method: 'GET', url: '/app/rest/activiti/form-instances/' + $routeParams.formInstanceId}).
             success(function (data, status, headers, config) {
-                $scope.submittedForm = data;
+                $scope.formInstance = data;
+
+                // Load form submitted forms
+                $http({
+                    method: 'GET',
+                    url: '/app/rest/activiti/form-instances/' + $routeParams.formInstanceId + '/form-field-values/'
+                }).
+                success(function (formFieldValuesData, status, headers, config) {
+                    $scope.formFieldValues = formFieldValuesData;
+                });
             }).
             error(function (data, status, headers, config) {
                 if (data && data.message) {

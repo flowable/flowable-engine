@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 'use strict';
 
 /* App Module */
@@ -29,6 +29,26 @@ activitiAdminApp
             		templateUrl: 'views/login.html',
             		controller: 'LoginController'
             	})
+                .when('/process-engine', {
+                    templateUrl: 'views/deployments.html',
+                    controller: 'DeploymentsController',
+                    reloadOnSearch: true
+                })
+                .when('/form-engine', {
+                    templateUrl: 'views/form-deployments.html',
+                    controller: 'FormDeploymentsController',
+                    reloadOnSearch: true
+                })
+                .when('/dmn-engine', {
+                    templateUrl: 'views/decision-table-deployments.html',
+                    controller: 'DecisionTableDeploymentsController',
+                    reloadOnSearch: true
+                })
+                .when('/content-engine', {
+                    templateUrl: 'views/content-items.html',
+                    controller: 'ContentItemsController',
+                    reloadOnSearch: true
+                })
                 .when('/process-definitions', {
                     templateUrl: 'views/process-definitions.html',
                     controller: 'ProcessDefinitionsController',
@@ -105,6 +125,16 @@ activitiAdminApp
               	.when('/process-definitions-refresh', {
               		redirectTo: '/process-definitions'
               	})
+                .when('/decision-table-deployments', {
+                    templateUrl: 'views/decision-table-deployments.html',
+                    controller: 'DecisionTableDeploymentsController',
+                    reloadOnSearch: true
+                })
+                .when('/decision-table-deployment/:deploymentId', {
+                    templateUrl: 'views/decision-table-deployment.html',
+                    controller: 'DecisionTableDeploymentController',
+                    reloadOnSearch: true
+                })
                 .when('/decision-tables', {
                     templateUrl: 'views/decision-tables.html',
                     controller: 'DecisionTablesController',
@@ -115,9 +145,24 @@ activitiAdminApp
                     controller: 'DecisionTableController',
                     reloadOnSearch: true
                 })
+                .when('/form-deployments', {
+                    templateUrl: 'views/form-deployments.html',
+                    controller: 'FormDeploymentsController',
+                    reloadOnSearch: true
+                })
+                .when('/form-deployment/:formDeploymentId', {
+                    templateUrl: 'views/form-deployment.html',
+                    controller: 'FormDeploymentController',
+                    reloadOnSearch: true
+                })
                 .when('/form-definitions', {
                     templateUrl: 'views/form-definitions.html',
                     controller: 'FormDefinitionsController',
+                    reloadOnSearch: true
+                })
+                .when('/form-instances', {
+                    templateUrl: 'views/form-instances.html',
+                    controller: 'FormInstancesController',
                     reloadOnSearch: true
                 })
                 .when('/form-definition/:formId', {
@@ -128,6 +173,16 @@ activitiAdminApp
                 .when('/form-instance/:formInstanceId', {
                     templateUrl: 'views/form-instance.html',
                     controller: 'FormInstanceController',
+                    reloadOnSearch: true
+                })
+                .when('/content-items', {
+                    templateUrl: 'views/content-items.html',
+                    controller: 'ContentItemsController',
+                    reloadOnSearch: true
+                })
+                .when('/content-item/:contentItemId', {
+                    templateUrl: 'views/content-item.html',
+                    controller: 'ContentItemController',
                     reloadOnSearch: true
                 })
                 .otherwise({
@@ -245,7 +300,7 @@ activitiAdminApp
                 $translate.use('en');
 
         		$rootScope.serversLoaded = false;
-        		
+
         		$rootScope.loadServerConfig = function(callbackAfterLoad) {
                     $http({method: 'GET', url: '/app/rest/server-configs'}).
                     success(function(data) {
@@ -260,6 +315,8 @@ activitiAdminApp
                                     $rootScope.activeServers['dmn'] = data[i];
                                 } else if (data[i].endpointType === 3) {
                                     $rootScope.activeServers['form'] = data[i];
+                                } else if (data[i].endpointType === 4) {
+                                    $rootScope.activeServers['content'] = data[i];
                                 } else {
                                     console.log('Warning! Invalid endpoint type received: '+data[i].endpointType);
                                 }
@@ -275,7 +332,7 @@ activitiAdminApp
                     });
 
                 };
-        		
+
         		$http.get('/app/rest/account')
 		        	.success(function (data, status, headers, config) {
 		              	$rootScope.account = data;

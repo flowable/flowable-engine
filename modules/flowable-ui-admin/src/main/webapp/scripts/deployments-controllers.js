@@ -19,7 +19,7 @@
 activitiAdminApp.controller('DeploymentsController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', 'gridConstants',
     function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, $modal, gridConstants) {
 
-		$rootScope.navigation = {selection: 'deployments'};
+		$rootScope.navigation = {main: 'process-engine', sub: 'deployments'};
         
 		$scope.filter = {};
 		$scope.deploymentsData = {};

@@ -40,7 +40,7 @@ public class FormServiceImpl extends ServiceImpl implements FormService {
   public FormInstance createFormInstance(Map<String, Object> variables, FormModel formModel, String taskId, String processInstanceId) {
     return commandExecutor.execute(new CreateFormInstanceCmd(formModel, variables, taskId, processInstanceId));
   }
-  
+
   public FormModel getFormModelWithVariablesById(String formDefinitionId, String processInstanceId, Map<String, Object> variables) {
     return commandExecutor.execute(new GetFormModelWithVariablesCmd(null, formDefinitionId, processInstanceId, variables));
   }
@@ -71,7 +71,12 @@ public class FormServiceImpl extends ServiceImpl implements FormService {
     
     return commandExecutor.execute(new GetFormModelWithVariablesCmd(formDefinitionKey, parentDeploymentId, null, processInstanceId, tenantId, variables));
   }
-  
+
+  public FormInstanceModel getFormInstanceModelById(String formInstanceId, Map<String, Object> variables) {
+
+    return commandExecutor.execute(new GetFormInstanceModelCmd(formInstanceId, variables));
+  }
+
   public FormInstanceModel getFormInstanceModelById(String formDefinitionId, String taskId, String processInstanceId, Map<String, Object> variables) {
     return commandExecutor.execute(new GetFormInstanceModelCmd(null, formDefinitionId, taskId, processInstanceId, variables));
   }

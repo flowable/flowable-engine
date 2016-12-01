@@ -38,17 +38,17 @@ public class FormDefinitionsClientResource extends AbstractClientResource {
     protected FormDefinitionService clientService;
 
     /**
-     * GET a list of deployed forms.
+     * GET a list of deployed form definitions.
      */
     @RequestMapping(value = "/rest/activiti/form-definitions", method = RequestMethod.GET, produces = "application/json")
-    public JsonNode listForms(HttpServletRequest request) {
+    public JsonNode listFormDefinitions(HttpServletRequest request) {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
         Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
         return clientService.listForms(serverConfig, parameterMap);
     }
     
     /**
-     * GET process definition's list of deployed forms.
+     * GET process definition's list of deployed form definitions.
      */
     @RequestMapping(value = "/rest/activiti/process-definition-form-definitions/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getProcessDefinitionForms(@PathVariable String processDefinitionId, HttpServletRequest request) {

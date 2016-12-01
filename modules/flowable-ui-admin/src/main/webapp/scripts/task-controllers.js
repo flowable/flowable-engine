@@ -17,7 +17,7 @@
 activitiAdminApp.controller('TaskController', ['$scope', '$rootScope', '$http', '$timeout','$location','$routeParams', '$modal', '$translate', '$q', 'gridConstants',
     function ($scope, $rootScope, $http, $timeout, $location, $routeParams, $modal, $translate, $q, gridConstants) {
 
-        $rootScope.navigation = {selection: 'tasks'};
+        $rootScope.navigation = {main: 'process-engine', sub: 'tasks'};
 		
 		$scope.tabData = {
             tabs: [

@@ -56,10 +56,12 @@ public interface FormService {
     
     FormModel getFormModelWithVariablesByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String processInstanceId, 
         Map<String, Object> variables, String tenantId);
+
+    FormInstanceModel getFormInstanceModelById(String formInstanceId, Map<String, Object> variables);
+
+    FormInstanceModel getFormInstanceModelById(String formDefinitionId, String taskId, String processInstanceId, Map<String, Object> variables);
     
-    FormInstanceModel getFormInstanceModelById(String formId, String taskId, String processInstanceId, Map<String, Object> variables);
-    
-    FormInstanceModel getFormInstanceModelById(String formId, String taskId, String processInstanceId, 
+    FormInstanceModel getFormInstanceModelById(String formDefinitionId, String taskId, String processInstanceId,
         Map<String, Object> variables, String tenantId);
     
     FormInstanceModel getFormInstanceModelByKey(String formDefinitionKey, String taskId, String processInstanceId, Map<String, Object> variables);

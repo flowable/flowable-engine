@@ -1,5 +1,5 @@
 /* Copyright 2005-2015 Alfresco Software, Ltd.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +19,7 @@
 activitiAdminApp.controller('DecisionTablesController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', 'gridConstants',
     function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, $modal, gridConstants) {
 
-        $rootScope.navigation = {selection: 'decision-tables'};
+        $rootScope.navigation = {main: 'dmn-engine', sub: 'decision-tables'};
         
         $scope.filter = {};
         $scope.decisionTablesData = {};

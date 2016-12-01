@@ -1,0 +1,1090 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "description" : "# flowable / flowəb(ə)l /\r\n\r\n- a compact and highly efficient workflow and Business Process Management (BPM) platform for developers, system admins and business users.\r\n- a lightning fast, tried and tested BPMN 2 process engine written in Java. It is Apache 2.0 licensed open source, with a committed community.\r\n- can run embedded in a Java application, or as a service on a server, a cluster, and in the cloud. It integrates perfectly with Spring. With a rich Java and REST API, it is the ideal engine for orchestrating human or system activities.",
+    "version" : "v1",
+    "title" : "Flowable REST API",
+    "contact" : {
+      "name" : "Flowable",
+      "url" : "http://www.flowable.org/"
+    },
+    "license" : {
+      "name" : "Apache 2.0",
+      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "host" : "localhost:8080",
+  "basePath" : "/flowable-rest/service",
+  "tags" : [ {
+    "name" : "Database tables"
+  }, {
+    "name" : "Engine"
+  }, {
+    "name" : "Jobs"
+  } ],
+  "schemes" : [ "http", "https" ],
+  "paths" : {
+    "/management/deadletter-jobs" : {
+      "get" : {
+        "tags" : [ "Jobs" ],
+        "summary" : "Get a list of deadletter jobs",
+        "description" : "",
+        "operationId" : "listDeadLetterJobs",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "query",
+          "description" : "Only return job with the given id",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "processInstanceId",
+          "in" : "query",
+          "description" : "Only return jobs part of a process with the given id",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "executionId",
+          "in" : "query",
+          "description" : "Only return jobs part of an execution with the given id",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "processDefinitionId",
+          "in" : "query",
+          "description" : "Only return jobs with the given process definition id",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "timersOnly",
+          "in" : "query",
+          "description" : "If true, only return jobs which are timers. If false, this parameter is ignored. Cannot be used together with 'messagesOnly'.",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "messagesOnly",
+          "in" : "query",
+          "description" : "If true, only return jobs which are messages. If false, this parameter is ignored. Cannot be used together with 'timersOnly'",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "withException",
+          "in" : "query",
+          "description" : "If true, only return jobs for which an exception occurred while executing it. If false, this parameter is ignored.",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "dueBefore",
+          "in" : "query",
+          "description" : "Only return jobs which are due to be executed before the given date. Jobs without duedate are never returned using this parameter.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "dueAfter",
+          "in" : "query",
+          "description" : "Only return jobs which are due to be executed after the given date. Jobs without duedate are never returned using this parameter.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "exceptionMessage",
+          "in" : "query",
+          "description" : "Only return jobs with the given exception message",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "tenantId",
+          "in" : "query",
+          "description" : "Only return jobs with the given tenantId.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "tenantIdLike",
+          "in" : "query",
+          "description" : "Only return jobs with a tenantId like the given value.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "withoutTenantId",
+          "in" : "query",
+          "description" : "If true, only returns jobs without a tenantId set. If false, the withoutTenantId parameter is ignored.",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "locked",
+          "in" : "query",
+          "description" : "If true, only return jobs which are locked.  If false, this parameter is ignored.",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "unlocked",
+          "in" : "query",
+          "description" : "If true, only return jobs which are unlocked. If false, this parameter is ignored.",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "sort",
+          "in" : "query",
+          "description" : "Property to sort on, to be used together with the order.",
+          "required" : false,
+          "type" : "string",
+          "enum" : [ "id", "dueDate", "executionId", "processInstanceId", "retries", "tenantId" ]
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Indicates the requested jobs were returned.",
+            "schema" : {
+              "$ref" : "#/definitions/DataResponse"
+            }
+          },
+          "400" : {
+            "description" : "Indicates an illegal value has been used in a url query parameter or the both 'messagesOnly' and 'timersOnly' are used as parameters. Status description contains additional details about the error."
+          }
+        }
+      }
+    },
+    "/management/deadletter-jobs/{jobId}" : {
+      "get" : {
+        "tags" : [ "Jobs" ],
+        "summary" : "Get a single deadletter job",
+        "description" : "",
+        "operationId" : "getDeadletterJob",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "jobId",
+          "in" : "path",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Indicates the suspended job exists and is returned.",
+            "schema" : {
+              "$ref" : "#/definitions/JobResponse"
+            }
+          },
+          "404" : {
+            "description" : "Indicates the requested job does not exist."
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Jobs" ],
+        "summary" : "Delete a deadletter job",
+        "description" : "",
+        "operationId" : "deleteDeadLetterJob",
+        "parameters" : [ {
+          "name" : "jobId",
+          "in" : "path",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Indicates the job was found and has been deleted. Response-body is intentionally empty."
+          },
+          "404" : {
+            "description" : "Indicates the requested job was not found."
+          }
+        }
+      }
+    },
+    "/management/deadletter-jobs/{jobId}/exception-stacktrace" : {
+      "get" : {
+        "tags" : [ "Jobs" ],
+        "summary" : "Get the exception stacktrace for a deadletter job",
+        "description" : "",
+        "operationId" : "getDeadLetterJobStacktrace",
+        "parameters" : [ {
+          "name" : "jobId",
+          "in" : "path",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Indicates the requested job was not found and the stacktrace has been returned. The response contains the raw stacktrace and always has a Content-type of text/plain.",
+            "schema" : {
+              "type" : "string"
+            }
+          },
+          "404" : {
+            "description" : "Indicates the requested job was not found or the job doesn’t have an exception stacktrace. Status-description contains additional information about the error."
+          }
+        }
+      }
+    },
+    "/management/engine" : {
+      "get" : {
+        "tags" : [ "Engine" ],
+        "summary" : "Get engine info",
+        "description" : "",
+        "operationId" : "getEngineInfo",
+        "produces" : [ "application/json" ],
+        "responses" : {
+          "200" : {
+            "description" : "Indicates the engine info is returned.",
+            "schema" : {
+              "$ref" : "#/definitions/ProcessEngineInfoResponse"
+            }
+          }
+        }
+      }
+    },
+    "/management/jobs" : {
+      "get" : {
+        "tags" : [ "Jobs" ],
+        "summary" : "Get a list of jobs",
+        "description" : "",
+        "operationId" : "listJobs",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "query",
+          "description" : "Only return job with the given id",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "processInstanceId",
+          "in" : "query",
+          "description" : "Only return jobs part of a process with the given id",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "executionId",
+          "in" : "query",
+          "description" : "Only return jobs part of an execution with the given id",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "processDefinitionId",
+          "in" : "query",
+          "description" : "Only return jobs with the given process definition id",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "timersOnly",
+          "in" : "query",
+          "description" : "If true, only return jobs which are timers. If false, this parameter is ignored. Cannot be used together with 'messagesOnly'.",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "messagesOnly",
+          "in" : "query",
+          "description" : "If true, only return jobs which are messages. If false, this parameter is ignored. Cannot be used together with 'timersOnly'",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "withException",
+          "in" : "query",
+          "description" : "If true, only return jobs for which an exception occurred while executing it. If false, this parameter is ignored.",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "dueBefore",
+          "in" : "query",
+          "description" : "Only return jobs which are due to be executed before the given date. Jobs without duedate are never returned using this parameter.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "dueAfter",
+          "in" : "query",
+          "description" : "Only return jobs which are due to be executed after the given date. Jobs without duedate are never returned using this parameter.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "exceptionMessage",
+          "in" : "query",
+          "description" : "Only return jobs with the given exception message",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "tenantId",
+          "in" : "query",
+          "description" : "Only return jobs with the given tenantId.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "tenantIdLike",
+          "in" : "query",
+          "description" : "Only return jobs with a tenantId like the given value.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "withoutTenantId",
+          "in" : "query",
+          "description" : "If true, only returns jobs without a tenantId set. If false, the withoutTenantId parameter is ignored.",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "locked",
+          "in" : "query",
+          "description" : "If true, only return jobs which are locked.  If false, this parameter is ignored.",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "unlocked",
+          "in" : "query",
+          "description" : "If true, only return jobs which are unlocked. If false, this parameter is ignored.",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "sort",
+          "in" : "query",
+          "description" : "Property to sort on, to be used together with the order.",
+          "required" : false,
+          "type" : "string",
+          "enum" : [ "id", "dueDate", "executionId", "processInstanceId", "retries", "tenantId" ]
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Indicates the requested jobs were returned.",
+            "schema" : {
+              "$ref" : "#/definitions/DataResponse"
+            }
+          },
+          "400" : {
+            "description" : "Indicates an illegal value has been used in a url query parameter or the both 'messagesOnly' and 'timersOnly' are used as parameters. Status description contains additional details about the error."
+          }
+        }
+      }
+    },
+    "/management/jobs/{jobId}" : {
+      "get" : {
+        "tags" : [ "Jobs" ],
+        "summary" : "Get a single job",
+        "description" : "",
+        "operationId" : "getJob",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "jobId",
+          "in" : "path",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Indicates the job exists and is returned.",
+            "schema" : {
+              "$ref" : "#/definitions/JobResponse"
+            }
+          },
+          "404" : {
+            "description" : "Indicates the requested job does not exist."
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Jobs" ],
+        "summary" : "Execute a single job",
+        "description" : "",
+        "operationId" : "executeJobAction",
+        "parameters" : [ {
+          "name" : "jobId",
+          "in" : "path",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/RestActionRequest"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Indicates the job was executed. Response-body is intentionally empty."
+          },
+          "404" : {
+            "description" : "Indicates the requested job was not found."
+          },
+          "500" : {
+            "description" : "Indicates the an exception occurred while executing the job. The status-description contains additional detail about the error. The full error-stacktrace can be fetched later on if needed."
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Jobs" ],
+        "summary" : "Delete a job",
+        "description" : "",
+        "operationId" : "deleteJob",
+        "parameters" : [ {
+          "name" : "jobId",
+          "in" : "path",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Indicates the job was found and has been deleted. Response-body is intentionally empty."
+          },
+          "404" : {
+            "description" : "Indicates the requested job was not found.."
+          }
+        }
+      }
+    },
+    "/management/jobs/{jobId}/exception-stacktrace" : {
+      "get" : {
+        "tags" : [ "Jobs" ],
+        "summary" : "Get the exception stacktrace for a job",
+        "description" : "",
+        "operationId" : "getJobStacktrace",
+        "parameters" : [ {
+          "name" : "jobId",
+          "in" : "path",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Indicates the requested job was not found and the stacktrace has been returned. The response contains the raw stacktrace and always has a Content-type of text/plain.",
+            "schema" : {
+              "type" : "string"
+            }
+          },
+          "404" : {
+            "description" : "Indicates the requested job was not found or the job doesn’t have an exception stacktrace. Status-description contains additional information about the error."
+          }
+        }
+      }
+    },
+    "/management/properties" : {
+      "get" : {
+        "tags" : [ "Engine" ],
+        "summary" : "Get engine properties",
+        "description" : "",
+        "operationId" : "getProperties",
+        "produces" : [ "application/json" ],
+        "responses" : {
+          "200" : {
+            "description" : "Indicates the properties are returned.",
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : {
+                "type" : "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/management/suspended-jobs" : {
+      "get" : {
+        "tags" : [ "Jobs" ],
+        "summary" : "Get a list of suspended jobs",
+        "description" : "",
+        "operationId" : "listSuspendedJobs",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "query",
+          "description" : "Only return job with the given id",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "processInstanceId",
+          "in" : "query",
+          "description" : "Only return jobs part of a process with the given id",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "executionId",
+          "in" : "query",
+          "description" : "Only return jobs part of an execution with the given id",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "processDefinitionId",
+          "in" : "query",
+          "description" : "Only return jobs with the given process definition id",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "timersOnly",
+          "in" : "query",
+          "description" : "If true, only return jobs which are timers. If false, this parameter is ignored. Cannot be used together with 'messagesOnly'.",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "messagesOnly",
+          "in" : "query",
+          "description" : "If true, only return jobs which are messages. If false, this parameter is ignored. Cannot be used together with 'timersOnly'",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "withException",
+          "in" : "query",
+          "description" : "If true, only return jobs for which an exception occurred while executing it. If false, this parameter is ignored.",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "dueBefore",
+          "in" : "query",
+          "description" : "Only return jobs which are due to be executed before the given date. Jobs without duedate are never returned using this parameter.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "dueAfter",
+          "in" : "query",
+          "description" : "Only return jobs which are due to be executed after the given date. Jobs without duedate are never returned using this parameter.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "exceptionMessage",
+          "in" : "query",
+          "description" : "Only return jobs with the given exception message",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "tenantId",
+          "in" : "query",
+          "description" : "Only return jobs with the given tenantId.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "tenantIdLike",
+          "in" : "query",
+          "description" : "Only return jobs with a tenantId like the given value.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "withoutTenantId",
+          "in" : "query",
+          "description" : "If true, only returns jobs without a tenantId set. If false, the withoutTenantId parameter is ignored.",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "locked",
+          "in" : "query",
+          "description" : "If true, only return jobs which are locked.  If false, this parameter is ignored.",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "unlocked",
+          "in" : "query",
+          "description" : "If true, only return jobs which are unlocked. If false, this parameter is ignored.",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "sort",
+          "in" : "query",
+          "description" : "Property to sort on, to be used together with the order.",
+          "required" : false,
+          "type" : "string",
+          "enum" : [ "id", "dueDate", "executionId", "processInstanceId", "retries", "tenantId" ]
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Indicates the requested jobs were returned.",
+            "schema" : {
+              "$ref" : "#/definitions/DataResponse"
+            }
+          },
+          "400" : {
+            "description" : "Indicates an illegal value has been used in a url query parameter or the both 'messagesOnly' and 'timersOnly' are used as parameters. Status description contains additional details about the error."
+          }
+        }
+      }
+    },
+    "/management/suspended-jobs/{jobId}" : {
+      "get" : {
+        "tags" : [ "Jobs" ],
+        "summary" : "Get a single suspended job",
+        "description" : "",
+        "operationId" : "getSuspendedJob",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "jobId",
+          "in" : "path",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Indicates the suspended job exists and is returned.",
+            "schema" : {
+              "$ref" : "#/definitions/JobResponse"
+            }
+          },
+          "404" : {
+            "description" : "Indicates the requested job does not exist."
+          }
+        }
+      }
+    },
+    "/management/suspended-jobs/{jobId}/exception-stacktrace" : {
+      "get" : {
+        "tags" : [ "Jobs" ],
+        "summary" : "Get the exception stacktrace for a suspended job",
+        "description" : "",
+        "operationId" : "getSuspendedJobStacktrace",
+        "parameters" : [ {
+          "name" : "jobId",
+          "in" : "path",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Indicates the requested job was not found and the stacktrace has been returned. The response contains the raw stacktrace and always has a Content-type of text/plain.",
+            "schema" : {
+              "type" : "string"
+            }
+          },
+          "404" : {
+            "description" : "Indicates the requested job was not found or the job doesn’t have an exception stacktrace. Status-description contains additional information about the error."
+          }
+        }
+      }
+    },
+    "/management/tables" : {
+      "get" : {
+        "tags" : [ "Database tables" ],
+        "summary" : " List of tables",
+        "description" : "",
+        "operationId" : "getTables",
+        "produces" : [ "application/json" ],
+        "responses" : {
+          "200" : {
+            "description" : "Indicates the request was successful.",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/TableResponse"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/management/tables/{tableName}" : {
+      "get" : {
+        "tags" : [ "Database tables" ],
+        "summary" : "Get a single table",
+        "description" : "",
+        "operationId" : "getTable",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "tableName",
+          "in" : "path",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Indicates the table exists and the table count is returned.",
+            "schema" : {
+              "$ref" : "#/definitions/TableResponse"
+            }
+          },
+          "404" : {
+            "description" : "Indicates the requested table does not exist."
+          }
+        }
+      }
+    },
+    "/management/tables/{tableName}/columns" : {
+      "get" : {
+        "tags" : [ "Database tables" ],
+        "summary" : "Get column info for a single table",
+        "description" : "",
+        "operationId" : "getTableMetaData",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "tableName",
+          "in" : "path",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Indicates the table exists and the table column info is returned.",
+            "schema" : {
+              "$ref" : "#/definitions/TableMetaData"
+            }
+          },
+          "404" : {
+            "description" : "Indicates the requested table does not exist."
+          }
+        }
+      }
+    },
+    "/management/tables/{tableName}/data" : {
+      "get" : {
+        "tags" : [ "Database tables" ],
+        "summary" : "Get row data for a single table",
+        "description" : "",
+        "operationId" : "getTableData",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "tableName",
+          "in" : "path",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "start",
+          "in" : "query",
+          "description" : "Index of the first row to fetch. Defaults to 0.",
+          "required" : false,
+          "type" : "integer"
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Number of rows to fetch, starting from start. Defaults to 10.",
+          "required" : false,
+          "type" : "integer"
+        }, {
+          "name" : "orderAscendingColumn",
+          "in" : "query",
+          "description" : "Name of the column to sort the resulting rows on, ascending.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "orderDescendingColumn",
+          "in" : "query",
+          "description" : "Name of the column to sort the resulting rows on, descending.",
+          "required" : false,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Indicates the table exists and the table row data is returned",
+            "schema" : {
+              "$ref" : "#/definitions/DataResponse"
+            }
+          },
+          "404" : {
+            "description" : "Indicates the requested table does not exist."
+          }
+        }
+      }
+    },
+    "/management/timer-jobs" : {
+      "get" : {
+        "tags" : [ "Jobs" ],
+        "summary" : "Get a list of timer jobs",
+        "description" : "",
+        "operationId" : "listTimerJobs",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "query",
+          "description" : "Only return job with the given id",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "processInstanceId",
+          "in" : "query",
+          "description" : "Only return jobs part of a process with the given id",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "executionId",
+          "in" : "query",
+          "description" : "Only return jobs part of an execution with the given id",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "processDefinitionId",
+          "in" : "query",
+          "description" : "Only return jobs with the given process definition id",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "timersOnly",
+          "in" : "query",
+          "description" : "If true, only return jobs which are timers. If false, this parameter is ignored. Cannot be used together with 'messagesOnly'.",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "messagesOnly",
+          "in" : "query",
+          "description" : "If true, only return jobs which are messages. If false, this parameter is ignored. Cannot be used together with 'timersOnly'",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "withException",
+          "in" : "query",
+          "description" : "If true, only return jobs for which an exception occurred while executing it. If false, this parameter is ignored.",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "dueBefore",
+          "in" : "query",
+          "description" : "Only return jobs which are due to be executed before the given date. Jobs without duedate are never returned using this parameter.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "dueAfter",
+          "in" : "query",
+          "description" : "Only return jobs which are due to be executed after the given date. Jobs without duedate are never returned using this parameter.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "exceptionMessage",
+          "in" : "query",
+          "description" : "Only return jobs with the given exception message",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "tenantId",
+          "in" : "query",
+          "description" : "Only return jobs with the given tenantId.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "tenantIdLike",
+          "in" : "query",
+          "description" : "Only return jobs with a tenantId like the given value.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "withoutTenantId",
+          "in" : "query",
+          "description" : "If true, only returns jobs without a tenantId set. If false, the withoutTenantId parameter is ignored.",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "locked",
+          "in" : "query",
+          "description" : "If true, only return jobs which are locked.  If false, this parameter is ignored.",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "unlocked",
+          "in" : "query",
+          "description" : "If true, only return jobs which are unlocked. If false, this parameter is ignored.",
+          "required" : false,
+          "type" : "boolean"
+        }, {
+          "name" : "sort",
+          "in" : "query",
+          "description" : "Property to sort on, to be used together with the order.",
+          "required" : false,
+          "type" : "string",
+          "enum" : [ "id", "dueDate", "executionId", "processInstanceId", "retries", "tenantId" ]
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Indicates the requested jobs were returned.",
+            "schema" : {
+              "$ref" : "#/definitions/DataResponse"
+            }
+          },
+          "400" : {
+            "description" : "Indicates an illegal value has been used in a url query parameter or the both 'messagesOnly' and 'timersOnly' are used as parameters. Status description contains additional details about the error."
+          }
+        }
+      }
+    },
+    "/management/timer-jobs/{jobId}" : {
+      "get" : {
+        "tags" : [ "Jobs" ],
+        "summary" : "Get a single timer job",
+        "description" : "",
+        "operationId" : "getTimerJob",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "jobId",
+          "in" : "path",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Indicates the timer job exists and is returned.",
+            "schema" : {
+              "$ref" : "#/definitions/JobResponse"
+            }
+          },
+          "404" : {
+            "description" : "Indicates the requested job does not exist."
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Jobs" ],
+        "summary" : "Delete a timer job",
+        "description" : "",
+        "operationId" : "deleteTimerJob",
+        "parameters" : [ {
+          "name" : "jobId",
+          "in" : "path",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Indicates the job was found and has been deleted. Response-body is intentionally empty."
+          },
+          "404" : {
+            "description" : "Indicates the requested job was not found."
+          }
+        }
+      }
+    },
+    "/management/timer-jobs/{jobId}/exception-stacktrace" : {
+      "get" : {
+        "tags" : [ "Jobs" ],
+        "summary" : "Get the exception stacktrace for a timer job",
+        "description" : "",
+        "operationId" : "getTimerJobStacktrace",
+        "parameters" : [ {
+          "name" : "jobId",
+          "in" : "path",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Indicates the requested job was not found and the stacktrace has been returned. The response contains the raw stacktrace and always has a Content-type of text/plain.",
+            "schema" : {
+              "type" : "string"
+            }
+          },
+          "404" : {
+            "description" : "Indicates the requested job was not found or the job doesn’t have an exception stacktrace. Status-description contains additional information about the error."
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions" : {
+    "basicAuth" : {
+      "type" : "basic"
+    }
+  },
+  "definitions" : {
+    "DataResponse" : {
+      "type" : "object",
+      "properties" : {
+        "data" : {
+          "type" : "object"
+        },
+        "total" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "start" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "sort" : {
+          "type" : "string"
+        },
+        "order" : {
+          "type" : "string"
+        },
+        "size" : {
+          "type" : "integer",
+          "format" : "int32"
+        }
+      }
+    },
+    "JobResponse" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "url" : {
+          "type" : "string"
+        },
+        "processInstanceId" : {
+          "type" : "string"
+        },
+        "processInstanceUrl" : {
+          "type" : "string"
+        },
+        "processDefinitionId" : {
+          "type" : "string"
+        },
+        "processDefinitionUrl" : {
+          "type" : "string"
+        },
+        "executionId" : {
+          "type" : "string"
+        },
+        "executionUrl" : {
+          "type" : "string"
+        },
+        "retries" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "exceptionMessage" : {
+          "type" : "string"
+        },
+        "dueDate" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "tenantId" : {
+          "type" : "string"
+        }
+      }
+    },
+    "ProcessEngineInfoResponse" : {
+      "type" : "object",
+      "properties" : {
+        "name" : {
+          "type" : "string"
+        },
+        "resourceUrl" : {
+          "type" : "string"
+        },
+        "exception" : {
+          "type" : "string"
+        },
+        "version" : {
+          "type" : "string"
+        }
+      }
+    },
+    "RestActionRequest" : {
+      "type" : "object",
+      "properties" : {
+        "action" : {
+          "type" : "string",
+          "description" : "Action to perform"
+        }
+      }
+    },
+    "TableMetaData" : {
+      "type" : "object",
+      "properties" : {
+        "tableName" : {
+          "type" : "string"
+        },
+        "columnNames" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "columnTypes" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          }
+        }
+      }
+    },
+    "TableResponse" : {
+      "type" : "object",
+      "properties" : {
+        "name" : {
+          "type" : "string"
+        },
+        "url" : {
+          "type" : "string"
+        },
+        "count" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      }
+    }
+  }
+}

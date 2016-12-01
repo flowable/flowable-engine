@@ -16,8 +16,8 @@
 
 activitiAdminApp.controller('FormDefinitionController', ['$scope', '$rootScope', '$http', '$timeout', '$location', '$routeParams', '$modal', '$translate', '$q', 'gridConstants',
     function ($scope, $rootScope, $http, $timeout, $location, $routeParams, $modal, $translate, $q, gridConstants) {
-        $rootScope.navigation = {selection: 'process-definitions'};
-        
+        $rootScope.navigation = {main: 'form-engine', sub: 'definitions'};
+
         $scope.returnToList = function () {
             $location.path("/form-definitions");
         };
@@ -35,9 +35,9 @@ activitiAdminApp.controller('FormDefinitionController', ['$scope', '$rootScope',
             });
         };
 
-        $scope.showSubmittedForm = function (submittedForm) {
-            if (submittedForm && submittedForm.getProperty('id')) {
-                $location.path("/form-instance/"+submittedForm.getProperty('id'));
+        $scope.showFormInstance = function (formInstance) {
+            if (formInstance && formInstance.getProperty('id')) {
+                $location.path("/form-instance/"+formInstance.getProperty('id'));
             }
         };
 
@@ -47,21 +47,21 @@ activitiAdminApp.controller('FormDefinitionController', ['$scope', '$rootScope',
             }
         };
 
-        $q.all([$translate('SUBMITTED-FORM.HEADER.ID'),
-                $translate('SUBMITTED-FORM.HEADER.TASK-ID'),
-                $translate('SUBMITTED-FORM.HEADER.PROCESS-ID'),
-                $translate('SUBMITTED-FORM.HEADER.SUBMITTED'),
-                $translate('SUBMITTED-FORM.HEADER.SUBMITTED-BY')])
+        $q.all([$translate('FORM-INSTANCE.HEADER.ID'),
+                $translate('FORM-INSTANCE.HEADER.TASK-ID'),
+                $translate('FORM-INSTANCE.HEADER.PROCESS-ID'),
+                $translate('FORM-INSTANCE.HEADER.SUBMITTED'),
+                $translate('FORM-INSTANCE.HEADER.SUBMITTED-BY')])
             .then(function (headers) {
 
-                $scope.gridSubmittedForms = {
-                    data: 'submittedForms.data',
+                $scope.gridFormInstances = {
+                    data: 'formInstances.data',
                     enableRowReordering: false,
                     multiSelect: false,
                     keepLastSelected: false,
                     enableSorting: false,
                     rowHeight: 36,
-                    afterSelectionChange: $scope.showSubmittedForm,
+                    afterSelectionChange: $scope.showFormInstance,
                     columnDefs: [
                         {field: 'id', displayName: headers[0]},
                         {field: 'taskId', displayName: headers[1]},
@@ -83,8 +83,8 @@ activitiAdminApp.controller('FormDefinitionController', ['$scope', '$rootScope',
                     method: 'GET',
                     url: '/app/rest/activiti/form-definition-form-instances/' + $routeParams.formId
                 }).
-                success(function (submittedFormsData, status, headers, config) {
-                    $scope.submittedForms = submittedFormsData;
+                success(function (formInstancesData, status, headers, config) {
+                    $scope.formInstances = formInstancesData;
                 });
             }).
             error(function (data, status, headers, config) {

@@ -12,6 +12,8 @@
  */
 package org.activiti.service.engine;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.exception.ActivitiServiceException;
@@ -23,6 +25,8 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.Map;
+
 /**
  * Service for invoking Activiti REST services.
  */
@@ -32,9 +36,22 @@ public class FormInstanceService {
   @Autowired
   protected ActivitiClientService clientUtil;
 
+  @Autowired
+  protected ObjectMapper objectMapper;
+
+  public JsonNode listFormInstances(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
+    URIBuilder builder = clientUtil.createUriBuilder("form/form-instances");
+
+    for (String name : parameterMap.keySet()) {
+      builder.addParameter(name, parameterMap.get(name)[0]);
+    }
+    HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder.toString()));
+    return clientUtil.executeRequest(get, serverConfig);
+  }
+
 
   public JsonNode getFormInstance(ServerConfig serverConfig, String formInstanceId) {
-    HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "/form/form-instance/" + formInstanceId));
+    HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "form/form-instance/" + formInstanceId));
     return clientUtil.executeRequest(get, serverConfig);
   }
 
@@ -43,7 +60,7 @@ public class FormInstanceService {
     JsonNode resultNode = null;
 
     try {
-      URIBuilder builder = clientUtil.createUriBuilder("/query/form-instances");
+      URIBuilder builder = clientUtil.createUriBuilder("query/form-instances");
       HttpPost post = clientUtil.createPost(builder.toString(), serverConfig);
       post.setEntity(clientUtil.createStringEntity(objectNode.toString()));
 
@@ -53,6 +70,50 @@ public class FormInstanceService {
     }
 
     return resultNode;
+  }
+
+  public JsonNode getFormInstanceFormFieldValues(ServerConfig serverConfig, String formInstanceId) {
+
+    ObjectNode returnNode = null;
+
+    try {
+      returnNode = objectMapper.createObjectNode();
+
+      ObjectNode requestNode = objectMapper.createObjectNode();
+      requestNode.put("formInstanceId", formInstanceId);
+
+      URIBuilder builder = clientUtil.createUriBuilder("form/form-instance-model");
+      HttpPost post = clientUtil.createPost(builder.toString(), serverConfig);
+      post.setEntity(clientUtil.createStringEntity(requestNode.toString()));
+
+      JsonNode resultNode = clientUtil.executeRequest(post, serverConfig);
+
+      ArrayNode formFieldValues = objectMapper.createArrayNode();
+
+      if (resultNode != null && resultNode.has("fields") && resultNode.get("fields").isArray()) {
+
+        ArrayNode fieldsNode = (ArrayNode) resultNode.get("fields");
+        for (JsonNode fieldNode : fieldsNode) {
+
+          ObjectNode formFieldValue = objectMapper.createObjectNode();
+
+          formFieldValue.put("id", fieldNode.get("id"));
+          formFieldValue.put("name", fieldNode.get("name"));
+          formFieldValue.put("type", fieldNode.get("type"));
+          formFieldValue.put("value", fieldNode.get("value"));
+
+          formFieldValues.add(formFieldValue);
+        }
+      }
+
+      returnNode.put("size", formFieldValues.size());
+      returnNode.put("total", formFieldValues.size());
+      returnNode.put("data", formFieldValues);
+    } catch (Exception ex) {
+      throw new ActivitiServiceException(ex.getMessage(), ex);
+    }
+
+    return returnNode;
   }
 
 }

@@ -37,12 +37,17 @@ public class FormInstanceModelResource {
   @Autowired
   protected FormRestResponseFactory formRestResponseFactory;
 
-  @RequestMapping(value = "/form/form-instance-model", method = RequestMethod.GET, produces = "application/json")
+  @RequestMapping(value = "/form/form-instance-model", method = RequestMethod.POST, produces = "application/json")
   public FormInstanceModelResponse getFormInstance(@RequestBody FormRequest formRequest, HttpServletRequest request) {
 
     FormInstanceModel formInstanceModel;
 
-    if (formRequest.getParentDeploymentId() != null) {
+    if (formRequest.getFormInstanceId() != null) {
+      formInstanceModel = formService.getFormInstanceModelById(
+          formRequest.getFormInstanceId(),
+          null
+      );
+    } else if (formRequest.getParentDeploymentId() != null) {
       formInstanceModel = formService.getFormInstanceModelByKeyAndParentDeploymentId(
           formRequest.getParentDeploymentId(),
           formRequest.getFormDefinitionKey(),
@@ -59,16 +64,16 @@ public class FormInstanceModelResource {
           formRequest.getVariables(),
           formRequest.getTenantId()
       );
-    } else if (formRequest.getFormId() != null) {
+    } else if (formRequest.getFormDefinitionId() != null) {
       formInstanceModel = formService.getFormInstanceModelById(
-          formRequest.getFormId(),
+          formRequest.getFormDefinitionId(),
           formRequest.getTaskId(),
           formRequest.getProcessInstanceId(),
           formRequest.getVariables(),
           formRequest.getTenantId()
       );
     } else {
-      throw new ActivitiIllegalArgumentException("Either parent deployment key, form definition key or form id must be provided in the request");
+      throw new ActivitiIllegalArgumentException("Either parent deployment key, form definition key or form definition id must be provided in the request");
     }
 
     if (formInstanceModel == null) {

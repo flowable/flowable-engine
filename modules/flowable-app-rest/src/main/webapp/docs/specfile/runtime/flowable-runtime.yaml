@@ -1,0 +1,2981 @@
+---
+swagger: "2.0"
+info:
+  description: "# flowable / flowəb(ə)l /\r\n\r\n- a compact and highly efficient\
+    \ workflow and Business Process Management (BPM) platform for developers, system\
+    \ admins and business users.\r\n- a lightning fast, tried and tested BPMN 2 process\
+    \ engine written in Java. It is Apache 2.0 licensed open source, with a committed\
+    \ community.\r\n- can run embedded in a Java application, or as a service on a\
+    \ server, a cluster, and in the cloud. It integrates perfectly with Spring. With\
+    \ a rich Java and REST API, it is the ideal engine for orchestrating human or\
+    \ system activities."
+  version: "v1"
+  title: "Flowable Runtime REST API"
+  contact:
+    name: "Flowable"
+    url: "http://www.flowable.org/"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost:8080"
+basePath: "/flowable-rest/service"
+tags:
+- name: "Executions"
+- name: "Process Instances"
+- name: "Runtime"
+- name: "Tasks"
+schemes:
+- "http"
+- "https"
+paths:
+  /query/executions:
+    post:
+      tags:
+      - "Executions"
+      summary: "Query executions"
+      description: "The request body can contain all possible filters that can be\
+        \ used in the List executions URL query. On top of these, it’s possible to\
+        \ provide an array of variables and processInstanceVariables to include in\
+        \ the query, with their format described here.\n\nThe general paging and sorting\
+        \ query-parameters can be used for this URL."
+      operationId: "queryExecutions"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/ExecutionQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the executions are returned."
+          schema:
+            $ref: "#/definitions/DataResponse"
+        404:
+          description: "Indicates a parameter was passed in the wrong format . The\
+            \ status-message contains additional information."
+  /query/process-instances:
+    post:
+      tags:
+      - "Process Instances"
+      summary: "Query process instances"
+      description: "The request body can contain all possible filters that can be\
+        \ used in the List process instances URL query. On top of these, it’s possible\
+        \ to provide an array of variables to include in the query, with their format\
+        \ described here.\n\nThe general paging and sorting query-parameters can be\
+        \ used for this URL."
+      operationId: "queryProcessInstances"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/ProcessInstanceQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the process-instances\
+            \ are returned"
+          schema:
+            $ref: "#/definitions/DataResponse"
+        400:
+          description: "Indicates a parameter was passed in the wrong format . The\
+            \ status-message contains additional information."
+  /query/tasks:
+    post:
+      tags:
+      - "Tasks"
+      summary: "Query for tasks"
+      description: "All supported JSON parameter fields allowed are exactly the same\
+        \ as the parameters found for getting a collection of tasks (except for candidateGroupIn\
+        \ which is only available in this POST task query REST service), but passed\
+        \ in as JSON-body arguments rather than URL-parameters to allow for more advanced\
+        \ querying and preventing errors with request-uri’s that are too long. On\
+        \ top of that, the query allows for filtering based on task and process variables.\
+        \ The taskVariables and processInstanceVariables are both JSON-arrays containing\
+        \ objects with the format as described here."
+      operationId: "getQueryResult"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/TaskQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the tasks are returned."
+          schema:
+            $ref: "#/definitions/DataResponse"
+        400:
+          description: "Indicates a parameter was passed in the wrong format or that\
+            \ delegationState has an invalid value (other than pending and resolved).\
+            \ The status-message contains additional information."
+  /runtime/executions:
+    get:
+      tags:
+      - "Executions"
+      summary: "List of executions"
+      description: ""
+      operationId: "getExecutions"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "query"
+        description: "Only return models with the given version."
+        required: false
+        type: "string"
+      - name: "activityId"
+        in: "query"
+        description: "Only return executions with the given activity id."
+        required: false
+        type: "string"
+      - name: "processDefinitionKey"
+        in: "query"
+        description: "Only return process instances with the given process definition\
+          \ key."
+        required: false
+        type: "string"
+      - name: "processDefinitionId"
+        in: "query"
+        description: "Only return process instances with the given process definition\
+          \ id."
+        required: false
+        type: "string"
+      - name: "processInstanceId"
+        in: "query"
+        description: "Only return executions which are part of the process instance\
+          \ with the given id."
+        required: false
+        type: "string"
+      - name: "messageEventSubscriptionName"
+        in: "query"
+        description: "Only return executions which are subscribed to a message with\
+          \ the given name."
+        required: false
+        type: "string"
+      - name: "signalEventSubscriptionName"
+        in: "query"
+        description: "Only return executions which are subscribed to a signal with\
+          \ the given name."
+        required: false
+        type: "string"
+      - name: "parentId"
+        in: "query"
+        description: "Only return executions which are a direct child of the given\
+          \ execution."
+        required: false
+        type: "string"
+      - name: "tenantId"
+        in: "query"
+        description: "Only return process instances with the given tenantId."
+        required: false
+        type: "string"
+      - name: "tenantIdLike"
+        in: "query"
+        description: "Only return process instances with a tenantId like the given\
+          \ value."
+        required: false
+        type: "string"
+      - name: "withoutTenantId"
+        in: "query"
+        description: "If true, only returns process instances without a tenantId set.\
+          \ If false, the withoutTenantId parameter is ignored."
+        required: false
+        type: "boolean"
+      - name: "sort"
+        in: "query"
+        description: "Property to sort on, to be used together with the order."
+        required: false
+        type: "string"
+        enum:
+        - "processInstanceId"
+        - "processDefinitionId"
+        - "processDefinitionKey"
+        - "tenantId"
+      responses:
+        200:
+          description: "Indicates request was successful and the executions are returned"
+          schema:
+            $ref: "#/definitions/DataResponse"
+        404:
+          description: "Indicates a parameter was passed in the wrong format . The\
+            \ status-message contains additional information."
+    put:
+      tags:
+      - "Executions"
+      summary: "Query Executions"
+      description: ""
+      operationId: "executeExecutionAction"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/ExecutionActionRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the executions are returned"
+        404:
+          description: "Indicates a parameter was passed in the wrong format . The\
+            \ status-message contains additional information."
+  /runtime/executions/{executionId}:
+    get:
+      tags:
+      - "Executions"
+      summary: "Get an execution"
+      description: ""
+      operationId: "getExecution"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the execution was found and returned."
+          schema:
+            $ref: "#/definitions/ExecutionResponse"
+        404:
+          description: "Indicates the execution was not found."
+    put:
+      tags:
+      - "Executions"
+      summary: "Execute an action on an execution"
+      description: "## Request body (signal an execution):\n\n ```JSON\n{\n  \"action\"\
+        :\"signal\"\n} ```\n\n\nBoth a variables and transientVariables property is\
+        \ accepted with following structure ```JSON\n{\n  \"action\":\"signal\",\n\
+        \  \"variables\" : [\n    {\n      \"name\": \"myVar\",\n      \"value\":\
+        \ \"someValue\"\n    }\n  ]\n}```\n\n\n## Request body (signal event received\
+        \ for execution)\n\n ```JSON\n{\n  \"action\":\"signal\"\n} ```\n\n\nNotifies\
+        \ the execution that a signal event has been received, requires a signalName\
+        \ parameter. Optional variables can be passed that are set on the execution\
+        \ before the action is executed.## Request body (signal event received for\
+        \ execution)\n\n ```JSON\n{\n  \"action\":\"messageEventReceived\",\n  \"\
+        messageName\":\"myMessage\"\n  \"variables\": [  ]\n} ```\n\n\n"
+      operationId: "performExecutionAction"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/ExecutionActionRequest"
+      responses:
+        200:
+          description: "Indicates the execution was found and the action is performed."
+          schema:
+            $ref: "#/definitions/ExecutionResponse"
+        204:
+          description: "Indicates the execution was found, the action was performed\
+            \ and the action caused the execution to end."
+        400:
+          description: "Indicates an illegal action was requested, required parameters\
+            \ are missing in the request body or illegal variables are passed in.\
+            \ Status description contains additional information about the error."
+        404:
+          description: "Indicates the execution was not found."
+  /runtime/executions/{executionId}/activities:
+    get:
+      tags:
+      - "Executions"
+      summary: "Get active activities in an execution"
+      description: "Returns all activities which are active in the execution and in\
+        \ all child-executions (and their children, recursively), if any."
+      operationId: "getActiveActivities"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the execution was found and activities are returned."
+          schema:
+            type: "array"
+            items:
+              type: "string"
+        404:
+          description: "Indicates the execution was not found."
+  /runtime/executions/{executionId}/variables:
+    get:
+      tags:
+      - "Executions"
+      summary: "List of variables for an execution"
+      description: ""
+      operationId: "listExecutionVariables"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "scope"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the execution was found and variables are returned."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/RestVariable"
+        404:
+          description: "Indicates the requested execution was not found."
+    post:
+      tags:
+      - "Executions"
+      summary: "Create variables on an execution"
+      description: ""
+      operationId: "createExecutionVariable"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "object"
+        201:
+          description: "Indicates the execution was found and variable is created/updated."
+        400:
+          description: "Indicates the request body is incomplete or contains illegal\
+            \ values. The status description contains additional information about\
+            \ the error."
+        404:
+          description: "Indicates the requested execution was not found."
+        409:
+          description: "Indicates the execution was found but already contains a variable\
+            \ with the given name. Use the update-method instead."
+    put:
+      tags:
+      - "Executions"
+      summary: "Update variables on an execution"
+      description: ""
+      operationId: "createOrUpdateExecutionVariable"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "object"
+        201:
+          description: "Indicates the execution was found and variable is created/updated."
+        400:
+          description: "Indicates the request body is incomplete or contains illegal\
+            \ values. The status description contains additional information about\
+            \ the error."
+        404:
+          description: "Indicates the requested execution was not found."
+    delete:
+      tags:
+      - "Executions"
+      summary: "Delete all variables for an execution"
+      description: ""
+      operationId: "deleteLocalVariables"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "Indicates the execution was found and variables have been\
+            \ deleted."
+        404:
+          description: "Indicates the requested execution was not found."
+  /runtime/executions/{executionId}/variables/{variableName}:
+    get:
+      tags:
+      - "Executions"
+      summary: "Get a variable for an execution"
+      description: ""
+      operationId: "getExecutionVariable"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "variableName"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "scope"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Indicates both the execution and variable were found and variable\
+            \ is returned."
+          schema:
+            $ref: "#/definitions/RestVariable"
+        400:
+          description: "Indicates the request body is incomplete or contains illegal\
+            \ values. The status description contains additional information about\
+            \ the error."
+        404:
+          description: "Indicates the requested execution was not found or the execution\
+            \ does not have a variable with the given name in the requested scope\
+            \ (in case scope-query parameter was omitted, variable doesn’t exist in\
+            \ local and global scope). Status description contains additional information\
+            \ about the error."
+    put:
+      tags:
+      - "Executions"
+      summary: "Update a variable on an execution"
+      description: ""
+      operationId: "updateExecutionVariable"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "variableName"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates both the process instance and variable were found\
+            \ and variable is updated."
+          schema:
+            $ref: "#/definitions/RestVariable"
+        404:
+          description: "Indicates the requested process instance was not found or\
+            \ the process instance does not have a variable with the given name. Status\
+            \ description contains additional information about the error."
+    delete:
+      tags:
+      - "Executions"
+      summary: "Delete a variable for an execution"
+      description: ""
+      operationId: "deletedExecutionVariable"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "variableName"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "scope"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        204:
+          description: "Indicates both the execution and variable were found and variable\
+            \ has been deleted."
+        404:
+          description: "Indicates the requested execution was not found or the execution\
+            \ does not have a variable with the given name in the requested scope.\
+            \ Status description contains additional information about the error."
+  /runtime/executions/{executionId}/variables/{variableName}/data:
+    get:
+      tags:
+      - "Executions"
+      summary: "Get the binary data for an execution"
+      description: ""
+      operationId: "getExecutionVariableData"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "variableName"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "scope"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the execution was found and the requested variables\
+            \ are returned."
+          schema:
+            type: "array"
+            items:
+              type: "string"
+              format: "byte"
+        404:
+          description: "Indicates the requested execution was not found or the task\
+            \ doesn’t have a variable with the given name (in the given scope). Status\
+            \ message provides additional information."
+  /runtime/process-instances:
+    get:
+      tags:
+      - "Process Instances"
+      summary: "List of process instances"
+      description: ""
+      operationId: "getProcessInstances"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "query"
+        description: "Only return models with the given version."
+        required: false
+        type: "string"
+      - name: "processDefinitionKey"
+        in: "query"
+        description: "Only return process instances with the given process definition\
+          \ key."
+        required: false
+        type: "string"
+      - name: "processDefinitionId"
+        in: "query"
+        description: "Only return process instances with the given process definition\
+          \ id."
+        required: false
+        type: "string"
+      - name: "businessKey"
+        in: "query"
+        description: "Only return process instances with the given businessKey."
+        required: false
+        type: "string"
+      - name: "involvedUser"
+        in: "query"
+        description: "Only return process instances in which the given user is involved."
+        required: false
+        type: "string"
+      - name: "suspended"
+        in: "query"
+        description: "If true, only return process instance which are suspended. If\
+          \ false, only return process instances which are not suspended (active)."
+        required: false
+        type: "boolean"
+      - name: "superProcessInstanceId"
+        in: "query"
+        description: "Only return process instances which have the given super process-instance\
+          \ id (for processes that have a call-activities)."
+        required: false
+        type: "string"
+      - name: "subProcessInstanceId"
+        in: "query"
+        description: "Only return process instances which have the given sub process-instance\
+          \ id (for processes started as a call-activity)."
+        required: false
+        type: "string"
+      - name: "excludeSubprocesses"
+        in: "query"
+        description: "Return only process instances which aren’t sub processes."
+        required: false
+        type: "boolean"
+      - name: "includeProcessVariables"
+        in: "query"
+        description: "Indication to include process variables in the result."
+        required: false
+        type: "boolean"
+      - name: "tenantId"
+        in: "query"
+        description: "Only return process instances with the given tenantId."
+        required: false
+        type: "string"
+      - name: "tenantIdLike"
+        in: "query"
+        description: "Only return process instances with a tenantId like the given\
+          \ value."
+        required: false
+        type: "string"
+      - name: "withoutTenantId"
+        in: "query"
+        description: "If true, only returns process instances without a tenantId set.\
+          \ If false, the withoutTenantId parameter is ignored."
+        required: false
+        type: "boolean"
+      - name: "sort"
+        in: "query"
+        description: "Property to sort on, to be used together with the order."
+        required: false
+        type: "string"
+        enum:
+        - "id"
+        - "processDefinitionId"
+        - "tenantId"
+        - "processDefinitionKey"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/DataResponse"
+        204:
+          description: "Indicates request was successful and the process-instances\
+            \ are returned"
+        404:
+          description: "Indicates a parameter was passed in the wrong format . The\
+            \ status-message contains additional information."
+    post:
+      tags:
+      - "Process Instances"
+      summary: "Start a process instance"
+      description: "## Request body (start by process definition id)\n\n```JSON\n\
+        \ {\n   \"processDefinitionId\":\"oneTaskProcess:1:158\",\n   \"businessKey\"\
+        :\"myBusinessKey\",\n   \"variables\": [\n      {\n        \"name\":\"myVar\"\
+        ,\n        \"value\":\"This is a variable\",\n      }\n   ]\n}```\n\n## Request\
+        \ body (start by process definition key)\n\n```JSON\n {\n   \"processDefinitionKey\"\
+        :\"oneTaskProcess\",\n   \"businessKey\":\"myBusinessKey\",\n   \"tenantId\"\
+        : \"tenant1\",\n   \"variables\": [\n      {\n        \"name\":\"myVar\",\n\
+        \        \"value\":\"This is a variable\",\n      }\n   ]\n}```\n\n## Request\
+        \ body (start by message)\n\n```JSON\n{\n   \"message\":\"newOrderMessage\"\
+        ,\n   \"businessKey\":\"myBusinessKey\",\n   \"tenantId\": \"tenant1\",\n\
+        \   \"variables\": [\n      {\n        \"name\":\"myVar\",\n        \"value\"\
+        :\"This is a variable\",\n      }\n   ]\n}```\n\nNote that also a *transientVariables*\
+        \ property is accepted as part of this json, that follows the same structure\
+        \ as the *variables* property.\n\nOnly one of *processDefinitionId*, *processDefinitionKey*\
+        \ or *message* can be used in the request body. Parameters *businessKey*,\
+        \ *variables* and *tenantId* are optional. If tenantId is omitted, the default\
+        \ tenant will be used. More information about the variable format can be found\
+        \ in the REST variables section. Note that the variable-scope that is supplied\
+        \ is ignored, process-variables are always local."
+      operationId: "createProcessInstance"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/ProcessInstanceCreateRequest"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ProcessInstanceResponse"
+        201:
+          description: "Indicates the process instance was created."
+        400:
+          description: "Indicates either the process-definition was not found (based\
+            \ on id or key), no process is started by sending the given message or\
+            \ an invalid variable has been passed. Status description contains additional\
+            \ information about the error."
+  /runtime/process-instances/{processInstanceId}:
+    get:
+      tags:
+      - "Process Instances"
+      summary: "Get a process instance"
+      description: ""
+      operationId: "getProcessInstance"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the process instance was found and returned."
+          schema:
+            $ref: "#/definitions/ProcessInstanceResponse"
+        404:
+          description: "Indicates the requested process instance was not found."
+    put:
+      tags:
+      - "Process Instances"
+      summary: "Activate or suspend a process instance"
+      description: "## Activate a process instance\n\n ```JSON\n{\n  \"action\" :\
+        \ \"suspend\"\n} ```\n\n\n## Suspend a process instance\n\n ```JSON\n{\n \
+        \ \"action\" : \"activate\"\n} ```\n\n\n"
+      operationId: "performProcessInstanceAction"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/ProcessInstanceActionRequest"
+      responses:
+        200:
+          description: "Indicates the process instance was found and action was executed."
+          schema:
+            $ref: "#/definitions/ProcessInstanceResponse"
+        400:
+          description: "\t\nIndicates an invalid action was supplied."
+        404:
+          description: "Indicates the requested process instance was not found."
+        409:
+          description: "Indicates the requested process instance action cannot be\
+            \ executed since the process-instance is already activated/suspended."
+    delete:
+      tags:
+      - "Process Instances"
+      summary: "Delete a process instance"
+      description: ""
+      operationId: "deleteProcessInstance"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "deleteReason"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        204:
+          description: "Indicates the process instance was found and deleted. Response\
+            \ body is left empty intentionally."
+        404:
+          description: "Indicates the requested process instance was not found."
+  /runtime/process-instances/{processInstanceId}/diagram:
+    get:
+      tags:
+      - "Process Instances"
+      summary: "Get diagram for a process instance"
+      description: ""
+      operationId: "getProcessInstanceDiagram"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the process instance was found and the diagram was\
+            \ returned."
+          schema:
+            type: "array"
+            items:
+              type: "string"
+              format: "byte"
+        400:
+          description: "Indicates the requested process instance was not found but\
+            \ the process doesn’t contain any graphical information (BPMN:DI) and\
+            \ no diagram can be created."
+        404:
+          description: "Indicates the requested process instance was not found."
+  /runtime/process-instances/{processInstanceId}/identitylinks:
+    get:
+      tags:
+      - "Process Instances"
+      summary: "Get involved people for process instance"
+      description: "Note that the groupId in Response Body will always be null, as\
+        \ it’s only possible to involve users with a process-instance."
+      operationId: "listProcessInstanceIdentityLinks"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the process instance was found and links are returned."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/RestIdentityLink"
+        404:
+          description: "Indicates the requested process instance was not found."
+    post:
+      tags:
+      - "Process Instances"
+      summary: "Add an involved user to a process instance"
+      description: "Note that the groupId in Response Body will always be null, as\
+        \ it’s only possible to involve users with a process-instance."
+      operationId: "createProcessInstanceIdentityLinks"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/RestIdentityLink"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/RestIdentityLink"
+        201:
+          description: "Indicates the process instance was found and the link is created."
+        400:
+          description: "Indicates the requested body did not contain a userId or a\
+            \ type."
+        404:
+          description: "Indicates the requested process instance was not found."
+  /runtime/process-instances/{processInstanceId}/identitylinks/users/{identityId}/{type}:
+    get:
+      tags:
+      - "Process Instances"
+      summary: "Get a specific involved people from process instance"
+      description: ""
+      operationId: "getProcessInstanceIdentityLinks"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "identityId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "type"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the process instance was found and the specified\
+            \ link is retrieved."
+          schema:
+            $ref: "#/definitions/RestIdentityLink"
+        404:
+          description: "Indicates the requested process instance was not found or\
+            \ the link to delete doesn’t exist. The response status contains additional\
+            \ information about the error."
+    delete:
+      tags:
+      - "Process Instances"
+      summary: "Remove an involved user to from process instance"
+      description: ""
+      operationId: "deleteProcessInstanceIdentityLinks"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "identityId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "type"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "Indicates the process instance was found and the link has\
+            \ been deleted. Response body is left empty intentionally."
+        404:
+          description: "Indicates the requested process instance was not found or\
+            \ the link to delete doesn’t exist. The response status contains additional\
+            \ information about the error."
+  /runtime/process-instances/{processInstanceId}/variables:
+    get:
+      tags:
+      - "Process Instances"
+      summary: "List of variables for a process instance"
+      description: "In case the variable is a binary variable or serializable, the\
+        \ valueUrl points to an URL to fetch the raw value. If it’s a plain variable,\
+        \ the value is present in the response. Note that only local scoped variables\
+        \ are returned, as there is no global scope for process-instance variables."
+      operationId: "getVariables"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "scope"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the process instance was found and variables are\
+            \ returned."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/RestVariable"
+        400:
+          description: "Indicates the requested process instance was not found."
+    post:
+      tags:
+      - "Process Instances"
+      summary: "Create variables or new binary variable on a process instance"
+      description: "## Update multiples variables\n\n ```JSON\n[\n   {\n      \"name\"\
+        :\"intProcVar\"\n      \"type\":\"integer\"\n      \"value\":123\n   },\n\n\
+        \   ...\n] ```\n\n\n Any number of variables can be passed into the request\
+        \ body array. More information about the variable format can be found in the\
+        \ REST variables section. Note that scope is ignored, only local variables\
+        \ can be set in a process instance.\n\n\nThe request should be of type multipart/form-data.\
+        \ There should be a single file-part included with the binary value of the\
+        \ variable. On top of that, the following additional form-fields can be present:\n\
+        \nname: Required name of the variable.\n\ntype: Type of variable that is created.\
+        \ If omitted, binary is assumed and the binary data in the request will be\
+        \ stored as an array of bytes."
+      operationId: "createProcessInstanceVariable"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "object"
+        201:
+          description: "Indicates the process instance was found and variable is created."
+        400:
+          description: "Indicates the request body is incomplete or contains illegal\
+            \ values. The status description contains additional information about\
+            \ the error."
+        404:
+          description: "Indicates the requested process instance was not found."
+        409:
+          description: "Indicates the process instance was found but already contains\
+            \ a variable with the given name (only thrown when POST method is used).\
+            \ Use the update-method instead."
+    put:
+      tags:
+      - "Process Instances"
+      summary: "Update a single or binary variable or multiple variables on a process\
+        \ instance"
+      description: "## Update multiples variables\n\n ```JSON\n[\n   {\n      \"name\"\
+        :\"intProcVar\"\n      \"type\":\"integer\"\n      \"value\":123\n   },\n\n\
+        \   ...\n] ```\n\n\n Any number of variables can be passed into the request\
+        \ body array. More information about the variable format can be found in the\
+        \ REST variables section. Note that scope is ignored, only local variables\
+        \ can be set in a process instance.\n\n\n## Update a single variable\n\n```JSON\n\
+        \ {\n    \"name\":\"intProcVar\"\n    \"type\":\"integer\"\n    \"value\"\
+        :123\n } ```\n\n\n##  Update an existing binary variable\n\n\n\n\nThe request\
+        \ should be of type multipart/form-data. There should be a single file-part\
+        \ included with the binary value of the variable. On top of that, the following\
+        \ additional form-fields can be present:\n\nname: Required name of the variable.\n\
+        \ntype: Type of variable that is created. If omitted, binary is assumed and\
+        \ the binary data in the request will be stored as an array of bytes."
+      operationId: "createOrUpdateProcessVariable"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "object"
+        201:
+          description: "Indicates the process instance was found and variable is created."
+        400:
+          description: "Indicates the request body is incomplete or contains illegal\
+            \ values. The status description contains additional information about\
+            \ the error."
+        404:
+          description: "Indicates the requested process instance was not found."
+        415:
+          description: "Indicates the serializable data contains an object for which\
+            \ no class is present in the JVM running the Flowable engine and therefore\
+            \ cannot be deserialized."
+    delete:
+      tags:
+      - "Process Instances"
+      summary: "Delete all variables"
+      description: ""
+      operationId: "deleteLocalProcessVariable"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "Indicates variables were found and have been deleted. Response-body\
+            \ is intentionally empty."
+        404:
+          description: "Indicates the requested process instance was not found."
+  /runtime/process-instances/{processInstanceId}/variables/{variableName}:
+    get:
+      tags:
+      - "Process Instances"
+      summary: "Get a variable for a process instance"
+      description: ""
+      operationId: "getProcessInstanceVariable"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "variableName"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "scope"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Indicates both the process instance and variable were found\
+            \ and variable is returned."
+          schema:
+            $ref: "#/definitions/RestVariable"
+        404:
+          description: "Indicates the requested process instance was not found or\
+            \ the process instance does not have a variable with the given name. Status\
+            \ description contains additional information about the error."
+    put:
+      tags:
+      - "Process Instances"
+      summary: "Update a single variable on a process instance"
+      description: ""
+      operationId: "updateProcessInstanceVariable"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "variableName"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates both the process instance and variable were found\
+            \ and variable is updated."
+          schema:
+            $ref: "#/definitions/RestVariable"
+        404:
+          description: "Indicates the requested process instance was not found or\
+            \ the process instance does not have a variable with the given name. Status\
+            \ description contains additional information about the error."
+    delete:
+      tags:
+      - "Process Instances"
+      summary: "Delete a variable"
+      description: ""
+      operationId: "deleteProcessInstanceVariable"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "variableName"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "scope"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        204:
+          description: "Indicates the variable was found and has been deleted. Response-body\
+            \ is intentionally empty."
+        404:
+          description: "Indicates the requested variable was not found."
+  /runtime/process-instances/{processInstanceId}/variables/{variableName}/data:
+    get:
+      tags:
+      - "Process Instances"
+      summary: "Get the binary data for a variable"
+      description: ""
+      operationId: "getProcessInstanceVariableData"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "variableName"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "scope"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the process instance was found and the requested\
+            \ variables are returned."
+          schema:
+            type: "array"
+            items:
+              type: "string"
+              format: "byte"
+        404:
+          description: "Indicates the requested task was not found or the task doesn’\
+            t have a variable with the given name (in the given scope). Status message\
+            \ provides additional information."
+  /runtime/signals:
+    post:
+      tags:
+      - "Runtime"
+      summary: "Signal event received"
+      description: ""
+      operationId: "signalEventReceived"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/SignalEventReceivedRequest"
+      responses:
+        200:
+          description: "Indicated signal has been processed and no errors occurred."
+        202:
+          description: "Indicated signal processing is queued as a job, ready to be\
+            \ executed."
+        400:
+          description: "Signal not processed. The signal name is missing or variables\
+            \ are used together with async, which is not allowed. Response body contains\
+            \ additional information about the error."
+  /runtime/tasks:
+    get:
+      tags:
+      - "Tasks"
+      summary: "List of tasks"
+      description: ""
+      operationId: "getTasks"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "name"
+        in: "query"
+        description: "Only return models with the given version."
+        required: false
+        type: "string"
+      - name: "nameLike"
+        in: "query"
+        description: "Only return tasks with a name like the given name."
+        required: false
+        type: "string"
+      - name: "description"
+        in: "query"
+        description: "Only return tasks with the given description."
+        required: false
+        type: "string"
+      - name: "priority"
+        in: "query"
+        description: "Only return tasks with the given priority."
+        required: false
+        type: "string"
+      - name: "minimumPriority"
+        in: "query"
+        description: "Only return tasks with a priority greater than the given value."
+        required: false
+        type: "string"
+      - name: "maximumPriority"
+        in: "query"
+        description: "Only return tasks with a priority lower than the given value."
+        required: false
+        type: "string"
+      - name: "assignee"
+        in: "query"
+        description: "Only return tasks assigned to the given user."
+        required: false
+        type: "string"
+      - name: "assigneeLike"
+        in: "query"
+        description: "Only return tasks assigned with an assignee like the given value."
+        required: false
+        type: "string"
+      - name: "owner"
+        in: "query"
+        description: "Only return tasks owned by the given user."
+        required: false
+        type: "string"
+      - name: "ownerLike"
+        in: "query"
+        description: "Only return tasks assigned with an owner like the given value."
+        required: false
+        type: "string"
+      - name: "unassigned"
+        in: "query"
+        description: "Only return tasks that are not assigned to anyone. If false\
+          \ is passed, the value is ignored."
+        required: false
+        type: "string"
+      - name: "delegationState"
+        in: "query"
+        description: "Only return tasks that have the given delegation state. Possible\
+          \ values are pending and resolved."
+        required: false
+        type: "string"
+      - name: "candidateUser"
+        in: "query"
+        description: "Only return tasks that can be claimed by the given user. This\
+          \ includes both tasks where the user is an explicit candidate for and task\
+          \ that are claimable by a group that the user is a member of."
+        required: false
+        type: "string"
+      - name: "candidateGroup"
+        in: "query"
+        description: "Only return tasks that can be claimed by a user in the given\
+          \ group."
+        required: false
+        type: "string"
+      - name: "candidateGroups"
+        in: "query"
+        description: "Only return tasks that can be claimed by a user in the given\
+          \ groups. Values split by comma."
+        required: false
+        type: "string"
+      - name: "involvedUser"
+        in: "query"
+        description: "Only return tasks in which the given user is involved."
+        required: false
+        type: "string"
+      - name: "taskDefinitionKey"
+        in: "query"
+        description: "Only return tasks with the given task definition id."
+        required: false
+        type: "string"
+      - name: "taskDefinitionKeyLike"
+        in: "query"
+        description: "Only return tasks with a given task definition id like the given\
+          \ value."
+        required: false
+        type: "string"
+      - name: "processInstanceId"
+        in: "query"
+        description: "Only return tasks which are part of the process instance with\
+          \ the given id."
+        required: false
+        type: "string"
+      - name: "processInstanceBusinessKey"
+        in: "query"
+        description: "Only return tasks which are part of the process instance with\
+          \ the given business key."
+        required: false
+        type: "string"
+      - name: "processInstanceBusinessKeyLike"
+        in: "query"
+        description: "Only return tasks which are part of the process instance which\
+          \ has a business key like the given value."
+        required: false
+        type: "string"
+      - name: "processDefinitionId"
+        in: "query"
+        description: "Only return tasks which are part of a process instance which\
+          \ has a process definition with the given id."
+        required: false
+        type: "string"
+      - name: "processDefinitionKey"
+        in: "query"
+        description: "Only return tasks which are part of a process instance which\
+          \ has a process definition with the given key."
+        required: false
+        type: "string"
+      - name: "processDefinitionKeyLike"
+        in: "query"
+        description: "Only return tasks which are part of a process instance which\
+          \ has a process definition with a key like the given value."
+        required: false
+        type: "string"
+      - name: "processDefinitionName"
+        in: "query"
+        description: "Only return tasks which are part of a process instance which\
+          \ has a process definition with the given name."
+        required: false
+        type: "string"
+      - name: "processDefinitionNameLike"
+        in: "query"
+        description: "Only return tasks which are part of a process instance which\
+          \ has a process definition with a name like the given value."
+        required: false
+        type: "string"
+      - name: "executionId"
+        in: "query"
+        description: "Only return tasks which are part of the execution with the given\
+          \ id."
+        required: false
+        type: "string"
+      - name: "createdOn"
+        in: "query"
+        description: "Only return tasks which are created on the given date."
+        required: false
+        type: "string"
+      - name: "createdBefore"
+        in: "query"
+        description: "Only return tasks which are created before the given date."
+        required: false
+        type: "string"
+      - name: "createdAfter"
+        in: "query"
+        description: "Only return tasks which are created after the given date."
+        required: false
+        type: "string"
+      - name: "dueOn"
+        in: "query"
+        description: "Only return tasks which are due on the given date."
+        required: false
+        type: "string"
+      - name: "dueBefore"
+        in: "query"
+        description: "Only return tasks which are due before the given date."
+        required: false
+        type: "string"
+      - name: "dueAfter"
+        in: "query"
+        description: "Only return tasks which are due after the given date."
+        required: false
+        type: "string"
+      - name: "withoutDueDate"
+        in: "query"
+        description: "Only return tasks which don’t have a due date. The property\
+          \ is ignored if the value is false."
+        required: false
+        type: "boolean"
+      - name: "excludeSubTasks"
+        in: "query"
+        description: "Only return tasks that are not a subtask of another task."
+        required: false
+        type: "boolean"
+      - name: "active"
+        in: "query"
+        description: "If true, only return tasks that are not suspended (either part\
+          \ of a process that is not suspended or not part of a process at all). If\
+          \ false, only tasks that are part of suspended process instances are returned."
+        required: false
+        type: "boolean"
+      - name: "includeTaskLocalVariables"
+        in: "query"
+        description: "Indication to include task local variables in the result."
+        required: false
+        type: "boolean"
+      - name: "includeProcessVariables"
+        in: "query"
+        description: "Indication to include process variables in the result."
+        required: false
+        type: "boolean"
+      - name: "tenantId"
+        in: "query"
+        description: "Only return tasks with the given tenantId."
+        required: false
+        type: "string"
+      - name: "tenantIdLike"
+        in: "query"
+        description: "Only return tasks with a tenantId like the given value."
+        required: false
+        type: "string"
+      - name: "withoutTenantId"
+        in: "query"
+        description: "If true, only returns tasks without a tenantId set. If false,\
+          \ the withoutTenantId parameter is ignored."
+        required: false
+        type: "boolean"
+      - name: "candidateOrAssigned"
+        in: "query"
+        description: "Select tasks that has been claimed or assigned to user or waiting\
+          \ to claim by user (candidate user or groups)."
+        required: false
+        type: "string"
+      - name: "category"
+        in: "query"
+        description: "Select tasks with the given category. Note that this is the\
+          \ task category, not the category of the process definition (namespace within\
+          \ the BPMN Xml).\n"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Indicates request was successful and the tasks are returned"
+          schema:
+            $ref: "#/definitions/DataResponse"
+        404:
+          description: "Indicates a parameter was passed in the wrong format or that\
+            \ delegationState has an invalid value (other than pending and resolved).\
+            \ The status-message contains additional information."
+    post:
+      tags:
+      - "Tasks"
+      summary: "Create Task"
+      description: ""
+      operationId: "createTask"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/TaskRequest"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/TaskResponse"
+        201:
+          description: "Indicates request was successful and the tasks are returned"
+        400:
+          description: "Indicates a parameter was passed in the wrong format or that\
+            \ delegationState has an invalid value (other than pending and resolved).\
+            \ The status-message contains additional information."
+  /runtime/tasks/{taskId}:
+    get:
+      tags:
+      - "Tasks"
+      summary: "Get a task"
+      description: ""
+      operationId: "getTask"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the task was found and returned."
+          schema:
+            $ref: "#/definitions/TaskResponse"
+        404:
+          description: "Indicates the requested task was not found."
+    post:
+      tags:
+      - "Tasks"
+      summary: "Tasks actions"
+      description: "## Complete a task - Request Body\n\n ```JSON\n{\n  \"action\"\
+        \ : \"complete\",\n  \"variables\" : []\n} ```Completes the task. Optional\
+        \ variable array can be passed in using the variables property. More information\
+        \ about the variable format can be found in the REST variables section. Note\
+        \ that the variable-scope that is supplied is ignored and the variables are\
+        \ set on the parent-scope unless a variable exists in a local scope, which\
+        \ is overridden in this case. This is the same behavior as the TaskService.completeTask(taskId,\
+        \ variables) invocation.\n\nNote that also a transientVariables property is\
+        \ accepted as part of this json, that follows the same structure as the variables\
+        \ property.\n\n\n## Claim a task - Request Body \n\n ```JSON\n{\n  \"action\"\
+        \ : \"claim\",\n  \"assignee\" : \"userWhoClaims\"\n} ```\n\n\nClaims the\
+        \ task by the given assignee. If the assignee is null, the task is assigned\
+        \ to no-one, claimable again.\n\n\n## Delegate a task - Request Body \n\n\
+        \ ```JSON\n{\n  \"action\" : \"delegate\",\n  \"assignee\" : \"userToDelegateTo\"\
+        \n} ```\n\n\nDelegates the task to the given assignee. The assignee is required.\n\
+        \n\n## Suspend a process instance\n\n ```JSON\n{\n  \"action\" : \"resolve\"\
+        \n} ```\n\n\nResolves the task delegation. The task is assigned back to the\
+        \ task owner (if any)."
+      operationId: "executeTaskAction"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/TaskActionRequest"
+      responses:
+        200:
+          description: "Indicates the action was executed."
+        400:
+          description: "When the body contains an invalid value or when the assignee\
+            \ is missing when the action requires it."
+        404:
+          description: "Indicates the requested task was not found."
+        409:
+          description: "Indicates the action cannot be performed due to a conflict.\
+            \ Either the task was updates simultaneously or the task was claimed by\
+            \ another user, in case of the claim action."
+    put:
+      tags:
+      - "Tasks"
+      summary: "Update a task"
+      description: "All request values are optional. For example, you can only include\
+        \ the assignee attribute in the request body JSON-object, only updating the\
+        \ assignee of the task, leaving all other fields unaffected. When an attribute\
+        \ is explicitly included and is set to null, the task-value will be updated\
+        \ to null. Example: {\"dueDate\" : null} will clear the duedate of the task)."
+      operationId: "updateTask"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/TaskRequest"
+      responses:
+        200:
+          description: "Indicates the task was updated."
+          schema:
+            $ref: "#/definitions/TaskResponse"
+        404:
+          description: "Indicates the requested task was not found."
+        409:
+          description: "Indicates the requested task was updated simultaneously."
+    delete:
+      tags:
+      - "Tasks"
+      summary: "Delete a task"
+      description: ""
+      operationId: "deleteTask"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "cascadeHistory"
+        in: "query"
+        description: "Whether or not to delete the HistoricTask instance when deleting\
+          \ the task (if applicable). If not provided, this value defaults to false."
+        required: false
+        type: "string"
+      - name: "deleteReason"
+        in: "query"
+        description: "Reason why the task is deleted. This value is ignored when cascadeHistory\
+          \ is true."
+        required: false
+        type: "string"
+      responses:
+        204:
+          description: "Indicates the task was found and has been deleted. Response-body\
+            \ is intentionally empty."
+        403:
+          description: "Indicates the requested task cannot be deleted because it’\
+            s part of a workflow."
+        404:
+          description: "Indicates the requested task was not found."
+  /runtime/tasks/{taskId}/attachments:
+    get:
+      tags:
+      - "Tasks"
+      summary: "Get all attachments on a task"
+      description: ""
+      operationId: "getAttachments"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the task was found and the attachments are returned."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/AttachmentResponse"
+        404:
+          description: "Indicates the requested task was not found."
+    post:
+      tags:
+      - "Tasks"
+      summary: "Create a new attachment on a task, containing a link to an external\
+        \ resource or an attached file"
+      description: "## Create a new attachment on a task, containing a link to an\
+        \ external resource\n\n ```JSON\n{\n  \"name\":\"Simple attachment\",\n  \"\
+        description\":\"Simple attachment description\",\n  \"type\":\"simpleType\"\
+        ,\n  \"externalUrl\":\"http://flowable.org\"\n} ```\n\n\nOnly the attachment\
+        \ name is required to create a new attachment.\n\n\n\n## Create a new attachment\
+        \ on a task, with an attached file\n\nThe request should be of type multipart/form-data.\
+        \ There should be a single file-part included with the binary value of the\
+        \ variable. On top of that, the following additional form-fields can be present:\n\
+        \n- *name*: Required name of the variable.\n\n- *description*: Description\
+        \ of the attachment, optional.\n\n- *type*: Type of attachment, optional.\
+        \ Supports any arbitrary string or a valid HTTP content-type."
+      operationId: "createAttachment"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/AttachmentResponse"
+        201:
+          description: "Indicates the attachment was created and the result is returned."
+        400:
+          description: "Indicates the attachment name is missing from the request."
+        404:
+          description: "Indicates the requested task was not found."
+  /runtime/tasks/{taskId}/attachments/{attachmentId}:
+    get:
+      tags:
+      - "Tasks"
+      summary: "Get an attachment on a task"
+      description: ""
+      operationId: "getAttachment"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "attachmentId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the task and attachment were found and the attachment\
+            \ is returned."
+          schema:
+            $ref: "#/definitions/AttachmentResponse"
+        404:
+          description: "Indicates the requested task was not found or the tasks doesn’\
+            t have a attachment with the given ID."
+    delete:
+      tags:
+      - "Tasks"
+      summary: "Delete an attachment on a task"
+      description: ""
+      operationId: "deleteAttachment"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "attachmentId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "Indicates the task and attachment were found and the attachment\
+            \ is deleted. Response body is left empty intentionally."
+        404:
+          description: "Indicates the requested task was not found or the tasks doesn’\
+            t have a attachment with the given ID."
+  /runtime/tasks/{taskId}/attachments/{attachmentId}/content:
+    get:
+      tags:
+      - "Tasks"
+      summary: "Get the content for an attachment"
+      description: "The response body contains the binary content. By default, the\
+        \ content-type of the response is set to application/octet-stream unless the\
+        \ attachment type contains a valid Content-type."
+      operationId: "getAttachmentContent"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "attachmentId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the task and attachment was found and the requested\
+            \ content is returned."
+          schema:
+            type: "array"
+            items:
+              type: "string"
+              format: "byte"
+        404:
+          description: "Indicates the requested task was not found or the task doesn’\
+            t have an attachment with the given id or the attachment doesn’t have\
+            \ a binary stream available. Status message provides additional information."
+  /runtime/tasks/{taskId}/comments:
+    get:
+      tags:
+      - "Tasks"
+      summary: "Get all comments on a task"
+      description: ""
+      operationId: "listTaskComments"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/CommentResponse"
+        201:
+          description: "Indicates the task was found and the comments are returned."
+        404:
+          description: "Indicates the requested task was not found."
+    post:
+      tags:
+      - "Tasks"
+      summary: "Create a new comment on a task"
+      description: ""
+      operationId: "createTaskComments"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/CommentRequest"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/CommentResponse"
+        201:
+          description: "Indicates the comment was created and the result is returned."
+        400:
+          description: "Indicates the comment is missing from the request."
+        404:
+          description: "Indicates the requested task was not found."
+  /runtime/tasks/{taskId}/comments/{commentId}:
+    get:
+      tags:
+      - "Tasks"
+      summary: " Get a comment on a task"
+      description: ""
+      operationId: "getTaskComment"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "commentId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the task and comment were found and the comment\
+            \ is returned."
+          schema:
+            $ref: "#/definitions/CommentResponse"
+        404:
+          description: "Indicates the requested task was not found or the tasks doesn’\
+            t have a comment with the given ID."
+    delete:
+      tags:
+      - "Tasks"
+      summary: "Delete a comment on a task"
+      description: ""
+      operationId: "deleteTaskComment"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "commentId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "Indicates the task and comment were found and the comment\
+            \ is deleted. Response body is left empty intentionally."
+        404:
+          description: "Indicates the requested task was not found or the tasks doesn’\
+            t have a comment with the given ID."
+  /runtime/tasks/{taskId}/events:
+    get:
+      tags:
+      - "Tasks"
+      summary: "Get all events for a task"
+      description: ""
+      operationId: "getEvents"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the task was found and the events are returned."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/EventResponse"
+        404:
+          description: "Indicates the requested task was not found."
+  /runtime/tasks/{taskId}/events/{eventId}:
+    get:
+      tags:
+      - "Tasks"
+      summary: "Get an event on a task"
+      description: ""
+      operationId: "getEvent"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "eventId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the task and event were found and the event is returned."
+          schema:
+            $ref: "#/definitions/EventResponse"
+        404:
+          description: "Indicates the requested task was not found or the tasks doesn’\
+            t have an event with the given ID."
+    delete:
+      tags:
+      - "Tasks"
+      summary: "Delete an event on a task"
+      description: ""
+      operationId: "deleteEvent"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "eventId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "Indicates the task was found and the events are returned."
+        404:
+          description: "Indicates the requested task was not found or the task doesn’\
+            t have the requested event."
+  /runtime/tasks/{taskId}/identitylinks:
+    get:
+      tags:
+      - "Tasks"
+      summary: "Get all identity links for a task"
+      description: ""
+      operationId: "listTasksInstanceIdentityLinks"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the task was found and the requested identity links\
+            \ are returned."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/RestIdentityLink"
+        404:
+          description: "Indicates the requested task was not found."
+    post:
+      tags:
+      - "Tasks"
+      summary: "Create an identity link on a task"
+      description: "## Request body (user)\n\n ```JSON\n{\n  \"userId\" : \"kermit\"\
+        ,\n  \"type\" : \"candidate\",\n} ```\n\n\n## Request body (group)\n\n ```JSON\n\
+        {\n  \"groupId\" : \"sales\",\n  \"type\" : \"candidate\",\n} ```\n\n\n"
+      operationId: "createTaskInstanceIdentityLinks"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/RestIdentityLink"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/RestIdentityLink"
+        201:
+          description: "Indicates the task was found and the identity link was created."
+        404:
+          description: "Indicates the requested task was not found or the task doesn’\
+            t have the requested identityLink. The status contains additional information\
+            \ about this error."
+  /runtime/tasks/{taskId}/identitylinks/{family}:
+    get:
+      tags:
+      - "Tasks"
+      summary: "Get all identitylinks for a task for either groups or users"
+      description: "## Get all identitylinks for a task URL\n\n ```\n GET runtime/tasks/{taskId}/identitylinks/users\n\
+        GET runtime/tasks/{taskId}/identitylinks/groups  ```\n\n\nReturns only identity\
+        \ links targetting either users or groups. Response body and status-codes\
+        \ are exactly the same as when getting the full list of identity links for\
+        \ a task."
+      operationId: "getIdentityLinksForFamily"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "family"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the task was found and the requested identity links\
+            \ are returned."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/RestIdentityLink"
+        404:
+          description: "Indicates the requested task was not found."
+  /runtime/tasks/{taskId}/identitylinks/{family}/{identityId}/{type}:
+    get:
+      tags:
+      - "Tasks"
+      summary: "Get a single identity link on a task"
+      description: ""
+      operationId: "getTaskInstanceIdentityLinks"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "family"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "identityId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "type"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the task and identity link was found and returned."
+          schema:
+            $ref: "#/definitions/RestIdentityLink"
+        404:
+          description: "Indicates the requested task was not found or the task doesn’\
+            t have the requested identityLink. The status contains additional information\
+            \ about this error."
+    delete:
+      tags:
+      - "Tasks"
+      summary: "Delete an identity link on a task"
+      description: ""
+      operationId: "deleteTaskInstanceIdentityLinks"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "family"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "identityId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "type"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "Indicates the task and identity link were found and the link\
+            \ has been deleted. Response-body is intentionally empty."
+        404:
+          description: "Indicates the requested task was not found or the task doesn’\
+            t have the requested identityLink. The status contains additional information\
+            \ about this error."
+  /runtime/tasks/{taskId}/subtasks:
+    get:
+      tags:
+      - "Tasks"
+      summary: "Get list of sub tasks for a task"
+      description: ""
+      operationId: "getSubTasks"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates request was successful and the  sub tasks are returned"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/TaskResponse"
+        404:
+          description: "Indicates the requested task was not found."
+  /runtime/tasks/{taskId}/variables:
+    get:
+      tags:
+      - "Tasks"
+      summary: "Get all variables for a task"
+      description: ""
+      operationId: "listTaskVariables"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "scope"
+        in: "query"
+        description: "Scope of variable to be returned. When local, only task-local\
+          \ variable value is returned. When global, only variable value from the\
+          \ task’s parent execution-hierarchy are returned. When the parameter is\
+          \ omitted, a local variable will be returned if it exists, otherwise a global\
+          \ variable."
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the task was found and the requested variables are\
+            \ returned"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/RestVariable"
+        404:
+          description: "Indicates the requested task was not found.."
+    post:
+      tags:
+      - "Tasks"
+      summary: "Create new variables on a task"
+      description: "## Request body for creating simple (non-binary) variables\n\n\
+        \ ```JSON\n[\n  {\n    \"name\" : \"myTaskVariable\",\n    \"scope\" : \"\
+        local\",\n    \"type\" : \"string\",\n    \"value\" : \"Hello my friend\"\n\
+        \  },\n  {\n\n  }\n] ```\n\n\nThe request body should be an array containing\
+        \ one or more JSON-objects representing the variables that should be created.\n\
+        \n- *name*: Required name of the variable\n\nscope: Scope of variable that\
+        \ is created. If omitted, local is assumed.\n\n- *type*: Type of variable\
+        \ that is created. If omitted, reverts to raw JSON-value type (string, boolean,\
+        \ integer or double).\n\n- *value*: Variable value.\n\nMore information about\
+        \ the variable format can be found in the REST variables section.\n\n\n##\
+        \ Request body for Creating a new binary variable\n\nThe request should be\
+        \ of type multipart/form-data. There should be a single file-part included\
+        \ with the binary value of the variable. On top of that, the following additional\
+        \ form-fields can be present:\n\n- *name*: Required name of the variable.\n\
+        \nscope: Scope of variable that is created. If omitted, local is assumed.\n\
+        \n- *type*: Type of variable that is created. If omitted, binary is assumed\
+        \ and the binary data in the request will be stored as an array of bytes.\n\
+        \n\n"
+      operationId: "createTaskVariable"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "object"
+        201:
+          description: "Indicates the variables were created and the result is returned."
+        400:
+          description: "Indicates the name of a variable to create was missing or\
+            \ that an attempt is done to create a variable on a standalone task (without\
+            \ a process associated) with scope global or an empty array of variables\
+            \ was included in the request or request did not contain an array of variables.\
+            \ Status message provides additional information."
+        404:
+          description: "Indicates the requested task was not found."
+        409:
+          description: "Indicates the task already has a variable with the given name.\
+            \ Use the PUT method to update the task variable instead."
+        415:
+          description: "Indicates the serializable data contains an object for which\
+            \ no class is present in the JVM running the Flowable engine and therefore\
+            \ cannot be deserialized."
+    delete:
+      tags:
+      - "Tasks"
+      summary: "Delete all local variables on a task"
+      description: ""
+      operationId: "deleteAllLocalTaskVariables"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "Indicates all local task variables have been deleted. Response-body\
+            \ is intentionally empty."
+        404:
+          description: "Indicates the requested task was not found."
+  /runtime/tasks/{taskId}/variables/{variableName}:
+    get:
+      tags:
+      - "Tasks"
+      summary: "Get a variable from a task"
+      description: ""
+      operationId: "getTaskInstanceVariable"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "variableName"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "scope"
+        in: "query"
+        description: "Scope of variable to be returned. When local, only task-local\
+          \ variable value is returned. When global, only variable value from the\
+          \ task’s parent execution-hierarchy are returned. When the parameter is\
+          \ omitted, a local variable will be returned if it exists, otherwise a global\
+          \ variable."
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the task was found and the requested variables are\
+            \ returned."
+          schema:
+            $ref: "#/definitions/RestVariable"
+        404:
+          description: "Indicates the requested task was not found or the task doesn’\
+            t have a variable with the given name (in the given scope). Status message\
+            \ provides additional information."
+    put:
+      tags:
+      - "Tasks"
+      summary: "Update an existing variable on a task"
+      description: "## Request body for updating simple (non-binary) variables\n\n\
+        \ ```JSON\n{\n  \"name\" : \"myTaskVariable\",\n  \"scope\" : \"local\",\n\
+        \  \"type\" : \"string\",\n  \"value\" : \"Hello my friend\"\n} ```\n\n\n\
+        - *name*: Required name of the variable\n\n- *scope*: Scope of variable that\
+        \ is updated. If omitted, local is assumed.\n\n- *type*: Type of variable\
+        \ that is updated. If omitted, reverts to raw JSON-value type (string, boolean,\
+        \ integer or double).\n\n- *value*: Variable value.\n\n\n## Request body for\
+        \ updating simple (non-binary) variables\n\nThe request should be of type\
+        \ multipart/form-data. There should be a single file-part included with the\
+        \ binary value of the variable. On top of that, the following additional form-fields\
+        \ can be present:\n\n- *name*: Required name of the variable.\n\n- *scope*:\
+        \ Scope of variable that is updated. If omitted, local is assumed.\n\n- *type*:\
+        \ Type of variable that is updated. If omitted, binary is assumed and the\
+        \ binary data in the request will be stored as an array of bytes."
+      operationId: "updateTaskInstanceVariable"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "variableName"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "scope"
+        in: "query"
+        description: "Scope of variable to be returned. When local, only task-local\
+          \ variable value is returned. When global, only variable value from the\
+          \ task’s parent execution-hierarchy are returned. When the parameter is\
+          \ omitted, a local variable will be returned if it exists, otherwise a global\
+          \ variable."
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the variables was updated and the result is returned."
+          schema:
+            $ref: "#/definitions/RestVariable"
+        400:
+          description: "Indicates the name of a variable to update was missing or\
+            \ that an attempt is done to update a variable on a standalone task (without\
+            \ a process associated) with scope global. Status message provides additional\
+            \ information."
+        404:
+          description: "Indicates the requested task was not found or the task doesn’\
+            t have a variable with the given name in the given scope. Status message\
+            \ contains additional information about the error."
+        415:
+          description: "Indicates the serializable data contains an object for which\
+            \ no class is present in the JVM running the Flowable engine and therefore\
+            \ cannot be deserialized."
+    delete:
+      tags:
+      - "Tasks"
+      summary: "Delete a variable on a task"
+      description: ""
+      operationId: "deleteTaskInstanceVariable"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "variableName"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "scope"
+        in: "query"
+        description: "Scope of variable to be returned. When local, only task-local\
+          \ variable value is returned. When global, only variable value from the\
+          \ task’s parent execution-hierarchy are returned. When the parameter is\
+          \ omitted, a local variable will be returned if it exists, otherwise a global\
+          \ variable."
+        required: false
+        type: "string"
+      responses:
+        204:
+          description: "Indicates the task variable was found and has been deleted.\
+            \ Response-body is intentionally empty."
+        404:
+          description: "Indicates the requested task was not found or the task doesn’\
+            t have a variable with the given name. Status message contains additional\
+            \ information about the error."
+  /runtime/tasks/{taskId}/variables/{variableName}/data:
+    get:
+      tags:
+      - "Tasks"
+      summary: "Get the binary data for a variable"
+      description: "The response body contains the binary value of the variable. When\
+        \ the variable is of type binary, the content-type of the response is set\
+        \ to application/octet-stream, regardless of the content of the variable or\
+        \ the request accept-type header. In case of serializable, application/x-java-serialized-object\
+        \ is used as content-type."
+      operationId: "geTaskVariableData"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "variableName"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "scope"
+        in: "query"
+        description: "Scope of variable to be returned. When local, only task-local\
+          \ variable value is returned. When global, only variable value from the\
+          \ task’s parent execution-hierarchy are returned. When the parameter is\
+          \ omitted, a local variable will be returned if it exists, otherwise a global\
+          \ variable."
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the task was found and the requested variables are\
+            \ returned."
+          schema:
+            type: "array"
+            items:
+              type: "string"
+              format: "byte"
+        404:
+          description: "Indicates the requested task was not found or the task doesn’\
+            t have a variable with the given name (in the given scope). Status message\
+            \ provides additional information."
+securityDefinitions:
+  basicAuth:
+    type: "basic"
+definitions:
+  AttachmentResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      url:
+        type: "string"
+      name:
+        type: "string"
+      userId:
+        type: "string"
+      description:
+        type: "string"
+      type:
+        type: "string"
+        description: "Can be any arbitrary value. When a valid formatted media-type\
+          \ (e.g. application/xml, text/plain) is included, the binary content HTTP\
+          \ response content-type will be set the the given value."
+      taskUrl:
+        type: "string"
+      processInstanceUrl:
+        type: "string"
+      externalUrl:
+        type: "string"
+        description: "contentUrl:In case the attachment is a link to an external resource,\
+          \ the externalUrl contains the URL to the external content. If the attachment\
+          \ content is present in the Flowable engine, the contentUrl will contain\
+          \ an URL where the binary content can be streamed from."
+      contentUrl:
+        type: "string"
+      time:
+        type: "string"
+        format: "date-time"
+  CommentRequest:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      url:
+        type: "string"
+      author:
+        type: "string"
+      message:
+        type: "string"
+      type:
+        type: "string"
+      saveProcessInstanceId:
+        type: "boolean"
+        default: false
+  CommentResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      author:
+        type: "string"
+      message:
+        type: "string"
+      time:
+        type: "string"
+        format: "date-time"
+      taskId:
+        type: "string"
+      taskUrl:
+        type: "string"
+      processInstanceId:
+        type: "string"
+      processInstanceUrl:
+        type: "string"
+  DataResponse:
+    type: "object"
+    properties:
+      data:
+        type: "object"
+      total:
+        type: "integer"
+        format: "int64"
+      start:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      size:
+        type: "integer"
+        format: "int32"
+  EventResponse:
+    type: "object"
+    properties:
+      url:
+        type: "string"
+      id:
+        type: "string"
+      action:
+        type: "string"
+      userId:
+        type: "string"
+      time:
+        type: "string"
+        format: "date-time"
+      taskUrl:
+        type: "string"
+      processInstanceUrl:
+        type: "string"
+      message:
+        type: "array"
+        items:
+          type: "string"
+  ExecutionActionRequest:
+    type: "object"
+    properties:
+      action:
+        type: "string"
+        description: "Action to perform"
+      signalName:
+        type: "string"
+      messageName:
+        type: "string"
+      variables:
+        type: "array"
+        items:
+          $ref: "#/definitions/RestVariable"
+      transientVariables:
+        type: "array"
+        items:
+          $ref: "#/definitions/RestVariable"
+  ExecutionQueryRequest:
+    type: "object"
+    properties:
+      start:
+        type: "integer"
+        format: "int32"
+      size:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      id:
+        type: "string"
+      activityId:
+        type: "string"
+      parentId:
+        type: "string"
+      processInstanceId:
+        type: "string"
+      processBusinessKey:
+        type: "string"
+      processDefinitionId:
+        type: "string"
+      processDefinitionKey:
+        type: "string"
+      signalEventSubscriptionName:
+        type: "string"
+      messageEventSubscriptionName:
+        type: "string"
+      variables:
+        type: "array"
+        items:
+          $ref: "#/definitions/QueryVariable"
+      processInstanceVariables:
+        type: "array"
+        items:
+          $ref: "#/definitions/QueryVariable"
+      tenantId:
+        type: "string"
+      tenantIdLike:
+        type: "string"
+      withoutTenantId:
+        type: "boolean"
+        default: false
+  ExecutionResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      url:
+        type: "string"
+      parentId:
+        type: "string"
+      parentUrl:
+        type: "string"
+      superExecutionId:
+        type: "string"
+      superExecutionUrl:
+        type: "string"
+      processInstanceId:
+        type: "string"
+      processInstanceUrl:
+        type: "string"
+      suspended:
+        type: "boolean"
+        default: false
+      activityId:
+        type: "string"
+      tenantId:
+        type: "string"
+  ProcessInstanceActionRequest:
+    type: "object"
+    properties:
+      action:
+        type: "string"
+        description: "Action to perform"
+  ProcessInstanceCreateRequest:
+    type: "object"
+    properties:
+      processDefinitionId:
+        type: "string"
+      processDefinitionKey:
+        type: "string"
+      message:
+        type: "string"
+      businessKey:
+        type: "string"
+      variables:
+        type: "array"
+        items:
+          $ref: "#/definitions/RestVariable"
+      transientVariables:
+        type: "array"
+        items:
+          $ref: "#/definitions/RestVariable"
+      tenantId:
+        type: "string"
+      returnVariables:
+        type: "boolean"
+        default: false
+  ProcessInstanceQueryRequest:
+    type: "object"
+    properties:
+      start:
+        type: "integer"
+        format: "int32"
+      size:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      processInstanceId:
+        type: "string"
+      processBusinessKey:
+        type: "string"
+      processDefinitionId:
+        type: "string"
+      processDefinitionKey:
+        type: "string"
+      superProcessInstanceId:
+        type: "string"
+      subProcessInstanceId:
+        type: "string"
+      excludeSubprocesses:
+        type: "boolean"
+        default: false
+      involvedUser:
+        type: "string"
+      suspended:
+        type: "boolean"
+        default: false
+      includeProcessVariables:
+        type: "boolean"
+        default: false
+      variables:
+        type: "array"
+        items:
+          $ref: "#/definitions/QueryVariable"
+      tenantId:
+        type: "string"
+      tenantIdLike:
+        type: "string"
+      withoutTenantId:
+        type: "boolean"
+        default: false
+  ProcessInstanceResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      url:
+        type: "string"
+      businessKey:
+        type: "string"
+      suspended:
+        type: "boolean"
+        default: false
+      ended:
+        type: "boolean"
+        default: false
+      processDefinitionId:
+        type: "string"
+      processDefinitionUrl:
+        type: "string"
+      activityId:
+        type: "string"
+      variables:
+        type: "array"
+        items:
+          $ref: "#/definitions/RestVariable"
+      tenantId:
+        type: "string"
+      completed:
+        type: "boolean"
+        default: false
+  QueryVariable:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      value:
+        type: "object"
+      type:
+        type: "string"
+      variableOperation:
+        type: "string"
+        enum:
+        - "EQUALS"
+        - "NOT_EQUALS"
+        - "EQUALS_IGNORE_CASE"
+        - "NOT_EQUALS_IGNORE_CASE"
+        - "LIKE"
+        - "LIKE_IGNORE_CASE"
+        - "GREATER_THAN"
+        - "GREATER_THAN_OR_EQUALS"
+        - "LESS_THAN"
+        - "LESS_THAN_OR_EQUALS"
+  RestIdentityLink:
+    type: "object"
+    properties:
+      url:
+        type: "string"
+      user:
+        type: "string"
+      group:
+        type: "string"
+      type:
+        type: "string"
+  RestVariable:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      type:
+        type: "string"
+      value:
+        type: "object"
+      valueUrl:
+        type: "string"
+      scope:
+        type: "string"
+  SignalEventReceivedRequest:
+    type: "object"
+    properties:
+      signalName:
+        type: "string"
+        description: "Name of the signal"
+      variables:
+        type: "array"
+        description: "Array of variables (in the general variables format) to use\
+          \ as payload to pass along with the signal. Cannot be used in case async\
+          \ is set to true, this will result in an error."
+        items:
+          $ref: "#/definitions/RestVariable"
+      tenantId:
+        type: "string"
+        description: "ID of the tenant that the signal event should be processed in"
+      async:
+        type: "boolean"
+        description: "If true, handling of the signal will happen asynchronously.\
+          \ Return code will be 202 - Accepted to indicate the request is accepted\
+          \ but not yet executed. If false,\n                    handling the signal\
+          \ will be done immediately and result (200 - OK) will only return after\
+          \ this completed successfully. Defaults to false if omitted."
+        default: false
+  TaskActionRequest:
+    type: "object"
+    properties:
+      action:
+        type: "string"
+        description: "Action to perform"
+      assignee:
+        type: "string"
+      variables:
+        type: "array"
+        items:
+          $ref: "#/definitions/RestVariable"
+      transientVariables:
+        type: "array"
+        items:
+          $ref: "#/definitions/RestVariable"
+  TaskQueryRequest:
+    type: "object"
+    properties:
+      start:
+        type: "integer"
+        format: "int32"
+      size:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      name:
+        type: "string"
+      nameLike:
+        type: "string"
+      description:
+        type: "string"
+      descriptionLike:
+        type: "string"
+      priority:
+        type: "integer"
+        format: "int32"
+      minimumPriority:
+        type: "integer"
+        format: "int32"
+      maximumPriority:
+        type: "integer"
+        format: "int32"
+      assignee:
+        type: "string"
+      assigneeLike:
+        type: "string"
+      owner:
+        type: "string"
+      ownerLike:
+        type: "string"
+      unassigned:
+        type: "boolean"
+        default: false
+      delegationState:
+        type: "string"
+      candidateUser:
+        type: "string"
+      candidateGroup:
+        type: "string"
+      candidateGroupIn:
+        type: "array"
+        items:
+          type: "string"
+      involvedUser:
+        type: "string"
+      processInstanceId:
+        type: "string"
+      processInstanceBusinessKey:
+        type: "string"
+      processInstanceBusinessKeyLike:
+        type: "string"
+      processDefinitionId:
+        type: "string"
+      processDefinitionKey:
+        type: "string"
+      processDefinitionName:
+        type: "string"
+      processDefinitionKeyLike:
+        type: "string"
+      processDefinitionNameLike:
+        type: "string"
+      executionId:
+        type: "string"
+      createdOn:
+        type: "string"
+        format: "date-time"
+      createdBefore:
+        type: "string"
+        format: "date-time"
+      createdAfter:
+        type: "string"
+        format: "date-time"
+      excludeSubTasks:
+        type: "boolean"
+        default: false
+      taskDefinitionKey:
+        type: "string"
+      taskDefinitionKeyLike:
+        type: "string"
+      dueDate:
+        type: "string"
+        format: "date-time"
+      dueBefore:
+        type: "string"
+        format: "date-time"
+      dueAfter:
+        type: "string"
+        format: "date-time"
+      withoutDueDate:
+        type: "boolean"
+        default: false
+      active:
+        type: "boolean"
+        default: false
+      includeTaskLocalVariables:
+        type: "boolean"
+        default: false
+      includeProcessVariables:
+        type: "boolean"
+        default: false
+      tenantId:
+        type: "string"
+      tenantIdLike:
+        type: "string"
+      withoutTenantId:
+        type: "boolean"
+        default: false
+      candidateOrAssigned:
+        type: "string"
+      category:
+        type: "string"
+      taskVariables:
+        type: "array"
+        items:
+          $ref: "#/definitions/QueryVariable"
+      processInstanceVariables:
+        type: "array"
+        items:
+          $ref: "#/definitions/QueryVariable"
+  TaskRequest:
+    type: "object"
+    properties:
+      owner:
+        type: "string"
+      assignee:
+        type: "string"
+      delegationState:
+        type: "string"
+      name:
+        type: "string"
+      description:
+        type: "string"
+      dueDate:
+        type: "string"
+        format: "date-time"
+      priority:
+        type: "integer"
+        format: "int32"
+      parentTaskId:
+        type: "string"
+      category:
+        type: "string"
+      tenantId:
+        type: "string"
+      formKey:
+        type: "string"
+      ownerSet:
+        type: "boolean"
+        default: false
+      assigneeSet:
+        type: "boolean"
+        default: false
+      delegationStateSet:
+        type: "boolean"
+        default: false
+      nameSet:
+        type: "boolean"
+        default: false
+      descriptionSet:
+        type: "boolean"
+        default: false
+      duedateSet:
+        type: "boolean"
+        default: false
+      prioritySet:
+        type: "boolean"
+        default: false
+      parentTaskIdSet:
+        type: "boolean"
+        default: false
+      categorySet:
+        type: "boolean"
+        default: false
+      tenantIdSet:
+        type: "boolean"
+        default: false
+      formKeySet:
+        type: "boolean"
+        default: false
+  TaskResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      url:
+        type: "string"
+      owner:
+        type: "string"
+      assignee:
+        type: "string"
+      delegationState:
+        type: "string"
+        description: "Delegation-state of the task, can be null, \"pending\" or \"\
+          resolved\"."
+      name:
+        type: "string"
+      description:
+        type: "string"
+      createTime:
+        type: "string"
+        format: "date-time"
+      dueDate:
+        type: "string"
+        format: "date-time"
+      priority:
+        type: "integer"
+        format: "int32"
+      suspended:
+        type: "boolean"
+        default: false
+      taskDefinitionKey:
+        type: "string"
+      tenantId:
+        type: "string"
+      category:
+        type: "string"
+      formKey:
+        type: "string"
+      parentTaskId:
+        type: "string"
+      parentTaskUrl:
+        type: "string"
+      executionId:
+        type: "string"
+      executionUrl:
+        type: "string"
+      processInstanceId:
+        type: "string"
+      processInstanceUrl:
+        type: "string"
+      processDefinitionId:
+        type: "string"
+      processDefinitionUrl:
+        type: "string"
+      variables:
+        type: "array"
+        items:
+          $ref: "#/definitions/RestVariable"

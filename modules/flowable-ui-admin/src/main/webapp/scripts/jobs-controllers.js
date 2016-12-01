@@ -18,7 +18,7 @@
 
 activitiAdminApp.controller('JobsController', ['$scope', '$rootScope', '$http', '$timeout','$location','$translate', '$q', 'gridConstants',
     function ($scope, $rootScope, $http, $timeout, $location, $translate, $q, gridConstants) {
-		$rootScope.navigation = {selection: 'jobs'};
+		$rootScope.navigation = {main: 'process-engine', sub: 'jobs'};
 		
 		$scope.jobData = {};
 	    $scope.selectedJobs = [];

@@ -59,6 +59,15 @@ public class ServerConfigService extends AbstractEncryptingService {
   private static final String REST_FORM_APP_USER = "rest.form.app.user";
   private static final String REST_FORM_APP_PASSWORD = "rest.form.app.password";
 
+  private static final String REST_CONTENT_APP_NAME = "rest.content.app.name";
+  private static final String REST_CONTENT_APP_DESCRIPTION = "rest.content.app.description";
+  private static final String REST_CONTENT_APP_HOST = "rest.content.app.host";
+  private static final String REST_CONTENT_APP_PORT = "rest.content.app.port";
+  private static final String REST_CONTENT_APP_CONTEXT_ROOT = "rest.content.app.contextroot";
+  private static final String REST_CONTENT_APP_REST_ROOT = "rest.content.app.restroot";
+  private static final String REST_CONTENT_APP_USER = "rest.content.app.user";
+  private static final String REST_CONTENT_APP_PASSWORD = "rest.content.app.password";
+
   @Autowired
   protected Environment environment;
 
@@ -174,6 +183,18 @@ public class ServerConfigService extends AbstractEncryptingService {
         serverConfig.setPassword(environment.getRequiredProperty(REST_FORM_APP_PASSWORD));
         serverConfig.setEndpointType(endpointType.getEndpointCode());
         break;
+
+      case CONTENT:
+        serverConfig.setName(environment.getRequiredProperty(REST_CONTENT_APP_NAME));
+        serverConfig.setDescription(environment.getRequiredProperty(REST_CONTENT_APP_DESCRIPTION));
+        serverConfig.setServerAddress(environment.getRequiredProperty(REST_CONTENT_APP_HOST));
+        serverConfig.setPort(environment.getRequiredProperty(REST_CONTENT_APP_PORT, Integer.class));
+        serverConfig.setContextRoot(environment.getRequiredProperty(REST_CONTENT_APP_CONTEXT_ROOT));
+        serverConfig.setRestRoot(environment.getRequiredProperty(REST_CONTENT_APP_REST_ROOT));
+        serverConfig.setUserName(environment.getRequiredProperty(REST_CONTENT_APP_USER));
+        serverConfig.setPassword(environment.getRequiredProperty(REST_CONTENT_APP_PASSWORD));
+        serverConfig.setEndpointType(endpointType.getEndpointCode());
+        break;
     }
 
     return serverConfig;
@@ -185,6 +206,7 @@ public class ServerConfigService extends AbstractEncryptingService {
     serverConfigs.add(getDefaultServerConfig(EndpointType.PROCESS));
     serverConfigs.add(getDefaultServerConfig(EndpointType.DMN));
     serverConfigs.add(getDefaultServerConfig(EndpointType.FORM));
+    serverConfigs.add(getDefaultServerConfig(EndpointType.CONTENT));
 
     return serverConfigs;
   }

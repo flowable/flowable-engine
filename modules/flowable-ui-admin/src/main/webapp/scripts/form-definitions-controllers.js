@@ -19,7 +19,7 @@
 activitiAdminApp.controller('FormDefinitionsController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', 'gridConstants',
     function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, $modal, gridConstants) {
 
-        $rootScope.navigation = {selection: 'forms'};
+        $rootScope.navigation = {main: 'form-engine', sub: 'definitions'};
         
         $scope.filter = {};
         $scope.formsData = {};
@@ -44,14 +44,14 @@ activitiAdminApp.controller('FormDefinitionsController', ['$rootScope', '$scope'
             },
 
             sortObjects: [
-                {name: 'FORMS.SORT.ID', id: 'id'},
-                {name: 'FORMS.SORT.NAME', id: 'name'}
+                {name: 'FORM-DEFINITIONS.SORT.ID', id: 'id'},
+                {name: 'FORM-DEFINITIONS.SORT.NAME', id: 'name'}
             ],
 
             supportedProperties: [
-                {id: 'nameLike', name: 'FORMS.FILTER.NAME', showByDefault: true},
-                {id: 'appId', name: 'FORMS.FILTER.APPID', showByDefault: true},
-                {id: 'tenantId', name: 'FORMS.FILTER.TENANTID', showByDefault: true}
+                {id: 'nameLike', name: 'FORM-DEFINITIONS.FILTER.NAME', showByDefault: true},
+                {id: 'appId', name: 'FORM-DEFINITIONS.FILTER.APPID', showByDefault: true},
+                {id: 'tenantId', name: 'FORM-DEFINITIONS.FILTER.TENANTID', showByDefault: true}
             ]
         };
 
@@ -66,14 +66,14 @@ activitiAdminApp.controller('FormDefinitionsController', ['$rootScope', '$scope'
 
         $scope.formSelected = function (form) {
             if (form && form.getProperty('id')) {
-                $location.path('/form/' + form.getProperty('id'));
+                $location.path('/form-definition/' + form.getProperty('id'));
             }
         };
 
-        $q.all([$translate('FORMS.HEADER.ID'),
-                $translate('FORMS.HEADER.NAME'),
-                $translate('FORMS.HEADER.APPID'),
-                $translate('FORMS.HEADER.TENANTID')])
+        $q.all([$translate('FORM-DEFINITIONS.HEADER.ID'),
+                $translate('FORM-DEFINITIONS.HEADER.NAME'),
+                $translate('FORM-DEFINITIONS.HEADER.DEPLOYMENTID'),
+                $translate('FORM-DEFINITIONS.HEADER.TENANTID')])
             .then(function (headers) {
                 // Config for grid
                 $scope.gridForms = {
@@ -86,7 +86,7 @@ activitiAdminApp.controller('FormDefinitionsController', ['$rootScope', '$scope'
                     columnDefs: [
                         {field: 'id', displayName: headers[0], cellTemplate: gridConstants.defaultTemplate},
                         {field: 'name', displayName: headers[1], cellTemplate: gridConstants.defaultTemplate},
-                        {field: 'appDeploymentId', displayName: headers[2], cellTemplate: gridConstants.defaultTemplate},
+                        {field: 'deploymentId', displayName: headers[2], cellTemplate: gridConstants.defaultTemplate},
                         {field: 'tenantId', displayName: headers[3], cellTemplate: gridConstants.defaultTemplate}]
                 };
             });

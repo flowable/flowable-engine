@@ -20,7 +20,7 @@
 activitiAdminApp.controller('ProcessDefinitionsController', ['$rootScope', '$scope', '$http', '$timeout', '$location','$translate', '$q', '$modal', 'gridConstants',
     function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, $modal, gridConstants) {
 
-		$rootScope.navigation = {selection: 'process-definitions'};
+		$rootScope.navigation = {main: 'process-engine', sub: 'definitions'};
         
 		$scope.filter = {};
 		$scope.processDefinitionsData = {};

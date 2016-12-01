@@ -1,6 +1,4 @@
-/* Copyright 2005-2015 Alfresco Software, Ltd.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
+/* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -16,7 +14,7 @@
 
 activitiAdminApp.controller('DecisionTableController', ['$scope', '$rootScope', '$http', '$timeout', '$location', '$routeParams', '$modal', '$translate', '$q', 'gridConstants',
     function ($scope, $rootScope, $http, $timeout, $location, $routeParams, $modal, $translate, $q, gridConstants) {
-        $rootScope.navigation = {selection: 'decision-tables'};
+        $rootScope.navigation = {main: 'dmn-engine', sub: 'decision-tables'};
         
         $scope.returnToList = function () {
             $location.path("/decision-tables");
@@ -81,13 +79,13 @@ activitiAdminApp.controller('DecisionTableController', ['$scope', '$rootScope', 
                 $scope.decisionTable = data;
 
                 // Load decision audits
-                $http({
-                    method: 'GET',
-                    url: '/app/rest/activiti/decision-audits?decisionKey=' + data.key + '&dmnDeploymentId=' + data.deploymentId
-                }).
-                success(function (auditsData, status, headers, config) {
-                    $scope.decisionAudits = auditsData;
-                });
+                // $http({
+                //     method: 'GET',
+                //     url: '/app/rest/activiti/decision-audits?decisionKey=' + data.key + '&dmnDeploymentId=' + data.deploymentId
+                // }).
+                // success(function (auditsData, status, headers, config) {
+                //     $scope.decisionAudits = auditsData;
+                // });
             }).
             error(function (data, status, headers, config) {
                 if (data && data.message) {
