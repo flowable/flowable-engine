@@ -271,8 +271,8 @@ public class AsyncExecutorTest {
       processEngineConfiguration.setAsyncExecutorActivate(true);
 
       CountingAsyncExecutor countingAsyncExecutor = new CountingAsyncExecutor();
-      countingAsyncExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(50); // To avoid waiting too long when a retry happens
-      countingAsyncExecutor.setDefaultTimerJobAcquireWaitTimeInMillis(50);
+      countingAsyncExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(2000); // To avoid waiting too long when a retry happens
+      countingAsyncExecutor.setDefaultTimerJobAcquireWaitTimeInMillis(2000);
       processEngineConfiguration.setAsyncExecutor(countingAsyncExecutor);
     }
 
