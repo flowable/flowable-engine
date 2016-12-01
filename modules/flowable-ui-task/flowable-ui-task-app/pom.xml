@@ -298,7 +298,7 @@
                 <groupId>org.apache.tomcat.maven</groupId>
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <configuration>
-                    <path>/flowable-app</path>
+                    <path>/flowable-task</path>
                     <port>9999</port>
                     <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
                     <systemProperties>

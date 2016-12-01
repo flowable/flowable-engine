@@ -19,8 +19,8 @@ var FLOWABLE = FLOWABLE || {};
 
 FLOWABLE.CONFIG = {
 	'onPremise' : true,
-	'contextRoot' : '/flowable-idm-app',
-	'webContextRoot' : '/flowable-idm-app'
+	'contextRoot' : '/flowable-idm',
+	'webContextRoot' : '/flowable-idm'
 };
 
 //

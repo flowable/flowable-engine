@@ -1010,6 +1010,7 @@
 				<module>modules/flowable-ldap</module>
 				<module>modules/flowable-jmx</module>
 				<module>modules/flowable-jms-spring-executor</module>
+				<module>modules/flowable-ui-common</module>
 				<module>modules/flowable-ui-idm</module>
 				<module>modules/flowable-ui-modeler</module>
 				<module>modules/flowable-ui-task</module>
@@ -1095,6 +1096,7 @@
 				<module>modules/flowable-content-spring</module>
 				<module>modules/flowable-content-spring-configurator</module>
 				<module>modules/flowable-jms-spring-executor</module>
+				<module>modules/flowable-ui-common</module>
 			</modules>
 		</profile>
 		<profile>
@@ -1205,8 +1207,8 @@
 				<module>modules/flowable-jmx</module>
 				<module>modules/flowable-jms-spring-executor</module>
 				<module>modules/flowable-crystalball</module>
-				<module>tooling/archetypes/flowable-archetype-unittest</module>
 				<module>modules/flowable-ui-common</module>
+				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 		</profile>
 		<profile>

@@ -19,8 +19,8 @@ var FLOWABLE = FLOWABLE || {};
 
 FLOWABLE.CONFIG = {
 	'onPremise' : true,
-	'contextRoot' : '/flowable-app',
-	'webContextRoot' : '/flowable-app'
+	'contextRoot' : '/flowable-task',
+	'webContextRoot' : '/flowable-task'
 };
 
 //

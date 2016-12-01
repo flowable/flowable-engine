@@ -180,8 +180,8 @@
                 <groupId>org.apache.tomcat.maven</groupId>
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <configuration>
-                    <path>/flowable-idm-app</path>
-                    <port>7777</port>
+                    <path>/flowable-idm</path>
+                    <port>8080</port>
                     <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
                     <systemProperties>
                         <com.sun.management.jmxremote.port>4002</com.sun.management.jmxremote.port>
