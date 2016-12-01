@@ -112,10 +112,10 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
   }
 
   /**
-   * @param searchRecurive: searches the whole process, including subprocesses
+   * @param searchRecursive: searches the whole process, including subprocesses
    */
-  public FlowElement getFlowElement(String flowElementId, boolean searchRecurive) {
-    if (searchRecurive) {
+  public FlowElement getFlowElement(String flowElementId, boolean searchRecursive) {
+    if (searchRecursive) {
       return flowElementMap.get(flowElementId);
     } else {
       return findFlowElementInList(flowElementId);
