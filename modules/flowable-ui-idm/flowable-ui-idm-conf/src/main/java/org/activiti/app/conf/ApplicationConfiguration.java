@@ -12,33 +12,41 @@
  */
 package org.activiti.app.conf;
 
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
 @PropertySources({
-	
-	@PropertySource("classpath:/META-INF/flowable-idm-app/flowable-idm-app.properties"),
-	@PropertySource(value = "classpath:flowable-idm-app.properties", ignoreResourceNotFound = true),
-	@PropertySource(value = "file:flowable-idm-app.properties", ignoreResourceNotFound = true),
+
+    @PropertySource("classpath:/META-INF/flowable-idm-app/flowable-idm-app.properties"),
+    @PropertySource(value = "classpath:flowable-idm-app.properties", ignoreResourceNotFound = true),
+    @PropertySource(value = "file:flowable-idm-app.properties", ignoreResourceNotFound = true),
 
 })
 @ComponentScan(basePackages = {
-        "org.activiti.app.conf",
-        "org.activiti.app.security",
-        "org.activiti.app.idm",
-        "org.activiti.app.service"})
+    "org.activiti.app.conf",
+    "org.activiti.app.security",
+    "org.activiti.app.idm",
+    "org.activiti.app.service"})
 public class ApplicationConfiguration {
-	
-	/**
-	 * This is needed to make property resolving work on annotations ...
-	 * (see http://stackoverflow.com/questions/11925952/custom-spring-property-source-does-not-resolve-placeholders-in-value) 
-	 * 
-	 * @Scheduled(cron="${someProperty}")
-	 */
-	@Bean
-    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-        return new PropertySourcesPlaceholderConfigurer();
-    }
-	
+
+  /**
+   * This is needed to make property resolving work on annotations ...
+   * (see http://stackoverflow.com/questions/11925952/custom-spring-property-source-does-not-resolve-placeholders-in-value)
+   *
+   * @Scheduled(cron="${someProperty}")
+   */
+  @Bean
+  public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+    return new PropertySourcesPlaceholderConfigurer();
+  }
+
+  @Bean
+  public static PropertyPlaceholderConfigurer propertyPlaceholderConfigurer() {
+    PropertyPlaceholderConfigurer placeholderConfigurer = new PropertyPlaceholderConfigurer();
+    placeholderConfigurer.setSystemPropertiesMode(PropertyPlaceholderConfigurer.SYSTEM_PROPERTIES_MODE_OVERRIDE);
+    return placeholderConfigurer;
+  }
+
 }
