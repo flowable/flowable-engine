@@ -8,9 +8,11 @@ import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.CompensateEventDefinition;
 import org.activiti.bpmn.model.EndEvent;
+import org.activiti.bpmn.model.EventSubProcess;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.Process;
+import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.Transaction;
 import org.activiti.engine.common.api.ActivitiException;
@@ -139,6 +141,37 @@ public class EndExecutionOperation extends AbstractOperation {
     }
 
     SubProcess subProcess = execution.getCurrentFlowElement().getSubProcess();
+    
+    if (subProcess instanceof EventSubProcess) {
+      EventSubProcess eventSubProcess = (EventSubProcess) subProcess;
+      
+      boolean hasNonInterruptingStartEvent = false;
+      for (FlowElement eventSubElement : eventSubProcess.getFlowElements()) {
+        if (eventSubElement instanceof StartEvent) {
+          StartEvent subStartEvent = (StartEvent) eventSubElement;
+          if (subStartEvent.isInterrupting() == false) {
+            hasNonInterruptingStartEvent = true;
+            break;
+          }
+        }
+      }
+      
+      if (hasNonInterruptingStartEvent) {
+        executionEntityManager.deleteChildExecutions(parentExecution, null, false);
+        executionEntityManager.deleteExecutionAndRelatedData(parentExecution, null, false);
+        
+        Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+            ActivitiEventBuilder.createActivityEvent(ActivitiEngineEventType.ACTIVITY_COMPLETED, subProcess.getId(), subProcess.getName(),
+                parentExecution.getId(), parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId(), subProcess));
+        
+        ExecutionEntity subProcessParentExecution = parentExecution.getParent();
+        if (getNumberOfActiveChildExecutionsForExecution(executionEntityManager, subProcessParentExecution.getId()) == 0) {
+          agenda.planEndExecutionOperation(subProcessParentExecution);
+        }
+        
+        return;
+      }
+    }
     
     // If there are no more active child executions, the process can be continued
     // If not (eg an embedded subprocess still has active elements, we cannot continue)
@@ -338,7 +371,6 @@ public class EndExecutionOperation extends AbstractOperation {
         executionEntityManager.deleteExecutionAndRelatedData(childExecution, null, false);
       } else {
         allEventScopeExecutions = false;
-        break;
       }
     }
     return allEventScopeExecutions;

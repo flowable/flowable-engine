@@ -76,21 +76,25 @@ public class EventSubProcessMessageStartEventActivityBehavior extends AbstractBp
               DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")", false);
         }
       }
-    }
-    
-    EventSubscriptionEntityManager eventSubscriptionEntityManager = Context.getCommandContext().getEventSubscriptionEntityManager();
-    List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
-    for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
-      if (eventSubscription instanceof MessageEventSubscriptionEntity && eventSubscription.getEventName().equals(messageEventDefinition.getMessageRef())) {
+      
+      EventSubscriptionEntityManager eventSubscriptionEntityManager = Context.getCommandContext().getEventSubscriptionEntityManager();
+      List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
+      
+      for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
+        if (eventSubscription instanceof MessageEventSubscriptionEntity && eventSubscription.getEventName().equals(messageEventDefinition.getMessageRef())) {
 
-        eventSubscriptionEntityManager.delete(eventSubscription);
+          eventSubscriptionEntityManager.delete(eventSubscription);
+        }
       }
     }
+
     
-    executionEntity.setCurrentFlowElement((SubProcess) executionEntity.getCurrentFlowElement().getParentContainer());
-    executionEntity.setScope(true);
+    ExecutionEntity newSubProcessExecution = executionEntityManager.createChildExecution(executionEntity.getParent());
+    newSubProcessExecution.setCurrentFlowElement((SubProcess) executionEntity.getCurrentFlowElement().getParentContainer());
+    newSubProcessExecution.setEventScope(false);
+    newSubProcessExecution.setScope(true);
     
-    ExecutionEntity outgoingFlowExecution = executionEntityManager.createChildExecution(executionEntity);
+    ExecutionEntity outgoingFlowExecution = executionEntityManager.createChildExecution(newSubProcessExecution);
     outgoingFlowExecution.setCurrentFlowElement(startEvent);
     
     leave(outgoingFlowExecution);
