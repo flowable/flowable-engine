@@ -14,6 +14,17 @@
  * Configure the HTTP provider such that no caching happens when fetching
  * a resource using $http.
  */
+activitiModule.service('NotPermittedInterceptor', [ '$window', function($window) {
+    var service = this;
+    service.responseError = function(response) {
+        if (response.status === 403) {
+            $window.location.href = FLOWABLE.CONFIG.contextRoot + '/workflow/views/not-permitted.html';
+            $window.reload();
+        }
+        return response;
+    };
+}]);
+
 activitiModule.config(['$httpProvider', function($httpProvider) {
 
     if (!$httpProvider.defaults.headers.get) {
@@ -23,5 +34,7 @@ activitiModule.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.get['Cache-Control'] = 'no-cache, no-store, must-revalidate';
     $httpProvider.defaults.headers.get['Pragma'] = 'no-cache';
     $httpProvider.defaults.headers.get['Expires'] = '0';
+
+    $httpProvider.interceptors.push('NotPermittedInterceptor');
 
 }]);

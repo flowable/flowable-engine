@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.activiti.app.model.common.AbstractRepresentation;
-import org.activiti.app.model.idm.UserRepresentation;
+import org.activiti.app.model.common.UserRepresentation;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;

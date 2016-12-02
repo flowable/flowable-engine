@@ -17,9 +17,9 @@ import java.util.List;
 
 import org.activiti.app.constant.GroupIds;
 import org.activiti.app.constant.GroupTypes;
+import org.activiti.app.model.common.GroupRepresentation;
 import org.activiti.app.model.common.ResultListDataRepresentation;
-import org.activiti.app.model.idm.GroupRepresentation;
-import org.activiti.app.model.idm.UserRepresentation;
+import org.activiti.app.model.common.UserRepresentation;
 import org.activiti.app.security.SecurityUtils;
 import org.activiti.app.service.exception.BadRequestException;
 import org.activiti.app.service.exception.NotFoundException;

@@ -14,7 +14,7 @@ package org.activiti.app.rest.idm;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.activiti.app.model.idm.UserRepresentation;
+import org.activiti.app.model.common.UserRepresentation;
 import org.activiti.app.security.SecurityUtils;
 import org.activiti.app.service.exception.NotFoundException;
 import org.activiti.app.service.exception.NotPermittedException;

@@ -131,6 +131,26 @@ activitiApp
                 });
             }
         };
+
+        $rootScope.logout = function () {
+            $rootScope.authenticated = false;
+            $rootScope.authenticationError = false;
+            $http.get(FLOWABLE.CONFIG.contextRoot + '/app/logout')
+                .success(function (data, status, headers, config) {
+                    $rootScope.login = null;
+                    $rootScope.authenticated = false;
+                    $window.location.href = '/';
+                    $window.location.reload();
+                });
+        };
+
+        $http.get(FLOWABLE.CONFIG.contextRoot + '/app/rest/account')
+        	.success(function (data, status, headers, config) {
+              	$rootScope.account = data;
+               	$rootScope.invalidCredentials = false;
+ 				$rootScope.authenticated = true;
+          	});
+
      }])
      .run(['$rootScope', '$location', '$window', '$translate', '$modal',
         function($rootScope, $location, $window, $translate, $modal) {

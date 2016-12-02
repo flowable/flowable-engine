@@ -10,6 +10,7 @@ target
 .vscode
 *.bpmn/
 /userguide/src/en/index.html
+userguide/src/en/output/
 migration.html
 /modules/**/bin
 modules/flowable-ui-task/flowable-ui-task-app/data

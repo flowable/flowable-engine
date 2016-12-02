@@ -14,14 +14,15 @@ package org.activiti.app.conf;
 
 import org.activiti.app.filter.FlowableCookieFilter;
 import org.activiti.app.security.AjaxLogoutSuccessHandler;
-import org.activiti.app.security.IdentityServiceAuthenticationProvider;
+import org.activiti.app.security.ClearFlowableCookieLogoutHandler;
+import org.activiti.app.security.DefaultPrivileges;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -42,24 +43,11 @@ public class SecurityConfiguration {
 	private static final Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
 
 	@Autowired
-	protected IdentityServiceAuthenticationProvider authenticationProvider;
-	
-	@Autowired
 	protected Environment env;
 	
-	//
-  // GLOBAL CONFIG
-  //
-  
-  @Autowired
-  public void configureGlobal(AuthenticationManagerBuilder auth) {
-
-    // Default auth (database backed)
-    try {
-      auth.authenticationProvider(authenticationProvider);
-    } catch (Exception e) {
-      logger.error("Could not configure authentication mechanism:", e);
-    }
+	@Bean
+  public FlowableCookieFilter flowableCookieFilter() {
+    return new FlowableCookieFilter();
   }
 	
 	//
@@ -91,14 +79,17 @@ public class SecurityConfiguration {
           .logout()
               .logoutUrl("/app/logout")
               .logoutSuccessHandler(ajaxLogoutSuccessHandler)
-              .deleteCookies("JSESSIONID")
+              .addLogoutHandler(new ClearFlowableCookieLogoutHandler())
               .and()
           .csrf()
               .disable() // Disabled, cause enabling it will cause sessions
           .headers()
               .frameOptions()
               	.sameOrigin()
-              	.addHeaderWriter(new XXssProtectionHeaderWriter());
+              	.addHeaderWriter(new XXssProtectionHeaderWriter())
+              	.and()
+          .authorizeRequests()
+                .antMatchers("/app/rest/**").hasAuthority(DefaultPrivileges.ACCESS_TASK);
     }
 	}
 

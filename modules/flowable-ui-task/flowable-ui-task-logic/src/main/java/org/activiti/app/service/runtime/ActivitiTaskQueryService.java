@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.activiti.app.model.common.ResultListDataRepresentation;
-import org.activiti.app.model.idm.UserRepresentation;
+import org.activiti.app.model.common.UserRepresentation;
 import org.activiti.app.model.runtime.TaskRepresentation;
 import org.activiti.app.security.SecurityUtils;
 import org.activiti.app.service.api.UserCache;

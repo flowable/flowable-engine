@@ -19,7 +19,6 @@ activitiModule.service('NotPermittedInterceptor', [ '$window', function($window)
     var service = this;
     service.responseError = function(response) {
         if (response.status === 403) {
-            console.log('test');
             $window.location.href = FLOWABLE.CONFIG.contextRoot + '/views/not-permitted.html';
             $window.reload();
         }

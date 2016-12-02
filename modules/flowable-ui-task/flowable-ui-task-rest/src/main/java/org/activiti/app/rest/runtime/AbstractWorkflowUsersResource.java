@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.activiti.app.model.common.ResultListDataRepresentation;
-import org.activiti.app.model.idm.UserRepresentation;
+import org.activiti.app.model.common.UserRepresentation;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
