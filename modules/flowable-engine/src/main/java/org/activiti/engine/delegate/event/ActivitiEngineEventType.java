@@ -119,6 +119,11 @@ public enum ActivitiEngineEventType implements ActivitiEventType {
    * An activity has been cancelled because of boundary event.
    */
   ACTIVITY_CANCELLED,
+  
+  /**
+   * A boundary, intermediate, or subprocess start signal catching event has started.
+   */
+  ACTIVITY_SIGNAL_WAITING,
 
   /**
    * An activity has received a signal. Dispatched after the activity has responded to the signal.
