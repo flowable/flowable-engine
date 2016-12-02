@@ -1,9 +1,9 @@
 version: '2'
 services:
-    flowable-ui-idm-app:
-        image: flowable/flowable-ui-idm-app
+    flowable-idm-app:
+        image: flowable/flowable-idm
         external_links:
-            - flowable-ui-idm-postgres:postgres
+            - flowable-idm-postgres:postgres
         environment:
             - datasource.driver=org.postgresql.Driver
             - datasource.url=jdbc:postgresql://postgres:5432/flowable
@@ -11,7 +11,7 @@ services:
             - datasource.password=flowable
         ports:
             - 8080:8080
-    flowable-ui-idm-postgres:
+    flowable-idm-postgres:
         extends:
             file: postgres.yml
-            service: flowable-ui-idm-postgres
+            service: flowable-idm-postgres

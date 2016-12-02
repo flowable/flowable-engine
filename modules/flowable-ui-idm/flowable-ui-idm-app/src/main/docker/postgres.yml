@@ -1,7 +1,7 @@
 version: '2'
 services:
-    flowable-ui-idm-postgres:
-        container_name: flowable-ui-idm-postgres
+    flowable-idm-postgres:
+        container_name: flowable-idm-postgres
         image: postgres:9.6-alpine
 #         volumes:
 #             - ~/flowable/flowable-ui-idm/postgres:/var/lib/postgresql/data
