@@ -1,0 +1,17 @@
+version: '2'
+services:
+    flowable-admin-app:
+        image: flowable/flowable-admin
+        external_links:
+            - flowable-admin-postgres:postgres
+        environment:
+            - datasource.driver=org.postgresql.Driver
+            - datasource.url=jdbc:postgresql://postgres:5432/flowable
+            - datasource.username=flowable
+            - datasource.password=flowable
+        ports:
+            - 9988:9988
+    flowable-admin-postgres:
+        extends:
+            file: postgres.yml
+            service: flowable-admin-postgres
