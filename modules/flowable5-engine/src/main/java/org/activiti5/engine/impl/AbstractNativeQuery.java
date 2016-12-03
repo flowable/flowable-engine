@@ -149,10 +149,7 @@ public abstract class AbstractNativeQuery<T extends NativeQuery< ? , ? >, U> imp
    * Executes the actual query to retrieve the list of results.
    * @param maxResults 
    * @param firstResult 
-   * 
-   * @param page
-   *          used if the results must be paged. If null, no paging will be
-   *          applied.
+   *
    */
   public abstract List<U> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults);
 
