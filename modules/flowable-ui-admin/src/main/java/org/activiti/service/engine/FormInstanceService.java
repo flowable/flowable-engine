@@ -97,10 +97,10 @@ public class FormInstanceService {
 
           ObjectNode formFieldValue = objectMapper.createObjectNode();
 
-          formFieldValue.put("id", fieldNode.get("id"));
-          formFieldValue.put("name", fieldNode.get("name"));
-          formFieldValue.put("type", fieldNode.get("type"));
-          formFieldValue.put("value", fieldNode.get("value"));
+          formFieldValue.set("id", fieldNode.get("id"));
+          formFieldValue.set("name", fieldNode.get("name"));
+          formFieldValue.set("type", fieldNode.get("type"));
+          formFieldValue.set("value", fieldNode.get("value"));
 
           formFieldValues.add(formFieldValue);
         }
@@ -108,7 +108,7 @@ public class FormInstanceService {
 
       returnNode.put("size", formFieldValues.size());
       returnNode.put("total", formFieldValues.size());
-      returnNode.put("data", formFieldValues);
+      returnNode.set("data", formFieldValues);
     } catch (Exception ex) {
       throw new ActivitiServiceException(ex.getMessage(), ex);
     }

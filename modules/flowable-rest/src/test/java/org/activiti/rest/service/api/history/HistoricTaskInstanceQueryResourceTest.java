@@ -78,7 +78,7 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
     ArrayNode variableArray = objectMapper.createArrayNode();
     ObjectNode variableNode = objectMapper.createObjectNode();
     variableArray.add(variableNode);
-    requestNode.put("processVariables", variableArray);
+    requestNode.set("processVariables", variableArray);
 
     variableNode.put("name", "stringVar");
     variableNode.put("value", "Azerty");
@@ -134,7 +134,7 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
     variableArray = objectMapper.createArrayNode();
     variableNode = objectMapper.createObjectNode();
     variableArray.add(variableNode);
-    requestNode.put("taskVariables", variableArray);
+    requestNode.set("taskVariables", variableArray);
     variableNode.put("name", "local");
     variableNode.put("value", "test");
     variableNode.put("operation", "equals");

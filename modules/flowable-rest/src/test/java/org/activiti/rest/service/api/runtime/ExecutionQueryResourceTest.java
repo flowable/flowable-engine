@@ -54,7 +54,7 @@ public class ExecutionQueryResourceTest extends BaseSpringRestTestCase {
     ArrayNode variableArray = objectMapper.createArrayNode();
     ObjectNode variableNode = objectMapper.createObjectNode();
     variableArray.add(variableNode);
-    requestNode.put("variables", variableArray);
+    requestNode.set("variables", variableArray);
 
     // String equals
     variableNode.put("name", "stringVar");
@@ -123,7 +123,7 @@ public class ExecutionQueryResourceTest extends BaseSpringRestTestCase {
     variableArray = objectMapper.createArrayNode();
     variableNode = objectMapper.createObjectNode();
     variableArray.add(variableNode);
-    requestNode.put("processInstanceVariables", variableArray);
+    requestNode.set("processInstanceVariables", variableArray);
 
     // String equals
     variableNode.put("name", "stringVar");

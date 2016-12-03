@@ -160,7 +160,7 @@ public class ExecutionCollectionResourceTest extends BaseSpringRestTestCase {
     ObjectNode requestNode = objectMapper.createObjectNode();
     requestNode.put("action", "signalEventReceived");
     requestNode.put("signalName", "alert");
-    requestNode.put("variables", variables);
+    requestNode.set("variables", variables);
 
     ObjectNode varNode = objectMapper.createObjectNode();
     variables.add(varNode);

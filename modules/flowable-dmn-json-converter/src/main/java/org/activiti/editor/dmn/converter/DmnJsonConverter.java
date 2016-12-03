@@ -114,7 +114,7 @@ public class DmnJsonConverter {
             inputExpressionsNode.add(inputExpressionNode);
         }
 
-        modelNode.put("inputExpressions", inputExpressionsNode);
+        modelNode.set("inputExpressions", inputExpressionsNode);
 
         // output expressions
         Map<String, OutputClause> outputClauseMap = new HashMap<>();
@@ -133,7 +133,7 @@ public class DmnJsonConverter {
             outputExpressionsNode.add(outputExpressionNode);
         }
 
-        modelNode.put("outputExpressions", outputExpressionsNode);
+        modelNode.set("outputExpressions", outputExpressionsNode);
 
         // rules
         ArrayNode rulesNode = objectMapper.createArrayNode();
@@ -156,7 +156,7 @@ public class DmnJsonConverter {
             rulesNode.add(ruleNode);
         }
 
-        modelNode.put("rules", rulesNode);
+        modelNode.set("rules", rulesNode);
 
         return modelNode;
     }

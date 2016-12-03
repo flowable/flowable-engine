@@ -105,21 +105,21 @@ public class HistoricVariableInstanceQueryResourceTest extends BaseSpringRestTes
     ArrayNode variableArray = objectMapper.createArrayNode();
     ObjectNode variableNode = objectMapper.createObjectNode();
     variableArray.add(variableNode);
-    requestNode.put("variables", variableArray);
+    requestNode.set("variables", variableArray);
     variableNode.put("name", "stringVar");
     variableNode.put("value", "Azerty");
     variableNode.put("operation", "equals");
     assertResultsPresentInDataResponse(url, requestNode, 2, "stringVar", "Azerty");
 
     variableNode.removeAll();
-    requestNode.put("variables", variableArray);
+    requestNode.set("variables", variableArray);
     variableNode.put("name", "taskVariable");
     variableNode.put("value", "test");
     variableNode.put("operation", "equals");
     assertResultsPresentInDataResponse(url, requestNode, 1, "taskVariable", "test");
 
     variableNode.removeAll();
-    requestNode.put("variables", variableArray);
+    requestNode.set("variables", variableArray);
     variableNode.put("name", "taskVariable");
     variableNode.put("value", "test");
     variableNode.put("operation", "notEquals");

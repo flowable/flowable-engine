@@ -160,7 +160,7 @@ public abstract class AbstractInfoMapper implements InfoMapper {
 			ObjectNode propertyNode = objectMapper.createObjectNode();
             propertyNode.put("name", name);
             propertyNode.put("type", "list");
-            propertyNode.put("value", itemsNode);
+            propertyNode.set("value", itemsNode);
 			propertiesNode.add(propertyNode);
 		}
 	}

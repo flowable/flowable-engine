@@ -152,7 +152,7 @@ public class ModelResource {
       try {
         ObjectNode editorJsonNode = (ObjectNode) objectMapper.readTree(model.getModelEditorJson());
         editorJsonNode.put("modelType", "model");
-        modelNode.put("model", editorJsonNode);
+        modelNode.set("model", editorJsonNode);
       } catch (Exception e) {
         log.error("Error reading editor json " + modelId, e);
         throw new InternalServerErrorException("Error reading editor json " + modelId);
@@ -165,7 +165,7 @@ public class ModelResource {
       ObjectNode stencilSetNode = objectMapper.createObjectNode();
       stencilSetNode.put("namespace", "http://b3mn.org/stencilset/bpmn2.0#");
       editorJsonNode.put("modelType", "model");
-      modelNode.put("model", editorJsonNode);
+      modelNode.set("model", editorJsonNode);
     }
     return modelNode;
   }

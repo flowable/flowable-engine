@@ -231,7 +231,7 @@ public class JsonTest extends PluggableActivitiTestCase {
       childNode.put("test2", "this is a simple test2 text");
       childNode.put("test3", "this is a simple test3 text");
       childNode.put("test4", "this is a simple test4 text");
-      valueNode.put("var" + i, childNode);
+      valueNode.set("var" + i, childNode);
     }
     return valueNode;
   }

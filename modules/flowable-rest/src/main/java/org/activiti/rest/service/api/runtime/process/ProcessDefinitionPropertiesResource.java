@@ -81,7 +81,7 @@ public class ProcessDefinitionPropertiesResource {
             Map<String, String> valuesMap = (Map<String, String>) property.getType().getInformation("values");
             if (valuesMap != null) {
               ArrayNode valuesArray = objectMapper.createArrayNode();
-              propertyJSON.put("enumValues", valuesArray);
+              propertyJSON.set("enumValues", valuesArray);
 
               for (String key : valuesMap.keySet()) {
                 ObjectNode valueJSON = objectMapper.createObjectNode();
@@ -104,7 +104,7 @@ public class ProcessDefinitionPropertiesResource {
       }
     }
 
-    responseJSON.put("data", propertiesJSON);
+    responseJSON.set("data", propertiesJSON);
     return responseJSON;
   }
 }
