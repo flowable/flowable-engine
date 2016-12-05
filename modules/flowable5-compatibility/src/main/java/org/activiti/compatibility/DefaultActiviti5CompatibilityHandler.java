@@ -758,7 +758,7 @@ public class DefaultActiviti5CompatibilityHandler implements Activiti5Compatibil
         if (transientVariables == null) {
             getProcessEngine().getRuntimeService().signal(executionId, processVariables);
         } else {
-            getProcessEngine().getRuntimeService().signal(executionId, processVariables, transientVariables);;
+            getProcessEngine().getRuntimeService().signal(executionId, processVariables, transientVariables);
         }
     } catch (org.activiti5.engine.ActivitiException e) {
       handleActivitiException(e);
