@@ -55,7 +55,7 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
     
     HistoricTaskInstance task = processEngineConfiguration.getHistoricTaskInstanceEntityManager().findById(taskId);
     if (task == null) {
-      throw new ActivitiObjectNotFoundException("Task not found with id " + task.getId());
+      throw new ActivitiObjectNotFoundException("Task not found with id " + taskId);
     }
     
     Map<String, Object> variables = new HashMap<String, Object>();
