@@ -22,7 +22,6 @@ import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
 import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
 import org.activiti.engine.common.api.delegate.event.ActivitiEventType;
-import org.activiti.idm.api.event.ActivitiIdmEventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

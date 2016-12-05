@@ -16,7 +16,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.ContentItemService;
-import org.activiti.service.engine.FormDefinitionService;
 import org.activiti.service.engine.exception.ActivitiServiceException;
 import org.activiti.web.rest.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;

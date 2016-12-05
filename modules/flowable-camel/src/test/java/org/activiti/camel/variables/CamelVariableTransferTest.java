@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.TaskService;
-import org.activiti.engine.delegate.event.ActivitiActivityEvent;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.test.Deployment;
 import org.activiti.spring.impl.test.SpringActivitiTestCase;
