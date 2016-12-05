@@ -108,7 +108,7 @@ public class JobRetryCmd implements Command<Object> {
           log.debug("Applying JobRetryStrategy '{}' the first time for job {} with {} retries", failedJobRetryTimeCycleValue, job.getId(), durationHelper.getTimes());
 
         } else {
-          log.debug("Decrementing retries of JobRetryStrategy '{} for job {}", failedJobRetryTimeCycleValue, job.getId());
+          log.debug("Decrementing retries of JobRetryStrategy '{}' for job {}", failedJobRetryTimeCycleValue, job.getId());
         }
         
         newJobEntity.setRetries(jobRetries - 1);
