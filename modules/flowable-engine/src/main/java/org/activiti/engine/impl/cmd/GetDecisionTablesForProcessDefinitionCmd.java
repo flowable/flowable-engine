@@ -14,7 +14,6 @@ package org.activiti.engine.impl.cmd;
 
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.FieldExtension;
-import org.activiti.bpmn.model.ImplementationType;
 import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.dmn.api.DecisionTable;
 import org.activiti.dmn.api.DecisionTableQuery;

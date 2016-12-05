@@ -15,7 +15,6 @@ package org.activiti.web.rest.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.activiti.domain.EndpointType;
 import org.activiti.domain.ServerConfig;
-import org.activiti.service.engine.DeploymentService;
 import org.activiti.service.engine.FormDeploymentService;
 import org.activiti.service.engine.exception.ActivitiServiceException;
 import org.activiti.web.rest.exception.BadRequestException;

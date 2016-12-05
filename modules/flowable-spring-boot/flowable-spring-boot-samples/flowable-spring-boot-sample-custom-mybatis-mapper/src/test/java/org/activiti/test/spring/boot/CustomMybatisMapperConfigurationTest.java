@@ -3,27 +3,18 @@ package org.activiti.test.spring.boot;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 import java.util.Properties;
 
 import activiti.Application;
 import activiti.mappers.CustomMybatisMapper;
 
 import org.activiti.engine.ManagementService;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
 import org.activiti.engine.impl.cmd.AbstractCustomSqlExecution;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.spring.boot.DataSourceProcessEngineAutoConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.env.PropertiesPropertySource;
 

@@ -6,7 +6,6 @@ import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.agenda.AbstractOperation;
 import org.activiti.engine.impl.cmd.NeedsActiveExecutionCmd;
 import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;

@@ -13,12 +13,8 @@
 package org.activiti.engine.impl.cmd;
 
 import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.FieldExtension;
-import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.UserTask;
-import org.activiti.dmn.api.DecisionTable;
-import org.activiti.dmn.api.DecisionTableQuery;
 import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.engine.impl.interceptor.Command;

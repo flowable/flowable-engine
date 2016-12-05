@@ -45,7 +45,6 @@ import org.activiti.engine.common.impl.db.HasRevision;
 import org.activiti.engine.common.impl.db.ListQueryParameterObject;
 import org.activiti.engine.common.impl.interceptor.Session;
 import org.activiti.engine.common.impl.persistence.entity.Entity;
-import org.activiti.engine.common.impl.transaction.ConnectionHolder;
 import org.activiti.engine.common.impl.util.IoUtil;
 import org.activiti.engine.impl.DeploymentQueryImpl;
 import org.activiti.engine.impl.ExecutionQueryImpl;

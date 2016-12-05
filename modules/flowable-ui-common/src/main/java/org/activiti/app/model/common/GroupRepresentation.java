@@ -12,7 +12,6 @@
  */
 package org.activiti.app.model.common;
 
-import org.activiti.app.model.common.AbstractRepresentation;
 import org.activiti.idm.api.Group;
 
 /**
