@@ -26,7 +26,7 @@ public class RestVariable {
 
     public enum RestVariableScope {
         LOCAL, GLOBAL
-    };
+    }
 
     private String name;
     private String type;
