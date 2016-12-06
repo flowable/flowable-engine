@@ -21,7 +21,7 @@ import org.flowable.engine.TaskService;
 
 /** Exposes twitter-like feeds for tasks and process instances.
  * 
- * @see {@link TaskService#getTaskEvents(String)
+ * @see {@link TaskService#getTaskEvents(String)}
  * @author Tom Baeyens
  */
 public interface Event extends Serializable {

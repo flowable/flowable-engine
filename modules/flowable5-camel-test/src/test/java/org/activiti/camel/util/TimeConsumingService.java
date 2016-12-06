@@ -11,7 +11,7 @@ public class TimeConsumingService {
   /**
    * Spend some time.
    * 
-   * @throws InterruptedException
+   * @throw InterruptedException
    */
   public void doWork() throws InterruptedException {
     Thread.sleep(100);

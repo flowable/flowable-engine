@@ -29,8 +29,9 @@ public interface XMLImporter {
   /**
    * Imports the definitions in the XML declared in element
    * 
-   * @param element
+   * @param theImport
    *          the declarations to be imported
+   * @param sourceSystemId
    */
   void importFrom(Import theImport, String sourceSystemId);
   

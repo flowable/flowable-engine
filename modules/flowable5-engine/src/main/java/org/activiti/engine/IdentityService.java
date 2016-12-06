@@ -126,8 +126,9 @@ public interface IdentityService {
   void setUserPicture(String userId, Picture picture);
 
   /** Retrieves the picture for a given user.
+   * @returns null if the user doesn't have a picture.
    * @throws ActivitiObjectNotFoundException if the user doesn't exist.
-   * @returns null if the user doesn't have a picture. */
+   * /
   Picture getUserPicture(String userId);
 
   /** Generic extensibility key-value pairs associated with a user */

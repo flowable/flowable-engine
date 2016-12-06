@@ -12,7 +12,7 @@ import org.flowable.engine.ProcessEngines;
 /**
  * Spring process engine base test
  * 
- * @author: Henry Yan
+ * @author Henry Yan
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:org/activiti/spring/test/engine/springProcessEngine-context.xml")

@@ -18,7 +18,7 @@ import org.flowable.idm.api.event.FlowableIdmEventType;
 
 /**
  * Base class for all {@link FlowableIdmEvent} implementations, related to entities.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class FlowableIdmEntityEventImpl extends FlowableIdmEventImpl implements FlowableEntityEvent {

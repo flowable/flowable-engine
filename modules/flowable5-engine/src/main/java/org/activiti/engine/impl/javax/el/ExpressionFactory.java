@@ -191,11 +191,8 @@ public abstract class ExpressionFactory {
 	 * 
 	 * @param properties
 	 *            Properties passed to the constructor of the implementation.
-	 * @return an instance of ExpressionFactory
 	 * @param className
 	 *            The name of the ExpressionFactory class.
-	 * @param classLoader
-	 *            The class loader to be used to load the class.
 	 * @return An instance of ExpressionFactory.
 	 * @throws ELException
 	 *             if the class could not be found or if it is not a subclass of ExpressionFactory

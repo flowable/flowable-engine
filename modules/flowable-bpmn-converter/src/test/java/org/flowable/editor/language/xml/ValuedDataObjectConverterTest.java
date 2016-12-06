@@ -21,7 +21,7 @@ import org.flowable.bpmn.model.ValuedDataObject;
 import org.junit.Test;
 
 /**
- * @see https://activiti.atlassian.net/browse/ACT-1847
+ * @see {}https://activiti.atlassian.net/browse/ACT-1847}
  */
 public class ValuedDataObjectConverterTest extends AbstractConverterTest {
 
