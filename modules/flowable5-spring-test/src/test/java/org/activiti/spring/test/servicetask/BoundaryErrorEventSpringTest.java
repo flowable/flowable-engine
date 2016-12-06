@@ -44,4 +44,3 @@ public class BoundaryErrorEventSpringTest extends SpringActivitiTestCase {
     assertProcessEnded(procId);
   }
 }
-}
