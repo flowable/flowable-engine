@@ -17,8 +17,6 @@ import java.util.Map;
 
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.engine.HistoryService;
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.history.HistoryLevel;
@@ -28,9 +26,11 @@ import org.flowable.engine.impl.history.HistoryLevel;
  */
 public class MyTransactionalOperationTransactionDependentExecutionListener extends CurrentActivityTransactionDependentExecutionListener {
 
+  private static final long serialVersionUID = 1L;
+
   @Override
   public void notify(String processInstanceId, String executionId, FlowElement currentFlowElement,
-                     Map<String, Object> executionVariables, Map<String, Object> customPropertiesMap) {
+      Map<String, Object> executionVariables, Map<String, Object> customPropertiesMap) {
     
     super.notify(processInstanceId, executionId, currentFlowElement, executionVariables, customPropertiesMap);
     

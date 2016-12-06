@@ -13,7 +13,6 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.cfg.ProcessEngineConfigurator;
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.test.FlowableRule;
@@ -34,9 +33,9 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Joram Barrez
  */
-public class AbstractActviti6Test {
+public class AbstractFlowable6Test {
   
-  private static final Logger logger = LoggerFactory.getLogger(AbstractActviti6Test.class);
+  private static final Logger logger = LoggerFactory.getLogger(AbstractFlowable6Test.class);
 
   public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000";
 

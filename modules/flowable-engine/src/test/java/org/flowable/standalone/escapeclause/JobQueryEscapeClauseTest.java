@@ -12,7 +12,6 @@
  */
 package org.flowable.standalone.escapeclause;
 
-import org.flowable.engine.runtime.JobQuery;
 import org.flowable.engine.runtime.TimerJobQuery;
 
 public class JobQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {

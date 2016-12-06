@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.exception.ActivitiServiceException;
 import org.activiti.web.rest.exception.BadRequestException;

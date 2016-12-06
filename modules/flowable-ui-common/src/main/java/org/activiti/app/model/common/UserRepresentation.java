@@ -15,7 +15,6 @@ package org.activiti.app.model.common;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.app.model.common.AbstractRepresentation;
 import org.flowable.idm.api.User;
 
 /**

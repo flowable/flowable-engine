@@ -15,8 +15,6 @@ package org.flowable.engine.test;
 
 import java.util.Date;
 
-import junit.framework.TestCase;
-
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.IdentityService;
@@ -26,10 +24,11 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.*;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.test.TestHelper;
 import org.flowable.engine.test.mock.ActivitiMockSupport;
+
+import junit.framework.TestCase;
 
 /**
  * Convenience for ProcessEngine and services initialization in the form of a JUnit base class.

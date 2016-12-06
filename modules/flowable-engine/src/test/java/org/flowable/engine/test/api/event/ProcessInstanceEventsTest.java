@@ -29,7 +29,6 @@ import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
 import org.flowable.engine.delegate.event.impl.FlowableActivityCancelledEventImpl;
-import org.flowable.engine.delegate.event.impl.FlowableProcessCancelledEventImpl;
 import org.flowable.engine.impl.delegate.event.ActivitiEngineEntityEvent;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;

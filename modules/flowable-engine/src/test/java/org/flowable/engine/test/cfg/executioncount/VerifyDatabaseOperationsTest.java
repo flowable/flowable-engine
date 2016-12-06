@@ -378,7 +378,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
   protected void stopProfiling() {
     ActivitiProfiler profiler = ActivitiProfiler.getInstance();
     profiler.stopCurrentProfileSession();
-    new ConsoleLogger(profiler).log();;
+    new ConsoleLogger(profiler).log();
   }
 
 }

@@ -12,14 +12,16 @@
  */
 package org.flowable.engine.impl.cmd;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.FieldExtension;
-import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.UserTask;
-import org.flowable.dmn.api.DecisionTable;
-import org.flowable.dmn.api.DecisionTableQuery;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.impl.interceptor.Command;
@@ -29,12 +31,6 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDefinitionQuery;
 import org.flowable.form.api.FormRepositoryService;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author Yvo Swillens
@@ -49,7 +45,6 @@ public class GetFormDefinitionsForProcessDefinitionCmd implements Command<List<F
     this.processDefinitionId = processDefinitionId;
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
   public List<FormDefinition> execute(CommandContext commandContext) {
     ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
 

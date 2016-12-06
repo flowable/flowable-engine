@@ -26,7 +26,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.ZipInputStream;
 
 import org.flowable.dmn.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.engine.common.api.FlowableException;

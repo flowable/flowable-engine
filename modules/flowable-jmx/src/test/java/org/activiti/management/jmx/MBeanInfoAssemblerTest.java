@@ -21,7 +21,6 @@ import static org.junit.Assert.assertTrue;
 
 import javax.management.JMException;
 import javax.management.MBeanAttributeInfo;
-import javax.management.MBeanOperationInfo;
 import javax.management.modelmbean.ModelMBeanInfo;
 
 import org.activiti.management.jmx.testMbeans.BadAttributeGetterHavinParameter;

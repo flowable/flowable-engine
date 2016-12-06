@@ -21,7 +21,6 @@ import org.activiti5.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti5.engine.impl.pvm.PvmTransition;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.history.DeleteReason;
 
 
 /**

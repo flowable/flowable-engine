@@ -7,7 +7,6 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.agenda.AbstractOperation;
 import org.flowable.engine.impl.cmd.NeedsActiveExecutionCmd;
 import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;

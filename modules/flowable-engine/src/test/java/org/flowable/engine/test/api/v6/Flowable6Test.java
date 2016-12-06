@@ -34,7 +34,7 @@ import org.junit.Test;
  * 
  * @author Joram Barrez
  */
-public class Activiti6Test extends PluggableFlowableTestCase {
+public class Flowable6Test extends PluggableFlowableTestCase {
 
   @Test
   public void testSimplestProcessPossible() {

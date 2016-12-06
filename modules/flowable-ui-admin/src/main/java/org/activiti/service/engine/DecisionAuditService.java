@@ -15,7 +15,6 @@ package org.activiti.service.engine;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import org.activiti.domain.ServerConfig;
-import org.activiti.service.engine.exception.ActivitiServiceException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
@@ -50,7 +49,7 @@ public class DecisionAuditService {
 		HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "/enterprise/decisions/audits/" + decisionAuditId));
 		return clientUtil.executeRequest(get, serverConfig);
 	}
-	
+
 	public JsonNode getProcessInstanceDecisionAudit(ServerConfig serverConfig, String processInstanceId) {
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "/enterprise/process-instances/" + processInstanceId + "/decision-tasks"));
         return clientUtil.executeRequest(get, serverConfig);

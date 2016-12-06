@@ -28,7 +28,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,14 +50,14 @@ public class AppService {
     public static final String EXPORT_DEPLOYED_APP_URL = "enterprise/export-app-deployment/{0}";
     public static final String EXPORT_APP_URL = "enterprise/app-definitions/{0}/export";
     public static final String APP_BY_DEPLOYMENT_URL = "enterprise/runtime-app-deployment";
-    
+
     @Autowired
     protected ActivitiClientService clientUtil;
 
     public JsonNode listAppDefinitions(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
         URIBuilder builder =  clientUtil.createUriBuilder(APP_LIST_URL);
         addParametersToBuilder(builder, parameterMap);
-        
+
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));
         return clientUtil.executeRequest(get, serverConfig);
     }
@@ -67,15 +66,15 @@ public class AppService {
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, clientUtil.createUriBuilder(MessageFormat.format(APP_URL, appDeploymentId))));
         return clientUtil.executeRequest(get, serverConfig);
     }
-    
+
     public void getAppDefinitionByDeployment(ServerConfig serverConfig, HttpServletResponse httpResponse, Map<String, String[]> parameterMap) {
         URIBuilder builder =  clientUtil.createUriBuilder(APP_BY_DEPLOYMENT_URL);
         addParametersToBuilder(builder, parameterMap);
-        
+
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));
         clientUtil.execute(get, httpResponse, serverConfig);
     }
-    
+
     public void deleteAppDeployment(ServerConfig serverConfig, HttpServletResponse httpResponse, String appDeploymentId) {
         HttpDelete delete = new HttpDelete(clientUtil.getServerUrl(serverConfig, clientUtil.createUriBuilder(MessageFormat.format(APP_URL, appDeploymentId))));
         clientUtil.execute(delete, httpResponse, serverConfig);
@@ -106,13 +105,13 @@ public class AppService {
         uploadAppDefinition(httpResponse, serverConfig, name, IOUtils.toByteArray(inputStream));
     }
 
-    
+
     public JsonNode exportApp(ServerConfig serverConfig, String deploymentId, HttpServletResponse httpResponse) throws IOException {
         URIBuilder builder =  clientUtil.createUriBuilder(MessageFormat.format(EXPORT_DEPLOYED_APP_URL, deploymentId));
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));
         return clientUtil.executeDownloadRequest(get, httpResponse, serverConfig);
     }
-    
+
     public JsonNode redeployApp(HttpServletResponse httpResponse, ServerConfig serverConfig, ServerConfig targetServerConfig, String deploymentId) throws IOException {
         URIBuilder builder =  clientUtil.createUriBuilder(MessageFormat.format(EXPORT_DEPLOYED_APP_URL, deploymentId));
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));
@@ -125,7 +124,7 @@ public class AppService {
             return attachmentResponseInfo.getContent();
         }
     }
-    
+
     public JsonNode redeployReplaceApp(HttpServletResponse httpResponse, ServerConfig serverConfig, ServerConfig targetServerConfig, String deploymentId, String appId) throws IOException {
         URIBuilder builder =  clientUtil.createUriBuilder(MessageFormat.format(EXPORT_DEPLOYED_APP_URL, deploymentId));
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));
@@ -138,7 +137,7 @@ public class AppService {
             return attachmentResponseInfo.getContent();
         }
     }
-    
+
     protected void uploadAppDefinition(HttpServletResponse httpResponse, ServerConfig serverConfig, String name, byte[] bytes) throws IOException {
         HttpPost post = new HttpPost(clientUtil.getServerUrl(serverConfig, APP_IMPORT_AND_PUBLISH_URL));
         HttpEntity reqEntity = MultipartEntityBuilder.create()
@@ -146,7 +145,7 @@ public class AppService {
         post.setEntity(reqEntity);
         clientUtil.execute(post, httpResponse, serverConfig);
     }
-    
+
     protected void uploadNewAppDefinitionVersion(HttpServletResponse httpResponse, ServerConfig serverConfig, String name, byte[] bytes, String appId) throws IOException {
         URIBuilder builder =  clientUtil.createUriBuilder(MessageFormat.format(APP_IMPORT_AND_PUBLISH_AS_NEW_VERSION_URL, appId));
         HttpPost post = new HttpPost(clientUtil.getServerUrl(serverConfig, builder));
@@ -155,7 +154,7 @@ public class AppService {
         post.setEntity(reqEntity);
         clientUtil.execute(post, httpResponse, serverConfig);
     }
-    
+
     protected void addParametersToBuilder(URIBuilder builder, Map<String, String[]> parameterMap) {
         for (String name : parameterMap.keySet()) {
             builder.addParameter(name, parameterMap.get(name)[0]);

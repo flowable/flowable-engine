@@ -13,7 +13,6 @@
 
 package org.flowable.engine.impl.interceptor;
 
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.TransactionCommandContextCloseListener;

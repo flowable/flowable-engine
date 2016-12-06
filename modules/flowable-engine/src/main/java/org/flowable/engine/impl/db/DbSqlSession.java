@@ -46,7 +46,6 @@ import org.flowable.engine.common.impl.db.HasRevision;
 import org.flowable.engine.common.impl.db.ListQueryParameterObject;
 import org.flowable.engine.common.impl.interceptor.Session;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.engine.common.impl.transaction.ConnectionHolder;
 import org.flowable.engine.common.impl.util.IoUtil;
 import org.flowable.engine.impl.DeploymentQueryImpl;
 import org.flowable.engine.impl.ExecutionQueryImpl;

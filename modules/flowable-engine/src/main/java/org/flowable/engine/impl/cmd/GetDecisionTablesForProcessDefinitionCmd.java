@@ -12,9 +12,14 @@
  */
 package org.flowable.engine.impl.cmd;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FieldExtension;
-import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.dmn.api.DecisionTable;
 import org.flowable.dmn.api.DecisionTableQuery;
@@ -25,12 +30,6 @@ import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author Yvo Swillens
@@ -45,7 +44,6 @@ public class GetDecisionTablesForProcessDefinitionCmd implements Command<List<De
     this.processDefinitionId = processDefinitionId;
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
   public List<DecisionTable> execute(CommandContext commandContext) {
     ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
 

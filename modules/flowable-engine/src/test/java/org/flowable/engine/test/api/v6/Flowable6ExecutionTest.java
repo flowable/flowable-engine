@@ -28,7 +28,7 @@ import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.junit.Test;
 
-public class Activiti6ExecutionTest extends PluggableFlowableTestCase {
+public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
 
   @Test
   @Deployment

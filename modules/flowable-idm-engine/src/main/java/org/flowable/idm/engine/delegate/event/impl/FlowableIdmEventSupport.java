@@ -22,7 +22,6 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.api.delegate.event.FlowableEventType;
-import org.flowable.idm.api.event.FlowableIdmEventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

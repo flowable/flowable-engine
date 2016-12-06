@@ -36,6 +36,6 @@ public class CustomDaoAuthenticationProvider extends DaoAuthenticationProvider {
 		
 		super.additionalAuthenticationChecks(userDetails, authentication);
 		
-	};
+	}
 
 }
