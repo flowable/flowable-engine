@@ -180,7 +180,7 @@ public class BpmnDeployer implements Deployer {
       processDefinition.setId(getIdForNewProcessDefinition(processDefinition));
       Process process = parsedDeployment.getProcessModelForProcessDefinition(processDefinition);
       FlowElement initialElement = process.getInitialFlowElement();
-      if (initialElement != null && initialElement instanceof StartEvent) {
+      if (initialElement instanceof StartEvent) {
         StartEvent startEvent = (StartEvent) initialElement;
         if (startEvent.getFormKey() != null) {
           processDefinition.setHasStartFormKey(true);

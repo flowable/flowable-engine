@@ -59,7 +59,7 @@ public final class SecurityUtils {
     SecurityContext securityContext = SecurityContextHolder.getContext();
     if (securityContext != null && securityContext.getAuthentication() != null) {
       Object principal = securityContext.getAuthentication().getPrincipal();
-      if (principal != null && principal instanceof FlowableAppUser) {
+      if (principal instanceof FlowableAppUser) {
         user = (FlowableAppUser) principal;
       }
     }
