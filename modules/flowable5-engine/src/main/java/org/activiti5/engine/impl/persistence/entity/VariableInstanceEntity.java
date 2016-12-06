@@ -16,15 +16,15 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.common.impl.persistence.entity.AbstractEntity;
-import org.activiti.engine.impl.persistence.entity.VariableInstance;
-import org.activiti.engine.impl.variable.ValueFields;
-import org.activiti.engine.impl.variable.VariableType;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.db.BulkDeleteable;
 import org.activiti5.engine.impl.db.HasRevision;
 import org.activiti5.engine.impl.db.PersistentObject;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
+import org.flowable.engine.impl.persistence.entity.VariableInstance;
+import org.flowable.engine.impl.variable.ValueFields;
+import org.flowable.engine.impl.variable.VariableType;
 
 /**
  * @author Tom Baeyens

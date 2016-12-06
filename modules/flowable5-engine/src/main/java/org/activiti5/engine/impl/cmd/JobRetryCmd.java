@@ -18,11 +18,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.impl.calendar.DurationHelper;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.Job;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ProcessEngineConfiguration;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
@@ -41,6 +36,11 @@ import org.activiti5.engine.impl.persistence.entity.JobEntity;
 import org.activiti5.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti5.engine.impl.persistence.entity.TimerJobEntity;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
+import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.impl.calendar.DurationHelper;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -135,12 +135,12 @@ public class JobRetryCmd implements Command<Object> {
     job.delete();
     
     // Dispatch both an update and a retry-decrement event
-    ActivitiEventDispatcher eventDispatcher = commandContext.getEventDispatcher();
+    FlowableEventDispatcher eventDispatcher = commandContext.getEventDispatcher();
     if (eventDispatcher.isEnabled()) {
       eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(
-          ActivitiEngineEventType.ENTITY_UPDATED, newJobEntity));
+          FlowableEngineEventType.ENTITY_UPDATED, newJobEntity));
       eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(
-          ActivitiEngineEventType.JOB_RETRIES_DECREMENTED, newJobEntity));
+          FlowableEngineEventType.JOB_RETRIES_DECREMENTED, newJobEntity));
     }
     
     return null;

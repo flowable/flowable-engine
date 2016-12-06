@@ -19,15 +19,15 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.query.QueryProperty;
-import org.activiti.idm.api.Group;
-import org.activiti.idm.api.GroupQuery;
-import org.activiti.idm.api.GroupQueryProperty;
-import org.activiti.rest.api.DataResponse;
-import org.activiti.rest.exception.ActivitiConflictException;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.flowable.engine.IdentityService;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.GroupQuery;
+import org.flowable.idm.api.GroupQueryProperty;
+import org.flowable.rest.api.DataResponse;
+import org.flowable.rest.exception.ActivitiConflictException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -109,7 +109,7 @@ public class GroupCollectionResource {
   @RequestMapping(value = "/identity/groups", method = RequestMethod.POST, produces = "application/json")
   public GroupResponse createGroup(@RequestBody GroupRequest groupRequest, HttpServletRequest httpRequest, HttpServletResponse response) {
     if (groupRequest.getId() == null) {
-      throw new ActivitiIllegalArgumentException("Id cannot be null.");
+      throw new FlowableIllegalArgumentException("Id cannot be null.");
     }
 
     // Check if a user with the given ID already exists so we return a CONFLICT

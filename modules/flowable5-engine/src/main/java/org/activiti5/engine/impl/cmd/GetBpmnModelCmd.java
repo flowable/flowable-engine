@@ -14,10 +14,10 @@ package org.activiti5.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.activiti.bpmn.model.BpmnModel;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.impl.interceptor.Command;
 import org.activiti5.engine.impl.interceptor.CommandContext;
+import org.flowable.bpmn.model.BpmnModel;
 
 /**
  * @author Joram Barrez

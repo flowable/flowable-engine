@@ -19,8 +19,6 @@ import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.activiti.bpmn.converter.BpmnXMLConverter;
-import org.activiti.bpmn.model.BpmnModel;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.impl.RepositoryServiceImpl;
@@ -30,6 +28,8 @@ import org.activiti5.engine.impl.util.IoUtil;
 import org.activiti5.engine.impl.util.ReflectUtil;
 import org.activiti5.engine.repository.Deployment;
 import org.activiti5.engine.repository.DeploymentBuilder;
+import org.flowable.bpmn.converter.BpmnXMLConverter;
+import org.flowable.bpmn.model.BpmnModel;
 
 /**
  * @author Tom Baeyens

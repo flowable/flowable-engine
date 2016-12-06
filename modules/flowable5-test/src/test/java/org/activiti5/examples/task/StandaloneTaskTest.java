@@ -16,12 +16,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.common.api.ActivitiOptimisticLockingException;
-import org.activiti.engine.history.HistoricVariableInstance;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.impl.persistence.entity.TaskEntity;
-import org.activiti.engine.task.Task;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.FlowableOptimisticLockingException;
+import org.flowable.engine.history.HistoricVariableInstance;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.task.Task;
 
 /**
  * @author Joram Barrez
@@ -100,7 +100,7 @@ public class StandaloneTaskTest extends PluggableActivitiTestCase {
     try {
       taskService.saveTask(task2);
       fail("should get an exception here as the task was modified by someone else.");
-    } catch (ActivitiOptimisticLockingException expected) {
+    } catch (FlowableOptimisticLockingException expected) {
       //  exception was thrown as expected
     }
     

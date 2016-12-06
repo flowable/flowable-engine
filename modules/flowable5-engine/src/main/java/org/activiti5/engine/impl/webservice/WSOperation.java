@@ -17,10 +17,10 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.xml.namespace.QName;
 
-import org.activiti.engine.impl.bpmn.webservice.MessageDefinition;
-import org.activiti.engine.impl.bpmn.webservice.MessageInstance;
-import org.activiti.engine.impl.bpmn.webservice.Operation;
-import org.activiti.engine.impl.bpmn.webservice.OperationImplementation;
+import org.flowable.engine.impl.bpmn.webservice.MessageDefinition;
+import org.flowable.engine.impl.bpmn.webservice.MessageInstance;
+import org.flowable.engine.impl.bpmn.webservice.Operation;
+import org.flowable.engine.impl.bpmn.webservice.OperationImplementation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

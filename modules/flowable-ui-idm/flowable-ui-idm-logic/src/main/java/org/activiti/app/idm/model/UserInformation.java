@@ -14,8 +14,8 @@ package org.activiti.app.idm.model;
 
 import java.util.List;
 
-import org.activiti.idm.api.Group;
-import org.activiti.idm.api.User;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.User;
 
 public class UserInformation {
   

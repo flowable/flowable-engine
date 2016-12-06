@@ -12,8 +12,8 @@
  */
 package org.activiti.app.idm.service;
 
-import org.activiti.idm.api.IdmIdentityService;
-import org.activiti.idm.api.Token;
+import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.api.Token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

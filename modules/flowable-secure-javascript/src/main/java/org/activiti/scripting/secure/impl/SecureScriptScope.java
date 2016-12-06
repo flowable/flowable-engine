@@ -12,9 +12,9 @@
  */
 package org.activiti.scripting.secure.impl;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.DelegateTask;
-import org.activiti.engine.delegate.VariableScope;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.DelegateTask;
+import org.flowable.engine.delegate.VariableScope;
 import org.mozilla.javascript.Scriptable;
 
 /**

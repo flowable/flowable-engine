@@ -1,6 +1,6 @@
 package org.activiti.rest.service;
 
-import org.activiti.engine.ProcessEngines;
+import org.flowable.engine.ProcessEngines;
 
 public class ProcessEnginesRest extends ProcessEngines {
 

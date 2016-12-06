@@ -22,18 +22,18 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.rest.exception.ActivitiContentNotSupportedException;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.engine.variable.RestVariable.RestVariableScope;
 import org.apache.commons.io.IOUtils;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.rest.exception.ActivitiContentNotSupportedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.multipart.MultipartFile;
@@ -80,12 +80,12 @@ public class BaseExecutionVariableResource {
         response.setContentType("application/x-java-serialized-object");
 
       } else {
-        throw new ActivitiObjectNotFoundException("The variable does not have a binary data stream.", null);
+        throw new FlowableObjectNotFoundException("The variable does not have a binary data stream.", null);
       }
       return result;
 
     } catch (IOException ioe) {
-      throw new ActivitiException("Error getting variable " + variableName, ioe);
+      throw new FlowableException("Error getting variable " + variableName, ioe);
     }
   }
 
@@ -93,14 +93,14 @@ public class BaseExecutionVariableResource {
 
     // Validate input and set defaults
     if (request.getFileMap().size() == 0) {
-      throw new ActivitiIllegalArgumentException("No file content was found in request body.");
+      throw new FlowableIllegalArgumentException("No file content was found in request body.");
     }
 
     // Get first file in the map, ignore possible other files
     MultipartFile file = request.getFile(request.getFileMap().keySet().iterator().next());
 
     if (file == null) {
-      throw new ActivitiIllegalArgumentException("No file content was found in request body.");
+      throw new FlowableIllegalArgumentException("No file content was found in request body.");
     }
 
     String variableScope = null;
@@ -128,12 +128,12 @@ public class BaseExecutionVariableResource {
 
       // Validate input and set defaults
       if (variableName == null) {
-        throw new ActivitiIllegalArgumentException("No variable name was found in request body.");
+        throw new FlowableIllegalArgumentException("No variable name was found in request body.");
       }
 
       if (variableType != null) {
         if (!RestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variableType) && !RestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variableType)) {
-          throw new ActivitiIllegalArgumentException("Only 'binary' and 'serializable' are supported as variable type.");
+          throw new FlowableIllegalArgumentException("Only 'binary' and 'serializable' are supported as variable type.");
         }
       } else {
         variableType = RestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE;
@@ -166,7 +166,7 @@ public class BaseExecutionVariableResource {
       }
 
     } catch (IOException ioe) {
-      throw new ActivitiIllegalArgumentException("Could not process multipart content", ioe);
+      throw new FlowableIllegalArgumentException("Could not process multipart content", ioe);
     } catch (ClassNotFoundException ioe) {
       throw new ActivitiContentNotSupportedException("The provided body contains a serialized object for which the class is nog found: " + ioe.getMessage());
     }
@@ -175,7 +175,7 @@ public class BaseExecutionVariableResource {
 
   protected RestVariable setSimpleVariable(RestVariable restVariable, Execution execution, boolean isNew) {
     if (restVariable.getName() == null) {
-      throw new ActivitiIllegalArgumentException("Variable name is required");
+      throw new FlowableIllegalArgumentException("Variable name is required");
     }
 
     // Figure out scope, revert to local is omitted
@@ -195,11 +195,11 @@ public class BaseExecutionVariableResource {
     // be updated using PUT
     boolean hasVariable = hasVariableOnScope(execution, name, scope);
     if (isNew && hasVariable) {
-      throw new ActivitiException("Variable '" + name + "' is already present on execution '" + execution.getId() + "'.");
+      throw new FlowableException("Variable '" + name + "' is already present on execution '" + execution.getId() + "'.");
     }
 
     if (!isNew && !hasVariable) {
-      throw new ActivitiObjectNotFoundException("Execution '" + execution.getId() + "' doesn't have a variable with name: '" + name + "'.", null);
+      throw new FlowableObjectNotFoundException("Execution '" + execution.getId() + "' doesn't have a variable with name: '" + name + "'.", null);
     }
 
     if (scope == RestVariableScope.LOCAL) {
@@ -235,7 +235,7 @@ public class BaseExecutionVariableResource {
     Object value = null;
 
     if (execution == null) {
-      throw new ActivitiObjectNotFoundException("Could not find an execution", Execution.class);
+      throw new FlowableObjectNotFoundException("Could not find an execution", Execution.class);
     }
 
     RestVariableScope variableScope = RestVariable.getScopeFromString(scope);
@@ -268,7 +268,7 @@ public class BaseExecutionVariableResource {
     }
 
     if (!variableFound) {
-      throw new ActivitiObjectNotFoundException("Execution '" + execution.getId() + "' doesn't have a variable with name: '" + variableName + "'.", VariableInstanceEntity.class);
+      throw new FlowableObjectNotFoundException("Execution '" + execution.getId() + "' doesn't have a variable with name: '" + variableName + "'.", VariableInstanceEntity.class);
     } else {
       return constructRestVariable(variableName, value, variableScope, execution.getId(), includeBinary);
     }
@@ -285,7 +285,7 @@ public class BaseExecutionVariableResource {
   protected Execution getExecutionFromRequest(String executionId) {
     Execution execution = runtimeService.createExecutionQuery().executionId(executionId).singleResult();
     if (execution == null) {
-      throw new ActivitiObjectNotFoundException("Could not find an execution with id '" + executionId + "'.", Execution.class);
+      throw new FlowableObjectNotFoundException("Could not find an execution with id '" + executionId + "'.", Execution.class);
     }
     return execution;
   }
@@ -293,7 +293,7 @@ public class BaseExecutionVariableResource {
   protected Execution getProcessInstanceFromRequest(String processInstanceId) {
     Execution execution = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
     if (execution == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", ProcessInstance.class);
+      throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", ProcessInstance.class);
     }
     return execution;
   }

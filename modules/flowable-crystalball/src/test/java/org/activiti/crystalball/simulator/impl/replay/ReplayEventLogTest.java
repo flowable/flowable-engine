@@ -20,19 +20,19 @@ import org.activiti.crystalball.simulator.delegate.event.impl.EventLogProcessIns
 import org.activiti.crystalball.simulator.delegate.event.impl.EventLogTransformer;
 import org.activiti.crystalball.simulator.delegate.event.impl.EventLogUserTaskCompleteTransformer;
 import org.activiti.crystalball.simulator.impl.StartReplayLogEventHandler;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.ProcessEngines;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.common.*;
-import org.activiti.engine.event.EventLogEntry;
-import org.activiti.engine.history.HistoricVariableInstance;
-import org.activiti.engine.impl.ProcessEngineImpl;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.el.NoExecutionVariableScope;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.ProcessEngines;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.common.*;
+import org.flowable.engine.event.EventLogEntry;
+import org.flowable.engine.history.HistoricVariableInstance;
+import org.flowable.engine.impl.ProcessEngineImpl;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.el.NoExecutionVariableScope;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -145,7 +145,7 @@ public class ReplayEventLogTest {
   }
 
   private ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
-    ProcessEngineConfigurationImpl configuration = new org.activiti.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl configuration = new org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration();
     configuration.
       setEnableDatabaseEventLogging(true).
       setDatabaseSchemaUpdate("create-drop");

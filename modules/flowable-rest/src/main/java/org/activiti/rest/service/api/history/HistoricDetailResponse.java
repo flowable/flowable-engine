@@ -15,8 +15,8 @@ package org.activiti.rest.service.api.history;
 
 import java.util.Date;
 
-import org.activiti.rest.util.DateToStringSerializer;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
+import org.flowable.rest.util.DateToStringSerializer;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 

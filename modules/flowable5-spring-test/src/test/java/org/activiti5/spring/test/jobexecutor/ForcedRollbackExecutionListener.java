@@ -1,7 +1,7 @@
 package org.activiti5.spring.test.jobexecutor;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.ExecutionListener;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.ExecutionListener;
 
 /**
  * @author Pablo Ganga

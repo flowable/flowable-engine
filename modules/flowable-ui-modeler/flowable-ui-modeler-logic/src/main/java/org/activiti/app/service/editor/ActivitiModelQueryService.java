@@ -34,15 +34,15 @@ import org.activiti.app.service.api.ModelService;
 import org.activiti.app.service.exception.BadRequestException;
 import org.activiti.app.service.exception.InternalServerErrorException;
 import org.activiti.app.util.XmlUtil;
-import org.activiti.bpmn.BpmnAutoLayout;
-import org.activiti.bpmn.converter.BpmnXMLConverter;
-import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.editor.language.json.converter.BpmnJsonConverter;
 import org.activiti.editor.language.json.converter.util.CollectionUtils;
-import org.activiti.idm.api.User;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.flowable.bpmn.BpmnAutoLayout;
+import org.flowable.bpmn.converter.BpmnXMLConverter;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,7 +165,7 @@ public class ActivitiModelQueryService {
 
         ObjectNode modelNode = bpmnJsonConverter.convertToJson(bpmnModel);
 
-        org.activiti.bpmn.model.Process process = bpmnModel.getMainProcess();
+        org.flowable.bpmn.model.Process process = bpmnModel.getMainProcess();
         String name = process.getId();
         if (StringUtils.isNotEmpty(process.getName())) {
           name = process.getName();

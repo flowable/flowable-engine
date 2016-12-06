@@ -13,7 +13,7 @@
 
 package org.activiti5.engine.impl.pvm.delegate;
 
-import org.activiti.engine.delegate.DelegateTask;
+import org.flowable.engine.delegate.DelegateTask;
 
 
 

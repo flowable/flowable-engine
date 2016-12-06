@@ -15,16 +15,16 @@ package org.activiti.crystalball.examples.tutorial.step01;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-import org.activiti.engine.ProcessEngines;
-import org.activiti.engine.impl.test.ResourceActivitiTestCase;
-import org.activiti.engine.test.Deployment;
+import org.flowable.engine.ProcessEngines;
+import org.flowable.engine.impl.test.ResourceFlowableTestCase;
+import org.flowable.engine.test.Deployment;
 
 /**
  * This class provides the first insight into simulation run driven by process definition
  *
  * @author martin.grofcik
  */
-public class FirstSimulationRunTest extends ResourceActivitiTestCase {
+public class FirstSimulationRunTest extends ResourceFlowableTestCase {
 
   public FirstSimulationRunTest() {
     super("org/activiti/crystalball/examples/tutorial/step01/FirstSimulationRunTest.cfg.xml");

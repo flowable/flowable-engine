@@ -18,10 +18,10 @@ import java.util.List;
 
 import org.activiti.app.model.common.AbstractRepresentation;
 import org.activiti.app.model.common.UserRepresentation;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.idm.api.User;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.idm.api.User;
 
 /**
  * REST representation of a process instance.

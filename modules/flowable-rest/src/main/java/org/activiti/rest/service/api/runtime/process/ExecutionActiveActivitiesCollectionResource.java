@@ -16,7 +16,8 @@ package org.activiti.rest.service.api.runtime.process;
 import java.util.List;
 
 import io.swagger.annotations.*;
-import org.activiti.engine.runtime.Execution;
+
+import org.flowable.engine.runtime.Execution;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

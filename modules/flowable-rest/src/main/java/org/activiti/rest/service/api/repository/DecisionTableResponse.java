@@ -12,7 +12,7 @@
  */
 package org.activiti.rest.service.api.repository;
 
-import org.activiti.dmn.api.DecisionTable;
+import org.flowable.dmn.api.DecisionTable;
 
 /**
  * @author Yvo Swillens

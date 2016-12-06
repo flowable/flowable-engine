@@ -15,12 +15,12 @@ package org.activiti5.examples.bpmn.scripttask;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti5.engine.impl.util.CollectionUtil;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -87,7 +87,7 @@ public class ScriptTaskTest extends PluggableActivitiTestCase {
         .addClasspathResource("org/activiti5/examples/bpmn/scripttask/ScriptTaskTest.testNoScriptProvided.bpmn20.xml")
         .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertTextPresent("No script provided", e.getMessage());
     }
   }

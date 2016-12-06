@@ -17,12 +17,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
 
 
 /**

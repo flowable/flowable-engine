@@ -19,12 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.form.FormData;
-import org.activiti.engine.impl.persistence.entity.VariableInstance;
-import org.activiti.engine.task.IdentityLink;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.RuntimeService;
 import org.activiti5.engine.impl.cmd.ActivateProcessInstanceCmd;
@@ -63,6 +57,12 @@ import org.activiti5.engine.runtime.ProcessInstanceBuilder;
 import org.activiti5.engine.runtime.ProcessInstanceQuery;
 import org.activiti5.engine.task.Event;
 import org.activiti5.engine.task.IdentityLinkType;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.form.FormData;
+import org.flowable.engine.impl.persistence.entity.VariableInstance;
+import org.flowable.engine.task.IdentityLink;
 
 /**
  * @author Tom Baeyens
@@ -408,22 +408,22 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
 	@Override
-  public void addEventListener(ActivitiEventListener listenerToAdd) {
+  public void addEventListener(FlowableEventListener listenerToAdd) {
 		commandExecutor.execute(new AddEventListenerCommand(listenerToAdd));
   }
 
 	@Override
-  public void addEventListener(ActivitiEventListener listenerToAdd, ActivitiEngineEventType... types) {
+  public void addEventListener(FlowableEventListener listenerToAdd, FlowableEngineEventType... types) {
 		commandExecutor.execute(new AddEventListenerCommand(listenerToAdd, types));
   }
 
 	@Override
-  public void removeEventListener(ActivitiEventListener listenerToRemove) {
+  public void removeEventListener(FlowableEventListener listenerToRemove) {
 		commandExecutor.execute(new RemoveEventListenerCommand(listenerToRemove));
   }
 
 	@Override
-  public void dispatchEvent(ActivitiEvent event) {
+  public void dispatchEvent(FlowableEvent event) {
 		commandExecutor.execute(new DispatchEventCommand(event));
   }
 	

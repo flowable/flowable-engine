@@ -14,12 +14,12 @@ package org.activiti.editor.language.json.converter;
 
 import java.util.Map;
 
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.EventSubProcess;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.GraphicInfo;
-import org.activiti.bpmn.model.SubProcess;
 import org.activiti.editor.language.json.model.ModelInfo;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.EventSubProcess;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.GraphicInfo;
+import org.flowable.bpmn.model.SubProcess;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;

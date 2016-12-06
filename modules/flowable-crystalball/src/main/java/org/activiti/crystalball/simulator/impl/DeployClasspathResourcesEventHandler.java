@@ -16,7 +16,7 @@ package org.activiti.crystalball.simulator.impl;
 import org.activiti.crystalball.simulator.SimulationEvent;
 import org.activiti.crystalball.simulator.SimulationEventHandler;
 import org.activiti.crystalball.simulator.SimulationRunContext;
-import org.activiti.engine.repository.DeploymentBuilder;
+import org.flowable.engine.repository.DeploymentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

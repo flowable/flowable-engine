@@ -6,18 +6,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.DelegateTask;
-import org.activiti.engine.delegate.ExecutionListener;
-import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.delegate.JavaDelegate;
-import org.activiti.engine.delegate.TaskListener;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti5.engine.impl.util.CollectionUtil;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.DelegateTask;
+import org.flowable.engine.delegate.ExecutionListener;
+import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.delegate.JavaDelegate;
+import org.flowable.engine.delegate.TaskListener;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 public class TransientVariablesTest extends PluggableActivitiTestCase {
   

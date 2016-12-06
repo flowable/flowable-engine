@@ -13,10 +13,10 @@
 
 package org.activiti5.standalone.el;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.ResourceActivitiTestCase;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 
 
 /**
@@ -39,7 +39,7 @@ public class ExpressionBeanAccessTest extends ResourceActivitiTestCase {
     try {
       runtimeService.trigger(pi.getId());
       fail("Exception expected");
-    } catch(ActivitiException ae) {
+    } catch(FlowableException ae) {
       assertNotNull(ae.getCause());
     }
   }

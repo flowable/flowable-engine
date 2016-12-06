@@ -3,12 +3,12 @@ package org.activiti.rest.service.api.repository;
 import java.util.Calendar;
 import java.util.List;
 
-import org.activiti.engine.repository.Deployment;
 import org.activiti.rest.service.BaseSpringRestTestCase;
 import org.activiti.rest.service.api.RestUrls;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.flowable.engine.repository.Deployment;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

@@ -14,7 +14,7 @@ package org.activiti.app.service.api;
 
 import java.util.List;
 
-import org.activiti.idm.api.User;
+import org.flowable.idm.api.User;
 
 public interface AppDefinitionService {
 

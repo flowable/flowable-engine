@@ -14,11 +14,11 @@ package org.activiti5.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.impl.interceptor.Command;
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.persistence.deploy.DeploymentManager;
+import org.flowable.engine.repository.ProcessDefinition;
 
 /**
  * @author Joram Barrez

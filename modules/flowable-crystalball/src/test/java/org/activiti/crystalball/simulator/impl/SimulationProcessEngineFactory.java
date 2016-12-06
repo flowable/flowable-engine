@@ -16,8 +16,8 @@ package org.activiti.crystalball.simulator.impl;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.impl.ProcessEngineImpl;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.impl.ProcessEngineImpl;
 import org.springframework.beans.factory.FactoryBean;
 
 /**

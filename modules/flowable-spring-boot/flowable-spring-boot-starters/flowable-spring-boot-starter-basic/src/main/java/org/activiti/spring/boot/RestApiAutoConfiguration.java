@@ -12,9 +12,9 @@
  */
 package org.activiti.spring.boot;
 
-import org.activiti.rest.application.ContentTypeResolver;
-import org.activiti.rest.application.DefaultContentTypeResolver;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.flowable.rest.application.ContentTypeResolver;
+import org.flowable.rest.application.DefaultContentTypeResolver;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;

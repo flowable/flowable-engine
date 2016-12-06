@@ -19,8 +19,6 @@ import java.util.Map;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
-import org.activiti.bpmn.converter.BpmnXMLConverter;
-import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.domain.ServerConfig;
 import org.activiti.service.engine.exception.ActivitiServiceException;
 import org.apache.http.HttpStatus;
@@ -30,6 +28,8 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.flowable.bpmn.converter.BpmnXMLConverter;
+import org.flowable.bpmn.model.BpmnModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

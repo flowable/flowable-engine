@@ -22,22 +22,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.history.HistoricDetail;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.runtime.ProcessInstanceBuilder;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti5.engine.impl.util.CollectionUtil;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.history.HistoricDetail;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.ProcessInstanceBuilder;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 
 /**
@@ -74,7 +74,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.startProcessInstanceByKey(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       // Expected exception
     }
   }
@@ -83,7 +83,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.startProcessInstanceByKey("unexistingkey");
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("no processes deployed with key", ae.getMessage());
       assertEquals(ProcessDefinition.class, ae.getObjectClass());
     }
@@ -93,7 +93,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.startProcessInstanceById(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       // Expected exception
     }
   }
@@ -102,7 +102,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.startProcessInstanceById("unexistingId");
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("no deployed process definition found with id", ae.getMessage());
       assertEquals(ProcessDefinition.class, ae.getObjectClass());
     }
@@ -274,7 +274,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.deleteProcessInstance("enexistingInstanceId", null);
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("No process instance found for id", ae.getMessage());
       assertEquals(ProcessInstance.class, ae.getObjectClass());
     }
@@ -285,7 +285,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.deleteProcessInstance(null, "test null id delete");
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("processInstanceId is null", ae.getMessage());
     }
   }
@@ -304,7 +304,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.getActiveActivityIds("unexistingExecutionId");      
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("execution unexistingExecutionId doesn't exist", ae.getMessage());
       assertEquals(Execution.class, ae.getObjectClass());
     }
@@ -314,7 +314,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.getActiveActivityIds(null);      
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("executionId is null", ae.getMessage());
     }
   }
@@ -403,7 +403,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.trigger("unexistingExecutionId");      
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("execution unexistingExecutionId doesn't exist", ae.getMessage());
       assertEquals(Execution.class, ae.getObjectClass());
     }
@@ -413,7 +413,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.trigger(null);      
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("executionId is null", ae.getMessage());
     }
   }
@@ -437,7 +437,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.getVariables("unexistingExecutionId");
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("execution unexistingExecutionId doesn't exist", ae.getMessage());
       assertEquals(Execution.class, ae.getObjectClass());
     }
@@ -447,7 +447,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.getVariables(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("executionId is null", ae.getMessage());
     }
   }
@@ -456,7 +456,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.getVariables("unexistingExecutionId");
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("execution unexistingExecutionId doesn't exist", ae.getMessage());
       assertEquals(Execution.class, ae.getObjectClass());
     }
@@ -466,7 +466,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.getVariables(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("executionId is null", ae.getMessage());
     }
   }
@@ -483,7 +483,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.setVariable("unexistingExecutionId", "variableName", "value");
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("execution unexistingExecutionId doesn't exist", ae.getMessage());
       assertEquals(Execution.class, ae.getObjectClass());
     }
@@ -493,7 +493,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.setVariable(null, "variableName", "variableValue");
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("executionId is null", ae.getMessage());
     }
   }
@@ -505,7 +505,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
       runtimeService.setVariable(processInstance.getId(), null, "variableValue");
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("variableName is null", ae.getMessage());
     }
   }
@@ -529,7 +529,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.setVariables("unexistingexecution", Collections.EMPTY_MAP);
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("execution unexistingexecution doesn't exist", ae.getMessage());
       assertEquals(Execution.class, ae.getObjectClass());
     }
@@ -540,7 +540,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.setVariables(null, Collections.EMPTY_MAP);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("executionId is null", ae.getMessage());
     }
   }
@@ -611,7 +611,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.removeVariable(null, "variable");
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("executionId is null", ae.getMessage());
     }    
   }
@@ -665,7 +665,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.removeVariableLocal(null, "variable");
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("executionId is null", ae.getMessage());
     }    
   }
@@ -730,7 +730,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.removeVariables(null, Collections.EMPTY_LIST);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("executionId is null", ae.getMessage());
     }    
   }
@@ -786,7 +786,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.removeVariablesLocal(null, Collections.EMPTY_LIST);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("executionId is null", ae.getMessage());
     }    
   }
@@ -866,7 +866,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
    try {
      runtimeService.signalEventReceived("alert", "nonexistingExecution");
      fail("exeception expected");
-   }catch (ActivitiObjectNotFoundException ae) {
+   }catch (FlowableObjectNotFoundException ae) {
      // this is good
      assertEquals(Execution.class, ae.getObjectClass());
    }
@@ -876,7 +876,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
    try {
      runtimeService.messageEventReceived("alert", "nonexistingExecution");
      fail("exeception expected");
-   }catch (ActivitiObjectNotFoundException ae) {
+   }catch (FlowableObjectNotFoundException ae) {
      assertEquals(Execution.class, ae.getObjectClass());
    }
   }
@@ -892,7 +892,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
    try {
      runtimeService.signalEventReceived("bogusSignal", execution.getId());
      fail("exeception expected");
-   }catch (ActivitiException e) {
+   }catch (FlowableException e) {
      // this is good
    }
   }
@@ -921,7 +921,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
    try {
      runtimeService.setProcessInstanceName("unexisting", null);
      fail("Exception excpected");
-   } catch(ActivitiObjectNotFoundException aonfe) {
+   } catch(FlowableObjectNotFoundException aonfe) {
      assertEquals(ProcessInstance.class, aonfe.getObjectClass());
    }
    
@@ -934,7 +934,7 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
    try {
      runtimeService.setProcessInstanceName(processInstance.getId(), null);
      fail("Exception excpected");
-   } catch(ActivitiException ae) {
+   } catch(FlowableException ae) {
      assertEquals("process instance " + processInstance.getId() + " is suspended, cannot set name", ae.getMessage());
    }
    

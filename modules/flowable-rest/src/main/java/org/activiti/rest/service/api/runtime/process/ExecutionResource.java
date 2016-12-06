@@ -18,8 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.runtime.Execution;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.runtime.Execution;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -82,7 +82,7 @@ public class ExecutionResource extends ExecutionBaseResource {
       }
     } else if (ExecutionActionRequest.ACTION_SIGNAL_EVENT_RECEIVED.equals(actionRequest.getAction())) {
       if (actionRequest.getSignalName() == null) {
-        throw new ActivitiIllegalArgumentException("Signal name is required");
+        throw new FlowableIllegalArgumentException("Signal name is required");
       }
       if (actionRequest.getVariables() != null) {
         runtimeService.signalEventReceived(actionRequest.getSignalName(), execution.getId(), getVariablesToSet(actionRequest.getVariables()));
@@ -91,7 +91,7 @@ public class ExecutionResource extends ExecutionBaseResource {
       }
     } else if (ExecutionActionRequest.ACTION_MESSAGE_EVENT_RECEIVED.equals(actionRequest.getAction())) {
       if (actionRequest.getMessageName() == null) {
-        throw new ActivitiIllegalArgumentException("Message name is required");
+        throw new FlowableIllegalArgumentException("Message name is required");
       }
       if (actionRequest.getVariables() != null) {
         runtimeService.messageEventReceived(actionRequest.getMessageName(), execution.getId(), getVariablesToSet(actionRequest.getVariables()));
@@ -99,7 +99,7 @@ public class ExecutionResource extends ExecutionBaseResource {
         runtimeService.messageEventReceived(actionRequest.getMessageName(), execution.getId());
       }
     } else {
-      throw new ActivitiIllegalArgumentException("Invalid action: '" + actionRequest.getAction() + "'.");
+      throw new FlowableIllegalArgumentException("Invalid action: '" + actionRequest.getAction() + "'.");
     }
 
     // Re-fetch the execution, could have changed due to action or even

@@ -15,7 +15,7 @@ package org.activiti.rest.service.api.engine;
 
 import java.util.Date;
 
-import org.activiti.rest.util.DateToStringSerializer;
+import org.flowable.rest.util.DateToStringSerializer;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 

@@ -13,12 +13,12 @@
 
 package org.activiti.rest.api.runtime;
 
-import org.activiti.engine.task.Task;
 import org.activiti.rest.service.BaseSpringRestTestCase;
 import org.activiti.rest.service.api.RestUrls;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.flowable.engine.task.Task;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

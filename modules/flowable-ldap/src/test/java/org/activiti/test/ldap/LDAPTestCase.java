@@ -19,7 +19,7 @@ import javax.annotation.Resource;
 
 import junit.framework.Test;
 
-import org.activiti.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.spring.impl.test.SpringActivitiTestCase;
 import org.springframework.security.ldap.server.ApacheDSContainer;
 
 /**

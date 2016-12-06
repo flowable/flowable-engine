@@ -13,12 +13,12 @@
 
 package org.activiti5.camel.examples.initiator;
 
-import org.activiti.engine.test.Deployment;
-import org.activiti.spring.impl.test.SpringActivitiTestCase;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
+import org.flowable.engine.test.Deployment;
+import org.flowable.spring.impl.test.SpringActivitiTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 

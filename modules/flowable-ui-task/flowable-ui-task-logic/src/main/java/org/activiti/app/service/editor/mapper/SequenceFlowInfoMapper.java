@@ -12,8 +12,8 @@
  */
 package org.activiti.app.service.editor.mapper;
 
-import org.activiti.bpmn.model.SequenceFlow;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.SequenceFlow;
 
 public class SequenceFlowInfoMapper extends AbstractInfoMapper {
 

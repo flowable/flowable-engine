@@ -18,7 +18,7 @@ import java.util.List;
 
 import javax.script.Bindings;
 
-import org.activiti.engine.delegate.VariableScope;
+import org.flowable.engine.delegate.VariableScope;
 
 
 /**

@@ -17,20 +17,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.common.api.query.QueryProperty;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.impl.TaskQueryProperty;
-import org.activiti.engine.task.DelegationState;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.task.TaskQuery;
-import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.QueryVariable;
 import org.activiti.rest.service.api.engine.variable.QueryVariable.QueryVariableOperation;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.impl.TaskQueryProperty;
+import org.flowable.engine.task.DelegationState;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.task.TaskQuery;
+import org.flowable.rest.api.DataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -71,7 +71,7 @@ public class TaskBaseResource {
       } else if (DelegationState.PENDING.name().toLowerCase().equals(delegationState)) {
         return DelegationState.PENDING;
       } else {
-        throw new ActivitiIllegalArgumentException("Illegal value for delegationState: " + delegationState);
+        throw new FlowableIllegalArgumentException("Illegal value for delegationState: " + delegationState);
       }
     }
     return state;
@@ -299,10 +299,10 @@ public class TaskBaseResource {
 
     for (QueryVariable variable : variables) {
       if (variable.getVariableOperation() == null) {
-        throw new ActivitiIllegalArgumentException("Variable operation is missing for variable: " + variable.getName());
+        throw new FlowableIllegalArgumentException("Variable operation is missing for variable: " + variable.getName());
       }
       if (variable.getValue() == null) {
-        throw new ActivitiIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+        throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
       }
 
       boolean nameLess = variable.getName() == null;
@@ -311,7 +311,7 @@ public class TaskBaseResource {
 
       // A value-only query is only possible using equals-operator
       if (nameLess && variable.getVariableOperation() != QueryVariableOperation.EQUALS) {
-        throw new ActivitiIllegalArgumentException("Value-only query (without a variable-name) is only supported when using 'equals' operation.");
+        throw new FlowableIllegalArgumentException("Value-only query (without a variable-name) is only supported when using 'equals' operation.");
       }
 
       switch (variable.getVariableOperation()) {
@@ -328,7 +328,7 @@ public class TaskBaseResource {
         if (actualValue instanceof String) {
           taskQuery.taskVariableValueEqualsIgnoreCase(variable.getName(), (String) actualValue);
         } else {
-          throw new ActivitiIllegalArgumentException("Only string variable values are supported when ignoring casing, but was: " + actualValue.getClass().getName());
+          throw new FlowableIllegalArgumentException("Only string variable values are supported when ignoring casing, but was: " + actualValue.getClass().getName());
         }
         break;
 
@@ -340,7 +340,7 @@ public class TaskBaseResource {
         if (actualValue instanceof String) {
           taskQuery.taskVariableValueNotEqualsIgnoreCase(variable.getName(), (String) actualValue);
         } else {
-          throw new ActivitiIllegalArgumentException("Only string variable values are supported when ignoring casing, but was: " + actualValue.getClass().getName());
+          throw new FlowableIllegalArgumentException("Only string variable values are supported when ignoring casing, but was: " + actualValue.getClass().getName());
         }
         break;
 
@@ -364,11 +364,11 @@ public class TaskBaseResource {
         if (actualValue instanceof String) {
           taskQuery.taskVariableValueLike(variable.getName(), (String) actualValue);
         } else {
-          throw new ActivitiIllegalArgumentException("Only string variable values are supported using like, but was: " + actualValue.getClass().getName());
+          throw new FlowableIllegalArgumentException("Only string variable values are supported using like, but was: " + actualValue.getClass().getName());
         }
         break;
       default:
-        throw new ActivitiIllegalArgumentException("Unsupported variable query operation: " + variable.getVariableOperation());
+        throw new FlowableIllegalArgumentException("Unsupported variable query operation: " + variable.getVariableOperation());
       }
     }
   }
@@ -376,10 +376,10 @@ public class TaskBaseResource {
   protected void addProcessvariables(TaskQuery taskQuery, List<QueryVariable> variables) {
     for (QueryVariable variable : variables) {
       if (variable.getVariableOperation() == null) {
-        throw new ActivitiIllegalArgumentException("Variable operation is missing for variable: " + variable.getName());
+        throw new FlowableIllegalArgumentException("Variable operation is missing for variable: " + variable.getName());
       }
       if (variable.getValue() == null) {
-        throw new ActivitiIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+        throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
       }
 
       boolean nameLess = variable.getName() == null;
@@ -388,7 +388,7 @@ public class TaskBaseResource {
 
       // A value-only query is only possible using equals-operator
       if (nameLess && variable.getVariableOperation() != QueryVariableOperation.EQUALS) {
-        throw new ActivitiIllegalArgumentException("Value-only query (without a variable-name) is only supported when using 'equals' operation.");
+        throw new FlowableIllegalArgumentException("Value-only query (without a variable-name) is only supported when using 'equals' operation.");
       }
 
       switch (variable.getVariableOperation()) {
@@ -405,7 +405,7 @@ public class TaskBaseResource {
         if (actualValue instanceof String) {
           taskQuery.processVariableValueEqualsIgnoreCase(variable.getName(), (String) actualValue);
         } else {
-          throw new ActivitiIllegalArgumentException("Only string variable values are supported when ignoring casing, but was: " + actualValue.getClass().getName());
+          throw new FlowableIllegalArgumentException("Only string variable values are supported when ignoring casing, but was: " + actualValue.getClass().getName());
         }
         break;
 
@@ -417,7 +417,7 @@ public class TaskBaseResource {
         if (actualValue instanceof String) {
           taskQuery.processVariableValueNotEqualsIgnoreCase(variable.getName(), (String) actualValue);
         } else {
-          throw new ActivitiIllegalArgumentException("Only string variable values are supported when ignoring casing, but was: " + actualValue.getClass().getName());
+          throw new FlowableIllegalArgumentException("Only string variable values are supported when ignoring casing, but was: " + actualValue.getClass().getName());
         }
         break;
 
@@ -441,12 +441,12 @@ public class TaskBaseResource {
         if (actualValue instanceof String) {
           taskQuery.processVariableValueLike(variable.getName(), (String) actualValue);
         } else {
-          throw new ActivitiIllegalArgumentException("Only string variable values are supported using like, but was: " + actualValue.getClass().getName());
+          throw new FlowableIllegalArgumentException("Only string variable values are supported using like, but was: " + actualValue.getClass().getName());
         }
         break;
 
       default:
-        throw new ActivitiIllegalArgumentException("Unsupported variable query operation: " + variable.getVariableOperation());
+        throw new FlowableIllegalArgumentException("Unsupported variable query operation: " + variable.getVariableOperation());
       }
     }
   }
@@ -457,7 +457,7 @@ public class TaskBaseResource {
   protected Task getTaskFromRequest(String taskId) {
     Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
     if (task == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
+      throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
     }
     return task;
   }
@@ -468,7 +468,7 @@ public class TaskBaseResource {
   protected HistoricTaskInstance getHistoricTaskFromRequest(String taskId) {
     HistoricTaskInstance task = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
     if (task == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
+      throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
     }
     return task;
   }

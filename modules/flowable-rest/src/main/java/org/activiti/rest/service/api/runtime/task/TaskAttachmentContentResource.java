@@ -19,11 +19,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.task.Attachment;
 import org.apache.commons.io.IOUtils;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.task.Attachment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -53,12 +53,12 @@ public class TaskAttachmentContentResource extends TaskBaseResource {
     Attachment attachment = taskService.getAttachment(attachmentId);
 
     if (attachment == null || !task.getId().equals(attachment.getTaskId())) {
-      throw new ActivitiObjectNotFoundException("Task '" + task.getId() + "' doesn't have an attachment with id '" + attachmentId + "'.", Attachment.class);
+      throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' doesn't have an attachment with id '" + attachmentId + "'.", Attachment.class);
     }
 
     InputStream attachmentStream = taskService.getAttachmentContent(attachmentId);
     if (attachmentStream == null) {
-      throw new ActivitiObjectNotFoundException("Attachment with id '" + attachmentId + "' doesn't have content associated with it.", Attachment.class);
+      throw new FlowableObjectNotFoundException("Attachment with id '" + attachmentId + "' doesn't have content associated with it.", Attachment.class);
     }
 
     HttpHeaders responseHeaders = new HttpHeaders();
@@ -79,7 +79,7 @@ public class TaskAttachmentContentResource extends TaskBaseResource {
     try {
       return new ResponseEntity<byte[]>(IOUtils.toByteArray(attachmentStream), responseHeaders, HttpStatus.OK);
     } catch (Exception e) {
-      throw new ActivitiException("Error creating attachment data", e);
+      throw new FlowableException("Error creating attachment data", e);
     }
   }
 }

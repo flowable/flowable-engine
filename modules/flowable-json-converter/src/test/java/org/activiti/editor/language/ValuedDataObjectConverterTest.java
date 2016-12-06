@@ -9,17 +9,17 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.activiti.bpmn.model.BooleanDataObject;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.DateDataObject;
-import org.activiti.bpmn.model.DoubleDataObject;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.IntegerDataObject;
-import org.activiti.bpmn.model.LongDataObject;
-import org.activiti.bpmn.model.StartEvent;
-import org.activiti.bpmn.model.StringDataObject;
-import org.activiti.bpmn.model.SubProcess;
-import org.activiti.bpmn.model.ValuedDataObject;
+import org.flowable.bpmn.model.BooleanDataObject;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.DateDataObject;
+import org.flowable.bpmn.model.DoubleDataObject;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.IntegerDataObject;
+import org.flowable.bpmn.model.LongDataObject;
+import org.flowable.bpmn.model.StartEvent;
+import org.flowable.bpmn.model.StringDataObject;
+import org.flowable.bpmn.model.SubProcess;
+import org.flowable.bpmn.model.ValuedDataObject;
 import org.junit.Test;
 
 public class ValuedDataObjectConverterTest extends AbstractConverterTest {

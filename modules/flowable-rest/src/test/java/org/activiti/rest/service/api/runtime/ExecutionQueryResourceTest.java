@@ -15,10 +15,10 @@ package org.activiti.rest.service.api.runtime;
 
 import java.util.HashMap;
 
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.test.Deployment;
 import org.activiti.rest.service.BaseSpringRestTestCase;
 import org.activiti.rest.service.api.RestUrls;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.engine.test.Deployment;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;

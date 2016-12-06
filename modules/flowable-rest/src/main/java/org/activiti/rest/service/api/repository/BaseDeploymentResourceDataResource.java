@@ -18,13 +18,13 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.rest.application.ContentTypeResolver;
 import org.apache.commons.io.IOUtils;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.rest.application.ContentTypeResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -41,16 +41,16 @@ public class BaseDeploymentResourceDataResource {
   protected byte[] getDeploymentResourceData(String deploymentId, String resourceId, HttpServletResponse response) {
 
     if (deploymentId == null) {
-      throw new ActivitiIllegalArgumentException("No deployment id provided");
+      throw new FlowableIllegalArgumentException("No deployment id provided");
     }
     if (resourceId == null) {
-      throw new ActivitiIllegalArgumentException("No resource id provided");
+      throw new FlowableIllegalArgumentException("No resource id provided");
     }
 
     // Check if deployment exists
     Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
     if (deployment == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.", Deployment.class);
+      throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.", Deployment.class);
     }
 
     List<String> resourceList = repositoryService.getDeploymentResourceNames(deploymentId);
@@ -63,11 +63,11 @@ public class BaseDeploymentResourceDataResource {
       try {
         return IOUtils.toByteArray(resourceStream);
       } catch (Exception e) {
-        throw new ActivitiException("Error converting resource stream", e);
+        throw new FlowableException("Error converting resource stream", e);
       }
     } else {
       // Resource not found in deployment
-      throw new ActivitiObjectNotFoundException("Could not find a resource with id '" + resourceId + "' in deployment '" + deploymentId + "'.", String.class);
+      throw new FlowableObjectNotFoundException("Could not find a resource with id '" + resourceId + "' in deployment '" + deploymentId + "'.", String.class);
     }
   }
 }

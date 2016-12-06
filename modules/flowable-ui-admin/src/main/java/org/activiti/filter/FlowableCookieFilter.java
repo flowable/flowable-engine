@@ -24,13 +24,13 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.idm.api.Group;
-import org.activiti.idm.api.IdmIdentityService;
-import org.activiti.idm.api.Token;
-import org.activiti.idm.api.User;
 import org.activiti.security.ActivitiAppUser;
 import org.activiti.security.AuthoritiesConstants;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.api.Token;
+import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +81,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
             if (token != null) {
               return token;
             } else {
-              throw new ActivitiException("token not found " + tokenId);
+              throw new FlowableException("token not found " + tokenId);
             }
           }
 
@@ -96,7 +96,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
             User userFromToken = idmIdentityService.createUserQuery().userId(userId).singleResult();
             
             if (userFromToken == null) {
-              throw new ActivitiException("user not found " + userId);
+              throw new FlowableException("user not found " + userId);
             }
             
             Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();

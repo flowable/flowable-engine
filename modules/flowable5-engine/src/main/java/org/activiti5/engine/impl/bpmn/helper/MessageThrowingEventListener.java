@@ -14,17 +14,17 @@ package org.activiti5.engine.impl.bpmn.helper;
 
 import java.util.List;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
-import org.activiti.engine.impl.delegate.event.ActivitiEngineEvent;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.event.MessageEventHandler;
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.persistence.entity.EventSubscriptionEntity;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.impl.delegate.event.ActivitiEngineEvent;
 
 /**
- * An {@link ActivitiEventListener} that throws a message event when an event is
+ * An {@link FlowableEventListener} that throws a message event when an event is
  * dispatched to it. Sends the message to the execution the event was fired from. If the execution
  * is not subscribed to a message, the process-instance is checked.
  * 
@@ -37,7 +37,7 @@ public class MessageThrowingEventListener extends BaseDelegateEventListener {
 	protected Class<?> entityClass;
 	
 	@Override
-	public void onEvent(ActivitiEvent event) {
+	public void onEvent(FlowableEvent event) {
 	  if (isValidEvent(event) && event instanceof ActivitiEngineEvent) {
       ActivitiEngineEvent engineEvent = (ActivitiEngineEvent) event;
 		

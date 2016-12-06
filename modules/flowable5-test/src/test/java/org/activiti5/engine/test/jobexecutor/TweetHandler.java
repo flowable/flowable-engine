@@ -15,10 +15,10 @@ package org.activiti5.engine.test.jobexecutor;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.runtime.Job;
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.jobexecutor.JobHandler;
 import org.activiti5.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.runtime.Job;
 import org.junit.Assert;
 
 public class TweetHandler implements JobHandler {

@@ -17,9 +17,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.delegate.JavaDelegate;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.delegate.JavaDelegate;
 
 /**
  * @author Joram Barrez

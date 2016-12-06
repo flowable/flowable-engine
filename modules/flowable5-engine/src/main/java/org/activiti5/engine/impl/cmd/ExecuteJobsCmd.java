@@ -14,7 +14,6 @@ package org.activiti5.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.JobNotFoundException;
@@ -26,6 +25,7 @@ import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.jobexecutor.FailedJobListener;
 import org.activiti5.engine.impl.jobexecutor.JobExecutorContext;
 import org.activiti5.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,7 +89,7 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
       
       if (commandContext.getEventDispatcher().isEnabled()) {
       	commandContext.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(
-      			ActivitiEngineEventType.JOB_EXECUTION_SUCCESS, job));
+      			FlowableEngineEventType.JOB_EXECUTION_SUCCESS, job));
       }
       
     } catch (Throwable exception) {
@@ -100,7 +100,7 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
       if (commandContext.getEventDispatcher().isEnabled()) {
 	      try {
 	      	commandContext.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityExceptionEvent(
-	      			ActivitiEngineEventType.JOB_EXECUTION_FAILURE, job, exception));
+	      			FlowableEngineEventType.JOB_EXECUTION_FAILURE, job, exception));
 	      } catch(Throwable ignore) {
 	      	log.warn("Exception occured while dispatching job failure event, ignoring.", ignore);
 	      }

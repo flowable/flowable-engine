@@ -15,8 +15,8 @@ package org.activiti.rest.service.api.management;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.common.api.query.QueryProperty;
-import org.activiti.engine.impl.JobQueryProperty;
+import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.engine.impl.JobQueryProperty;
 
 /**
  * @author Joram Barrez

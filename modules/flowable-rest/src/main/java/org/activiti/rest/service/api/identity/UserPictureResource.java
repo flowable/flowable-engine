@@ -20,12 +20,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.idm.api.Picture;
-import org.activiti.idm.api.User;
 import org.apache.commons.io.IOUtils;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.idm.api.Picture;
+import org.flowable.idm.api.User;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +55,7 @@ public class UserPictureResource extends BaseUserResource {
     Picture userPicture = identityService.getUserPicture(user.getId());
 
     if (userPicture == null) {
-      throw new ActivitiObjectNotFoundException("The user with id '" + user.getId() + "' does not have a picture.", Picture.class);
+      throw new FlowableObjectNotFoundException("The user with id '" + user.getId() + "' does not have a picture.", Picture.class);
     }
 
     HttpHeaders responseHeaders = new HttpHeaders();
@@ -68,7 +68,7 @@ public class UserPictureResource extends BaseUserResource {
     try {
       return new ResponseEntity<byte[]>(IOUtils.toByteArray(userPicture.getInputStream()), responseHeaders, HttpStatus.OK);
     } catch (Exception e) {
-      throw new ActivitiException("Error exporting picture: " + e.getMessage(), e);
+      throw new FlowableException("Error exporting picture: " + e.getMessage(), e);
     }
   }
 
@@ -85,13 +85,13 @@ public class UserPictureResource extends BaseUserResource {
     User user = getUserFromRequest(userId);
 
     if (request instanceof MultipartHttpServletRequest == false) {
-      throw new ActivitiIllegalArgumentException("Multipart request is required");
+      throw new FlowableIllegalArgumentException("Multipart request is required");
     }
 
     MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
 
     if (multipartRequest.getFileMap().size() == 0) {
-      throw new ActivitiIllegalArgumentException("Multipart request with file content is required");
+      throw new FlowableIllegalArgumentException("Multipart request with file content is required");
     }
 
     MultipartFile file = multipartRequest.getFileMap().values().iterator().next();
@@ -110,7 +110,7 @@ public class UserPictureResource extends BaseUserResource {
       response.setStatus(HttpStatus.NO_CONTENT.value());
 
     } catch (Exception e) {
-      throw new ActivitiException("Error while reading uploaded file: " + e.getMessage(), e);
+      throw new FlowableException("Error while reading uploaded file: " + e.getMessage(), e);
     }
   }
 }

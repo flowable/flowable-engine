@@ -15,12 +15,12 @@ package org.activiti5.engine.test.api.repository;
 
 import java.util.List;
 
-import org.activiti.engine.impl.persistence.entity.ModelEntity;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.repository.Model;
-import org.activiti.engine.repository.ModelQuery;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.impl.persistence.entity.ModelEntity;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.repository.Model;
+import org.flowable.engine.repository.ModelQuery;
 import org.junit.Assert;
 
 

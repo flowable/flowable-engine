@@ -5,12 +5,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.activiti.bpmn.model.ActivitiListener;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.FormProperty;
-import org.activiti.bpmn.model.ImplementationType;
-import org.activiti.bpmn.model.StartEvent;
+import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FormProperty;
+import org.flowable.bpmn.model.ImplementationType;
+import org.flowable.bpmn.model.StartEvent;
 import org.junit.Test;
 
 public class StartEventConverterTest extends AbstractConverterTest {

@@ -14,7 +14,7 @@ package org.activiti5.engine.impl;
 
 import java.io.Serializable;
 
-import org.activiti.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.DelegateExecution;
 
 
 

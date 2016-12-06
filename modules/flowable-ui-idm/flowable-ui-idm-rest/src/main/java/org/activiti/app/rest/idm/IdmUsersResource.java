@@ -20,7 +20,7 @@ import org.activiti.app.idm.model.UpdateUsersRepresentation;
 import org.activiti.app.idm.service.UserService;
 import org.activiti.app.model.common.ResultListDataRepresentation;
 import org.activiti.app.model.common.UserRepresentation;
-import org.activiti.idm.api.User;
+import org.flowable.idm.api.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;

@@ -19,14 +19,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.task.Comment;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.CommentResponse;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.task.Comment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -69,7 +69,7 @@ public class HistoricProcessInstanceCommentCollectionResource {
     HistoricProcessInstance instance = getHistoricProcessInstanceFromRequest(processInstanceId);
 
     if (comment.getMessage() == null) {
-      throw new ActivitiIllegalArgumentException("Comment text is required.");
+      throw new FlowableIllegalArgumentException("Comment text is required.");
     }
 
     Comment createdComment = taskService.addComment(null, instance.getId(), comment.getMessage());
@@ -81,7 +81,7 @@ public class HistoricProcessInstanceCommentCollectionResource {
   protected HistoricProcessInstance getHistoricProcessInstanceFromRequest(String processInstanceId) {
     HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
     if (processInstance == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", HistoricProcessInstance.class);
+      throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", HistoricProcessInstance.class);
     }
     return processInstance;
   }

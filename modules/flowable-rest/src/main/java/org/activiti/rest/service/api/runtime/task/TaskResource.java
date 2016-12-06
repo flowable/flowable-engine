@@ -21,11 +21,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.task.Task;
-import org.activiti.rest.exception.ActivitiForbiddenException;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.task.Task;
+import org.flowable.rest.exception.ActivitiForbiddenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -63,7 +63,7 @@ public class TaskResource extends TaskBaseResource {
   public TaskResponse updateTask(@ApiParam(name = "taskId") @PathVariable String taskId, @RequestBody TaskRequest taskRequest, HttpServletRequest request) {
 
     if (taskRequest == null) {
-      throw new ActivitiException("A request body was expected when updating the task.");
+      throw new FlowableException("A request body was expected when updating the task.");
     }
 
     Task task = getTaskFromRequest(taskId);
@@ -112,7 +112,7 @@ public class TaskResource extends TaskBaseResource {
   @ResponseStatus(value = HttpStatus.OK)
   public void executeTaskAction(@ApiParam(name = "taskId") @PathVariable String taskId, @RequestBody TaskActionRequest actionRequest) {
     if (actionRequest == null) {
-      throw new ActivitiException("A request body was expected when executing a task action.");
+      throw new FlowableException("A request body was expected when executing a task action.");
     }
 
     Task task = getTaskFromRequest(taskId);
@@ -130,7 +130,7 @@ public class TaskResource extends TaskBaseResource {
       resolveTask(task, actionRequest);
 
     } else {
-      throw new ActivitiIllegalArgumentException("Invalid action: '" + actionRequest.getAction() + "'.");
+      throw new FlowableIllegalArgumentException("Invalid action: '" + actionRequest.getAction() + "'.");
     }
   }
 
@@ -173,7 +173,7 @@ public class TaskResource extends TaskBaseResource {
       variablesToSet = new HashMap<String, Object>();
       for (RestVariable var : actionRequest.getVariables()) {
         if (var.getName() == null) {
-          throw new ActivitiIllegalArgumentException("Variable name is required");
+          throw new FlowableIllegalArgumentException("Variable name is required");
         }
 
         Object actualVariableValue = restResponseFactory.getVariableValue(var);
@@ -185,7 +185,7 @@ public class TaskResource extends TaskBaseResource {
       transientVariablesToSet = new HashMap<String, Object>();
       for (RestVariable var : actionRequest.getTransientVariables()) {
         if (var.getName() == null) {
-          throw new ActivitiIllegalArgumentException("Transient variable name is required");
+          throw new FlowableIllegalArgumentException("Transient variable name is required");
         }
 
         Object actualVariableValue = restResponseFactory.getVariableValue(var);
@@ -202,7 +202,7 @@ public class TaskResource extends TaskBaseResource {
 
   protected void delegateTask(Task task, TaskActionRequest actionRequest) {
     if (actionRequest.getAssignee() == null) {
-      throw new ActivitiIllegalArgumentException("An assignee is required when delegating a task.");
+      throw new FlowableIllegalArgumentException("An assignee is required when delegating a task.");
     }
     taskService.delegateTask(task.getId(), actionRequest.getAssignee());
   }

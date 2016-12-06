@@ -22,14 +22,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.history.HistoricVariableInstance;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.runtime.ProcessInstanceBuilder;
-import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.history.HistoricVariableInstance;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.ProcessInstanceBuilder;
+import org.flowable.rest.api.DataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -165,19 +165,19 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
   public ProcessInstanceResponse createProcessInstance(@RequestBody ProcessInstanceCreateRequest request, HttpServletRequest httpRequest, HttpServletResponse response) {
 
     if (request.getProcessDefinitionId() == null && request.getProcessDefinitionKey() == null && request.getMessage() == null) {
-      throw new ActivitiIllegalArgumentException("Either processDefinitionId, processDefinitionKey or message is required.");
+      throw new FlowableIllegalArgumentException("Either processDefinitionId, processDefinitionKey or message is required.");
     }
 
     int paramsSet = ((request.getProcessDefinitionId() != null) ? 1 : 0) + ((request.getProcessDefinitionKey() != null) ? 1 : 0) + ((request.getMessage() != null) ? 1 : 0);
 
     if (paramsSet > 1) {
-      throw new ActivitiIllegalArgumentException("Only one of processDefinitionId, processDefinitionKey or message should be set.");
+      throw new FlowableIllegalArgumentException("Only one of processDefinitionId, processDefinitionKey or message should be set.");
     }
 
     if (request.isTenantSet()) {
       // Tenant-id can only be used with either key or message
       if (request.getProcessDefinitionId() != null) {
-        throw new ActivitiIllegalArgumentException("TenantId can only be used with either processDefinitionKey or message.");
+        throw new FlowableIllegalArgumentException("TenantId can only be used with either processDefinitionKey or message.");
       }
     }
 
@@ -186,7 +186,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
       startVariables = new HashMap<String, Object>();
       for (RestVariable variable : request.getVariables()) {
         if (variable.getName() == null) {
-          throw new ActivitiIllegalArgumentException("Variable name is required.");
+          throw new FlowableIllegalArgumentException("Variable name is required.");
         }
         startVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
       }
@@ -197,7 +197,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
       transientVariables = new HashMap<String, Object>();
       for (RestVariable variable : request.getTransientVariables()) {
         if (variable.getName() == null) {
-          throw new ActivitiIllegalArgumentException("Variable name is required.");
+          throw new FlowableIllegalArgumentException("Variable name is required.");
         }
         transientVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
       }
@@ -248,8 +248,8 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         return restResponseFactory.createProcessInstanceResponse(instance);
       }
 
-    } catch (ActivitiObjectNotFoundException aonfe) {
-      throw new ActivitiIllegalArgumentException(aonfe.getMessage(), aonfe);
+    } catch (FlowableObjectNotFoundException aonfe) {
+      throw new FlowableIllegalArgumentException(aonfe.getMessage(), aonfe);
     }
   }
 }

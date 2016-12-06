@@ -18,10 +18,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.repository.Model;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.repository.Model;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,7 +49,7 @@ public class ModelSourceResource extends BaseModelSourceResource {
   byte[] getModelBytes(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletResponse response) {
     byte[] editorSource = repositoryService.getModelEditorSource(modelId);
     if (editorSource == null) {
-      throw new ActivitiObjectNotFoundException("Model with id '" + modelId + "' does not have source available.", String.class);
+      throw new FlowableObjectNotFoundException("Model with id '" + modelId + "' does not have source available.", String.class);
     }
     response.setContentType("application/octet-stream");
     return editorSource;
@@ -67,13 +67,13 @@ public class ModelSourceResource extends BaseModelSourceResource {
     if (model != null) {
 
       if (request instanceof MultipartHttpServletRequest == false) {
-        throw new ActivitiIllegalArgumentException("Multipart request is required");
+        throw new FlowableIllegalArgumentException("Multipart request is required");
       }
 
       MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
 
       if (multipartRequest.getFileMap().size() == 0) {
-        throw new ActivitiIllegalArgumentException("Multipart request with file content is required");
+        throw new FlowableIllegalArgumentException("Multipart request with file content is required");
       }
 
       MultipartFile file = multipartRequest.getFileMap().values().iterator().next();
@@ -82,7 +82,7 @@ public class ModelSourceResource extends BaseModelSourceResource {
         repositoryService.addModelEditorSource(modelId, file.getBytes());
         response.setStatus(HttpStatus.NO_CONTENT.value());
       } catch (Exception e) {
-        throw new ActivitiException("Error adding model editor source extra", e);
+        throw new FlowableException("Error adding model editor source extra", e);
       }
     }
   }

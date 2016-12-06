@@ -4,12 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.activiti.bpmn.model.BoundaryEvent;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.ErrorEventDefinition;
-import org.activiti.bpmn.model.MessageEventDefinition;
-import org.activiti.bpmn.model.SignalEventDefinition;
-import org.activiti.bpmn.model.TimerEventDefinition;
+import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ErrorEventDefinition;
+import org.flowable.bpmn.model.MessageEventDefinition;
+import org.flowable.bpmn.model.SignalEventDefinition;
+import org.flowable.bpmn.model.TimerEventDefinition;
 import org.junit.Test;
 
 public class BoundaryEventConverterTest extends AbstractConverterTest {

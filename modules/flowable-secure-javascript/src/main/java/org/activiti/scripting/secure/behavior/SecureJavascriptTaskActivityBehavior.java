@@ -12,9 +12,9 @@
  */
 package org.activiti.scripting.secure.behavior;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.impl.bpmn.behavior.ScriptTaskActivityBehavior;
 import org.activiti.scripting.secure.impl.SecureJavascriptUtil;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.bpmn.behavior.ScriptTaskActivityBehavior;
 
 /**
  * @author Joram Barrez

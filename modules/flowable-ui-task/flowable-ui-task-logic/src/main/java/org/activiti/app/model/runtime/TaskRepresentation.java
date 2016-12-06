@@ -17,10 +17,10 @@ import java.util.List;
 
 import org.activiti.app.model.common.AbstractRepresentation;
 import org.activiti.app.model.common.UserRepresentation;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.task.TaskInfo;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.task.TaskInfo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;

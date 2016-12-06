@@ -18,8 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.idm.api.Group;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.idm.api.Group;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,7 +47,7 @@ public class GroupMembershipResource extends BaseGroupResource {
     // exception
     if (identityService.createUserQuery().memberOfGroup(group.getId()).userId(userId).count() != 1) {
 
-      throw new ActivitiObjectNotFoundException("User '" + userId + "' is not part of group '" + group.getId() + "'.", null);
+      throw new FlowableObjectNotFoundException("User '" + userId + "' is not part of group '" + group.getId() + "'.", null);
     }
 
     identityService.deleteMembership(userId, group.getId());

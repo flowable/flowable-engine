@@ -18,17 +18,17 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.activiti.engine.FormService;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.spring.ProcessEngineFactoryBean;
-import org.activiti.spring.SpringAsyncExecutor;
-import org.activiti.spring.SpringProcessEngineConfiguration;
+import org.flowable.engine.FormService;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.IdentityService;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
+import org.flowable.spring.ProcessEngineFactoryBean;
+import org.flowable.spring.SpringAsyncExecutor;
+import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;

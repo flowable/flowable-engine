@@ -15,7 +15,7 @@ package org.activiti.app.model.runtime;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.activiti.app.model.common.AbstractRepresentation;
-import org.activiti.engine.repository.ProcessDefinition;
+import org.flowable.engine.repository.ProcessDefinition;
 
 /**
  * REST representation of a process definition.

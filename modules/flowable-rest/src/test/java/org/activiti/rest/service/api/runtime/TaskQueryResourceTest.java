@@ -19,15 +19,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.DelegationState;
-import org.activiti.engine.task.IdentityLinkType;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti.rest.service.BaseSpringRestTestCase;
 import org.activiti.rest.service.api.RestUrls;
 import org.apache.http.HttpStatus;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.DelegationState;
+import org.flowable.engine.task.IdentityLinkType;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;

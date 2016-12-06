@@ -15,13 +15,13 @@ package org.activiti.rest.service.api.runtime;
 
 import java.util.List;
 
-import org.activiti.engine.runtime.Job;
-import org.activiti.engine.test.Deployment;
 import org.activiti.rest.service.BaseSpringRestTestCase;
 import org.activiti.rest.service.api.RestUrls;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.flowable.engine.runtime.Job;
+import org.flowable.engine.test.Deployment;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -34,7 +34,7 @@ public class SignalsResourceTest extends BaseSpringRestTestCase {
   @Deployment(resources = { "org/activiti/rest/service/api/runtime/SignalsResourceTest.process-signal-start.bpmn20.xml" })
   public void testSignalEventReceivedSync() throws Exception {
 
-    org.activiti.engine.repository.Deployment tenantDeployment = repositoryService.createDeployment()
+    org.flowable.engine.repository.Deployment tenantDeployment = repositoryService.createDeployment()
         .addClasspathResource("org/activiti/rest/service/api/runtime/SignalsResourceTest.process-signal-start.bpmn20.xml").tenantId("my tenant").deploy();
 
     try {
@@ -94,7 +94,7 @@ public class SignalsResourceTest extends BaseSpringRestTestCase {
   @Deployment(resources = { "org/activiti/rest/service/api/runtime/SignalsResourceTest.process-signal-start.bpmn20.xml" })
   public void testSignalEventReceivedAsync() throws Exception {
 
-    org.activiti.engine.repository.Deployment tenantDeployment = repositoryService.createDeployment()
+    org.flowable.engine.repository.Deployment tenantDeployment = repositoryService.createDeployment()
         .addClasspathResource("org/activiti/rest/service/api/runtime/SignalsResourceTest.process-signal-start.bpmn20.xml").tenantId("my tenant").deploy();
 
     try {

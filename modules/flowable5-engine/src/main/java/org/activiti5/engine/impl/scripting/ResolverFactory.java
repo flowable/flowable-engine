@@ -13,7 +13,7 @@
 
 package org.activiti5.engine.impl.scripting;
 
-import org.activiti.engine.delegate.VariableScope;
+import org.flowable.engine.delegate.VariableScope;
 
 
 

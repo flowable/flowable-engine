@@ -15,21 +15,21 @@ package org.activiti.validation.validator.impl;
 import java.util.HashMap;
 import java.util.List;
 
-import org.activiti.bpmn.model.BoundaryEvent;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.CancelEventDefinition;
-import org.activiti.bpmn.model.CompensateEventDefinition;
-import org.activiti.bpmn.model.ErrorEventDefinition;
-import org.activiti.bpmn.model.EventDefinition;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.MessageEventDefinition;
-import org.activiti.bpmn.model.Process;
-import org.activiti.bpmn.model.SignalEventDefinition;
-import org.activiti.bpmn.model.TimerEventDefinition;
-import org.activiti.bpmn.model.Transaction;
 import org.activiti.validation.ValidationError;
 import org.activiti.validation.validator.Problems;
 import org.activiti.validation.validator.ProcessLevelValidator;
+import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.CancelEventDefinition;
+import org.flowable.bpmn.model.CompensateEventDefinition;
+import org.flowable.bpmn.model.ErrorEventDefinition;
+import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.MessageEventDefinition;
+import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.SignalEventDefinition;
+import org.flowable.bpmn.model.TimerEventDefinition;
+import org.flowable.bpmn.model.Transaction;
 
 /**
  * @author jbarrez

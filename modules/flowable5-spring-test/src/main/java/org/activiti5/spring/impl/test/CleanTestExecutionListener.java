@@ -1,7 +1,7 @@
 package org.activiti5.spring.impl.test;
 
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.repository.Deployment;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.repository.Deployment;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.support.AbstractTestExecutionListener;
 

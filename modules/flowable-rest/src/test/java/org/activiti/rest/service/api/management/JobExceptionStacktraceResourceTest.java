@@ -3,16 +3,16 @@ package org.activiti.rest.service.api.management;
 import java.util.Calendar;
 import java.util.Collections;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.runtime.Job;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
 import org.activiti.rest.service.BaseSpringRestTestCase;
 import org.activiti.rest.service.api.RestUrls;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 
 /**
  * Test for all REST-operations related to the Job collection and a single job resource.
@@ -37,7 +37,7 @@ public class JobExceptionStacktraceResourceTest extends BaseSpringRestTestCase {
       managementService.moveTimerToExecutableJob(timerJob.getId());
       managementService.executeJob(timerJob.getId());
       fail();
-    } catch (ActivitiException expected) {
+    } catch (FlowableException expected) {
       // Ignore, we expect the exception
     }
 

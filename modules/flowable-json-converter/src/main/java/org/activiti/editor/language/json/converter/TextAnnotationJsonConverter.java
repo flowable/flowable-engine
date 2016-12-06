@@ -14,9 +14,9 @@ package org.activiti.editor.language.json.converter;
 
 import java.util.Map;
 
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.TextAnnotation;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.TextAnnotation;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;

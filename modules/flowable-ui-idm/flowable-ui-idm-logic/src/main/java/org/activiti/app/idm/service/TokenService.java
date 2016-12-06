@@ -12,7 +12,7 @@
  */
 package org.activiti.app.idm.service;
 
-import org.activiti.idm.api.Token;
+import org.flowable.idm.api.Token;
 
 public interface TokenService {
   

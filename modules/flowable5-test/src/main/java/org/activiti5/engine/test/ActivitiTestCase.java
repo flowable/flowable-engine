@@ -17,19 +17,19 @@ import java.util.Date;
 
 import junit.framework.TestCase;
 
-import org.activiti.engine.FormService;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.impl.ProcessEngineImpl;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.TestHelper;
 import org.activiti5.engine.test.mock.ActivitiMockSupport;
+import org.flowable.engine.FormService;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.IdentityService;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.impl.ProcessEngineImpl;
+import org.flowable.engine.test.Deployment;
 
 /**
  * Convenience for ProcessEngine and services initialization in the form of a JUnit base class.

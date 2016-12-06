@@ -12,8 +12,8 @@
  */
 package org.activiti5.engine.impl.delegate;
 
-import org.activiti.engine.impl.delegate.ActivityBehavior;
 import org.activiti5.engine.impl.pvm.delegate.ActivityExecution;
+import org.flowable.engine.impl.delegate.ActivityBehavior;
 
 /**
  * 

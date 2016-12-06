@@ -13,7 +13,7 @@
 
 package org.activiti.rest.service.api.engine.variable;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -98,7 +98,7 @@ public class RestVariable {
           return s;
         }
       }
-      throw new ActivitiIllegalArgumentException("Invalid variable scope: '" + scope + "'");
+      throw new FlowableIllegalArgumentException("Invalid variable scope: '" + scope + "'");
     } else {
       return null;
     }

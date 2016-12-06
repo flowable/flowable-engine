@@ -15,10 +15,10 @@ package org.activiti.app.service.editor.mapper;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.bpmn.model.FormProperty;
-import org.activiti.bpmn.model.UserTask;
 import org.activiti.editor.language.json.converter.util.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.FormProperty;
+import org.flowable.bpmn.model.UserTask;
 
 public class UserTaskInfoMapper extends AbstractInfoMapper {
 

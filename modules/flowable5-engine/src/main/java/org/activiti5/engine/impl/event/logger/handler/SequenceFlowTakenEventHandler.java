@@ -3,9 +3,9 @@ package org.activiti5.engine.impl.event.logger.handler;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiSequenceFlowTakenEvent;
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.persistence.entity.EventLogEntryEntity;
+import org.flowable.engine.delegate.event.FlowableSequenceFlowTakenEvent;
 
 /**
  * @author Joram Barrez
@@ -14,7 +14,7 @@ public class SequenceFlowTakenEventHandler extends AbstractDatabaseEventLoggerEv
 	
 	@Override
 	public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
-		ActivitiSequenceFlowTakenEvent sequenceFlowTakenEvent = (ActivitiSequenceFlowTakenEvent) event;
+		FlowableSequenceFlowTakenEvent sequenceFlowTakenEvent = (FlowableSequenceFlowTakenEvent) event;
 		
 		Map<String, Object> data = new HashMap<String, Object>();
 		putInMapIfNotNull(data, Fields.ID, sequenceFlowTakenEvent.getId());

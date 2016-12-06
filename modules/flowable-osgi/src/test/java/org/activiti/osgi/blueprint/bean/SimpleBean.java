@@ -12,8 +12,8 @@
  */
 package org.activiti.osgi.blueprint.bean;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.JavaDelegate;
 
 public class SimpleBean implements JavaDelegate {
 

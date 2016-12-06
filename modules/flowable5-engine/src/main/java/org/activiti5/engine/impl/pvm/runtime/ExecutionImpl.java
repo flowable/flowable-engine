@@ -20,11 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.bpmn.model.ActivitiListener;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.engine.impl.persistence.entity.VariableInstance;
-import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.activiti.engine.impl.util.ProcessDefinitionUtil;
 import org.activiti5.engine.impl.pvm.PvmActivity;
 import org.activiti5.engine.impl.pvm.PvmException;
 import org.activiti5.engine.impl.pvm.PvmExecution;
@@ -38,6 +33,11 @@ import org.activiti5.engine.impl.pvm.delegate.SignallableActivityBehavior;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
 import org.activiti5.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti5.engine.impl.pvm.process.TransitionImpl;
+import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.engine.impl.persistence.entity.VariableInstance;
+import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -411,7 +411,7 @@ public class ExecutionImpl implements
     if (currentFlowElement == null) {
       String processDefinitionId = getProcessDefinitionId();
       if (processDefinitionId != null) {
-        org.activiti.bpmn.model.Process process = ProcessDefinitionUtil.getProcess(processDefinitionId);
+        org.flowable.bpmn.model.Process process = ProcessDefinitionUtil.getProcess(processDefinitionId);
         currentFlowElement = process.getFlowElement(getCurrentActivityId(), true);
       }
     }

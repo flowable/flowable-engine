@@ -22,8 +22,8 @@ import org.activiti.app.domain.editor.ModelHistory;
 import org.activiti.app.model.editor.ModelKeyRepresentation;
 import org.activiti.app.model.editor.ModelRepresentation;
 import org.activiti.app.model.editor.ReviveModelResultRepresentation;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.idm.api.User;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.idm.api.User;
 
 public interface ModelService {
 

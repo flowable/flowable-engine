@@ -17,8 +17,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.common.runtime.ClockReader;
-import org.activiti.idm.api.Group;
+import org.flowable.engine.common.runtime.ClockReader;
+import org.flowable.idm.api.Group;
 
 /**
  * Simple cache for groups a user belongs to, which avoid hitting the LDAP system too much. Groups are fetched internally by the engine for exampe when doing queries, eg when fetching tasks for a

@@ -16,18 +16,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.EventListener;
-import org.activiti.bpmn.model.ImplementationType;
-import org.activiti.bpmn.model.Process;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.delegate.event.impl.ActivitiEventSupport;
-import org.activiti.engine.impl.bpmn.data.IOSpecification;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti5.engine.impl.el.ExpressionManager;
 import org.activiti5.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti5.engine.impl.task.TaskDefinition;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.EventListener;
+import org.flowable.bpmn.model.ImplementationType;
+import org.flowable.bpmn.model.Process;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.delegate.event.impl.FlowableEventSupport;
+import org.flowable.engine.impl.bpmn.data.IOSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,7 +112,7 @@ public class ProcessParseHandler extends AbstractBpmnParseHandler<Process> {
     if (eventListeners != null && !eventListeners.isEmpty()) {
       for (EventListener eventListener : eventListeners) {
         // Extract specific event-types (if any)
-        ActivitiEngineEventType[] types = ActivitiEngineEventType.getTypesFromString(eventListener.getEvents());
+        FlowableEngineEventType[] types = FlowableEngineEventType.getTypesFromString(eventListener.getEvents());
 
         if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(eventListener.getImplementationType())) {
           getEventSupport(bpmnParse.getBpmnModel()).addEventListener(bpmnParse.getListenerFactory().createClassDelegateEventListener(eventListener), types);
@@ -135,7 +135,7 @@ public class ProcessParseHandler extends AbstractBpmnParseHandler<Process> {
 
   }
   
-  protected ActivitiEventSupport getEventSupport(BpmnModel bpmnModel) {
-    return (ActivitiEventSupport) bpmnModel.getEventSupport();
+  protected FlowableEventSupport getEventSupport(BpmnModel bpmnModel) {
+    return (FlowableEventSupport) bpmnModel.getEventSupport();
   }
 }

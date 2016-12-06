@@ -3,10 +3,10 @@ package org.activiti5.standalone.cfg;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.task.Task;
 import org.activiti5.engine.impl.cmd.AbstractCustomSqlExecution;
 import org.activiti5.engine.impl.cmd.CustomSqlExecution;
 import org.activiti5.engine.impl.test.ResourceActivitiTestCase;
+import org.flowable.engine.task.Task;
 
 /**
  * @author jbarrez

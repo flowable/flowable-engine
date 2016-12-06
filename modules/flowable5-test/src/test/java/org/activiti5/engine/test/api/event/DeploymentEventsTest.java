@@ -12,15 +12,15 @@
  */
 package org.activiti5.engine.test.api.event;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.DeploymentProperties;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.DeploymentProperties;
 
 /**
- * Test case for all {@link ActivitiEvent}s related to deployments.
+ * Test case for all {@link FlowableEvent}s related to deployments.
  * 
  * @author Frederik Heremans
  */
@@ -43,15 +43,15 @@ public class DeploymentEventsTest extends PluggableActivitiTestCase {
 			
 			// Check create-event
 			assertEquals(2, listener.getEventsReceived().size());
-			assertTrue(listener.getEventsReceived().get(0) instanceof ActivitiEntityEvent);
+			assertTrue(listener.getEventsReceived().get(0) instanceof FlowableEntityEvent);
 			
-			ActivitiEntityEvent event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(ActivitiEngineEventType.ENTITY_CREATED, event.getType());
+			FlowableEntityEvent event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+			assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
 			assertEquals(deployment.getId(), ((org.activiti5.engine.repository.Deployment) event.getEntity()).getId());
 			
-			assertTrue(listener.getEventsReceived().get(1) instanceof ActivitiEntityEvent);
-			event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
-			assertEquals(ActivitiEngineEventType.ENTITY_INITIALIZED, event.getType());
+			assertTrue(listener.getEventsReceived().get(1) instanceof FlowableEntityEvent);
+			event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
+			assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
 			assertEquals(deployment.getId(), ((org.activiti5.engine.repository.Deployment) event.getEntity()).getId());
 			
 			listener.clearEventsReceived();
@@ -59,10 +59,10 @@ public class DeploymentEventsTest extends PluggableActivitiTestCase {
 			// Check update event when category is updated
 			repositoryService.setDeploymentCategory(deployment.getId(), "test");
 			assertEquals(1, listener.getEventsReceived().size());
-			assertTrue(listener.getEventsReceived().get(0) instanceof ActivitiEntityEvent);
+			assertTrue(listener.getEventsReceived().get(0) instanceof FlowableEntityEvent);
 			
-			event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, event.getType());
+			event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+			assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
 			assertEquals(deployment.getId(), ((org.activiti5.engine.repository.Deployment) event.getEntity()).getId());
 			assertEquals("test", ((org.activiti5.engine.repository.Deployment) event.getEntity()).getCategory());
 			listener.clearEventsReceived();
@@ -70,10 +70,10 @@ public class DeploymentEventsTest extends PluggableActivitiTestCase {
 		  // Check delete event when category is updated
 			repositoryService.deleteDeployment(deployment.getId(), true);
 			assertEquals(1, listener.getEventsReceived().size());
-			assertTrue(listener.getEventsReceived().get(0) instanceof ActivitiEntityEvent);
+			assertTrue(listener.getEventsReceived().get(0) instanceof FlowableEntityEvent);
 			
-			event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(ActivitiEngineEventType.ENTITY_DELETED, event.getType());
+			event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+			assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
 			assertEquals(deployment.getId(), ((org.activiti5.engine.repository.Deployment) event.getEntity()).getId());
 			listener.clearEventsReceived();
 			

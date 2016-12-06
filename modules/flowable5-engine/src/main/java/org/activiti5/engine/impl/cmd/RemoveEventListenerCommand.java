@@ -12,10 +12,10 @@
  */
 package org.activiti5.engine.impl.cmd;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.impl.interceptor.Command;
 import org.activiti5.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 
 /**
  * Command that removes an event-listener to the Activiti engine.
@@ -24,9 +24,9 @@ import org.activiti5.engine.impl.interceptor.CommandContext;
  */
 public class RemoveEventListenerCommand implements Command<Void> {
 	
-	protected ActivitiEventListener listener;
+	protected FlowableEventListener listener;
 	
-	public RemoveEventListenerCommand(ActivitiEventListener listener) {
+	public RemoveEventListenerCommand(FlowableEventListener listener) {
 	  super();
 	  this.listener = listener;
   }

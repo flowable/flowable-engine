@@ -21,11 +21,11 @@ import org.activiti.app.idm.model.UserInformation;
 import org.activiti.app.service.exception.BadRequestException;
 import org.activiti.app.service.exception.ConflictingRequestException;
 import org.activiti.app.service.exception.NotFoundException;
-import org.activiti.idm.api.Group;
-import org.activiti.idm.api.Privilege;
-import org.activiti.idm.api.User;
-import org.activiti.idm.api.UserQuery;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.Privilege;
+import org.flowable.idm.api.User;
+import org.flowable.idm.api.UserQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -12,7 +12,7 @@
  */
 package org.activiti.spring.integration;
 
-import org.activiti.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngine;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.MessagingException;
@@ -43,7 +43,7 @@ public class Activiti {
     /**
      * Any message that enters this {@link org.springframework.messaging.MessageHandler}
      * containing a {@code executionId} parameter will trigger a
-     * {@link org.activiti.engine.RuntimeService#signal(String)}.
+     * {@link org.flowable.engine.RuntimeService#signal(String)}.
      */
     public static MessageHandler signallingMessageHandler(final ProcessEngine processEngine) {
         return new MessageHandler() {

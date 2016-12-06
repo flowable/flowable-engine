@@ -12,7 +12,7 @@
  */
 package org.activiti.app.security;
 
-import org.activiti.idm.api.User;
+import org.flowable.idm.api.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;

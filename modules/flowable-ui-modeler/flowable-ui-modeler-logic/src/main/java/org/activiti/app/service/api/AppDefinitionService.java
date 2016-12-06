@@ -17,7 +17,7 @@ import java.util.List;
 import org.activiti.app.model.editor.AppDefinitionRepresentation;
 import org.activiti.app.model.editor.AppDefinitionSaveRepresentation;
 import org.activiti.app.model.editor.AppDefinitionUpdateResultRepresentation;
-import org.activiti.idm.api.User;
+import org.flowable.idm.api.User;
 
 public interface AppDefinitionService {
 

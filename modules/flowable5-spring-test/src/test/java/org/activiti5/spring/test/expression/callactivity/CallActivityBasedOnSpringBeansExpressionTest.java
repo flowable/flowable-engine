@@ -8,11 +8,11 @@
 
 package org.activiti5.spring.test.expression.callactivity;
 
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.task.TaskQuery;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.task.TaskQuery;
+import org.flowable.engine.test.Deployment;
 import org.springframework.test.context.ContextConfiguration;
 
 /**

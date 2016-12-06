@@ -16,10 +16,10 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import org.activiti.engine.task.IdentityLink;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.history.HistoricTaskInstanceQuery;
 import org.activiti5.engine.query.Query;
+import org.flowable.engine.task.IdentityLink;
 
 /**
  * Interface containing shared methods between the {@link TaskQuery} and the {@link HistoricTaskInstanceQuery}.

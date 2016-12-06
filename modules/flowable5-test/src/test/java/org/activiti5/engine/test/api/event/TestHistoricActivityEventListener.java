@@ -15,22 +15,22 @@ package org.activiti5.engine.test.api.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
  * @author Joram Barrez
  */
-public class TestHistoricActivityEventListener implements ActivitiEventListener {
+public class TestHistoricActivityEventListener implements FlowableEventListener {
 
-  private List<ActivitiEvent> eventsReceived;
+  private List<FlowableEvent> eventsReceived;
   
   public TestHistoricActivityEventListener() {
-    eventsReceived = new ArrayList<ActivitiEvent>();
+    eventsReceived = new ArrayList<FlowableEvent>();
   }
   
-  public List<ActivitiEvent> getEventsReceived() {
+  public List<FlowableEvent> getEventsReceived() {
     return eventsReceived;
   }
   
@@ -39,11 +39,11 @@ public class TestHistoricActivityEventListener implements ActivitiEventListener 
   }
   
   @Override
-  public void onEvent(ActivitiEvent event) {
-    if (event.getType().equals(ActivitiEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED)
-        || event.getType().equals(ActivitiEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED)
-        || event.getType().equals(ActivitiEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED)
-        || event.getType().equals(ActivitiEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED)) {
+  public void onEvent(FlowableEvent event) {
+    if (event.getType().equals(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED)
+        || event.getType().equals(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED)
+        || event.getType().equals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED)
+        || event.getType().equals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED)) {
           eventsReceived.add(event);
         }
   }

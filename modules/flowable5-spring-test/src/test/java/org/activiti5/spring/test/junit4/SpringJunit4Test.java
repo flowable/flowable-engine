@@ -16,12 +16,12 @@ package org.activiti5.spring.test.junit4;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.test.ActivitiRule;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;

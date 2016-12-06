@@ -18,9 +18,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.idm.api.Group;
-import org.activiti.rest.exception.ActivitiConflictException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.idm.api.Group;
+import org.flowable.rest.exception.ActivitiConflictException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,7 +48,7 @@ public class GroupMembershipCollectionResource extends BaseGroupResource {
     Group group = getGroupFromRequest(groupId);
 
     if (memberShip.getUserId() == null) {
-      throw new ActivitiIllegalArgumentException("UserId cannot be null.");
+      throw new FlowableIllegalArgumentException("UserId cannot be null.");
     }
 
     // Check if user is member of group since API doesn't return typed

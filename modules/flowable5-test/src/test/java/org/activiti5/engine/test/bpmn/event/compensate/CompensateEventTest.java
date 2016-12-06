@@ -13,14 +13,14 @@
 
 package org.activiti5.engine.test.bpmn.event.compensate;
 
-import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricActivityInstanceQuery;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti5.engine.test.bpmn.event.compensate.helper.SetVariablesDelegate;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricActivityInstanceQuery;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 
 
 /**

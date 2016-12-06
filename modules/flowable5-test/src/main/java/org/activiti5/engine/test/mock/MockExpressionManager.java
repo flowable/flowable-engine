@@ -13,7 +13,6 @@
 
 package org.activiti5.engine.test.mock;
 
-import org.activiti.engine.delegate.VariableScope;
 import org.activiti5.engine.impl.el.ExpressionManager;
 import org.activiti5.engine.impl.el.VariableScopeElResolver;
 import org.activiti5.engine.impl.javax.el.ArrayELResolver;
@@ -22,6 +21,7 @@ import org.activiti5.engine.impl.javax.el.CompositeELResolver;
 import org.activiti5.engine.impl.javax.el.ELResolver;
 import org.activiti5.engine.impl.javax.el.ListELResolver;
 import org.activiti5.engine.impl.javax.el.MapELResolver;
+import org.flowable.engine.delegate.VariableScope;
 
 public class MockExpressionManager extends ExpressionManager {
 

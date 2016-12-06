@@ -12,9 +12,9 @@
  */
 package org.activiti.management.jmx;
 
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.cfg.AbstractProcessEngineConfigurator;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.cfg.AbstractProcessEngineConfigurator;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -13,8 +13,8 @@
 
 package org.activiti5.spring.test.transaction;
 
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;

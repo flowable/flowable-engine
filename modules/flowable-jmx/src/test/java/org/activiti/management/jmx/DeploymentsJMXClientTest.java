@@ -35,9 +35,9 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.RepositoryService;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.RepositoryService;
 import org.junit.Test;
 
 /**

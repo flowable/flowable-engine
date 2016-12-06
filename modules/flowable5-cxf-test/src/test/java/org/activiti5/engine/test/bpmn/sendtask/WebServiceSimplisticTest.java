@@ -15,8 +15,8 @@ package org.activiti5.engine.test.bpmn.sendtask;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.test.bpmn.servicetask.AbstractWebServiceTaskTest;
+import org.flowable.engine.test.Deployment;
 
 /**
  * @author Esteban Robles Luna

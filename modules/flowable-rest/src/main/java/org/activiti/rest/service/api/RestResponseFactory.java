@@ -19,36 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.activiti.dmn.api.DecisionTable;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.form.FormData;
-import org.activiti.engine.form.FormProperty;
-import org.activiti.engine.form.StartFormData;
-import org.activiti.engine.form.TaskFormData;
-import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricDetail;
-import org.activiti.engine.history.HistoricFormProperty;
-import org.activiti.engine.history.HistoricIdentityLink;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.history.HistoricVariableInstance;
-import org.activiti.engine.history.HistoricVariableUpdate;
-import org.activiti.engine.impl.bpmn.deployer.ResourceNameUtil;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.Model;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.runtime.Job;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Attachment;
-import org.activiti.engine.task.Comment;
-import org.activiti.engine.task.Event;
-import org.activiti.engine.task.IdentityLink;
-import org.activiti.engine.task.Task;
-import org.activiti.form.api.FormDefinition;
-import org.activiti.idm.api.Group;
-import org.activiti.idm.api.User;
-import org.activiti.rest.application.ContentTypeResolver;
 import org.activiti.rest.service.api.engine.AttachmentResponse;
 import org.activiti.rest.service.api.engine.CommentResponse;
 import org.activiti.rest.service.api.engine.EventResponse;
@@ -89,6 +59,36 @@ import org.activiti.rest.service.api.runtime.process.ExecutionResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.dmn.api.DecisionTable;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.form.FormData;
+import org.flowable.engine.form.FormProperty;
+import org.flowable.engine.form.StartFormData;
+import org.flowable.engine.form.TaskFormData;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricDetail;
+import org.flowable.engine.history.HistoricFormProperty;
+import org.flowable.engine.history.HistoricIdentityLink;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.history.HistoricVariableInstance;
+import org.flowable.engine.history.HistoricVariableUpdate;
+import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.Model;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Attachment;
+import org.flowable.engine.task.Comment;
+import org.flowable.engine.task.Event;
+import org.flowable.engine.task.IdentityLink;
+import org.flowable.engine.task.Task;
+import org.flowable.form.api.FormDefinition;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.User;
+import org.flowable.rest.application.ContentTypeResolver;
 
 /**
  * Default implementation of a {@link RestResponseFactory}.
@@ -351,7 +351,7 @@ public class RestResponseFactory {
         }
       }
       if (converter == null) {
-        throw new ActivitiIllegalArgumentException("Variable '" + restVariable.getName() + "' has unsupported type: '" + restVariable.getType() + "'.");
+        throw new FlowableIllegalArgumentException("Variable '" + restVariable.getName() + "' has unsupported type: '" + restVariable.getType() + "'.");
       }
       value = converter.getVariableValue(restVariable);
 
@@ -376,7 +376,7 @@ public class RestResponseFactory {
         }
       }
       if (converter == null) {
-        throw new ActivitiIllegalArgumentException("Variable '" + restVariable.getName() + "' has unsupported type: '" + restVariable.getType() + "'.");
+        throw new FlowableIllegalArgumentException("Variable '" + restVariable.getName() + "' has unsupported type: '" + restVariable.getType() + "'.");
       }
 
       RestVariable temp = new RestVariable();

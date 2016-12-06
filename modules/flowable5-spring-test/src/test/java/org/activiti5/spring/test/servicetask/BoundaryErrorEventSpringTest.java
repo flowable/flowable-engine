@@ -13,9 +13,9 @@
 
 package org.activiti5.spring.test.servicetask;
 
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 import org.springframework.test.context.ContextConfiguration;
 
 /**

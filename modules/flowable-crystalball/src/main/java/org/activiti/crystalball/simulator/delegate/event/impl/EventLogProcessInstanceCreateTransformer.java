@@ -19,8 +19,8 @@ import java.util.Map;
 
 import org.activiti.crystalball.simulator.CrystalballException;
 import org.activiti.crystalball.simulator.SimulationEvent;
-import org.activiti.engine.event.EventLogEntry;
-import org.activiti.engine.impl.event.logger.handler.Fields;
+import org.flowable.engine.event.EventLogEntry;
+import org.flowable.engine.impl.event.logger.handler.Fields;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

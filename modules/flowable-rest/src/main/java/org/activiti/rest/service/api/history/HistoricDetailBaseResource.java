@@ -16,12 +16,12 @@ package org.activiti.rest.service.api.history;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.common.api.query.QueryProperty;
-import org.activiti.engine.history.HistoricDetailQuery;
-import org.activiti.engine.impl.HistoricDetailQueryProperty;
-import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.engine.history.HistoricDetailQuery;
+import org.flowable.engine.impl.HistoricDetailQueryProperty;
+import org.flowable.rest.api.DataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

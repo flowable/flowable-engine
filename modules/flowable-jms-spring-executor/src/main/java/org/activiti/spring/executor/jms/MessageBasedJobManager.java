@@ -18,14 +18,14 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
-import org.activiti.engine.common.impl.cfg.TransactionState;
-import org.activiti.engine.impl.asyncexecutor.DefaultJobManager;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.cfg.TransactionListener;
-import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.impl.persistence.entity.JobEntity;
-import org.activiti.engine.runtime.Job;
+import org.flowable.engine.common.impl.cfg.TransactionState;
+import org.flowable.engine.impl.asyncexecutor.DefaultJobManager;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.cfg.TransactionListener;
+import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.runtime.Job;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 

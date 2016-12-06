@@ -21,19 +21,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipInputStream;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.EndEvent;
-import org.activiti.bpmn.model.ParallelGateway;
-import org.activiti.bpmn.model.StartEvent;
-import org.activiti.bpmn.model.UserTask;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.repository.Model;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.EndEvent;
+import org.flowable.bpmn.model.ParallelGateway;
+import org.flowable.bpmn.model.StartEvent;
+import org.flowable.bpmn.model.UserTask;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.repository.Model;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.test.Deployment;
 
 /**
  * @author Frederik Heremans
@@ -89,7 +89,7 @@ public class RepositoryServiceTest extends PluggableActivitiTestCase {
     try {
       repositoryService.deleteDeployment(null);    
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("deploymentId is null", ae.getMessage());
     }
   }
@@ -98,7 +98,7 @@ public class RepositoryServiceTest extends PluggableActivitiTestCase {
     try {
       repositoryService.deleteDeployment(null, true);    
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("deploymentId is null", ae.getMessage());
     }
   }
@@ -107,7 +107,7 @@ public class RepositoryServiceTest extends PluggableActivitiTestCase {
     try {
       repositoryService.deleteDeployment("foobar");
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("Could not find a deployment with id 'foobar'.", ae.getMessage());
     } catch (Throwable t) {
       fail("Unexpected exception: " + t);
@@ -118,7 +118,7 @@ public class RepositoryServiceTest extends PluggableActivitiTestCase {
     try {
       repositoryService.deleteDeployment("foobar", true);
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("Could not find a deployment with id 'foobar'.", ae.getMessage());
     } catch (Throwable t) {
       fail("Unexpected exception: " + t);
@@ -141,7 +141,7 @@ public class RepositoryServiceTest extends PluggableActivitiTestCase {
     try {
       repositoryService.getDeploymentResourceNames(null);    
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("deploymentId is null", ae.getMessage());
     }
   }
@@ -153,7 +153,7 @@ public class RepositoryServiceTest extends PluggableActivitiTestCase {
     Date inThreeDays = new Date(startTime.getTime() + (3 * 24 * 60 * 60 * 1000));
     
     // Deploy process, but activate after three days
-    org.activiti.engine.repository.Deployment deployment = repositoryService.createDeployment()
+    org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment()
             .addClasspathResource("org/activiti5/engine/test/api/oneTaskProcess.bpmn20.xml")
             .addClasspathResource("org/activiti5/engine/test/api/twoTasksProcess.bpmn20.xml")
             .activateProcessDefinitionsOn(inThreeDays)
@@ -169,7 +169,7 @@ public class RepositoryServiceTest extends PluggableActivitiTestCase {
     try {
       runtimeService.startProcessInstanceByKey("oneTaskProcess");
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertTextPresentIgnoreCase("suspended", e.getMessage());
     }
     
@@ -194,12 +194,12 @@ public class RepositoryServiceTest extends PluggableActivitiTestCase {
   @Deployment(resources = { "org/activiti5/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testGetResourceAsStreamUnexistingResourceInExistingDeployment() {
     // Get hold of the deployment id
-    org.activiti.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
+    org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
     
     try {
       repositoryService.getResourceAsStream(deployment.getId(), "org/activiti5/engine/test/api/unexistingProcess.bpmn.xml");
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("no resource found with name", ae.getMessage());
       assertEquals(InputStream.class, ae.getObjectClass());
     }
@@ -211,9 +211,9 @@ public class RepositoryServiceTest extends PluggableActivitiTestCase {
     try {
       repositoryService.getResourceAsStream("unexistingdeployment", "org/activiti5/engine/test/api/unexistingProcess.bpmn.xml");
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("deployment does not exist", ae.getMessage());
-      assertEquals(org.activiti.engine.repository.Deployment.class, ae.getObjectClass());
+      assertEquals(org.flowable.engine.repository.Deployment.class, ae.getObjectClass());
     }
   }
   
@@ -222,14 +222,14 @@ public class RepositoryServiceTest extends PluggableActivitiTestCase {
     try {
       repositoryService.getResourceAsStream(null, "resource");    
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("deploymentId is null", ae.getMessage());
     }
     
     try {
       repositoryService.getResourceAsStream("deployment", null);    
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("resourceName is null", ae.getMessage());
     }
   }
@@ -339,7 +339,7 @@ public class RepositoryServiceTest extends PluggableActivitiTestCase {
     assertTrue(!bpmnModel.getFlowLocationMap().isEmpty());
     
     // Test the flow
-    org.activiti.bpmn.model.Process process = bpmnModel.getProcesses().get(0);
+    org.flowable.bpmn.model.Process process = bpmnModel.getProcesses().get(0);
     List<StartEvent> startEvents = process.findFlowElementsOfType(StartEvent.class); 
     assertEquals(1, startEvents.size());
     StartEvent startEvent = startEvents.get(0);
@@ -396,7 +396,7 @@ public class RepositoryServiceTest extends PluggableActivitiTestCase {
 	  
 	  
 	  // Delete
-	  for (org.activiti.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+	  for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
 		  repositoryService.deleteDeployment(deployment.getId(), true);
 	  }
   }

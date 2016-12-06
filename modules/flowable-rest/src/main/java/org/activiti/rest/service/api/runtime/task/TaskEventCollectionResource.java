@@ -18,8 +18,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import io.swagger.annotations.*;
-import org.activiti.engine.history.HistoricTaskInstance;
+
 import org.activiti.rest.service.api.engine.EventResponse;
+import org.flowable.engine.history.HistoricTaskInstance;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

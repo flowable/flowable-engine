@@ -21,7 +21,7 @@ import org.activiti.app.model.common.UserRepresentation;
 import org.activiti.app.security.SecurityUtils;
 import org.activiti.app.service.exception.NotFoundException;
 import org.activiti.app.service.exception.UnauthorizedException;
-import org.activiti.idm.api.Group;
+import org.flowable.idm.api.Group;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

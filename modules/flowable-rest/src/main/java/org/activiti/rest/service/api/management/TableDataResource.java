@@ -17,13 +17,13 @@ import java.util.Map;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.common.api.management.TablePage;
-import org.activiti.engine.common.api.management.TablePageQuery;
-import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.api.management.TablePage;
+import org.flowable.engine.common.api.management.TablePageQuery;
+import org.flowable.rest.api.DataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,14 +61,14 @@ public class TableDataResource {
   public DataResponse getTableData(@ApiParam(name = "tableName") @PathVariable String tableName, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
     // Check if table exists before continuing
     if (managementService.getTableMetaData(tableName) == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a table with name '" + tableName + "'.", String.class);
+      throw new FlowableObjectNotFoundException("Could not find a table with name '" + tableName + "'.", String.class);
     }
 
     String orderAsc = allRequestParams.get("orderAscendingColumn");
     String orderDesc = allRequestParams.get("orderDescendingColumn");
 
     if (orderAsc != null && orderDesc != null) {
-      throw new ActivitiIllegalArgumentException("Only one of 'orderAscendingColumn' or 'orderDescendingColumn' can be supplied.");
+      throw new FlowableIllegalArgumentException("Only one of 'orderAscendingColumn' or 'orderDescendingColumn' can be supplied.");
     }
 
     Integer start = null;

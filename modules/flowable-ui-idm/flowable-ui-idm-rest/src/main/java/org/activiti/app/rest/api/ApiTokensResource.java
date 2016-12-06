@@ -15,7 +15,7 @@ package org.activiti.app.rest.api;
 import org.activiti.app.idm.model.TokenRepresentation;
 import org.activiti.app.idm.service.TokenService;
 import org.activiti.app.service.exception.NotFoundException;
-import org.activiti.idm.api.Token;
+import org.flowable.idm.api.Token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

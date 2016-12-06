@@ -15,15 +15,15 @@ package org.activiti5.engine.test.bpmn.subprocess.transaction;
 
 import java.util.List;
 
-import org.activiti.engine.impl.EventSubscriptionQueryImpl;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.impl.EventSubscriptionQueryImpl;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 
 /**

@@ -22,11 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.bpmn.model.ActivitiListener;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.impl.util.ProcessDefinitionUtil;
-import org.activiti.engine.runtime.Job;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ProcessEngineConfiguration;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
@@ -62,6 +57,11 @@ import org.activiti5.engine.impl.pvm.runtime.OutgoingExecution;
 import org.activiti5.engine.impl.pvm.runtime.StartingExecution;
 import org.activiti5.engine.runtime.Execution;
 import org.activiti5.engine.runtime.ProcessInstance;
+import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -288,9 +288,9 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-        ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_CREATED, createdExecution));
+        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, createdExecution));
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-              ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_INITIALIZED, createdExecution));
+              ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, createdExecution));
     }
 
     return createdExecution;
@@ -312,7 +312,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-        ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_CREATED, subProcessInstance));
+        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, subProcessInstance));
     }
     return subProcessInstance;
   }
@@ -422,7 +422,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
       if(!isUserTask && Context.getProcessEngineConfiguration() != null 
       		&& Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createSignalEvent(
-      		ActivitiEngineEventType.ACTIVITY_SIGNALED, signalledActivityId, signalName, signalData, this.id, this.processInstanceId, this.processDefinitionId));
+      		FlowableEngineEventType.ACTIVITY_SIGNALED, signalledActivityId, signalName, signalData, this.id, this.processInstanceId, this.processDefinitionId));
       }
       
     } catch (RuntimeException e) {
@@ -606,7 +606,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 	protected void fireActivityCompletedEvent() {
 	  if(Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
     	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createActivityEvent(ActivitiEngineEventType.ACTIVITY_COMPLETED, 
+    			ActivitiEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, 
     					getActivity() != null ? getActivity().getId() : getActivityId(), 
     					getActivity() != null ? (String) getActivity().getProperties().get("name") : null,
     					getId(),
@@ -1007,7 +1007,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     
     if(Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
     	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_DELETED, this));
+    			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
     }
 
     // finally delete this execution
@@ -1224,7 +1224,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     // Dispatch event, if needed
     if(Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
   		Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-  				ActivitiEventBuilder.createVariableEvent(ActivitiEngineEventType.VARIABLE_CREATED, variableName, value, result.getType(), result.getTaskId(), 
+  				ActivitiEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_CREATED, variableName, value, result.getType(), result.getTaskId(), 
   						result.getExecutionId(), getProcessInstanceId(), getProcessDefinitionId()));
     }
     return result;
@@ -1238,7 +1238,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     // Dispatch event, if needed
     if(Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
     	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createVariableEvent(ActivitiEngineEventType.VARIABLE_UPDATED, variableInstance.getName(), value, variableInstance.getType(), 
+    			ActivitiEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_UPDATED, variableInstance.getName(), value, variableInstance.getType(), 
     					variableInstance.getTaskId(), variableInstance.getExecutionId(), getProcessInstanceId(), getProcessDefinitionId()));
     }
   }
@@ -1297,7 +1297,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     if (currentFlowElement == null) {
       String processDefinitionId = getProcessDefinitionId();
       if (processDefinitionId != null) {
-        org.activiti.bpmn.model.Process process = ProcessDefinitionUtil.getProcess(processDefinitionId);
+        org.flowable.bpmn.model.Process process = ProcessDefinitionUtil.getProcess(processDefinitionId);
         currentFlowElement = process.getFlowElement(getCurrentActivityId(), true);
       }
     }
@@ -1765,7 +1765,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
       
       if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-      			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_UPDATED, this));
+      			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, this));
       }
       
       return bzKey;

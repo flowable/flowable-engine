@@ -22,17 +22,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.impl.persistence.entity.TaskEntity;
-import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.DelegationState;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.task.TaskQuery;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.DelegationState;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.task.TaskQuery;
+import org.flowable.engine.test.Deployment;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -85,7 +85,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail("expected exception");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // OK
     }
   }
@@ -117,7 +117,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       taskService.createTaskQuery().taskId(null);
       fail("expected exception");
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       // OK
     }
   }
@@ -134,7 +134,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       taskService.createTaskQuery().taskId(null);
       fail("expected exception");
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       // OK
     }
   }
@@ -147,7 +147,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail("expected exception");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // OK
     }
   }
@@ -163,7 +163,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail("expected exception");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // OK
     }
   }
@@ -180,7 +180,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
         .taskId("invalid")
         .taskName(null).singleResult();
       fail("expected exception");
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       // OK
     }
   }
@@ -200,7 +200,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
         .taskId("invalid")
         .taskName(null).singleResult();
       fail("expected exception");
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       // OK
     }
   }
@@ -217,7 +217,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail("expected exception");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // OK
     }
   }
@@ -234,7 +234,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail("expected exception");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // OK
     }
   }
@@ -254,7 +254,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail("expected exception");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // OK
     }
   }
@@ -274,7 +274,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail("expected exception");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // OK
     }
   }
@@ -293,7 +293,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
           .taskId("invalid")
           .taskNameIn(null).singleResult();
       fail("expected exception");
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       // OK
     }
   }
@@ -312,7 +312,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
           .taskId("invalid")
           .taskNameIn(null).singleResult();
       fail("expected exception");
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       // OK
     }
   }
@@ -334,7 +334,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
           .taskId("invalid")
           .taskNameIn(null).singleResult();
       fail("expected exception");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // OK
     }
   }
@@ -356,7 +356,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
           .taskId("invalid")
           .taskNameIn(null).singleResult();
       fail("expected exception");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // OK
     }
   }
@@ -390,7 +390,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
         .taskId("invalid")
         .taskNameLike(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) { }
+    } catch (FlowableIllegalArgumentException e) { }
   }
   
   public void testQueryByInvalidNameLikeOr() {
@@ -408,7 +408,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
         .taskId("invalid")
         .taskNameLike(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) { }
+    } catch (FlowableIllegalArgumentException e) { }
   }
   
   public void testQueryByDescription() {
@@ -419,7 +419,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ActivitiException e) {}
+    } catch (FlowableException e) {}
   }
   
   public void testQueryByDescriptionOr() {
@@ -433,7 +433,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ActivitiException e) {}
+    } catch (FlowableException e) {}
   }
   
   public void testQueryByInvalidDescription() {
@@ -448,7 +448,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
         .taskId("invalid")
         .taskDescription(null).list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       
     }
   }
@@ -468,7 +468,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
         .taskId("invalid")
         .taskDescription(null).list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       
     }
   }
@@ -502,7 +502,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
         .taskId("invalid")
         .taskDescriptionLike(null).list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       
     }
   }
@@ -522,7 +522,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
         .taskId("invalid")
         .taskDescriptionLike(null).list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       
     }
   }
@@ -535,7 +535,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ActivitiException e) {}
+    } catch (FlowableException e) {}
     
     query = taskService.createTaskQuery().taskPriority(100);
     assertNull(query.singleResult());
@@ -567,7 +567,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ActivitiException e) {}
+    } catch (FlowableException e) {}
     
     query = taskService.createTaskQuery()
         .or()
@@ -606,7 +606,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       taskService.createTaskQuery().taskPriority(null);
       fail("expected exception");
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       // OK
     }
   }
@@ -618,7 +618,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
         .taskId("invalid")
         .taskPriority(null);
       fail("expected exception");
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       // OK
     }
   }
@@ -721,7 +721,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       taskService.createTaskQuery().taskAssignee(null).list();
       fail("expected exception");
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       // OK
     }
   }
@@ -732,7 +732,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
          .taskId("invalid")
          .taskAssignee(null).list();
       fail("expected exception");
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       // OK
     }
   }
@@ -759,7 +759,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail("expected exception");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // OK
     }
 
@@ -769,7 +769,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail("expected exception");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // OK
     }
   }
@@ -783,7 +783,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail("expected exception");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // OK
     }
     
@@ -796,7 +796,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail("expected exception");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // OK
     }
   }
@@ -805,7 +805,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       taskService.createTaskQuery().taskCandidateUser(null).list();
       fail();
-    } catch(ActivitiIllegalArgumentException e) {}
+    } catch(FlowableIllegalArgumentException e) {}
   }
   
   public void testQueryByNullCandidateUserOr() {
@@ -815,7 +815,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
         .taskId("invalid")
         .taskCandidateUser(null).list();
       fail();
-    } catch(ActivitiIllegalArgumentException e) {}
+    } catch(FlowableIllegalArgumentException e) {}
   }
   
   public void testQueryByCandidateGroup() {
@@ -825,7 +825,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail("expected exception");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // OK
     }
 
@@ -844,7 +844,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail("expected exception");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // OK
     }
     
@@ -956,7 +956,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       taskService.createTaskQuery().taskCandidateGroup(null).list();
       fail("expected exception");
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       // OK
     }
   }
@@ -968,7 +968,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
         .taskId("invalid")
         .taskCandidateGroup(null).list();
       fail("expected exception");
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       // OK
     }
   }
@@ -982,7 +982,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail("expected exception");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // OK
     }
     
@@ -1018,7 +1018,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail("expected exception");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // OK
     }
     
@@ -1053,13 +1053,13 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     try {
       taskService.createTaskQuery().taskCandidateGroupIn(null).list();
       fail("expected exception");
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       // OK
     }
     try {
       taskService.createTaskQuery().taskCandidateGroupIn(new ArrayList<String>()).list();
       fail("expected exception");
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       // OK
     }
   }
@@ -1071,7 +1071,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
         .taskId("invalid")
         .taskCandidateGroupIn(null).list();
       fail("expected exception");
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       // OK
     }
     try {
@@ -1080,7 +1080,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
          .taskId("invalid")
         .taskCandidateGroupIn(new ArrayList<String>()).list();
       fail("expected exception");
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       // OK
     }
   }
@@ -2581,7 +2581,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
   
   @Deployment(resources={"org/activiti5/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
   public void testQueryByDeploymentId() throws Exception {
-    org.activiti.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
+    org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
     assertNotNull(taskService.createTaskQuery().deploymentId(deployment.getId()).singleResult());
     assertEquals(1, taskService.createTaskQuery().deploymentId(deployment.getId()).count());
@@ -2591,7 +2591,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
   
   @Deployment(resources={"org/activiti5/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
   public void testQueryByDeploymentIdOr() throws Exception {
-    org.activiti.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
+    org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
     assertNotNull(taskService.createTaskQuery()
         .or()
@@ -2610,7 +2610,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
   
   @Deployment(resources={"org/activiti5/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
   public void testQueryByDeploymentIdIn() throws Exception {
-    org.activiti.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
+    org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
     List<String> deploymentIds = new ArrayList<String>();
     deploymentIds.add(deployment.getId());
@@ -2629,7 +2629,7 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
   
   @Deployment(resources={"org/activiti5/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
   public void testQueryByDeploymentIdInOr() throws Exception {
-    org.activiti.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
+    org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
     List<String> deploymentIds = new ArrayList<String>();
     deploymentIds.add(deployment.getId());

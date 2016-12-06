@@ -22,13 +22,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.history.HistoricVariableInstance;
-import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.history.HistoricVariableInstance;
+import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -74,13 +74,13 @@ public class HistoricVariableInstanceDataResource {
         response.setContentType("application/x-java-serialized-object");
 
       } else {
-        throw new ActivitiObjectNotFoundException("The variable does not have a binary data stream.", null);
+        throw new FlowableObjectNotFoundException("The variable does not have a binary data stream.", null);
       }
       return result;
 
     } catch (IOException ioe) {
       // Re-throw IOException
-      throw new ActivitiException("Unexpected exception getting variable data", ioe);
+      throw new FlowableException("Unexpected exception getting variable data", ioe);
     }
   }
 
@@ -88,7 +88,7 @@ public class HistoricVariableInstanceDataResource {
     HistoricVariableInstance varObject = historyService.createHistoricVariableInstanceQuery().id(varInstanceId).singleResult();
 
     if (varObject == null) {
-      throw new ActivitiObjectNotFoundException("Historic variable instance '" + varInstanceId + "' couldn't be found.", VariableInstanceEntity.class);
+      throw new FlowableObjectNotFoundException("Historic variable instance '" + varInstanceId + "' couldn't be found.", VariableInstanceEntity.class);
     } else {
       return restResponseFactory.createRestVariable(varObject.getVariableName(), varObject.getValue(), null, varInstanceId, RestResponseFactory.VARIABLE_HISTORY_VARINSTANCE, includeBinary);
     }

@@ -14,8 +14,9 @@
 package org.activiti.rest.service.api.repository;
 
 import io.swagger.annotations.*;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.engine.repository.ProcessDefinition;
+
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

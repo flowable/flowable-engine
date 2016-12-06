@@ -1,11 +1,11 @@
 package org.activiti.crystalball.simulator;
 
-import org.activiti.engine.common.api.ActivitiException;
+import org.flowable.engine.common.api.FlowableException;
 
 /**
  * @author martin.grofcik
  */
-public class CrystalballException extends ActivitiException {
+public class CrystalballException extends FlowableException {
 
   private static final long serialVersionUID = 1L;
 

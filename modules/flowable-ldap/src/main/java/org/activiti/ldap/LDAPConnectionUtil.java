@@ -18,7 +18,7 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.directory.InitialDirContext;
 
-import org.activiti.engine.common.api.ActivitiException;
+import org.flowable.engine.common.api.FlowableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +54,7 @@ public class LDAPConnectionUtil {
       context = new InitialDirContext(properties);
     } catch (NamingException e) {
     	LOGGER.warn("Could not create InitialDirContext for LDAP connection : " + e.getMessage());
-      throw new ActivitiException("Could not create InitialDirContext for LDAP connection : " + e.getMessage(), e);
+      throw new FlowableException("Could not create InitialDirContext for LDAP connection : " + e.getMessage(), e);
     }
     return context;
   }

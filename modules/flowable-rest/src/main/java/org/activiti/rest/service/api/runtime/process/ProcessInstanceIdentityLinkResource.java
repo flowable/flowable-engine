@@ -20,11 +20,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.IdentityLink;
 import org.activiti.rest.service.api.engine.RestIdentityLink;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.IdentityLink;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -78,10 +78,10 @@ public class ProcessInstanceIdentityLinkResource extends BaseProcessInstanceReso
 
   protected void validateIdentityLinkArguments(String identityId, String type) {
     if (identityId == null) {
-      throw new ActivitiIllegalArgumentException("IdentityId is required.");
+      throw new FlowableIllegalArgumentException("IdentityId is required.");
     }
     if (type == null) {
-      throw new ActivitiIllegalArgumentException("Type is required.");
+      throw new FlowableIllegalArgumentException("Type is required.");
     }
   }
 
@@ -94,6 +94,6 @@ public class ProcessInstanceIdentityLinkResource extends BaseProcessInstanceReso
         return link;
       }
     }
-    throw new ActivitiObjectNotFoundException("Could not find the requested identity link.", IdentityLink.class);
+    throw new FlowableObjectNotFoundException("Could not find the requested identity link.", IdentityLink.class);
   }
 }

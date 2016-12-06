@@ -3,14 +3,14 @@ package org.activiti5.engine.test.api.repository;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.bpmn.converter.BpmnXMLConverter;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.ExtensionElement;
-import org.activiti.bpmn.model.Lane;
-import org.activiti.bpmn.model.Process;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.test.ActivitiRule;
-import org.activiti.engine.test.Deployment;
+import org.flowable.bpmn.converter.BpmnXMLConverter;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ExtensionElement;
+import org.flowable.bpmn.model.Lane;
+import org.flowable.bpmn.model.Process;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.test.FlowableRule;
+import org.flowable.engine.test.Deployment;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,7 +21,7 @@ import org.junit.Test;
 public class LaneExtensionTest {
 
   @Rule
-  public ActivitiRule activitiRule = new ActivitiRule();
+  public FlowableRule activitiRule = new FlowableRule();
 
   @Test
   @Deployment

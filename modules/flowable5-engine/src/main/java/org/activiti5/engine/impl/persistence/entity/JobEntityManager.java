@@ -18,9 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
-import org.activiti.engine.runtime.Job;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.ProcessEngineConfiguration;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
@@ -30,6 +27,9 @@ import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.interceptor.CommandContextCloseListener;
 import org.activiti5.engine.impl.jobexecutor.AsyncJobAddedNotification;
 import org.activiti5.engine.impl.persistence.AbstractManager;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.engine.runtime.Job;
 
 
 /**
@@ -72,7 +72,7 @@ public class JobEntityManager extends AbstractManager {
     for (TimerJobEntity timer: timers) {
       if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
         Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.JOB_CANCELED, timer));
+          ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timer));
       }
       timer.delete();
     }

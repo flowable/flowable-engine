@@ -14,9 +14,9 @@ package org.activiti.test.ldap;
 
 import java.util.Date;
 
-import org.activiti.engine.test.Deployment;
 import org.activiti.ldap.LDAPGroupCache;
 import org.activiti.ldap.LDAPGroupCache.LDAPGroupCacheListener;
+import org.flowable.engine.test.Deployment;
 import org.activiti.ldap.LDAPIdentityServiceImpl;
 import org.springframework.test.context.ContextConfiguration;
 

@@ -17,14 +17,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.query.QueryProperty;
-import org.activiti.engine.history.HistoricVariableInstanceQuery;
-import org.activiti.engine.impl.HistoricVariableInstanceQueryProperty;
-import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.QueryVariable;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.engine.history.HistoricVariableInstanceQuery;
+import org.flowable.engine.impl.HistoricVariableInstanceQueryProperty;
+import org.flowable.rest.api.DataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -86,10 +86,10 @@ public class HistoricVariableInstanceBaseResource {
   protected void addVariables(HistoricVariableInstanceQuery variableInstanceQuery, List<QueryVariable> variables) {
     for (QueryVariable variable : variables) {
       if (variable.getVariableOperation() == null) {
-        throw new ActivitiIllegalArgumentException("Variable operation is missing for variable: " + variable.getName());
+        throw new FlowableIllegalArgumentException("Variable operation is missing for variable: " + variable.getName());
       }
       if (variable.getValue() == null) {
-        throw new ActivitiIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+        throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
       }
 
       boolean nameLess = variable.getName() == null;
@@ -98,7 +98,7 @@ public class HistoricVariableInstanceBaseResource {
 
       // A value-only query is only possible using equals-operator
       if (nameLess) {
-        throw new ActivitiIllegalArgumentException("Value-only query (without a variable-name) is not supported");
+        throw new FlowableIllegalArgumentException("Value-only query (without a variable-name) is not supported");
       }
 
       switch (variable.getVariableOperation()) {
@@ -108,7 +108,7 @@ public class HistoricVariableInstanceBaseResource {
         break;
 
       default:
-        throw new ActivitiIllegalArgumentException("Unsupported variable query operation: " + variable.getVariableOperation());
+        throw new FlowableIllegalArgumentException("Unsupported variable query operation: " + variable.getVariableOperation());
       }
     }
   }

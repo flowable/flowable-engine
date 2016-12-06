@@ -14,8 +14,8 @@ package org.activiti5.engine.impl.variable;
 
 import java.util.UUID;
 
-import org.activiti.engine.impl.variable.ValueFields;
-import org.activiti.engine.impl.variable.VariableType;
+import org.flowable.engine.impl.variable.ValueFields;
+import org.flowable.engine.impl.variable.VariableType;
 
 /**
  * @author Birger Zimmermann

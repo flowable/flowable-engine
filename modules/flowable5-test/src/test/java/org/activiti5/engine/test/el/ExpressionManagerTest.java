@@ -16,10 +16,10 @@ package org.activiti5.engine.test.el;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.impl.identity.Authentication;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.impl.identity.Authentication;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 
 /**
  * @author Frederik Heremans

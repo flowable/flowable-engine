@@ -12,7 +12,9 @@
  */
 package org.activiti.rest.exception;
 
-import org.activiti.engine.ActivitiTaskAlreadyClaimedException;
+import org.flowable.engine.ActivitiTaskAlreadyClaimedException;
+import org.flowable.rest.exception.BaseExceptionHandlerAdvice;
+import org.flowable.rest.exception.ErrorInfo;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;

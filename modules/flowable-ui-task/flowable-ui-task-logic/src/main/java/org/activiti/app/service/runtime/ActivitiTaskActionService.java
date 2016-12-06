@@ -24,17 +24,17 @@ import org.activiti.app.service.exception.BadRequestException;
 import org.activiti.app.service.exception.NotFoundException;
 import org.activiti.app.service.exception.NotPermittedException;
 import org.activiti.app.service.util.TaskUtil;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.history.HistoricIdentityLink;
-import org.activiti.engine.task.IdentityLink;
-import org.activiti.engine.task.IdentityLinkType;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.task.TaskInfo;
-import org.activiti.idm.api.User;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.IdentityService;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.history.HistoricIdentityLink;
+import org.flowable.engine.task.IdentityLink;
+import org.flowable.engine.task.IdentityLinkType;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.task.TaskInfo;
+import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +86,7 @@ public class ActivitiTaskActionService {
 
     try {
       taskService.complete(task.getId());
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       logger.error("Error completing task " + taskId, e);
       throw new BadRequestException("Task " + taskId + " can't be completed", e);
     }
@@ -192,7 +192,7 @@ public class ActivitiTaskActionService {
 
     try {
       taskService.claim(task.getId(), String.valueOf(currentUser.getId()));
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       throw new BadRequestException("Task " + taskId + " can't be claimed", e);
     }
   }
@@ -221,7 +221,7 @@ public class ActivitiTaskActionService {
       String currentUserIdString = String.valueOf(currentUser.getId());
       addIdentiyLinkForUser(task, currentUserIdString, IdentityLinkType.PARTICIPANT);
 
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       throw new BadRequestException("Task " + task.getId() + " can't be assigned", e);
     }
   }

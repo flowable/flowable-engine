@@ -16,7 +16,7 @@ import org.activiti.app.domain.editor.Model;
 import org.activiti.app.domain.editor.ModelHistory;
 import org.activiti.app.service.api.ModelService;
 import org.activiti.app.service.editor.BpmnDisplayJsonConverter;
-import org.activiti.bpmn.model.GraphicInfo;
+import org.flowable.bpmn.model.GraphicInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

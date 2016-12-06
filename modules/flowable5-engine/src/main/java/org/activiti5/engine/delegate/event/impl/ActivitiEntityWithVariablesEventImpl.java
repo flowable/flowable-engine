@@ -14,22 +14,22 @@ package org.activiti5.engine.delegate.event.impl;
 
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEntityWithVariablesEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
+import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.delegate.event.FlowableEntityWithVariablesEvent;
 
 /**
- * Base class for all {@link ActivitiEntityEvent} implementations, related to entities with variables.
+ * Base class for all {@link FlowableEntityEvent} implementations, related to entities with variables.
  * 
  * @author Tijs Rademakers
  */
 @SuppressWarnings("rawtypes")
-public class ActivitiEntityWithVariablesEventImpl extends ActivitiEntityEventImpl implements ActivitiEntityWithVariablesEvent {
+public class ActivitiEntityWithVariablesEventImpl extends ActivitiEntityEventImpl implements FlowableEntityWithVariablesEvent {
 
   protected Map variables;
   protected boolean localScope;
   
-  public ActivitiEntityWithVariablesEventImpl(Object entity, Map variables, boolean localScope, ActivitiEngineEventType type) {
+  public ActivitiEntityWithVariablesEventImpl(Object entity, Map variables, boolean localScope, FlowableEngineEventType type) {
 		super(entity, type);
 		
 		this.variables = variables;

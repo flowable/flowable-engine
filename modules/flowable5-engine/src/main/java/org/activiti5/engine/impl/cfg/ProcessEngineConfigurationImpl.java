@@ -30,26 +30,6 @@ import javax.naming.InitialContext;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.common.impl.util.DefaultClockImpl;
-import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
-import org.activiti.engine.form.AbstractFormType;
-import org.activiti.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
-import org.activiti.engine.impl.bpmn.data.ItemInstance;
-import org.activiti.engine.impl.bpmn.webservice.MessageInstance;
-import org.activiti.engine.impl.calendar.BusinessCalendarManager;
-import org.activiti.engine.impl.calendar.CycleBusinessCalendar;
-import org.activiti.engine.impl.calendar.DueDateBusinessCalendar;
-import org.activiti.engine.impl.calendar.DurationBusinessCalendar;
-import org.activiti.engine.impl.calendar.MapBusinessCalendarManager;
-import org.activiti.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
-import org.activiti.engine.impl.persistence.deploy.DefaultDeploymentCache;
-import org.activiti.engine.impl.persistence.deploy.DeploymentCache;
-import org.activiti.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
-import org.activiti.engine.impl.variable.VariableType;
-import org.activiti.engine.impl.variable.VariableTypes;
-import org.activiti.idm.api.IdmIdentityService;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.activiti.validation.ProcessValidator;
 import org.activiti.validation.ProcessValidatorFactory;
@@ -225,6 +205,26 @@ import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.apache.ibatis.type.JdbcType;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.engine.common.impl.util.DefaultClockImpl;
+import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.form.AbstractFormType;
+import org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
+import org.flowable.engine.impl.bpmn.data.ItemInstance;
+import org.flowable.engine.impl.bpmn.webservice.MessageInstance;
+import org.flowable.engine.impl.calendar.BusinessCalendarManager;
+import org.flowable.engine.impl.calendar.CycleBusinessCalendar;
+import org.flowable.engine.impl.calendar.DueDateBusinessCalendar;
+import org.flowable.engine.impl.calendar.DurationBusinessCalendar;
+import org.flowable.engine.impl.calendar.MapBusinessCalendarManager;
+import org.flowable.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
+import org.flowable.engine.impl.persistence.deploy.DefaultDeploymentCache;
+import org.flowable.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
+import org.flowable.engine.impl.variable.VariableType;
+import org.flowable.engine.impl.variable.VariableTypes;
+import org.flowable.idm.api.IdmIdentityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -260,7 +260,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // IDM ENGINE SERVICES /////////////////////////////////////////////////////
   protected boolean idmEngineInitialized;
   protected IdmIdentityService idmIdentityService;
-  protected ActivitiEventDispatcher idmEventDispatcher;
+  protected FlowableEventDispatcher idmEventDispatcher;
   
   // COMMAND EXECUTORS ////////////////////////////////////////////////////////
   
@@ -573,7 +573,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected ObjectMapper objectMapper = new ObjectMapper();
   
   protected boolean enableEventDispatcher = true;
-  protected ActivitiEventDispatcher eventDispatcher;
+  protected FlowableEventDispatcher eventDispatcher;
   
   // Event logging to database
   protected boolean enableDatabaseEventLogging = false;
@@ -1723,11 +1723,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public ActivitiEventDispatcher getIdmEventDispatcher() {
+  public FlowableEventDispatcher getIdmEventDispatcher() {
     return idmEventDispatcher;
   }
 
-  public ProcessEngineConfigurationImpl setIdmEventDispatcher(ActivitiEventDispatcher idmEventDispatcher) {
+  public ProcessEngineConfigurationImpl setIdmEventDispatcher(FlowableEventDispatcher idmEventDispatcher) {
     this.idmEventDispatcher = idmEventDispatcher;
     return this;
   }
@@ -2266,11 +2266,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
   
-  public ActivitiEventDispatcher getEventDispatcher() {
+  public FlowableEventDispatcher getEventDispatcher() {
 	  return eventDispatcher;
   }
   
-  public void setEventDispatcher(ActivitiEventDispatcher eventDispatcher) {
+  public void setEventDispatcher(FlowableEventDispatcher eventDispatcher) {
 	  this.eventDispatcher = eventDispatcher;
   }
   

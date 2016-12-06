@@ -18,8 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.idm.api.Group;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.idm.api.Group;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -64,7 +64,7 @@ public class GroupResource extends BaseGroupResource {
       }
       identityService.saveGroup(group);
     } else {
-      throw new ActivitiIllegalArgumentException("Key provided in request body doesn't match the key in the resource URL.");
+      throw new FlowableIllegalArgumentException("Key provided in request body doesn't match the key in the resource URL.");
     }
 
     return restResponseFactory.createGroupResponse(group);

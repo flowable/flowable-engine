@@ -20,10 +20,10 @@ import java.util.concurrent.TimeUnit;
 
 import javax.jms.ConnectionFactory;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
-import org.activiti.spring.impl.test.CleanTestExecutionListener;
 import org.activiti.test.spring.executor.jms.config.SpringJmsConfig;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
+import org.flowable.spring.impl.test.CleanTestExecutionListener;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

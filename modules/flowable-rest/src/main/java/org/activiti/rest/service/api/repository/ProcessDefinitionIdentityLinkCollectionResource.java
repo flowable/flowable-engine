@@ -20,10 +20,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.rest.service.api.engine.RestIdentityLink;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.task.IdentityLinkType;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -68,11 +68,11 @@ public class ProcessDefinitionIdentityLinkCollectionResource extends BaseProcess
     ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
 
     if (identityLink.getGroup() == null && identityLink.getUser() == null) {
-      throw new ActivitiIllegalArgumentException("A group or a user is required to create an identity link.");
+      throw new FlowableIllegalArgumentException("A group or a user is required to create an identity link.");
     }
 
     if (identityLink.getGroup() != null && identityLink.getUser() != null) {
-      throw new ActivitiIllegalArgumentException("Only one of user or group can be used to create an identity link.");
+      throw new FlowableIllegalArgumentException("Only one of user or group can be used to create an identity link.");
     }
 
     if (identityLink.getGroup() != null) {

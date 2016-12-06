@@ -20,9 +20,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,7 +60,7 @@ public class TableResource {
     }
 
     if (response == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a table with name '" + tableName + "'.", String.class);
+      throw new FlowableObjectNotFoundException("Could not find a table with name '" + tableName + "'.", String.class);
     }
     return response;
   }

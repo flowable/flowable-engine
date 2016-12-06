@@ -12,7 +12,7 @@
  */
 package org.activiti.app.service.editor.mapper;
 
-import org.activiti.bpmn.model.ReceiveTask;
+import org.flowable.bpmn.model.ReceiveTask;
 
 public class ReceiveTaskInfoMapper extends AbstractInfoMapper {
 

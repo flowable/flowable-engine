@@ -15,8 +15,8 @@ package org.activiti.rest.service.api.runtime.process;
 
 import java.util.List;
 
-import org.activiti.rest.api.PaginateRequest;
 import org.activiti.rest.service.api.engine.variable.QueryVariable;
+import org.flowable.rest.api.PaginateRequest;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;

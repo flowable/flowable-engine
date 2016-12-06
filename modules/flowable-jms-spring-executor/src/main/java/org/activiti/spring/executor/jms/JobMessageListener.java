@@ -15,8 +15,8 @@ package org.activiti.spring.executor.jms;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
-import org.activiti.engine.impl.asyncexecutor.ExecuteAsyncRunnable;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.asyncexecutor.ExecuteAsyncRunnable;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -17,7 +17,7 @@ import org.activiti.app.idm.service.UserService;
 import org.activiti.app.model.common.GroupRepresentation;
 import org.activiti.app.model.common.UserRepresentation;
 import org.activiti.app.service.exception.NotFoundException;
-import org.activiti.idm.api.Group;
+import org.flowable.idm.api.Group;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

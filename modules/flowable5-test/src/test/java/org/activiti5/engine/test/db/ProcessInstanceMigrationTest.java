@@ -15,23 +15,23 @@ package org.activiti5.engine.test.db;
 
 import java.util.List;
 
-import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.ActivitiObjectNotFoundException;
 import org.activiti5.engine.impl.cmd.SetProcessDefinitionVersionCmd;
 import org.activiti5.engine.impl.interceptor.CommandExecutor;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 
 /**
@@ -134,7 +134,7 @@ public class ProcessInstanceMigrationTest extends PluggableActivitiTestCase {
     assertNotNull(execution);
     
     // deploy new version of the process definition
-    org.activiti.engine.repository.Deployment deployment = repositoryService
+    org.flowable.engine.repository.Deployment deployment = repositoryService
       .createDeployment()
       .addClasspathResource(TEST_PROCESS_ACTIVITY_MISSING)
       .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
@@ -168,7 +168,7 @@ public class ProcessInstanceMigrationTest extends PluggableActivitiTestCase {
     assertNotNull(execution);
     
     // deploy new version of the process definition
-    org.activiti.engine.repository.Deployment deployment = repositoryService
+    org.flowable.engine.repository.Deployment deployment = repositoryService
       .createDeployment()
       .addClasspathResource(TEST_PROCESS)
       .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
@@ -225,7 +225,7 @@ public class ProcessInstanceMigrationTest extends PluggableActivitiTestCase {
     assertEquals(2, taskService.createTaskQuery().count());
     
     // deploy new version of the process definition
-    org.activiti.engine.repository.Deployment deployment = repositoryService
+    org.flowable.engine.repository.Deployment deployment = repositoryService
       .createDeployment()
       .addClasspathResource(TEST_PROCESS_WITH_PARALLEL_GATEWAY)
       .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
@@ -268,7 +268,7 @@ public class ProcessInstanceMigrationTest extends PluggableActivitiTestCase {
     assertNotNull(execution);
     
     // deploy new version of the process definition
-    org.activiti.engine.repository.Deployment deployment = repositoryService
+    org.flowable.engine.repository.Deployment deployment = repositoryService
       .createDeployment()
       .addClasspathResource(TEST_PROCESS_CALL_ACTIVITY)
       .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
@@ -299,7 +299,7 @@ public class ProcessInstanceMigrationTest extends PluggableActivitiTestCase {
       assertEquals(1, taskService.createTaskQuery().processInstanceId(pi.getId()).count());
       
       // deploy new version of the process definition
-      org.activiti.engine.repository.Deployment deployment = repositoryService.createDeployment()
+      org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment()
         .addClasspathResource(TEST_PROCESS_USER_TASK_V2)
         .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
@@ -345,7 +345,7 @@ public class ProcessInstanceMigrationTest extends PluggableActivitiTestCase {
     assertEquals(2, taskService.createTaskQuery().count());
 
     // deploy new version of the process definition
-    org.activiti.engine.repository.Deployment deployment = repositoryService
+    org.flowable.engine.repository.Deployment deployment = repositoryService
             .createDeployment()
             .addClasspathResource(TEST_PROCESS_NESTED_SUB_EXECUTIONS)
             .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)

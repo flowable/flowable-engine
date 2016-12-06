@@ -14,16 +14,16 @@ package org.activiti.validation.validator.impl;
 
 import java.util.List;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.CancelEventDefinition;
-import org.activiti.bpmn.model.EndEvent;
-import org.activiti.bpmn.model.EventDefinition;
-import org.activiti.bpmn.model.FlowElementsContainer;
-import org.activiti.bpmn.model.Process;
-import org.activiti.bpmn.model.Transaction;
 import org.activiti.validation.ValidationError;
 import org.activiti.validation.validator.Problems;
 import org.activiti.validation.validator.ProcessLevelValidator;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.CancelEventDefinition;
+import org.flowable.bpmn.model.EndEvent;
+import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.FlowElementsContainer;
+import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.Transaction;
 
 /**
  * @author jbarrez

@@ -12,18 +12,18 @@
  */
 package org.activiti5.engine.impl.bpmn.helper;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.impl.util.ReflectUtil;
+import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 
 /**
- * An {@link ActivitiEventListener} implementation which uses a classname to
- * create a delegate {@link ActivitiEventListener} instance to use for event notification.
+ * An {@link FlowableEventListener} implementation which uses a classname to
+ * create a delegate {@link FlowableEventListener} instance to use for event notification.
  * <br><br>
  * 
- * In case an entityClass was passed in the constructor, only events that are {@link ActivitiEntityEvent}'s
+ * In case an entityClass was passed in the constructor, only events that are {@link FlowableEntityEvent}'s
  * that target an entity of the given type, are dispatched to the delegate.
  *  
  * @author Frederik Heremans
@@ -31,7 +31,7 @@ import org.activiti5.engine.impl.util.ReflectUtil;
 public class DelegateActivitiEventListener extends BaseDelegateEventListener {
 
 	protected String className;
-	protected ActivitiEventListener delegateInstance;
+	protected FlowableEventListener delegateInstance;
 	protected boolean failOnException = true;
 
 	public DelegateActivitiEventListener(String className, Class<?> entityClass) {
@@ -40,7 +40,7 @@ public class DelegateActivitiEventListener extends BaseDelegateEventListener {
 	}
 
 	@Override
-	public void onEvent(ActivitiEvent event) {
+	public void onEvent(FlowableEvent event) {
 		if (isValidEvent(event)) {
 			getDelegateInstance().onEvent(event);
 		}
@@ -54,16 +54,16 @@ public class DelegateActivitiEventListener extends BaseDelegateEventListener {
 		return failOnException;
 	}
 	
-	protected ActivitiEventListener getDelegateInstance() {
+	protected FlowableEventListener getDelegateInstance() {
 		if (delegateInstance == null) {
 			Object instance = ReflectUtil.instantiate(className);
-			if (instance instanceof ActivitiEventListener) {
-				delegateInstance = (ActivitiEventListener) instance;
+			if (instance instanceof FlowableEventListener) {
+				delegateInstance = (FlowableEventListener) instance;
 			} else {
 				// Force failing of the listener invocation, since the delegate cannot be created
 				failOnException = true;
 				throw new ActivitiIllegalArgumentException("Class " + className
-				    + " does not implement " + ActivitiEventListener.class.getName());
+				    + " does not implement " + FlowableEventListener.class.getName());
 			}
 		}
 		return delegateInstance;

@@ -21,11 +21,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.query.QueryProperty;
-import org.activiti.engine.impl.ModelQueryProperty;
-import org.activiti.engine.repository.Model;
-import org.activiti.engine.repository.ModelQuery;
-import org.activiti.rest.api.DataResponse;
+import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.engine.impl.ModelQueryProperty;
+import org.flowable.engine.repository.Model;
+import org.flowable.engine.repository.ModelQuery;
+import org.flowable.rest.api.DataResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

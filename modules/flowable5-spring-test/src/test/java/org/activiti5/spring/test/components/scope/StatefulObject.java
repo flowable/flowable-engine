@@ -1,6 +1,6 @@
 package org.activiti5.spring.test.components.scope;
 
-import org.activiti.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;

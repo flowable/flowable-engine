@@ -15,18 +15,18 @@ package org.activiti5.engine.test.api.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 
-public class TestActivitiEventListener implements ActivitiEventListener {
+public class TestActivitiEventListener implements FlowableEventListener {
 
-	private List<ActivitiEvent> eventsReceived;
+	private List<FlowableEvent> eventsReceived;
 	
 	public TestActivitiEventListener() {
-		eventsReceived = new ArrayList<ActivitiEvent>();
+		eventsReceived = new ArrayList<FlowableEvent>();
   }
 	
-	public List<ActivitiEvent> getEventsReceived() {
+	public List<FlowableEvent> getEventsReceived() {
 	  return eventsReceived;
   }
 	
@@ -35,7 +35,7 @@ public class TestActivitiEventListener implements ActivitiEventListener {
 	}
 	
 	@Override
-	public void onEvent(ActivitiEvent event) {
+	public void onEvent(FlowableEvent event) {
 		eventsReceived.add(event);
 	}
 

@@ -3,9 +3,9 @@ package org.activiti.test.spring.boot;
 
 import javax.persistence.EntityManagerFactory;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.activiti.spring.boot.JpaProcessEngineAutoConfiguration;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;

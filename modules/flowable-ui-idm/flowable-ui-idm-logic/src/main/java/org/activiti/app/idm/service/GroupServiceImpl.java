@@ -17,11 +17,11 @@ import java.util.List;
 import org.activiti.app.idm.constant.GroupTypes;
 import org.activiti.app.service.exception.BadRequestException;
 import org.activiti.app.service.exception.NotFoundException;
-import org.activiti.idm.api.Group;
-import org.activiti.idm.api.GroupQuery;
-import org.activiti.idm.api.User;
-import org.activiti.idm.api.UserQuery;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.GroupQuery;
+import org.flowable.idm.api.User;
+import org.flowable.idm.api.UserQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

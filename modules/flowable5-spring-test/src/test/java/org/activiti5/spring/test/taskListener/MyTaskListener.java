@@ -13,8 +13,8 @@
 
 package org.activiti5.spring.test.taskListener;
 
-import org.activiti.engine.delegate.DelegateTask;
-import org.activiti.engine.delegate.TaskListener;
+import org.flowable.engine.delegate.DelegateTask;
+import org.flowable.engine.delegate.TaskListener;
 
 /**
  * @author Joram Barrez

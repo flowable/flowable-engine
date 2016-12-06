@@ -18,7 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiOptimisticLockingException;
 import org.activiti5.engine.ActivitiTaskAlreadyClaimedException;
@@ -58,6 +57,7 @@ import org.activiti5.engine.impl.persistence.entity.VariableInstanceEntityManage
 import org.activiti5.engine.impl.pvm.runtime.AtomicOperation;
 import org.activiti5.engine.impl.pvm.runtime.InterpretableExecution;
 import org.activiti5.engine.logging.LogMDC;
+import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -399,7 +399,7 @@ public class CommandContext {
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
 	  return processEngineConfiguration;
   }
-  public ActivitiEventDispatcher getEventDispatcher() {
+  public FlowableEventDispatcher getEventDispatcher() {
   	return processEngineConfiguration.getEventDispatcher();
   }
 }

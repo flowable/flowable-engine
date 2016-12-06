@@ -17,14 +17,14 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.activiti.dmn.engine.DmnEngine;
-import org.activiti.dmn.engine.deployer.DmnDeployer;
-import org.activiti.dmn.spring.SpringDmnEngineConfiguration;
-import org.activiti.engine.cfg.AbstractProcessEngineConfigurator;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.persistence.deploy.Deployer;
-import org.activiti.spring.SpringProcessEngineConfiguration;
+import org.flowable.dmn.engine.DmnEngine;
+import org.flowable.dmn.engine.deployer.DmnDeployer;
+import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
+import org.flowable.engine.cfg.AbstractProcessEngineConfigurator;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.persistence.deploy.Deployer;
+import org.flowable.spring.SpringProcessEngineConfiguration;
 
 /**
  * @author Tijs Rademakers
@@ -60,7 +60,7 @@ public class SpringDmnEngineConfigurator extends AbstractProcessEngineConfigurat
       dmnEngineConfiguration.setDataSource(originalDatasource);
       
     } else {
-      throw new ActivitiException("A datasource is required for initializing the DMN engine ");
+      throw new FlowableException("A datasource is required for initializing the DMN engine ");
     }
     
     dmnEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
@@ -78,7 +78,7 @@ public class SpringDmnEngineConfigurator extends AbstractProcessEngineConfigurat
 
   protected synchronized DmnEngine initDmnEngine() {
     if (dmnEngineConfiguration == null) {
-      throw new ActivitiException("DMnEngineConfiguration is required");
+      throw new FlowableException("DMnEngineConfiguration is required");
     }
     
     return dmnEngineConfiguration.buildDmnEngine();

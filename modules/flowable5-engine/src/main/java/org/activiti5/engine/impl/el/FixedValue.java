@@ -13,9 +13,9 @@
 
 package org.activiti5.engine.impl.el;
 
-import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.delegate.VariableScope;
 import org.activiti5.engine.ActivitiException;
+import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.delegate.VariableScope;
 
 /**
  * Expression that always returns the same value when <code>getValue</code> is

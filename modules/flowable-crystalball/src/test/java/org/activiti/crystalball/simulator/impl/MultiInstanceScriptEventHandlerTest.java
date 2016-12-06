@@ -1,18 +1,18 @@
 package org.activiti.crystalball.simulator.impl;
 
-import org.activiti.engine.impl.test.ResourceActivitiTestCase;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+
+import org.flowable.engine.impl.test.ResourceFlowableTestCase;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 
 /**
  * This class tests ScriptEventHandler with multi instance simulation run.
  *
  * @author martin.grofcik
  */
-public class MultiInstanceScriptEventHandlerTest extends ResourceActivitiTestCase {
+public class MultiInstanceScriptEventHandlerTest extends ResourceFlowableTestCase {
 
   public MultiInstanceScriptEventHandlerTest() {
     super("org/activiti/crystalball/simulator/impl/MultiInstanceScriptEventHandlerTest.cfg.xml");

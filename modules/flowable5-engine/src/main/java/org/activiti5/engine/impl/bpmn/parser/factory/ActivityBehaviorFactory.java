@@ -12,31 +12,6 @@
  */
 package org.activiti5.engine.impl.bpmn.parser.factory;
 
-import org.activiti.bpmn.model.BoundaryEvent;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.BusinessRuleTask;
-import org.activiti.bpmn.model.CallActivity;
-import org.activiti.bpmn.model.CancelEventDefinition;
-import org.activiti.bpmn.model.EndEvent;
-import org.activiti.bpmn.model.ErrorEventDefinition;
-import org.activiti.bpmn.model.EventGateway;
-import org.activiti.bpmn.model.ExclusiveGateway;
-import org.activiti.bpmn.model.InclusiveGateway;
-import org.activiti.bpmn.model.IntermediateCatchEvent;
-import org.activiti.bpmn.model.ManualTask;
-import org.activiti.bpmn.model.ParallelGateway;
-import org.activiti.bpmn.model.ReceiveTask;
-import org.activiti.bpmn.model.ScriptTask;
-import org.activiti.bpmn.model.SendTask;
-import org.activiti.bpmn.model.ServiceTask;
-import org.activiti.bpmn.model.Signal;
-import org.activiti.bpmn.model.StartEvent;
-import org.activiti.bpmn.model.SubProcess;
-import org.activiti.bpmn.model.Task;
-import org.activiti.bpmn.model.ThrowEvent;
-import org.activiti.bpmn.model.Transaction;
-import org.activiti.bpmn.model.UserTask;
-import org.activiti.engine.impl.delegate.ActivityBehavior;
 import org.activiti5.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.activiti5.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
 import org.activiti5.engine.impl.bpmn.behavior.CallActivityBehavior;
@@ -77,6 +52,31 @@ import org.activiti5.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
 import org.activiti5.engine.impl.task.TaskDefinition;
+import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.BusinessRuleTask;
+import org.flowable.bpmn.model.CallActivity;
+import org.flowable.bpmn.model.CancelEventDefinition;
+import org.flowable.bpmn.model.EndEvent;
+import org.flowable.bpmn.model.ErrorEventDefinition;
+import org.flowable.bpmn.model.EventGateway;
+import org.flowable.bpmn.model.ExclusiveGateway;
+import org.flowable.bpmn.model.InclusiveGateway;
+import org.flowable.bpmn.model.IntermediateCatchEvent;
+import org.flowable.bpmn.model.ManualTask;
+import org.flowable.bpmn.model.ParallelGateway;
+import org.flowable.bpmn.model.ReceiveTask;
+import org.flowable.bpmn.model.ScriptTask;
+import org.flowable.bpmn.model.SendTask;
+import org.flowable.bpmn.model.ServiceTask;
+import org.flowable.bpmn.model.Signal;
+import org.flowable.bpmn.model.StartEvent;
+import org.flowable.bpmn.model.SubProcess;
+import org.flowable.bpmn.model.Task;
+import org.flowable.bpmn.model.ThrowEvent;
+import org.flowable.bpmn.model.Transaction;
+import org.flowable.bpmn.model.UserTask;
+import org.flowable.engine.impl.delegate.ActivityBehavior;
 
 /**
  * Factory class used by the {@link BpmnParser} and {@link BpmnParse} to instantiate

@@ -28,7 +28,6 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
-import org.activiti.engine.impl.bpmn.data.ItemInstance;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.impl.el.ExpressionFactoryResolver;
 import org.activiti5.engine.impl.javax.el.ArrayELResolver;
@@ -47,6 +46,7 @@ import org.activiti5.engine.impl.javax.el.ValueExpression;
 import org.activiti5.engine.impl.javax.el.VariableMapper;
 import org.activiti5.engine.impl.juel.SimpleResolver;
 import org.activiti5.engine.impl.util.ReflectUtil;
+import org.flowable.engine.impl.bpmn.data.ItemInstance;
 
 
 /**

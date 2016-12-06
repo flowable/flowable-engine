@@ -26,7 +26,7 @@ import org.activiti.app.service.api.ModelService;
 import org.activiti.app.service.exception.BadRequestException;
 import org.activiti.app.service.exception.BaseModelerRestException;
 import org.activiti.app.service.exception.InternalServerErrorException;
-import org.activiti.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.BpmnModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

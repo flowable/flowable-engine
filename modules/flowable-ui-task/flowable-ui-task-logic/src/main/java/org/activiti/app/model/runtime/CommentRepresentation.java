@@ -15,7 +15,7 @@ package org.activiti.app.model.runtime;
 import java.util.Date;
 
 import org.activiti.app.model.common.AbstractRepresentation;
-import org.activiti.engine.task.Comment;
+import org.flowable.engine.task.Comment;
 
 public class CommentRepresentation extends AbstractRepresentation {
 

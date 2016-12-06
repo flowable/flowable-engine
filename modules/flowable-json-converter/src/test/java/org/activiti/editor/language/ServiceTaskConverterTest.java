@@ -6,12 +6,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.activiti.bpmn.model.ActivitiListener;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.FieldExtension;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.ImplementationType;
-import org.activiti.bpmn.model.ServiceTask;
+import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.FieldExtension;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.ImplementationType;
+import org.flowable.bpmn.model.ServiceTask;
 import org.junit.Test;
 
 public class ServiceTaskConverterTest extends AbstractConverterTest {

@@ -13,10 +13,10 @@
 
 package org.activiti.rest.form;
 
-import org.activiti.engine.ProcessEngines;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.form.AbstractFormType;
-import org.activiti.idm.api.User;
+import org.flowable.engine.ProcessEngines;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.form.AbstractFormType;
+import org.flowable.idm.api.User;
 
 /**
  * Form type that holds an ID of a user.
@@ -41,7 +41,7 @@ public class UserFormType extends AbstractFormType {
       long count = ProcessEngines.getDefaultProcessEngine().getIdentityService().createUserQuery().userId(propertyValue).count();
 
       if (count == 0) {
-        throw new ActivitiObjectNotFoundException("User " + propertyValue + " does not exist", User.class);
+        throw new FlowableObjectNotFoundException("User " + propertyValue + " does not exist", User.class);
       }
       return propertyValue;
     }

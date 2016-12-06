@@ -7,19 +7,19 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.history.HistoricData;
-import org.activiti.engine.history.HistoricVariableInstance;
-import org.activiti.engine.history.ProcessInstanceHistoryLog;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
-import org.activiti.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.AbstractActivitiTestCase;
 import org.activiti5.engine.impl.variable.EntityManagerSession;
 import org.activiti5.engine.impl.variable.EntityManagerSessionFactory;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.history.HistoricData;
+import org.flowable.engine.history.HistoricVariableInstance;
+import org.flowable.engine.history.ProcessInstanceHistoryLog;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
+import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 /**
  * @author Daisuke Yoshimoto

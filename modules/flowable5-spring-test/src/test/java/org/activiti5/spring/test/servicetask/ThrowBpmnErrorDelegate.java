@@ -13,9 +13,9 @@
 
 package org.activiti5.spring.test.servicetask;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
 import org.activiti5.engine.delegate.BpmnError;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.JavaDelegate;
 
 /**
  * @author Falko Menge

@@ -1,10 +1,10 @@
 package org.activiti.test.spring.boot;
 
-import org.activiti.engine.IdentityService;
-import org.activiti.idm.api.Group;
-import org.activiti.idm.api.User;
 import org.activiti.spring.boot.DataSourceProcessEngineAutoConfiguration;
 import org.activiti.spring.boot.SecurityAutoConfiguration;
+import org.flowable.engine.IdentityService;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.User;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;

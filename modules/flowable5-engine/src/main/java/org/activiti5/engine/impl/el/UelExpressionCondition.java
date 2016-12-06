@@ -13,12 +13,12 @@
 
 package org.activiti5.engine.impl.el;
 
-import org.activiti.engine.DynamicBpmnConstants;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.Expression;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.impl.Condition;
 import org.activiti5.engine.impl.context.Context;
+import org.flowable.engine.DynamicBpmnConstants;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.Expression;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;

@@ -14,12 +14,6 @@ package org.activiti5.engine.impl.bpmn.behavior;
 
 import java.util.List;
 
-import org.activiti.engine.DynamicBpmnConstants;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.delegate.JavaDelegate;
-import org.activiti.engine.impl.delegate.ActivityBehavior;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.delegate.BpmnError;
 import org.activiti5.engine.impl.bpmn.helper.DelegateExpressionUtil;
@@ -32,6 +26,12 @@ import org.activiti5.engine.impl.delegate.JavaDelegateInvocation;
 import org.activiti5.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti5.engine.impl.pvm.delegate.SignallableActivityBehavior;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.engine.DynamicBpmnConstants;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.delegate.JavaDelegate;
+import org.flowable.engine.impl.delegate.ActivityBehavior;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -121,7 +121,7 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
       if (error != null) {
         ErrorPropagation.propagateError(error, activityExecution);
       } else {
-        throw new ActivitiException(exc.getMessage(), exc);
+        throw new FlowableException(exc.getMessage(), exc);
       }
 
     }

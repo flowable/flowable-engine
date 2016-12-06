@@ -12,9 +12,9 @@
  */
 package org.activiti.spring.boot;
 
-import org.activiti.engine.IdentityService;
 import org.activiti.rest.security.BasicAuthenticationProvider;
 import org.activiti.spring.security.IdentityServiceUserDetailsService;
+import org.flowable.engine.IdentityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -30,7 +30,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
  * Installs a Spring Security adapter for the Activiti
- * {@link org.activiti.engine.IdentityService}.
+ * {@link org.flowable.engine.IdentityService}.
  *
  * @author Josh Long
  */

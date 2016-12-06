@@ -13,11 +13,11 @@
 
 package org.activiti5.spring.test.expression;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -46,7 +46,7 @@ public class SpringLimitedExpressionsTest extends SpringActivitiTestCase {
     try {
       taskService.complete(task.getId());
       fail("Exception should have been thrown");
-    } catch (ActivitiException ae) {
+    } catch (FlowableException ae) {
       assertTextPresent("Unknown property used in expression", ae.getCause().getMessage());
     }
   }

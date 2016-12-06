@@ -16,13 +16,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 /**
  * @author Tijs Rademakers
@@ -79,7 +79,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableActivitiTestCase {
     try {
       repositoryService.activateProcessDefinitionById(processDefinition.getId());
       fail("Exception exprected");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // expected
     }
     
@@ -96,7 +96,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableActivitiTestCase {
     try {
       repositoryService.suspendProcessDefinitionById(processDefinition.getId());
       fail("Exception expected");
-    }catch (ActivitiException e) {
+    }catch (FlowableException e) {
       // expected
     }
   }
@@ -148,7 +148,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableActivitiTestCase {
     try {
       runtimeService.startProcessInstanceById(processDefinition.getId());
       fail("Exception is expected but not thrown");
-    } catch(ActivitiException e) {
+    } catch(FlowableException e) {
       assertTextPresentIgnoreCase("cannot start process instance", e.getMessage());
     }
     
@@ -156,7 +156,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableActivitiTestCase {
     try {
       runtimeService.startProcessInstanceByKey(processDefinition.getKey());
       fail("Exception is expected but not thrown");
-    } catch(ActivitiException e) {
+    } catch(FlowableException e) {
       assertTextPresentIgnoreCase("cannot start process instance", e.getMessage());
     }
   }
@@ -208,7 +208,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableActivitiTestCase {
       try {
         taskService.complete(task.getId());
         fail("A suspended task shouldn't be able to be continued");
-      } catch(ActivitiException e) {
+      } catch(FlowableException e) {
         // This is good
       }
     }
@@ -236,14 +236,14 @@ public class ProcessDefinitionSuspensionTest extends PluggableActivitiTestCase {
     try {
       formService.submitStartFormData(processDefinition.getId(), new HashMap<String, String>());
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // This is expected
     }
     
     try {
       formService.submitStartFormData(processDefinition.getId(), "someKey", new HashMap<String, String>());
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       e.printStackTrace();
       // This is expected
     }
@@ -301,7 +301,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableActivitiTestCase {
     try {
       runtimeService.startProcessInstanceById(processDefinition.getId());
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertTextPresentIgnoreCase("suspended", e.getMessage());
     }
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
@@ -355,7 +355,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableActivitiTestCase {
     try {
       runtimeService.startProcessInstanceById(processDefinition.getId());
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertTextPresentIgnoreCase("suspended", e.getMessage());
     }
     assertEquals(nrOfProcessInstances, runtimeService.createProcessInstanceQuery().count());
@@ -390,7 +390,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableActivitiTestCase {
     try {
       runtimeService.startProcessInstanceById(processDefinition.getId());
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertTextPresentIgnoreCase("suspended", e.getMessage());
     }
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
@@ -452,7 +452,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableActivitiTestCase {
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
     
     // Clean DB
-    for (org.activiti.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+    for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
   }
@@ -515,7 +515,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableActivitiTestCase {
     assertEquals(1, runtimeService.createProcessInstanceQuery().active().count());
     
     // Clean DB
-    for (org.activiti.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+    for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
   }

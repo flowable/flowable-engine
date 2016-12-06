@@ -21,16 +21,16 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.impl.Page;
-import org.activiti.idm.api.User;
-import org.activiti.idm.engine.impl.UserQueryImpl;
-import org.activiti.idm.engine.impl.interceptor.CommandContext;
-import org.activiti.idm.engine.impl.persistence.entity.UserEntity;
-import org.activiti.idm.engine.impl.persistence.entity.UserEntityImpl;
 import org.activiti.ldap.LDAPCallBack;
 import org.activiti.ldap.LDAPConfigurator;
 import org.activiti.ldap.LDAPTemplate;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.Page;
+import org.flowable.idm.api.User;
+import org.flowable.idm.engine.impl.UserQueryImpl;
+import org.flowable.idm.engine.impl.interceptor.CommandContext;
+import org.flowable.idm.engine.impl.persistence.entity.UserEntity;
+import org.flowable.idm.engine.impl.persistence.entity.UserEntityImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +95,7 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
       });
 
     } else {
-      throw new ActivitiIllegalArgumentException("Query is currently not supported by LDAPUserManager.");
+      throw new FlowableIllegalArgumentException("Query is currently not supported by LDAPUserManager.");
     }
   }
   

@@ -12,9 +12,9 @@
  */
 package org.activiti.web.rest.client.modelinfo.bpmn;
 
-import org.activiti.bpmn.model.ImplementationType;
-import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.web.rest.client.modelinfo.AbstractInfoMapper;
+import org.flowable.bpmn.model.ImplementationType;
+import org.flowable.bpmn.model.ServiceTask;
 
 public class ServiceTaskInfoMapper extends AbstractInfoMapper {
 

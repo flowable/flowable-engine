@@ -14,9 +14,9 @@ package org.activiti.crystalball.process;
  */
 
 import org.activiti.crystalball.simulator.SimulationRun;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.delegate.JavaDelegate;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.delegate.JavaDelegate;
 
 /**
  * This class implement task which runs simulation experiment

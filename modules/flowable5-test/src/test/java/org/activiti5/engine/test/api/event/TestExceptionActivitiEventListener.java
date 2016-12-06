@@ -12,10 +12,10 @@
  */
 package org.activiti5.engine.test.api.event;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 
-public class TestExceptionActivitiEventListener implements ActivitiEventListener {
+public class TestExceptionActivitiEventListener implements FlowableEventListener {
 
 	private boolean failOnException;
 	
@@ -24,7 +24,7 @@ public class TestExceptionActivitiEventListener implements ActivitiEventListener
   }
 
 	@Override
-  public void onEvent(ActivitiEvent event) {
+  public void onEvent(FlowableEvent event) {
 		throw new RuntimeException("Test exception");
   }
 

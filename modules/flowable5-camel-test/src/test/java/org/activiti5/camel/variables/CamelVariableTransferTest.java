@@ -15,9 +15,6 @@ package org.activiti5.camel.variables;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.TaskService;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.spring.impl.test.SpringActivitiTestCase;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
@@ -25,6 +22,9 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 

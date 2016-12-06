@@ -1,7 +1,7 @@
 package org.activiti5.engine.test.logging.mdc;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.JavaDelegate;
 
 public class TestService implements JavaDelegate{
 	static String processInstanceId = null;

@@ -14,9 +14,9 @@ package org.activiti.app.idm.service;
 
 import java.util.List;
 
-import org.activiti.idm.api.Group;
-import org.activiti.idm.api.Privilege;
-import org.activiti.idm.api.User;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.Privilege;
+import org.flowable.idm.api.User;
 
 /**
  * Service for retrieving and changing privilege information.

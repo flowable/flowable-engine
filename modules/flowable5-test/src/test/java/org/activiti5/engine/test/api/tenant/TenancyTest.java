@@ -3,19 +3,19 @@ package org.activiti5.engine.test.api.tenant;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.repository.Model;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.Job;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti5.engine.impl.util.CollectionUtil;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.repository.Model;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
 import org.junit.Assert;
 
 /**
@@ -561,11 +561,11 @@ public class TenancyTest extends PluggableActivitiTestCase {
 		// Shouldn't be able to start proc defs for tentant B
 		try {
 			runtimeService.startProcessInstanceById(procDefIdB);
-		} catch (ActivitiException e) {}
+		} catch (FlowableException e) {}
 		
 		try {
 			runtimeService.startProcessInstanceById(procDefIdB2);
-		} catch (ActivitiException e) {}
+		} catch (FlowableException e) {}
 		
 		ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefIdA);
 		Assert.assertNotNull(processInstance);
@@ -585,7 +585,7 @@ public class TenancyTest extends PluggableActivitiTestCase {
 		// Suspending with NO tenant id should give an error, cause they both have tenants
 		try {
 			repositoryService.suspendProcessDefinitionByKey("oneTaskProcess");
-		} catch (ActivitiException e) {}
+		} catch (FlowableException e) {}
 	}
 	
 	public void testSignalFromProcessTenancy() {

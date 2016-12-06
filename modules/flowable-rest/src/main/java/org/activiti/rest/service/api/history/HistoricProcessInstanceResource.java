@@ -18,10 +18,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -64,7 +64,7 @@ public class HistoricProcessInstanceResource {
   protected HistoricProcessInstance getHistoricProcessInstanceFromRequest(String processInstanceId) {
     HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
     if (processInstance == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", HistoricProcessInstance.class);
+      throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", HistoricProcessInstance.class);
     }
     return processInstance;
   }

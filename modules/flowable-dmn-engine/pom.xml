@@ -15,7 +15,7 @@
 
 	<properties>
 		<activiti.artifact>
-			org.activiti.dmn.engine
+			org.flowable.dmn.engine
 		</activiti.artifact>
 		<activiti.osgi.import.additional>
 			org.springframework*;resolution:=optional,

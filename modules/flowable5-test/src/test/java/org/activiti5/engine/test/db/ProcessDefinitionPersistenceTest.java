@@ -16,8 +16,6 @@ package org.activiti5.engine.test.db;
 import java.util.Collections;
 import java.util.List;
 
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti5.engine.impl.RepositoryServiceImpl;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -25,6 +23,8 @@ import org.activiti5.engine.impl.pvm.PvmActivity;
 import org.activiti5.engine.impl.pvm.PvmTransition;
 import org.activiti5.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.repository.ProcessDefinition;
 
 
 /**

@@ -17,13 +17,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti5.engine.impl.util.CollectionUtil;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 /**
  * @author Joram Barrez
@@ -71,7 +71,7 @@ public class ExclusiveGatewayTest extends PluggableActivitiTestCase {
     try {
       runtimeService.startProcessInstanceByKey("exclusiveGwNoSeqFlowSelected", CollectionUtil.singletonMap("input", 4));
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertTextPresent("No outgoing sequence flow of the exclusive gateway " + "'exclusiveGw' could be selected for continuing the process", e.getMessage());
     }
   }
@@ -93,7 +93,7 @@ public class ExclusiveGatewayTest extends PluggableActivitiTestCase {
       runtimeService.startProcessInstanceByKey(
             "exclusiveGwDiverging", CollectionUtil.singletonMap("iinput", 1));
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertTextPresent("Unknown property used in expression", e.getMessage());
     }
   }
@@ -150,7 +150,7 @@ public class ExclusiveGatewayTest extends PluggableActivitiTestCase {
       runtimeService.startProcessInstanceByKey("invalidMethodExpression", 
             CollectionUtil.singletonMap("order", new ExclusiveGatewayTestOrder(50)));
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertTextPresent("Unknown method used in expression", e.getMessage());
     }
   }
@@ -212,7 +212,7 @@ public class ExclusiveGatewayTest extends PluggableActivitiTestCase {
           .deploy();
       fail("Could deploy a process definition with a XOR Gateway without outgoing sequence flows.");
     }
-    catch (ActivitiException ex) {
+    catch (FlowableException ex) {
     }
 
   }

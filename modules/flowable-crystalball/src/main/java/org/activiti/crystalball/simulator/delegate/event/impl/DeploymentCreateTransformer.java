@@ -14,11 +14,11 @@ package org.activiti.crystalball.simulator.delegate.event.impl;
  */
 
 import org.activiti.crystalball.simulator.SimulationEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
+import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,10 +37,10 @@ public class DeploymentCreateTransformer extends Activiti2SimulationEventFunctio
   }
 
   @Override
-  public SimulationEvent apply(ActivitiEvent event) {
-    if (ActivitiEngineEventType.ENTITY_CREATED.equals(event.getType()) && (event instanceof ActivitiEntityEvent) && ((ActivitiEntityEvent) event).getEntity() instanceof DeploymentEntity) {
+  public SimulationEvent apply(FlowableEvent event) {
+    if (FlowableEngineEventType.ENTITY_CREATED.equals(event.getType()) && (event instanceof FlowableEntityEvent) && ((FlowableEntityEvent) event).getEntity() instanceof DeploymentEntity) {
 
-      DeploymentEntity deploymentEntity = (DeploymentEntity) ((ActivitiEntityEvent) event).getEntity();
+      DeploymentEntity deploymentEntity = (DeploymentEntity) ((FlowableEntityEvent) event).getEntity();
 
       Map<String, Object> simEventProperties = new HashMap<String, Object>();
       simEventProperties.put(resourcesKey, deploymentEntity.getResources());

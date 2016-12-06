@@ -16,8 +16,8 @@ package org.activiti.crystalball.simulator.impl.bpmn.parser.handler;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.ExtensionElement;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

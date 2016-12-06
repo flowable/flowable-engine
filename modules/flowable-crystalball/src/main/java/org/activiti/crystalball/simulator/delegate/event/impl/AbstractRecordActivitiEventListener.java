@@ -15,8 +15,8 @@ package org.activiti.crystalball.simulator.delegate.event.impl;
 
 import org.activiti.crystalball.simulator.SimulationEvent;
 import org.activiti.crystalball.simulator.delegate.event.Function;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,26 +27,26 @@ import java.util.List;
  * 
  * @author martin.grofcik
  */
-public abstract class AbstractRecordActivitiEventListener implements ActivitiEventListener {
-  protected List<Function<ActivitiEvent, SimulationEvent>> transformers;
+public abstract class AbstractRecordActivitiEventListener implements FlowableEventListener {
+  protected List<Function<FlowableEvent, SimulationEvent>> transformers;
 
-  public AbstractRecordActivitiEventListener(List<Function<ActivitiEvent, SimulationEvent>> transformers) {
+  public AbstractRecordActivitiEventListener(List<Function<FlowableEvent, SimulationEvent>> transformers) {
     this.transformers = transformers;
   }
 
   public abstract Collection<SimulationEvent> getSimulationEvents();
 
   @Override
-  public void onEvent(ActivitiEvent event) {
+  public void onEvent(FlowableEvent event) {
     Collection<SimulationEvent> simulationEvents = transform(event);
     store(simulationEvents);
   }
 
   protected abstract void store(Collection<SimulationEvent> simulationEvents);
 
-  protected Collection<SimulationEvent> transform(ActivitiEvent event) {
+  protected Collection<SimulationEvent> transform(FlowableEvent event) {
     List<SimulationEvent> simEvents = new ArrayList<SimulationEvent>();
-    for (Function<ActivitiEvent, SimulationEvent> t : transformers) {
+    for (Function<FlowableEvent, SimulationEvent> t : transformers) {
       SimulationEvent simEvent = t.apply(event);
       if (simEvent != null)
         simEvents.add(simEvent);

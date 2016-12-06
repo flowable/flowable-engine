@@ -12,7 +12,7 @@
  */
 package org.activiti.app.model.component;
 
-import org.activiti.content.api.ContentItem;
+import org.flowable.content.api.ContentItem;
 import org.springframework.stereotype.Component;
 
 /**

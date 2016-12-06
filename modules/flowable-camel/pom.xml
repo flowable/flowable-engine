@@ -75,7 +75,7 @@
   <properties>
     <activiti.osgi.import.pkg>*</activiti.osgi.import.pkg>
     <activiti.artifact>
-      org.activiti.camel
+      org.flowable.camel
     </activiti.artifact>
   </properties>
 

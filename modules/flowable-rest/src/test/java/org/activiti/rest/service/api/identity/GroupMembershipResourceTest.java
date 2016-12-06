@@ -13,8 +13,6 @@
 
 package org.activiti.rest.service.api.identity;
 
-import org.activiti.idm.api.Group;
-import org.activiti.idm.api.User;
 import org.activiti.rest.service.BaseSpringRestTestCase;
 import org.activiti.rest.service.api.RestUrls;
 import org.apache.http.HttpStatus;
@@ -22,6 +20,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.User;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;

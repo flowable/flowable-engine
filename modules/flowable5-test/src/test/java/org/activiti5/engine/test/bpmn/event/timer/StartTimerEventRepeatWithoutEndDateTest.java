@@ -17,15 +17,15 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.runtime.Clock;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.runtime.Job;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti5.engine.test.api.event.TestActivitiEntityEventListener;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
 
 /**
  * @author Vasile Dirla
@@ -137,25 +137,25 @@ public class StartTimerEventRepeatWithoutEndDateTest extends PluggableActivitiTe
     //FINAL CHECK
     // count "timer fired" events
     int timerFiredCount = 0;
-    List<ActivitiEvent> eventsReceived = listener.getEventsReceived();
-    for (ActivitiEvent eventReceived : eventsReceived) {
-      if (ActivitiEngineEventType.TIMER_FIRED.equals(eventReceived.getType())) {
+    List<FlowableEvent> eventsReceived = listener.getEventsReceived();
+    for (FlowableEvent eventReceived : eventsReceived) {
+      if (FlowableEngineEventType.TIMER_FIRED.equals(eventReceived.getType())) {
         timerFiredCount++;
       }
     }
 
     //count "entity created" events
     int eventCreatedCount = 0;
-    for (ActivitiEvent eventReceived : eventsReceived) {
-      if (ActivitiEngineEventType.ENTITY_CREATED.equals(eventReceived.getType())) {
+    for (FlowableEvent eventReceived : eventsReceived) {
+      if (FlowableEngineEventType.ENTITY_CREATED.equals(eventReceived.getType())) {
         eventCreatedCount++;
       }
     }
 
     // count "entity deleted" events
     int eventDeletedCount = 0;
-    for (ActivitiEvent eventReceived : eventsReceived) {
-      if (ActivitiEngineEventType.ENTITY_DELETED.equals(eventReceived.getType())) {
+    for (FlowableEvent eventReceived : eventsReceived) {
+      if (FlowableEngineEventType.ENTITY_DELETED.equals(eventReceived.getType())) {
         eventDeletedCount++;
       }
     }

@@ -17,8 +17,6 @@ import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.idm.api.Picture;
-import org.activiti.idm.api.User;
 import org.activiti.rest.service.BaseSpringRestTestCase;
 import org.activiti.rest.service.HttpMultipartHelper;
 import org.activiti.rest.service.api.RestUrls;
@@ -27,6 +25,8 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
+import org.flowable.idm.api.Picture;
+import org.flowable.idm.api.User;
 import org.springframework.http.MediaType;
 
 /**

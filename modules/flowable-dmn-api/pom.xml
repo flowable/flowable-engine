@@ -16,7 +16,7 @@
 
 	<properties>
 		<activiti.artifact>
-			org.activiti.dmn.api
+			org.flowable.dmn.api
 		</activiti.artifact>
 	</properties>
 	

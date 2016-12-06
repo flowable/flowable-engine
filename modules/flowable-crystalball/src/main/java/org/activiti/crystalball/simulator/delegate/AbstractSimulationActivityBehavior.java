@@ -12,8 +12,8 @@
  */
 package org.activiti.crystalball.simulator.delegate;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.impl.delegate.ActivityBehavior;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.delegate.ActivityBehavior;
 
 /**
  * @author martin.grofcik

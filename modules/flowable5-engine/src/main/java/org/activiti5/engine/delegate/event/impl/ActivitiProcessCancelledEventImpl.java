@@ -12,20 +12,20 @@
  */
 package org.activiti5.engine.delegate.event.impl;
 
-import org.activiti.engine.delegate.event.ActivitiCancelledEvent;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
+import org.flowable.engine.delegate.event.FlowableCancelledEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
- * An {@link org.activiti5.engine.delegate.event.ActivitiCancelledEvent} implementation.
+ * An {@link org.activiti5.engine.delegate.event.FlowableCancelledEvent} implementation.
  *
  * @author martin.grofcik
  */
-public class ActivitiProcessCancelledEventImpl extends ActivitiEventImpl implements ActivitiCancelledEvent {
+public class ActivitiProcessCancelledEventImpl extends ActivitiEventImpl implements FlowableCancelledEvent {
 
 	protected Object cause;
 
 	public ActivitiProcessCancelledEventImpl() {
-	  super(ActivitiEngineEventType.PROCESS_CANCELLED);
+	  super(FlowableEngineEventType.PROCESS_CANCELLED);
   }
 
 	public void setCause(Object cause) {

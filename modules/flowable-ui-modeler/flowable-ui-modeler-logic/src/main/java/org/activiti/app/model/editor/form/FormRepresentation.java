@@ -16,7 +16,7 @@ import java.util.Date;
 
 import org.activiti.app.domain.editor.AbstractModel;
 import org.activiti.app.model.common.AbstractRepresentation;
-import org.activiti.form.model.FormModel;
+import org.flowable.form.model.FormModel;
 
 public class FormRepresentation extends AbstractRepresentation {
 

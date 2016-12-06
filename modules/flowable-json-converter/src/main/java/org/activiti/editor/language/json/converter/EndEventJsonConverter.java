@@ -15,14 +15,14 @@ package org.activiti.editor.language.json.converter;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.CancelEventDefinition;
-import org.activiti.bpmn.model.EndEvent;
-import org.activiti.bpmn.model.ErrorEventDefinition;
-import org.activiti.bpmn.model.EventDefinition;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.TerminateEventDefinition;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.CancelEventDefinition;
+import org.flowable.bpmn.model.EndEvent;
+import org.flowable.bpmn.model.ErrorEventDefinition;
+import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.TerminateEventDefinition;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;

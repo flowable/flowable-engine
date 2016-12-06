@@ -29,8 +29,8 @@ import org.activiti.app.model.common.RemoteUser;
 import org.activiti.app.security.ActivitiAppUser;
 import org.activiti.app.security.CookieConstants;
 import org.activiti.app.service.idm.RemoteIdmService;
-import org.activiti.engine.common.api.ActivitiException;
 import org.apache.commons.codec.binary.Base64;
+import org.flowable.engine.common.api.FlowableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,7 +94,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
             if (token != null) {
               return token;
             } else {
-              throw new ActivitiException("token not found " + tokenId);
+              throw new FlowableException("token not found " + tokenId);
             }
           }
 
@@ -110,7 +110,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
           public ActivitiAppUser load(final String userId) throws Exception {
             RemoteUser user = remoteIdmService.getUser(userId);
             if (user == null) {
-              throw new ActivitiException("user not found " + userId);
+              throw new FlowableException("user not found " + userId);
             }
             
             Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();

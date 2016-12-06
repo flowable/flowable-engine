@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.app.model.runtime.ProcessInstanceRepresentation;
 import org.activiti.app.service.runtime.ActivitiProcessInstanceService;
-import org.activiti.form.model.FormModel;
+import org.flowable.form.model.FormModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;

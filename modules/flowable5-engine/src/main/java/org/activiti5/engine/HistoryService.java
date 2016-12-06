@@ -16,7 +16,6 @@ package org.activiti5.engine;
 
 import java.util.List;
 
-import org.activiti.engine.task.IdentityLink;
 import org.activiti5.engine.history.HistoricActivityInstance;
 import org.activiti5.engine.history.HistoricActivityInstanceQuery;
 import org.activiti5.engine.history.HistoricDetail;
@@ -35,6 +34,7 @@ import org.activiti5.engine.history.NativeHistoricTaskInstanceQuery;
 import org.activiti5.engine.history.NativeHistoricVariableInstanceQuery;
 import org.activiti5.engine.history.ProcessInstanceHistoryLog;
 import org.activiti5.engine.history.ProcessInstanceHistoryLogQuery;
+import org.flowable.engine.task.IdentityLink;
 
 /** 
  * Service exposing information about ongoing and past process instances.  This is different

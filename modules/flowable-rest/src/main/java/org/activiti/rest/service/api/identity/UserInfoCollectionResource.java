@@ -20,11 +20,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.idm.api.User;
-import org.activiti.rest.exception.ActivitiConflictException;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.flowable.engine.IdentityService;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.idm.api.User;
+import org.flowable.rest.exception.ActivitiConflictException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -71,10 +71,10 @@ public class UserInfoCollectionResource extends BaseUserResource {
     User user = getUserFromRequest(userId);
 
     if (userRequest.getKey() == null) {
-      throw new ActivitiIllegalArgumentException("The key cannot be null.");
+      throw new FlowableIllegalArgumentException("The key cannot be null.");
     }
     if (userRequest.getValue() == null) {
-      throw new ActivitiIllegalArgumentException("The value cannot be null.");
+      throw new FlowableIllegalArgumentException("The value cannot be null.");
     }
 
     String existingValue = identityService.getUserInfo(user.getId(), userRequest.getKey());

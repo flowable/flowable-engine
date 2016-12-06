@@ -24,18 +24,18 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.history.HistoricVariableInstance;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.AbstractActivitiTestCase;
 import org.activiti5.engine.impl.variable.EntityManagerSession;
 import org.activiti5.engine.impl.variable.EntityManagerSessionFactory;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.history.HistoricVariableInstance;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 
 
 /**
@@ -414,7 +414,7 @@ public class JPAVariableTest extends AbstractActivitiTestCase {
     try {
       runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables);
       fail("Exception expected");
-    } catch(ActivitiException ae ) {
+    } catch(FlowableException ae ) {
       // Expected
     }
     
@@ -493,7 +493,7 @@ public class JPAVariableTest extends AbstractActivitiTestCase {
     try {
       runtimeService.startProcessInstanceByKey("JPAVariableProcessExceptions", variables);
       fail("Exception expected");
-    } catch(ActivitiException ae) {
+    } catch(FlowableException ae) {
       assertTextPresent("Cannot find field or method with annotation @Id on class", ae.getMessage());
       assertTextPresent("only single-valued primary keys are supported on JPA-enities", ae.getMessage());
     }
@@ -505,7 +505,7 @@ public class JPAVariableTest extends AbstractActivitiTestCase {
     try {
       runtimeService.startProcessInstanceByKey("JPAVariableProcessExceptions", variables);
       fail("Exception expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("Value of primary key for JPA-Entity cannot be null", ae.getMessage());
     }
     
@@ -520,7 +520,7 @@ public class JPAVariableTest extends AbstractActivitiTestCase {
     try {
       runtimeService.startProcessInstanceByKey("JPAVariableProcessExceptions", variables);
       fail("Exception expected");
-    } catch(ActivitiException ae) {
+    } catch(FlowableException ae) {
       assertTextPresent("Unsupported Primary key type for JPA-Entity", ae.getMessage());
     }
     
@@ -536,7 +536,7 @@ public class JPAVariableTest extends AbstractActivitiTestCase {
     try {
       runtimeService.getVariable(processInstance.getId(), "nonPersistentEntity");
       fail("Exception expected");
-    } catch(ActivitiException ae) {
+    } catch(FlowableException ae) {
       assertTextPresent("Entity does not exist: " + FieldAccessJPAEntity.class.getName() + " - 9999", ae.getMessage());
     }
   }
@@ -566,31 +566,31 @@ public class JPAVariableTest extends AbstractActivitiTestCase {
     try {
       runtimeService.createProcessInstanceQuery().variableValueNotEquals("entityToQuery", entityToQuery).singleResult();
       fail("Exception expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("JPA entity variables can only be used in 'variableValueEquals'", ae.getMessage());
     }
     try {
       runtimeService.createProcessInstanceQuery().variableValueGreaterThan("entityToQuery", entityToQuery).singleResult();
       fail("Exception expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("JPA entity variables can only be used in 'variableValueEquals'", ae.getMessage());
     }
     try {
       runtimeService.createProcessInstanceQuery().variableValueGreaterThanOrEqual("entityToQuery", entityToQuery).singleResult();
       fail("Exception expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("JPA entity variables can only be used in 'variableValueEquals'", ae.getMessage());
     }
     try {
       runtimeService.createProcessInstanceQuery().variableValueLessThan("entityToQuery", entityToQuery).singleResult();
       fail("Exception expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("JPA entity variables can only be used in 'variableValueEquals'", ae.getMessage());
     }
     try {
       runtimeService.createProcessInstanceQuery().variableValueLessThanOrEqual("entityToQuery", entityToQuery).singleResult();
       fail("Exception expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("JPA entity variables can only be used in 'variableValueEquals'", ae.getMessage());
     }
   }

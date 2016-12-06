@@ -17,10 +17,10 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.bpmn.model.FormProperty;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti5.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti5.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.bpmn.model.FormProperty;
+import org.flowable.engine.repository.ProcessDefinition;
 
 
 /**

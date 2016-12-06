@@ -18,10 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
 import org.activiti.rest.service.BaseSpringRestTestCase;
 import org.activiti.rest.service.api.RestUrls;
 import org.apache.http.HttpStatus;
@@ -29,6 +25,10 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -435,7 +435,7 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
 
   @Deployment(resources = { "org/activiti/rest/service/api/oneTaskProcess.bpmn20.xml" })
   public void testStartProcessUsingKeyAndTenantId() throws Exception {
-    org.activiti.engine.repository.Deployment tenantDeployment = null;
+    org.flowable.engine.repository.Deployment tenantDeployment = null;
 
     try {
       // Deploy the same process, in another tenant

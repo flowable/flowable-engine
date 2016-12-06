@@ -12,15 +12,15 @@
  */
 package org.activiti5.engine.impl.jobexecutor;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.impl.delegate.ActivityBehavior;
-import org.activiti.engine.runtime.Job;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.impl.delegate.ActivityBehavior;
+import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +54,7 @@ public class TimerExecuteNestedActivityJobHandler extends TimerEventHandler impl
     try {
       if (commandContext.getEventDispatcher().isEnabled()) {
         commandContext.getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.TIMER_FIRED, job));
+          ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_FIRED, job));
         dispatchActivityTimeoutIfNeeded(job, execution, commandContext);
       }
 

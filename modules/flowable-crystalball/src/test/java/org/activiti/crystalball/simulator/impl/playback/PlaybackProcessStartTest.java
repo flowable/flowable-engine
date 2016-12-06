@@ -13,12 +13,12 @@
 package org.activiti.crystalball.simulator.impl.playback;
 
 import org.activiti.crystalball.simulator.impl.EventRecorderTestUtils;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 import java.util.HashMap;
 import java.util.List;

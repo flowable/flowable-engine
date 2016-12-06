@@ -12,8 +12,8 @@
  */
 package org.activiti5.engine.test.helper;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.JavaDelegate;
 
 public class PassThroughServiceTask implements JavaDelegate {
 

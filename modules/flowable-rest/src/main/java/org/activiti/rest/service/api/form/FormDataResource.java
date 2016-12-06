@@ -24,14 +24,14 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-import org.activiti.engine.FormService;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.form.FormData;
-import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
+import org.flowable.engine.FormService;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.form.FormData;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -63,11 +63,11 @@ public class FormDataResource {
           @RequestParam(value = "processDefinitionId", required = false) String processDefinitionId, HttpServletRequest request) {
 
     if (taskId == null && processDefinitionId == null) {
-      throw new ActivitiIllegalArgumentException("The taskId or processDefinitionId parameter has to be provided");
+      throw new FlowableIllegalArgumentException("The taskId or processDefinitionId parameter has to be provided");
     }
 
     if (taskId != null && processDefinitionId != null) {
-      throw new ActivitiIllegalArgumentException("Not both a taskId and a processDefinitionId parameter can be provided");
+      throw new FlowableIllegalArgumentException("Not both a taskId and a processDefinitionId parameter can be provided");
     }
 
     FormData formData = null;
@@ -81,7 +81,7 @@ public class FormDataResource {
     }
 
     if (formData == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a form data with id '" + id + "'.", FormData.class);
+      throw new FlowableObjectNotFoundException("Could not find a form data with id '" + id + "'.", FormData.class);
     }
 
     return restResponseFactory.createFormDataResponse(formData);
@@ -95,11 +95,11 @@ public class FormDataResource {
   public ProcessInstanceResponse submitForm(@RequestBody SubmitFormRequest submitRequest, HttpServletRequest request, HttpServletResponse response) {
 
     if (submitRequest == null) {
-      throw new ActivitiException("A request body was expected when executing the form submit.");
+      throw new FlowableException("A request body was expected when executing the form submit.");
     }
 
     if (submitRequest.getTaskId() == null && submitRequest.getProcessDefinitionId() == null) {
-      throw new ActivitiIllegalArgumentException("The taskId or processDefinitionId property has to be provided");
+      throw new FlowableIllegalArgumentException("The taskId or processDefinitionId property has to be provided");
     }
 
     Map<String, String> propertyMap = new HashMap<String, String>();

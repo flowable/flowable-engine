@@ -17,10 +17,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.runtime.ProcessInstanceQuery;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.ProcessInstanceQuery;
 
 /**
  * @author Tijs Rademakers
@@ -63,7 +63,7 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableActivitiTestC
   }
 
   protected void tearDown() throws Exception {
-    for (org.activiti.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+    for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
     super.tearDown();

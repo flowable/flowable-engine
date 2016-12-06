@@ -14,8 +14,8 @@ package org.activiti.validation.validator;
 
 import java.util.List;
 
-import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.validation.ValidationError;
+import org.flowable.bpmn.model.BpmnModel;
 
 /**
  * @author jbarrez

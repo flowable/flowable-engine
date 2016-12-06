@@ -3,8 +3,6 @@ package org.activiti.rest.service.api.repository;
 import java.net.URLDecoder;
 import java.util.Calendar;
 
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.test.Deployment;
 import org.activiti.rest.service.BaseSpringRestTestCase;
 import org.activiti.rest.service.api.RestUrls;
 import org.apache.commons.io.IOUtils;
@@ -13,6 +11,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.test.Deployment;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 

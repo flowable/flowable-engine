@@ -15,8 +15,8 @@ package org.activiti.compatibility.wrapper;
 
 import java.util.Date;
 
-import org.activiti.engine.task.Attachment;
 import org.activiti5.engine.impl.persistence.entity.AttachmentEntity;
+import org.flowable.engine.task.Attachment;
 
 /**
  * Wraps an Activiti 5 attachment to an Activiti 6 {@link Attachment}.

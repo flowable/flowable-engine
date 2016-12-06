@@ -12,8 +12,8 @@
  */
 package org.activiti5.engine.impl.variable;
 
-import org.activiti.engine.impl.variable.ValueFields;
 import org.activiti5.engine.ActivitiException;
+import org.flowable.engine.impl.variable.ValueFields;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

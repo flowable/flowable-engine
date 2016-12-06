@@ -12,8 +12,8 @@
  */
 package org.activiti.app.security;
 
-import org.activiti.idm.api.Token;
-import org.activiti.idm.api.User;
+import org.flowable.idm.api.Token;
+import org.flowable.idm.api.User;
 
 public interface CustomRememberMeService {
 

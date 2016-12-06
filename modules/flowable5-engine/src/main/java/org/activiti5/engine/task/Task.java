@@ -14,7 +14,7 @@ package org.activiti5.engine.task;
 
 import java.util.Date;
 
-import org.activiti.engine.task.DelegationState;
+import org.flowable.engine.task.DelegationState;
 
 
 

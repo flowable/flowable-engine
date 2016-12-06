@@ -16,7 +16,7 @@ import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.util.List;
 
-import org.activiti.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.BpmnModel;
 
 /**
  * This interface declares methods to generate process diagram

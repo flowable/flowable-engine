@@ -17,13 +17,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.db.PersistentObject;
 import org.activiti5.engine.impl.persistence.AbstractManager;
 import org.activiti5.engine.task.Comment;
 import org.activiti5.engine.task.Event;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 
 /**
@@ -47,7 +47,7 @@ public class CommentEntityManager extends AbstractManager {
     		}
     	}
     	getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_DELETED, persistentObject, processInstanceId, processInstanceId, processDefinitionId));
+    			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, persistentObject, processInstanceId, processInstanceId, processDefinitionId));
     }
   }
 
@@ -67,9 +67,9 @@ public class CommentEntityManager extends AbstractManager {
     		}
     	}
     	getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_CREATED, persistentObject, processInstanceId, processInstanceId, processDefinitionId));
+    			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, persistentObject, processInstanceId, processInstanceId, processDefinitionId));
     	getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_INITIALIZED, persistentObject, processInstanceId, processInstanceId, processDefinitionId));
+    			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, persistentObject, processInstanceId, processInstanceId, processDefinitionId));
     }
   }
 

@@ -15,8 +15,8 @@ package org.activiti5.spring.impl.test;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.activiti.engine.ProcessEngine;
 import org.activiti5.engine.impl.test.AbstractActivitiTestCase;
+import org.flowable.engine.ProcessEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;

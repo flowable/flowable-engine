@@ -14,7 +14,7 @@ package org.activiti.compatibility.wrapper;
 
 import java.util.Date;
 
-import org.activiti.engine.repository.Deployment;
+import org.flowable.engine.repository.Deployment;
 
 /**
  * @author Joram Barrez

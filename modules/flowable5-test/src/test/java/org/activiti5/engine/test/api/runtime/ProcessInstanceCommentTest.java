@@ -14,12 +14,12 @@ package org.activiti5.engine.test.api.runtime;
 
 import java.util.List;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Comment;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Comment;
+import org.flowable.engine.test.Deployment;
 
 
 /**
@@ -47,7 +47,7 @@ public class ProcessInstanceCommentTest extends PluggableActivitiTestCase {
       runtimeService.suspendProcessInstanceById(processInstance.getId());
       try {
         taskService.addComment(null, processInstance.getId(), "Hello World 2");
-      } catch (ActivitiException e) {
+      } catch (FlowableException e) {
         assertTextPresent("Cannot add a comment to a suspended execution", e.getMessage());
       }
       

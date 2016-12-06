@@ -17,8 +17,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.repository.ProcessDefinition;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -51,7 +51,7 @@ public class ProcessDefinitionResourceDataResource extends BaseDeploymentResourc
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
 
     if (processDefinition == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a process definition with id '" + processDefinitionId + "'.", ProcessDefinition.class);
+      throw new FlowableObjectNotFoundException("Could not find a process definition with id '" + processDefinitionId + "'.", ProcessDefinition.class);
     }
     return processDefinition;
   }

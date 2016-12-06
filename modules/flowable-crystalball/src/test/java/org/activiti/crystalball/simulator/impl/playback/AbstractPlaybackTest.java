@@ -26,16 +26,16 @@ import org.activiti.crystalball.simulator.impl.RecordableProcessEngineFactory;
 import org.activiti.crystalball.simulator.impl.StartProcessByIdEventHandler;
 import org.activiti.crystalball.simulator.impl.clock.DefaultClockFactory;
 import org.activiti.crystalball.simulator.impl.clock.ThreadLocalClock;
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.ProcessEngines;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.impl.util.DefaultClockImpl;
-import org.activiti.engine.common.runtime.Clock;
-import org.activiti.engine.impl.ProcessEngineImpl;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.el.NoExecutionVariableScope;
-import org.activiti.engine.impl.test.AbstractActivitiTestCase;
-import org.activiti.engine.impl.test.TestHelper;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.ProcessEngines;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.impl.util.DefaultClockImpl;
+import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.impl.ProcessEngineImpl;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.el.NoExecutionVariableScope;
+import org.flowable.engine.impl.test.AbstractFlowableTestCase;
+import org.flowable.engine.impl.test.TestHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
@@ -52,7 +52,7 @@ import java.util.Map;
  *
  * @author martin.grofcik
  */
-public abstract class AbstractPlaybackTest extends AbstractActivitiTestCase {
+public abstract class AbstractPlaybackTest extends AbstractFlowableTestCase {
   // Process instance start event
   private static final String PROCESS_INSTANCE_START_EVENT_TYPE = "PROCESS_INSTANCE_START";
   private static final String PROCESS_DEFINITION_ID_KEY = "processDefinitionId";
@@ -235,8 +235,8 @@ public abstract class AbstractPlaybackTest extends AbstractActivitiTestCase {
     ProcessEngines.destroy();
   }
 
-  protected List<Function<ActivitiEvent, SimulationEvent>> getTransformers() {
-    List<Function<ActivitiEvent, SimulationEvent>> transformers = new ArrayList<Function<ActivitiEvent, SimulationEvent>>();
+  protected List<Function<FlowableEvent, SimulationEvent>> getTransformers() {
+    List<Function<FlowableEvent, SimulationEvent>> transformers = new ArrayList<Function<FlowableEvent, SimulationEvent>>();
     transformers.add(new ProcessInstanceCreateTransformer(PROCESS_INSTANCE_START_EVENT_TYPE, PROCESS_DEFINITION_ID_KEY, BUSINESS_KEY, VARIABLES_KEY));
     transformers.add(new UserTaskCompleteTransformer(USER_TASK_COMPLETED_EVENT_TYPE));
     return transformers;

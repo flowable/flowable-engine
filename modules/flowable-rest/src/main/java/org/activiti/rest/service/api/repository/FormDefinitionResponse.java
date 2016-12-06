@@ -12,7 +12,7 @@
  */
 package org.activiti.rest.service.api.repository;
 
-import org.activiti.form.api.FormDefinition;
+import org.flowable.form.api.FormDefinition;
 
 /**
  * @author Yvo Swillens

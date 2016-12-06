@@ -14,15 +14,15 @@ package org.activiti.validation.validator.impl;
 
 import java.util.List;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.EventGateway;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.IntermediateCatchEvent;
-import org.activiti.bpmn.model.Process;
-import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.validation.ValidationError;
 import org.activiti.validation.validator.Problems;
 import org.activiti.validation.validator.ProcessLevelValidator;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.EventGateway;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.IntermediateCatchEvent;
+import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.SequenceFlow;
 
 /**
  * @author jbarrez

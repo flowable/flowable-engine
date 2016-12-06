@@ -13,8 +13,8 @@
 
 package org.activiti.rest.servlet;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngines;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngines;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

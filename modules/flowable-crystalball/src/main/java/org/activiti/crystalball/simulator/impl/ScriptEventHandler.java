@@ -3,10 +3,10 @@ package org.activiti.crystalball.simulator.impl;
 import org.activiti.crystalball.simulator.SimulationEvent;
 import org.activiti.crystalball.simulator.SimulationEventHandler;
 import org.activiti.crystalball.simulator.SimulationRunContext;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.delegate.VariableScope;
-import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.impl.scripting.ScriptingEngines;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.delegate.VariableScope;
+import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.scripting.ScriptingEngines;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +40,7 @@ public class ScriptEventHandler implements SimulationEventHandler {
     try {
       scriptingEngines.evaluate((String) event.getProperty(this.scriptPropertyName), language, execution, false);
 
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       log.warn("Exception while executing simulation event " + event + " scriptPropertyName :" + this.scriptPropertyName + "\n script: " + event.getProperty(this.scriptPropertyName)
           + "\n exception is:" + e.getMessage());
       throw e;

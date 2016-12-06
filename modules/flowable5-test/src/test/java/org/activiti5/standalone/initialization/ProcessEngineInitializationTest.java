@@ -15,16 +15,16 @@ package org.activiti5.standalone.initialization;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiWrongDbException;
-import org.activiti.engine.impl.ProcessEngineImpl;
-import org.activiti.engine.impl.db.DbSqlSession;
-import org.activiti.engine.impl.db.DbSqlSessionFactory;
 import org.activiti5.engine.impl.test.PvmTestCase;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableWrongDbException;
+import org.flowable.engine.impl.ProcessEngineImpl;
+import org.flowable.engine.impl.db.DbSqlSession;
+import org.flowable.engine.impl.db.DbSqlSessionFactory;
 
 /**
  * @author Tom Baeyens
@@ -65,7 +65,7 @@ public class ProcessEngineInitializationTest extends PvmTestCase {
       sqlSession.update("updateProperty", parameters);
       success = true;
     } catch (Exception e) {
-      throw new ActivitiException("couldn't update db schema version", e);
+      throw new FlowableException("couldn't update db schema version", e);
     } finally {
       if (success) {
         sqlSession.commit();
@@ -84,7 +84,7 @@ public class ProcessEngineInitializationTest extends PvmTestCase {
         .buildProcessEngine();
       
       fail("expected exception");
-    } catch (ActivitiWrongDbException e) {
+    } catch (FlowableWrongDbException e) {
       assertTextPresent("version mismatch", e.getMessage());
       assertEquals("25.7", e.getDbVersion());
       assertEquals(ProcessEngine.VERSION, e.getLibraryVersion());

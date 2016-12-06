@@ -14,12 +14,12 @@ package org.activiti.crystalball.simulator.delegate.event.impl;
  */
 
 import org.activiti.crystalball.simulator.SimulationEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.activiti.engine.runtime.ProcessInstance;
+import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.runtime.ProcessInstance;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,12 +42,12 @@ public class ProcessInstanceCreateTransformer extends Activiti2SimulationEventFu
   }
 
   @Override
-  public SimulationEvent apply(ActivitiEvent event) {
-    if (ActivitiEngineEventType.ENTITY_INITIALIZED.equals(event.getType()) && (event instanceof ActivitiEntityEvent) && ((ActivitiEntityEvent) event).getEntity() instanceof ProcessInstance
-        && ((ExecutionEntity) ((ActivitiEntityEvent) event).getEntity()).isProcessInstanceType()) {
+  public SimulationEvent apply(FlowableEvent event) {
+    if (FlowableEngineEventType.ENTITY_INITIALIZED.equals(event.getType()) && (event instanceof FlowableEntityEvent) && ((FlowableEntityEvent) event).getEntity() instanceof ProcessInstance
+        && ((ExecutionEntity) ((FlowableEntityEvent) event).getEntity()).isProcessInstanceType()) {
 
-      ProcessInstance processInstance = (ProcessInstance) ((ActivitiEntityEvent) event).getEntity();
-      ExecutionEntity executionEntity = (ExecutionEntity) ((ActivitiEntityEvent) event).getEntity();
+      ProcessInstance processInstance = (ProcessInstance) ((FlowableEntityEvent) event).getEntity();
+      ExecutionEntity executionEntity = (ExecutionEntity) ((FlowableEntityEvent) event).getEntity();
 
       Map<String, Object> simEventProperties = new HashMap<String, Object>();
       simEventProperties.put(processDefinitionIdKey, processInstance.getProcessDefinitionId());

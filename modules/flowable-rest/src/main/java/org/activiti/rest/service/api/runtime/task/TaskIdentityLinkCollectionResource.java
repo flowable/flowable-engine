@@ -20,9 +20,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.task.Task;
 import org.activiti.rest.service.api.engine.RestIdentityLink;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.task.Task;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -66,15 +66,15 @@ public class TaskIdentityLinkCollectionResource extends TaskBaseResource {
     Task task = getTaskFromRequest(taskId);
 
     if (identityLink.getGroup() == null && identityLink.getUser() == null) {
-      throw new ActivitiIllegalArgumentException("A group or a user is required to create an identity link.");
+      throw new FlowableIllegalArgumentException("A group or a user is required to create an identity link.");
     }
 
     if (identityLink.getGroup() != null && identityLink.getUser() != null) {
-      throw new ActivitiIllegalArgumentException("Only one of user or group can be used to create an identity link.");
+      throw new FlowableIllegalArgumentException("Only one of user or group can be used to create an identity link.");
     }
 
     if (identityLink.getType() == null) {
-      throw new ActivitiIllegalArgumentException("The identity link type is required.");
+      throw new FlowableIllegalArgumentException("The identity link type is required.");
     }
 
     if (identityLink.getGroup() != null) {

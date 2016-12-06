@@ -22,16 +22,16 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.history.HistoricTaskInstanceQuery;
-import org.activiti.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
-import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.engine.variable.RestVariable.RestVariableScope;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.history.HistoricTaskInstanceQuery;
+import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -79,13 +79,13 @@ public class HistoricTaskInstanceVariableDataResource {
         response.setContentType("application/x-java-serialized-object");
 
       } else {
-        throw new ActivitiObjectNotFoundException("The variable does not have a binary data stream.", null);
+        throw new FlowableObjectNotFoundException("The variable does not have a binary data stream.", null);
       }
       return result;
 
     } catch (IOException ioe) {
       // Re-throw IOException
-      throw new ActivitiException("Unexpected exception getting variable data", ioe);
+      throw new FlowableException("Unexpected exception getting variable data", ioe);
     }
   }
 
@@ -106,7 +106,7 @@ public class HistoricTaskInstanceVariableDataResource {
     HistoricTaskInstance taskObject = taskQuery.singleResult();
 
     if (taskObject == null) {
-      throw new ActivitiObjectNotFoundException("Historic task instance '" + taskId + "' couldn't be found.", HistoricTaskInstanceEntity.class);
+      throw new FlowableObjectNotFoundException("Historic task instance '" + taskId + "' couldn't be found.", HistoricTaskInstanceEntity.class);
     }
 
     Object value = null;
@@ -126,7 +126,7 @@ public class HistoricTaskInstanceVariableDataResource {
     }
 
     if (value == null) {
-      throw new ActivitiObjectNotFoundException("Historic task instance '" + taskId + "' variable value for " + variableName + " couldn't be found.", VariableInstanceEntity.class);
+      throw new FlowableObjectNotFoundException("Historic task instance '" + taskId + "' variable value for " + variableName + " couldn't be found.", VariableInstanceEntity.class);
     } else {
       return restResponseFactory.createRestVariable(variableName, value, null, taskId, RestResponseFactory.VARIABLE_HISTORY_TASK, includeBinary);
     }

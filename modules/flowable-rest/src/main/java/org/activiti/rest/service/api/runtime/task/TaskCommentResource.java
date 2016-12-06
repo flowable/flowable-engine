@@ -18,11 +18,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.task.Comment;
-import org.activiti.engine.task.Task;
 import org.activiti.rest.service.api.engine.CommentResponse;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.task.Comment;
+import org.flowable.engine.task.Task;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,7 +48,7 @@ public class TaskCommentResource extends TaskBaseResource {
 
     Comment comment = taskService.getComment(commentId);
     if (comment == null || !task.getId().equals(comment.getTaskId())) {
-      throw new ActivitiObjectNotFoundException("Task '" + task.getId() + "' doesn't have a comment with id '" + commentId + "'.", Comment.class);
+      throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' doesn't have a comment with id '" + commentId + "'.", Comment.class);
     }
 
     return restResponseFactory.createRestComment(comment);
@@ -67,7 +67,7 @@ public class TaskCommentResource extends TaskBaseResource {
 
     Comment comment = taskService.getComment(commentId);
     if (comment == null || comment.getTaskId() == null || !comment.getTaskId().equals(task.getId())) {
-      throw new ActivitiObjectNotFoundException("Task '" + task.getId() + "' doesn't have a comment with id '" + commentId + "'.", Comment.class);
+      throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' doesn't have a comment with id '" + commentId + "'.", Comment.class);
     }
 
     taskService.deleteComment(commentId);

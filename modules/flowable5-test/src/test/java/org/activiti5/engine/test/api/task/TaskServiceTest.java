@@ -24,30 +24,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiTaskAlreadyClaimedException;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.common.api.ActivitiOptimisticLockingException;
-import org.activiti.engine.history.HistoricDetail;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.impl.TaskServiceImpl;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.impl.persistence.entity.CommentEntity;
-import org.activiti.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Attachment;
-import org.activiti.engine.task.Comment;
-import org.activiti.engine.task.DelegationState;
-import org.activiti.engine.task.Event;
-import org.activiti.engine.task.IdentityLink;
-import org.activiti.engine.task.IdentityLinkType;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
-import org.activiti.idm.api.Group;
-import org.activiti.idm.api.User;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti5.engine.impl.util.CollectionUtil;
+import org.flowable.engine.ActivitiTaskAlreadyClaimedException;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.api.FlowableOptimisticLockingException;
+import org.flowable.engine.history.HistoricDetail;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.impl.TaskServiceImpl;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.persistence.entity.CommentEntity;
+import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Attachment;
+import org.flowable.engine.task.Comment;
+import org.flowable.engine.task.DelegationState;
+import org.flowable.engine.task.Event;
+import org.flowable.engine.task.IdentityLink;
+import org.flowable.engine.task.IdentityLinkType;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.User;
 
 /**
  * @author Frederik Heremans
@@ -306,7 +306,7 @@ public class TaskServiceTest extends PluggableActivitiTestCase {
     try {
     	taskService.complete(task.getId());
     	fail();
-    } catch (ActivitiException e) {}
+    } catch (FlowableException e) {}
 
     taskService.resolveTask(taskId);
     task = taskService.createTaskQuery().taskId(taskId).singleResult();
@@ -384,7 +384,7 @@ public class TaskServiceTest extends PluggableActivitiTestCase {
     try {
       taskService.saveTask(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("task is null", ae.getMessage());
     }
   }
@@ -393,7 +393,7 @@ public class TaskServiceTest extends PluggableActivitiTestCase {
     try {
       taskService.deleteTask(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       // Expected exception
     }
   }
@@ -407,7 +407,7 @@ public class TaskServiceTest extends PluggableActivitiTestCase {
     try {
       taskService.deleteTasks(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       // Expected exception
     }
   }
@@ -463,7 +463,7 @@ public class TaskServiceTest extends PluggableActivitiTestCase {
     try {
       taskService.claim(null, "userid");
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("taskId is null", ae.getMessage());
     }
   }
@@ -475,7 +475,7 @@ public class TaskServiceTest extends PluggableActivitiTestCase {
     try {
       taskService.claim("unexistingtaskid", user.getId());
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("Cannot find task with id unexistingtaskid", ae.getMessage());
       assertEquals(Task.class, ae.getObjectClass());
     }
@@ -548,7 +548,7 @@ public class TaskServiceTest extends PluggableActivitiTestCase {
     try {
       taskService.complete(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("taskId is null", ae.getMessage());
     }
   }
@@ -557,7 +557,7 @@ public class TaskServiceTest extends PluggableActivitiTestCase {
     try {
       taskService.complete("unexistingtask");
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("Cannot find task with id unexistingtask", ae.getMessage());
       assertEquals(Task.class, ae.getObjectClass());
     }
@@ -567,7 +567,7 @@ public class TaskServiceTest extends PluggableActivitiTestCase {
     try {
       taskService.complete(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("taskId is null", ae.getMessage());
     }
   }
@@ -576,7 +576,7 @@ public class TaskServiceTest extends PluggableActivitiTestCase {
     try {
       taskService.complete("unexistingtask");
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("Cannot find task with id unexistingtask", ae.getMessage());
       assertEquals(Task.class, ae.getObjectClass());
     }
@@ -715,7 +715,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.setAssignee(null, "userId");
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("taskId is null", ae.getMessage());
     }
   }
@@ -727,7 +727,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.setAssignee("unexistingTaskId", user.getId());
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("Cannot find task with id unexistingTaskId", ae.getMessage());
       assertEquals(Task.class, ae.getObjectClass());
     }
@@ -756,7 +756,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.addCandidateUser(null, "userId");
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("taskId is null", ae.getMessage());
     }
   }
@@ -765,7 +765,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.addCandidateUser("taskId", null);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("identityId is null", ae.getMessage());
     }
   }
@@ -777,7 +777,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.addCandidateUser("unexistingTaskId", user.getId());
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("Cannot find task with id unexistingTaskId", ae.getMessage());
       assertEquals(Task.class, ae.getObjectClass());
     }
@@ -789,7 +789,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.addCandidateGroup(null, "groupId");
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("taskId is null", ae.getMessage());
     }
   }
@@ -798,7 +798,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.addCandidateGroup("taskId", null);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("identityId is null", ae.getMessage());
     }
   }
@@ -809,7 +809,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.addCandidateGroup("unexistingTaskId", group.getId());
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("Cannot find task with id unexistingTaskId", ae.getMessage());
       assertEquals(Task.class, ae.getObjectClass());
     }
@@ -820,7 +820,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.addGroupIdentityLink(null, "groupId", IdentityLinkType.CANDIDATE);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("taskId is null", ae.getMessage());
     }
   }
@@ -829,7 +829,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.addGroupIdentityLink("taskId", null, IdentityLinkType.CANDIDATE);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("identityId is null", ae.getMessage());
     }
   }
@@ -841,7 +841,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.addGroupIdentityLink("unexistingTaskId", user.getId(), IdentityLinkType.CANDIDATE);
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("Cannot find task with id unexistingTaskId", ae.getMessage());
       assertEquals(Task.class, ae.getObjectClass());
     }
@@ -853,7 +853,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.addUserIdentityLink(null, "userId", IdentityLinkType.CANDIDATE);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("taskId is null", ae.getMessage());
     }
   }
@@ -862,7 +862,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.addUserIdentityLink("taskId", null, IdentityLinkType.CANDIDATE);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("identityId is null", ae.getMessage());
     }
   }
@@ -874,7 +874,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.addUserIdentityLink("unexistingTaskId", user.getId(), IdentityLinkType.CANDIDATE);
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("Cannot find task with id unexistingTaskId", ae.getMessage());
       assertEquals(Task.class, ae.getObjectClass());
     }
@@ -1026,7 +1026,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.setPriority("unexistingtask", 12345);
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("Cannot find task with id unexistingtask", ae.getMessage());
       assertEquals(Task.class, ae.getObjectClass());
     }
@@ -1036,7 +1036,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.setPriority(null, 12345);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("taskId is null", ae.getMessage());
     }
   }
@@ -1067,7 +1067,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.setDueDate("unexistingtask", new Date());
       fail("ActivitiException expected");
-    } catch (ActivitiException ae) {
+    } catch (FlowableException ae) {
         assertTextPresent("Cannot find task with id unexistingtask", ae.getMessage());
     }
   }
@@ -1076,7 +1076,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.setDueDate(null, new Date());
       fail("ActivitiException expected");
-    } catch (ActivitiException ae) {
+    } catch (FlowableException ae) {
       assertTextPresent("taskId is null", ae.getMessage());
     }
   }
@@ -1152,7 +1152,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.removeVariable(null, "variable");
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("taskId is null", ae.getMessage());
     }    
   }
@@ -1196,7 +1196,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.removeVariables(null, Collections.EMPTY_LIST);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("taskId is null", ae.getMessage());
     }    
   }
@@ -1224,7 +1224,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.removeVariableLocal(null, "variable");
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("taskId is null", ae.getMessage());
     }    
   }
@@ -1268,7 +1268,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.removeVariablesLocal(null, Collections.EMPTY_LIST);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException ae) {
+    } catch (FlowableIllegalArgumentException ae) {
       assertTextPresent("taskId is null", ae.getMessage());
     }    
   }
@@ -1288,7 +1288,7 @@ public void testCompleteWithParametersTask2() {
       taskService.saveTask(task2);
       
       fail("Expecting exception");
-    } catch(ActivitiOptimisticLockingException e) {
+    } catch(FlowableOptimisticLockingException e) {
       // Expected exception
     }
   }
@@ -1321,7 +1321,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.resolveTask(null);
       fail();
-    } catch (ActivitiException ae) {
+    } catch (FlowableException ae) {
       assertTextPresent("taskId is null", ae.getMessage());
     }
   }
@@ -1330,7 +1330,7 @@ public void testCompleteWithParametersTask2() {
     try {
       taskService.resolveTask("blergh");
       fail();
-    } catch (ActivitiException ae) {
+    } catch (FlowableException ae) {
       assertTextPresent("Cannot find task with id", ae.getMessage());
     }
   }
@@ -1407,37 +1407,37 @@ public void testCompleteWithParametersTask2() {
     
     try {
       taskService.deleteTask(task.getId());
-    } catch(ActivitiException ae) {
+    } catch(FlowableException ae) {
       assertEquals("The task cannot be deleted because is part of a running process", ae.getMessage());
     }
     
     try {
       taskService.deleteTask(task.getId(), true);
-    } catch(ActivitiException ae) {
+    } catch(FlowableException ae) {
       assertEquals("The task cannot be deleted because is part of a running process", ae.getMessage());
     }
     
     try {
       taskService.deleteTask(task.getId(), "test");
-    } catch(ActivitiException ae) {
+    } catch(FlowableException ae) {
       assertEquals("The task cannot be deleted because is part of a running process", ae.getMessage());
     }
     
     try {
       taskService.deleteTasks(Arrays.asList(task.getId()));
-    } catch(ActivitiException ae) {
+    } catch(FlowableException ae) {
       assertEquals("The task cannot be deleted because is part of a running process", ae.getMessage());
     }
     
     try {
       taskService.deleteTasks(Arrays.asList(task.getId()), true);
-    } catch(ActivitiException ae) {
+    } catch(FlowableException ae) {
       assertEquals("The task cannot be deleted because is part of a running process", ae.getMessage());
     }
     
     try {
       taskService.deleteTasks(Arrays.asList(task.getId()), "test");
-    } catch(ActivitiException ae) {
+    } catch(FlowableException ae) {
       assertEquals("The task cannot be deleted because is part of a running process", ae.getMessage());
     }
     

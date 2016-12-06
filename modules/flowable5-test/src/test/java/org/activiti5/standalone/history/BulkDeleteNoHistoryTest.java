@@ -15,10 +15,10 @@ package org.activiti5.standalone.history;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.ResourceActivitiTestCase;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 
 public class BulkDeleteNoHistoryTest extends ResourceActivitiTestCase {

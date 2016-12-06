@@ -12,11 +12,6 @@
  */
 package org.activiti5.engine.impl.bpmn.parser.handler;
 
-import org.activiti.bpmn.model.Activity;
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.FlowNode;
-import org.activiti.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.activiti5.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
@@ -24,6 +19,11 @@ import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti5.engine.impl.el.ExpressionManager;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.Activity;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.FlowNode;
+import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 
 
 /**

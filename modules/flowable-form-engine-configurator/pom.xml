@@ -16,7 +16,7 @@
 
 	<properties>
 		<activiti.artifact>
-			org.activiti.form.engine.configurator
+			org.flowable.form.engine.configurator
 		</activiti.artifact>
 	</properties>
 	

@@ -12,9 +12,9 @@
  */
 package org.activiti5.engine.test.api.repository;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.test.Deployment;
 
 /**
  * @author jbarrez
@@ -32,7 +32,7 @@ public class DeployNonExecutableProcessDefinitionTest extends PluggableActivitiT
 		try {
 			runtimeService.startProcessInstanceByKey("oneTaskProcessNonExecutable");
 			fail();
-		} catch (ActivitiException e) {
+		} catch (FlowableException e) {
 			assertTextPresent("no processes deployed with key 'oneTaskProcessNonExecutable'", e.getMessage());
 		}
 	}

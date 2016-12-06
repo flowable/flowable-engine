@@ -14,9 +14,9 @@ package org.activiti.test.ldap;
 
 import java.util.List;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.test.Deployment;
-import org.activiti.idm.api.User;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.test.Deployment;
+import org.flowable.idm.api.User;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration("classpath:activiti-context.xml")
@@ -32,12 +32,12 @@ public class LdapIntegrationTest extends LDAPTestCase {
     try {
       identityService.checkPassword("kermit", null);
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
     }
     try {
       identityService.checkPassword("kermit", "");
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
     }
   }
 

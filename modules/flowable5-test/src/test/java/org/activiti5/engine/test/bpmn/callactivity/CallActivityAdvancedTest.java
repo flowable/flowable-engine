@@ -21,14 +21,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.task.TaskQuery;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.task.TaskQuery;
+import org.flowable.engine.test.Deployment;
 
 /**
  * @author Joram Barrez

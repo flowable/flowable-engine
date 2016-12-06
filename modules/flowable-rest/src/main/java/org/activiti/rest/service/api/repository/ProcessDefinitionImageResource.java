@@ -17,10 +17,10 @@ import java.io.InputStream;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.apache.commons.io.IOUtils;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,10 +52,10 @@ public class ProcessDefinitionImageResource extends BaseProcessDefinitionResourc
       try {
         return new ResponseEntity<byte[]>(IOUtils.toByteArray(imageStream), responseHeaders, HttpStatus.OK);
       } catch (Exception e) {
-        throw new ActivitiException("Error reading image stream", e);
+        throw new FlowableException("Error reading image stream", e);
       }
     } else {
-      throw new ActivitiIllegalArgumentException("Process definition with id '" + processDefinition.getId() + "' has no image.");
+      throw new FlowableIllegalArgumentException("Process definition with id '" + processDefinition.getId() + "' has no image.");
     }
   }
 

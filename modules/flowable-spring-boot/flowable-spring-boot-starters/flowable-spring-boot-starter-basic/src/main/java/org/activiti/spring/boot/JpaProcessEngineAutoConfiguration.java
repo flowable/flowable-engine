@@ -17,8 +17,8 @@ import java.io.IOException;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
-import org.activiti.spring.SpringAsyncExecutor;
-import org.activiti.spring.SpringProcessEngineConfiguration;
+import org.flowable.spring.SpringAsyncExecutor;
+import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;

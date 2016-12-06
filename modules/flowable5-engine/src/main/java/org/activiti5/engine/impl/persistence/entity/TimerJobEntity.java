@@ -17,12 +17,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.delegate.VariableScope;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.impl.calendar.BusinessCalendar;
-import org.activiti.engine.impl.calendar.CycleBusinessCalendar;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.context.Context;
@@ -36,6 +30,12 @@ import org.activiti5.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandle
 import org.activiti5.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.delegate.VariableScope;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.impl.calendar.BusinessCalendar;
+import org.flowable.engine.impl.calendar.CycleBusinessCalendar;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,9 +157,9 @@ public class TimerJobEntity extends AbstractJobEntity {
     
     if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_CREATED, this));
+          ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, this));
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_INITIALIZED, this));
+          ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, this));
     }
   }
   
@@ -181,7 +181,7 @@ public class TimerJobEntity extends AbstractJobEntity {
 
     if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_DELETED, this));
+          ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
     }
   }
 

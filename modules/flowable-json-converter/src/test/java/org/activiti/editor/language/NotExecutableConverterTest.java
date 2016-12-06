@@ -2,7 +2,7 @@ package org.activiti.editor.language;
 
 import static org.junit.Assert.assertEquals;
 
-import org.activiti.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.BpmnModel;
 import org.junit.Test;
 
 public class NotExecutableConverterTest extends AbstractConverterTest {

@@ -13,12 +13,12 @@
 
 package org.activiti.rest.form;
 
-import org.activiti.engine.ProcessEngines;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.form.AbstractFormType;
-import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.activiti.engine.repository.ProcessDefinition;
+import org.flowable.engine.ProcessEngines;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.form.AbstractFormType;
+import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.flowable.engine.repository.ProcessDefinition;
 
 /**
  * @author Joram Barrez
@@ -39,7 +39,7 @@ public class ProcessDefinitionFormType extends AbstractFormType {
       ProcessDefinition processDefinition = ProcessEngines.getDefaultProcessEngine().getRepositoryService().createProcessDefinitionQuery().processDefinitionId(propertyValue).singleResult();
 
       if (processDefinition == null) {
-        throw new ActivitiObjectNotFoundException("Process definition with id " + propertyValue + " does not exist", ProcessDefinitionEntity.class);
+        throw new FlowableObjectNotFoundException("Process definition with id " + propertyValue + " does not exist", ProcessDefinitionEntity.class);
       }
 
       return processDefinition;
@@ -53,7 +53,7 @@ public class ProcessDefinitionFormType extends AbstractFormType {
       return null;
     }
     if (!(modelValue instanceof ProcessDefinition)) {
-      throw new ActivitiIllegalArgumentException("This form type only support process definitions, but is " + modelValue.getClass());
+      throw new FlowableIllegalArgumentException("This form type only support process definitions, but is " + modelValue.getClass());
     }
     return ((ProcessDefinition) modelValue).getId();
   }

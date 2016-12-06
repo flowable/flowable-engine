@@ -16,14 +16,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.ExtensionElement;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.UserTask;
 import org.activiti.editor.language.json.converter.util.CollectionUtils;
 import org.activiti.editor.language.json.model.ModelInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.ExtensionElement;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.UserTask;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;

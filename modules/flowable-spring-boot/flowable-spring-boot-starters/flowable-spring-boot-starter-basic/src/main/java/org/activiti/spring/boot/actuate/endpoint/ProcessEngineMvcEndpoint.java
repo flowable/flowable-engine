@@ -14,12 +14,12 @@ package org.activiti.spring.boot.actuate.endpoint;
 
 import java.io.InputStream;
 
-import org.activiti.bpmn.BpmnAutoLayout;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
+import org.flowable.bpmn.BpmnAutoLayout;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.boot.actuate.endpoint.mvc.EndpointMvcAdapter;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;

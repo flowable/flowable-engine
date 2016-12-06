@@ -17,9 +17,9 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.rest.exception.ActivitiConflictException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.rest.exception.ActivitiConflictException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -70,7 +70,7 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
           HttpServletRequest request) {
 
     if (actionRequest == null) {
-      throw new ActivitiIllegalArgumentException("No action found in request body.");
+      throw new FlowableIllegalArgumentException("No action found in request body.");
     }
 
     ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
@@ -96,7 +96,7 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
         }
       }
 
-      throw new ActivitiIllegalArgumentException("Invalid action: '" + actionRequest.getAction() + "'.");
+      throw new FlowableIllegalArgumentException("Invalid action: '" + actionRequest.getAction() + "'.");
     }
   }
 

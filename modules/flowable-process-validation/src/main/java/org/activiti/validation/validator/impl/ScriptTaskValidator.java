@@ -14,13 +14,13 @@ package org.activiti.validation.validator.impl;
 
 import java.util.List;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.Process;
-import org.activiti.bpmn.model.ScriptTask;
 import org.activiti.validation.ValidationError;
 import org.activiti.validation.validator.Problems;
 import org.activiti.validation.validator.ProcessLevelValidator;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.ScriptTask;
 
 /**
  * @author jbarrez

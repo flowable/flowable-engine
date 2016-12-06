@@ -12,7 +12,7 @@
  */
 package org.activiti5.spring.test.servicetask;
 
-import org.activiti.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.DelegateExecution;
 
 /**
  * @author Joram Barrez

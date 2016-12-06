@@ -12,8 +12,8 @@
  */
 package org.activiti.spring.integration;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.impl.bpmn.behavior.ReceiveTaskActivityBehavior;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.bpmn.behavior.ReceiveTaskActivityBehavior;
 
 public class IntegrationActivityBehavior extends ReceiveTaskActivityBehavior {
 

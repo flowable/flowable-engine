@@ -15,12 +15,12 @@ package org.activiti5.engine.impl.bpmn.parser.factory;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.bpmn.model.FieldExtension;
-import org.activiti.engine.delegate.Expression;
 import org.activiti5.engine.impl.bpmn.parser.FieldDeclaration;
 import org.activiti5.engine.impl.el.ExpressionManager;
 import org.activiti5.engine.impl.el.FixedValue;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.FieldExtension;
+import org.flowable.engine.delegate.Expression;
 
 /**
  * @author Joram Barrez

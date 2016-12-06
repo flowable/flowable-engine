@@ -2,7 +2,7 @@ package org.activiti.osgi.blueprint;
 
 import javax.sql.DataSource;
 
-import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 
 public class ConfigurationFactory {
 

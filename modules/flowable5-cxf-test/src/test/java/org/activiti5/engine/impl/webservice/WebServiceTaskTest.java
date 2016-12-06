@@ -21,12 +21,12 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.interceptor.Fault;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 
 /**
  * An integration test for CXF based web services
@@ -81,7 +81,7 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
     webServiceMock.setTo(123456);
     try {
       runtimeService.startProcessInstanceByKey("webServiceInvocation");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertTrue(e.getCause() instanceof SoapFault);
     }
 
@@ -89,7 +89,7 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
     server.stop();
     try {
       runtimeService.startProcessInstanceByKey("webServiceInvocation");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertTrue(e.getCause() instanceof Fault);
     } finally {
       server.start();

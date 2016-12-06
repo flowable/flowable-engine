@@ -14,13 +14,13 @@ package org.activiti.crystalball.simulator;
 
 import java.util.Stack;
 
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.common.runtime.Clock;
-import org.activiti.engine.delegate.VariableScope;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.delegate.VariableScope;
 
 /**
  * Context in which simulation is run. It contains references to process engine, event calendar.

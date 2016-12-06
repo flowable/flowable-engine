@@ -21,8 +21,8 @@ import javax.annotation.PostConstruct;
 
 import org.activiti.app.idm.cache.UserCache;
 import org.activiti.app.idm.model.UserInformation;
-import org.activiti.idm.api.IdmIdentityService;
-import org.activiti.idm.api.User;
+import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.api.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.LockedException;

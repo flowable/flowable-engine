@@ -12,9 +12,9 @@
  */
 package org.activiti5.engine.impl.bpmn.parser.handler;
 
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.FlowNode;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.FlowNode;
 
 
 /**

@@ -13,7 +13,7 @@
 
 package org.activiti.rest.form;
 
-import org.activiti.engine.form.AbstractFormType;
+import org.flowable.engine.form.AbstractFormType;
 
 /**
  * @author Joram Barrez

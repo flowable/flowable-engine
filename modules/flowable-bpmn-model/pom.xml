@@ -15,7 +15,7 @@
   
   <properties>
     <activiti.artifact>
-      org.activiti.bpmn.model
+      org.flowable.bpmn.model
     </activiti.artifact>
     <activiti.osgi.import.additional>
       org.apache.commons.lang;resolution:=optional

@@ -16,8 +16,8 @@ package org.activiti5.engine.test.bpmn.event.compensate.helper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.JavaDelegate;
 
 
 /**

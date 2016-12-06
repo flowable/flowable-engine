@@ -13,7 +13,7 @@
 package org.activiti.app.rest.runtime.variable;
 
 import org.activiti.app.model.runtime.RestVariable;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.springframework.stereotype.Component;
 
 
@@ -37,7 +37,7 @@ public class StringRestVariableConverter implements RestVariableConverter {
   public Object getVariableValue(RestVariable result) {
     if(result.getValue() != null) {
       if(!(result.getValue() instanceof String)) {
-        throw new ActivitiIllegalArgumentException("Converter can only convert strings");
+        throw new FlowableIllegalArgumentException("Converter can only convert strings");
       }
       return (String) result.getValue();
     }
@@ -48,7 +48,7 @@ public class StringRestVariableConverter implements RestVariableConverter {
   public void convertVariableValue(Object variableValue, RestVariable result) {
     if(variableValue != null) {
       if(!(variableValue instanceof String)) {
-        throw new ActivitiIllegalArgumentException("Converter can only convert strings");
+        throw new FlowableIllegalArgumentException("Converter can only convert strings");
       }
       result.setValue(variableValue);
     } else {

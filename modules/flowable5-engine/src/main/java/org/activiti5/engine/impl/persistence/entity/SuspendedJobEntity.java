@@ -12,9 +12,9 @@
  */
 package org.activiti5.engine.impl.persistence.entity;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.context.Context;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,9 +71,9 @@ public class SuspendedJobEntity extends AbstractJobEntity {
     
     if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_CREATED, this));
+          ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, this));
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_INITIALIZED, this));
+          ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, this));
     }
   }
   
@@ -87,7 +87,7 @@ public class SuspendedJobEntity extends AbstractJobEntity {
 
     if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_DELETED, this));
+          ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
     }
   }
 }

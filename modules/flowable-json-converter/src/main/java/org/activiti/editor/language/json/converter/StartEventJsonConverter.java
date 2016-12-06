@@ -14,18 +14,18 @@ package org.activiti.editor.language.json.converter;
 
 import java.util.Map;
 
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.ErrorEventDefinition;
-import org.activiti.bpmn.model.Event;
-import org.activiti.bpmn.model.EventDefinition;
-import org.activiti.bpmn.model.ExtensionElement;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.MessageEventDefinition;
-import org.activiti.bpmn.model.SignalEventDefinition;
-import org.activiti.bpmn.model.StartEvent;
-import org.activiti.bpmn.model.TimerEventDefinition;
 import org.activiti.editor.language.json.model.ModelInfo;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.ErrorEventDefinition;
+import org.flowable.bpmn.model.Event;
+import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.ExtensionElement;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.MessageEventDefinition;
+import org.flowable.bpmn.model.SignalEventDefinition;
+import org.flowable.bpmn.model.StartEvent;
+import org.flowable.bpmn.model.TimerEventDefinition;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;

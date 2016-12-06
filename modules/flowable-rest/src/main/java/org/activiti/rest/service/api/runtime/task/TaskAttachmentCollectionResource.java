@@ -22,13 +22,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.task.Attachment;
-import org.activiti.engine.task.Task;
 import org.activiti.rest.service.api.engine.AttachmentRequest;
 import org.activiti.rest.service.api.engine.AttachmentResponse;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.task.Attachment;
+import org.flowable.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -101,11 +101,11 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
         attachmentRequest = objectMapper.readValue(request.getInputStream(), AttachmentRequest.class);
 
       } catch (Exception e) {
-        throw new ActivitiIllegalArgumentException("Failed to serialize to a AttachmentRequest instance", e);
+        throw new FlowableIllegalArgumentException("Failed to serialize to a AttachmentRequest instance", e);
       }
 
       if (attachmentRequest == null) {
-        throw new ActivitiIllegalArgumentException("AttachmentRequest properties not found in request");
+        throw new FlowableIllegalArgumentException("AttachmentRequest properties not found in request");
       }
 
       result = createSimpleAttachment(attachmentRequest, task);
@@ -118,7 +118,7 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
   protected AttachmentResponse createSimpleAttachment(AttachmentRequest attachmentRequest, Task task) {
 
     if (attachmentRequest.getName() == null) {
-      throw new ActivitiIllegalArgumentException("Attachment name is required.");
+      throw new FlowableIllegalArgumentException("Attachment name is required.");
     }
 
     Attachment createdAttachment = taskService.createAttachment(attachmentRequest.getType(), task.getId(), task.getProcessInstanceId(), attachmentRequest.getName(),
@@ -150,17 +150,17 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
     }
 
     if (name == null) {
-      throw new ActivitiIllegalArgumentException("Attachment name is required.");
+      throw new FlowableIllegalArgumentException("Attachment name is required.");
     }
 
     if (request.getFileMap().size() == 0) {
-      throw new ActivitiIllegalArgumentException("Attachment content is required.");
+      throw new FlowableIllegalArgumentException("Attachment content is required.");
     }
 
     MultipartFile file = request.getFileMap().values().iterator().next();
 
     if (file == null) {
-      throw new ActivitiIllegalArgumentException("Attachment content is required.");
+      throw new FlowableIllegalArgumentException("Attachment content is required.");
     }
 
     try {
@@ -170,7 +170,7 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
       return restResponseFactory.createAttachmentResponse(createdAttachment);
 
     } catch (Exception e) {
-      throw new ActivitiException("Error creating attachment response", e);
+      throw new FlowableException("Error creating attachment response", e);
     }
   }
 }

@@ -22,11 +22,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.runtime.Execution;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.runtime.Execution;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -69,12 +69,12 @@ public class ExecutionVariableDataResource extends BaseExecutionVariableResource
         response.setContentType("application/x-java-serialized-object");
 
       } else {
-        throw new ActivitiObjectNotFoundException("The variable does not have a binary data stream.", null);
+        throw new FlowableObjectNotFoundException("The variable does not have a binary data stream.", null);
       }
       return result;
 
     } catch (IOException ioe) {
-      throw new ActivitiException("Error getting variable " + variableName, ioe);
+      throw new FlowableException("Error getting variable " + variableName, ioe);
     }
   }
 }

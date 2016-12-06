@@ -20,12 +20,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.task.Comment;
-import org.activiti.engine.task.Task;
 import org.activiti.rest.service.api.engine.CommentRequest;
 import org.activiti.rest.service.api.engine.CommentResponse;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.task.Comment;
+import org.flowable.engine.task.Task;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -63,7 +63,7 @@ public class TaskCommentCollectionResource extends TaskBaseResource {
     Task task = getTaskFromRequest(taskId);
 
     if (comment.getMessage() == null) {
-      throw new ActivitiIllegalArgumentException("Comment text is required.");
+      throw new FlowableIllegalArgumentException("Comment text is required.");
     }
 
     String processInstanceId = null;

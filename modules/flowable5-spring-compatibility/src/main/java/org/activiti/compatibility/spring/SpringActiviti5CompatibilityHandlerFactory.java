@@ -12,8 +12,8 @@
  */
 package org.activiti.compatibility.spring;
 
-import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
-import org.activiti.engine.compatibility.Activiti5CompatibilityHandlerFactory;
+import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Activiti5CompatibilityHandlerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

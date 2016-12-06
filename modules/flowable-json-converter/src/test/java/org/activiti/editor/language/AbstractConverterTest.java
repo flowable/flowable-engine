@@ -6,11 +6,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.Event;
-import org.activiti.bpmn.model.EventDefinition;
-import org.activiti.bpmn.model.FlowElement;
 import org.activiti.editor.language.json.converter.BpmnJsonConverter;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.Event;
+import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.FlowElement;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

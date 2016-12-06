@@ -15,16 +15,16 @@ package org.activiti5.engine.test.history;
 
 import java.util.List;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricActivityInstanceQuery;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricActivityInstanceQuery;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 
 /**
@@ -264,21 +264,21 @@ public class HistoricActivityInstanceTest extends PluggableActivitiTestCase {
     try {
       historyService.createHistoricActivityInstanceQuery().asc().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       
     }
     
     try {
       historyService.createHistoricActivityInstanceQuery().desc().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       
     }
     
     try {
       historyService.createHistoricActivityInstanceQuery().orderByHistoricActivityInstanceDuration().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       
     }
   }

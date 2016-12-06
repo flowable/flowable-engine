@@ -14,8 +14,8 @@ package org.activiti5.standalone.parsing;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.ResourceActivitiTestCase;
+import org.flowable.engine.test.Deployment;
 
 /**
  * @author Joram Barrez

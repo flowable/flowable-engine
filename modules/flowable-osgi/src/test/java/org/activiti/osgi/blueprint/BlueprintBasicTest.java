@@ -28,16 +28,16 @@ import java.io.InputStream;
 
 import javax.inject.Inject;
 
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.history.HistoricVariableInstance;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.osgi.blueprint.bean.ActivityBehaviourBean;
 import org.activiti.osgi.blueprint.bean.SimpleBean;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.history.HistoricVariableInstance;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;

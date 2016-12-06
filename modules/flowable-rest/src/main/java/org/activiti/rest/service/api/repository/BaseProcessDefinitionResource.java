@@ -13,10 +13,10 @@
 
 package org.activiti.rest.service.api.repository;
 
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -37,7 +37,7 @@ public class BaseProcessDefinitionResource {
     ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processDefinitionId);
 
     if (processDefinition == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a process definition with id '" + processDefinitionId + "'.", ProcessDefinition.class);
+      throw new FlowableObjectNotFoundException("Could not find a process definition with id '" + processDefinitionId + "'.", ProcessDefinition.class);
     }
     return processDefinition;
   }

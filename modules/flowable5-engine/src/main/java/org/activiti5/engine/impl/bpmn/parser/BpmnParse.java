@@ -22,36 +22,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.bpmn.constants.BpmnXMLConstants;
-import org.activiti.bpmn.converter.BpmnXMLConverter;
-import org.activiti.bpmn.exceptions.XMLException;
-import org.activiti.bpmn.model.BoundaryEvent;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.Event;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.FlowNode;
-import org.activiti.bpmn.model.GraphicInfo;
-import org.activiti.bpmn.model.Import;
-import org.activiti.bpmn.model.Interface;
-import org.activiti.bpmn.model.Message;
-import org.activiti.bpmn.model.Process;
-import org.activiti.bpmn.model.SequenceFlow;
-import org.activiti.bpmn.model.SubProcess;
-import org.activiti.engine.common.impl.util.io.InputStreamSource;
-import org.activiti.engine.common.impl.util.io.StreamSource;
-import org.activiti.engine.common.impl.util.io.StringStreamSource;
-import org.activiti.engine.common.impl.util.io.UrlStreamSource;
-import org.activiti.engine.delegate.event.impl.ActivitiEventSupport;
-import org.activiti.engine.impl.bpmn.data.ClassStructureDefinition;
-import org.activiti.engine.impl.bpmn.data.ItemDefinition;
-import org.activiti.engine.impl.bpmn.data.ItemKind;
-import org.activiti.engine.impl.bpmn.data.StructureDefinition;
-import org.activiti.engine.impl.bpmn.parser.XMLImporter;
-import org.activiti.engine.impl.bpmn.webservice.BpmnInterface;
-import org.activiti.engine.impl.bpmn.webservice.BpmnInterfaceImplementation;
-import org.activiti.engine.impl.bpmn.webservice.MessageDefinition;
-import org.activiti.engine.impl.bpmn.webservice.Operation;
-import org.activiti.engine.impl.bpmn.webservice.OperationImplementation;
 import org.activiti.validation.ProcessValidator;
 import org.activiti.validation.ValidationError;
 import org.activiti5.engine.ActivitiException;
@@ -70,6 +40,36 @@ import org.activiti5.engine.impl.pvm.process.TransitionImpl;
 import org.activiti5.engine.impl.util.ReflectUtil;
 import org.activiti5.engine.impl.util.io.ResourceStreamSource;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.constants.BpmnXMLConstants;
+import org.flowable.bpmn.converter.BpmnXMLConverter;
+import org.flowable.bpmn.exceptions.XMLException;
+import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.Event;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowNode;
+import org.flowable.bpmn.model.GraphicInfo;
+import org.flowable.bpmn.model.Import;
+import org.flowable.bpmn.model.Interface;
+import org.flowable.bpmn.model.Message;
+import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.SubProcess;
+import org.flowable.engine.common.impl.util.io.InputStreamSource;
+import org.flowable.engine.common.impl.util.io.StreamSource;
+import org.flowable.engine.common.impl.util.io.StringStreamSource;
+import org.flowable.engine.common.impl.util.io.UrlStreamSource;
+import org.flowable.engine.delegate.event.impl.FlowableEventSupport;
+import org.flowable.engine.impl.bpmn.data.ClassStructureDefinition;
+import org.flowable.engine.impl.bpmn.data.ItemDefinition;
+import org.flowable.engine.impl.bpmn.data.ItemKind;
+import org.flowable.engine.impl.bpmn.data.StructureDefinition;
+import org.flowable.engine.impl.bpmn.parser.XMLImporter;
+import org.flowable.engine.impl.bpmn.webservice.BpmnInterface;
+import org.flowable.engine.impl.bpmn.webservice.BpmnInterfaceImplementation;
+import org.flowable.engine.impl.bpmn.webservice.MessageDefinition;
+import org.flowable.engine.impl.bpmn.webservice.Operation;
+import org.flowable.engine.impl.bpmn.webservice.OperationImplementation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -227,7 +227,7 @@ public class BpmnParse implements BpmnXMLConstants {
       	}
       }
       
-      bpmnModel.setEventSupport(new ActivitiEventSupport());
+      bpmnModel.setEventSupport(new FlowableEventSupport());
       
       // Validation successful (or no validation)
       createImports();
@@ -353,7 +353,7 @@ public class BpmnParse implements BpmnXMLConstants {
   }
 
   protected void createItemDefinitions() {
-    for (org.activiti.bpmn.model.ItemDefinition itemDefinitionElement : bpmnModel.getItemDefinitions().values()) {
+    for (org.flowable.bpmn.model.ItemDefinition itemDefinitionElement : bpmnModel.getItemDefinitions().values()) {
       StructureDefinition structure = null;
 
       try {
@@ -378,7 +378,7 @@ public class BpmnParse implements BpmnXMLConstants {
       BpmnInterface bpmnInterface = new BpmnInterface(interfaceObject.getId(), interfaceObject.getName());
       bpmnInterface.setImplementation(this.interfaceImplementations.get(interfaceObject.getImplementationRef()));
 
-      for (org.activiti.bpmn.model.Operation operationObject : interfaceObject.getOperations()) {
+      for (org.flowable.bpmn.model.Operation operationObject : interfaceObject.getOperations()) {
         if (this.messages.containsKey(operationObject.getInMessageRef())) {
           MessageDefinition inMessage = this.messages.get(operationObject.getInMessageRef());
           Operation operation = new Operation(operationObject.getId(), operationObject.getName(), bpmnInterface, inMessage);

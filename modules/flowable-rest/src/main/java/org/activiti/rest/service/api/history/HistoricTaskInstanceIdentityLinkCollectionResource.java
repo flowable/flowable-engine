@@ -19,9 +19,10 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import io.swagger.annotations.*;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.history.HistoricIdentityLink;
+
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.history.HistoricIdentityLink;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

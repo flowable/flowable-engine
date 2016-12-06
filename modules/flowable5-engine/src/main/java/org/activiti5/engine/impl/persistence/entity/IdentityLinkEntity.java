@@ -16,13 +16,13 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.task.IdentityLink;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.db.BulkDeleteable;
 import org.activiti5.engine.impl.db.PersistentObject;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.task.IdentityLink;
 
 
 /**
@@ -92,9 +92,9 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, BulkDelet
     
     if(Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
     	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_CREATED, this));
+    			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, this));
     	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_INITIALIZED, this));
+    			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, this));
     }
   }
   

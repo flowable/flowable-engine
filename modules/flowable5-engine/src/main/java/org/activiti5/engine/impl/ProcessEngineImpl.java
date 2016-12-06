@@ -14,7 +14,6 @@ package org.activiti5.engine.impl;
 
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.DynamicBpmnService;
 import org.activiti5.engine.FormService;
 import org.activiti5.engine.HistoryService;
@@ -31,6 +30,7 @@ import org.activiti5.engine.impl.cfg.TransactionContextFactory;
 import org.activiti5.engine.impl.el.ExpressionManager;
 import org.activiti5.engine.impl.interceptor.CommandExecutor;
 import org.activiti5.engine.impl.interceptor.SessionFactory;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +85,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     }
     
     processEngineConfiguration.getEventDispatcher().dispatchEvent(
-    		ActivitiEventBuilder.createGlobalEvent(ActivitiEngineEventType.ENGINE_CREATED));
+    		ActivitiEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CREATED));
   }
   
   public void close() {
@@ -98,7 +98,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     }
     
     processEngineConfiguration.getEventDispatcher().dispatchEvent(
-    		ActivitiEventBuilder.createGlobalEvent(ActivitiEngineEventType.ENGINE_CLOSED));
+    		ActivitiEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CLOSED));
   }
 
   // getters and setters //////////////////////////////////////////////////////

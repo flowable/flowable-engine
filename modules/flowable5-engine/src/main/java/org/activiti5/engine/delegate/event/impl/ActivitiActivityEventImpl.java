@@ -12,23 +12,23 @@
  */
 package org.activiti5.engine.delegate.event.impl;
 
-import org.activiti.engine.delegate.event.ActivitiActivityEvent;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
+import org.flowable.engine.delegate.event.FlowableActivityEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
- * Implementation of an {@link ActivitiActivityEvent}.
+ * Implementation of an {@link FlowableActivityEvent}.
  * 
  * @author Frederik Heremans
  * @author Joram Barrez
  */
-public class ActivitiActivityEventImpl extends ActivitiEventImpl implements ActivitiActivityEvent {
+public class ActivitiActivityEventImpl extends ActivitiEventImpl implements FlowableActivityEvent {
 
 	protected String activityId;
 	protected String activityName;
 	protected String activityType;
 	protected String behaviorClass;
 	
-	public ActivitiActivityEventImpl(ActivitiEngineEventType type) {
+	public ActivitiActivityEventImpl(FlowableEngineEventType type) {
 	  super(type);
   }
 

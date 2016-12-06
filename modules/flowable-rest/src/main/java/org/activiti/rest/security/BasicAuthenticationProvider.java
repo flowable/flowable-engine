@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.activiti.engine.IdentityService;
-import org.activiti.idm.api.Group;
+import org.flowable.engine.IdentityService;
+import org.flowable.idm.api.Group;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;

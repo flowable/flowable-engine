@@ -12,17 +12,17 @@
  */
 package org.activiti5.engine.test.api.event;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.bpmn.helper.ErrorThrowingEventListener;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 /**
- * Test case for all {@link ActivitiEventListener}s that throws an error BPMN event when an {@link ActivitiEvent}
+ * Test case for all {@link FlowableEventListener}s that throws an error BPMN event when an {@link FlowableEvent}
  * has been dispatched.
  * 
  * @author Frederik Heremans
@@ -36,7 +36,7 @@ public class ErrorThrowingEventListenerTest extends PluggableActivitiTestCase {
 		try {
 			listener = new ErrorThrowingEventListener();
 			
-			processEngineConfiguration.getEventDispatcher().addEventListener(listener, ActivitiEngineEventType.TASK_ASSIGNED);
+			processEngineConfiguration.getEventDispatcher().addEventListener(listener, FlowableEngineEventType.TASK_ASSIGNED);
 			
 			ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testError");
 			assertNotNull(processInstance);
@@ -87,7 +87,7 @@ public class ErrorThrowingEventListenerTest extends PluggableActivitiTestCase {
 			listener = new ErrorThrowingEventListener();
 			listener.setErrorCode("123");
 			
-			processEngineConfiguration.getEventDispatcher().addEventListener(listener, ActivitiEngineEventType.TASK_ASSIGNED);
+			processEngineConfiguration.getEventDispatcher().addEventListener(listener, FlowableEngineEventType.TASK_ASSIGNED);
 			
 			ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testError");
 			assertNotNull(processInstance);

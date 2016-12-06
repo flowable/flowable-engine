@@ -15,9 +15,9 @@ package org.activiti5.engine.repository;
 
 import java.util.Set;
 
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.query.Query;
+import org.flowable.engine.repository.ProcessDefinition;
 
 /**
  * Allows programmatic querying of {@link ProcessDefinition}s.

@@ -10,12 +10,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.FormProperty;
-import org.activiti.bpmn.model.FormValue;
-import org.activiti.bpmn.model.StartEvent;
-import org.activiti.bpmn.model.UserTask;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FormProperty;
+import org.flowable.bpmn.model.FormValue;
+import org.flowable.bpmn.model.StartEvent;
+import org.flowable.bpmn.model.UserTask;
 import org.junit.Test;
 
 public class FormPropertiesConverterTest extends AbstractConverterTest {

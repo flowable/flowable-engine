@@ -16,7 +16,7 @@ import java.util.Date;
 
 import org.activiti.app.model.common.AbstractRepresentation;
 import org.activiti.app.model.component.SimpleContentTypeMapper;
-import org.activiti.content.api.ContentItem;
+import org.flowable.content.api.ContentItem;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;

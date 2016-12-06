@@ -19,15 +19,15 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.query.QueryProperty;
-import org.activiti.idm.api.User;
-import org.activiti.idm.api.UserQuery;
-import org.activiti.idm.api.UserQueryProperty;
-import org.activiti.rest.api.DataResponse;
-import org.activiti.rest.exception.ActivitiConflictException;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.flowable.engine.IdentityService;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.idm.api.User;
+import org.flowable.idm.api.UserQuery;
+import org.flowable.idm.api.UserQueryProperty;
+import org.flowable.rest.api.DataResponse;
+import org.flowable.rest.exception.ActivitiConflictException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -123,7 +123,7 @@ public class UserCollectionResource {
   @RequestMapping(value = "/identity/users", method = RequestMethod.POST, produces = "application/json")
   public UserResponse createUser(@RequestBody UserRequest userRequest, HttpServletRequest request, HttpServletResponse response) {
     if (userRequest.getId() == null) {
-      throw new ActivitiIllegalArgumentException("Id cannot be null.");
+      throw new FlowableIllegalArgumentException("Id cannot be null.");
     }
 
     // Check if a user with the given ID already exists so we return a

@@ -3,9 +3,9 @@ package org.activiti.editor.language;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.Pool;
-import org.activiti.bpmn.model.Process;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.Pool;
+import org.flowable.bpmn.model.Process;
 import org.junit.Test;
 
 public class NotExecutablePoolConverterTest extends AbstractConverterTest {

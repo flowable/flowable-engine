@@ -15,7 +15,7 @@
 
 	<properties>
 		<activiti.artifact>
-			org.activiti.idm.engine
+			org.flowable.idm.engine
 		</activiti.artifact>
 		<activiti.osgi.import.additional>
 			org.springframework*;resolution:=optional,
@@ -200,8 +200,8 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<echo message="updating activiti idm configuration to db ${databaseidm}" />
-										<copy file="${basedir}/../../qa/db/activiti.idm.cfg.xml"
+										<echo message="updating flowable idm configuration to db ${databaseidm}" />
+										<copy file="${basedir}/../../qa/db/flowable.idm.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset
 												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databaseidm}.properties" />
@@ -218,7 +218,7 @@
 								<configuration>
 									<tasks>
 										<echo message="dropping schema in ${databaseidm}" />
-										<java classname="org.activiti.idm.engine.impl.db.DbSchemaDrop"
+										<java classname="org.flowable.idm.engine.impl.db.DbSchemaDrop"
 											classpathref="maven.test.classpath" />
 									</tasks>
 								</configuration>
@@ -252,8 +252,8 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<echo message="updating activiti idm configuration to db ${databasewithschemaidm}" />
-										<copy file="${basedir}/../../qa/db/schema/activiti.idm.cfg.xml"
+										<echo message="updating flowable idm configuration to db ${databasewithschemaidm}" />
+										<copy file="${basedir}/../../qa/db/schema/flowable.idm.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset
 												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasewithschemaidm}.properties" />
@@ -270,7 +270,7 @@
 								<configuration>
 									<tasks>
 										<echo message="dropping schema in ${databasewithschemaidm}" />
-										<java classname="org.activiti.idm.engine.impl.db.DbSchemaDrop"
+										<java classname="org.flowable.idm.engine.impl.db.DbSchemaDrop"
 											classpathref="maven.test.classpath" />
 									</tasks>
 								</configuration>

@@ -15,7 +15,7 @@
 
 	<properties>
 		<activiti.artifact>
-			org.activiti.dmn.converter
+			org.flowable.dmn.converter
 		</activiti.artifact>
 	</properties>
 

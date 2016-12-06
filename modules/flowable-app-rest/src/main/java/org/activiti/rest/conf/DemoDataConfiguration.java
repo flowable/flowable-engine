@@ -20,16 +20,16 @@ import java.util.Random;
 
 import javax.annotation.PostConstruct;
 
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.common.impl.util.IoUtil;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.Model;
-import org.activiti.idm.api.Group;
-import org.activiti.idm.api.Picture;
-import org.activiti.idm.api.User;
 import org.apache.commons.io.IOUtils;
+import org.flowable.engine.IdentityService;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.common.impl.util.IoUtil;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.Model;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.Picture;
+import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

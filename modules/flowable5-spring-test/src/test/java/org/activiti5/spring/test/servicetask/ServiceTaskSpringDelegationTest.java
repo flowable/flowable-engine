@@ -12,10 +12,10 @@
  */
 package org.activiti5.spring.test.servicetask;
 
-import org.activiti.engine.impl.test.JobTestHelper;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.engine.impl.test.JobTestHelper;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 import org.springframework.test.context.ContextConfiguration;
 
 /**

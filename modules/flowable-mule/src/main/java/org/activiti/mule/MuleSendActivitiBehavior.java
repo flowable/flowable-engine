@@ -18,13 +18,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
-import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.impl.scripting.ScriptingEngines;
-import org.activiti.engine.impl.util.Activiti5Util;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -34,6 +27,13 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
+import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.scripting.ScriptingEngines;
+import org.flowable.engine.impl.util.Activiti5Util;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -117,7 +117,7 @@ public class MuleSendActivitiBehavior extends AbstractBpmnActivityBehavior {
         request.setEntity(new ByteArrayEntity(baos.toByteArray()));
 
       } catch (Exception e) {
-        throw new ActivitiException("Error setting message payload", e);
+        throw new FlowableException("Error setting message payload", e);
       }
 
       byte[] responseBytes = null;
@@ -142,7 +142,7 @@ public class MuleSendActivitiBehavior extends AbstractBpmnActivityBehavior {
             execution.setVariable(resultVariableValue, result);
           }
         } catch (Exception e) {
-          throw new ActivitiException("Failed to read response value", e);
+          throw new FlowableException("Failed to read response value", e);
         }
       }
     }

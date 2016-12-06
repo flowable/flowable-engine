@@ -12,11 +12,11 @@
  */
 package org.activiti.crystalball.simulator.impl;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
-import org.activiti.engine.common.runtime.Clock;
-import org.activiti.engine.impl.ProcessEngineImpl;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.impl.ProcessEngineImpl;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 import java.util.Calendar;
 
@@ -38,7 +38,7 @@ public final class EventRecorderTestUtils {
     clock.setCurrentTime(c.getTime());
   }
 
-  public static void closeProcessEngine(ProcessEngine processEngine, ActivitiEventListener listener) {
+  public static void closeProcessEngine(ProcessEngine processEngine, FlowableEventListener listener) {
     if (listener != null) {
       final ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
       processEngineConfiguration.getEventDispatcher().removeEventListener(listener);

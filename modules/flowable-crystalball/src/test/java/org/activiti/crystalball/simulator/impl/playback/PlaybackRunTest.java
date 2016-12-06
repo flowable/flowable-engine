@@ -23,20 +23,20 @@ import org.activiti.crystalball.simulator.delegate.event.impl.UserTaskCompleteTr
 import org.activiti.crystalball.simulator.impl.*;
 import org.activiti.crystalball.simulator.impl.clock.DefaultClockFactory;
 import org.activiti.crystalball.simulator.impl.clock.ThreadLocalClock;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.ProcessEngines;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.common.*;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.impl.util.DefaultClockImpl;
-import org.activiti.engine.common.runtime.Clock;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.impl.ProcessEngineImpl;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.el.NoExecutionVariableScope;
-import org.activiti.engine.repository.ProcessDefinition;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.ProcessEngines;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.common.*;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.impl.util.DefaultClockImpl;
+import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.ProcessEngineImpl;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.el.NoExecutionVariableScope;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -134,8 +134,8 @@ public class PlaybackRunTest {
     assertEquals(BUSINESS_KEY, historicProcessInstance.getBusinessKey());
   }
 
-  private List<Function<ActivitiEvent, SimulationEvent>> getTransformers() {
-    List<Function<ActivitiEvent, SimulationEvent>> transformers = new ArrayList<Function<ActivitiEvent, SimulationEvent>>();
+  private List<Function<FlowableEvent, SimulationEvent>> getTransformers() {
+    List<Function<FlowableEvent, SimulationEvent>> transformers = new ArrayList<Function<FlowableEvent, SimulationEvent>>();
     transformers.add(new DeploymentCreateTransformer(DEPLOYMENT_CREATED_EVENT_TYPE, DEPLOYMENT_RESOURCES_KEY));
     transformers.add(new ProcessInstanceCreateTransformer(PROCESS_INSTANCE_START_EVENT_TYPE, PROCESS_DEFINITION_ID_KEY, BUSINESS_KEY, VARIABLES_KEY));
     transformers.add(new UserTaskCompleteTransformer(USER_TASK_COMPLETED_EVENT_TYPE));

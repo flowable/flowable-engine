@@ -4,11 +4,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.spring.integration.ActivitiInboundGateway;
 import org.activiti.spring.integration.IntegrationActivityBehavior;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

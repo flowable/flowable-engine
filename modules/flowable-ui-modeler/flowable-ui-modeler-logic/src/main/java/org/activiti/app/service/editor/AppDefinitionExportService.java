@@ -23,7 +23,7 @@ import org.activiti.app.service.exception.BadRequestException;
 import org.activiti.app.service.exception.InternalServerErrorException;
 import org.activiti.editor.language.json.converter.BpmnJsonConverter;
 import org.activiti.editor.language.json.converter.util.CollectionUtils;
-import org.activiti.idm.api.User;
+import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

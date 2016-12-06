@@ -12,7 +12,7 @@
  */
 package org.activiti.app.model.common;
 
-import org.activiti.idm.api.Group;
+import org.flowable.idm.api.Group;
 
 public class RemoteGroup implements Group {
   

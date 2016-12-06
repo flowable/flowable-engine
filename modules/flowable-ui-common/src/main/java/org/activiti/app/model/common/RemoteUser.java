@@ -15,7 +15,7 @@ package org.activiti.app.model.common;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.idm.api.User;
+import org.flowable.idm.api.User;
 
 public class RemoteUser implements User {
   

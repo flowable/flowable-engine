@@ -15,7 +15,7 @@ package org.activiti.management.jmx;
 import javax.management.Notification;
 import javax.management.modelmbean.ModelMBeanNotificationBroadcaster;
 
-import org.activiti.engine.common.api.ActivitiException;
+import org.flowable.engine.common.api.FlowableException;
 
 /**
  * @author Saeid Mirzaei
@@ -33,7 +33,7 @@ public final class NotificationSenderAdapter implements NotificationSender {
     try {
       broadcaster.sendNotification(notification);
     } catch (Exception e) {
-      throw new ActivitiException("Error sending notification", e);
+      throw new FlowableException("Error sending notification", e);
     }
   }
 }

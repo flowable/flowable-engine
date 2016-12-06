@@ -3,7 +3,6 @@ package org.activiti.rest.service.api.repository;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 
-import org.activiti.engine.repository.Deployment;
 import org.activiti.rest.service.BaseSpringRestTestCase;
 import org.activiti.rest.service.api.RestUrls;
 import org.apache.commons.io.IOUtils;
@@ -12,6 +11,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.message.BasicHeader;
+import org.flowable.engine.repository.Deployment;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

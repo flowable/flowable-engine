@@ -29,17 +29,17 @@ public class ActivitiAppUser extends User {
 
     private static final long serialVersionUID = 1L;
     
-    protected org.activiti.idm.api.User userObject;
+    protected org.flowable.idm.api.User userObject;
     
     /**
      * The userId needs to be passed explicitly. It can be the email, but also the external id when eg LDAP is being used. 
      */
-    public ActivitiAppUser(org.activiti.idm.api.User user, String userId, Collection<? extends GrantedAuthority> authorities) {
+    public ActivitiAppUser(org.flowable.idm.api.User user, String userId, Collection<? extends GrantedAuthority> authorities) {
         super(userId, user.getPassword() != null ? user.getPassword() : "", authorities); // Passwords needs to be non-null. Even if it's not there (eg LDAP auth)
         this.userObject = user;
     }
     
-    public org.activiti.idm.api.User getUserObject() {
+    public org.flowable.idm.api.User getUserObject() {
         return userObject;
     }
 }

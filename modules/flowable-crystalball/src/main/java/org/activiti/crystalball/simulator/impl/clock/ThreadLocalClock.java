@@ -1,7 +1,7 @@
 package org.activiti.crystalball.simulator.impl.clock;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.runtime.Clock;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.runtime.Clock;
 import org.springframework.beans.factory.FactoryBean;
 
 import java.util.Calendar;
@@ -29,7 +29,7 @@ public class ThreadLocalClock implements Clock {
       try {
         THREAD_CLOCK.set(clockFactory.getObject());
       } catch (Exception e) {
-        throw new ActivitiException("Unable to get simulation clock", e);
+        throw new FlowableException("Unable to get simulation clock", e);
       }
     }
     return THREAD_CLOCK.get();

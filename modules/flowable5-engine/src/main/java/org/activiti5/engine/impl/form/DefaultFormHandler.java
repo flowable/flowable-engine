@@ -18,15 +18,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.form.AbstractFormType;
-import org.activiti.engine.form.FormProperty;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.el.ExpressionManager;
 import org.activiti5.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti5.engine.impl.persistence.entity.ExecutionEntity;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.form.AbstractFormType;
+import org.flowable.engine.form.FormProperty;
+import org.flowable.engine.repository.ProcessDefinition;
 
 
 /**
@@ -38,7 +38,7 @@ public class DefaultFormHandler implements FormHandler {
   protected String deploymentId;
   protected List<FormPropertyHandler> formPropertyHandlers = new ArrayList<FormPropertyHandler>();
   
-  public void parseConfiguration(List<org.activiti.bpmn.model.FormProperty> formProperties, String formKey, DeploymentEntity deployment, ProcessDefinition processDefinition) {
+  public void parseConfiguration(List<org.flowable.bpmn.model.FormProperty> formProperties, String formKey, DeploymentEntity deployment, ProcessDefinition processDefinition) {
     this.deploymentId = deployment.getId();
     
     ExpressionManager expressionManager = Context
@@ -53,7 +53,7 @@ public class DefaultFormHandler implements FormHandler {
       .getProcessEngineConfiguration()
       .getFormTypes();
     
-    for (org.activiti.bpmn.model.FormProperty formProperty : formProperties) {
+    for (org.flowable.bpmn.model.FormProperty formProperty : formProperties) {
       FormPropertyHandler formPropertyHandler = new FormPropertyHandler();
       formPropertyHandler.setId(formProperty.getId());
       formPropertyHandler.setName(formProperty.getName());

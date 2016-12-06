@@ -23,8 +23,8 @@ import java.util.Map;
 import org.activiti.crystalball.simulator.SimulationEvent;
 import org.activiti.crystalball.simulator.SimulationEventHandler;
 import org.activiti.crystalball.simulator.SimulationRunContext;
-import org.activiti.engine.impl.persistence.entity.ResourceEntity;
-import org.activiti.engine.repository.DeploymentBuilder;
+import org.flowable.engine.impl.persistence.entity.ResourceEntity;
+import org.flowable.engine.repository.DeploymentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -17,17 +17,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.common.api.query.QueryProperty;
-import org.activiti.engine.impl.ProcessInstanceQueryProperty;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.runtime.ProcessInstanceQuery;
-import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.QueryVariable;
 import org.activiti.rest.service.api.engine.variable.QueryVariable.QueryVariableOperation;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.engine.impl.ProcessInstanceQueryProperty;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.flowable.rest.api.DataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -113,10 +113,10 @@ public class BaseProcessInstanceResource {
   protected void addVariables(ProcessInstanceQuery processInstanceQuery, List<QueryVariable> variables) {
     for (QueryVariable variable : variables) {
       if (variable.getVariableOperation() == null) {
-        throw new ActivitiIllegalArgumentException("Variable operation is missing for variable: " + variable.getName());
+        throw new FlowableIllegalArgumentException("Variable operation is missing for variable: " + variable.getName());
       }
       if (variable.getValue() == null) {
-        throw new ActivitiIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+        throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
       }
 
       boolean nameLess = variable.getName() == null;
@@ -125,7 +125,7 @@ public class BaseProcessInstanceResource {
 
       // A value-only query is only possible using equals-operator
       if (nameLess && variable.getVariableOperation() != QueryVariableOperation.EQUALS) {
-        throw new ActivitiIllegalArgumentException("Value-only query (without a variable-name) is only supported when using 'equals' operation.");
+        throw new FlowableIllegalArgumentException("Value-only query (without a variable-name) is only supported when using 'equals' operation.");
       }
 
       switch (variable.getVariableOperation()) {
@@ -142,7 +142,7 @@ public class BaseProcessInstanceResource {
         if (actualValue instanceof String) {
           processInstanceQuery.variableValueEqualsIgnoreCase(variable.getName(), (String) actualValue);
         } else {
-          throw new ActivitiIllegalArgumentException("Only string variable values are supported when ignoring casing, but was: " + actualValue.getClass().getName());
+          throw new FlowableIllegalArgumentException("Only string variable values are supported when ignoring casing, but was: " + actualValue.getClass().getName());
         }
         break;
 
@@ -154,7 +154,7 @@ public class BaseProcessInstanceResource {
         if (actualValue instanceof String) {
           processInstanceQuery.variableValueNotEqualsIgnoreCase(variable.getName(), (String) actualValue);
         } else {
-          throw new ActivitiIllegalArgumentException("Only string variable values are supported when ignoring casing, but was: " + actualValue.getClass().getName());
+          throw new FlowableIllegalArgumentException("Only string variable values are supported when ignoring casing, but was: " + actualValue.getClass().getName());
         }
         break;
 
@@ -162,7 +162,7 @@ public class BaseProcessInstanceResource {
         if (actualValue instanceof String) {
           processInstanceQuery.variableValueLike(variable.getName(), (String) actualValue);
         } else {
-          throw new ActivitiIllegalArgumentException("Only string variable values are supported for like, but was: " + actualValue.getClass().getName());
+          throw new FlowableIllegalArgumentException("Only string variable values are supported for like, but was: " + actualValue.getClass().getName());
         }
         break;
 
@@ -183,7 +183,7 @@ public class BaseProcessInstanceResource {
         break;
 
       default:
-        throw new ActivitiIllegalArgumentException("Unsupported variable query operation: " + variable.getVariableOperation());
+        throw new FlowableIllegalArgumentException("Unsupported variable query operation: " + variable.getVariableOperation());
       }
     }
   }
@@ -191,7 +191,7 @@ public class BaseProcessInstanceResource {
   protected ProcessInstance getProcessInstanceFromRequest(String processInstanceId) {
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
     if (processInstance == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.");
+      throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.");
     }
     return processInstance;
   }

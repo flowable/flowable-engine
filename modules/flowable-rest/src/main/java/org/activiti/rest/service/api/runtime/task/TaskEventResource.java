@@ -18,11 +18,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.task.Event;
-import org.activiti.engine.task.Task;
 import org.activiti.rest.service.api.engine.EventResponse;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.task.Event;
+import org.flowable.engine.task.Task;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,7 +48,7 @@ public class TaskEventResource extends TaskBaseResource {
 
     Event event = taskService.getEvent(eventId);
     if (event == null || !task.getId().equals(event.getTaskId())) {
-      throw new ActivitiObjectNotFoundException("Task '" + task.getId() + "' doesn't have an event with id '" + eventId + "'.", Event.class);
+      throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' doesn't have an event with id '" + eventId + "'.", Event.class);
     }
 
     return restResponseFactory.createEventResponse(event);
@@ -68,7 +68,7 @@ public class TaskEventResource extends TaskBaseResource {
 
     Event event = taskService.getEvent(eventId);
     if (event == null || event.getTaskId() == null || !event.getTaskId().equals(task.getId())) {
-      throw new ActivitiObjectNotFoundException("Task '" + task.getId() + "' doesn't have an event with id '" + event + "'.", Event.class);
+      throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' doesn't have an event with id '" + event + "'.", Event.class);
     }
 
     taskService.deleteComment(eventId);

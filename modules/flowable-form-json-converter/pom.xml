@@ -12,7 +12,7 @@
 	
 	<properties>
 		<activiti.artifact>
-			org.activiti.form.json.converter
+			org.flowable.form.json.converter
 		</activiti.artifact>
 	</properties>
 

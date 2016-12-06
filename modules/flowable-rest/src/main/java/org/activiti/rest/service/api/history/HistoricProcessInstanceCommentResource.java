@@ -18,13 +18,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.task.Comment;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.CommentResponse;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.task.Comment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -59,7 +59,7 @@ public class HistoricProcessInstanceCommentResource {
 
     Comment comment = taskService.getComment(commentId);
     if (comment == null || comment.getProcessInstanceId() == null || !comment.getProcessInstanceId().equals(instance.getId())) {
-      throw new ActivitiObjectNotFoundException("Process instance '" + instance.getId() + "' doesn't have a comment with id '" + commentId + "'.", Comment.class);
+      throw new FlowableObjectNotFoundException("Process instance '" + instance.getId() + "' doesn't have a comment with id '" + commentId + "'.", Comment.class);
     }
 
     return restResponseFactory.createRestComment(comment);
@@ -76,7 +76,7 @@ public class HistoricProcessInstanceCommentResource {
 
     Comment comment = taskService.getComment(commentId);
     if (comment == null || comment.getProcessInstanceId() == null || !comment.getProcessInstanceId().equals(instance.getId())) {
-      throw new ActivitiObjectNotFoundException("Process instance '" + instance.getId() + "' doesn't have a comment with id '" + commentId + "'.", Comment.class);
+      throw new FlowableObjectNotFoundException("Process instance '" + instance.getId() + "' doesn't have a comment with id '" + commentId + "'.", Comment.class);
     }
 
     taskService.deleteComment(commentId);
@@ -86,7 +86,7 @@ public class HistoricProcessInstanceCommentResource {
   protected HistoricProcessInstance getHistoricProcessInstanceFromRequest(String processInstanceId) {
     HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
     if (processInstance == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", HistoricProcessInstance.class);
+      throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", HistoricProcessInstance.class);
     }
     return processInstance;
   }

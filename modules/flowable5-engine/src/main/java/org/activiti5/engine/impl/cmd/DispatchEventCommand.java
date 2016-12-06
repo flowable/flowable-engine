@@ -12,11 +12,11 @@
  */
 package org.activiti5.engine.impl.cmd;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.impl.interceptor.Command;
 import org.activiti5.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 
 /**
  * Command that dispatches an event.
@@ -25,9 +25,9 @@ import org.activiti5.engine.impl.interceptor.CommandContext;
  */
 public class DispatchEventCommand implements Command<Void> {
 	
-	protected ActivitiEvent event;
+	protected FlowableEvent event;
 	
-	public DispatchEventCommand(ActivitiEvent event) {
+	public DispatchEventCommand(FlowableEvent event) {
 	  this.event = event;
   }
 

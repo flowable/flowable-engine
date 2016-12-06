@@ -18,17 +18,17 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.idm.api.Group;
-import org.activiti.idm.api.GroupQuery;
-import org.activiti.idm.api.NativeGroupQuery;
-import org.activiti.idm.api.NativeUserQuery;
-import org.activiti.idm.api.User;
-import org.activiti.idm.api.UserQuery;
-import org.activiti.idm.engine.impl.IdmIdentityServiceImpl;
 import org.activiti.ldap.impl.LDAPGroupQueryImpl;
 import org.activiti.ldap.impl.LDAPUserQueryImpl;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.GroupQuery;
+import org.flowable.idm.api.NativeGroupQuery;
+import org.flowable.idm.api.NativeUserQuery;
+import org.flowable.idm.api.User;
+import org.flowable.idm.api.UserQuery;
+import org.flowable.idm.engine.impl.IdmIdentityServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,48 +65,48 @@ public class LDAPIdentityServiceImpl extends IdmIdentityServiceImpl {
 
   @Override
   public User newUser(String userId) {
-    throw new ActivitiException("LDAP identity service doesn't support creating a new user");
+    throw new FlowableException("LDAP identity service doesn't support creating a new user");
   }
 
   @Override
   public void saveUser(User user) {
-    throw new ActivitiException("LDAP identity service doesn't support saving an user");
+    throw new FlowableException("LDAP identity service doesn't support saving an user");
   }
 
   @Override
   public NativeUserQuery createNativeUserQuery() {
-    throw new ActivitiException("LDAP identity service doesn't support native querying");
+    throw new FlowableException("LDAP identity service doesn't support native querying");
   }
 
   @Override
   public void deleteUser(String userId) {
-    throw new ActivitiException("LDAP identity service doesn't support deleting an user");
+    throw new FlowableException("LDAP identity service doesn't support deleting an user");
   }
 
   @Override
   public Group newGroup(String groupId) {
-    throw new ActivitiException("LDAP identity service doesn't support creating a new group");
+    throw new FlowableException("LDAP identity service doesn't support creating a new group");
   }
 
   @Override
   public NativeGroupQuery createNativeGroupQuery() {
-    throw new ActivitiException("LDAP identity service doesn't support native querying");
+    throw new FlowableException("LDAP identity service doesn't support native querying");
   }
 
   @Override
   public void saveGroup(Group group) {
-    throw new ActivitiException("LDAP identity service doesn't support saving a group");
+    throw new FlowableException("LDAP identity service doesn't support saving a group");
   }
 
   @Override
   public void deleteGroup(String groupId) {
-    throw new ActivitiException("LDAP identity service doesn't support deleting a group");
+    throw new FlowableException("LDAP identity service doesn't support deleting a group");
   }
   
   protected boolean executeCheckPassword(final String userId, final String password) {
     // Extra password check, see http://forums.activiti.org/comment/22312
     if (password == null || password.length() == 0) {
-      throw new ActivitiException("Null or empty passwords are not allowed!");
+      throw new FlowableException("Null or empty passwords are not allowed!");
     }
 
     try {
@@ -143,7 +143,7 @@ public class LDAPIdentityServiceImpl extends IdmIdentityServiceImpl {
             InitialDirContext verificationContext = null;
             try {
               verificationContext = LDAPConnectionUtil.createDirectoryContext(ldapConfigurator, userDn, password);
-            } catch (ActivitiException e) {
+            } catch (FlowableException e) {
               // Do nothing, an exception will be thrown if the login fails
             }
 
@@ -158,7 +158,7 @@ public class LDAPIdentityServiceImpl extends IdmIdentityServiceImpl {
         }
       });
 
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       logger.info("Could not authenticate user : " + e);
       return false;
     }

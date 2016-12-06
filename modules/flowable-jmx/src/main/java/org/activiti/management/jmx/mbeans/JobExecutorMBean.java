@@ -12,11 +12,11 @@
  */
 package org.activiti.management.jmx.mbeans;
 
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.management.jmx.annotations.ManagedAttribute;
 import org.activiti.management.jmx.annotations.ManagedOperation;
 import org.activiti.management.jmx.annotations.ManagedResource;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
 
 /**
  * @author Saeid Mirzaei

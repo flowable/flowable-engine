@@ -20,8 +20,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.rest.api.DataResponse;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.rest.api.DataResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -122,11 +122,11 @@ public class ExecutionCollectionResource extends ExecutionBaseResource {
   @RequestMapping(value = "/runtime/executions", method = RequestMethod.PUT)
   public void executeExecutionAction(@RequestBody ExecutionActionRequest actionRequest, HttpServletResponse response) {
     if (!ExecutionActionRequest.ACTION_SIGNAL_EVENT_RECEIVED.equals(actionRequest.getAction())) {
-      throw new ActivitiIllegalArgumentException("Illegal action: '" + actionRequest.getAction() + "'.");
+      throw new FlowableIllegalArgumentException("Illegal action: '" + actionRequest.getAction() + "'.");
     }
 
     if (actionRequest.getSignalName() == null) {
-      throw new ActivitiIllegalArgumentException("Signal name is required.");
+      throw new FlowableIllegalArgumentException("Signal name is required.");
     }
 
     if (actionRequest.getVariables() != null) {

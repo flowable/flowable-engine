@@ -14,8 +14,8 @@ package org.activiti5.engine.runtime;
 
 import java.util.Map;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 
 /**
  * Helper for starting new ProcessInstance.
@@ -85,9 +85,9 @@ public interface ProcessInstanceBuilder {
   /**
    * Start the process instance
    * 
-   * @throws ActivitiIllegalArgumentException
+   * @throws FlowableIllegalArgumentException
    *           if processDefinitionKey and processDefinitionId are null
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no process definition is deployed with the given processDefinitionKey or processDefinitionId
    * **/
   ProcessInstance start();

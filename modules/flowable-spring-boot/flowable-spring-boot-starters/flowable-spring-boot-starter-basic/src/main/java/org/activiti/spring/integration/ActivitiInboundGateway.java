@@ -18,8 +18,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.delegate.DelegateExecution;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.integration.gateway.MessagingGatewaySupport;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;

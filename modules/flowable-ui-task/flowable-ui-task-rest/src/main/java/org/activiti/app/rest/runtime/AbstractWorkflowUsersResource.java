@@ -20,13 +20,13 @@ import java.util.Set;
 
 import org.activiti.app.model.common.ResultListDataRepresentation;
 import org.activiti.app.model.common.UserRepresentation;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.task.IdentityLink;
-import org.activiti.idm.api.User;
-import org.activiti.idm.api.UserQuery;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.engine.IdentityService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.task.IdentityLink;
+import org.flowable.idm.api.User;
+import org.flowable.idm.api.UserQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class AbstractWorkflowUsersResource {

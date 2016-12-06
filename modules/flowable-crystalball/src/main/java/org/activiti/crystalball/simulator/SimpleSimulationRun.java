@@ -14,9 +14,9 @@ package org.activiti.crystalball.simulator;
  */
 
 import org.activiti.crystalball.simulator.impl.NoopEventHandler;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.delegate.VariableScope;
-import org.activiti.engine.impl.ProcessEngineImpl;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.delegate.VariableScope;
+import org.flowable.engine.impl.ProcessEngineImpl;
 
 import java.util.Collections;
 import java.util.Date;
@@ -65,7 +65,7 @@ public class SimpleSimulationRun extends AbstractSimulationRun {
       if (dueDate != null)
         SimulationRunContext.getEventCalendar().addEvent(new SimulationEvent.Builder(SimulationConstants.TYPE_END_SIMULATION).simulationTime(dueDate.getTime()).build());
     } catch (Exception e) {
-      throw new ActivitiException("Unable to initialize simulation run", e);
+      throw new FlowableException("Unable to initialize simulation run", e);
     }
   }
 

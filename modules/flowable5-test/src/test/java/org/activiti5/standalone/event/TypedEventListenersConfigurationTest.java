@@ -12,11 +12,11 @@
  */
 package org.activiti5.standalone.event;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventImpl;
 import org.activiti5.engine.impl.test.ResourceActivitiTestCase;
 import org.activiti5.engine.test.api.event.TestActivitiEventListener;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
  * Test to verify event-listeners, which are configured in the cfg.xml, are notified.
@@ -38,7 +38,7 @@ public class TypedEventListenersConfigurationTest extends ResourceActivitiTestCa
   	listener.clearEventsReceived();
   	
   	// Dispath a custom event
-  	ActivitiEvent event = new ActivitiEventImpl(ActivitiEngineEventType.CUSTOM);
+  	FlowableEvent event = new ActivitiEventImpl(FlowableEngineEventType.CUSTOM);
   	processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
   	
   	assertEquals(1, listener.getEventsReceived().size());
@@ -46,18 +46,18 @@ public class TypedEventListenersConfigurationTest extends ResourceActivitiTestCa
   	listener.clearEventsReceived();
   	
     // Dispatch another event the listener is registered for
-    event = new ActivitiEventImpl(ActivitiEngineEventType.ENTITY_DELETED);
+    event = new ActivitiEventImpl(FlowableEngineEventType.ENTITY_DELETED);
     processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
-   	event = new ActivitiEventImpl(ActivitiEngineEventType.ENTITY_UPDATED);
+   	event = new ActivitiEventImpl(FlowableEngineEventType.ENTITY_UPDATED);
    	processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
    	
    	assertEquals(2, listener.getEventsReceived().size());
-   	assertEquals(ActivitiEngineEventType.ENTITY_DELETED, listener.getEventsReceived().get(0).getType());
-   	assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, listener.getEventsReceived().get(1).getType());
+   	assertEquals(FlowableEngineEventType.ENTITY_DELETED, listener.getEventsReceived().get(0).getType());
+   	assertEquals(FlowableEngineEventType.ENTITY_UPDATED, listener.getEventsReceived().get(1).getType());
    	listener.clearEventsReceived();
   	
   	// Dispatch an event that is NOT part of the types configured
-  	event = new ActivitiEventImpl(ActivitiEngineEventType.ENTITY_CREATED);
+  	event = new ActivitiEventImpl(FlowableEngineEventType.ENTITY_CREATED);
   	processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
   	assertTrue(listener.getEventsReceived().isEmpty());
   }

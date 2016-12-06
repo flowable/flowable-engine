@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.activiti.engine.impl.util.ReflectUtil;
-import org.activiti.engine.repository.Deployment;
 import org.activiti.rest.service.BaseSpringRestTestCase;
 import org.activiti.rest.service.HttpMultipartHelper;
 import org.activiti.rest.service.api.RestUrls;
@@ -18,6 +16,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.flowable.engine.impl.util.ReflectUtil;
+import org.flowable.engine.repository.Deployment;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -205,7 +205,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
   /**
    * Test getting a single deployment. GET repository/deployments/{deploymentId}
    */
-  @org.activiti.engine.test.Deployment(resources = { "org/activiti/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
+  @org.flowable.engine.test.Deployment(resources = { "org/activiti/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
   public void testGetDeployment() throws Exception {
     Deployment existingDeployment = repositoryService.createDeploymentQuery().singleResult();
 
@@ -249,7 +249,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
   /**
    * Test deleting a single deployment. DELETE repository/deployments/{deploymentId}
    */
-  @org.activiti.engine.test.Deployment(resources = { "org/activiti/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
+  @org.flowable.engine.test.Deployment(resources = { "org/activiti/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
   public void testDeleteDeployment() throws Exception {
     Deployment existingDeployment = repositoryService.createDeploymentQuery().singleResult();
     assertNotNull(existingDeployment);

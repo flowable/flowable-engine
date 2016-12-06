@@ -15,13 +15,13 @@ package org.activiti.test.spring.executor.jms.config;
 import javax.jms.ConnectionFactory;
 import javax.sql.DataSource;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
-import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.activiti.spring.executor.jms.JobMessageListener;
 import org.activiti.spring.executor.jms.MessageBasedJobManager;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.RepositoryService;
+import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;

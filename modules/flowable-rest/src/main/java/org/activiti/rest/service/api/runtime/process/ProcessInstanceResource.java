@@ -18,9 +18,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.rest.exception.ActivitiConflictException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.rest.exception.ActivitiConflictException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -85,7 +85,7 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
     } else if (ProcessInstanceActionRequest.ACTION_SUSPEND.equals(actionRequest.getAction())) {
       return suspendProcessInstance(processInstance);
     }
-    throw new ActivitiIllegalArgumentException("Invalid action: '" + actionRequest.getAction() + "'.");
+    throw new FlowableIllegalArgumentException("Invalid action: '" + actionRequest.getAction() + "'.");
   }
 
   protected ProcessInstanceResponse activateProcessInstance(ProcessInstance processInstance) {

@@ -19,12 +19,12 @@ import java.util.Map;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.spi.InitialContextFactory;
 
-import org.activiti.engine.cfg.AbstractProcessEngineConfigurator;
-import org.activiti.engine.cfg.ProcessEngineConfigurator;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.idm.api.Group;
-import org.activiti.idm.api.User;
 import org.activiti.ldap.LDAPGroupCache.LDAPGroupCacheListener;
+import org.flowable.engine.cfg.AbstractProcessEngineConfigurator;
+import org.flowable.engine.cfg.ProcessEngineConfigurator;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.User;
 
 /**
  * A {@link ProcessEngineConfigurator} that integrates a LDAP system with the Activiti process engine. The LDAP system will be consulted primarily for getting user information and in particular for

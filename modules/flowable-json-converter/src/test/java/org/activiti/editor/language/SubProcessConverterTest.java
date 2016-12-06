@@ -4,13 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.activiti.bpmn.model.BoundaryEvent;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.StartEvent;
-import org.activiti.bpmn.model.SubProcess;
-import org.activiti.bpmn.model.TimerEventDefinition;
-import org.activiti.bpmn.model.UserTask;
+import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.StartEvent;
+import org.flowable.bpmn.model.SubProcess;
+import org.flowable.bpmn.model.TimerEventDefinition;
+import org.flowable.bpmn.model.UserTask;
 import org.junit.Test;
 
 public class SubProcessConverterTest extends AbstractConverterTest {

@@ -20,11 +20,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.task.IdentityLink;
-import org.activiti.engine.task.Task;
 import org.activiti.rest.service.api.RestUrls;
 import org.activiti.rest.service.api.engine.RestIdentityLink;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.task.IdentityLink;
+import org.flowable.engine.task.Task;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -53,7 +53,7 @@ public class TaskIdentityLinkFamilyResource extends TaskBaseResource {
     Task task = getTaskFromRequest(taskId);
 
     if (family == null || (!RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS.equals(family) && !RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS.equals(family))) {
-      throw new ActivitiIllegalArgumentException("Identity link family should be 'users' or 'groups'.");
+      throw new FlowableIllegalArgumentException("Identity link family should be 'users' or 'groups'.");
     }
 
     boolean isUser = family.equals(RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS);

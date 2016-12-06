@@ -20,8 +20,8 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 
 import org.activiti.app.service.api.UserCache;
-import org.activiti.engine.IdentityService;
-import org.activiti.idm.api.User;
+import org.flowable.engine.IdentityService;
+import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

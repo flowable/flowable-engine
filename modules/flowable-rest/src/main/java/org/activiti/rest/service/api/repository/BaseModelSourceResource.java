@@ -13,7 +13,7 @@
 
 package org.activiti.rest.service.api.repository;
 
-import org.activiti.engine.common.api.ActivitiException;
+import org.flowable.engine.common.api.FlowableException;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -26,7 +26,7 @@ public abstract class BaseModelSourceResource extends BaseModelResource {
     try {
       byteArray = file.getBytes();
     } catch (Exception e) {
-      throw new ActivitiException("Error getting file bytes", e);
+      throw new FlowableException("Error getting file bytes", e);
     }
     return byteArray;
   }

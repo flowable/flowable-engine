@@ -12,14 +12,14 @@
  */
 package org.activiti5.standalone.validation;
 
-import org.activiti.bpmn.exceptions.XMLException;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngines;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.DeploymentProperties;
+import org.flowable.bpmn.exceptions.XMLException;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngines;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.DeploymentProperties;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -77,7 +77,7 @@ public class DisabledSchemaValidationTest {
 				.disableSchemaValidation()
 				.deploy();
 			Assert.fail();
-		} catch (ActivitiException e) {
+		} catch (FlowableException e) {
 		  // expected exception
 		}
 		

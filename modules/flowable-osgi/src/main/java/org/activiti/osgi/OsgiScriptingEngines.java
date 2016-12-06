@@ -17,10 +17,10 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.delegate.VariableScope;
-import org.activiti.engine.impl.scripting.ScriptBindingsFactory;
-import org.activiti.engine.impl.scripting.ScriptingEngines;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.delegate.VariableScope;
+import org.flowable.engine.impl.scripting.ScriptBindingsFactory;
+import org.flowable.engine.impl.scripting.ScriptingEngines;
 import org.osgi.framework.InvalidSyntaxException;
 
 /**
@@ -53,7 +53,7 @@ public class OsgiScriptingEngines extends ScriptingEngines {
     try {
       scriptEngine = Extender.resolveScriptEngine(language);
     } catch (InvalidSyntaxException e) {
-      throw new ActivitiException("problem resolving scripting engine" + e.getMessage(), e);
+      throw new FlowableException("problem resolving scripting engine" + e.getMessage(), e);
     }
 
     if (scriptEngine == null) {
@@ -63,7 +63,7 @@ public class OsgiScriptingEngines extends ScriptingEngines {
     try {
       return scriptEngine.eval(script, bindings);
     } catch (ScriptException e) {
-      throw new ActivitiException("problem evaluating script: " + e.getMessage(), e);
+      throw new FlowableException("problem evaluating script: " + e.getMessage(), e);
     }
   }
 }

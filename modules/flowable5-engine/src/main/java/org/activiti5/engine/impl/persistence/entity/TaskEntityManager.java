@@ -18,8 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.delegate.TaskListener;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
@@ -30,6 +28,8 @@ import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.persistence.AbstractManager;
 import org.activiti5.engine.task.Task;
+import org.flowable.engine.delegate.TaskListener;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 
 /**
@@ -99,7 +99,7 @@ public class TaskEntityManager extends AbstractManager {
       
       if(commandContext.getEventDispatcher().isEnabled()) {
       	commandContext.getEventDispatcher().dispatchEvent(
-      			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_DELETED, task));
+      			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, task));
       }
     }
   }

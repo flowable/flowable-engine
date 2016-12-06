@@ -10,15 +10,15 @@ import javax.el.ELResolver;
 import javax.el.ListELResolver;
 import javax.el.MapELResolver;
 
-import org.activiti.engine.delegate.VariableScope;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.el.ExpressionManager;
-import org.activiti.engine.impl.el.VariableScopeElResolver;
-import org.activiti.engine.impl.scripting.BeansResolverFactory;
-import org.activiti.engine.impl.scripting.ResolverFactory;
-import org.activiti.engine.impl.scripting.ScriptBindingsFactory;
-import org.activiti.engine.impl.scripting.VariableScopeResolverFactory;
 import org.activiti.osgi.OsgiScriptingEngines;
+import org.flowable.engine.delegate.VariableScope;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.el.ExpressionManager;
+import org.flowable.engine.impl.el.VariableScopeElResolver;
+import org.flowable.engine.impl.scripting.BeansResolverFactory;
+import org.flowable.engine.impl.scripting.ResolverFactory;
+import org.flowable.engine.impl.scripting.ScriptBindingsFactory;
+import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 
 public class ProcessEngineFactoryWithELResolver extends ProcessEngineFactory {
 

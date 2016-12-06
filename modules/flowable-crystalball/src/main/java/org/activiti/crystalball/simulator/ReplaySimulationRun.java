@@ -15,9 +15,9 @@ package org.activiti.crystalball.simulator;
 
 import java.util.Map;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.delegate.VariableScope;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.delegate.VariableScope;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 /**
  * This class provides simulation run for replay purposes replay uses real time and running engine to execute simulation events.

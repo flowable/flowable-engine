@@ -23,14 +23,14 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.activiti.bpmn.converter.BpmnXMLConverter;
-import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.validation.ProcessValidator;
 import org.activiti.validation.ProcessValidatorFactory;
 import org.activiti.validation.ValidationError;
 import org.activiti.validation.validator.Problems;
 import org.activiti.validation.validator.ValidatorSetNames;
 import org.activiti5.engine.test.util.TestProcessUtil;
+import org.flowable.bpmn.converter.BpmnXMLConverter;
+import org.flowable.bpmn.model.BpmnModel;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -275,7 +275,7 @@ public class DefaultProcessValidatorTest {
 	public void testAllNonExecutableProcesses() {
 		BpmnModel bpmnModel = new BpmnModel();
 		for (int i=0; i<5; i++) {
-			org.activiti.bpmn.model.Process process = TestProcessUtil.createOneTaskProcess();
+			org.flowable.bpmn.model.Process process = TestProcessUtil.createOneTaskProcess();
 			process.setExecutable(false);
 			bpmnModel.addProcess(process);
 		}
@@ -297,13 +297,13 @@ public class DefaultProcessValidatorTest {
 		
 		// 3 non-executables
 		for (int i=0; i<3; i++) {
-			org.activiti.bpmn.model.Process process = TestProcessUtil.createOneTaskProcess();
+			org.flowable.bpmn.model.Process process = TestProcessUtil.createOneTaskProcess();
 			process.setExecutable(false);
 			bpmnModel.addProcess(process);
 		}
 		
 		// 1 executables
-		org.activiti.bpmn.model.Process process = TestProcessUtil.createOneTaskProcess();
+		org.flowable.bpmn.model.Process process = TestProcessUtil.createOneTaskProcess();
 		process.setExecutable(true);
 		bpmnModel.addProcess(process);
 		

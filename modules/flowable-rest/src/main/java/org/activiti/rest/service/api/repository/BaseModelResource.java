@@ -13,11 +13,11 @@
 
 package org.activiti.rest.service.api.repository;
 
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.repository.Model;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.repository.Model;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -38,7 +38,7 @@ public class BaseModelResource {
     Model model = repositoryService.createModelQuery().modelId(modelId).singleResult();
 
     if (model == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a model with id '" + modelId + "'.", ProcessDefinition.class);
+      throw new FlowableObjectNotFoundException("Could not find a model with id '" + modelId + "'.", ProcessDefinition.class);
     }
     return model;
   }

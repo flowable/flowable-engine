@@ -12,9 +12,9 @@
  */
 package org.activiti5.engine.impl.jobexecutor;
 
-import org.activiti.engine.runtime.Job;
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.runtime.Job;
 
 
 /**

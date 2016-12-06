@@ -18,35 +18,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.EndEvent;
-import org.activiti.bpmn.model.SequenceFlow;
-import org.activiti.bpmn.model.StartEvent;
-import org.activiti.bpmn.model.UserTask;
-import org.activiti.engine.DynamicBpmnService;
-import org.activiti.engine.FormService;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.common.impl.interceptor.CommandConfig;
-import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.impl.ProcessEngineImpl;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.db.DbSqlSession;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.impl.interceptor.Command;
-import org.activiti.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.impl.interceptor.CommandExecutor;
-import org.activiti.engine.impl.test.AbstractTestCase;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.ProcessInstance;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.EndEvent;
+import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.StartEvent;
+import org.flowable.bpmn.model.UserTask;
+import org.flowable.engine.DynamicBpmnService;
+import org.flowable.engine.FormService;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.IdentityService;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.impl.ProcessEngineImpl;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.db.DbSqlSession;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.interceptor.Command;
+import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.impl.test.AbstractTestCase;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.junit.Assert;
 
 import junit.framework.AssertionFailedError;
@@ -264,7 +264,7 @@ public abstract class AbstractActivitiTestCase extends AbstractTestCase {
    */
   public BpmnModel createOneTaskTestProcess() {
   	BpmnModel model = new BpmnModel();
-  	org.activiti.bpmn.model.Process process = new org.activiti.bpmn.model.Process();
+  	org.flowable.bpmn.model.Process process = new org.flowable.bpmn.model.Process();
     model.addProcess(process);
     process.setId("oneTaskProcess");
     process.setName("The one task process");
@@ -291,7 +291,7 @@ public abstract class AbstractActivitiTestCase extends AbstractTestCase {
   
   public BpmnModel createTwoTasksTestProcess() {
   	BpmnModel model = new BpmnModel();
-  	org.activiti.bpmn.model.Process process = new org.activiti.bpmn.model.Process();
+  	org.flowable.bpmn.model.Process process = new org.flowable.bpmn.model.Process();
     model.addProcess(process);
     process.setId("twoTasksProcess");
     process.setName("The two tasks process");

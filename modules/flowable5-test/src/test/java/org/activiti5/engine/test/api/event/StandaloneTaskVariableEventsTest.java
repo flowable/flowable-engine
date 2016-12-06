@@ -12,15 +12,15 @@
  */
 package org.activiti5.engine.test.api.event;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.delegate.event.ActivitiVariableEvent;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.task.Task;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.delegate.event.FlowableVariableEvent;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.task.Task;
 
 /**
- * Test case for all {@link ActivitiEvent}s related to variables.
+ * Test case for all {@link FlowableEvent}s related to variables.
  * 
  * @author Frederik Heremans
  */
@@ -41,8 +41,8 @@ public class StandaloneTaskVariableEventsTest extends PluggableActivitiTestCase 
 			taskService.removeVariable(newTask.getId(), "testVariable");
 			
 			assertEquals(3, listener.getEventsReceived().size());
-			ActivitiVariableEvent event = (ActivitiVariableEvent) listener.getEventsReceived().get(0);
-			assertEquals(ActivitiEngineEventType.VARIABLE_CREATED, event.getType());
+			FlowableVariableEvent event = (FlowableVariableEvent) listener.getEventsReceived().get(0);
+			assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
 			assertNull(event.getProcessDefinitionId());
 			assertNull(event.getExecutionId());
 			assertNull(event.getProcessInstanceId());
@@ -50,8 +50,8 @@ public class StandaloneTaskVariableEventsTest extends PluggableActivitiTestCase 
 			assertEquals("testVariable", event.getVariableName());
 			assertEquals(123, event.getVariableValue());
 			
-			event = (ActivitiVariableEvent) listener.getEventsReceived().get(1);
-			assertEquals(ActivitiEngineEventType.VARIABLE_UPDATED, event.getType());
+			event = (FlowableVariableEvent) listener.getEventsReceived().get(1);
+			assertEquals(FlowableEngineEventType.VARIABLE_UPDATED, event.getType());
 			assertNull(event.getProcessDefinitionId());
 			assertNull(event.getExecutionId());
 			assertNull(event.getProcessInstanceId());
@@ -59,8 +59,8 @@ public class StandaloneTaskVariableEventsTest extends PluggableActivitiTestCase 
 			assertEquals("testVariable", event.getVariableName());
 			assertEquals(456, event.getVariableValue());
 			
-			event = (ActivitiVariableEvent) listener.getEventsReceived().get(2);
-			assertEquals(ActivitiEngineEventType.VARIABLE_DELETED, event.getType());
+			event = (FlowableVariableEvent) listener.getEventsReceived().get(2);
+			assertEquals(FlowableEngineEventType.VARIABLE_DELETED, event.getType());
 			assertNull(event.getProcessDefinitionId());
 			assertNull(event.getExecutionId());
 			assertNull(event.getProcessInstanceId());

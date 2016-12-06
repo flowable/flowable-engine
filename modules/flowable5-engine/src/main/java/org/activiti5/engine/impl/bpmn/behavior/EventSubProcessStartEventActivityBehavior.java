@@ -14,10 +14,10 @@ package org.activiti5.engine.impl.bpmn.behavior;
 
 import java.util.Collections;
 
-import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti5.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
 import org.activiti5.engine.impl.pvm.runtime.InterpretableExecution;
+import org.flowable.engine.delegate.DelegateExecution;
 
 
 /**

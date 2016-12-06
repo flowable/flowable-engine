@@ -22,11 +22,11 @@ import javax.el.ELContext;
 import javax.el.ELResolver;
 import javax.el.PropertyNotWritableException;
 
-import org.activiti.engine.delegate.VariableScope;
-import org.activiti.engine.impl.el.ExpressionManager;
+import org.flowable.engine.delegate.VariableScope;
+import org.flowable.engine.impl.el.ExpressionManager;
 
 /**
- * {@link org.activiti.engine.impl.el.ExpressionManager} that exposes the simulation event in expressions
+ * {@link org.flowable.engine.impl.el.ExpressionManager} that exposes the simulation event in expressions
  * 
  * @author martin.grofcik
  */

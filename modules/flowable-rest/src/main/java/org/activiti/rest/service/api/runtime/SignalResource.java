@@ -23,11 +23,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.runtime.process.SignalEventReceivedRequest;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -59,7 +59,7 @@ public class SignalResource {
   @RequestMapping(value = "/runtime/signals", method = RequestMethod.POST)
   public void signalEventReceived(@RequestBody SignalEventReceivedRequest signalRequest, HttpServletResponse response) {
     if (signalRequest.getSignalName() == null) {
-      throw new ActivitiIllegalArgumentException("signalName is required");
+      throw new FlowableIllegalArgumentException("signalName is required");
     }
 
     Map<String, Object> signalVariables = null;
@@ -67,7 +67,7 @@ public class SignalResource {
       signalVariables = new HashMap<String, Object>();
       for (RestVariable variable : signalRequest.getVariables()) {
         if (variable.getName() == null) {
-          throw new ActivitiIllegalArgumentException("Variable name is required.");
+          throw new FlowableIllegalArgumentException("Variable name is required.");
         }
         signalVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
       }
@@ -75,7 +75,7 @@ public class SignalResource {
 
     if (signalRequest.isAsync()) {
       if (signalVariables != null) {
-        throw new ActivitiIllegalArgumentException("Async signals cannot take variables as payload");
+        throw new FlowableIllegalArgumentException("Async signals cannot take variables as payload");
       }
 
       if (signalRequest.isCustomTenantSet()) {

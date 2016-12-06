@@ -14,9 +14,9 @@
 package org.activiti.compatibility.spring;
 
 import org.activiti.compatibility.DefaultProcessEngineFactory;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.activiti5.engine.ProcessEngine;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.spring.SpringProcessEngineConfiguration;
 
 
 public class DefaultSpringProcessEngineFactory extends DefaultProcessEngineFactory {

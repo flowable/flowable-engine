@@ -12,13 +12,13 @@
  */
 package org.activiti5.engine.delegate.event.impl;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.impl.delegate.event.ActivitiEngineEntityEvent;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.impl.delegate.event.ActivitiEngineEntityEvent;
 
 /**
- * Base class for all {@link ActivitiEvent} implementations, related to entities.
+ * Base class for all {@link FlowableEvent} implementations, related to entities.
  * 
  * @author Frederik Heremans
  */
@@ -26,7 +26,7 @@ public class ActivitiEntityEventImpl extends ActivitiEventImpl implements Activi
 
 	protected Object entity;
 	
-	public ActivitiEntityEventImpl(Object entity, ActivitiEngineEventType type) {
+	public ActivitiEntityEventImpl(Object entity, FlowableEngineEventType type) {
 		super(type);
 		if(entity == null) {
 			throw new ActivitiIllegalArgumentException("Entity cannot be null.");

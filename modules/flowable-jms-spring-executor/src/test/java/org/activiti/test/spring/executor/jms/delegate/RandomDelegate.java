@@ -2,8 +2,8 @@ package org.activiti.test.spring.executor.jms.delegate;
 
 import java.util.Random;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.JavaDelegate;
 
 public class RandomDelegate implements JavaDelegate {
 

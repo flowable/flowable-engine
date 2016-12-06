@@ -16,10 +16,10 @@ package org.activiti.spring.security;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.idm.api.Group;
-import org.activiti.idm.api.User;
+import org.flowable.engine.IdentityService;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -45,7 +45,7 @@ public class IdentityServiceUserDetailsService
             user = this.identityService.createUserQuery()
                     .userId(userId)
                     .singleResult();
-        } catch (ActivitiException ex) {
+        } catch (FlowableException ex) {
             // don't care
         }
 

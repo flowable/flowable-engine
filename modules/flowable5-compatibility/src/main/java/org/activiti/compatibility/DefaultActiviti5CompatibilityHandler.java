@@ -22,41 +22,10 @@ import java.util.Map;
 
 import javax.el.PropertyNotFoundException;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.MapExceptionEntry;
 import org.activiti.compatibility.wrapper.Activiti5AttachmentWrapper;
 import org.activiti.compatibility.wrapper.Activiti5CommentWrapper;
 import org.activiti.compatibility.wrapper.Activiti5DeploymentWrapper;
 import org.activiti.compatibility.wrapper.Activiti5ProcessInstanceWrapper;
-import org.activiti.engine.common.api.ActivitiClassLoadingException;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.common.api.ActivitiOptimisticLockingException;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.runtime.Clock;
-import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
-import org.activiti.engine.delegate.BpmnError;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.form.StartFormData;
-import org.activiti.engine.impl.cmd.AddIdentityLinkCmd;
-import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.impl.identity.Authentication;
-import org.activiti.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
-import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
-import org.activiti.engine.impl.persistence.entity.JobEntity;
-import org.activiti.engine.impl.persistence.entity.ResourceEntity;
-import org.activiti.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
-import org.activiti.engine.impl.persistence.entity.TaskEntity;
-import org.activiti.engine.impl.persistence.entity.TaskEntityImpl;
-import org.activiti.engine.impl.persistence.entity.VariableInstance;
-import org.activiti.engine.impl.repository.DeploymentBuilderImpl;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.Job;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Attachment;
-import org.activiti.engine.task.Comment;
 import org.activiti5.engine.ProcessEngine;
 import org.activiti5.engine.ProcessEngineConfiguration;
 import org.activiti5.engine.impl.asyncexecutor.AsyncJobUtil;
@@ -73,6 +42,37 @@ import org.activiti5.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti5.engine.impl.scripting.ScriptingEngines;
 import org.activiti5.engine.repository.DeploymentBuilder;
 import org.activiti5.engine.runtime.ProcessInstanceBuilder;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.MapExceptionEntry;
+import org.flowable.engine.common.api.FlowableClassLoadingException;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.api.FlowableOptimisticLockingException;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.delegate.BpmnError;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.form.StartFormData;
+import org.flowable.engine.impl.cmd.AddIdentityLinkCmd;
+import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.identity.Authentication;
+import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
+import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
+import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.persistence.entity.ResourceEntity;
+import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
+import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.impl.persistence.entity.TaskEntityImpl;
+import org.flowable.engine.impl.persistence.entity.VariableInstance;
+import org.flowable.engine.impl.repository.DeploymentBuilderImpl;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Attachment;
+import org.flowable.engine.task.Comment;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -111,13 +111,13 @@ public class DefaultActiviti5CompatibilityHandler implements Activiti5Compatibil
     return processDefinition;
   }
   
-  public org.activiti.bpmn.model.Process getProcessDefinitionProcessObject(final String processDefinitionId) {
+  public org.flowable.bpmn.model.Process getProcessDefinitionProcessObject(final String processDefinitionId) {
     final ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
-    org.activiti.bpmn.model.Process process = processEngineConfig.getCommandExecutor().execute(new Command<org.activiti.bpmn.model.Process>() {
+    org.flowable.bpmn.model.Process process = processEngineConfig.getCommandExecutor().execute(new Command<org.flowable.bpmn.model.Process>() {
 
       @Override
-      public org.activiti.bpmn.model.Process execute(CommandContext commandContext) {
-        org.activiti.bpmn.model.Process process = null;
+      public org.flowable.bpmn.model.Process execute(CommandContext commandContext) {
+        org.flowable.bpmn.model.Process process = null;
         DeploymentManager deploymentManager = processEngineConfig.getDeploymentManager();
         ProcessDefinition processDefinition = deploymentManager.findDeployedProcessDefinitionById(processDefinitionId);
         if (processDefinition != null) {
@@ -899,7 +899,7 @@ public class DefaultActiviti5CompatibilityHandler implements Activiti5Compatibil
     }
   }
   
-  public void throwErrorEvent(ActivitiEvent event) {
+  public void throwErrorEvent(FlowableEvent event) {
     ErrorThrowingEventListener eventListener = new ErrorThrowingEventListener();
     eventListener.onEvent(event);
   }
@@ -935,7 +935,7 @@ public class DefaultActiviti5CompatibilityHandler implements Activiti5Compatibil
   }
   
   public Object getCamelContextObject(String camelContextValue) {
-    throw new ActivitiException("Getting the Camel context is not support in this engine configuration");
+    throw new FlowableException("Getting the Camel context is not support in this engine configuration");
   }
   
   protected ProcessEngine getProcessEngine() {
@@ -1010,28 +1010,28 @@ public class DefaultActiviti5CompatibilityHandler implements Activiti5Compatibil
       throw new BpmnError(activiti5BpmnError.getErrorCode(), activiti5BpmnError.getMessage());
       
     } else if (e instanceof org.activiti5.engine.ActivitiClassLoadingException) {
-      throw new ActivitiClassLoadingException(e.getMessage(), e.getCause());
+      throw new FlowableClassLoadingException(e.getMessage(), e.getCause());
       
     } else if (e instanceof org.activiti5.engine.ActivitiObjectNotFoundException) {
       org.activiti5.engine.ActivitiObjectNotFoundException activiti5ObjectNotFoundException = (org.activiti5.engine.ActivitiObjectNotFoundException) e;
-      throw new ActivitiObjectNotFoundException(activiti5ObjectNotFoundException.getMessage(), 
+      throw new FlowableObjectNotFoundException(activiti5ObjectNotFoundException.getMessage(), 
           activiti5ObjectNotFoundException.getObjectClass(), activiti5ObjectNotFoundException.getCause());
       
     } else if (e instanceof org.activiti5.engine.ActivitiOptimisticLockingException) {
-      throw new ActivitiOptimisticLockingException(e.getMessage());
+      throw new FlowableOptimisticLockingException(e.getMessage());
       
     } else if (e instanceof org.activiti5.engine.ActivitiIllegalArgumentException) {
-      throw new ActivitiIllegalArgumentException(e.getMessage(), e.getCause());
+      throw new FlowableIllegalArgumentException(e.getMessage(), e.getCause());
       
     } else {
       if (e.getCause() instanceof org.activiti5.engine.ActivitiClassLoadingException) {
-        throw new ActivitiException(e.getMessage(), new ActivitiClassLoadingException(e.getCause().getMessage(), e.getCause().getCause()));
+        throw new FlowableException(e.getMessage(), new FlowableClassLoadingException(e.getCause().getMessage(), e.getCause().getCause()));
       } else if (e.getCause() instanceof org.activiti5.engine.impl.javax.el.PropertyNotFoundException) {
-        throw new ActivitiException(e.getMessage(), new PropertyNotFoundException(e.getCause().getMessage(), e.getCause().getCause()));
+        throw new FlowableException(e.getMessage(), new PropertyNotFoundException(e.getCause().getMessage(), e.getCause().getCause()));
       } else if (e.getCause() instanceof org.activiti5.engine.ActivitiException) {
-        throw new ActivitiException(e.getMessage(), new ActivitiException(e.getCause().getMessage(), e.getCause().getCause()));
+        throw new FlowableException(e.getMessage(), new FlowableException(e.getCause().getMessage(), e.getCause().getCause()));
       } else {
-        throw new ActivitiException(e.getMessage(), e.getCause());
+        throw new FlowableException(e.getMessage(), e.getCause());
       }
     }
   }

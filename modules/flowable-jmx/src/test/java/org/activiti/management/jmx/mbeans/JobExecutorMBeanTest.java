@@ -28,10 +28,10 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.modelmbean.ModelMBean;
 
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.management.jmx.DefaultManagementMBeanAssembler;
 import org.activiti.management.jmx.ManagementMBeanAssembler;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

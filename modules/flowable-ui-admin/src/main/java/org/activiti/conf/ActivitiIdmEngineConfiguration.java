@@ -14,11 +14,11 @@ package org.activiti.conf;
 
 import javax.sql.DataSource;
 
-import org.activiti.engine.common.runtime.Clock;
-import org.activiti.idm.api.IdmIdentityService;
-import org.activiti.idm.api.IdmManagementService;
-import org.activiti.idm.engine.IdmEngine;
-import org.activiti.idm.engine.IdmEngineConfiguration;
+import org.flowable.engine.common.runtime.Clock;
+import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.api.IdmManagementService;
+import org.flowable.idm.engine.IdmEngine;
+import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

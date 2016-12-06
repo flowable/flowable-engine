@@ -15,7 +15,7 @@ package org.activiti.app.idm.service;
 import java.util.List;
 
 import org.activiti.app.idm.model.UserInformation;
-import org.activiti.idm.api.User;
+import org.flowable.idm.api.User;
 
 /**
  * @author Joram Barrez

@@ -17,14 +17,14 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.DeploymentBuilder;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.management.jmx.annotations.ManagedAttribute;
 import org.activiti.management.jmx.annotations.ManagedOperation;
 import org.activiti.management.jmx.annotations.ManagedResource;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.DeploymentBuilder;
+import org.flowable.engine.repository.ProcessDefinition;
 
 /**
  * @author Saeid Mirzaei

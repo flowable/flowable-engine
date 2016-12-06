@@ -25,26 +25,26 @@ import org.activiti.app.service.editor.mapper.ReceiveTaskInfoMapper;
 import org.activiti.app.service.editor.mapper.SequenceFlowInfoMapper;
 import org.activiti.app.service.editor.mapper.ServiceTaskInfoMapper;
 import org.activiti.app.service.editor.mapper.UserTaskInfoMapper;
-import org.activiti.bpmn.model.Artifact;
-import org.activiti.bpmn.model.Association;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.ErrorEventDefinition;
-import org.activiti.bpmn.model.Event;
-import org.activiti.bpmn.model.EventDefinition;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.GraphicInfo;
-import org.activiti.bpmn.model.Lane;
-import org.activiti.bpmn.model.MessageEventDefinition;
-import org.activiti.bpmn.model.Pool;
-import org.activiti.bpmn.model.SequenceFlow;
-import org.activiti.bpmn.model.ServiceTask;
-import org.activiti.bpmn.model.SignalEventDefinition;
-import org.activiti.bpmn.model.SubProcess;
-import org.activiti.bpmn.model.TextAnnotation;
-import org.activiti.bpmn.model.TimerEventDefinition;
 import org.activiti.editor.language.json.converter.BpmnJsonConverter;
 import org.activiti.editor.language.json.converter.util.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.Artifact;
+import org.flowable.bpmn.model.Association;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ErrorEventDefinition;
+import org.flowable.bpmn.model.Event;
+import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.GraphicInfo;
+import org.flowable.bpmn.model.Lane;
+import org.flowable.bpmn.model.MessageEventDefinition;
+import org.flowable.bpmn.model.Pool;
+import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.ServiceTask;
+import org.flowable.bpmn.model.SignalEventDefinition;
+import org.flowable.bpmn.model.SubProcess;
+import org.flowable.bpmn.model.TextAnnotation;
+import org.flowable.bpmn.model.TimerEventDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -108,7 +108,7 @@ public class BpmnDisplayJsonConverter {
                 poolNode.put("name", pool.getName());
                 GraphicInfo poolInfo = pojoModel.getGraphicInfo(pool.getId());
                 fillGraphicInfo(poolNode, poolInfo, true);
-                org.activiti.bpmn.model.Process process = pojoModel.getProcess(pool.getId());
+                org.flowable.bpmn.model.Process process = pojoModel.getProcess(pool.getId());
                 if (process != null && CollectionUtils.isNotEmpty(process.getLanes())) {
                     ArrayNode laneArray = objectMapper.createArrayNode();
                     for (Lane lane : process.getLanes()) {
@@ -148,7 +148,7 @@ public class BpmnDisplayJsonConverter {
             diagramInfo.setY(1000);
         }
 
-        for (org.activiti.bpmn.model.Process process : pojoModel.getProcesses()) {
+        for (org.flowable.bpmn.model.Process process : pojoModel.getProcesses()) {
             processElements(process.getFlowElements(), pojoModel, elementArray, flowArray, diagramInfo);
             processArtifacts(process.getArtifacts(), pojoModel, elementArray, flowArray, diagramInfo);
         }

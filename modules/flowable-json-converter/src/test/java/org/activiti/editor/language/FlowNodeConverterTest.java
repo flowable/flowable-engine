@@ -6,10 +6,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.ExclusiveGateway;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ExclusiveGateway;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.SequenceFlow;
 import org.junit.Test;
 
 public class FlowNodeConverterTest extends AbstractConverterTest {

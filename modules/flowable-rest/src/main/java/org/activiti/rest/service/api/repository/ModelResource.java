@@ -17,7 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
-import org.activiti.engine.repository.Model;
+
+import org.flowable.engine.repository.Model;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;

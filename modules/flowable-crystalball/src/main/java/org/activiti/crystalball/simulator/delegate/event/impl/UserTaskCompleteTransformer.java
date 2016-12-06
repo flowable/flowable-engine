@@ -14,11 +14,11 @@ package org.activiti.crystalball.simulator.delegate.event.impl;
  */
 
 import org.activiti.crystalball.simulator.SimulationEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.task.Task;
+import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.task.Task;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,9 +37,9 @@ public class UserTaskCompleteTransformer extends Activiti2SimulationEventFunctio
   }
 
   @Override
-  public SimulationEvent apply(ActivitiEvent event) {
-    if (ActivitiEngineEventType.TASK_COMPLETED.equals(event.getType())) {
-      Task task = (Task) ((ActivitiEntityEvent) event).getEntity();
+  public SimulationEvent apply(FlowableEvent event) {
+    if (FlowableEngineEventType.TASK_COMPLETED.equals(event.getType())) {
+      Task task = (Task) ((FlowableEntityEvent) event).getEntity();
 
       Map<String, Object> properties = new HashMap<String, Object>();
       properties.put("taskId", task.getId());

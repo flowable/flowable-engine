@@ -13,7 +13,7 @@
 package org.activiti.app.rest.runtime.variable;
 
 import org.activiti.app.model.runtime.RestVariable;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.springframework.stereotype.Component;
 
 
@@ -37,7 +37,7 @@ public class LongRestVariableConverter implements RestVariableConverter {
   public Object getVariableValue(RestVariable result) {
     if(result.getValue() != null) {
       if(!(result.getValue() instanceof Number)) {
-        throw new ActivitiIllegalArgumentException("Converter can only convert longs");
+        throw new FlowableIllegalArgumentException("Converter can only convert longs");
       }
       return ((Number) result.getValue()).longValue();
     }
@@ -48,7 +48,7 @@ public class LongRestVariableConverter implements RestVariableConverter {
   public void convertVariableValue(Object variableValue, RestVariable result) {
     if(variableValue != null) {
       if(!(variableValue instanceof Long)) {
-        throw new ActivitiIllegalArgumentException("Converter can only convert integers");
+        throw new FlowableIllegalArgumentException("Converter can only convert integers");
       }
       result.setValue(variableValue);
     } else {

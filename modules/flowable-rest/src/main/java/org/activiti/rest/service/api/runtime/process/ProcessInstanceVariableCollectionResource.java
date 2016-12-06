@@ -20,10 +20,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
-import org.activiti.engine.runtime.Execution;
+
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.engine.variable.RestVariable.RestVariableScope;
+import org.flowable.engine.runtime.Execution;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

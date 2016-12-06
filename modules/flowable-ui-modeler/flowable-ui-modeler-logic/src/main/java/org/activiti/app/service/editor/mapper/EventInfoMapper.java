@@ -12,14 +12,14 @@
  */
 package org.activiti.app.service.editor.mapper;
 
-import org.activiti.bpmn.model.ErrorEventDefinition;
-import org.activiti.bpmn.model.Event;
-import org.activiti.bpmn.model.EventDefinition;
-import org.activiti.bpmn.model.MessageEventDefinition;
-import org.activiti.bpmn.model.SignalEventDefinition;
-import org.activiti.bpmn.model.TimerEventDefinition;
 import org.activiti.editor.language.json.converter.util.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.ErrorEventDefinition;
+import org.flowable.bpmn.model.Event;
+import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.MessageEventDefinition;
+import org.flowable.bpmn.model.SignalEventDefinition;
+import org.flowable.bpmn.model.TimerEventDefinition;
 
 public class EventInfoMapper extends AbstractInfoMapper {
 

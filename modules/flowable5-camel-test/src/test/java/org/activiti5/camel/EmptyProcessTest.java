@@ -15,14 +15,14 @@ package org.activiti5.camel;
 
 import java.util.List;
 
-import org.activiti.engine.history.HistoricVariableInstance;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.spring.impl.test.SpringActivitiTestCase;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
+import org.flowable.engine.history.HistoricVariableInstance;
+import org.flowable.engine.test.Deployment;
 import org.junit.BeforeClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;

@@ -28,10 +28,10 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.util.CollectionUtil;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.test.Deployment;
 import org.subethamail.wiser.WiserMessage;
 
 
@@ -222,7 +222,7 @@ public class EmailSendTaskTest extends EmailTestCase {
     try {
       runtimeService.startProcessInstanceByKey("invalidAddress").getId();
       fail("An Invalid email address should not execute");
-    } catch(ActivitiException e) {
+    } catch(FlowableException e) {
       // fine
     } catch(Exception e) {
       fail("Only an ActivitiException is expected here but not: " + e);

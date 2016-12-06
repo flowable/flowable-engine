@@ -18,10 +18,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngines;
-import org.activiti.engine.common.EngineInfo;
-import org.activiti.engine.common.api.ActivitiException;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngines;
+import org.flowable.engine.common.EngineInfo;
+import org.flowable.engine.common.api.FlowableException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,7 +58,7 @@ public class ProcessEngineResource {
         response.setName(engine.getName());
       }
     } catch (Exception e) {
-      throw new ActivitiException("Error retrieving process info", e);
+      throw new FlowableException("Error retrieving process info", e);
     }
 
     response.setVersion(ProcessEngine.VERSION);

@@ -23,20 +23,20 @@ import org.activiti.app.model.runtime.ProcessDefinitionRepresentation;
 import org.activiti.app.service.exception.BadRequestException;
 import org.activiti.app.service.exception.InternalServerErrorException;
 import org.activiti.app.service.exception.NotFoundException;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.Process;
-import org.activiti.bpmn.model.StartEvent;
 import org.activiti.editor.language.json.converter.util.CollectionUtils;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.repository.ProcessDefinitionQuery;
-import org.activiti.form.api.FormRepositoryService;
-import org.activiti.form.model.FormField;
-import org.activiti.form.model.FormModel;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.StartEvent;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.repository.ProcessDefinitionQuery;
+import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.model.FormField;
+import org.flowable.form.model.FormModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +73,7 @@ public class ActivitiProcessDefinitionService {
     try {
       return getStartForm(processDefinition);
 
-    } catch (ActivitiObjectNotFoundException aonfe) {
+    } catch (FlowableObjectNotFoundException aonfe) {
       // Process definition does not exist
       throw new NotFoundException("No process definition found with the given id: " + processDefinitionId);
     }

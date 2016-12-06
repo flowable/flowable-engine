@@ -14,33 +14,33 @@ package org.activiti5.engine.delegate.event.impl;
 
 import java.util.Map;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiExceptionEvent;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.event.ActivitiActivityCancelledEvent;
-import org.activiti.engine.delegate.event.ActivitiActivityEvent;
-import org.activiti.engine.delegate.event.ActivitiCancelledEvent;
-import org.activiti.engine.delegate.event.ActivitiEntityWithVariablesEvent;
-import org.activiti.engine.delegate.event.ActivitiErrorEvent;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.delegate.event.ActivitiMessageEvent;
-import org.activiti.engine.delegate.event.ActivitiProcessStartedEvent;
-import org.activiti.engine.delegate.event.ActivitiSequenceFlowTakenEvent;
-import org.activiti.engine.delegate.event.ActivitiSignalEvent;
-import org.activiti.engine.delegate.event.ActivitiVariableEvent;
-import org.activiti.engine.impl.variable.VariableType;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.Job;
-import org.activiti.idm.api.event.ActivitiIdmEventType;
-import org.activiti.idm.api.event.ActivitiIdmMembershipEvent;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.context.ExecutionContext;
 import org.activiti5.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.activiti5.engine.task.Task;
+import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableExceptionEvent;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
+import org.flowable.engine.delegate.event.FlowableActivityEvent;
+import org.flowable.engine.delegate.event.FlowableCancelledEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.delegate.event.FlowableEntityWithVariablesEvent;
+import org.flowable.engine.delegate.event.FlowableErrorEvent;
+import org.flowable.engine.delegate.event.FlowableMessageEvent;
+import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
+import org.flowable.engine.delegate.event.FlowableSequenceFlowTakenEvent;
+import org.flowable.engine.delegate.event.FlowableSignalEvent;
+import org.flowable.engine.delegate.event.FlowableVariableEvent;
+import org.flowable.engine.impl.variable.VariableType;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.Job;
+import org.flowable.idm.api.event.FlowableIdmEventType;
+import org.flowable.idm.api.event.FlowableIdmMembershipEvent;
 
 /**
- * Builder class used to create {@link ActivitiEvent} implementations.
+ * Builder class used to create {@link FlowableEvent} implementations.
  * 
  * @author Frederik Heremans
  */
@@ -48,15 +48,15 @@ public class ActivitiEventBuilder {
 
 	/**
 	 * @param type type of event
-	 * @return an {@link ActivitiEvent} that doesn't have it's execution context-fields filled,
+	 * @return an {@link FlowableEvent} that doesn't have it's execution context-fields filled,
 	 * as the event is a global event, independant of any running execution.
 	 */
-	public static ActivitiEvent createGlobalEvent(ActivitiEngineEventType type) {
+	public static FlowableEvent createGlobalEvent(FlowableEngineEventType type) {
 		ActivitiEventImpl newEvent = new ActivitiEventImpl(type);
 		return newEvent;
 	}
 	
-	public static ActivitiEvent createEvent(ActivitiEngineEventType type, String executionId, String processInstanceId, String processDefinitionId) {
+	public static FlowableEvent createEvent(FlowableEngineEventType type, String executionId, String processInstanceId, String processDefinitionId) {
 		ActivitiEventImpl newEvent = new ActivitiEventImpl(type);
 		newEvent.setExecutionId(executionId);
 		newEvent.setProcessDefinitionId(processDefinitionId);
@@ -67,10 +67,10 @@ public class ActivitiEventBuilder {
 	/**
 	 * @param type type of event
 	 * @param entity the entity this event targets
-	 * @return an {@link ActivitiEntityEvent}. In case an {@link ExecutionContext} is active, the execution related
+	 * @return an {@link FlowableEntityEvent}. In case an {@link ExecutionContext} is active, the execution related
 	 * event fields will be populated. If not, execution details will be reteived from the {@link Object} if possible.
 	 */
-	public static ActivitiEntityEvent createEntityEvent(ActivitiEngineEventType type, Object entity) {
+	public static FlowableEntityEvent createEntityEvent(FlowableEngineEventType type, Object entity) {
 		ActivitiEntityEventImpl newEvent = new ActivitiEntityEventImpl(entity, type);
 
 		// In case an execution-context is active, populate the event fields related to the execution
@@ -83,12 +83,12 @@ public class ActivitiEventBuilder {
    *            the entity this event targets
    * @param variables
    *            the variables associated with this entity
-   * @return an {@link ActivitiEntityEvent}. In case an {@link ExecutionContext} is active, the execution related
+   * @return an {@link FlowableEntityEvent}. In case an {@link ExecutionContext} is active, the execution related
    *         event fields will be populated. If not, execution details will be reteived from the {@link Object} if
    *         possible.
    */
   @SuppressWarnings("rawtypes")
-  public static ActivitiProcessStartedEvent createProcessStartedEvent(final Object entity, final Map variables, final boolean localScope) {
+  public static FlowableProcessStartedEvent createProcessStartedEvent(final Object entity, final Map variables, final boolean localScope) {
     final ActivitiProcessStartedEventImpl newEvent = new ActivitiProcessStartedEventImpl(entity, variables, localScope);
 
     // In case an execution-context is active, populate the event fields related to the execution
@@ -100,11 +100,11 @@ public class ActivitiEventBuilder {
    * @param type type of event
    * @param entity the entity this event targets
    * @param variables the variables associated with this entity
-   * @return an {@link ActivitiEntityEvent}. In case an {@link ExecutionContext} is active, the execution related
+   * @return an {@link FlowableEntityEvent}. In case an {@link ExecutionContext} is active, the execution related
    * event fields will be populated. If not, execution details will be reteived from the {@link Object} if possible.
    */
   @SuppressWarnings("rawtypes")
-  public static ActivitiEntityWithVariablesEvent createEntityWithVariablesEvent(ActivitiEngineEventType type, Object entity, Map variables, boolean localScope) {
+  public static FlowableEntityWithVariablesEvent createEntityWithVariablesEvent(FlowableEngineEventType type, Object entity, Map variables, boolean localScope) {
     ActivitiEntityWithVariablesEventImpl newEvent = new ActivitiEntityWithVariablesEventImpl(entity, variables, localScope, type);
 
     // In case an execution-context is active, populate the event fields related to the execution
@@ -112,7 +112,7 @@ public class ActivitiEventBuilder {
     return newEvent;
   }
 	
-	public static ActivitiSequenceFlowTakenEvent createSequenceFlowTakenEvent(ActivitiEngineEventType type, String sequenceFlowId, 
+	public static FlowableSequenceFlowTakenEvent createSequenceFlowTakenEvent(FlowableEngineEventType type, String sequenceFlowId, 
 			String sourceActivityId, String sourceActivityName, String sourceActivityType, String sourceActivityBehaviorClass,
 			String targetActivityId, String targetActivityName, String targetActivityType, String targetActivityBehaviorClass) {
 		ActivitiSequenceFlowTakenEventImpl newEvent = new ActivitiSequenceFlowTakenEventImpl(type);
@@ -135,9 +135,9 @@ public class ActivitiEventBuilder {
 	/**
 	 * @param type type of event
 	 * @param entity the entity this event targets
-	 * @return an {@link ActivitiEntityEvent}
+	 * @return an {@link FlowableEntityEvent}
 	 */
-	public static ActivitiEntityEvent createEntityEvent(ActivitiEngineEventType type, Object entity, String executionId,
+	public static FlowableEntityEvent createEntityEvent(FlowableEngineEventType type, Object entity, String executionId,
 			String processInstanceId, String processDefinitionId) {
 		ActivitiEntityEventImpl newEvent = new ActivitiEntityEventImpl(entity, type);
 
@@ -151,10 +151,10 @@ public class ActivitiEventBuilder {
 	 * @param type type of event
 	 * @param entity the entity this event targets
 	 * @param cause the cause of the event
-	 * @return an {@link ActivitiEntityEvent} that is also instance of {@link ActivitiExceptionEvent}. 
+	 * @return an {@link FlowableEntityEvent} that is also instance of {@link FlowableExceptionEvent}. 
 	 * In case an {@link ExecutionContext} is active, the execution related event fields will be populated.
 	 */
-	public static ActivitiEntityEvent createEntityExceptionEvent(ActivitiEngineEventType type, Object entity, Throwable cause) {
+	public static FlowableEntityEvent createEntityExceptionEvent(FlowableEngineEventType type, Object entity, Throwable cause) {
 		ActivitiEntityExceptionEventImpl newEvent = new ActivitiEntityExceptionEventImpl(entity, type, cause);
 
 		// In case an execution-context is active, populate the event fields related to the execution
@@ -166,9 +166,9 @@ public class ActivitiEventBuilder {
 	 * @param type type of event
 	 * @param entity the entity this event targets
 	 * @param cause the cause of the event
-	 * @return an {@link ActivitiEntityEvent} that is also instance of {@link ActivitiExceptionEvent}. 
+	 * @return an {@link FlowableEntityEvent} that is also instance of {@link FlowableExceptionEvent}. 
 	 */
-	public static ActivitiEntityEvent createEntityExceptionEvent(ActivitiEngineEventType type, Object entity, Throwable cause, String executionId,
+	public static FlowableEntityEvent createEntityExceptionEvent(FlowableEngineEventType type, Object entity, Throwable cause, String executionId,
 			String processInstanceId, String processDefinitionId) {
 		ActivitiEntityExceptionEventImpl newEvent = new ActivitiEntityExceptionEventImpl(entity, type, cause);
 
@@ -178,7 +178,7 @@ public class ActivitiEventBuilder {
 		return newEvent;
 	}
 	
-	public static ActivitiActivityEvent createActivityEvent(ActivitiEngineEventType type, String activityId, String activityName,
+	public static FlowableActivityEvent createActivityEvent(FlowableEngineEventType type, String activityId, String activityName,
 			String executionId, String processInstanceId, String processDefinitionId, String activityType, String behaviourClass) {
 		ActivitiActivityEventImpl newEvent = new ActivitiActivityEventImpl(type);
 		newEvent.setActivityId(activityId);
@@ -191,7 +191,7 @@ public class ActivitiEventBuilder {
 		return newEvent;
 	}
 
-  public static ActivitiActivityCancelledEvent createActivityCancelledEvent(String activityId, String activityName,
+  public static FlowableActivityCancelledEvent createActivityCancelledEvent(String activityId, String activityName,
                                                           String executionId, String processInstanceId, String processDefinitionId, String activityType, String behaviourClass, Object cause) {
     ActivitiActivityCancelledEventImpl newEvent = new ActivitiActivityCancelledEventImpl();
     newEvent.setActivityId(activityId);
@@ -205,7 +205,7 @@ public class ActivitiEventBuilder {
     return newEvent;
   }
 
-	public static ActivitiCancelledEvent createCancelledEvent(String executionId, String processInstanceId,
+	public static FlowableCancelledEvent createCancelledEvent(String executionId, String processInstanceId,
 	                                                          String processDefinitionId, Object cause) {
 		ActivitiProcessCancelledEventImpl newEvent = new ActivitiProcessCancelledEventImpl();
 		newEvent.setExecutionId(executionId);
@@ -215,7 +215,7 @@ public class ActivitiEventBuilder {
 		return newEvent;
 	}
 
-	public static ActivitiSignalEvent createSignalEvent(ActivitiEngineEventType type, String activityId, String signalName, Object signalData,
+	public static FlowableSignalEvent createSignalEvent(FlowableEngineEventType type, String activityId, String signalName, Object signalData,
 			String executionId, String processInstanceId, String processDefinitionId) {
 		ActivitiSignalEventImpl newEvent = new ActivitiSignalEventImpl(type);
 		newEvent.setActivityId(activityId);
@@ -227,7 +227,7 @@ public class ActivitiEventBuilder {
 		return newEvent;
 	}
 	
-	public static ActivitiMessageEvent createMessageEvent(ActivitiEngineEventType type, String activityId, String messageName, Object payload, 
+	public static FlowableMessageEvent createMessageEvent(FlowableEngineEventType type, String activityId, String messageName, Object payload, 
 			String executionId, String processInstanceId, String processDefinitionId) {
 		ActivitiMessageEventImpl newEvent = new ActivitiMessageEventImpl(type);
 		newEvent.setActivityId(activityId);
@@ -239,7 +239,7 @@ public class ActivitiEventBuilder {
 		return newEvent;
 	}
 	
-	public static ActivitiErrorEvent createErrorEvent(ActivitiEngineEventType type, String activityId, String errorCode, String executionId, String processInstanceId, String processDefinitionId) {
+	public static FlowableErrorEvent createErrorEvent(FlowableEngineEventType type, String activityId, String errorCode, String executionId, String processInstanceId, String processDefinitionId) {
 		ActivitiErrorEventImpl newEvent = new ActivitiErrorEventImpl(type);
 		newEvent.setActivityId(activityId);
 		newEvent.setExecutionId(executionId);
@@ -249,7 +249,7 @@ public class ActivitiEventBuilder {
 		return newEvent;
 	}
 	
-	public static ActivitiVariableEvent createVariableEvent(ActivitiEngineEventType type, String variableName, Object variableValue, VariableType variableType, String taskId, 
+	public static FlowableVariableEvent createVariableEvent(FlowableEngineEventType type, String variableName, Object variableValue, VariableType variableType, String taskId, 
 			String executionId, String processInstanceId, String processDefinitionId) {
 		ActivitiVariableEventImpl newEvent = new ActivitiVariableEventImpl(type);
 		newEvent.setVariableName(variableName);
@@ -262,7 +262,7 @@ public class ActivitiEventBuilder {
 		return newEvent;
 	}
 	
-	public static ActivitiIdmMembershipEvent createMembershipEvent(ActivitiIdmEventType type, String groupId, String userId) {
+	public static FlowableIdmMembershipEvent createMembershipEvent(FlowableIdmEventType type, String groupId, String userId) {
 		ActivitiMembershipEventImpl newEvent = new ActivitiMembershipEventImpl(type);
 		newEvent.setUserId(userId);
 		newEvent.setGroupId(groupId);
@@ -283,8 +283,8 @@ public class ActivitiEventBuilder {
 		
 		// Fallback to fetching context from the object itself
 		if(!extractedFromContext){
-			if(event instanceof ActivitiEntityEvent) {
-				Object persistendObject = ((ActivitiEntityEvent) event).getEntity();
+			if(event instanceof FlowableEntityEvent) {
+				Object persistendObject = ((FlowableEntityEvent) event).getEntity();
 				if(persistendObject instanceof Job) {
 					event.setExecutionId(((Job) persistendObject).getExecutionId());
 					event.setProcessInstanceId(((Job) persistendObject).getProcessInstanceId());

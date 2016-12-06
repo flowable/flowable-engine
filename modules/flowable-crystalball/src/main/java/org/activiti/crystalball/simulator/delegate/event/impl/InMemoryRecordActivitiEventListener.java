@@ -15,7 +15,7 @@ package org.activiti.crystalball.simulator.delegate.event.impl;
 
 import org.activiti.crystalball.simulator.SimulationEvent;
 import org.activiti.crystalball.simulator.delegate.event.Function;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -29,7 +29,7 @@ public class InMemoryRecordActivitiEventListener extends AbstractRecordActivitiE
 
   private Collection<SimulationEvent> events;
 
-  public InMemoryRecordActivitiEventListener(List<Function<ActivitiEvent, SimulationEvent>> transformers) {
+  public InMemoryRecordActivitiEventListener(List<Function<FlowableEvent, SimulationEvent>> transformers) {
     super(transformers);
     events = new HashSet<SimulationEvent>();
   }

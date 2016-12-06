@@ -48,10 +48,10 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import org.activiti.bpmn.model.AssociationDirection;
-import org.activiti.bpmn.model.GraphicInfo;
 import org.activiti.image.exception.ActivitiImageException;
 import org.activiti.image.util.ReflectUtil;
+import org.flowable.bpmn.model.AssociationDirection;
+import org.flowable.bpmn.model.GraphicInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

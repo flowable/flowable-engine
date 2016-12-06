@@ -12,8 +12,8 @@
  */
 package org.activiti5.engine.test.api.event;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.BaseEntityEventListener;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.delegate.event.BaseEntityEventListener;
 
 public class TestBaseEntityEventListener extends BaseEntityEventListener {
 
@@ -60,27 +60,27 @@ public class TestBaseEntityEventListener extends BaseEntityEventListener {
   }
 	
 	@Override
-	protected void onCreate(ActivitiEvent event) {
+	protected void onCreate(FlowableEvent event) {
 		createReceived = true;
 	}
 	
 	@Override
-	protected void onDelete(ActivitiEvent event) {
+	protected void onDelete(FlowableEvent event) {
 		deleteReceived = true;
 	}
 	
 	@Override
-	protected void onUpdate(ActivitiEvent event) {
+	protected void onUpdate(FlowableEvent event) {
 		updateReceived = true;
 	}
 	
 	@Override
-	protected void onEntityEvent(ActivitiEvent event) {
+	protected void onEntityEvent(FlowableEvent event) {
 		customReceived = true;
 	}
 	
 	@Override
-	protected void onInitialized(ActivitiEvent event) {
+	protected void onInitialized(FlowableEvent event) {
 		initializeReceived = true;
 	}
 }

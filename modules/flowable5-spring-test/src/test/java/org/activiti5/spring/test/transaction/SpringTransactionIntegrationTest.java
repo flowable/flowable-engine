@@ -15,10 +15,10 @@ package org.activiti5.spring.test.transaction;
 
 import javax.sql.DataSource;
 
-import org.activiti.bpmn.exceptions.XMLException;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.bpmn.exceptions.XMLException;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;

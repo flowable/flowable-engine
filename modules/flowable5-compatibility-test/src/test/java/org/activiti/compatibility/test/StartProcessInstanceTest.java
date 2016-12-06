@@ -15,10 +15,10 @@ package org.activiti.compatibility.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.ProcessInstance;
+import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.junit.Test;
 
 public class StartProcessInstanceTest extends AbstractActiviti6CompatibilityTest {

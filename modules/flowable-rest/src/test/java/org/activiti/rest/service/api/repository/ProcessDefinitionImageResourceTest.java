@@ -13,13 +13,13 @@
 
 package org.activiti.rest.service.api.repository;
 
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.test.Deployment;
 import org.activiti.rest.service.BaseSpringRestTestCase;
 import org.activiti.rest.service.api.RestUrls;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.test.Deployment;
 
 /**
  * @author Bassam Al-Sarori

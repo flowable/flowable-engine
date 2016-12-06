@@ -17,14 +17,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.bpmn.converter.BpmnXMLConverter;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.common.impl.util.io.BytesStreamSource;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.impl.persistence.deploy.DeploymentCache;
-import org.activiti.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.ActivitiObjectNotFoundException;
@@ -36,6 +28,14 @@ import org.activiti5.engine.impl.persistence.entity.DeploymentEntityManager;
 import org.activiti5.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti5.engine.impl.persistence.entity.ResourceEntity;
 import org.activiti5.engine.repository.Deployment;
+import org.flowable.bpmn.converter.BpmnXMLConverter;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.engine.common.impl.util.io.BytesStreamSource;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
+import org.flowable.engine.repository.ProcessDefinition;
 
 
 /**
@@ -212,14 +212,14 @@ public class DeploymentManager {
             .deploymentId(deploymentId)
             .list();
     
-    ActivitiEventDispatcher eventDispatcher = Context.getProcessEngineConfiguration().getEventDispatcher();
+    FlowableEventDispatcher eventDispatcher = Context.getProcessEngineConfiguration().getEventDispatcher();
     
     for (ProcessDefinition processDefinition : processDefinitions) {
       
       // Since all process definitions are deleted by a single query, we should dispatch the events in this loop
       if (eventDispatcher.isEnabled()) {
       	eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(
-      			ActivitiEngineEventType.ENTITY_DELETED, processDefinition));
+      			FlowableEngineEventType.ENTITY_DELETED, processDefinition));
       }
     }
     
@@ -229,7 +229,7 @@ public class DeploymentManager {
     // Since we use a delete by query, delete-events are not automatically dispatched
     if (eventDispatcher.isEnabled()) {
     	eventDispatcher.dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_DELETED, deployment));
+    			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, deployment));
     }
     
     for (ProcessDefinition processDefinition : processDefinitions) {

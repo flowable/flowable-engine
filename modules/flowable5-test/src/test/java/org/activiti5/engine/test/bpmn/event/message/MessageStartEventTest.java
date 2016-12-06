@@ -15,15 +15,15 @@ package org.activiti5.engine.test.bpmn.event.message;
 
 import java.util.List;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.impl.EventSubscriptionQueryImpl;
-import org.activiti.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.impl.EventSubscriptionQueryImpl;
+import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 
 /**
@@ -61,7 +61,7 @@ public class MessageStartEventTest extends PluggableActivitiTestCase {
         .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
       fail("exception expected");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertTrue(e.getMessage().contains("there already is a message event subscription for the message with name"));
     }
     
@@ -78,7 +78,7 @@ public class MessageStartEventTest extends PluggableActivitiTestCase {
         .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
       fail("exception expected: Cannot have more than one message event subscription with name 'newInvoiceMessage' for scope");
-    }catch (ActivitiException e) {
+    }catch (FlowableException e) {
       e.printStackTrace();
     }        
   }

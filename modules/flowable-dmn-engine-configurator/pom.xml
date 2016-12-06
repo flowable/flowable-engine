@@ -16,7 +16,7 @@
 
 	<properties>
 		<activiti.artifact>
-			org.activiti.dmn.engine.configurator
+			org.flowable.dmn.engine.configurator
 		</activiti.artifact>
 	</properties>
 	

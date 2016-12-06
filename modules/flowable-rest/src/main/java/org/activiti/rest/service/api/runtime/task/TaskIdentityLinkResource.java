@@ -20,12 +20,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.task.IdentityLink;
-import org.activiti.engine.task.Task;
 import org.activiti.rest.service.api.RestUrls;
 import org.activiti.rest.service.api.engine.RestIdentityLink;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.task.IdentityLink;
+import org.flowable.engine.task.Task;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -83,13 +83,13 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
 
   protected void validateIdentityLinkArguments(String family, String identityId, String type) {
     if (family == null || (!RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS.equals(family) && !RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS.equals(family))) {
-      throw new ActivitiIllegalArgumentException("Identity link family should be 'users' or 'groups'.");
+      throw new FlowableIllegalArgumentException("Identity link family should be 'users' or 'groups'.");
     }
     if (identityId == null) {
-      throw new ActivitiIllegalArgumentException("IdentityId is required.");
+      throw new FlowableIllegalArgumentException("IdentityId is required.");
     }
     if (type == null) {
-      throw new ActivitiIllegalArgumentException("Type is required.");
+      throw new FlowableIllegalArgumentException("Type is required.");
     }
   }
 
@@ -111,6 +111,6 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
         return link;
       }
     }
-    throw new ActivitiObjectNotFoundException("Could not find the requested identity link.", IdentityLink.class);
+    throw new FlowableObjectNotFoundException("Could not find the requested identity link.", IdentityLink.class);
   }
 }

@@ -12,14 +12,14 @@
  */
 package org.activiti5.engine.test.api.event;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.repository.Model;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.repository.Model;
 
 /**
- * Test case for all {@link ActivitiEvent}s related to models.
+ * Test case for all {@link FlowableEvent}s related to models.
  * 
  * @author Frederik Heremans
  */
@@ -40,11 +40,11 @@ public class ModelEventsTest extends PluggableActivitiTestCase {
 			
 			// Check create event
 			assertEquals(2, listener.getEventsReceived().size());
-			assertEquals(ActivitiEngineEventType.ENTITY_CREATED, listener.getEventsReceived().get(0).getType());
-			assertEquals(model.getId(), ((Model) ((ActivitiEntityEvent) listener.getEventsReceived().get(0)).getEntity()).getId());
+			assertEquals(FlowableEngineEventType.ENTITY_CREATED, listener.getEventsReceived().get(0).getType());
+			assertEquals(model.getId(), ((Model) ((FlowableEntityEvent) listener.getEventsReceived().get(0)).getEntity()).getId());
 			
-			assertEquals(ActivitiEngineEventType.ENTITY_INITIALIZED, listener.getEventsReceived().get(1).getType());
-			assertEquals(model.getId(), ((Model) ((ActivitiEntityEvent) listener.getEventsReceived().get(1)).getEntity()).getId());
+			assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, listener.getEventsReceived().get(1).getType());
+			assertEquals(model.getId(), ((Model) ((FlowableEntityEvent) listener.getEventsReceived().get(1)).getEntity()).getId());
 			listener.clearEventsReceived();
 			
 			
@@ -53,23 +53,23 @@ public class ModelEventsTest extends PluggableActivitiTestCase {
 			model.setName("Updated");
 			repositoryService.saveModel(model);
 			assertEquals(1, listener.getEventsReceived().size());
-			assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, listener.getEventsReceived().get(0).getType());
-			assertEquals(model.getId(), ((Model) ((ActivitiEntityEvent) listener.getEventsReceived().get(0)).getEntity()).getId());
+			assertEquals(FlowableEngineEventType.ENTITY_UPDATED, listener.getEventsReceived().get(0).getType());
+			assertEquals(model.getId(), ((Model) ((FlowableEntityEvent) listener.getEventsReceived().get(0)).getEntity()).getId());
 			listener.clearEventsReceived();
 			
 			// Test additional update-methods (source and extra-source)
 			repositoryService.addModelEditorSource(model.getId(), "test".getBytes());
 			repositoryService.addModelEditorSourceExtra(model.getId(), "test extra".getBytes());
 			assertEquals(2, listener.getEventsReceived().size());
-			assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, listener.getEventsReceived().get(0).getType());
-			assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, listener.getEventsReceived().get(1).getType());
+			assertEquals(FlowableEngineEventType.ENTITY_UPDATED, listener.getEventsReceived().get(0).getType());
+			assertEquals(FlowableEngineEventType.ENTITY_UPDATED, listener.getEventsReceived().get(1).getType());
 			listener.clearEventsReceived();
 			
 			// Delete model events
 			repositoryService.deleteModel(model.getId());
 			assertEquals(1, listener.getEventsReceived().size());
-			assertEquals(ActivitiEngineEventType.ENTITY_DELETED, listener.getEventsReceived().get(0).getType());
-			assertEquals(model.getId(), ((Model) ((ActivitiEntityEvent) listener.getEventsReceived().get(0)).getEntity()).getId());
+			assertEquals(FlowableEngineEventType.ENTITY_DELETED, listener.getEventsReceived().get(0).getType());
+			assertEquals(model.getId(), ((Model) ((FlowableEntityEvent) listener.getEventsReceived().get(0)).getEntity()).getId());
 			listener.clearEventsReceived();
 			
 		} finally {

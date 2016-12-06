@@ -3,9 +3,9 @@ package org.activiti5.engine.test.jobexecutor;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
 import org.activiti5.engine.ActivitiException;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.JavaDelegate;
 
 public class RetryFailingDelegate implements JavaDelegate {
 

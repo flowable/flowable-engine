@@ -3,10 +3,10 @@ package org.activiti.test.spring.boot;
 
 import java.util.List;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.spring.boot.DataSourceProcessEngineAutoConfiguration;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;

@@ -15,13 +15,13 @@ package org.activiti.editor.language.json.converter;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.GraphicInfo;
-import org.activiti.bpmn.model.SubProcess;
-import org.activiti.bpmn.model.Transaction;
-import org.activiti.bpmn.model.ValuedDataObject;
 import org.activiti.editor.language.json.model.ModelInfo;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.GraphicInfo;
+import org.flowable.bpmn.model.SubProcess;
+import org.flowable.bpmn.model.Transaction;
+import org.flowable.bpmn.model.ValuedDataObject;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;

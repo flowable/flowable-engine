@@ -22,17 +22,17 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.query.QueryProperty;
-import org.activiti.engine.impl.DeploymentQueryProperty;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.DeploymentBuilder;
-import org.activiti.engine.repository.DeploymentQuery;
-import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.engine.impl.DeploymentQueryProperty;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.DeploymentBuilder;
+import org.flowable.engine.repository.DeploymentQuery;
+import org.flowable.rest.api.DataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -127,13 +127,13 @@ public class DeploymentCollectionResource {
   public DeploymentResponse uploadDeployment(@RequestParam(value = "tenantId", required = false) String tenantId, HttpServletRequest request, HttpServletResponse response) {
 
     if (request instanceof MultipartHttpServletRequest == false) {
-      throw new ActivitiIllegalArgumentException("Multipart request is required");
+      throw new FlowableIllegalArgumentException("Multipart request is required");
     }
 
     MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
 
     if (multipartRequest.getFileMap().size() == 0) {
-      throw new ActivitiIllegalArgumentException("Multipart request with file content is required");
+      throw new FlowableIllegalArgumentException("Multipart request with file content is required");
     }
 
     MultipartFile file = multipartRequest.getFileMap().values().iterator().next();
@@ -151,7 +151,7 @@ public class DeploymentCollectionResource {
       } else if (fileName.toLowerCase().endsWith(".bar") || fileName.toLowerCase().endsWith(".zip")) {
         deploymentBuilder.addZipInputStream(new ZipInputStream(file.getInputStream()));
       } else {
-        throw new ActivitiIllegalArgumentException("File must be of type .bpmn20.xml, .bpmn, .bar or .zip");
+        throw new FlowableIllegalArgumentException("File must be of type .bpmn20.xml, .bpmn, .bar or .zip");
       }
       deploymentBuilder.name(fileName);
 
@@ -166,10 +166,10 @@ public class DeploymentCollectionResource {
       return restResponseFactory.createDeploymentResponse(deployment);
 
     } catch (Exception e) {
-      if (e instanceof ActivitiException) {
-        throw (ActivitiException) e;
+      if (e instanceof FlowableException) {
+        throw (FlowableException) e;
       }
-      throw new ActivitiException(e.getMessage(), e);
+      throw new FlowableException(e.getMessage(), e);
     }
   }
 }

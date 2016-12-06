@@ -19,9 +19,9 @@ import java.util.Map;
 
 import org.activiti.crystalball.simulator.CrystalballException;
 import org.activiti.crystalball.simulator.SimulationEvent;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.event.EventLogEntry;
-import org.activiti.engine.impl.event.logger.handler.Fields;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.event.EventLogEntry;
+import org.flowable.engine.impl.event.logger.handler.Fields;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,7 +43,7 @@ public class EventLogUserTaskCompleteTransformer extends EventLog2SimulationEven
   @SuppressWarnings("unchecked")
   @Override
   public SimulationEvent apply(EventLogEntry event) {
-    if (ActivitiEngineEventType.TASK_COMPLETED.toString().equals(event.getType())) {
+    if (FlowableEngineEventType.TASK_COMPLETED.toString().equals(event.getType())) {
 
       ObjectMapper objectMapper = new ObjectMapper();
       Map<String, Object> data;

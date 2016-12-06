@@ -16,7 +16,7 @@ import java.text.ParseException;
 import java.util.Date;
 
 import org.activiti.app.model.runtime.RestVariable;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
@@ -44,12 +44,12 @@ public class DateRestVariableConverter implements RestVariableConverter {
   public Object getVariableValue(RestVariable result) {
     if(result.getValue() != null) {
       if(!(result.getValue() instanceof String)) {
-        throw new ActivitiIllegalArgumentException("Converter can only convert string to date");
+        throw new FlowableIllegalArgumentException("Converter can only convert string to date");
       }
       try {
         return isoFormatter.parse((String) result.getValue());
       } catch (ParseException e) {
-        throw new ActivitiIllegalArgumentException("The given variable value is not a date: '" + result.getValue() + "'", e);
+        throw new FlowableIllegalArgumentException("The given variable value is not a date: '" + result.getValue() + "'", e);
       }
     }
     return null;
@@ -59,7 +59,7 @@ public class DateRestVariableConverter implements RestVariableConverter {
   public void convertVariableValue(Object variableValue, RestVariable result) {
     if(variableValue != null) {
       if(!(variableValue instanceof Date)) {
-        throw new ActivitiIllegalArgumentException("Converter can only convert booleans");
+        throw new FlowableIllegalArgumentException("Converter can only convert booleans");
       }
       result.setValue(isoFormatter.format(variableValue));
     } else {

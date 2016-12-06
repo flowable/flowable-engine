@@ -21,18 +21,18 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.impl.Page;
-import org.activiti.idm.api.Group;
-import org.activiti.idm.engine.impl.GroupQueryImpl;
-import org.activiti.idm.engine.impl.interceptor.CommandContext;
-import org.activiti.idm.engine.impl.persistence.entity.GroupEntity;
-import org.activiti.idm.engine.impl.persistence.entity.GroupEntityImpl;
 import org.activiti.ldap.LDAPCallBack;
 import org.activiti.ldap.LDAPConfigurator;
 import org.activiti.ldap.LDAPGroupCache;
 import org.activiti.ldap.LDAPTemplate;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.Page;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.engine.impl.GroupQueryImpl;
+import org.flowable.idm.engine.impl.interceptor.CommandContext;
+import org.flowable.idm.engine.impl.persistence.entity.GroupEntity;
+import org.flowable.idm.engine.impl.persistence.entity.GroupEntityImpl;
 
 public class LDAPGroupQueryImpl extends GroupQueryImpl {
   
@@ -60,7 +60,7 @@ public class LDAPGroupQueryImpl extends GroupQueryImpl {
     if (getUserId() != null) {
       return findGroupsByUser(getUserId());
     } else {
-      throw new ActivitiIllegalArgumentException("This query is not supported by the LDAPGroupManager");
+      throw new FlowableIllegalArgumentException("This query is not supported by the LDAPGroupManager");
     }
   }
   
@@ -112,7 +112,7 @@ public class LDAPGroupQueryImpl extends GroupQueryImpl {
           return groups;
 
         } catch (NamingException e) {
-          throw new ActivitiException("Could not find groups for user " + userId, e);
+          throw new FlowableException("Could not find groups for user " + userId, e);
         }
       }
 

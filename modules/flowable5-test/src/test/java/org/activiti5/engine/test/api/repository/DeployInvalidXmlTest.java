@@ -1,10 +1,10 @@
 package org.activiti5.engine.test.api.repository;
 
-import org.activiti.bpmn.exceptions.XMLException;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.bpmn.exceptions.XMLException;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.repository.ProcessDefinition;
 
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

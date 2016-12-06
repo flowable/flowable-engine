@@ -15,11 +15,11 @@ package org.activiti5.engine.test.api.identity;
 
 import java.util.List;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.idm.api.User;
-import org.activiti.idm.api.UserQuery;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.idm.api.User;
+import org.flowable.idm.api.UserQuery;
 
 
 /**
@@ -81,7 +81,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().userId(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) { }
+    } catch (FlowableIllegalArgumentException e) { }
   }
   
   public void testQueryByFirstName() {
@@ -99,7 +99,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().userFirstName(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) { }
+    } catch (FlowableIllegalArgumentException e) { }
   }
   
   public void testQueryByFirstNameLike() {
@@ -117,7 +117,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().userFirstNameLike(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) { }
+    } catch (FlowableIllegalArgumentException e) { }
   }
   
   public void testQueryByLastName() {
@@ -135,7 +135,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().userLastName(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) { }
+    } catch (FlowableIllegalArgumentException e) { }
   }
   
   public void testQueryByLastNameLike() {
@@ -164,7 +164,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().userLastNameLike(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) { }
+    } catch (FlowableIllegalArgumentException e) { }
   }
   
   public void testQueryByEmail() {
@@ -179,7 +179,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().userEmail(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) { }
+    } catch (FlowableIllegalArgumentException e) { }
   }
   
   public void testQueryByEmailLike() {
@@ -197,7 +197,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().userEmailLike(null).singleResult();
       fail();
-    } catch (ActivitiIllegalArgumentException e) { }
+    } catch (FlowableIllegalArgumentException e) { }
   }
   
   public void testQuerySorting() {
@@ -225,12 +225,12 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().orderByUserId().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (FlowableIllegalArgumentException e) {}
     
     try {
       identityService.createUserQuery().orderByUserId().orderByUserEmail().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (FlowableIllegalArgumentException e) {}
   }
   
   public void testQueryByMemberOf() {
@@ -251,7 +251,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createUserQuery().memberOfGroup(null).list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) { }
+    } catch (FlowableIllegalArgumentException e) { }
   }
   
   private void verifyQueryResults(UserQuery query, int countExpected) {
@@ -271,7 +271,7 @@ public class UserQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ActivitiException e) {}
+    } catch (FlowableException e) {}
   }
 
   public void testNativeQuery() {

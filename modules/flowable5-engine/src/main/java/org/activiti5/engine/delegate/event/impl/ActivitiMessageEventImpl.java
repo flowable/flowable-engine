@@ -12,21 +12,21 @@
  */
 package org.activiti5.engine.delegate.event.impl;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.delegate.event.ActivitiMessageEvent;
-import org.activiti.engine.delegate.event.ActivitiSignalEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.delegate.event.FlowableMessageEvent;
+import org.flowable.engine.delegate.event.FlowableSignalEvent;
 
 /**
- * An {@link ActivitiSignalEvent} implementation.
+ * An {@link FlowableSignalEvent} implementation.
  * 
  * @author Frederik Heremans
  */
-public class ActivitiMessageEventImpl extends ActivitiActivityEventImpl implements ActivitiMessageEvent {
+public class ActivitiMessageEventImpl extends ActivitiActivityEventImpl implements FlowableMessageEvent {
 
 	protected String messageName;
 	protected Object messageData;
 	
-	public ActivitiMessageEventImpl(ActivitiEngineEventType type) {
+	public ActivitiMessageEventImpl(FlowableEngineEventType type) {
 	  super(type);
   }
 	

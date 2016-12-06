@@ -14,16 +14,16 @@ package org.activiti.validation.validator.impl;
 
 import java.util.List;
 
-import org.activiti.bpmn.model.Activity;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.DataAssociation;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.MultiInstanceLoopCharacteristics;
-import org.activiti.bpmn.model.Process;
 import org.activiti.validation.ValidationError;
 import org.activiti.validation.validator.Problems;
 import org.activiti.validation.validator.ProcessLevelValidator;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.Activity;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.DataAssociation;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
+import org.flowable.bpmn.model.Process;
 
 /**
  * A validator for stuff that is shared across all flow elements

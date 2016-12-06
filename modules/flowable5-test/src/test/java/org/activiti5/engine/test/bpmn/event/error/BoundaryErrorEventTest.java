@@ -16,17 +16,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.delegate.BpmnError;
-import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti5.engine.impl.util.CollectionUtil;
 import org.activiti5.engine.impl.util.JvmUtil;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.delegate.BpmnError;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 
 /**
@@ -56,7 +56,7 @@ public class BoundaryErrorEventTest extends PluggableActivitiTestCase {
         .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
       fail("ActivitiException expected");
-    } catch (ActivitiException re) {
+    } catch (FlowableException re) {
     }
   }
 

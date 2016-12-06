@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+  <settings>
+    <setting name="lazyLoadingEnabled" value="false" />
+  </settings>
+  <mappers>
+    <mapper resource="org/flowable/content/db/mapping/common.xml" />
+    <mapper resource="org/flowable/content/db/mapping/entity/ContentItem.xml" />
+    <mapper resource="org/flowable/content/db/mapping/entity/TableData.xml" />
+  </mappers>
+</configuration>

@@ -19,11 +19,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.rest.application.ContentTypeResolver;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.rest.application.ContentTypeResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,7 +61,7 @@ public class DeploymentResourceResource {
     // Check if deployment exists
     Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
     if (deployment == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.");
+      throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.");
     }
 
     String pathInfo = request.getPathInfo();
@@ -76,7 +76,7 @@ public class DeploymentResourceResource {
 
     } else {
       // Resource not found in deployment
-      throw new ActivitiObjectNotFoundException("Could not find a resource with id '" + resourceName + "' in deployment '" + deploymentId + "'.");
+      throw new FlowableObjectNotFoundException("Could not find a resource with id '" + resourceName + "' in deployment '" + deploymentId + "'.");
     }
   }
 }

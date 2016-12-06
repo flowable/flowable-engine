@@ -14,10 +14,10 @@ package org.activiti5.standalone.deploy;
 
 import java.text.MessageFormat;
 
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.DeploymentProperties;
 import org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti5.engine.impl.test.ResourceActivitiTestCase;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.DeploymentProperties;
 
 /**
  * @author Joram Barrez

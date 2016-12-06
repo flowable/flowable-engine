@@ -18,20 +18,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.bpmn.converter.BpmnXMLConverter;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.impl.util.io.InputStreamSource;
-import org.activiti.engine.common.impl.util.io.StreamSource;
-import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricActivityInstanceQuery;
-import org.activiti.engine.history.HistoricVariableInstance;
-import org.activiti.engine.history.HistoricVariableInstanceQuery;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti5.engine.impl.test.ResourceActivitiTestCase;
+import org.flowable.bpmn.converter.BpmnXMLConverter;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.util.io.InputStreamSource;
+import org.flowable.engine.common.impl.util.io.StreamSource;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricActivityInstanceQuery;
+import org.flowable.engine.history.HistoricVariableInstance;
+import org.flowable.engine.history.HistoricVariableInstanceQuery;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ProcessInstance;
 
 public class CallActivityTest extends ResourceActivitiTestCase {
 
@@ -75,7 +75,7 @@ public class CallActivityTest extends ResourceActivitiTestCase {
     try {
       runtimeService.startProcessInstanceByMessage("TRIGGER_PROCESS_MESSAGE");
       fail("Exception expected");
-    } catch (ActivitiException ae) {
+    } catch (FlowableException ae) {
       assertTextPresent("Cannot start process instance. Process definition Message Triggered Process", ae.getMessage());
     }
 
@@ -110,7 +110,7 @@ public class CallActivityTest extends ResourceActivitiTestCase {
     try {
       runtimeService.startProcessInstanceByKey("childProcess");
       fail("Exception expected");
-    } catch (ActivitiException ae) {
+    } catch (FlowableException ae) {
       assertTextPresent("Cannot start process instance. Process definition Child Process", ae.getMessage());
     }
 
@@ -140,7 +140,7 @@ public class CallActivityTest extends ResourceActivitiTestCase {
     try {
       runtimeService.startProcessInstanceByKey("masterProcess");
       fail("Exception expected");
-    } catch (ActivitiException ae) {
+    } catch (FlowableException ae) {
       assertTextPresent("Cannot start process instance. Process definition Child Process", ae.getMessage());
     }
 

@@ -12,8 +12,8 @@
  */
 package org.activiti5.engine.impl.webservice;
 
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.test.Deployment;
 
 /**
  * An integration test for CXF based web services

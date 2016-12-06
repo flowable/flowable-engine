@@ -32,9 +32,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.delegate.event.ActivitiVariableEvent;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiOptimisticLockingException;
 import org.activiti5.engine.ActivitiWrongDbException;
@@ -64,6 +61,9 @@ import org.activiti5.engine.impl.util.IoUtil;
 import org.activiti5.engine.impl.util.ReflectUtil;
 import org.activiti5.engine.impl.variable.DeserializedObject;
 import org.apache.ibatis.session.SqlSession;
+import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.delegate.event.FlowableVariableEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -894,7 +894,7 @@ public class DbSqlSession implements Session {
 
   protected void flushDeletes(List<DeleteOperation> removedOperations) {
     boolean dispatchEvent = false;
-    ActivitiEventDispatcher eventDispatcher = Context.getProcessEngineConfiguration().getEventDispatcher();
+    FlowableEventDispatcher eventDispatcher = Context.getProcessEngineConfiguration().getEventDispatcher();
     if (eventDispatcher != null && eventDispatcher.isEnabled()) {
       dispatchEvent = eventDispatcher.isEnabled();
     }
@@ -924,8 +924,8 @@ public class DbSqlSession implements Session {
     }
   }
 
-  protected static ActivitiVariableEvent createVariableDeleteEvent(VariableInstanceEntity variableInstance) {
-    return ActivitiEventBuilder.createVariableEvent(ActivitiEngineEventType.VARIABLE_DELETED, variableInstance.getName(), null, variableInstance.getType(),
+  protected static FlowableVariableEvent createVariableDeleteEvent(VariableInstanceEntity variableInstance) {
+    return ActivitiEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_DELETED, variableInstance.getName(), null, variableInstance.getType(),
     		variableInstance.getTaskId(), variableInstance.getExecutionId(), variableInstance.getProcessInstanceId(), null);
   }
 

@@ -2,13 +2,13 @@ package org.activiti5.engine.test.regression;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.Process;
-import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.validation.ProcessValidator;
 import org.activiti.validation.ValidationError;
 import org.activiti.validation.validator.ValidatorSet;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.ServiceTask;
  
 /**
  * Sample Process Validator for Activiti Test case.

@@ -9,15 +9,15 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.AbstractActivitiTestCase;
 import org.activiti5.engine.impl.variable.EntityManagerSession;
 import org.activiti5.engine.impl.variable.EntityManagerSessionFactory;
 import org.activiti5.engine.task.Task;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -17,9 +17,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.runtime.Job;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.runtime.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,13 +46,13 @@ public class JobExceptionStacktraceResource {
   public String getJobStacktrace(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
     Job job = managementService.createJobQuery().jobId(jobId).singleResult();
     if (job == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
+      throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
     }
 
     String stackTrace = managementService.getJobExceptionStacktrace(job.getId());
 
     if (stackTrace == null) {
-      throw new ActivitiObjectNotFoundException("Job with id '" + job.getId() + "' doesn't have an exception stacktrace.", String.class);
+      throw new FlowableObjectNotFoundException("Job with id '" + job.getId() + "' doesn't have an exception stacktrace.", String.class);
     }
 
     response.setContentType("text/plain");
@@ -68,13 +68,13 @@ public class JobExceptionStacktraceResource {
   public String getTimerJobStacktrace(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
     Job job = managementService.createTimerJobQuery().jobId(jobId).singleResult();
     if (job == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
+      throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
     }
 
     String stackTrace = managementService.getTimerJobExceptionStacktrace(job.getId());
 
     if (stackTrace == null) {
-      throw new ActivitiObjectNotFoundException("Timer job with id '" + job.getId() + "' doesn't have an exception stacktrace.", String.class);
+      throw new FlowableObjectNotFoundException("Timer job with id '" + job.getId() + "' doesn't have an exception stacktrace.", String.class);
     }
 
     response.setContentType("text/plain");
@@ -90,13 +90,13 @@ public class JobExceptionStacktraceResource {
   public String getSuspendedJobStacktrace(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
     Job job = managementService.createSuspendedJobQuery().jobId(jobId).singleResult();
     if (job == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
+      throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
     }
 
     String stackTrace = managementService.getSuspendedJobExceptionStacktrace(job.getId());
 
     if (stackTrace == null) {
-      throw new ActivitiObjectNotFoundException("Suspended job with id '" + job.getId() + "' doesn't have an exception stacktrace.", String.class);
+      throw new FlowableObjectNotFoundException("Suspended job with id '" + job.getId() + "' doesn't have an exception stacktrace.", String.class);
     }
 
     response.setContentType("text/plain");
@@ -112,13 +112,13 @@ public class JobExceptionStacktraceResource {
   public String getDeadLetterJobStacktrace(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
     Job job = managementService.createDeadLetterJobQuery().jobId(jobId).singleResult();
     if (job == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
+      throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
     }
 
     String stackTrace = managementService.getDeadLetterJobExceptionStacktrace(job.getId());
 
     if (stackTrace == null) {
-      throw new ActivitiObjectNotFoundException("Suspended job with id '" + job.getId() + "' doesn't have an exception stacktrace.", String.class);
+      throw new FlowableObjectNotFoundException("Suspended job with id '" + job.getId() + "' doesn't have an exception stacktrace.", String.class);
     }
 
     response.setContentType("text/plain");

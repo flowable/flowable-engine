@@ -4,12 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.EventDefinition;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.IntermediateCatchEvent;
-import org.activiti.bpmn.model.SequenceFlow;
-import org.activiti.bpmn.model.TimerEventDefinition;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.IntermediateCatchEvent;
+import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.TimerEventDefinition;
 import org.junit.Test;
 
 public class SimpleConverterTest extends AbstractConverterTest {

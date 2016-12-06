@@ -12,7 +12,7 @@
  */
 package org.activiti.scripting.secure.impl;
 
-import org.activiti.engine.delegate.VariableScope;
+import org.flowable.engine.delegate.VariableScope;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 

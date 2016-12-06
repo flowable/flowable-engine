@@ -12,8 +12,6 @@
  */
 package org.activiti5.engine.impl.bpmn.behavior;
 
-import org.activiti.engine.DynamicBpmnConstants;
-import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.delegate.BpmnError;
 import org.activiti5.engine.impl.bpmn.helper.ErrorPropagation;
@@ -22,6 +20,8 @@ import org.activiti5.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti5.engine.impl.scripting.ScriptingEngines;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.flowable.engine.DynamicBpmnConstants;
+import org.flowable.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

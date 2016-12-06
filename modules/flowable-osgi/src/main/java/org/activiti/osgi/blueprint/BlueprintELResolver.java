@@ -8,8 +8,8 @@ import java.util.Map;
 import javax.el.ELContext;
 import javax.el.ELResolver;
 
-import org.activiti.engine.delegate.JavaDelegate;
-import org.activiti.engine.impl.delegate.ActivityBehavior;
+import org.flowable.engine.delegate.JavaDelegate;
+import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

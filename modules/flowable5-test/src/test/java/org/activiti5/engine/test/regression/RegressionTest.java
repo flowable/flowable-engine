@@ -12,8 +12,8 @@
  */
 package org.activiti5.engine.test.regression;
 
-import org.activiti.engine.repository.DeploymentProperties;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.repository.DeploymentProperties;
 
 
 /**

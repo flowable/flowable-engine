@@ -1,8 +1,8 @@
 package org.activiti5.engine.impl.bpmn.helper;
 
-import org.activiti.engine.delegate.Expression;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.impl.pvm.delegate.ActivityExecution;
+import org.flowable.engine.delegate.Expression;
 
 
 public class SkipExpressionUtil {

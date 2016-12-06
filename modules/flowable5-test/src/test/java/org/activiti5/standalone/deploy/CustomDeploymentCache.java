@@ -12,8 +12,8 @@
  */
 package org.activiti5.standalone.deploy;
 
-import org.activiti.engine.impl.persistence.deploy.DeploymentCache;
-import org.activiti.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
+import org.flowable.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 
 /**
  * Very simplistic cache implementation that only caches one process definition.

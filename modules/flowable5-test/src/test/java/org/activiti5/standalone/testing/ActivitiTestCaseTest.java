@@ -13,15 +13,15 @@
 
 package org.activiti5.standalone.testing;
 
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.ActivitiTestCase;
-import org.activiti.engine.test.Deployment;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.FlowableTestCase;
+import org.flowable.engine.test.Deployment;
 
 
 /**
  * @author Joram Barrez
  */
-public class ActivitiTestCaseTest extends ActivitiTestCase {
+public class ActivitiTestCaseTest extends FlowableTestCase {
   
   @Deployment
   public void testSimpleProcess() {

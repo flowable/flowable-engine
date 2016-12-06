@@ -15,7 +15,7 @@ package org.activiti.spring.boot;
 import java.util.Arrays;
 import java.util.List;
 
-import org.activiti.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.history.HistoryLevel;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**

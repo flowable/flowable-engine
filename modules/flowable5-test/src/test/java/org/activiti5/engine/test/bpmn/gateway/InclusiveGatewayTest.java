@@ -17,13 +17,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti5.engine.impl.util.CollectionUtil;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 /**
  * @author Joram Barrez
@@ -90,7 +90,7 @@ public class InclusiveGatewayTest extends PluggableActivitiTestCase {
     try {
       runtimeService.startProcessInstanceByKey("inclusiveGwNoSeqFlowSelected", CollectionUtil.singletonMap("input", 4));
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertTextPresent("No outgoing sequence flow of the inclusive gateway 'inclusiveGw' could be selected for continuing the process", e.getMessage());
     }
   }
@@ -158,7 +158,7 @@ public class InclusiveGatewayTest extends PluggableActivitiTestCase {
     try {
       runtimeService.startProcessInstanceByKey("inclusiveGwDiverging", CollectionUtil.singletonMap("iinput", 1));
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertTextPresent("Unknown property used in expression", e.getMessage());
     }
   }
@@ -187,7 +187,7 @@ public class InclusiveGatewayTest extends PluggableActivitiTestCase {
     try {
       runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnListOrArrayOfBeans", CollectionUtil.singletonMap("orders", orders));
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // expect an exception to be thrown here
     }
 
@@ -250,7 +250,7 @@ public class InclusiveGatewayTest extends PluggableActivitiTestCase {
     try {
       runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnBeanMethod", CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(300)));
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // Should get an exception indicating that no path could be taken
     }
 
@@ -261,7 +261,7 @@ public class InclusiveGatewayTest extends PluggableActivitiTestCase {
     try {
       runtimeService.startProcessInstanceByKey("inclusiveInvalidMethodExpression", CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(50)));
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertTextPresent("Unknown method used in expression", e.getMessage());
     }
   }
@@ -382,7 +382,7 @@ public class InclusiveGatewayTest extends PluggableActivitiTestCase {
     try {
       runtimeService.startProcessInstanceByKey("InclusiveGateway", variableMap);
       fail();
-    } catch(ActivitiException e) {
+    } catch(FlowableException e) {
       assertTrue(e.getMessage().contains("No outgoing sequence flow"));
     }
 	}

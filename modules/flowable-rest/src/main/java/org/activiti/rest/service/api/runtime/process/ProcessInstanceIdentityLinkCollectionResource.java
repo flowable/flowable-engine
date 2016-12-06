@@ -20,9 +20,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.rest.service.api.engine.RestIdentityLink;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -62,15 +62,15 @@ public class ProcessInstanceIdentityLinkCollectionResource extends BaseProcessIn
     ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
 
     if (identityLink.getGroup() != null) {
-      throw new ActivitiIllegalArgumentException("Only user identity links are supported on a process instance.");
+      throw new FlowableIllegalArgumentException("Only user identity links are supported on a process instance.");
     }
 
     if (identityLink.getUser() == null) {
-      throw new ActivitiIllegalArgumentException("The user is required.");
+      throw new FlowableIllegalArgumentException("The user is required.");
     }
 
     if (identityLink.getType() == null) {
-      throw new ActivitiIllegalArgumentException("The identity link type is required.");
+      throw new FlowableIllegalArgumentException("The identity link type is required.");
     }
 
     runtimeService.addUserIdentityLink(processInstance.getId(), identityLink.getUser(), identityLink.getType());

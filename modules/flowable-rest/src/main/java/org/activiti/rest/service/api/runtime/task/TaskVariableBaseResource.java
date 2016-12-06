@@ -19,17 +19,17 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.activiti.engine.task.Task;
-import org.activiti.rest.exception.ActivitiContentNotSupportedException;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.engine.variable.RestVariable.RestVariableScope;
 import org.apache.commons.io.IOUtils;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.engine.task.Task;
+import org.flowable.rest.exception.ActivitiContentNotSupportedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.multipart.MultipartFile;
@@ -91,7 +91,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
     }
 
     if (!variableFound) {
-      throw new ActivitiObjectNotFoundException("Task '" + taskId + "' doesn't have a variable with name: '" + variableName + "'.", VariableInstanceEntity.class);
+      throw new FlowableObjectNotFoundException("Task '" + taskId + "' doesn't have a variable with name: '" + variableName + "'.", VariableInstanceEntity.class);
     } else {
       return restResponseFactory.createRestVariable(variableName, value, variableScope, taskId, RestResponseFactory.VARIABLE_TASK, includeBinary);
     }
@@ -117,14 +117,14 @@ public class TaskVariableBaseResource extends TaskBaseResource {
 
     // Validate input and set defaults
     if (request.getFileMap().size() == 0) {
-      throw new ActivitiIllegalArgumentException("No file content was found in request body.");
+      throw new FlowableIllegalArgumentException("No file content was found in request body.");
     }
 
     // Get first file in the map, ignore possible other files
     MultipartFile file = request.getFile(request.getFileMap().keySet().iterator().next());
 
     if (file == null) {
-      throw new ActivitiIllegalArgumentException("No file content was found in request body.");
+      throw new FlowableIllegalArgumentException("No file content was found in request body.");
     }
 
     String variableScope = null;
@@ -151,12 +151,12 @@ public class TaskVariableBaseResource extends TaskBaseResource {
     try {
 
       if (variableName == null) {
-        throw new ActivitiIllegalArgumentException("No variable name was found in request body.");
+        throw new FlowableIllegalArgumentException("No variable name was found in request body.");
       }
 
       if (variableType != null) {
         if (!RestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variableType) && !RestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variableType)) {
-          throw new ActivitiIllegalArgumentException("Only 'binary' and 'serializable' are supported as variable type.");
+          throw new FlowableIllegalArgumentException("Only 'binary' and 'serializable' are supported as variable type.");
         }
       } else {
         variableType = RestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE;
@@ -186,7 +186,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
       return restResponseFactory.createBinaryRestVariable(variableName, scope, variableType, task.getId(), null, null);
 
     } catch (IOException ioe) {
-      throw new ActivitiIllegalArgumentException("Error getting binary variable", ioe);
+      throw new FlowableIllegalArgumentException("Error getting binary variable", ioe);
     } catch (ClassNotFoundException ioe) {
       throw new ActivitiContentNotSupportedException("The provided body contains a serialized object for which the class is nog found: " + ioe.getMessage());
     }
@@ -195,7 +195,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
 
   protected RestVariable setSimpleVariable(RestVariable restVariable, Task task, boolean isNew) {
     if (restVariable.getName() == null) {
-      throw new ActivitiIllegalArgumentException("Variable name is required");
+      throw new FlowableIllegalArgumentException("Variable name is required");
     }
 
     // Figure out scope, revert to local is omitted
@@ -215,11 +215,11 @@ public class TaskVariableBaseResource extends TaskBaseResource {
     // be updated using PUT
     boolean hasVariable = hasVariableOnScope(task, name, scope);
     if (isNew && hasVariable) {
-      throw new ActivitiException("Variable '" + name + "' is already present on task '" + task.getId() + "'.");
+      throw new FlowableException("Variable '" + name + "' is already present on task '" + task.getId() + "'.");
     }
 
     if (!isNew && !hasVariable) {
-      throw new ActivitiObjectNotFoundException("Task '" + task.getId() + "' doesn't have a variable with name: '" + name + "'.", null);
+      throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' doesn't have a variable with name: '" + name + "'.", null);
     }
 
     if (scope == RestVariableScope.LOCAL) {
@@ -231,7 +231,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
         runtimeService.setVariable(task.getExecutionId(), name, value);
       } else {
         // Standalone task, no global variables possible
-        throw new ActivitiIllegalArgumentException("Cannot set global variable '" + name + "' on task '" + task.getId() + "', task is not part of process.");
+        throw new FlowableIllegalArgumentException("Cannot set global variable '" + name + "' on task '" + task.getId() + "', task is not part of process.");
       }
     }
   }

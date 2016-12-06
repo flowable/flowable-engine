@@ -1,9 +1,9 @@
 package org.activiti.osgi.blueprint.bean;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.impl.delegate.ActivityBehavior;
-import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.delegate.ActivityBehavior;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 public class ActivityBehaviourBean implements ActivityBehavior {
 

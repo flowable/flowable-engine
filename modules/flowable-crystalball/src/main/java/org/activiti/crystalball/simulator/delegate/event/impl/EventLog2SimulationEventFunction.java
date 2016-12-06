@@ -15,7 +15,7 @@ package org.activiti.crystalball.simulator.delegate.event.impl;
 
 import org.activiti.crystalball.simulator.SimulationEvent;
 import org.activiti.crystalball.simulator.delegate.event.Function;
-import org.activiti.engine.event.EventLogEntry;
+import org.flowable.engine.event.EventLogEntry;
 
 /**
  * This class provides abstract base for ActivitiEvent -> SimulationEvent transformation

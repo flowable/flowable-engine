@@ -12,7 +12,7 @@
  */
 package org.activiti.spring.boot;
 
-import org.activiti.spring.SpringProcessEngineConfiguration;
+import org.flowable.spring.SpringProcessEngineConfiguration;
 
 /**
  * Interface to be implemented by a bean that does some extra configuration of the SpringProcessEngineConfiguration.

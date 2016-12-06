@@ -26,18 +26,18 @@ import org.activiti.crystalball.simulator.delegate.event.impl.UserTaskCompleteTr
 import org.activiti.crystalball.simulator.impl.StartReplayProcessEventHandler;
 import org.activiti.crystalball.simulator.impl.bpmn.parser.handler.AddListenerUserTaskParseHandler;
 import org.activiti.crystalball.simulator.impl.playback.PlaybackUserTaskCompleteEventHandler;
-import org.activiti.engine.ProcessEngines;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.TaskListener;
-import org.activiti.engine.impl.ProcessEngineImpl;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.el.NoExecutionVariableScope;
-import org.activiti.engine.parse.BpmnParseHandler;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
+import org.flowable.engine.ProcessEngines;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.delegate.TaskListener;
+import org.flowable.engine.impl.ProcessEngineImpl;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.el.NoExecutionVariableScope;
+import org.flowable.engine.parse.BpmnParseHandler;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
 import org.junit.Test;
 
 import java.util.*;
@@ -119,7 +119,7 @@ public class ReplayRunTest {
   }
 
   private ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
-    ProcessEngineConfigurationImpl configuration = new org.activiti.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl configuration = new org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration();
     configuration.
       setHistory("full").
       setDatabaseSchemaUpdate("drop-create");
@@ -128,12 +128,12 @@ public class ReplayRunTest {
             new AddListenerUserTaskParseHandler(TaskListener.EVENTNAME_CREATE,
             new UserTaskExecutionListener(USER_TASK_COMPLETED_EVENT_TYPE, USER_TASK_COMPLETED_EVENT_TYPE, listener.getSimulationEvents()))
         ));
-    configuration.setEventListeners(Arrays.<ActivitiEventListener>asList(listener));
+    configuration.setEventListeners(Arrays.<FlowableEventListener>asList(listener));
     return configuration;
   }
 
-  private static List<Function<ActivitiEvent, SimulationEvent>> getTransformers() {
-    List<Function<ActivitiEvent, SimulationEvent>> transformers = new ArrayList<Function<ActivitiEvent, SimulationEvent>>();
+  private static List<Function<FlowableEvent, SimulationEvent>> getTransformers() {
+    List<Function<FlowableEvent, SimulationEvent>> transformers = new ArrayList<Function<FlowableEvent, SimulationEvent>>();
     transformers.add(new ProcessInstanceCreateTransformer(PROCESS_INSTANCE_START_EVENT_TYPE, PROCESS_DEFINITION_ID_KEY, BUSINESS_KEY, VARIABLES_KEY));
     transformers.add(new UserTaskCompleteTransformer(USER_TASK_COMPLETED_EVENT_TYPE));
     return transformers;

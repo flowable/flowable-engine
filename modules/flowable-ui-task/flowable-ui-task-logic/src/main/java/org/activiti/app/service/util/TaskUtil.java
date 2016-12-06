@@ -18,21 +18,21 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.app.model.runtime.TaskRepresentation;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.ExtensionElement;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.UserTask;
 import org.activiti.editor.language.json.converter.util.CollectionUtils;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricVariableInstance;
-import org.activiti.engine.task.TaskInfo;
-import org.activiti.idm.api.Group;
-import org.activiti.idm.api.User;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ExtensionElement;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.UserTask;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.IdentityService;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.history.HistoricVariableInstance;
+import org.flowable.engine.task.TaskInfo;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.User;
 
 public class TaskUtil {
 

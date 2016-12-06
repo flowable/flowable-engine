@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+  <settings>
+    <setting name="lazyLoadingEnabled" value="false" />
+  </settings>
+  <typeAliases>
+    <typeAlias type="org.flowable.form.engine.impl.persistence.ResourceRefTypeHandler" alias="ResourceRefTypeHandler"/>
+  </typeAliases>
+  <typeHandlers>
+    <typeHandler handler="ResourceRefTypeHandler" 
+                 javaType="org.flowable.form.engine.impl.persistence.entity.ResourceRef"
+                 jdbcType="VARCHAR"/>
+  </typeHandlers>
+  <mappers>
+    <mapper resource="org/flowable/form/db/mapping/common.xml" />
+    <mapper resource="org/flowable/form/db/mapping/entity/Deployment.xml" />
+    <mapper resource="org/flowable/form/db/mapping/entity/FormDefinition.xml" />
+    <mapper resource="org/flowable/form/db/mapping/entity/Resource.xml" />
+    <mapper resource="org/flowable/form/db/mapping/entity/FormInstance.xml" />
+    <mapper resource="org/flowable/form/db/mapping/entity/TableData.xml" />
+  </mappers>
+</configuration>

@@ -12,8 +12,8 @@
  */
 package org.activiti.test.scripting.secure;
 
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
 import org.junit.Assert;
 import org.junit.Test;
 

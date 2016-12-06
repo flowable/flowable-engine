@@ -19,14 +19,15 @@ import java.util.Collections;
 import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.ProcessInstance;
+
 import org.activiti.image.ProcessDiagramGenerator;
 import org.apache.commons.io.IOUtils;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -73,11 +74,11 @@ public class ProcessInstanceDiagramResource extends BaseProcessInstanceResource 
       try {
         return new ResponseEntity<byte[]>(IOUtils.toByteArray(resource), responseHeaders, HttpStatus.OK);
       } catch (Exception e) {
-        throw new ActivitiIllegalArgumentException("Error exporting diagram", e);
+        throw new FlowableIllegalArgumentException("Error exporting diagram", e);
       }
 
     } else {
-      throw new ActivitiIllegalArgumentException("Process instance with id '" + processInstance.getId() + "' has no graphical notation defined.");
+      throw new FlowableIllegalArgumentException("Process instance with id '" + processInstance.getId() + "' has no graphical notation defined.");
     }
   }
 }

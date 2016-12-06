@@ -12,10 +12,10 @@
  */
 package org.activiti5.engine.test.bpmn.event.error.mapError;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
 import org.activiti5.engine.ActivitiException;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.JavaDelegate;
 
 
 /**

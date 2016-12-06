@@ -13,7 +13,7 @@
 
 package org.activiti5.engine.impl.bpmn.behavior;
 
-import org.activiti.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.DelegateExecution;
 
 
 /**

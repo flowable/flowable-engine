@@ -15,22 +15,22 @@ package org.activiti5.engine.test.api.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 
-public class TestActiviti6EntityEventListener implements ActivitiEventListener {
+public class TestActiviti6EntityEventListener implements FlowableEventListener {
 
-	private List<ActivitiEvent> eventsReceived;
+	private List<FlowableEvent> eventsReceived;
 	private Class<?> entityClass;
 	
 	public TestActiviti6EntityEventListener(Class<?> entityClass) {
 		this.entityClass = entityClass;
 		
-		eventsReceived = new ArrayList<ActivitiEvent>();
+		eventsReceived = new ArrayList<FlowableEvent>();
   }
 	
-	public List<ActivitiEvent> getEventsReceived() {
+	public List<FlowableEvent> getEventsReceived() {
 	  return eventsReceived;
   }
 	
@@ -39,8 +39,8 @@ public class TestActiviti6EntityEventListener implements ActivitiEventListener {
 	}
 	
 	@Override
-	public void onEvent(ActivitiEvent event) {
-		if (event instanceof ActivitiEntityEvent && entityClass.isAssignableFrom(((ActivitiEntityEvent) event).getEntity().getClass())) {
+	public void onEvent(FlowableEvent event) {
+		if (event instanceof FlowableEntityEvent && entityClass.isAssignableFrom(((FlowableEntityEvent) event).getEntity().getClass())) {
 			eventsReceived.add(event);
 		}
 	}

@@ -16,7 +16,7 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.zip.ZipInputStream;
 
-import org.activiti.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.BpmnModel;
 
 /**
  * Builder for creating new deployments.

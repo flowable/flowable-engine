@@ -13,10 +13,10 @@
 
 package org.activiti.rest.service.api.identity;
 
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.idm.api.User;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.flowable.engine.IdentityService;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.idm.api.User;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -34,7 +34,7 @@ public class BaseUserResource {
     User user = identityService.createUserQuery().userId(userId).singleResult();
 
     if (user == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a user with id '" + userId + "'.", User.class);
+      throw new FlowableObjectNotFoundException("Could not find a user with id '" + userId + "'.", User.class);
     }
     return user;
   }

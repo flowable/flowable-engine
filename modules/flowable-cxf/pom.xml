@@ -16,7 +16,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <activiti.artifact>
-      org.activiti.cxf
+      org.flowable.cxf
     </activiti.artifact>
   </properties>
 
@@ -200,7 +200,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
-          <excludePackageNames>org.activiti.impl*,org.activiti.engine.impl*</excludePackageNames>
+          <excludePackageNames>org.flowable.impl*,org.flowable.engine.impl*</excludePackageNames>
           <additionalparam>-Xdoclint:none</additionalparam>
         </configuration>
       </plugin>

@@ -12,8 +12,8 @@
  */
 package org.activiti.app.service.editor.mapper;
 
-import org.activiti.bpmn.model.ImplementationType;
-import org.activiti.bpmn.model.ServiceTask;
+import org.flowable.bpmn.model.ImplementationType;
+import org.flowable.bpmn.model.ServiceTask;
 
 public class ServiceTaskInfoMapper extends AbstractInfoMapper {
 

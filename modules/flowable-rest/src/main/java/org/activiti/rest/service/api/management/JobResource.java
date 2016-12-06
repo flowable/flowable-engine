@@ -18,12 +18,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.runtime.Job;
 import org.activiti.rest.service.api.RestActionRequest;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.runtime.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,7 +58,7 @@ public class JobResource {
     Job job = managementService.createJobQuery().jobId(jobId).singleResult();
 
     if (job == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
+      throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
     }
 
     return restResponseFactory.createJobResponse(job);
@@ -74,7 +74,7 @@ public class JobResource {
     Job job = managementService.createTimerJobQuery().jobId(jobId).singleResult();
 
     if (job == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a timer job with id '" + jobId + "'.", Job.class);
+      throw new FlowableObjectNotFoundException("Could not find a timer job with id '" + jobId + "'.", Job.class);
     }
 
     return restResponseFactory.createJobResponse(job);
@@ -90,7 +90,7 @@ public class JobResource {
     Job job = managementService.createSuspendedJobQuery().jobId(jobId).singleResult();
 
     if (job == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a suspended job with id '" + jobId + "'.", Job.class);
+      throw new FlowableObjectNotFoundException("Could not find a suspended job with id '" + jobId + "'.", Job.class);
     }
 
     return restResponseFactory.createJobResponse(job);
@@ -106,7 +106,7 @@ public class JobResource {
     Job job = managementService.createDeadLetterJobQuery().jobId(jobId).singleResult();
 
     if (job == null) {
-      throw new ActivitiObjectNotFoundException("Could not find a deadletter job with id '" + jobId + "'.", Job.class);
+      throw new FlowableObjectNotFoundException("Could not find a deadletter job with id '" + jobId + "'.", Job.class);
     }
 
     return restResponseFactory.createJobResponse(job);
@@ -121,9 +121,9 @@ public class JobResource {
   public void deleteJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
     try {
       managementService.deleteJob(jobId);
-    } catch (ActivitiObjectNotFoundException aonfe) {
+    } catch (FlowableObjectNotFoundException aonfe) {
       // Re-throw to have consistent error-messaging acrosse REST-api
-      throw new ActivitiObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
+      throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
     }
     response.setStatus(HttpStatus.NO_CONTENT.value());
   }
@@ -137,9 +137,9 @@ public class JobResource {
   public void deleteTimerJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
     try {
       managementService.deleteTimerJob(jobId);
-    } catch (ActivitiObjectNotFoundException aonfe) {
+    } catch (FlowableObjectNotFoundException aonfe) {
       // Re-throw to have consistent error-messaging acrosse REST-api
-      throw new ActivitiObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
+      throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
     }
     response.setStatus(HttpStatus.NO_CONTENT.value());
   }
@@ -153,9 +153,9 @@ public class JobResource {
   public void deleteDeadLetterJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
     try {
       managementService.deleteDeadLetterJob(jobId);
-    } catch (ActivitiObjectNotFoundException aonfe) {
+    } catch (FlowableObjectNotFoundException aonfe) {
       // Re-throw to have consistent error-messaging acrosse REST-api
-      throw new ActivitiObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
+      throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
     }
     response.setStatus(HttpStatus.NO_CONTENT.value());
   }
@@ -169,14 +169,14 @@ public class JobResource {
   @RequestMapping(value = "/management/jobs/{jobId}", method = RequestMethod.POST)
   public void executeJobAction(@ApiParam(name = "jobId") @PathVariable String jobId, @RequestBody RestActionRequest actionRequest, HttpServletResponse response) {
     if (actionRequest == null || !EXECUTE_ACTION.equals(actionRequest.getAction())) {
-      throw new ActivitiIllegalArgumentException("Invalid action, only 'execute' is supported.");
+      throw new FlowableIllegalArgumentException("Invalid action, only 'execute' is supported.");
     }
 
     try {
       managementService.executeJob(jobId);
-    } catch (ActivitiObjectNotFoundException aonfe) {
+    } catch (FlowableObjectNotFoundException aonfe) {
       // Re-throw to have consistent error-messaging acrosse REST-api
-      throw new ActivitiObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
+      throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
     }
 
     response.setStatus(HttpStatus.NO_CONTENT.value());

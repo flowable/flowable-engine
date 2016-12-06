@@ -14,16 +14,16 @@ package org.activiti5.engine.impl;
 
 import java.util.List;
 
-import org.activiti.idm.api.Group;
-import org.activiti.idm.api.GroupQuery;
-import org.activiti.idm.api.NativeGroupQuery;
-import org.activiti.idm.api.NativeUserQuery;
-import org.activiti.idm.api.Picture;
-import org.activiti.idm.api.User;
-import org.activiti.idm.api.UserQuery;
 import org.activiti5.engine.IdentityService;
 import org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti5.engine.impl.identity.Authentication;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.GroupQuery;
+import org.flowable.idm.api.NativeGroupQuery;
+import org.flowable.idm.api.NativeUserQuery;
+import org.flowable.idm.api.Picture;
+import org.flowable.idm.api.User;
+import org.flowable.idm.api.UserQuery;
 
 
 /**

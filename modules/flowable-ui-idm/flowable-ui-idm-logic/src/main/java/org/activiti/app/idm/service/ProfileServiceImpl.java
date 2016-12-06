@@ -19,10 +19,10 @@ import java.io.InputStream;
 import org.activiti.app.security.SecurityUtils;
 import org.activiti.app.service.exception.BadRequestException;
 import org.activiti.app.service.exception.NotFoundException;
-import org.activiti.idm.api.Picture;
-import org.activiti.idm.api.User;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.flowable.idm.api.Picture;
+import org.flowable.idm.api.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

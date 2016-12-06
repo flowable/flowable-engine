@@ -28,11 +28,11 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.util.CollectionUtil;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.test.Deployment;
 import org.subethamail.wiser.WiserMessage;
 
 
@@ -58,7 +58,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
   public void testSimpleTextMailWhenMultiTenant() throws Exception {
     String tenantId = "myEmailTenant";
 
-    org.activiti.engine.repository.Deployment deployment = repositoryService.createDeployment()
+    org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment()
         .addClasspathResource("org/activiti5/engine/test/bpmn/mail/EmailSendTaskTest.testSimpleTextMail.bpmn20.xml")
         .tenantId(tenantId)
         .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
@@ -79,7 +79,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
   public void testSimpleTextMailForNonExistentTenant() throws Exception {
     String tenantId = "nonExistentTenant";
 
-    org.activiti.engine.repository.Deployment deployment = repositoryService.createDeployment().addClasspathResource("org/activiti5/engine/test/bpmn/mail/EmailSendTaskTest.testSimpleTextMail.bpmn20.xml")
+    org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().addClasspathResource("org/activiti5/engine/test/bpmn/mail/EmailSendTaskTest.testSimpleTextMail.bpmn20.xml")
         .tenantId(tenantId)
         .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
@@ -277,7 +277,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
     try {
       runtimeService.startProcessInstanceByKey("invalidAddress").getId();
       fail("An Invalid email address should not execute");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // fine
     } catch (Exception e) {
       fail("Only an ActivitiException is expected here but not: " + e);

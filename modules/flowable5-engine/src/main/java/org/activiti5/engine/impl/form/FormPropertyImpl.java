@@ -13,8 +13,8 @@
 
 package org.activiti5.engine.impl.form;
 
-import org.activiti.engine.form.FormProperty;
-import org.activiti.engine.form.FormType;
+import org.flowable.engine.form.FormProperty;
+import org.flowable.engine.form.FormType;
 
 
 /**

@@ -16,7 +16,7 @@
 
 	<properties>
 		<activiti.artifact>
-			org.activiti.idm.api
+			org.flowable.idm.api
 		</activiti.artifact>
 	</properties>
 

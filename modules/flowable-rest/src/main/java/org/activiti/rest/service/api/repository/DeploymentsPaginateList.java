@@ -15,8 +15,8 @@ package org.activiti.rest.service.api.repository;
 
 import java.util.List;
 
-import org.activiti.rest.api.AbstractPaginateList;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.flowable.rest.api.AbstractPaginateList;
 
 /**
  * @author Tijs Rademakers

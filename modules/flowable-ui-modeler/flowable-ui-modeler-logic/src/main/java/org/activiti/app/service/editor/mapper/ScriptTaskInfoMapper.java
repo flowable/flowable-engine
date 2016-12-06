@@ -12,8 +12,8 @@
  */
 package org.activiti.app.service.editor.mapper;
 
-import org.activiti.bpmn.model.ScriptTask;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.ScriptTask;
 
 public class ScriptTaskInfoMapper extends AbstractInfoMapper {
 

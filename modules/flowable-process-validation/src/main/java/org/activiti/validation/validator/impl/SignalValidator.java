@@ -15,12 +15,12 @@ package org.activiti.validation.validator.impl;
 import java.util.Collection;
 import java.util.List;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.Signal;
 import org.activiti.validation.ValidationError;
 import org.activiti.validation.validator.Problems;
 import org.activiti.validation.validator.ValidatorImpl;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.Signal;
 
 /**
  * @author jbarrez

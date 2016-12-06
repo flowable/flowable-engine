@@ -16,7 +16,7 @@
 
 	<properties>
 		<activiti.artifact>
-			org.activiti.content.spring.configurator
+			org.flowable.content.spring.configurator
 		</activiti.artifact>
 	</properties>
 	

@@ -12,10 +12,10 @@
  */
 package org.activiti5.engine.impl.persistence.entity;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.context.Context;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
  * Contains a predefined set of states for process definitions and process instances
@@ -103,11 +103,11 @@ public interface SuspensionState {
     
     protected static void dispatchStateChangeEvent(Object entity, SuspensionState state) {
     	if(Context.getCommandContext() != null && Context.getCommandContext().getEventDispatcher().isEnabled()) {
-      	ActivitiEngineEventType eventType = null;
+      	FlowableEngineEventType eventType = null;
       	if(state == SuspensionState.ACTIVE) {
-      		eventType = ActivitiEngineEventType.ENTITY_ACTIVATED;
+      		eventType = FlowableEngineEventType.ENTITY_ACTIVATED;
       	} else {
-      		eventType = ActivitiEngineEventType.ENTITY_SUSPENDED;
+      		eventType = FlowableEngineEventType.ENTITY_SUSPENDED;
       	}
       	Context.getCommandContext().getEventDispatcher().dispatchEvent(
       			ActivitiEventBuilder.createEntityEvent(eventType, entity));

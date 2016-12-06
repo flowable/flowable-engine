@@ -14,27 +14,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
 
-import org.activiti.engine.FormService;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.impl.ProcessEngineImpl;
-import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.db.DbSqlSession;
-import org.activiti.engine.impl.interceptor.Command;
-import org.activiti.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.impl.interceptor.CommandExecutor;
-import org.activiti.engine.impl.test.AbstractTestCase;
-import org.activiti.engine.impl.test.TestHelper;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.idm.api.Group;
-import org.activiti.idm.api.User;
 import org.activiti.rest.conf.ApplicationConfiguration;
 import org.activiti.rest.service.api.RestUrlBuilder;
 import org.activiti.rest.util.TestServerUtil;
@@ -58,6 +37,27 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.server.Server;
+import org.flowable.engine.FormService;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.IdentityService;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.impl.ProcessEngineImpl;
+import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.db.DbSqlSession;
+import org.flowable.engine.impl.interceptor.Command;
+import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.impl.test.AbstractTestCase;
+import org.flowable.engine.impl.test.TestHelper;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.User;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Assert;
@@ -358,7 +358,7 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
         timer.cancel();
       }
       if (areJobsAvailable) {
-        throw new ActivitiException("time limit of " + maxMillisToWait + " was exceeded");
+        throw new FlowableException("time limit of " + maxMillisToWait + " was exceeded");
       }
 
     } finally {
@@ -382,12 +382,12 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
         }
       } catch (InterruptedException e) {
       } catch (Exception e) {
-        throw new ActivitiException("Exception while waiting on condition: " + e.getMessage(), e);
+        throw new FlowableException("Exception while waiting on condition: " + e.getMessage(), e);
       } finally {
         timer.cancel();
       }
       if (conditionIsViolated) {
-        throw new ActivitiException("time limit of " + maxMillisToWait + " was exceeded");
+        throw new FlowableException("time limit of " + maxMillisToWait + " was exceeded");
       }
 
     } finally {

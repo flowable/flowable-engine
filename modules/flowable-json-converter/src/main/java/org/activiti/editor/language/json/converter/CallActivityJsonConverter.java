@@ -16,11 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.CallActivity;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.IOParameter;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.CallActivity;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.IOParameter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;

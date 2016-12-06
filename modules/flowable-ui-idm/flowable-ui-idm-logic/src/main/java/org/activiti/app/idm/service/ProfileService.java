@@ -14,8 +14,8 @@ package org.activiti.app.idm.service;
 
 import java.io.InputStream;
 
-import org.activiti.idm.api.User;
 import org.apache.commons.lang3.tuple.Pair;
+import org.flowable.idm.api.User;
 
 /**
  * @author Joram Barrez

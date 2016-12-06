@@ -21,18 +21,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.EndEvent;
-import org.activiti.bpmn.model.ExtensionAttribute;
-import org.activiti.bpmn.model.ExtensionElement;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.EndEvent;
+import org.flowable.bpmn.model.ExtensionAttribute;
+import org.flowable.bpmn.model.ExtensionElement;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.JavaDelegate;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 /**
  * @author Nico Rehwaldt
@@ -812,7 +812,7 @@ public class TerminateEndEventTest extends PluggableActivitiTestCase {
   }
 
   public void testParseTerminateEndEventDefinitionWithExtensions() {
-    org.activiti.engine.repository.Deployment deployment = repositoryService.createDeployment().addClasspathResource("org/activiti5/engine/test/bpmn/event/end/TerminateEndEventTest.parseExtensionElements.bpmn20.xml").deploy();
+    org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().addClasspathResource("org/activiti5/engine/test/bpmn/event/end/TerminateEndEventTest.parseExtensionElements.bpmn20.xml").deploy();
     ProcessDefinition processDefinitionQuery = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
     BpmnModel bpmnModel = this.processEngineConfiguration.getProcessDefinitionCache()
         .get(processDefinitionQuery.getId()).getBpmnModel();

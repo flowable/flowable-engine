@@ -1,8 +1,8 @@
 package org.activiti.rest.conf.common;
 
-import org.activiti.rest.application.ContentTypeResolver;
-import org.activiti.rest.application.DefaultContentTypeResolver;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.flowable.rest.application.ContentTypeResolver;
+import org.flowable.rest.application.DefaultContentTypeResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

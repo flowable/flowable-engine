@@ -18,7 +18,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<activiti.artifact>
-			org.activiti.rest.dmn.service
+			org.flowable.rest.dmn.service
 		</activiti.artifact>
 	</properties>
 

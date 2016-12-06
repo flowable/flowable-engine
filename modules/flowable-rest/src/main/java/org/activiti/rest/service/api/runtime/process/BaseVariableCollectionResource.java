@@ -22,11 +22,11 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.rest.exception.ActivitiConflictException;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.engine.variable.RestVariable.RestVariableScope;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.rest.exception.ActivitiConflictException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -91,11 +91,11 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
           inputVariables.add(restVariable);
         }
       } catch (Exception e) {
-        throw new ActivitiIllegalArgumentException("Failed to serialize to a RestVariable instance", e);
+        throw new FlowableIllegalArgumentException("Failed to serialize to a RestVariable instance", e);
       }
 
       if (inputVariables == null || inputVariables.size() == 0) {
-        throw new ActivitiIllegalArgumentException("Request didn't contain a list of variables to create.");
+        throw new FlowableIllegalArgumentException("Request didn't contain a list of variables to create.");
       }
 
       RestVariableScope sharedScope = null;
@@ -106,7 +106,7 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
         // Validate if scopes match
         varScope = var.getVariableScope();
         if (var.getName() == null) {
-          throw new ActivitiIllegalArgumentException("Variable name is required");
+          throw new FlowableIllegalArgumentException("Variable name is required");
         }
 
         if (varScope == null) {
@@ -116,7 +116,7 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
           sharedScope = varScope;
         }
         if (varScope != sharedScope) {
-          throw new ActivitiIllegalArgumentException("Only allowed to update multiple variables in the same scope.");
+          throw new FlowableIllegalArgumentException("Only allowed to update multiple variables in the same scope.");
         }
 
         if (!override && hasVariableOnScope(execution, var.getName(), varScope)) {
@@ -139,7 +139,7 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
             runtimeService.setVariables(execution.getParentId(), variablesToSet);
           } else {
             // Standalone task, no global variables possible
-            throw new ActivitiIllegalArgumentException("Cannot set global variables on execution '" + execution.getId() + "', task is not part of process.");
+            throw new FlowableIllegalArgumentException("Cannot set global variables on execution '" + execution.getId() + "', task is not part of process.");
           }
         }
       }

@@ -19,12 +19,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import io.swagger.annotations.*;
 
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.runtime.JobQuery;
-import org.activiti.rest.api.DataResponse;
-import org.activiti.rest.api.RequestUtil;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.runtime.JobQuery;
+import org.flowable.rest.api.DataResponse;
+import org.flowable.rest.api.RequestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -88,7 +88,7 @@ public class JobCollectionResource {
     }
     if (allRequestParams.containsKey("timersOnly")) {
       if (allRequestParams.containsKey("messagesOnly")) {
-        throw new ActivitiIllegalArgumentException("Only one of 'timersOnly' or 'messagesOnly' can be provided.");
+        throw new FlowableIllegalArgumentException("Only one of 'timersOnly' or 'messagesOnly' can be provided.");
       }
       if (Boolean.valueOf(allRequestParams.get("timersOnly"))) {
         query.timers();

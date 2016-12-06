@@ -13,7 +13,7 @@
 
 package org.activiti.rest.service.api.engine.variable;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 
 /**
  * @author Frederik Heremans
@@ -34,7 +34,7 @@ public class BooleanRestVariableConverter implements RestVariableConverter {
   public Object getVariableValue(RestVariable result) {
     if (result.getValue() != null) {
       if (!(result.getValue() instanceof Boolean)) {
-        throw new ActivitiIllegalArgumentException("Converter can only convert booleans");
+        throw new FlowableIllegalArgumentException("Converter can only convert booleans");
       }
       return result.getValue();
     }
@@ -45,7 +45,7 @@ public class BooleanRestVariableConverter implements RestVariableConverter {
   public void convertVariableValue(Object variableValue, RestVariable result) {
     if (variableValue != null) {
       if (!(variableValue instanceof Boolean)) {
-        throw new ActivitiIllegalArgumentException("Converter can only convert booleans");
+        throw new FlowableIllegalArgumentException("Converter can only convert booleans");
       }
       result.setValue(variableValue);
     } else {

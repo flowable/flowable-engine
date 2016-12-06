@@ -13,7 +13,7 @@
 
 package org.activiti.rest.service.api.engine.variable;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 
 /**
  * @author Frederik Heremans
@@ -88,7 +88,7 @@ public class QueryVariable {
           return type;
         }
       }
-      throw new ActivitiIllegalArgumentException("Unsupported variable query operation: " + friendlyName);
+      throw new FlowableIllegalArgumentException("Unsupported variable query operation: " + friendlyName);
     }
   }
 

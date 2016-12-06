@@ -3,15 +3,15 @@ package org.activiti5.engine.impl.event.logger.handler;
 import java.util.Date;
 import java.util.Map;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.impl.persistence.deploy.DeploymentCache;
-import org.activiti.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.identity.Authentication;
 import org.activiti5.engine.impl.persistence.entity.EventLogEntryEntity;
+import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +24,7 @@ public abstract class AbstractDatabaseEventLoggerEventHandler implements EventLo
 	
 	private static final Logger logger = LoggerFactory.getLogger(AbstractDatabaseEventLoggerEventHandler.class);
 
-	protected ActivitiEvent event;
+	protected FlowableEvent event;
 	protected Date timeStamp;
 	protected ObjectMapper objectMapper;
 	
@@ -83,7 +83,7 @@ public abstract class AbstractDatabaseEventLoggerEventHandler implements EventLo
 	}
 
 	@Override
-	public void setEvent(ActivitiEvent event) {
+	public void setEvent(FlowableEvent event) {
 		this.event = event;
 	}
 	
@@ -101,7 +101,7 @@ public abstract class AbstractDatabaseEventLoggerEventHandler implements EventLo
 	
 	@SuppressWarnings("unchecked")
   public <T> T getEntityFromEvent() {
-		return (T) ((ActivitiEntityEvent) event).getEntity();
+		return (T) ((FlowableEntityEvent) event).getEntity();
 	}
 	
 	public void putInMapIfNotNull(Map<String, Object> map, String key, Object value) {

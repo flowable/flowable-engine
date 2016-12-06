@@ -15,7 +15,6 @@ package org.activiti.rest.service.api.repository;
 
 import java.io.ByteArrayInputStream;
 
-import org.activiti.engine.repository.Model;
 import org.activiti.rest.service.BaseSpringRestTestCase;
 import org.activiti.rest.service.HttpMultipartHelper;
 import org.activiti.rest.service.api.RestUrls;
@@ -25,6 +24,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
+import org.flowable.engine.repository.Model;
 
 /**
  * @author Frederik Heremans

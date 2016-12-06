@@ -15,7 +15,7 @@ package org.activiti.app.idm.model;
 import java.util.Date;
 
 import org.activiti.app.model.common.AbstractRepresentation;
-import org.activiti.idm.api.Token;
+import org.flowable.idm.api.Token;
 
 public class TokenRepresentation extends AbstractRepresentation {
   

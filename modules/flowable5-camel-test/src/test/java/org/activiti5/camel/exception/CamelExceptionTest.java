@@ -15,12 +15,6 @@ package org.activiti5.camel.exception;
 
 import java.util.List;
 
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.impl.test.JobTestHelper;
-import org.activiti.engine.runtime.Job;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.camel.exception.tools.ExceptionServiceMock;
 import org.activiti5.camel.exception.tools.NoExceptionServiceMock;
 import org.activiti5.camel.exception.tools.ThrowBpmnExceptionBean;
@@ -28,6 +22,12 @@ import org.activiti5.spring.impl.test.SpringActivitiTestCase;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.impl.test.JobTestHelper;
+import org.flowable.engine.runtime.Job;
+import org.flowable.engine.test.Deployment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -85,7 +85,7 @@ public class CamelExceptionTest extends SpringActivitiTestCase {
 
     try {
       runtimeService.startProcessInstanceByKey("exceptionInRouteSynchron");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertEquals(Exception.class, e.getCause().getCause().getClass());
       assertEquals("arbitary non bpmn exception", e.getCause().getCause().getMessage());
 
@@ -105,7 +105,7 @@ public class CamelExceptionTest extends SpringActivitiTestCase {
 
     try {
       runtimeService.startProcessInstanceByKey("exceptionInRouteSynchron");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       fail("The exception should be handled by camel. No exception expected.");
     }
 

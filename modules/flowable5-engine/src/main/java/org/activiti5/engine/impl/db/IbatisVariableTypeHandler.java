@@ -18,12 +18,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.activiti.engine.impl.variable.VariableType;
-import org.activiti.engine.impl.variable.VariableTypes;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.impl.context.Context;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
+import org.flowable.engine.impl.variable.VariableType;
+import org.flowable.engine.impl.variable.VariableTypes;
 
 
 /**

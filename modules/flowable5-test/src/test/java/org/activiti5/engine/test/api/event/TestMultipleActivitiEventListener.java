@@ -17,21 +17,21 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 
-public class TestMultipleActivitiEventListener implements ActivitiEventListener {
+public class TestMultipleActivitiEventListener implements FlowableEventListener {
 
-	private List<ActivitiEvent> eventsReceived;
+	private List<FlowableEvent> eventsReceived;
 	private List<Class<?>> entityClasses;
 	private List<Class<?>> eventClasses;
 
 	public TestMultipleActivitiEventListener() {
-		eventsReceived = new ArrayList<ActivitiEvent>();
+		eventsReceived = new ArrayList<FlowableEvent>();
   }
 
-	public List<ActivitiEvent> getEventsReceived() {
+	public List<FlowableEvent> getEventsReceived() {
 	  return eventsReceived;
   }
 	
@@ -40,8 +40,8 @@ public class TestMultipleActivitiEventListener implements ActivitiEventListener 
 	}
 	
 	@Override
-	public void onEvent(ActivitiEvent event) {
-		if(isAssignableFrom(eventClasses, event) && isAssignableFrom(entityClasses, ((ActivitiEntityEvent) event).getEntity())) {
+	public void onEvent(FlowableEvent event) {
+		if(isAssignableFrom(eventClasses, event) && isAssignableFrom(entityClasses, ((FlowableEntityEvent) event).getEntity())) {
 			eventsReceived.add(event);
 		}
 	}

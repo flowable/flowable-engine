@@ -14,7 +14,7 @@ package org.activiti.app.idm.cache;
 
 import java.util.Collection;
 
-import org.activiti.idm.api.User;
+import org.flowable.idm.api.User;
 import org.springframework.security.core.GrantedAuthority;
 
 /**

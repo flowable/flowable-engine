@@ -15,13 +15,13 @@ package org.activiti5.engine.test.api.repository;
 
 import java.util.List;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.repository.DeploymentQuery;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.repository.DeploymentQuery;
 
 
 /**
@@ -70,7 +70,7 @@ public class DeploymentQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ActivitiException e) {}
+    } catch (FlowableException e) {}
   }
   
   public void testQueryByDeploymentId() {
@@ -89,7 +89,7 @@ public class DeploymentQueryTest extends PluggableActivitiTestCase {
     try {
       repositoryService.createDeploymentQuery().deploymentId(null);
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (FlowableIllegalArgumentException e) {}
   }
   
   public void testQueryByName() {
@@ -108,7 +108,7 @@ public class DeploymentQueryTest extends PluggableActivitiTestCase {
     try {
       repositoryService.createDeploymentQuery().deploymentName(null);
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (FlowableIllegalArgumentException e) {}
   }
   
   public void testQueryByNameLike() {
@@ -119,7 +119,7 @@ public class DeploymentQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ActivitiException e) {}
+    } catch (FlowableException e) {}
   }
   
   public void testQueryByInvalidNameLike() {
@@ -131,7 +131,7 @@ public class DeploymentQueryTest extends PluggableActivitiTestCase {
     try {
       repositoryService.createDeploymentQuery().deploymentNameLike(null);
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (FlowableIllegalArgumentException e) {}
   }
   
   public void testQueryByNameAndCategory() {

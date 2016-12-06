@@ -14,12 +14,12 @@ package org.activiti5.engine.test.api.event;
 
 import java.util.Map;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.engine.delegate.event.impl.ActivitiEventSupport;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.engine.delegate.event.impl.FlowableEventSupport;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 
 /**
  * Test for event-listeners that are registered on a process-definition scope,
@@ -52,7 +52,7 @@ public class ProcessDefinitionScopedEventListenerTest extends PluggableActivitiT
 		BpmnModel bpmnModel = repositoryService.getBpmnModel(firstDefinition.getId());
 		assertNotNull(bpmnModel);
 
-		((ActivitiEventSupport) bpmnModel.getEventSupport()).addEventListener(listener);
+		((FlowableEventSupport) bpmnModel.getEventSupport()).addEventListener(listener);
 
 		// Start a process for the first definition, events should be received
 		ProcessInstance processInstance = runtimeService.startProcessInstanceById(firstDefinition.getId());

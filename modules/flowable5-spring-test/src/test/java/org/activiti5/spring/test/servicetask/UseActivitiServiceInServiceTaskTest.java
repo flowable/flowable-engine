@@ -14,11 +14,11 @@ package org.activiti5.spring.test.servicetask;
 
 import java.util.List;
 
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 import org.springframework.test.context.ContextConfiguration;
 
 /**

@@ -12,8 +12,6 @@
  */
 package org.activiti5.engine.impl.pvm.runtime;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.impl.delegate.ActivityBehavior;
 import org.activiti5.engine.ActivitiActivityExecutionException;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
@@ -21,6 +19,8 @@ import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.pvm.PvmException;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
 import org.activiti5.engine.logging.LogMDC;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +49,7 @@ public class AtomicOperationActivityExecute implements AtomicOperation {
     try {
     	if(Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-      			ActivitiEventBuilder.createActivityEvent(ActivitiEngineEventType.ACTIVITY_STARTED, 
+      			ActivitiEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, 
       					execution.getActivity().getId(),
       					(String) execution.getActivity().getProperty("name"),
       					execution.getId(), 

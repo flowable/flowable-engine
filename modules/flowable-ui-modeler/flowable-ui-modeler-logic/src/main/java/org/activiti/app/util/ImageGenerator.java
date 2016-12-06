@@ -18,10 +18,10 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.activiti.image.exception.ActivitiImageException;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
+import org.flowable.bpmn.model.BpmnModel;
 
 public class ImageGenerator {
 

@@ -21,7 +21,7 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.Rdn;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +86,7 @@ public class LDAPQueryBuilder {
       searchExpression = MessageFormat.format(ldapConfigurator.getQueryUserByFullNameLike(), ldapConfigurator.getUserFirstNameAttribute(), searchText, ldapConfigurator.getUserLastNameAttribute(),
           searchText);
     } else {
-      throw new ActivitiIllegalArgumentException("No 'queryUserByFullNameLike' configured");
+      throw new FlowableIllegalArgumentException("No 'queryUserByFullNameLike' configured");
     }
     return searchExpression;
   }

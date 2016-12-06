@@ -12,10 +12,10 @@
  */
 package org.activiti.scripting.secure.behavior;
 
-import org.activiti.bpmn.model.ScriptTask;
-import org.activiti.engine.impl.bpmn.parser.BpmnParse;
-import org.activiti.engine.impl.bpmn.parser.handler.ScriptTaskParseHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.ScriptTask;
+import org.flowable.engine.impl.bpmn.parser.BpmnParse;
+import org.flowable.engine.impl.bpmn.parser.handler.ScriptTaskParseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

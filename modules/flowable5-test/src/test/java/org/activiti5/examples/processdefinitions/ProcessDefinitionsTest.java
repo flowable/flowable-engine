@@ -19,10 +19,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.activiti.engine.impl.bpmn.deployer.ResourceNameUtil;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.repository.ProcessDefinition;
 
 /**
  * @author Tom Baeyens

@@ -14,13 +14,13 @@ package org.activiti5.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.impl.persistence.entity.VariableInstance;
 import org.activiti5.engine.impl.interceptor.Command;
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti5.engine.runtime.Execution;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.impl.persistence.entity.VariableInstance;
 
 public class GetExecutionVariableInstanceCmd implements Command<VariableInstance>, Serializable {
 
@@ -37,16 +37,16 @@ public class GetExecutionVariableInstanceCmd implements Command<VariableInstance
 
   public VariableInstance execute(CommandContext commandContext) {
     if (executionId == null) {
-      throw new ActivitiIllegalArgumentException("executionId is null");
+      throw new FlowableIllegalArgumentException("executionId is null");
     }
     if (variableName == null) {
-      throw new ActivitiIllegalArgumentException("variableName is null");
+      throw new FlowableIllegalArgumentException("variableName is null");
     }
     
     ExecutionEntity execution = commandContext.getExecutionEntityManager().findExecutionById(executionId);
 
     if (execution == null) {
-      throw new ActivitiObjectNotFoundException("execution " + executionId + " doesn't exist", Execution.class);
+      throw new FlowableObjectNotFoundException("execution " + executionId + " doesn't exist", Execution.class);
     }
     
     VariableInstance variableEntity = null;

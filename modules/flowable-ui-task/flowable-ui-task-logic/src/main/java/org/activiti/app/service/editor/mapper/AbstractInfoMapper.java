@@ -18,13 +18,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.activiti.bpmn.model.ActivitiListener;
-import org.activiti.bpmn.model.Activity;
-import org.activiti.bpmn.model.FieldExtension;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.activiti.editor.language.json.converter.util.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.Activity;
+import org.flowable.bpmn.model.FieldExtension;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;

@@ -4,10 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.Lane;
-import org.activiti.bpmn.model.Pool;
-import org.activiti.bpmn.model.Process;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.Lane;
+import org.flowable.bpmn.model.Pool;
+import org.flowable.bpmn.model.Process;
 import org.junit.Test;
 
 public class PoolConverterTest extends AbstractConverterTest {

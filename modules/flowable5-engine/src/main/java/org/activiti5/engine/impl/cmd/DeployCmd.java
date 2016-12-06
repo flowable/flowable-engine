@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.ProcessEngineConfiguration;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.interceptor.Command;
@@ -29,6 +28,7 @@ import org.activiti5.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti5.engine.impl.persistence.entity.ResourceEntity;
 import org.activiti5.engine.impl.repository.DeploymentBuilderImpl;
 import org.activiti5.engine.repository.Deployment;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
  * @author Tom Baeyens
@@ -91,7 +91,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
     
     if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
 	    commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-	    		ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_CREATED, deployment));
+	    		ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, deployment));
     }
     
     // Deployment settings
@@ -111,7 +111,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
     
     if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
 	    commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-	    		ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_INITIALIZED, deployment));
+	    		ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, deployment));
     }
     
     return deployment;

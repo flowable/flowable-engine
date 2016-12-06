@@ -18,8 +18,8 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.runtime.ClockReader;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.runtime.ClockReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +63,7 @@ public class SimpleEventCalendar implements EventCalendar {
     SimulationEvent minEvent = eventList.remove(minIndex);
 
     if (minEvent.hasSimulationTime() && minEvent.getSimulationTime() < this.clockReader.getCurrentTime().getTime()) {
-      throw new ActivitiException("Unable to execute event from the past");
+      throw new FlowableException("Unable to execute event from the past");
     }
 
     if (eventList.isEmpty()) {

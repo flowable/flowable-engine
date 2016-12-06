@@ -17,14 +17,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.repository.ProcessDefinitionQuery;
 
 
 /**
@@ -103,7 +103,7 @@ public class ProcessDefinitionQueryTest extends PluggableActivitiTestCase {
     try {
       repositoryService.createProcessDefinitionQuery().deploymentId(null);
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (FlowableIllegalArgumentException e) {}
   }
   
   public void testQueryByName() {
@@ -121,7 +121,7 @@ public class ProcessDefinitionQueryTest extends PluggableActivitiTestCase {
     try {
       repositoryService.createProcessDefinitionQuery().processDefinitionName(null);
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (FlowableIllegalArgumentException e) {}
   }
   
   public void testQueryByNameLike() {
@@ -151,7 +151,7 @@ public class ProcessDefinitionQueryTest extends PluggableActivitiTestCase {
     try {
       repositoryService.createProcessDefinitionQuery().processDefinitionKey(null);
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (FlowableIllegalArgumentException e) {}
   }
   
   public void testQueryByKeyLike() {
@@ -166,7 +166,7 @@ public class ProcessDefinitionQueryTest extends PluggableActivitiTestCase {
     try {
       repositoryService.createProcessDefinitionQuery().processDefinitionKeyLike(null);
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (FlowableIllegalArgumentException e) {}
   }
 
   public void testQueryByCategory() {
@@ -197,12 +197,12 @@ public class ProcessDefinitionQueryTest extends PluggableActivitiTestCase {
     try {
       repositoryService.createProcessDefinitionQuery().processDefinitionVersion(-1).list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (FlowableIllegalArgumentException e) {}
     
     try {
       repositoryService.createProcessDefinitionQuery().processDefinitionVersion(null).list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (FlowableIllegalArgumentException e) {}
   }
   
   public void testQueryByKeyAndVersion() {
@@ -287,7 +287,7 @@ public class ProcessDefinitionQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ActivitiException e) {}
+    } catch (FlowableException e) {}
   }
   
   public void testQueryByMessageSubscription() {

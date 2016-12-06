@@ -12,18 +12,18 @@
  */
 package org.activiti5.engine.test.api.event;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.impl.delegate.event.ActivitiEngineEntityEvent;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Comment;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.impl.delegate.event.ActivitiEngineEntityEvent;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Comment;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 /**
- * Test case for all {@link ActivitiEvent}s related to comments.
+ * Test case for all {@link FlowableEvent}s related to comments.
  * 
  * @author Frederik Heremans
  */
@@ -46,7 +46,7 @@ public class CommentEventsTest extends PluggableActivitiTestCase {
 			Comment comment = taskService.addComment(task.getId(), task.getProcessInstanceId(), "comment");
 			assertEquals(2, listener.getEventsReceived().size());
 			ActivitiEngineEntityEvent event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(ActivitiEngineEventType.ENTITY_CREATED, event.getType());
+			assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
 			assertEquals(processInstance.getId(), event.getProcessInstanceId());
 			assertEquals(processInstance.getId(), event.getExecutionId());
 			assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
@@ -54,14 +54,14 @@ public class CommentEventsTest extends PluggableActivitiTestCase {
 			assertEquals(comment.getId(), commentFromEvent.getId());
 			
 			event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
-			assertEquals(ActivitiEngineEventType.ENTITY_INITIALIZED, event.getType());
+			assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
 			listener.clearEventsReceived();
 			
 			// Finally, delete comment
 			taskService.deleteComment(comment.getId());
 			assertEquals(1, listener.getEventsReceived().size());
 			event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(ActivitiEngineEventType.ENTITY_DELETED, event.getType());
+			assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
 			assertEquals(processInstance.getId(), event.getProcessInstanceId());
 			assertEquals(processInstance.getId(), event.getExecutionId());
 			assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());

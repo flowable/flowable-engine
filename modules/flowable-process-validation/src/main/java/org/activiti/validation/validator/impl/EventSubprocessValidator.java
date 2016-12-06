@@ -14,16 +14,16 @@ package org.activiti.validation.validator.impl;
 
 import java.util.List;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.EventDefinition;
-import org.activiti.bpmn.model.EventSubProcess;
-import org.activiti.bpmn.model.MessageEventDefinition;
-import org.activiti.bpmn.model.Process;
-import org.activiti.bpmn.model.SignalEventDefinition;
-import org.activiti.bpmn.model.StartEvent;
 import org.activiti.validation.ValidationError;
 import org.activiti.validation.validator.Problems;
 import org.activiti.validation.validator.ProcessLevelValidator;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.EventSubProcess;
+import org.flowable.bpmn.model.MessageEventDefinition;
+import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.SignalEventDefinition;
+import org.flowable.bpmn.model.StartEvent;
 
 /**
  * @author jbarrez
@@ -39,7 +39,7 @@ public class EventSubprocessValidator extends ProcessLevelValidator {
       for (StartEvent startEvent : startEvents) {
         if (startEvent.getEventDefinitions() != null && !startEvent.getEventDefinitions().isEmpty()) {
           EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
-          if (!(eventDefinition instanceof org.activiti.bpmn.model.ErrorEventDefinition) && !(eventDefinition instanceof MessageEventDefinition) && !(eventDefinition instanceof SignalEventDefinition)) {
+          if (!(eventDefinition instanceof org.flowable.bpmn.model.ErrorEventDefinition) && !(eventDefinition instanceof MessageEventDefinition) && !(eventDefinition instanceof SignalEventDefinition)) {
             addError(errors, Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_DEFINITION, process, eventSubprocess, "start event of event subprocess must be of type 'error', 'message' or 'signal'");
           }
         }

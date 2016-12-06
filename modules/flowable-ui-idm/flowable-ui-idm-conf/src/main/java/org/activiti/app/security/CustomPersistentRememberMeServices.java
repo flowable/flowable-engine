@@ -21,9 +21,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.app.idm.service.PersistentTokenService;
-import org.activiti.idm.api.IdmIdentityService;
-import org.activiti.idm.api.Token;
-import org.activiti.idm.api.User;
+import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.api.Token;
+import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

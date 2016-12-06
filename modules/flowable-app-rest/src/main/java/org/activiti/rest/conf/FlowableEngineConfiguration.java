@@ -2,24 +2,24 @@ package org.activiti.rest.conf;
 
 import javax.sql.DataSource;
 
-import org.activiti.content.api.ContentService;
-import org.activiti.content.spring.configurator.SpringContentEngineConfigurator;
-import org.activiti.dmn.api.DmnRepositoryService;
-import org.activiti.dmn.api.DmnRuleService;
 import org.activiti.dmn.spring.configurator.SpringDmnEngineConfigurator;
-import org.activiti.engine.FormService;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.form.api.FormRepositoryService;
-import org.activiti.form.spring.configurator.SpringFormEngineConfigurator;
-import org.activiti.spring.ProcessEngineFactoryBean;
-import org.activiti.spring.SpringProcessEngineConfiguration;
+import org.flowable.content.api.ContentService;
+import org.flowable.content.spring.configurator.SpringContentEngineConfigurator;
+import org.flowable.dmn.api.DmnRepositoryService;
+import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.engine.FormService;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.IdentityService;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.spring.configurator.SpringFormEngineConfigurator;
+import org.flowable.spring.ProcessEngineFactoryBean;
+import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,7 +117,7 @@ public class FlowableEngineConfiguration {
   }
   
   @Bean
-  public org.activiti.form.api.FormService formEngineFormService() {
+  public org.flowable.form.api.FormService formEngineFormService() {
     return processEngine().getFormEngineFormService();
   }
   

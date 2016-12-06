@@ -15,14 +15,14 @@ package org.activiti.test.scripting.secure;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
-import org.activiti.engine.repository.Deployment;
 import org.activiti.scripting.secure.SecureJavascriptConfigurator;
 import org.activiti.scripting.secure.impl.SecureScriptClassShutter;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
+import org.flowable.engine.repository.Deployment;
 import org.junit.After;
 import org.junit.Before;
 
