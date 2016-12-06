@@ -229,7 +229,7 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
       
       int responseStatusCode = response.getStatusLine().getStatusCode();
       if (expectedStatusCode != responseStatusCode) {
-        log.info("Wrong status code : {}, but should be {}", responseStatusCode expectedStatusCode);
+        log.info("Wrong status code : {}, but should be {}", responseStatusCode, expectedStatusCode);
         log.info("Response body: {}", IOUtils.toString(response.getEntity().getContent()));
       }
       
