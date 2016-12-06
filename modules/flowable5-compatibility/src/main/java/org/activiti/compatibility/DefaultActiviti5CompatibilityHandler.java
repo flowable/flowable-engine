@@ -83,7 +83,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class DefaultActiviti5CompatibilityHandler implements Activiti5CompatibilityHandler {
 
   protected DefaultProcessEngineFactory processEngineFactory;
-  protected ProcessEngine processEngine;
+  protected volatile ProcessEngine processEngine;
   
   public ProcessDefinition getProcessDefinition(final String processDefinitionId) {
     final ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
