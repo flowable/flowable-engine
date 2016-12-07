@@ -86,6 +86,7 @@ public class GetDecisionTablesForProcessDefinitionCmd implements Command<List<De
               String decisionTableReferenceKey = fieldExtension.getStringValue();
               if (!decisionTableKeys.contains(decisionTableReferenceKey)) {
                 addDecisionTableToCollection(decisionTables, decisionTableReferenceKey, processDefinition);
+                decisionTableKeys.add(decisionTableReferenceKey);
               }
               break;
             }
