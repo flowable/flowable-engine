@@ -30,14 +30,14 @@ public class OutboundErrorRoute extends RouteBuilder {
 
     // always fails with default error handling: propagates exception back
     // to the caller
-    from("activiti:ErrorHandling:ProvokeError").routeId("error").log(LoggingLevel.INFO, "Provoked error").beanRef("brokenService") // <--
+    from("activiti:ErrorHandling:ProvokeError").routeId("error").log(LoggingLevel.INFO, "Provoked error").bean("brokenService") // <--
                                                                                                                                    // throws
                                                                                                                                    // Exception
         .to("seda:inbound");
 
     // always fails with specific error handler: exception is not propagated
     // back
-    from("activiti:ErrorHandling:HandleError").routeId("errorWithDlq").errorHandler(deadLetterChannel("seda:dlq")).log(LoggingLevel.INFO, "Provoked error").beanRef("brokenService") // <--
+    from("activiti:ErrorHandling:HandleError").routeId("errorWithDlq").errorHandler(deadLetterChannel("seda:dlq")).log(LoggingLevel.INFO, "Provoked error").bean("brokenService") // <--
                                                                                                                                                                                      // throws
                                                                                                                                                                                      // Exception
         .to("seda:inbound");
