@@ -3,15 +3,15 @@ services:
     flowable-idm-app:
         image: flowable/flowable-idm
         external_links:
-            - flowable-idm-postgres:postgres
+            - flowable-idm-db:db
         environment:
             - datasource.driver=org.postgresql.Driver
-            - datasource.url=jdbc:postgresql://postgres:5432/flowable
+            - datasource.url=jdbc:postgresql://db:5432/flowable
             - datasource.username=flowable
             - datasource.password=flowable
         ports:
             - 8080:8080
-    flowable-idm-postgres:
+    flowable-idm-db:
         extends:
             file: postgres.yml
             service: flowable-idm-postgres
