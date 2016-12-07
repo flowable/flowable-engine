@@ -1,0 +1,18 @@
+version: '2'
+services:
+    flowable-modeler-app:
+        image: flowable/flowable-modeler
+        external_links:
+            - flowable-modeler-postgres:postgres
+        environment:
+            - datasource.driver=org.postgresql.Driver
+            - datasource.url=jdbc:postgresql://postgres:5432/flowable
+            - datasource.username=flowable
+            - datasource.password=flowable
+            - idm.app.url=http://localhost:8080/flowable-idm
+        ports:
+            - 8888:8888
+    flowable-modeler-postgres:
+        extends:
+            file: postgres.yml
+            service: flowable-modeler-postgres

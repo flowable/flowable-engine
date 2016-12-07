@@ -9,7 +9,7 @@ then
 	# Run war
 	echo "Running war file"sd
 	export MAVEN_OPTS="$MAVEN_OPTS -noverify -Xms512m -Xmx1024m -XX:MaxPermSize=512m -Xdebug -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=8001,server=y,suspend=n"
-	mvn clean tomcat7:run
+	mvn clean tomcat7:run -Pmysql
 else
     echo "Error while building root pom. Halting."
 fi
