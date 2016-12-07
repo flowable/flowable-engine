@@ -59,7 +59,7 @@ public class HistoricProcessInstanceQueryResourceTest extends BaseSpringRestTest
     ArrayNode variableArray = objectMapper.createArrayNode();
     ObjectNode variableNode = objectMapper.createObjectNode();
     variableArray.add(variableNode);
-    requestNode.put("variables", variableArray);
+    requestNode.set("variables", variableArray);
 
     // String equals
     variableNode.put("name", "stringVar");

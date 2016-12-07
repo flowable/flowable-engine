@@ -16,8 +16,6 @@ import java.util.Date;
 
 import javax.jws.WebService;
 
-import org.apache.cxf.common.i18n.UncheckedException;
-
 /**
  * An implementation of a Counter WS
  *

@@ -12,14 +12,8 @@
  */
 package org.activiti.app.idm.service;
 
-import java.util.Collection;
-
-import org.activiti.app.security.DefaultPrivileges;
-import org.activiti.app.security.SecurityUtils;
-import org.activiti.app.service.exception.NotPermittedException;
 import org.activiti.idm.api.IdmIdentityService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
 
 /**
  * @author Joram Barrez

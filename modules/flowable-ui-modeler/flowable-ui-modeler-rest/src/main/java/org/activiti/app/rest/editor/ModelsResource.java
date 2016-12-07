@@ -140,35 +140,35 @@ public class ModelsResource {
       editorNode.put("resourceId", "canvas");
       ObjectNode stencilSetNode = objectMapper.createObjectNode();
       stencilSetNode.put("namespace", "http://b3mn.org/stencilset/bpmn2.0#");
-      editorNode.put("stencilset", stencilSetNode);
+      editorNode.set("stencilset", stencilSetNode);
       ObjectNode propertiesNode = objectMapper.createObjectNode();
       propertiesNode.put("process_id", modelRepresentation.getKey());
       propertiesNode.put("name", modelRepresentation.getName());
       if (StringUtils.isNotEmpty(modelRepresentation.getDescription())) {
         propertiesNode.put("documentation", modelRepresentation.getDescription());
       }
-      editorNode.put("properties", propertiesNode);
+      editorNode.set("properties", propertiesNode);
 
       ArrayNode childShapeArray = objectMapper.createArrayNode();
-      editorNode.put("childShapes", childShapeArray);
+      editorNode.set("childShapes", childShapeArray);
       ObjectNode childNode = objectMapper.createObjectNode();
       childShapeArray.add(childNode);
       ObjectNode boundsNode = objectMapper.createObjectNode();
-      childNode.put("bounds", boundsNode);
+      childNode.set("bounds", boundsNode);
       ObjectNode lowerRightNode = objectMapper.createObjectNode();
-      boundsNode.put("lowerRight", lowerRightNode);
+      boundsNode.set("lowerRight", lowerRightNode);
       lowerRightNode.put("x", 130);
       lowerRightNode.put("y", 193);
       ObjectNode upperLeftNode = objectMapper.createObjectNode();
-      boundsNode.put("upperLeft", upperLeftNode);
+      boundsNode.set("upperLeft", upperLeftNode);
       upperLeftNode.put("x", 100);
       upperLeftNode.put("y", 163);
-      childNode.put("childShapes", objectMapper.createArrayNode());
-      childNode.put("dockers", objectMapper.createArrayNode());
-      childNode.put("outgoing", objectMapper.createArrayNode());
+      childNode.set("childShapes", objectMapper.createArrayNode());
+      childNode.set("dockers", objectMapper.createArrayNode());
+      childNode.set("outgoing", objectMapper.createArrayNode());
       childNode.put("resourceId", "startEvent1");
       ObjectNode stencilNode = objectMapper.createObjectNode();
-      childNode.put("stencil", stencilNode);
+      childNode.set("stencil", stencilNode);
       stencilNode.put("id", "StartNoneEvent");
       json = editorNode.toString();
     }
@@ -210,7 +210,7 @@ public class ModelsResource {
         if (StringUtils.isNotEmpty(model.getDescription())) {
           propertiesNode.put("documentation", model.getDescription());
         }
-        editorNode.put("properties", propertiesNode);
+        editorNode.set("properties", propertiesNode);
 
       } catch (IOException e) {
         e.printStackTrace();

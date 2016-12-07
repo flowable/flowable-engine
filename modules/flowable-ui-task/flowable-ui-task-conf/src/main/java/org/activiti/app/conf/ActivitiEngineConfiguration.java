@@ -115,6 +115,7 @@ public class ActivitiEngineConfiguration {
     	// Enable safe XML. See http://www.flowable.org/docs/userguide/index.html#advanced.safe.bpmn.xml
     	processEngineConfiguration.setEnableSafeBpmnXml(true);
     	
+    	processEngineConfiguration.setDisableIdmEngine(true);
     	processEngineConfiguration.addConfigurator(new SpringFormEngineConfigurator());
       processEngineConfiguration.addConfigurator(new SpringDmnEngineConfigurator());
       

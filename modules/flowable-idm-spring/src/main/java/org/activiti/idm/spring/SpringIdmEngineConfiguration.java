@@ -13,6 +13,8 @@
 
 package org.activiti.idm.spring;
 
+import javax.sql.DataSource;
+
 import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.idm.engine.IdmEngineConfiguration;
@@ -21,6 +23,7 @@ import org.activiti.idm.engine.impl.interceptor.CommandInterceptor;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -62,6 +65,17 @@ public class SpringIdmEngineConfiguration extends IdmEngineConfiguration impleme
   public void initTransactionContextFactory() {
     if (transactionContextFactory == null && transactionManager != null) {
       transactionContextFactory = new SpringTransactionContextFactory(transactionManager, transactionSynchronizationAdapterOrder);
+    }
+  }
+  
+  @Override
+  public IdmEngineConfiguration setDataSource(DataSource dataSource) {
+    if (dataSource instanceof TransactionAwareDataSourceProxy) {
+      return super.setDataSource(dataSource);
+    } else {
+      // Wrap datasource in Transaction-aware proxy
+      DataSource proxiedDataSource = new TransactionAwareDataSourceProxy(dataSource);
+      return super.setDataSource(proxiedDataSource);
     }
   }
 

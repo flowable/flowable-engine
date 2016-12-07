@@ -80,6 +80,9 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
     
     Privilege modelerAppPrivilege = identityService.createPrivilege(DefaultPrivileges.ACCESS_MODELER);
     identityService.addUserPrivilegeMapping(modelerAppPrivilege.getId(), adminId);
+    
+    Privilege taskAppPrivilege = identityService.createPrivilege(DefaultPrivileges.ACCESS_TASK);
+    identityService.addUserPrivilegeMapping(taskAppPrivilege.getId(), adminId);
   }
 
 }

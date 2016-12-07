@@ -13,6 +13,8 @@
 package org.activiti.app.conf;
 
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
+import org.activiti.app.service.idm.RemoteIdmServiceImpl;
+
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
@@ -28,7 +30,8 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
     "org.activiti.app.conf",
     "org.activiti.app.security",
     "org.activiti.app.idm",
-    "org.activiti.app.service"})
+    "org.activiti.app.service"}
+    , excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = RemoteIdmServiceImpl.class)})
 public class ApplicationConfiguration {
 
   /**

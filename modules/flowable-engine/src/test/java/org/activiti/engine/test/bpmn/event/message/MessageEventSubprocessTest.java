@@ -45,14 +45,14 @@ public class MessageEventSubprocessTest extends PluggableActivitiTestCase {
     Execution execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("newMessage").singleResult();
     assertNotNull(execution);
     assertEquals(expectedNumberOfEventSubscriptions, createEventSubscriptionQuery().count());
-    assertEquals(numberOfExecutions, runtimeService.createExecutionQuery().count());
+    assertEquals(numberOfExecutions, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
 
     // if we trigger the usertask, the process terminates and the event subscription is removed:
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("task", task.getTaskDefinitionKey());
     taskService.complete(task.getId());
     assertEquals(0, createEventSubscriptionQuery().count());
-    assertEquals(0, runtimeService.createExecutionQuery().count());
+    assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
     assertProcessEnded(processInstance.getId());
 
     // now we start a new instance but this time we trigger the event subprocess:
@@ -66,63 +66,195 @@ public class MessageEventSubprocessTest extends PluggableActivitiTestCase {
     taskService.complete(task.getId());
     assertProcessEnded(processInstance.getId());
     assertEquals(0, createEventSubscriptionQuery().count());
-    assertEquals(0, runtimeService.createExecutionQuery().count());
+    assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
   }
 
   @Deployment
-  public void FAILING_testNonInterruptingUnderProcessDefinition() {
+  public void testNonInterruptingUnderProcessDefinition() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
     // the process instance must have a message event subscription:
-    Execution execution = runtimeService.createExecutionQuery().executionId(processInstance.getId()).messageEventSubscriptionName("newMessage").singleResult();
+    Execution execution = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId())
+        .messageEventSubscriptionName("newMessage")
+        .singleResult();
+    
     assertNotNull(execution);
     assertEquals(1, createEventSubscriptionQuery().count());
-    assertEquals(1, runtimeService.createExecutionQuery().count());
+    assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
 
-    // if we trigger the usertask, the process terminates and the event
-    // subscription is removed:
+    // if we trigger the usertask, the process terminates and the event subscription is removed:
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("task", task.getTaskDefinitionKey());
     taskService.complete(task.getId());
     assertEquals(0, createEventSubscriptionQuery().count());
     assertEquals(0, runtimeService.createExecutionQuery().count());
 
-    // ###################### now we start a new instance but this time we
-    // trigger the event subprocess:
+    // now we start a new instance but this time we trigger the event subprocess:
     processInstance = runtimeService.startProcessInstanceByKey("process");
-    runtimeService.messageEventReceived("newMessage", processInstance.getId());
+    execution = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId())
+        .messageEventSubscriptionName("newMessage")
+        .singleResult();
+    
+    runtimeService.messageEventReceived("newMessage", execution.getId());
 
     assertEquals(2, taskService.createTaskQuery().count());
 
     // now let's first complete the task in the main flow:
     task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
     taskService.complete(task.getId());
-    // we still have 2 executions:
-    assertEquals(2, runtimeService.createExecutionQuery().count());
+    
+    // we still have 3 executions:
+    assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
 
     // now let's complete the task in the event subprocess
     task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
     taskService.complete(task.getId());
+    
     // done!
-    assertEquals(0, runtimeService.createExecutionQuery().count());
+    assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
 
     // #################### again, the other way around:
 
     processInstance = runtimeService.startProcessInstanceByKey("process");
-    runtimeService.messageEventReceived("newMessage", processInstance.getId());
+    execution = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId())
+        .messageEventSubscriptionName("newMessage")
+        .singleResult();
+    
+    runtimeService.messageEventReceived("newMessage", execution.getId());
 
     assertEquals(2, taskService.createTaskQuery().count());
 
     task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
     taskService.complete(task.getId());
-    // we still have 1 execution:
-    assertEquals(2, runtimeService.createExecutionQuery().count());
+    
+    assertEquals(1, createEventSubscriptionQuery().count());
+    
+    // we still have 3 executions:
+    assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
 
     task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
     taskService.complete(task.getId());
+    
     // done!
-    assertEquals(0, runtimeService.createExecutionQuery().count());
+    assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+  }
+  
+  @Deployment
+  public void testNonInterruptingMultipleInstances() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+    
+    Execution execution = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId())
+        .messageEventSubscriptionName("newMessage")
+        .singleResult();
+    
+    runtimeService.messageEventReceived("newMessage", execution.getId());
+    assertEquals(5, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+
+    assertEquals(2, taskService.createTaskQuery().count());
+    assertEquals(1, createEventSubscriptionQuery().count());
+    
+    runtimeService.messageEventReceived("newMessage", execution.getId());
+    assertEquals(7, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+    
+    assertEquals(3, taskService.createTaskQuery().count());
+    assertEquals(1, createEventSubscriptionQuery().count());
+
+    // now let's first complete the task in the main flow:
+    Task task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
+    taskService.complete(task.getId());
+    
+    assertEquals(0, createEventSubscriptionQuery().count());
+    
+    // we still have 6 executions:
+    assertEquals(5, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+
+    // now let's complete the first task in the event subprocess
+    task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").list().get(0);
+    taskService.complete(task.getId());
+    
+    assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+    
+    // complete the second task in the event subprocess
+    task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
+    taskService.complete(task.getId());
+    
+    // done!
+    assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+  }
+  
+  @Deployment
+  public void testNonInterruptingSubProcess() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+    
+    Execution execution = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId())
+        .messageEventSubscriptionName("eventMessage")
+        .singleResult();
+    
+    runtimeService.messageEventReceived("eventMessage", execution.getId());
+    assertEquals(6, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+
+    assertEquals(2, taskService.createTaskQuery().count());
+    assertEquals(1, createEventSubscriptionQuery().count());
+    
+    runtimeService.messageEventReceived("eventMessage", execution.getId());
+    assertEquals(9, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+    
+    assertEquals(3, taskService.createTaskQuery().count());
+    assertEquals(1, createEventSubscriptionQuery().count());
+
+    // now let's first complete the task in the main flow:
+    Task task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
+    taskService.complete(task.getId());
+    
+    assertEquals(0, createEventSubscriptionQuery().count());
+    
+    // we still have 7 executions:
+    assertEquals(7, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+
+    // now let's complete the first task in the event subprocess
+    task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").list().get(0);
+    taskService.complete(task.getId());
+    
+    assertEquals(4, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+    
+    // complete the second task in the event subprocess
+    task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
+    taskService.complete(task.getId());
+    
+    // done!
+    assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+  }
+  
+  @Deployment
+  public void testInterruptingSubProcess() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+    
+    Execution execution = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId())
+        .messageEventSubscriptionName("eventMessage")
+        .singleResult();
+    
+    runtimeService.messageEventReceived("eventMessage", execution.getId());
+    assertEquals(5, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+
+    assertEquals(1, taskService.createTaskQuery().count());
+    assertEquals(0, createEventSubscriptionQuery().count());
+
+    // now let's complete the task in the event subprocess
+    Task task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").list().get(0);
+    taskService.complete(task.getId());
+    
+    // done!
+    assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
   }
 
   private EventSubscriptionQueryImpl createEventSubscriptionQuery() {

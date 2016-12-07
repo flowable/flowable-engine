@@ -131,7 +131,7 @@ public class AppDefinitionExportService {
     modelJson.put("description", model.getDescription());
     
     try {
-      modelJson.put("editorJson", objectMapper.readTree(model.getModelEditorJson()));
+      modelJson.set("editorJson", objectMapper.readTree(model.getModelEditorJson()));
     } catch (Exception e) {
       logger.error("Error exporting model json for id " + model.getId(), e);
       throw new InternalServerErrorException("Error exporting model json for id " + model.getId());

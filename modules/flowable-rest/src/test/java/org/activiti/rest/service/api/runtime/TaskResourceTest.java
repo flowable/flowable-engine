@@ -384,7 +384,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
       requestNode = objectMapper.createObjectNode();
       ArrayNode variablesNode = objectMapper.createArrayNode();
       requestNode.put("action", "complete");
-      requestNode.put("variables", variablesNode);
+      requestNode.set("variables", variablesNode);
 
       ObjectNode var1 = objectMapper.createObjectNode();
       variablesNode.add(var1);

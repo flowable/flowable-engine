@@ -22,5 +22,7 @@ public interface DefaultPrivileges {
   String ACCESS_MODELER = "access-modeler";
   
   String ACCESS_ADMIN = "access-admin";
+  
+  String ACCESS_TASK = "access-task";
 
 }

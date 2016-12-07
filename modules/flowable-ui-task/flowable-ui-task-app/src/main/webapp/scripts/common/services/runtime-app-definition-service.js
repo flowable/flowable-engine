@@ -49,15 +49,11 @@ activitiApp.service('RuntimeAppDefinitionService', ['$http', '$q', '$location', 
                 baseUrl = baseUrl.substring(0, baseUrl.length - appName.length - 1);
             }
 
-            var urls = {
-                editor: baseUrl + '/editor/',
-                identity: baseUrl + '/idm/',
-                workflow: baseUrl + '/workflow/',
-                admin: 'http://localhost:8080/activiti-admin',
-                analytics: baseUrl + '/analytics/'
-            };
-
-            var transformAppsResponse = function(value) {
+            var transformAppsResponse = function(value, headersGetter, status) {
+                if (status !== 200) {
+                    return;
+                }
+                
                 var response = JSON.parse(value);
                 var customApps = [];
                 for (var i = 0; i < response.data.length; i++) {
@@ -75,8 +71,8 @@ activitiApp.service('RuntimeAppDefinitionService', ['$http', '$q', '$location', 
                                     defaultAppId : app.defaultAppId,
                                     theme: 'theme-2',
                                     icon: 'icon icon-clock',
-                                    fixedBaseUrl: urls.workflow + '/#/',
-                                    fixedUrl: urls.workflow,
+                                    fixedBaseUrl: baseUrl + '/workflow/' + '/#/',
+                                    fixedUrl: baseUrl + '/workflow/',
                                     pages: ['tasks', 'processes']
                                 });
                         }

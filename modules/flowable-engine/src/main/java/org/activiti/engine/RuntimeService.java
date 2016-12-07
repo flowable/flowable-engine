@@ -1208,6 +1208,15 @@ public interface RuntimeService {
   void setProcessInstanceName(String processInstanceId, String name);
   
   /**
+   * Gets executions with an adhoc sub process as current flow element
+   * 
+   * @param processInstanceId
+   *          id of the process instance that is used to search for child executions
+   * @return a list of executions 
+   */
+  List<Execution> getAdhocSubProcessExecutions(String processInstanceId);
+  
+  /**
    * Gets enabled activities from ad-hoc sub process
    * 
    * @param executionId

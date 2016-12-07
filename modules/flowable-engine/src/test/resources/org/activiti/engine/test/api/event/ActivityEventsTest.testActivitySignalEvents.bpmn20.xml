@@ -9,8 +9,7 @@
 
     <startEvent id="theStart" />
 
-    <sequenceFlow id="flow1" sourceRef="theStart"
-      targetRef="fork" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="fork" />
 
     <parallelGateway id="fork" />
     <sequenceFlow sourceRef="fork" targetRef="receivePayment" />

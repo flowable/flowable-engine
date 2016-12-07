@@ -165,6 +165,8 @@ public class DefaultAsyncJobExecutor implements AsyncExecutor {
     if (isActive) {
       return;
     }
+    
+    isActive = true;
 
     log.info("Starting up the default async job executor [{}].", getClass().getName());
     
@@ -187,8 +189,6 @@ public class DefaultAsyncJobExecutor implements AsyncExecutor {
     
     startTimerAcquisitionThread();
     startResetExpiredJobsThread();
-
-    isActive = true;
     
     executeTemporaryJobs();
   }

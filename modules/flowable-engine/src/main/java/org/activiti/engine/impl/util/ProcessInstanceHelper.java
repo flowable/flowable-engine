@@ -24,6 +24,8 @@ import org.activiti.bpmn.model.EventSubProcess;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.MessageEventDefinition;
 import org.activiti.bpmn.model.Process;
+import org.activiti.bpmn.model.Signal;
+import org.activiti.bpmn.model.SignalEventDefinition;
 import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.ValuedDataObject;
 import org.activiti.engine.common.api.ActivitiException;
@@ -36,6 +38,7 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
+import org.activiti.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 
@@ -205,6 +208,8 @@ public class ProcessInstanceHelper {
 
     // Event sub process handling
     List<MessageEventSubscriptionEntity> messageEventSubscriptions = new LinkedList<>();
+    List<SignalEventSubscriptionEntity> signalEventSubscriptions = new LinkedList<>();
+    
     for (FlowElement flowElement : process.getFlowElements()) {
       if (flowElement instanceof EventSubProcess == false) {
         continue;
@@ -233,6 +238,20 @@ public class ProcessInstanceHelper {
           messageExecution.setEventScope(true);
           messageEventSubscriptions.add(commandContext.getEventSubscriptionEntityManager().insertMessageEvent(
               messageEventDefinition.getMessageRef(), messageExecution));
+        
+        } else if (eventDefinition instanceof SignalEventDefinition) {
+          SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
+          BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processInstance.getProcessDefinitionId());
+          Signal signal = null;
+          if (bpmnModel.containsSignalId(signalEventDefinition.getSignalRef())) {
+            signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
+            signalEventDefinition.setSignalRef(signal.getName());
+          }
+          ExecutionEntity signalExecution = commandContext.getExecutionEntityManager().createChildExecution(processInstance);
+          signalExecution.setCurrentFlowElement(startEvent);
+          signalExecution.setEventScope(true);
+          signalEventSubscriptions.add(commandContext.getEventSubscriptionEntityManager().insertSignalEvent(
+              signalEventDefinition.getSignalRef(), signal, signalExecution));
         }
       }
     }
@@ -249,6 +268,13 @@ public class ProcessInstanceHelper {
             .dispatchEvent(ActivitiEventBuilder.createMessageEvent(ActivitiEngineEventType.ACTIVITY_MESSAGE_WAITING, messageEventSubscription.getActivityId(),
                 messageEventSubscription.getEventName(), null, messageEventSubscription.getExecution().getId(),
                 messageEventSubscription.getProcessInstanceId(), messageEventSubscription.getProcessDefinitionId()));
+      }
+      
+      for (SignalEventSubscriptionEntity signalEventSubscription : signalEventSubscriptions) {
+        commandContext.getProcessEngineConfiguration().getEventDispatcher()
+            .dispatchEvent(ActivitiEventBuilder.createSignalEvent(ActivitiEngineEventType.ACTIVITY_SIGNAL_WAITING, signalEventSubscription.getActivityId(),
+                signalEventSubscription.getEventName(), null, signalEventSubscription.getExecution().getId(),
+                signalEventSubscription.getProcessInstanceId(), signalEventSubscription.getProcessDefinitionId()));
       }
     }
   }

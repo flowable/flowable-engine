@@ -347,7 +347,7 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
 
     // Start using process definition key, passing in variables
     requestNode.put("processDefinitionKey", "processOne");
-    requestNode.put("variables", variablesNode);
+    requestNode.set("variables", variablesNode);
 
     HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION));
     httpPost.setEntity(new StringEntity(requestNode.toString()));
@@ -398,7 +398,7 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
     // Start using process definition key, passing in variables
     requestNode.put("processDefinitionKey", "processOne");
     requestNode.put("returnVariables", true);
-    requestNode.put("variables", variablesNode);
+    requestNode.set("variables", variablesNode);
 
     HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION));
     httpPost.setEntity(new StringEntity(requestNode.toString()));

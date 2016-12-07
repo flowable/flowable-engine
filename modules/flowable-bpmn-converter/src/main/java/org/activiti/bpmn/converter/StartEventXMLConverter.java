@@ -48,13 +48,15 @@ public class StartEventXMLConverter extends BaseBpmnXMLConverter {
     if (startEvent == null) {
       startEvent = new StartEvent();
     }
+    
     BpmnXMLUtil.addXMLLocation(startEvent, xtr);
     startEvent.setInitiator(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_EVENT_START_INITIATOR));
     boolean interrupting = true;
-    String interruptingAttribute = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_EVENT_START_INTERRUPTING);
+    String interruptingAttribute = xtr.getAttributeValue(null, ATTRIBUTE_EVENT_START_INTERRUPTING);
     if (ATTRIBUTE_VALUE_FALSE.equalsIgnoreCase(interruptingAttribute)) {
       interrupting = false;
     }
+    
     startEvent.setInterrupting(interrupting);
     startEvent.setFormKey(formKey);
 
@@ -70,7 +72,7 @@ public class StartEventXMLConverter extends BaseBpmnXMLConverter {
     writeQualifiedAttribute(ATTRIBUTE_FORM_FORMKEY, startEvent.getFormKey(), xtw);
     
     if (startEvent.getEventDefinitions() != null && startEvent.getEventDefinitions().size() > 0) {
-      writeQualifiedAttribute(ATTRIBUTE_EVENT_START_INTERRUPTING, String.valueOf(startEvent.isInterrupting()), xtw);
+      writeDefaultAttribute(ATTRIBUTE_EVENT_START_INTERRUPTING, String.valueOf(startEvent.isInterrupting()), xtw);
     }
   }
 

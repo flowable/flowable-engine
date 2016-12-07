@@ -88,7 +88,7 @@ public class TransactionContextAwareTransactionFactory<T> implements Transaction
   protected boolean isNonIdmTransactionContextActive() {
     BaseTransactionContext transactionContext = TransactionContextHolder.getTransactionContext();
     if (transactionContext != null) {
-      return transactionContext != null && !transactionContextClass.isInstance(transactionContext);
+      return !transactionContextClass.isInstance(transactionContext);
     } 
     return false;
   }

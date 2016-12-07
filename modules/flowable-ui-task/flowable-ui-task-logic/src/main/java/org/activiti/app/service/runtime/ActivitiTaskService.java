@@ -17,7 +17,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.activiti.app.model.idm.UserRepresentation;
+import org.activiti.app.model.common.UserRepresentation;
 import org.activiti.app.model.runtime.TaskRepresentation;
 import org.activiti.app.model.runtime.TaskUpdateRepresentation;
 import org.activiti.app.security.SecurityUtils;

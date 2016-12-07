@@ -23,8 +23,6 @@ import org.activiti.engine.form.StartFormData;
 import org.activiti.engine.impl.form.EnumFormType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -81,7 +79,7 @@ public class ProcessDefinitionPropertiesResource {
             Map<String, String> valuesMap = (Map<String, String>) property.getType().getInformation("values");
             if (valuesMap != null) {
               ArrayNode valuesArray = objectMapper.createArrayNode();
-              propertyJSON.put("enumValues", valuesArray);
+              propertyJSON.set("enumValues", valuesArray);
 
               for (String key : valuesMap.keySet()) {
                 ObjectNode valueJSON = objectMapper.createObjectNode();
@@ -104,7 +102,7 @@ public class ProcessDefinitionPropertiesResource {
       }
     }
 
-    responseJSON.put("data", propertiesJSON);
+    responseJSON.set("data", propertiesJSON);
     return responseJSON;
   }
 }

@@ -36,17 +36,20 @@ public class EventSubProcessErrorStartEventActivityBehavior extends AbstractBpmn
   public void execute(DelegateExecution execution) {
     StartEvent startEvent = (StartEvent) execution.getCurrentFlowElement();
     EventSubProcess eventSubProcess = (EventSubProcess) startEvent.getSubProcess();
-    execution.setCurrentFlowElement(eventSubProcess);
-    execution.setScope(true);
+    ExecutionEntity executionEntity = (ExecutionEntity) execution;
+    
+    executionEntity.setCurrentFlowElement(eventSubProcess);
+    executionEntity.setEventScope(false);
+    executionEntity.setScope(true);
 
     // initialize the template-defined data objects as variables
     Map<String, Object> dataObjectVars = processDataObjects(eventSubProcess.getDataObjects());
     if (dataObjectVars != null) {
-      execution.setVariablesLocal(dataObjectVars);
+      executionEntity.setVariablesLocal(dataObjectVars);
     }
 
     ExecutionEntity startSubProcessExecution = Context.getCommandContext()
-        .getExecutionEntityManager().createChildExecution((ExecutionEntity) execution); 
+        .getExecutionEntityManager().createChildExecution(executionEntity); 
     startSubProcessExecution.setCurrentFlowElement(startEvent);
     Context.getAgenda().planTakeOutgoingSequenceFlowsOperation(startSubProcessExecution, true);
   }

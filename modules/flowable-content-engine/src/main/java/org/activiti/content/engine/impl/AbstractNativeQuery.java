@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.activiti.content.engine.impl.context.Context;
 import org.activiti.content.engine.impl.interceptor.Command;
@@ -23,7 +24,6 @@ import org.activiti.content.engine.impl.interceptor.CommandContext;
 import org.activiti.content.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.common.api.query.NativeQuery;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -119,7 +119,7 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> implem
       parameterMap.put("resultType", "LIST_PAGE");
       parameterMap.put("firstResult", firstResult);
       parameterMap.put("maxResults", maxResults);
-      if (StringUtils.isNotBlank(ObjectUtils.toString(parameterMap.get("orderBy")))) {
+      if (StringUtils.isNotBlank(Objects.toString(parameterMap.get("orderBy"), ""))) {
         parameterMap.put("orderByColumns", "RES." + parameterMap.get("orderBy"));
       } else {
         parameterMap.put("orderByColumns", "RES.ID_ asc");
@@ -149,9 +149,7 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> implem
    * 
    * @param maxResults
    * @param firstResult
-   * 
-   * @param page
-   *          used if the results must be paged. If null, no paging will be applied.
+   *
    */
   public abstract List<U> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults);
 

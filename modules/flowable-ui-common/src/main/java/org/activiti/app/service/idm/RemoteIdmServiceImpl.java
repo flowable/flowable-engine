@@ -26,6 +26,9 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
@@ -59,9 +62,9 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
 
   @PostConstruct
   protected void init() {
-    url = environment.getProperty(PROPERTY_URL);
-    adminUser = environment.getProperty(PROPERTY_ADMIN_USER);
-    adminPassword = environment.getProperty(PROPERTY_ADMIN_PASSWORD);
+    url = environment.getRequiredProperty(PROPERTY_URL);
+    adminUser = environment.getRequiredProperty(PROPERTY_ADMIN_USER);
+    adminPassword = environment.getRequiredProperty(PROPERTY_ADMIN_PASSWORD);
   }
   
   public RemoteToken getToken(String tokenValue) {
@@ -108,8 +111,20 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
     HttpGet httpGet = new HttpGet(url);
     httpGet.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
         Base64.encodeBase64((adminUser + ":" + adminPassword).getBytes(Charset.forName("UTF-8")))));
-     
-    CloseableHttpClient client = HttpClientBuilder.create().build();
+    
+    HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+    SSLConnectionSocketFactory sslsf = null;
+    try {
+      SSLContextBuilder builder = new SSLContextBuilder();
+      builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+      sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+      clientBuilder.setSSLSocketFactory(sslsf);
+    } catch (Exception e) {
+      logger.warn("Could not configure SSL for http client", e);
+    }
+
+    CloseableHttpClient client = clientBuilder.build();
+    
     try {
       HttpResponse response = client.execute(httpGet);
       if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {

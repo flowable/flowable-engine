@@ -118,7 +118,7 @@ public class BpmnDisplayJsonConverter {
                         fillGraphicInfo(laneNode, pojoModel.getGraphicInfo(lane.getId()), true);
                         laneArray.add(laneNode);
                     }
-                    poolNode.put("lanes", laneArray);
+                    poolNode.set("lanes", laneArray);
                 }
                 poolArray.add(poolNode);
 
@@ -139,7 +139,7 @@ public class BpmnDisplayJsonConverter {
                 }
                 firstElement = false;
             }
-            displayNode.put("pools", poolArray);
+            displayNode.set("pools", poolArray);
             
         } else {
             // in initialize with fake x and y to make sure the minimal
@@ -153,8 +153,8 @@ public class BpmnDisplayJsonConverter {
             processArtifacts(process.getArtifacts(), pojoModel, elementArray, flowArray, diagramInfo);
         }
 
-        displayNode.put("elements", elementArray);
-        displayNode.put("flows", flowArray);
+        displayNode.set("elements", elementArray);
+        displayNode.set("flows", flowArray);
         
         displayNode.put("diagramBeginX", diagramInfo.getX());
         displayNode.put("diagramBeginY", diagramInfo.getY());
@@ -182,11 +182,11 @@ public class BpmnDisplayJsonConverter {
                         waypointArray.add(pointNode);
                         fillDiagramInfo(graphicInfo, diagramInfo);
                     }
-                    elementNode.put("waypoints", waypointArray);
+                    elementNode.set("waypoints", waypointArray);
                     
                     String className = element.getClass().getSimpleName();
                     if (propertyMappers.containsKey(className)) {
-                        elementNode.put("properties", propertyMappers.get(className).map(element));
+                        elementNode.set("properties", propertyMappers.get(className).map(element));
                     }
                     
                     flowArray.add(elementNode);
@@ -222,7 +222,7 @@ public class BpmnDisplayJsonConverter {
                 }
 
                 if (propertyMappers.containsKey(className)) {
-                    elementNode.put("properties", propertyMappers.get(className).map(element));
+                    elementNode.set("properties", propertyMappers.get(className).map(element));
                 }
 
                 elementArray.add(elementNode);
@@ -285,7 +285,7 @@ public class BpmnDisplayJsonConverter {
             waypointArray.add(pointNode);
             fillDiagramInfo(graphicInfo, diagramInfo);
         }
-        elementNode.put("waypoints", waypointArray);
+        elementNode.set("waypoints", waypointArray);
     }
 
     protected void fillEventTypes(String className, FlowElement element, ObjectNode elementNode) {
@@ -328,7 +328,7 @@ public class BpmnDisplayJsonConverter {
                         eventNode.put("messageRef", messageDef.getMessageRef());
                     }
                 }
-                elementNode.put("eventDefinition", eventNode);
+                elementNode.set("eventDefinition", eventNode);
             }
         }
     }

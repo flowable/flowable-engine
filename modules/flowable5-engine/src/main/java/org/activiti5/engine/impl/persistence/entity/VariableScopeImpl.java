@@ -469,7 +469,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
       variables.put(variableName, usedVariablesCache.get(variableName));
     }
     if (transientVariabes != null) {
-      variables.putAll(transientVariabes);;
+      variables.putAll(transientVariabes);
     }
     return variables;
   }

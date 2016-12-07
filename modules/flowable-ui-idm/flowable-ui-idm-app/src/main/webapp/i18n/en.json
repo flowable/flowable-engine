@@ -206,6 +206,7 @@
           "access-idm": "Access identity management application",
           "access-admin": "Access admin application",
           "access-modeler": "Access modeler application",
+		  "access-task": "Access the workflow application",
           "NO-SELECTION": "No privilege selected",
           "USERS": "Users",
           "GROUPS": "Groups",

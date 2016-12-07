@@ -195,8 +195,8 @@ public class GroupResourceTest extends BaseSpringRestTestCase {
       identityService.saveGroup(testGroup);
 
       ObjectNode requestNode = objectMapper.createObjectNode();
-      requestNode.put("name", (JsonNode) null);
-      requestNode.put("type", (JsonNode) null);
+      requestNode.set("name", null);
+      requestNode.set("type", null);
 
       HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP, "testgroup"));
       httpPut.setEntity(new StringEntity(requestNode.toString()));
