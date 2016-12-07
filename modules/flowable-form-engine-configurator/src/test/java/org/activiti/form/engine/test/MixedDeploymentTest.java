@@ -25,7 +25,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * @author Yvo Swillens
  */
-public class MixedDeploymentTest extends AbstractActivitiFromEngineConfiguratorTest {
+public class MixedDeploymentTest extends AbstractActivitiFormEngineConfiguratorTest {
 
   @Test
   @Deployment(resources = {"org/activiti/form/engine/test/deployment/oneTaskWithFormKeyProcess.bpmn20.xml",
