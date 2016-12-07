@@ -71,13 +71,13 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
   
   @PostConstruct
   protected void initCaches() {
-    initIdmAppUrl();
+    initIdmAppRedirectUrl();
     initTokenCache();
     initUserCache();
   }
 
-  protected void initIdmAppUrl() {
-    idmAppUrl = env.getRequiredProperty("idm.app.url");
+  protected void initIdmAppRedirectUrl() {
+    idmAppUrl = env.getRequiredProperty("idm.app.redirect.url");
     if (idmAppUrl.endsWith("/") == false) {
       idmAppUrl += "/";
     }
