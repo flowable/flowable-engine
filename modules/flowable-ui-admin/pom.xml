@@ -294,7 +294,7 @@
                         <configuration>
                             <imageName>flowable/${project.build.finalName}</imageName>
                             <baseImage>flowable/java8_server</baseImage>
-                            <entryPoint>["java", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
+                            <entryPoint>["java", "-jar", "/${project.build.finalName}.jar", "-httpPort=9988", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]</entryPoint>
                             <forceTags>true</forceTags>
                             <imageTags>
                                 <imageTag>${project.version}</imageTag>
@@ -315,32 +315,6 @@
                                 <goals>
                                     <goal>build</goal>
                                 </goals>
-                            </execution>
-                            <execution>
-                                <id>tag-image-version</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>tag</goal>
-                                </goals>
-                                <configuration>
-                                    <image>flowable/${project.build.finalName}</image>
-                                    <newName>docker.io/flowable/${project.build.finalName}:${project.version}</newName>
-                                    <serverId>docker-hub</serverId>
-                                    <pushImage>true</pushImage>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>tag-image-latest</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>tag</goal>
-                                </goals>
-                                <configuration>
-                                    <image>flowable/${project.build.finalName}</image>
-                                    <newName>docker.io/flowable/${project.build.finalName}:latest</newName>
-                                    <serverId>docker-hub</serverId>
-                                    <pushImage>true</pushImage>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
