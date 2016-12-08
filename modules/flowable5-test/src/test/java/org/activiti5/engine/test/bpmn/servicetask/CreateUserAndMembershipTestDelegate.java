@@ -12,12 +12,12 @@
  */
 package org.activiti5.engine.test.bpmn.servicetask;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
-import org.activiti.idm.api.Group;
-import org.activiti.idm.api.User;
 import org.activiti5.engine.IdentityService;
 import org.activiti5.engine.impl.context.Context;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.JavaDelegate;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.User;
 
 /**
  * @author Joram Barrez

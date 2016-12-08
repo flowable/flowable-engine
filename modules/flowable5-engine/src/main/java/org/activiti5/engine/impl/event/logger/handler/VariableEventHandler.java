@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.activiti.engine.delegate.event.ActivitiVariableEvent;
-import org.activiti.engine.impl.variable.VariableType;
 import org.activiti5.engine.impl.variable.BooleanType;
 import org.activiti5.engine.impl.variable.DateType;
 import org.activiti5.engine.impl.variable.DoubleType;
@@ -17,6 +15,8 @@ import org.activiti5.engine.impl.variable.SerializableType;
 import org.activiti5.engine.impl.variable.ShortType;
 import org.activiti5.engine.impl.variable.StringType;
 import org.activiti5.engine.impl.variable.UUIDType;
+import org.flowable.engine.delegate.event.FlowableVariableEvent;
+import org.flowable.engine.impl.variable.VariableType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +40,7 @@ public abstract class VariableEventHandler extends AbstractDatabaseEventLoggerEv
 	public static final String TYPE_UUID = "uuid";
 	public static final String TYPE_JSON = "json";
 	
-	protected Map<String, Object> createData(ActivitiVariableEvent variableEvent) {
+	protected Map<String, Object> createData(FlowableVariableEvent variableEvent) {
 	  Map<String, Object> data = new HashMap<String, Object>();
 		putInMapIfNotNull(data, Fields.NAME, variableEvent.getVariableName());
 		putInMapIfNotNull(data, Fields.PROCESS_DEFINITION_ID, variableEvent.getProcessDefinitionId());

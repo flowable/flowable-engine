@@ -17,8 +17,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.form.FormData;
-import org.activiti.engine.form.FormProperty;
+import org.flowable.engine.form.FormData;
+import org.flowable.engine.form.FormProperty;
 
 
 /**

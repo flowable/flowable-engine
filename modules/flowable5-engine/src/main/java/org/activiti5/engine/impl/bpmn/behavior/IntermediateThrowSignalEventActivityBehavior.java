@@ -15,14 +15,14 @@ package org.activiti5.engine.impl.bpmn.behavior;
 
 import java.util.List;
 
-import org.activiti.bpmn.model.Signal;
-import org.activiti.bpmn.model.ThrowEvent;
-import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti5.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.activiti5.engine.impl.pvm.delegate.ActivityExecution;
+import org.flowable.bpmn.model.Signal;
+import org.flowable.bpmn.model.ThrowEvent;
+import org.flowable.engine.delegate.DelegateExecution;
 
 
 /**

@@ -35,6 +35,6 @@
 
     <!-- All the Servlets and Filters are configured by this ServletContextListener : -->
     <listener>
-        <listener-class>org.activiti.app.servlet.WebConfigurer</listener-class>
+        <listener-class>org.flowable.app.servlet.WebConfigurer</listener-class>
     </listener>
 </web-app>

@@ -9,6 +9,6 @@
   </parent>
 
   <artifactId>flowable-archetype-unittest</artifactId>
-  <description>Creates a new Activiti unit test.</description>
+  <description>Creates a new Flowable unit test.</description>
   <packaging>jar</packaging>  
 </project>

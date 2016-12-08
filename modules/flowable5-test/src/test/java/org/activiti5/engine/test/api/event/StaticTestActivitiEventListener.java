@@ -15,19 +15,19 @@ package org.activiti5.engine.test.api.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 
 /**
  * Event listener that keeps a static list of all events received.
  * 
  * @author Frederik Heremans
  */
-public class StaticTestActivitiEventListener implements ActivitiEventListener {
+public class StaticTestActivitiEventListener implements FlowableEventListener {
 
-	private static List<ActivitiEvent> eventsReceived = new ArrayList<ActivitiEvent>();
+	private static List<FlowableEvent> eventsReceived = new ArrayList<FlowableEvent>();
 	
-	public static List<ActivitiEvent> getEventsReceived() {
+	public static List<FlowableEvent> getEventsReceived() {
 	  return eventsReceived;
   }
 	
@@ -36,7 +36,7 @@ public class StaticTestActivitiEventListener implements ActivitiEventListener {
 	}
 	
 	@Override
-	public void onEvent(ActivitiEvent event) {
+	public void onEvent(FlowableEvent event) {
 		eventsReceived.add(event);
 	}
 

@@ -13,11 +13,11 @@
 
 package org.activiti5.engine.impl;
 
-import org.activiti.engine.DynamicBpmnConstants;
 import org.activiti5.engine.DynamicBpmnService;
 import org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti5.engine.impl.cmd.GetProcessDefinitionInfoCmd;
 import org.activiti5.engine.impl.cmd.SaveProcessDefinitionInfoCmd;
+import org.flowable.engine.DynamicBpmnConstants;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;

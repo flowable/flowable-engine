@@ -17,9 +17,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.ResourceActivitiTestCase;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 
 
 /**

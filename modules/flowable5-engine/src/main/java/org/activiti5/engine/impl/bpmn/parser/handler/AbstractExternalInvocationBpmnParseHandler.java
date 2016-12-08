@@ -12,17 +12,17 @@
  */
 package org.activiti5.engine.impl.bpmn.parser.handler;
 
-import org.activiti.bpmn.model.DataAssociation;
-import org.activiti.bpmn.model.FlowNode;
-import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.impl.bpmn.data.AbstractDataAssociation;
-import org.activiti.engine.impl.bpmn.data.Assignment;
-import org.activiti.engine.impl.bpmn.data.SimpleDataInputAssociation;
-import org.activiti.engine.impl.bpmn.data.TransformationDataOutputAssociation;
-import org.activiti.engine.impl.bpmn.webservice.MessageImplicitDataInputAssociation;
-import org.activiti.engine.impl.bpmn.webservice.MessageImplicitDataOutputAssociation;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.DataAssociation;
+import org.flowable.bpmn.model.FlowNode;
+import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.impl.bpmn.data.AbstractDataAssociation;
+import org.flowable.engine.impl.bpmn.data.Assignment;
+import org.flowable.engine.impl.bpmn.data.SimpleDataInputAssociation;
+import org.flowable.engine.impl.bpmn.data.TransformationDataOutputAssociation;
+import org.flowable.engine.impl.bpmn.webservice.MessageImplicitDataInputAssociation;
+import org.flowable.engine.impl.bpmn.webservice.MessageImplicitDataOutputAssociation;
 
 
 /**
@@ -37,7 +37,7 @@ public abstract class AbstractExternalInvocationBpmnParseHandler<T extends FlowN
       SimpleDataInputAssociation dataAssociation = new SimpleDataInputAssociation(
           dataAssociationElement.getSourceRef(), dataAssociationElement.getTargetRef());
 
-      for (org.activiti.bpmn.model.Assignment assigmentElement : dataAssociationElement.getAssignments()) {
+      for (org.flowable.bpmn.model.Assignment assigmentElement : dataAssociationElement.getAssignments()) {
         if (StringUtils.isNotEmpty(assigmentElement.getFrom()) && StringUtils.isNotEmpty(assigmentElement.getTo())) {
           Expression from = bpmnParse.getExpressionManager().createExpression(assigmentElement.getFrom());
           Expression to = bpmnParse.getExpressionManager().createExpression(assigmentElement.getTo());

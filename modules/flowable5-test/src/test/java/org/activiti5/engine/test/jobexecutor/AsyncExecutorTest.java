@@ -22,17 +22,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.runtime.Clock;
-import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
-import org.activiti.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.runtime.Job;
-import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti5.engine.impl.test.JobTestHelper;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -235,7 +235,7 @@ public class AsyncExecutorTest {
   			    .processInstanceId(processInstance.getId())
   			    .singleResult().getId());
   			fail("Job execution should have failed");
-			} catch (ActivitiException e) {
+			} catch (FlowableException e) {
 			  // expected
 			}
 			
@@ -256,7 +256,7 @@ public class AsyncExecutorTest {
 			  processEngine.getManagementService().moveTimerToExecutableJob(job.getId());
 			  processEngine.getManagementService().executeJob(job.getId());
 			  fail("Job execution should have failed");
-      } catch (ActivitiException e) {
+      } catch (FlowableException e) {
         // expected
       }
 			
@@ -277,7 +277,7 @@ public class AsyncExecutorTest {
         processEngine.getManagementService().moveTimerToExecutableJob(job.getId());
         processEngine.getManagementService().executeJob(job.getId());
         fail("Job execution should have failed");
-      } catch (ActivitiException e) {
+      } catch (FlowableException e) {
         // expected
       }
       
@@ -353,7 +353,7 @@ public class AsyncExecutorTest {
 	}
 	
 	private void cleanup(ProcessEngine processEngine) {
-		for (org.activiti.engine.repository.Deployment deployment : processEngine.getRepositoryService().createDeploymentQuery().list()) {
+		for (org.flowable.engine.repository.Deployment deployment : processEngine.getRepositoryService().createDeploymentQuery().list()) {
 			processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
 		}
 		processEngine.close();

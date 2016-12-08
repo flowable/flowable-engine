@@ -7,12 +7,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.util.Date;
 import java.util.List;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.impl.calendar.BusinessCalendar;
-import org.activiti.engine.runtime.Job;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.ResourceActivitiTestCase;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.impl.calendar.BusinessCalendar;
+import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 
 /**
  * testing custom calendar for timer definitions
@@ -67,7 +67,7 @@ public class TimerCustomCalendarTest extends ResourceActivitiTestCase {
     try {
       this.runtimeService.startProcessInstanceByKey("testCustomDurationCalendar");
       fail("Activiti exception expected - calendar not found");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertThat(e.getMessage(), containsString("INVALID does not exist"));
     }
   }

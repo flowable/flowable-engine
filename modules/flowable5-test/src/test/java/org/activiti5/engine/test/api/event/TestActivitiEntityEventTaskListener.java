@@ -15,10 +15,10 @@ package org.activiti5.engine.test.api.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
 import org.activiti5.engine.impl.persistence.entity.TaskEntity;
 import org.activiti5.engine.task.Task;
+import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 
 /**
  * Records a copy of the tasks involved in the events
@@ -39,10 +39,10 @@ public class TestActivitiEntityEventTaskListener extends TestActivitiEntityEvent
 	}
 	
 	@Override
-	public void onEvent(ActivitiEvent event) {
+	public void onEvent(FlowableEvent event) {
 		super.onEvent(event);
-		if (event instanceof ActivitiEntityEvent && Task.class.isAssignableFrom(((ActivitiEntityEvent) event).getEntity().getClass())) {
-			tasks.add(copy((Task) ((ActivitiEntityEvent) event).getEntity()));
+		if (event instanceof FlowableEntityEvent && Task.class.isAssignableFrom(((FlowableEntityEvent) event).getEntity().getClass())) {
+			tasks.add(copy((Task) ((FlowableEntityEvent) event).getEntity()));
 		}
 	}
 

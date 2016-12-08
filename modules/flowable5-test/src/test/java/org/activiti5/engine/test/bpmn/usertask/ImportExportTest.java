@@ -3,13 +3,13 @@ package org.activiti5.engine.test.bpmn.usertask;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import org.activiti.bpmn.converter.BpmnXMLConverter;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.engine.common.impl.util.io.InputStreamSource;
-import org.activiti.engine.common.impl.util.io.StreamSource;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.runtime.Execution;
 import org.activiti5.engine.impl.test.ResourceActivitiTestCase;
+import org.flowable.bpmn.converter.BpmnXMLConverter;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.engine.common.impl.util.io.InputStreamSource;
+import org.flowable.engine.common.impl.util.io.StreamSource;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.runtime.Execution;
 
 /**
  * Created by p3700487 on 23/02/15.
@@ -37,7 +37,7 @@ public class ImportExportTest extends ResourceActivitiTestCase {
     }
 
     protected void tearDown() throws Exception {
-        for (org.activiti.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+        for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
         super.tearDown();

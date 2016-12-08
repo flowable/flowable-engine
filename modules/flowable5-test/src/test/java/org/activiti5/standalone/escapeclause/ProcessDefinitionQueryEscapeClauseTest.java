@@ -12,8 +12,8 @@
  */
 package org.activiti5.standalone.escapeclause;
 
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.repository.ProcessDefinitionQuery;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.repository.ProcessDefinitionQuery;
 
 public class ProcessDefinitionQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
   

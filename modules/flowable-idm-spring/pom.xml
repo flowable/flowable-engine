@@ -15,10 +15,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <activiti.artifact>
-            org.activiti.idm.spring
+            org.flowable.idm.spring
         </activiti.artifact>
         <activiti.osgi.import.additional>
-          org.springframework.test.context*;resolution:=optional,
+          	org.springframework.test.context*;resolution:=optional,
         </activiti.osgi.import.additional>
     </properties>
 

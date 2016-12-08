@@ -12,9 +12,6 @@
  */
 package org.activiti5.engine.impl.bpmn.parser.handler;
 
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.SequenceFlow;
-import org.activiti.engine.delegate.Expression;
 import org.activiti5.engine.impl.Condition;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti5.engine.impl.el.ExpressionManager;
@@ -23,6 +20,9 @@ import org.activiti5.engine.impl.pvm.process.ActivityImpl;
 import org.activiti5.engine.impl.pvm.process.ScopeImpl;
 import org.activiti5.engine.impl.pvm.process.TransitionImpl;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.engine.delegate.Expression;
 
 /**
  * @author Joram Barrez

@@ -12,8 +12,8 @@
  */
 package org.activiti5.engine.test.bpmn.async;
 
-import org.activiti.engine.delegate.DelegateTask;
-import org.activiti.engine.delegate.TaskListener;
+import org.flowable.engine.delegate.DelegateTask;
+import org.flowable.engine.delegate.TaskListener;
 
 
 public class AsyncTaskListener implements TaskListener {

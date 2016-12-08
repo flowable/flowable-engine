@@ -1,7 +1,7 @@
 package org.activiti5.camel.exception.tools;
 
-import org.activiti.engine.delegate.BpmnError;
 import org.apache.camel.Handler;
+import org.flowable.engine.delegate.BpmnError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

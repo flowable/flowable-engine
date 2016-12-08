@@ -16,12 +16,12 @@ package org.activiti5.engine.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.impl.variable.VariableTypes;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.interceptor.CommandExecutor;
 import org.activiti5.engine.query.Query;
+import org.flowable.engine.impl.variable.VariableTypes;
 
 
 /**

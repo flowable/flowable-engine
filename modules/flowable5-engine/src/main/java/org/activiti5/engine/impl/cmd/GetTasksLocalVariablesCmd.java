@@ -18,11 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.activiti.engine.impl.persistence.entity.VariableInstance;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.impl.interceptor.Command;
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.engine.impl.persistence.entity.VariableInstance;
 
 /**
  * @author Daisuke Yoshimoto

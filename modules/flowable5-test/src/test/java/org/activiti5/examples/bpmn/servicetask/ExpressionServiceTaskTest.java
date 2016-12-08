@@ -3,9 +3,9 @@ package org.activiti5.examples.bpmn.servicetask;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 
 /**
  * @author Christian Stettler

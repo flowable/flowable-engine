@@ -14,16 +14,16 @@ package org.activiti5.engine.delegate.event.impl;
 
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.delegate.event.ActivitiProcessStartedEvent;
 import org.activiti5.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
 
 /**
- * An {@link org.activiti5.engine.delegate.event.ActivitiCancelledEvent} implementation.
+ * An {@link org.activiti5.engine.delegate.event.FlowableCancelledEvent} implementation.
  *
  * @author martin.grofcik
  */
-public class ActivitiProcessStartedEventImpl extends ActivitiEntityWithVariablesEventImpl implements ActivitiProcessStartedEvent {
+public class ActivitiProcessStartedEventImpl extends ActivitiEntityWithVariablesEventImpl implements FlowableProcessStartedEvent {
 
   protected final String nestedProcessInstanceId;
 
@@ -31,7 +31,7 @@ public class ActivitiProcessStartedEventImpl extends ActivitiEntityWithVariables
 
   @SuppressWarnings("rawtypes")
   public ActivitiProcessStartedEventImpl(final Object entity, final Map variables, final boolean localScope) {
-    super(entity, variables, localScope, ActivitiEngineEventType.PROCESS_STARTED);
+    super(entity, variables, localScope, FlowableEngineEventType.PROCESS_STARTED);
     if (entity instanceof ExecutionEntity) {
       final ExecutionEntity superExecution = ((ExecutionEntity) entity).getSuperExecution();
       if (superExecution != null) {

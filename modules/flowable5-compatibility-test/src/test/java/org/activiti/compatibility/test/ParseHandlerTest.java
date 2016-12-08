@@ -14,7 +14,7 @@ package org.activiti.compatibility.test;
 
 import java.util.List;
 
-import org.activiti.engine.task.Task;
+import org.flowable.engine.task.Task;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

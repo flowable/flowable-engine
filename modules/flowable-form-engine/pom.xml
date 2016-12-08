@@ -15,7 +15,7 @@
 
 	<properties>
 		<activiti.artifact>
-			org.activiti.form.engine
+			org.flowable.form.engine
 		</activiti.artifact>
 		<activiti.osgi.import.additional>
 			org.springframework*;resolution:=optional,
@@ -232,8 +232,8 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<echo message="updating activiti form configuration to db ${databaseform}" />
-										<copy file="${basedir}/../../qa/db/activiti.form.cfg.xml"
+										<echo message="updating flowable form configuration to db ${databaseform}" />
+										<copy file="${basedir}/../../qa/db/flowable.form.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset
 												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databaseform}.properties" />
@@ -250,7 +250,7 @@
 								<configuration>
 									<tasks>
 										<echo message="dropping schema in ${databaseform}" />
-										<java classname="org.activiti.form.engine.impl.db.DbSchemaDrop"
+										<java classname="org.flowable.form.engine.impl.db.DbSchemaDrop"
 											classpathref="maven.test.classpath" />
 									</tasks>
 								</configuration>
@@ -284,8 +284,8 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<echo message="updating activiti form configuration to db ${databasewithschemaform}" />
-										<copy file="${basedir}/../../qa/db/schema/activiti.form.cfg.xml"
+										<echo message="updating flowable form configuration to db ${databasewithschemaform}" />
+										<copy file="${basedir}/../../qa/db/schema/flowable.form.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset
 												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasewithschemaform}.properties" />
@@ -302,7 +302,7 @@
 								<configuration>
 									<tasks>
 										<echo message="dropping schema in ${databasewithschemaform}" />
-										<java classname="org.activiti.form.engine.impl.db.DbSchemaDrop"
+										<java classname="org.flowable.form.engine.impl.db.DbSchemaDrop"
 											classpathref="maven.test.classpath" />
 									</tasks>
 								</configuration>

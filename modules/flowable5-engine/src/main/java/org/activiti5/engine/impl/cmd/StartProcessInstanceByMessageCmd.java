@@ -15,7 +15,6 @@ package org.activiti5.engine.impl.cmd;
 
 import java.util.Map;
 
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.ActivitiObjectNotFoundException;
@@ -28,6 +27,7 @@ import org.activiti5.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
 import org.activiti5.engine.impl.runtime.ProcessInstanceBuilderImpl;
 import org.activiti5.engine.runtime.ProcessInstance;
+import org.flowable.engine.repository.ProcessDefinition;
 
 
 /**

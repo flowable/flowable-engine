@@ -15,14 +15,14 @@ package org.activiti5.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.runtime.Job;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.ActivitiObjectNotFoundException;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.interceptor.Command;
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.runtime.Job;
 
 
 /**
@@ -55,7 +55,7 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
       
       if(commandContext.getEventDispatcher().isEnabled()) {
       	commandContext.getEventDispatcher().dispatchEvent(
-      			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_UPDATED, job));
+      			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, job));
       }
     } else {
       throw new ActivitiObjectNotFoundException("No job found with id '" + jobId + "'.", Job.class);

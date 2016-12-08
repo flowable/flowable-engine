@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.activiti.engine.DynamicBpmnConstants;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.impl.context.Context;
@@ -28,6 +27,7 @@ import org.activiti5.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti5.engine.impl.persistence.entity.SuspensionState;
 import org.activiti5.engine.runtime.ProcessInstance;
 import org.activiti5.engine.runtime.ProcessInstanceQuery;
+import org.flowable.engine.DynamicBpmnConstants;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;

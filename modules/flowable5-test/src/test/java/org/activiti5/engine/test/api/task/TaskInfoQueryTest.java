@@ -15,11 +15,11 @@ package org.activiti5.engine.test.api.task;
 import java.util.Date;
 import java.util.List;
 
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.task.TaskInfo;
-import org.activiti.engine.task.TaskInfoQueryWrapper;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.task.TaskInfo;
+import org.flowable.engine.task.TaskInfoQueryWrapper;
 
 /**
  * @author Joram Barrez

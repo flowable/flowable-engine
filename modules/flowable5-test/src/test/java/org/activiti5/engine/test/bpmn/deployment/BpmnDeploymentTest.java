@@ -16,20 +16,20 @@ package org.activiti5.engine.test.bpmn.deployment;
 import java.io.InputStream;
 import java.util.List;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.impl.interceptor.Command;
-import org.activiti.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.impl.interceptor.CommandExecutor;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.test.Deployment;
-import org.activiti.validation.validator.Problems;
 import org.activiti5.engine.impl.RepositoryServiceImpl;
 import org.activiti5.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti5.engine.impl.util.IoUtil;
 import org.activiti5.engine.impl.util.ReflectUtil;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.interceptor.Command;
+import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.test.Deployment;
+import org.flowable.validation.validator.Problems;
 
 
 /**
@@ -80,7 +80,7 @@ public class BpmnDeploymentTest extends PluggableActivitiTestCase {
           .addClasspathResource("org/activiti5/engine/test/bpmn/deployment/definitionWithLongTargetNamespace.bpmn20.xml")
           .deploy();
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertTextPresent(Problems.BPMN_MODEL_TARGET_NAMESPACE_TOO_LONG, e.getMessage());
     }
 
@@ -95,7 +95,7 @@ public class BpmnDeploymentTest extends PluggableActivitiTestCase {
         .addClasspathResource("org/activiti5/engine/test/bpmn/deployment/processWithLongId.bpmn20.xml")
         .deploy();
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertTextPresent(Problems.PROCESS_DEFINITION_ID_TOO_LONG, e.getMessage());
     }
     
@@ -109,7 +109,7 @@ public class BpmnDeploymentTest extends PluggableActivitiTestCase {
           .addClasspathResource("org/activiti5/engine/test/bpmn/deployment/BpmnDeploymentTest.definitionWithLongTargetNamespace.bpmn20.xml")
           .deploy();
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertTextPresent(Problems.BPMN_MODEL_TARGET_NAMESPACE_TOO_LONG, e.getMessage());
     }
     
@@ -123,7 +123,7 @@ public class BpmnDeploymentTest extends PluggableActivitiTestCase {
           .addClasspathResource("org/activiti5/engine/test/bpmn/deployment/processWithLongNameAndDescription.bpmn20.xml")
           .deploy();
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertTextPresent(Problems.PROCESS_DEFINITION_NAME_TOO_LONG, e.getMessage());
       assertTextPresent(Problems.PROCESS_DEFINITION_DOCUMENTATION_TOO_LONG, e.getMessage());
     }
@@ -152,7 +152,7 @@ public class BpmnDeploymentTest extends PluggableActivitiTestCase {
       .name("twice")
       .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy();
-    List<org.activiti.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().list();
+    List<org.flowable.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().list();
     assertEquals(1, deploymentList.size());
     
     repositoryService.deleteDeployment(deploymentId);
@@ -196,10 +196,10 @@ public class BpmnDeploymentTest extends PluggableActivitiTestCase {
       .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy();
     
-    List<org.activiti.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().list();
+    List<org.flowable.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().list();
     assertEquals(2, deploymentList.size());
     
-    for (org.activiti.engine.repository.Deployment deployment : deploymentList) {
+    for (org.flowable.engine.repository.Deployment deployment : deploymentList) {
       repositoryService.deleteDeployment(deployment.getId());
     }
   }
@@ -292,7 +292,7 @@ public class BpmnDeploymentTest extends PluggableActivitiTestCase {
 
       fail("Expected exception when deploying process with invalid expression.");
     }
-    catch(ActivitiException expected) {
+    catch(FlowableException expected) {
       // Check if no deployments are made
       assertEquals(0, repositoryService.createDeploymentQuery().count());
       assertTrue(expected.getMessage().startsWith("Error parsing XML"));
@@ -322,11 +322,11 @@ public class BpmnDeploymentTest extends PluggableActivitiTestCase {
       .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy();
     
-    List<org.activiti.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().list();
+    List<org.flowable.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().list();
     //Now, we should have two deployment for same process file, one for each tenant
     assertEquals(2, deploymentList.size());
     
-    for(org.activiti.engine.repository.Deployment deployment: deploymentList) {
+    for(org.flowable.engine.repository.Deployment deployment: deploymentList) {
     	repositoryService.deleteDeployment(deployment.getId());
     }
   }

@@ -14,7 +14,6 @@ package org.activiti5.engine.impl.cmd;
 
 import java.util.List;
 
-import org.activiti.engine.runtime.Job;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.ActivitiObjectNotFoundException;
@@ -28,6 +27,7 @@ import org.activiti5.engine.impl.persistence.entity.SuspensionState.SuspensionSt
 import org.activiti5.engine.impl.persistence.entity.TaskEntity;
 import org.activiti5.engine.impl.persistence.entity.TimerJobEntity;
 import org.activiti5.engine.runtime.Execution;
+import org.flowable.engine.runtime.Job;
 
 /**
  * @author Daniel Meyer

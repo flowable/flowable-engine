@@ -12,8 +12,8 @@
  */
 package org.activiti5.engine.impl.delegate;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.ExecutionListener;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.ExecutionListener;
 
 /**
  * Class handling invocations of ExecutionListeners

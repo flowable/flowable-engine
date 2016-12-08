@@ -15,12 +15,12 @@ package org.activiti5.engine.test.mock;
 import java.util.Collections;
 import java.util.List;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.impl.ProcessEngineImpl;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti5.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
 import org.activiti5.engine.impl.test.NoOpServiceTask;
 import org.activiti5.engine.test.TestActivityBehaviorFactory;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.impl.ProcessEngineImpl;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 /**
  * @author Joram Barrez

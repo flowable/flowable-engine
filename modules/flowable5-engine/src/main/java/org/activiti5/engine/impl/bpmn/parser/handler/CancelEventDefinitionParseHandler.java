@@ -12,11 +12,11 @@
  */
 package org.activiti5.engine.impl.bpmn.parser.handler;
 
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.BoundaryEvent;
-import org.activiti.bpmn.model.CancelEventDefinition;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.CancelEventDefinition;
 
 /**
  * @author Joram Barrez

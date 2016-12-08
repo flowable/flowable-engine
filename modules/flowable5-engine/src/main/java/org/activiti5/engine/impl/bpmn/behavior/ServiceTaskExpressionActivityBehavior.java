@@ -13,16 +13,16 @@
 
 package org.activiti5.engine.impl.bpmn.behavior;
 
-import org.activiti.engine.DynamicBpmnConstants;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.Expression;
 import org.activiti5.engine.delegate.BpmnError;
 import org.activiti5.engine.impl.bpmn.helper.ErrorPropagation;
 import org.activiti5.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.pvm.delegate.ActivityExecution;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.engine.DynamicBpmnConstants;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.Expression;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -90,7 +90,7 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
       if (error != null) {
         ErrorPropagation.propagateError(error, activityExecution);
       } else {
-        throw new ActivitiException(exc.getMessage(), exc);
+        throw new FlowableException(exc.getMessage(), exc);
       }
     }
   }

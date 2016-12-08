@@ -22,18 +22,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.runtime.Clock;
-import org.activiti.engine.history.HistoricIdentityLink;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.runtime.ProcessInstanceBuilder;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.identity.Authentication;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.history.HistoricIdentityLink;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.ProcessInstanceBuilder;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 
 /**
@@ -374,21 +374,21 @@ public class HistoricProcessInstanceTest extends PluggableActivitiTestCase {
     try {
       historyService.createHistoricProcessInstanceQuery().asc();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       
     }
     
     try {
       historyService.createHistoricProcessInstanceQuery().desc();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       
     }
     
     try {
       historyService.createHistoricProcessInstanceQuery().orderByProcessInstanceId().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       
     }
   }

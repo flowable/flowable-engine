@@ -12,14 +12,14 @@
  */
 package org.activiti5.engine.impl.jobexecutor;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.runtime.Job;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
 import org.activiti5.engine.logging.LogMDC;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +47,7 @@ public class TimerCatchIntermediateEventJobHandler extends TimerEventHandler imp
     try {
       if (commandContext.getEventDispatcher().isEnabled()) {
         commandContext.getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.TIMER_FIRED, job));
+          ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_FIRED, job));
       }
 
       if(!execution.getActivity().getId().equals(intermediateEventActivity.getId())) {

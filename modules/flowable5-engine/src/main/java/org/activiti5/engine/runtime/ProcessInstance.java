@@ -14,7 +14,7 @@ package org.activiti5.engine.runtime;
 
 import java.util.Map;
 
-import org.activiti.engine.repository.ProcessDefinition;
+import org.flowable.engine.repository.ProcessDefinition;
 
 
 

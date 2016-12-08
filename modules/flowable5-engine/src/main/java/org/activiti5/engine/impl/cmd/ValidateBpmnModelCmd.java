@@ -2,12 +2,12 @@ package org.activiti5.engine.impl.cmd;
 
 import java.util.List;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.validation.ProcessValidator;
-import org.activiti.validation.ValidationError;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.impl.interceptor.Command;
 import org.activiti5.engine.impl.interceptor.CommandContext;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.validation.ProcessValidator;
+import org.flowable.validation.ValidationError;
 
 /**
  * @author Joram Barrez

@@ -14,9 +14,6 @@ package org.activiti5.engine.impl.el;
 
 import java.util.Map;
 
-import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.delegate.VariableScope;
-import org.activiti.engine.impl.bpmn.data.ItemInstance;
 import org.activiti5.engine.impl.javax.el.ArrayELResolver;
 import org.activiti5.engine.impl.javax.el.BeanELResolver;
 import org.activiti5.engine.impl.javax.el.CompositeELResolver;
@@ -29,6 +26,9 @@ import org.activiti5.engine.impl.javax.el.MapELResolver;
 import org.activiti5.engine.impl.javax.el.ValueExpression;
 import org.activiti5.engine.impl.juel.ExpressionFactoryImpl;
 import org.activiti5.engine.impl.persistence.entity.VariableScopeImpl;
+import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.delegate.VariableScope;
+import org.flowable.engine.impl.bpmn.data.ItemInstance;
 
 
 /**

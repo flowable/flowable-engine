@@ -12,8 +12,8 @@
  */
 package org.activiti5.standalone.escapeclause;
 
-import org.activiti.engine.history.HistoricActivityInstanceQuery;
-import org.activiti.engine.repository.DeploymentProperties;
+import org.flowable.engine.history.HistoricActivityInstanceQuery;
+import org.flowable.engine.repository.DeploymentProperties;
 
 public class HistoricActivityInstanceEscapeClauseTest extends AbstractEscapeClauseTestCase {
 

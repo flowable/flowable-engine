@@ -15,12 +15,12 @@ package org.activiti5.engine.impl.el;
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
-import org.activiti.engine.delegate.VariableScope;
 import org.activiti5.engine.impl.identity.Authentication;
 import org.activiti5.engine.impl.javax.el.ELContext;
 import org.activiti5.engine.impl.javax.el.ELResolver;
 import org.activiti5.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti5.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.delegate.VariableScope;
 
 
 /**

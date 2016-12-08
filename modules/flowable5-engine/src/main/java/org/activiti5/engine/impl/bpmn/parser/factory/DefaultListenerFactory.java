@@ -15,15 +15,6 @@ package org.activiti5.engine.impl.bpmn.parser.factory;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.bpmn.model.ActivitiListener;
-import org.activiti.bpmn.model.EventListener;
-import org.activiti.bpmn.model.ImplementationType;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.ExecutionListener;
-import org.activiti.engine.delegate.TaskListener;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.Job;
-import org.activiti.engine.task.IdentityLink;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.impl.bpmn.helper.BaseDelegateEventListener;
 import org.activiti5.engine.impl.bpmn.helper.ClassDelegate;
@@ -42,6 +33,15 @@ import org.activiti5.engine.runtime.ProcessInstance;
 import org.activiti5.engine.task.Attachment;
 import org.activiti5.engine.task.Comment;
 import org.activiti5.engine.task.Task;
+import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.EventListener;
+import org.flowable.bpmn.model.ImplementationType;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.delegate.ExecutionListener;
+import org.flowable.engine.delegate.TaskListener;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.Job;
+import org.flowable.engine.task.IdentityLink;
 
 /**
  * Default implementation of the {@link ListenerFactory}. 
@@ -91,18 +91,18 @@ public class DefaultListenerFactory extends AbstractBehaviorFactory implements L
   }
 
 	@Override
-	public ActivitiEventListener createClassDelegateEventListener(EventListener eventListener) {
+	public FlowableEventListener createClassDelegateEventListener(EventListener eventListener) {
 		return new DelegateActivitiEventListener(eventListener.getImplementation(), getEntityType(eventListener.getEntityType()));
 	}
 
 	@Override
-	public ActivitiEventListener createDelegateExpressionEventListener(EventListener eventListener) {
+	public FlowableEventListener createDelegateExpressionEventListener(EventListener eventListener) {
 		return new DelegateExpressionActivitiEventListener(expressionManager.createExpression(
 				eventListener.getImplementation()), getEntityType(eventListener.getEntityType()));
 	}
 	
 	@Override
-	public ActivitiEventListener createEventThrowingEventListener(EventListener eventListener) {
+	public FlowableEventListener createEventThrowingEventListener(EventListener eventListener) {
 		BaseDelegateEventListener result = null;
 		if (ImplementationType.IMPLEMENTATION_TYPE_THROW_SIGNAL_EVENT.equals(eventListener.getImplementationType())) {
 			result = new SignalThrowingEventListener();

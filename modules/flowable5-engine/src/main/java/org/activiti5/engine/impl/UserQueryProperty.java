@@ -16,8 +16,8 @@ package org.activiti5.engine.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.idm.api.UserQuery;
 import org.activiti5.engine.query.QueryProperty;
+import org.flowable.idm.api.UserQuery;
 
 
 

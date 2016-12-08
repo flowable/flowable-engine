@@ -7,8 +7,8 @@ public class ExecutionAndProcessInstanceQueryVersionTest extends PluggableActivi
   private static final String PROCESS_DEFINITION_KEY = "oneTaskProcess";
   private static final String DEPLOYMENT_FILE_PATH = "org/activiti5/engine/test/api/runtime/oneTaskProcess.bpmn20.xml";
 
-  private org.activiti.engine.repository.Deployment oldDeployment;
-  private org.activiti.engine.repository.Deployment newDeployment;
+  private org.flowable.engine.repository.Deployment oldDeployment;
+  private org.flowable.engine.repository.Deployment newDeployment;
 
   protected void setUp() throws Exception {
     super.setUp();

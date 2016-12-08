@@ -1,6 +1,5 @@
 package org.activiti5.engine.impl.asyncexecutor;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.ActivitiOptimisticLockingException;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.cmd.ExecuteAsyncJobCmd;
@@ -13,6 +12,7 @@ import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.interceptor.CommandExecutor;
 import org.activiti5.engine.impl.jobexecutor.FailedJobCommandFactory;
 import org.activiti5.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,7 +112,7 @@ public class AsyncJobUtil {
         if (commandContext.getEventDispatcher().isEnabled()) {
           try {
             commandContext.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityExceptionEvent(
-                ActivitiEngineEventType.JOB_EXECUTION_FAILURE, job, exception));
+                FlowableEngineEventType.JOB_EXECUTION_FAILURE, job, exception));
           } catch(Throwable ignore) {
             log.warn("Exception occured while dispatching job failure event, ignoring.", ignore);
           }

@@ -12,11 +12,11 @@
  */
 package org.activiti5.engine.test.util;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.EndEvent;
-import org.activiti.bpmn.model.SequenceFlow;
-import org.activiti.bpmn.model.StartEvent;
-import org.activiti.bpmn.model.UserTask;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.EndEvent;
+import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.StartEvent;
+import org.flowable.bpmn.model.UserTask;
 
 /**
  * @author Joram Barrez
@@ -35,8 +35,8 @@ public class TestProcessUtil {
 		return model;
 	}
 
-	public static org.activiti.bpmn.model.Process createOneTaskProcess() {
-		org.activiti.bpmn.model.Process process = new org.activiti.bpmn.model.Process();
+	public static org.flowable.bpmn.model.Process createOneTaskProcess() {
+		org.flowable.bpmn.model.Process process = new org.flowable.bpmn.model.Process();
 
 		process.setId("oneTaskProcess");
 		process.setName("The one task process");
@@ -63,7 +63,7 @@ public class TestProcessUtil {
 
 	public static BpmnModel createTwoTasksBpmnModel() {
 		BpmnModel model = new BpmnModel();
-		org.activiti.bpmn.model.Process process = new org.activiti.bpmn.model.Process();
+		org.flowable.bpmn.model.Process process = new org.flowable.bpmn.model.Process();
 		model.addProcess(process);
 		process.setId("twoTasksProcess");
 		process.setName("The two tasks process");

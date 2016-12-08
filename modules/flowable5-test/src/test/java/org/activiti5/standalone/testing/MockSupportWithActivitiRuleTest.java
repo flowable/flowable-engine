@@ -12,13 +12,13 @@
  */
 package org.activiti5.standalone.testing;
 
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.test.ActivitiRule;
 import org.activiti5.engine.test.mock.ActivitiMockSupport;
 import org.activiti5.engine.test.mock.MockServiceTask;
 import org.activiti5.engine.test.mock.MockServiceTasks;
 import org.activiti5.engine.test.mock.NoOpServiceTasks;
 import org.activiti5.standalone.testing.helpers.ServiceTaskTestMock;
+import org.flowable.engine.test.Deployment;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;

@@ -12,15 +12,15 @@
  */
 package org.activiti5.engine.impl.bpmn.helper;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
-import org.activiti.engine.impl.delegate.event.ActivitiEngineEvent;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.impl.delegate.event.ActivitiEngineEvent;
 
 /**
- * An {@link ActivitiEventListener} that throws a error event when an event is
+ * An {@link FlowableEventListener} that throws a error event when an event is
  * dispatched to it.
  * 
  * @author Frederik Heremans
@@ -31,7 +31,7 @@ public class ErrorThrowingEventListener extends BaseDelegateEventListener {
 	protected String errorCode;
 
 	@Override
-	public void onEvent(ActivitiEvent event) {
+	public void onEvent(FlowableEvent event) {
 		if (isValidEvent(event) && event instanceof ActivitiEngineEvent) {
 		  ActivitiEngineEvent engineEvent = (ActivitiEngineEvent) event;
 			ExecutionEntity execution = null;

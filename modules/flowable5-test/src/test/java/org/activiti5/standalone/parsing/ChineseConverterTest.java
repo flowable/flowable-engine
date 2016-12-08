@@ -3,13 +3,13 @@ package org.activiti5.standalone.parsing;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import org.activiti.bpmn.converter.BpmnXMLConverter;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.engine.common.impl.util.io.InputStreamSource;
-import org.activiti.engine.common.impl.util.io.StreamSource;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.DeploymentProperties;
 import org.activiti5.engine.impl.test.ResourceActivitiTestCase;
+import org.flowable.bpmn.converter.BpmnXMLConverter;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.engine.common.impl.util.io.InputStreamSource;
+import org.flowable.engine.common.impl.util.io.StreamSource;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.DeploymentProperties;
 
 public class ChineseConverterTest extends ResourceActivitiTestCase {
   

@@ -17,20 +17,20 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.activiti.engine.FormService;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.TestHelper;
 import org.activiti5.engine.test.mock.ActivitiMockSupport;
+import org.flowable.engine.FormService;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.IdentityService;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.test.Deployment;
 import org.junit.internal.AssumptionViolatedException;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
@@ -221,7 +221,7 @@ public class ActivitiRule implements TestRule {
 		try {
 	    TestHelper.annotationMockSupportSetup(Class.forName(description.getClassName()), description.getMethodName(), mockSupport);
     } catch (ClassNotFoundException e) {
-    	throw new ActivitiException("Programmatic error: could not instantiate "
+    	throw new FlowableException("Programmatic error: could not instantiate "
 			    + description.getClassName(), e);
     }
 
@@ -229,7 +229,7 @@ public class ActivitiRule implements TestRule {
 			deploymentId = TestHelper.annotationDeploymentSetUp(processEngine,
 			    Class.forName(description.getClassName()), description.getMethodName());
 		} catch (ClassNotFoundException e) {
-			throw new ActivitiException("Programmatic error: could not instantiate "
+			throw new FlowableException("Programmatic error: could not instantiate "
 			    + description.getClassName(), e);
 		}
 	}
@@ -266,7 +266,7 @@ public class ActivitiRule implements TestRule {
 			TestHelper.annotationDeploymentTearDown(processEngine, deploymentId,
 			    Class.forName(description.getClassName()), description.getMethodName());
 		} catch (ClassNotFoundException e) {
-			throw new ActivitiException("Programmatic error: could not instantiate "
+			throw new FlowableException("Programmatic error: could not instantiate "
 			    + description.getClassName(), e);
 		}
 

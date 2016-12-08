@@ -15,11 +15,11 @@ package org.activiti5.examples.bpmn.gateway;
 
 import java.util.List;
 
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.task.TaskQuery;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.task.TaskQuery;
+import org.flowable.engine.test.Deployment;
 
 /**
  * @author Joram Barrez

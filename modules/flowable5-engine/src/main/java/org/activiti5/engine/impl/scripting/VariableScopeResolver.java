@@ -12,12 +12,12 @@
  */
 package org.activiti5.engine.impl.scripting;
 
-import org.activiti.engine.delegate.VariableScope;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti5.engine.impl.persistence.entity.TaskEntity;
 import org.activiti5.engine.impl.pvm.runtime.ExecutionImpl;
+import org.flowable.engine.delegate.VariableScope;
 
 
 /**

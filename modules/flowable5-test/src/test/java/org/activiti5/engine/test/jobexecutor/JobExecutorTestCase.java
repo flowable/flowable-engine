@@ -14,11 +14,11 @@ package org.activiti5.engine.test.jobexecutor;
 
 import java.util.Date;
 
-import org.activiti.engine.runtime.Job;
 import org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti5.engine.impl.persistence.entity.JobEntity;
 import org.activiti5.engine.impl.persistence.entity.TimerJobEntity;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.runtime.Job;
 
 /**
  * @author Tom Baeyens

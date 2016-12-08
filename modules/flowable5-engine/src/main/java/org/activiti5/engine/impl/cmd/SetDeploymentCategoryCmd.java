@@ -12,7 +12,6 @@
  */
 package org.activiti5.engine.impl.cmd;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.ActivitiObjectNotFoundException;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
@@ -20,6 +19,7 @@ import org.activiti5.engine.impl.interceptor.Command;
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti5.engine.repository.Deployment;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
  * @author Tijs Rademakers
@@ -53,7 +53,7 @@ public class SetDeploymentCategoryCmd implements Command<Void> {
     
     if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_UPDATED, deployment));
+    			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, deployment));
     }
     
     return null;

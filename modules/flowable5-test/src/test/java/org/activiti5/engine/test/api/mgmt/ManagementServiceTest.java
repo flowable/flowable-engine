@@ -15,20 +15,20 @@ package org.activiti5.engine.test.api.mgmt;
 
 import java.util.Date;
 
-import org.activiti.engine.JobNotFoundException;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.common.api.management.TableMetaData;
-import org.activiti.engine.common.runtime.Clock;
-import org.activiti.engine.impl.cmd.AcquireTimerJobsCmd;
-import org.activiti.engine.impl.interceptor.CommandExecutor;
-import org.activiti.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.activiti.engine.runtime.Job;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.persistence.entity.JobEntity;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.JobNotFoundException;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.api.management.TableMetaData;
+import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.impl.cmd.AcquireTimerJobsCmd;
+import org.flowable.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
+import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 
 
 /**
@@ -48,7 +48,7 @@ public class ManagementServiceTest extends PluggableActivitiTestCase {
     try {
       managementService.getTableMetaData(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException re) {
+    } catch (FlowableIllegalArgumentException re) {
       assertTextPresent("tableName is null", re.getMessage());
     }
   }
@@ -57,7 +57,7 @@ public class ManagementServiceTest extends PluggableActivitiTestCase {
     try {
       managementService.executeJob(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException re) {
+    } catch (FlowableIllegalArgumentException re) {
       assertTextPresent("JobId is null", re.getMessage());
     }
   }
@@ -112,7 +112,7 @@ public class ManagementServiceTest extends PluggableActivitiTestCase {
     try {
       managementService.getJobExceptionStacktrace("unexistingjob");
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException re) {
+    } catch (FlowableObjectNotFoundException re) {
       assertTextPresent("No job found with id unexistingjob", re.getMessage());
       assertEquals(Job.class, re.getObjectClass());
     }
@@ -122,7 +122,7 @@ public class ManagementServiceTest extends PluggableActivitiTestCase {
     try {
       managementService.getJobExceptionStacktrace(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException re) {
+    } catch (FlowableIllegalArgumentException re) {
       assertTextPresent("jobId is null", re.getMessage());
     }
   }
@@ -154,7 +154,7 @@ public class ManagementServiceTest extends PluggableActivitiTestCase {
     try {
       managementService.setJobRetries("unexistingjob", 5);
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException re) {
+    } catch (FlowableObjectNotFoundException re) {
       assertTextPresent("No job found with id 'unexistingjob'.", re.getMessage());
       assertEquals(Job.class, re.getObjectClass());
     }
@@ -164,7 +164,7 @@ public class ManagementServiceTest extends PluggableActivitiTestCase {
     try {
       managementService.setJobRetries("", 5);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException re) {
+    } catch (FlowableIllegalArgumentException re) {
       assertTextPresent("The job id is mandatory, but '' has been provided.", re.getMessage());
     }
   }
@@ -173,7 +173,7 @@ public class ManagementServiceTest extends PluggableActivitiTestCase {
     try {
       managementService.setJobRetries(null, 5);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException re) {
+    } catch (FlowableIllegalArgumentException re) {
       assertTextPresent("The job id is mandatory, but 'null' has been provided.", re.getMessage());
     }
   }
@@ -182,7 +182,7 @@ public class ManagementServiceTest extends PluggableActivitiTestCase {
     try {
       managementService.setJobRetries("unexistingjob", -1);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException re) {
+    } catch (FlowableIllegalArgumentException re) {
       assertTextPresent("The number of job retries must be a non-negative Integer, but '-1' has been provided.", re.getMessage());
     }
   }
@@ -191,7 +191,7 @@ public class ManagementServiceTest extends PluggableActivitiTestCase {
     try {
       managementService.deleteJob(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException re) {
+    } catch (FlowableIllegalArgumentException re) {
       assertTextPresent("jobId is null", re.getMessage());
     }
   }
@@ -200,7 +200,7 @@ public class ManagementServiceTest extends PluggableActivitiTestCase {
     try {
       managementService.deleteJob("unexistingjob");
       fail("ActivitiException expected");
-    } catch (ActivitiObjectNotFoundException ae) {
+    } catch (FlowableObjectNotFoundException ae) {
       assertTextPresent("No job found with id", ae.getMessage());
       assertEquals(Job.class, ae.getObjectClass());
     }
@@ -239,7 +239,7 @@ public class ManagementServiceTest extends PluggableActivitiTestCase {
     try {
       managementService.deleteJob(timerJob.getId());
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // Exception is expected
     }
     

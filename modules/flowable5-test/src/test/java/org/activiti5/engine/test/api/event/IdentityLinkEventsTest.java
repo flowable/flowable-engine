@@ -12,19 +12,19 @@
  */
 package org.activiti5.engine.test.api.event;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.impl.delegate.event.ActivitiEngineEntityEvent;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.IdentityLink;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.identity.Authentication;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.impl.delegate.event.ActivitiEngineEntityEvent;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.IdentityLink;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 /**
- * Test case for all {@link ActivitiEvent}s related to process definitions.
+ * Test case for all {@link FlowableEvent}s related to process definitions.
  * 
  * @author Frederik Heremans
  */
@@ -48,24 +48,24 @@ public class IdentityLinkEventsTest extends PluggableActivitiTestCase {
 		assertEquals(4, listener.getEventsReceived().size());
 
 		ActivitiEngineEntityEvent event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
-		assertEquals(ActivitiEngineEventType.ENTITY_CREATED, event.getType());
+		assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
 		assertTrue(event.getEntity() instanceof IdentityLink);
 		assertEquals(processDefinition.getId(), event.getProcessDefinitionId());
 		assertNull(event.getProcessInstanceId());
 		assertNull(event.getExecutionId());
 		
 		event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
-		assertEquals(ActivitiEngineEventType.ENTITY_INITIALIZED, event.getType());
+		assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
 		
 		event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(2);
-		assertEquals(ActivitiEngineEventType.ENTITY_CREATED, event.getType());
+		assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
 		assertTrue(event.getEntity() instanceof IdentityLink);
 		assertEquals(processDefinition.getId(), event.getProcessDefinitionId());
 		assertNull(event.getProcessInstanceId());
 		assertNull(event.getExecutionId());
 		
 		event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(3);
-		assertEquals(ActivitiEngineEventType.ENTITY_INITIALIZED, event.getType());
+		assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
 		listener.clearEventsReceived();
 
 		// Delete identity links
@@ -73,13 +73,13 @@ public class IdentityLinkEventsTest extends PluggableActivitiTestCase {
 		repositoryService.deleteCandidateStarterGroup(processDefinition.getId(), "sales");
 		assertEquals(2, listener.getEventsReceived().size());
 		event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
-		assertEquals(ActivitiEngineEventType.ENTITY_DELETED, event.getType());
+		assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
 		assertTrue(event.getEntity() instanceof IdentityLink);
 		assertEquals(processDefinition.getId(), event.getProcessDefinitionId());
 		assertNull(event.getProcessInstanceId());
 		assertNull(event.getExecutionId());
 		event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
-		assertEquals(ActivitiEngineEventType.ENTITY_DELETED, event.getType());
+		assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
 		assertTrue(event.getEntity() instanceof IdentityLink);
 		assertEquals(processDefinition.getId(), event.getProcessDefinitionId());
 		assertNull(event.getProcessInstanceId());
@@ -99,7 +99,7 @@ public class IdentityLinkEventsTest extends PluggableActivitiTestCase {
 		assertEquals(2, listener.getEventsReceived().size());
 
 		ActivitiEngineEntityEvent event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
-		assertEquals(ActivitiEngineEventType.ENTITY_CREATED, event.getType());
+		assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
 		assertTrue(event.getEntity() instanceof IdentityLink);
 		assertEquals(processInstance.getId(), event.getProcessInstanceId());
 		assertEquals(processInstance.getId(), event.getExecutionId());
@@ -109,7 +109,7 @@ public class IdentityLinkEventsTest extends PluggableActivitiTestCase {
 		assertEquals("test", link.getType());
 		
 		event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
-		assertEquals(ActivitiEngineEventType.ENTITY_INITIALIZED, event.getType());
+		assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
 		
 		listener.clearEventsReceived();
 
@@ -118,7 +118,7 @@ public class IdentityLinkEventsTest extends PluggableActivitiTestCase {
 		assertEquals(1, listener.getEventsReceived().size());
 
 		event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
-		assertEquals(ActivitiEngineEventType.ENTITY_DELETED, event.getType());
+		assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
 		assertTrue(event.getEntity() instanceof IdentityLink);
 		link = (IdentityLink) event.getEntity();
 		assertEquals("kermit", link.getUserId());
@@ -144,7 +144,7 @@ public class IdentityLinkEventsTest extends PluggableActivitiTestCase {
 		assertEquals(6, listener.getEventsReceived().size());
 
 		ActivitiEngineEntityEvent event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
-		assertEquals(ActivitiEngineEventType.ENTITY_CREATED, event.getType());
+		assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
 		assertTrue(event.getEntity() instanceof IdentityLink);
 		IdentityLink link = (IdentityLink) event.getEntity();
 		assertEquals("kermit", link.getUserId());
@@ -155,12 +155,12 @@ public class IdentityLinkEventsTest extends PluggableActivitiTestCase {
 		assertEquals(task.getProcessInstanceId(), event.getProcessInstanceId());
 		
 		event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
-		assertEquals(ActivitiEngineEventType.ENTITY_INITIALIZED, event.getType());
+		assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
 		assertEquals("kermit", link.getUserId());
 		assertEquals("candidate", link.getType());
 		
 		event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(4);
-		assertEquals(ActivitiEngineEventType.ENTITY_CREATED, event.getType());
+		assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
 		assertTrue(event.getEntity() instanceof IdentityLink);
 		link = (IdentityLink) event.getEntity();
 		assertEquals("sales", link.getGroupId());
@@ -170,7 +170,7 @@ public class IdentityLinkEventsTest extends PluggableActivitiTestCase {
 		assertEquals(task.getProcessDefinitionId(), event.getProcessDefinitionId());
 		assertEquals(task.getProcessInstanceId(), event.getProcessInstanceId());
 		event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(5);
-		assertEquals(ActivitiEngineEventType.ENTITY_INITIALIZED, event.getType());
+		assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
 		assertEquals("sales", link.getGroupId());
 		assertEquals("candidate", link.getType());
 		
@@ -181,11 +181,11 @@ public class IdentityLinkEventsTest extends PluggableActivitiTestCase {
 		assertEquals(3, listener.getEventsReceived().size());
 
 		event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
-		assertEquals(ActivitiEngineEventType.ENTITY_DELETED, event.getType());
+		assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
 		event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
-		assertEquals(ActivitiEngineEventType.ENTITY_DELETED, event.getType());
+		assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
 		event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(2);
-		assertEquals(ActivitiEngineEventType.ENTITY_DELETED, event.getType());
+		assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
 	}
 	
 	/**

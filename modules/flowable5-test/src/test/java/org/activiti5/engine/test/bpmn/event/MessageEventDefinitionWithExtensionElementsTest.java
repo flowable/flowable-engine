@@ -15,12 +15,12 @@ package org.activiti5.engine.test.bpmn.event;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.ExtensionElement;
-import org.activiti.bpmn.model.Message;
-import org.activiti.bpmn.model.MessageEventDefinition;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti5.engine.impl.bpmn.parser.handler.MessageEventDefinitionParseHandler;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ExtensionElement;
+import org.flowable.bpmn.model.Message;
+import org.flowable.bpmn.model.MessageEventDefinition;
 import org.junit.Test;
 import org.mockito.Mockito;
 

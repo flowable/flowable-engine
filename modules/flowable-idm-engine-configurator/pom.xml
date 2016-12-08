@@ -16,7 +16,7 @@
 
 	<properties>
 		<activiti.artifact>
-			org.activiti.idm.engine.configurator
+			org.flowable.idm.engine.configurator
 		</activiti.artifact>
 	</properties>
 	

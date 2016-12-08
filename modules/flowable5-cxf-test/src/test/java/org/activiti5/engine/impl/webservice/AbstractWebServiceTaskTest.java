@@ -12,11 +12,11 @@
  */
 package org.activiti5.engine.impl.webservice;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 
 /**
  * An abstract class for unit test of web-service task
@@ -24,7 +24,7 @@ import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
  * @author <a href="mailto:gnodet@gmail.com">Guillaume Nodet</a>
  * @author Christophe DENEUX
  */
-public abstract class AbstractWebServiceTaskTest extends PluggableActivitiTestCase {
+public abstract class AbstractWebServiceTaskTest extends PluggableFlowableTestCase {
 
     protected WebServiceMock webServiceMock;
 

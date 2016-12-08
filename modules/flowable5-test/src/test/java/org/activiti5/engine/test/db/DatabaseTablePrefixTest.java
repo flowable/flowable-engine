@@ -15,11 +15,11 @@ package org.activiti5.engine.test.db;
 
 import java.sql.Connection;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.repository.DeploymentProperties;
 import org.activiti5.engine.impl.util.ReflectUtil;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.repository.DeploymentProperties;
 
 import junit.framework.TestCase;
 

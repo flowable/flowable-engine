@@ -1,8 +1,8 @@
 package org.activiti5.spring.test.components.scope;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.repository.Deployment;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.repository.Deployment;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;

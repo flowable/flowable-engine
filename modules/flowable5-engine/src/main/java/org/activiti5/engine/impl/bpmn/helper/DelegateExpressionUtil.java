@@ -14,11 +14,11 @@ package org.activiti5.engine.impl.bpmn.helper;
 
 import java.util.List;
 
-import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.delegate.VariableScope;
-import org.activiti.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
 import org.activiti5.engine.impl.bpmn.parser.FieldDeclaration;
 import org.activiti5.engine.impl.context.Context;
+import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.delegate.VariableScope;
+import org.flowable.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
 
 /**
  * @author Joram Barrez

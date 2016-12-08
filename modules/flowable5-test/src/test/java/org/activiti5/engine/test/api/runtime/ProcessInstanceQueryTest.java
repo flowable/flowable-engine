@@ -24,16 +24,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.runtime.ProcessInstanceQuery;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.flowable.engine.test.Deployment;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -55,7 +55,7 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
   private static final String PROCESS_DEFINITION_CATEGORY = "org.activiti.enginge.test.api.runtime.Category";
   private static final String PROCESS_DEFINITION_CATEGORY_2 = "org.activiti.enginge.test.api.runtime.2Category";
   
-  private org.activiti.engine.repository.Deployment deployment;
+  private org.flowable.engine.repository.Deployment deployment;
   private List<String> processInstanceIds;
 
   /**
@@ -78,7 +78,7 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
   }
 
   protected void tearDown() throws Exception {
-    for (org.activiti.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+    for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
     super.tearDown();
@@ -95,7 +95,7 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
     try { 
       query.singleResult();
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // Exception is expected
     }
   }
@@ -120,7 +120,7 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // Exception is expected
     }
   }
@@ -136,7 +136,7 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // Exception is expected
     }
   }
@@ -145,14 +145,14 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
     try {
       runtimeService.createProcessInstanceQuery().processDefinitionKeys(null);
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // Exception is expected
     }
 
     try {
       runtimeService.createProcessInstanceQuery().processDefinitionKeys(Collections.<String>emptySet());
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // Exception is expected
     }
   }
@@ -261,7 +261,7 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
     try {
       runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(null).count();
       fail();
-    } catch(ActivitiIllegalArgumentException e) {
+    } catch(FlowableIllegalArgumentException e) {
       
     }
   }
@@ -274,7 +274,7 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
     try {
       query1.singleResult();
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // Exception is expected
     }
 
@@ -299,7 +299,7 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // Exception is expected
     }
   }
@@ -308,14 +308,14 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
     try {
       runtimeService.createProcessInstanceQuery().processDefinitionIds(null);
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // Exception is expected
     }
 
     try {
       runtimeService.createProcessInstanceQuery().processDefinitionIds(Collections.<String>emptySet());
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // Exception is expected
     }
   }
@@ -595,7 +595,7 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
     try {
       runtimeService.createProcessInstanceQuery().orderByProcessDefinitionId().list(); // asc - desc not called -> exception
       fail();
-    }catch (ActivitiIllegalArgumentException e) {}
+    }catch (FlowableIllegalArgumentException e) {}
   }
   
   @Deployment(resources={
@@ -1362,28 +1362,28 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
     try {
       runtimeService.createProcessInstanceQuery().variableValueGreaterThan("booleanVar", true);
       fail("Excetion expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("Booleans and null cannot be used in 'greater than' condition", ae.getMessage());
     }
     
     try {
       runtimeService.createProcessInstanceQuery().variableValueGreaterThanOrEqual("booleanVar", true);
       fail("Excetion expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("Booleans and null cannot be used in 'greater than or equal' condition", ae.getMessage());
     }
     
     try {
       runtimeService.createProcessInstanceQuery().variableValueLessThan("booleanVar", true);
       fail("Excetion expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("Booleans and null cannot be used in 'less than' condition", ae.getMessage());
     }
     
     try {
       runtimeService.createProcessInstanceQuery().variableValueLessThanOrEqual("booleanVar", true);
       fail("Excetion expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("Booleans and null cannot be used in 'less than or equal' condition", ae.getMessage());
     }
     
@@ -1489,35 +1489,35 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
     try {
       runtimeService.createProcessInstanceQuery().variableValueGreaterThan("nullVar", null);
       fail("Excetion expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("Booleans and null cannot be used in 'greater than' condition", ae.getMessage());
     }
     
     try {
       runtimeService.createProcessInstanceQuery().variableValueGreaterThanOrEqual("nullVar", null);
       fail("Excetion expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("Booleans and null cannot be used in 'greater than or equal' condition", ae.getMessage());
     }
     
     try {
       runtimeService.createProcessInstanceQuery().variableValueLessThan("nullVar", null);
       fail("Excetion expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("Booleans and null cannot be used in 'less than' condition", ae.getMessage());
     }
     
     try {
       runtimeService.createProcessInstanceQuery().variableValueLessThanOrEqual("nullVar", null);
       fail("Excetion expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("Booleans and null cannot be used in 'less than or equal' condition", ae.getMessage());
     }
     
     try {
       runtimeService.createProcessInstanceQuery().variableValueLike("nullVar", null);
       fail("Excetion expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("Only string values can be used with 'like' condition", ae.getMessage());
     }
     
@@ -1561,7 +1561,7 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
     try {
       runtimeService.createProcessInstanceQuery().variableValueEqualsIgnoreCase("upper", null).singleResult();
       fail("Exception expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertEquals("value is null", ae.getMessage());
     }
     
@@ -1569,7 +1569,7 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
     try {
       runtimeService.createProcessInstanceQuery().variableValueEqualsIgnoreCase(null, "abcdefg").singleResult();
       fail("Exception expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertEquals("name is null", ae.getMessage());
     }
     
@@ -1587,7 +1587,7 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
     try {
       runtimeService.createProcessInstanceQuery().variableValueNotEqualsIgnoreCase("upper", null).singleResult();
       fail("Exception expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertEquals("value is null", ae.getMessage());
     }
     
@@ -1595,7 +1595,7 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
     try {
       runtimeService.createProcessInstanceQuery().variableValueNotEqualsIgnoreCase(null, "abcdefg").singleResult();
       fail("Exception expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertEquals("name is null", ae.getMessage());
     }
   }
@@ -1629,7 +1629,7 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
     try {
       runtimeService.createProcessInstanceQuery().variableValueEqualsIgnoreCase("upper", null).singleResult();
       fail("Exception expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertEquals("value is null", ae.getMessage());
     }
     
@@ -1637,7 +1637,7 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
     try {
       runtimeService.createProcessInstanceQuery().variableValueEqualsIgnoreCase(null, "abcdefg").singleResult();
       fail("Exception expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertEquals("name is null", ae.getMessage());
     }
   }
@@ -1656,7 +1656,7 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
         .variableValueEquals("bytesVar", "test".getBytes())
         .list();
       fail("Expected exception");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("Variables of type ByteArray cannot be used to query", ae.getMessage());
     }
     
@@ -1665,7 +1665,7 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
         .variableValueEquals("serializableVar", new DummySerializable())
         .list();
       fail("Expected exception");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("Variables of type ByteArray cannot be used to query", ae.getMessage());
     }   
   
@@ -1676,43 +1676,43 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
     try {
       runtimeService.createProcessInstanceQuery().variableValueEquals(null, "value");
       fail("Expected exception");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("name is null", ae.getMessage());
     }   
     try {
       runtimeService.createProcessInstanceQuery().variableValueNotEquals(null, "value");
       fail("Expected exception");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("name is null", ae.getMessage());
     }   
     try {
       runtimeService.createProcessInstanceQuery().variableValueGreaterThan(null, "value");
       fail("Expected exception");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("name is null", ae.getMessage());
     }   
     try {
       runtimeService.createProcessInstanceQuery().variableValueGreaterThanOrEqual(null, "value");
       fail("Expected exception");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("name is null", ae.getMessage());
     }   
     try {
       runtimeService.createProcessInstanceQuery().variableValueLessThan(null, "value");
       fail("Expected exception");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("name is null", ae.getMessage());
     }   
     try {
       runtimeService.createProcessInstanceQuery().variableValueLessThanOrEqual(null, "value");
       fail("Expected exception");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("name is null", ae.getMessage());
     }   
     try {
       runtimeService.createProcessInstanceQuery().variableValueLike(null, "value");
       fail("Expected exception");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertTextPresent("name is null", ae.getMessage());
     }   
   }
@@ -1795,7 +1795,7 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
     try {
       runtimeService.createProcessInstanceQuery().processInstanceIds(new HashSet<String>());
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException re) {
+    } catch (FlowableIllegalArgumentException re) {
       assertTextPresent("Set of process instance ids is empty", re.getMessage());
     }
   }
@@ -1804,7 +1804,7 @@ public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
     try {
       runtimeService.createProcessInstanceQuery().processInstanceIds(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException re) {
+    } catch (FlowableIllegalArgumentException re) {
       assertTextPresent("Set of process instance ids is null", re.getMessage());
     }
   }

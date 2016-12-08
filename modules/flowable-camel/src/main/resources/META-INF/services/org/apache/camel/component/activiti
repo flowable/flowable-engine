@@ -1,1 +1,1 @@
-class=org.activiti.camel.ActivitiComponent
+class=org.flowable.camel.FlowableComponent

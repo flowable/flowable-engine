@@ -3,10 +3,10 @@ package org.activiti5.engine.impl.event.logger.handler;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEntityWithVariablesEvent;
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.persistence.entity.EventLogEntryEntity;
 import org.activiti5.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.delegate.event.FlowableEntityWithVariablesEvent;
 
 /**
  * @author Joram Barrez
@@ -18,7 +18,7 @@ public class ProcessInstanceStartedEventHandler extends AbstractDatabaseEventLog
 	@Override
   public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
 	  
-	  ActivitiEntityWithVariablesEvent eventWithVariables = (ActivitiEntityWithVariablesEvent) event;
+	  FlowableEntityWithVariablesEvent eventWithVariables = (FlowableEntityWithVariablesEvent) event;
 		ExecutionEntity processInstanceEntity = (ExecutionEntity) eventWithVariables.getEntity(); 
 		
 		Map<String, Object> data = new HashMap<String, Object>();

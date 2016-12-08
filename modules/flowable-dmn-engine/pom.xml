@@ -15,7 +15,7 @@
 
 	<properties>
 		<activiti.artifact>
-			org.activiti.dmn.engine
+			org.flowable.dmn.engine
 		</activiti.artifact>
 		<activiti.osgi.import.additional>
 			org.springframework*;resolution:=optional,
@@ -225,8 +225,8 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<echo message="updating activiti dmn configuration to db ${databasedmn}" />
-										<copy file="${basedir}/../../qa/db/activiti.dmn.cfg.xml"
+										<echo message="updating flowable dmn configuration to db ${databasedmn}" />
+										<copy file="${basedir}/../../qa/db/flowable.dmn.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset
 												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasedmn}.properties" />
@@ -243,7 +243,7 @@
 								<configuration>
 									<tasks>
 										<echo message="dropping schema in ${databasedmn}" />
-										<java classname="org.activiti.dmn.engine.impl.db.DbSchemaDrop"
+										<java classname="org.flowable.dmn.engine.impl.db.DbSchemaDrop"
 											classpathref="maven.test.classpath" />
 									</tasks>
 								</configuration>
@@ -278,7 +278,7 @@
 								<configuration>
 									<tasks>
 										<echo message="updating activiti dmn configuration to db ${databasewithschemadmn}" />
-										<copy file="${basedir}/../../qa/db/schema/activiti.dmn.cfg.xml"
+										<copy file="${basedir}/../../qa/db/schema/flowable.dmn.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset
 												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasewithschemadmn}.properties" />
@@ -295,7 +295,7 @@
 								<configuration>
 									<tasks>
 										<echo message="dropping schema in ${databasewithschemadmn}" />
-										<java classname="org.activiti.dmn.engine.impl.db.DbSchemaDrop"
+										<java classname="org.flowable.dmn.engine.impl.db.DbSchemaDrop"
 											classpathref="maven.test.classpath" />
 									</tasks>
 								</configuration>

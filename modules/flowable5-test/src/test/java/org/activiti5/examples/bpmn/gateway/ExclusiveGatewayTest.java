@@ -15,11 +15,11 @@ package org.activiti5.examples.bpmn.gateway;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 /**
  * Example of using the exclusive gateway.
@@ -61,7 +61,7 @@ public class ExclusiveGatewayTest extends PluggableActivitiTestCase {
     try {
       runtimeService.startProcessInstanceByKey("exclusiveGateway", variables);
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       // Exception is expected since no outgoing sequence flow matches
     }
 

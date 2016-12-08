@@ -18,11 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.bpmn.model.EndEvent;
-import org.activiti.bpmn.model.EventDefinition;
-import org.activiti.bpmn.model.TerminateEventDefinition;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.history.HistoricActivityInstance;
 import org.activiti5.engine.impl.HistoricActivityInstanceQueryImpl;
@@ -35,6 +30,11 @@ import org.activiti5.engine.impl.persistence.entity.HistoricActivityInstanceEnti
 import org.activiti5.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
 import org.activiti5.engine.impl.pvm.runtime.InterpretableExecution;
+import org.flowable.bpmn.model.EndEvent;
+import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.TerminateEventDefinition;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
  * @author Martin Grofcik
@@ -219,7 +219,7 @@ private static final long serialVersionUID = 1L;
       ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
       if (config != null && config.getEventDispatcher().isEnabled()) {
         config.getEventDispatcher().dispatchEvent(
-            ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
+            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
       }
     }
     

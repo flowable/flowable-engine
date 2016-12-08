@@ -121,7 +121,7 @@
                 <apiSource>
                   <springmvc>true</springmvc>
                   <locations>
-                    <location>org.activiti.rest.service.api.form</location>
+                    <location>org.flowable.rest.service.api.form</location>
                   </locations>
                   <schemes>
                     <scheme>http</scheme>
@@ -159,7 +159,7 @@
                 <apiSource>
                   <springmvc>true</springmvc>
                   <locations>
-                    <location>org.activiti.rest.service.api.history</location>
+                    <location>org.flowable.rest.service.api.history</location>
                   </locations>
                   <schemes>
                     <scheme>http</scheme>
@@ -197,7 +197,7 @@
                 <apiSource>
                   <springmvc>true</springmvc>
                   <locations>
-                    <location>org.activiti.rest.service.api.identity</location>
+                    <location>org.flowable.rest.service.api.identity</location>
                   </locations>
                   <schemes>
                     <scheme>http</scheme>
@@ -235,7 +235,7 @@
                 <apiSource>
                   <springmvc>true</springmvc>
                   <locations>
-                    <location>org.activiti.rest.service.api.management</location>
+                    <location>org.flowable.rest.service.api.management</location>
                   </locations>
                   <schemes>
                     <scheme>http</scheme>
@@ -273,7 +273,7 @@
                 <apiSource>
                   <springmvc>true</springmvc>
                   <locations>
-                    <location>org.activiti.rest.service.api.repository</location>
+                    <location>org.flowable.rest.service.api.repository</location>
                   </locations>
                   <schemes>
                     <scheme>http</scheme>
@@ -313,7 +313,7 @@
                 <apiSource>
                   <springmvc>true</springmvc>
                   <locations>
-                    <location>org.activiti.rest.service.api.runtime</location>
+                    <location>org.flowable.rest.service.api.runtime</location>
                   </locations>
                   <schemes>
                     <scheme>http</scheme>
@@ -351,7 +351,7 @@
                 <apiSource>
                   <springmvc>true</springmvc>
                   <locations>
-                    <location>org.activiti.rest.service.api.runtime.process</location>
+                    <location>org.flowable.rest.service.api.runtime.process</location>
                   </locations>
                   <schemes>
                     <scheme>http</scheme>
@@ -389,7 +389,7 @@
                 <apiSource>
                   <springmvc>true</springmvc>
                   <locations>
-                    <location>org.activiti.rest.service.api.runtime.task</location>
+                    <location>org.flowable.rest.service.api.runtime.task</location>
                   </locations>
                   <schemes>
                     <scheme>http</scheme>
@@ -427,7 +427,7 @@
                 <apiSource>
                   <springmvc>true</springmvc>
                   <locations>
-                    <location>org.activiti.rest.service.api</location>
+                    <location>org.flowable.rest.service.api</location>
                   </locations>
                   <schemes>
                     <scheme>http</scheme>

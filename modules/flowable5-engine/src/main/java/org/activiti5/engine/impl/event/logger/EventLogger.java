@@ -5,11 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
-import org.activiti.engine.common.runtime.Clock;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.event.logger.handler.ActivityCompensatedEventHandler;
 import org.activiti5.engine.impl.event.logger.handler.ActivityCompletedEventHandler;
@@ -30,6 +25,11 @@ import org.activiti5.engine.impl.event.logger.handler.VariableUpdatedEventHandle
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.interceptor.CommandContextCloseListener;
 import org.activiti5.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +38,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author Joram Barrez
  */
-public class EventLogger implements ActivitiEventListener {
+public class EventLogger implements FlowableEventListener {
 	
 	private static final Logger logger = LoggerFactory.getLogger(EventLogger.class);
 	
@@ -48,8 +48,8 @@ public class EventLogger implements ActivitiEventListener {
 	protected ObjectMapper objectMapper;
 	
 	// Mapping of type -> handler
-	protected Map<ActivitiEngineEventType, Class<? extends EventLoggerEventHandler>> eventHandlers 
-		= new HashMap<ActivitiEngineEventType, Class<? extends EventLoggerEventHandler>>();
+	protected Map<FlowableEngineEventType, Class<? extends EventLoggerEventHandler>> eventHandlers 
+		= new HashMap<FlowableEngineEventType, Class<? extends EventLoggerEventHandler>>();
 	
 	// Listeners for new events
 	protected List<EventLoggerListener> listeners;
@@ -68,26 +68,26 @@ public class EventLogger implements ActivitiEventListener {
 		
 		// Initialization of all event handlers
 		
-		addEventHandler(ActivitiEngineEventType.TASK_CREATED, TaskCreatedEventHandler.class);
-		addEventHandler(ActivitiEngineEventType.TASK_COMPLETED, TaskCompletedEventHandler.class);
-		addEventHandler(ActivitiEngineEventType.TASK_ASSIGNED, TaskAssignedEventHandler.class);
+		addEventHandler(FlowableEngineEventType.TASK_CREATED, TaskCreatedEventHandler.class);
+		addEventHandler(FlowableEngineEventType.TASK_COMPLETED, TaskCompletedEventHandler.class);
+		addEventHandler(FlowableEngineEventType.TASK_ASSIGNED, TaskAssignedEventHandler.class);
 		
-		addEventHandler(ActivitiEngineEventType.SEQUENCEFLOW_TAKEN, SequenceFlowTakenEventHandler.class);
+		addEventHandler(FlowableEngineEventType.SEQUENCEFLOW_TAKEN, SequenceFlowTakenEventHandler.class);
 		
-		addEventHandler(ActivitiEngineEventType.ACTIVITY_COMPLETED, ActivityCompletedEventHandler.class);
-		addEventHandler(ActivitiEngineEventType.ACTIVITY_STARTED, ActivityStartedEventHandler.class);
-		addEventHandler(ActivitiEngineEventType.ACTIVITY_SIGNALED, ActivitySignaledEventHandler.class);
-		addEventHandler(ActivitiEngineEventType.ACTIVITY_MESSAGE_RECEIVED, ActivityMessageEventHandler.class);
-		addEventHandler(ActivitiEngineEventType.ACTIVITY_COMPENSATE, ActivityCompensatedEventHandler.class);
-		addEventHandler(ActivitiEngineEventType.ACTIVITY_ERROR_RECEIVED, ActivityErrorReceivedEventHandler.class);
+		addEventHandler(FlowableEngineEventType.ACTIVITY_COMPLETED, ActivityCompletedEventHandler.class);
+		addEventHandler(FlowableEngineEventType.ACTIVITY_STARTED, ActivityStartedEventHandler.class);
+		addEventHandler(FlowableEngineEventType.ACTIVITY_SIGNALED, ActivitySignaledEventHandler.class);
+		addEventHandler(FlowableEngineEventType.ACTIVITY_MESSAGE_RECEIVED, ActivityMessageEventHandler.class);
+		addEventHandler(FlowableEngineEventType.ACTIVITY_COMPENSATE, ActivityCompensatedEventHandler.class);
+		addEventHandler(FlowableEngineEventType.ACTIVITY_ERROR_RECEIVED, ActivityErrorReceivedEventHandler.class);
 		
-		addEventHandler(ActivitiEngineEventType.VARIABLE_CREATED, VariableCreatedEventHandler.class);
-		addEventHandler(ActivitiEngineEventType.VARIABLE_DELETED, VariableDeletedEventHandler.class);
-		addEventHandler(ActivitiEngineEventType.VARIABLE_UPDATED, VariableUpdatedEventHandler.class);
+		addEventHandler(FlowableEngineEventType.VARIABLE_CREATED, VariableCreatedEventHandler.class);
+		addEventHandler(FlowableEngineEventType.VARIABLE_DELETED, VariableDeletedEventHandler.class);
+		addEventHandler(FlowableEngineEventType.VARIABLE_UPDATED, VariableUpdatedEventHandler.class);
 	}
 	
 	@Override
-	public void onEvent(ActivitiEvent event) {
+	public void onEvent(FlowableEvent event) {
 		EventLoggerEventHandler eventHandler = getEventHandler(event);
 		if (eventHandler != null) {
 
@@ -129,19 +129,19 @@ public class EventLogger implements ActivitiEventListener {
 	}
 	
 	// Subclasses can override this if defaults are not ok
-	protected EventLoggerEventHandler getEventHandler(ActivitiEvent event) {
+	protected EventLoggerEventHandler getEventHandler(FlowableEvent event) {
 
 		Class<? extends EventLoggerEventHandler> eventHandlerClass = null;
-		if (event.getType().equals(ActivitiEngineEventType.ENTITY_INITIALIZED)) {
-			Object entity = ((ActivitiEntityEvent) event).getEntity();
+		if (event.getType().equals(FlowableEngineEventType.ENTITY_INITIALIZED)) {
+			Object entity = ((FlowableEntityEvent) event).getEntity();
 			if (entity instanceof ExecutionEntity) {
 				ExecutionEntity executionEntity = (ExecutionEntity) entity;
 				if (executionEntity.getProcessInstanceId().equals(executionEntity.getId())) {
 					eventHandlerClass = ProcessInstanceStartedEventHandler.class;
 				}
 			}
-		} else if (event.getType().equals(ActivitiEngineEventType.ENTITY_DELETED)) {
-			Object entity = ((ActivitiEntityEvent) event).getEntity();
+		} else if (event.getType().equals(FlowableEngineEventType.ENTITY_DELETED)) {
+			Object entity = ((FlowableEntityEvent) event).getEntity();
 			if (entity instanceof ExecutionEntity) {
 				ExecutionEntity executionEntity = (ExecutionEntity) entity;
 				if (executionEntity.getProcessInstanceId().equals(executionEntity.getId())) {
@@ -160,7 +160,7 @@ public class EventLogger implements ActivitiEventListener {
 		return null;
 	}
 
-	protected EventLoggerEventHandler instantiateEventHandler(ActivitiEvent event,
+	protected EventLoggerEventHandler instantiateEventHandler(FlowableEvent event,
       Class<? extends EventLoggerEventHandler> eventHandlerClass) {
 		try {
 			EventLoggerEventHandler eventHandler = eventHandlerClass.newInstance();
@@ -179,7 +179,7 @@ public class EventLogger implements ActivitiEventListener {
 		return false;
   }
 	
-	public void addEventHandler(ActivitiEngineEventType eventType, Class<? extends EventLoggerEventHandler> eventHandlerClass) {
+	public void addEventHandler(FlowableEngineEventType eventType, Class<? extends EventLoggerEventHandler> eventHandlerClass) {
 		eventHandlers.put(eventType, eventHandlerClass);
 	}
 	

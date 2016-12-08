@@ -25,27 +25,27 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.runtime.Clock;
-import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricDetail;
-import org.activiti.engine.history.HistoricFormProperty;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.history.HistoricVariableInstance;
-import org.activiti.engine.history.HistoricVariableInstanceQuery;
-import org.activiti.engine.history.HistoricVariableUpdate;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.ResourceActivitiTestCase;
 import org.activiti5.engine.impl.variable.EntityManagerSession;
 import org.activiti5.engine.impl.variable.EntityManagerSessionFactory;
 import org.activiti5.engine.test.api.runtime.DummySerializable;
 import org.activiti5.engine.test.history.SerializableVariable;
 import org.activiti5.standalone.jpa.FieldAccessJPAEntity;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricDetail;
+import org.flowable.engine.history.HistoricFormProperty;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.history.HistoricVariableInstance;
+import org.flowable.engine.history.HistoricVariableInstanceQuery;
+import org.flowable.engine.history.HistoricVariableUpdate;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 
 /**
@@ -265,7 +265,7 @@ public class FullHistoryTest extends ResourceActivitiTestCase {
       historyService.createHistoricVariableInstanceQuery().taskId(null).singleResult();
       fail("Exception expected");
     }
-    catch(ActivitiIllegalArgumentException ae)
+    catch(FlowableIllegalArgumentException ae)
     {
       assertEquals("taskId is null", ae.getMessage());
     }
@@ -276,7 +276,7 @@ public class FullHistoryTest extends ResourceActivitiTestCase {
       historyService.createHistoricVariableInstanceQuery().taskId("123").excludeTaskVariables().singleResult();
       fail("Exception expected");
     }
-    catch(ActivitiIllegalArgumentException ae)
+    catch(FlowableIllegalArgumentException ae)
     {
       assertEquals("Cannot use taskId together with excludeTaskVariables", ae.getMessage());
     }
@@ -286,7 +286,7 @@ public class FullHistoryTest extends ResourceActivitiTestCase {
       historyService.createHistoricVariableInstanceQuery().excludeTaskVariables().taskId("123").singleResult();
       fail("Exception expected");
     }
-    catch(ActivitiIllegalArgumentException ae)
+    catch(FlowableIllegalArgumentException ae)
     {
       assertEquals("Cannot use taskId together with excludeTaskVariables", ae.getMessage());
     }
@@ -765,49 +765,49 @@ public class FullHistoryTest extends ResourceActivitiTestCase {
     try {
       historyService.createHistoricDetailQuery().asc().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       
     }
     
     try {
       historyService.createHistoricDetailQuery().desc().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       
     }
     
     try {
       historyService.createHistoricDetailQuery().orderByProcessInstanceId().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       
     }
     
     try {
       historyService.createHistoricDetailQuery().orderByTime().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       
     }
     
     try {
       historyService.createHistoricDetailQuery().orderByVariableName().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       
     }
     
     try {
       historyService.createHistoricDetailQuery().orderByVariableRevision().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       
     }
     
     try {
       historyService.createHistoricDetailQuery().orderByVariableType().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       
     }
   }
@@ -894,7 +894,7 @@ public class FullHistoryTest extends ResourceActivitiTestCase {
       // Delete the historic process-instance, which is still running
       historyService.deleteHistoricProcessInstance("unexisting");
       fail("Exception expected when deleting process-instance that is still running");
-    } catch(ActivitiException ae) {
+    } catch(FlowableException ae) {
       // Expected exception
       assertTextPresent("No historic process instance found with id: unexisting", ae.getMessage());
     }
@@ -909,7 +909,7 @@ public class FullHistoryTest extends ResourceActivitiTestCase {
       // Delete the historic process-instance, which is still running
       historyService.deleteHistoricProcessInstance(processInstance.getId());
       fail("Exception expected when deleting process-instance that is still running");
-    } catch(ActivitiException ae) {
+    } catch(FlowableException ae) {
       // Expected exception
       assertTextPresent("Process instance is still running, cannot delete historic process instance", ae.getMessage());
     }

@@ -15,11 +15,11 @@ package org.activiti5.engine.test.api.identity;
 
 import java.util.List;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.idm.api.Group;
-import org.activiti.idm.api.GroupQuery;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.GroupQuery;
 
 /**
  * @author Joram Barrez
@@ -85,7 +85,7 @@ public class GroupQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createGroupQuery().groupId(null).list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (FlowableIllegalArgumentException e) {}
   }
   
   public void testQueryByName() {
@@ -103,7 +103,7 @@ public class GroupQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createGroupQuery().groupName(null).list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (FlowableIllegalArgumentException e) {}
   }
   
   public void testQueryByNameLike() {
@@ -124,7 +124,7 @@ public class GroupQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createGroupQuery().groupNameLike(null).list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (FlowableIllegalArgumentException e) {}
   }
   
   public void testQueryByType() {
@@ -142,7 +142,7 @@ public class GroupQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createGroupQuery().groupType(null).list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (FlowableIllegalArgumentException e) {}
   }
   
   public void testQueryByMember() {
@@ -173,7 +173,7 @@ public class GroupQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createGroupQuery().groupMember(null).list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (FlowableIllegalArgumentException e) {}
   }
   
   public void testQuerySorting() {
@@ -207,12 +207,12 @@ public class GroupQueryTest extends PluggableActivitiTestCase {
     try {
       identityService.createGroupQuery().orderByGroupId().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (FlowableIllegalArgumentException e) {}
     
     try {
       identityService.createGroupQuery().orderByGroupId().orderByGroupName().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (FlowableIllegalArgumentException e) {}
   }
   
   private void verifyQueryResults(GroupQuery query, int countExpected) {
@@ -232,7 +232,7 @@ public class GroupQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ActivitiException e) {}
+    } catch (FlowableException e) {}
   }
 
   public void testNativeQuery() {

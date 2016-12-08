@@ -18,18 +18,18 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.runtime.Clock;
-import org.activiti.engine.impl.EventSubscriptionQueryImpl;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.runtime.Job;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
-import org.activiti.validation.validator.Problems;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti5.engine.impl.util.CollectionUtil;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.impl.EventSubscriptionQueryImpl;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
+import org.flowable.validation.validator.Problems;
 
 
 /**
@@ -376,7 +376,7 @@ public class SignalEventTest extends PluggableActivitiTestCase {
     try {
       runtimeService.trigger(execution.getId());
       fail("ActivitiException expected");
-    } catch (ActivitiException ae) {
+    } catch (FlowableException ae) {
       // Exception expected
     }
     
@@ -416,7 +416,7 @@ public class SignalEventTest extends PluggableActivitiTestCase {
   	assertEquals(1, taskService.createTaskQuery().taskName("Task after signal").count());
   	
   	// Cleanup
-  	for (org.activiti.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+  	for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
   		repositoryService.deleteDeployment(deployment.getId(), true);
   	}
   	
@@ -468,7 +468,7 @@ public class SignalEventTest extends PluggableActivitiTestCase {
   	assertEquals(1, taskService.createTaskQuery().taskName("Task after signal").count());
   	
   	// Cleanup
-  	for (org.activiti.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+  	for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
   		repositoryService.deleteDeployment(deployment.getId(), true);
   	}
   	
@@ -507,7 +507,7 @@ public class SignalEventTest extends PluggableActivitiTestCase {
  	assertEquals(1, taskService.createTaskQuery().taskName("Task after signal").count());
  	
  	// Cleanup
- 	for (org.activiti.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+ 	for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
  		repositoryService.deleteDeployment(deployment.getId(), true);
  	}
  	
@@ -554,7 +554,7 @@ public class SignalEventTest extends PluggableActivitiTestCase {
  	assertEquals(1, taskService.createTaskQuery().taskName("Task after signal").count());
  	
  	// Cleanup
- 	for (org.activiti.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+ 	for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
  		repositoryService.deleteDeployment(deployment.getId(), true);
  	}
  	
@@ -607,7 +607,7 @@ public class SignalEventTest extends PluggableActivitiTestCase {
   	assertEquals(3, runtimeService.createProcessInstanceQuery().count());
   	
   	// Cleanup
-  	for (org.activiti.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+  	for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
   		repositoryService.deleteDeployment(deployment.getId(), true);
   	}
 	}

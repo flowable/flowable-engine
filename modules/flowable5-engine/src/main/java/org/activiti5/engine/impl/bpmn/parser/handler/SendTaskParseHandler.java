@@ -12,18 +12,18 @@
  */
 package org.activiti5.engine.impl.bpmn.parser.handler;
 
-import org.activiti.bpmn.constants.BpmnXMLConstants;
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.DataAssociation;
-import org.activiti.bpmn.model.ImplementationType;
-import org.activiti.bpmn.model.SendTask;
-import org.activiti.engine.impl.bpmn.data.AbstractDataAssociation;
-import org.activiti.engine.impl.bpmn.data.IOSpecification;
-import org.activiti.engine.impl.bpmn.webservice.Operation;
 import org.activiti5.engine.impl.bpmn.behavior.WebServiceActivityBehavior;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.constants.BpmnXMLConstants;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.DataAssociation;
+import org.flowable.bpmn.model.ImplementationType;
+import org.flowable.bpmn.model.SendTask;
+import org.flowable.engine.impl.bpmn.data.AbstractDataAssociation;
+import org.flowable.engine.impl.bpmn.data.IOSpecification;
+import org.flowable.engine.impl.bpmn.webservice.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

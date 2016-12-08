@@ -1,12 +1,12 @@
 package org.activiti5.engine.delegate.event.impl;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.delegate.event.ActivitiSequenceFlowTakenEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.delegate.event.FlowableSequenceFlowTakenEvent;
 
 /**
  * @author Joram Barrez
  */
-public class ActivitiSequenceFlowTakenEventImpl extends ActivitiEventImpl implements ActivitiSequenceFlowTakenEvent {
+public class ActivitiSequenceFlowTakenEventImpl extends ActivitiEventImpl implements FlowableSequenceFlowTakenEvent {
 	
 	protected String id;
 	protected String sourceActivityId;
@@ -18,7 +18,7 @@ public class ActivitiSequenceFlowTakenEventImpl extends ActivitiEventImpl implem
 	protected String targetActivityType;
 	protected String targetActivityBehaviorClass;
 	
-	public ActivitiSequenceFlowTakenEventImpl(ActivitiEngineEventType type) {
+	public ActivitiSequenceFlowTakenEventImpl(FlowableEngineEventType type) {
 	  super(type);
   }
 

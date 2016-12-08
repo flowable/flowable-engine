@@ -16,7 +16,6 @@ package org.activiti5.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.ActivitiObjectNotFoundException;
@@ -30,6 +29,7 @@ import org.activiti5.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti5.engine.impl.persistence.entity.TaskEntity;
 import org.activiti5.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti5.engine.runtime.ProcessInstance;
+import org.flowable.engine.repository.ProcessDefinition;
 
 
 /**

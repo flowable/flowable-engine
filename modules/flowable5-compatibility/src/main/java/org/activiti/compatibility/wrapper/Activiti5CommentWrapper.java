@@ -15,7 +15,7 @@ package org.activiti.compatibility.wrapper;
 
 import java.util.Date;
 
-import org.activiti.engine.task.Comment;
+import org.flowable.engine.task.Comment;
 
 /**
  * Wraps an Activiti 5 comment to an Activiti 6 {@link Comment}.

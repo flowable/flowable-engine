@@ -2,14 +2,14 @@ package org.activiti5.engine.test.api.runtime;
 
 import java.util.List;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.runtime.Job;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.runtime.ProcessInstanceQuery;
-import org.activiti.engine.runtime.TimerJobQuery;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.JavaDelegate;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.flowable.engine.runtime.TimerJobQuery;
 
 public class ProcessInstanceQueryAndWithExceptionTest extends PluggableActivitiTestCase {
 
@@ -17,7 +17,7 @@ public class ProcessInstanceQueryAndWithExceptionTest extends PluggableActivitiT
   private static final String PROCESS_DEFINITION_KEY_WITH_EXCEPTION_1 = "JobErrorCheck";
   private static final String PROCESS_DEFINITION_KEY_WITH_EXCEPTION_2 = "JobErrorDoubleCheck";
 
-  private org.activiti.engine.repository.Deployment deployment;
+  private org.flowable.engine.repository.Deployment deployment;
 
   protected void setUp() throws Exception {
     super.setUp();

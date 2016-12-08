@@ -15,7 +15,7 @@
   
   <properties>
     <activiti.artifact>
-      org.activiti.ldap
+      org.flowable.ldap
     </activiti.artifact>
   </properties>
 

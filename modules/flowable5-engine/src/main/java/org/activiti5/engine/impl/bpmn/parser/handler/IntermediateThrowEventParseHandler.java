@@ -12,13 +12,13 @@
  */
 package org.activiti5.engine.impl.bpmn.parser.handler;
 
-import org.activiti.bpmn.constants.BpmnXMLConstants;
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.EventDefinition;
-import org.activiti.bpmn.model.SignalEventDefinition;
-import org.activiti.bpmn.model.ThrowEvent;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
+import org.flowable.bpmn.constants.BpmnXMLConstants;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.SignalEventDefinition;
+import org.flowable.bpmn.model.ThrowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +48,7 @@ public class IntermediateThrowEventParseHandler extends AbstractActivityBpmnPars
     
     if (eventDefinition instanceof SignalEventDefinition) {
       bpmnParse.getBpmnParserHandlers().parseElement(bpmnParse, eventDefinition);
-    } else if (eventDefinition instanceof org.activiti.bpmn.model.CompensateEventDefinition) {
+    } else if (eventDefinition instanceof org.flowable.bpmn.model.CompensateEventDefinition) {
       bpmnParse.getBpmnParserHandlers().parseElement(bpmnParse, eventDefinition);
     } else if (eventDefinition == null) {
       nestedActivityImpl.setActivityBehavior(bpmnParse.getActivityBehaviorFactory().createIntermediateThrowNoneEventActivityBehavior(intermediateEvent)); 

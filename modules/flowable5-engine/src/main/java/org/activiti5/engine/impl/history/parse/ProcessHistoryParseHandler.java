@@ -12,11 +12,11 @@
  */
 package org.activiti5.engine.impl.history.parse;
 
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.Process;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti5.engine.impl.bpmn.parser.handler.AbstractBpmnParseHandler;
 import org.activiti5.engine.impl.history.handler.ProcessInstanceEndHandler;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.Process;
 
 
 /**

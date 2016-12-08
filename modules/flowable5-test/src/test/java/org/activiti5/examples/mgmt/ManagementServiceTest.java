@@ -15,9 +15,9 @@ package org.activiti5.examples.mgmt;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.common.api.management.TableMetaData;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.common.api.management.TableMetaData;
 
 /**
  * Test case for the various operations of the {@link ManagementService}

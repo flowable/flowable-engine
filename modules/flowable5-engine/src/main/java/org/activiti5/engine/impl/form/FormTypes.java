@@ -17,11 +17,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.activiti.bpmn.model.FormProperty;
-import org.activiti.bpmn.model.FormValue;
-import org.activiti.engine.form.AbstractFormType;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.FormProperty;
+import org.flowable.bpmn.model.FormValue;
+import org.flowable.engine.form.AbstractFormType;
 
 
 /**

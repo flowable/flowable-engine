@@ -13,7 +13,7 @@
 
 package org.activiti5.spring.test.transaction;
 
-import org.activiti.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.DelegateExecution;
 
 /**
  * @author Tom Baeyens

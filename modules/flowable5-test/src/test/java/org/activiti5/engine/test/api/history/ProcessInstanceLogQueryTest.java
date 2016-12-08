@@ -4,16 +4,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricData;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.history.HistoricVariableInstance;
-import org.activiti.engine.history.HistoricVariableUpdate;
-import org.activiti.engine.history.ProcessInstanceHistoryLog;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.task.Comment;
-import org.activiti.engine.task.Task;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricData;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.history.HistoricVariableInstance;
+import org.flowable.engine.history.HistoricVariableUpdate;
+import org.flowable.engine.history.ProcessInstanceHistoryLog;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.task.Comment;
+import org.flowable.engine.task.Task;
 /**
  * @author Joram Barrez
  */

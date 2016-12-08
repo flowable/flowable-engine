@@ -9,7 +9,7 @@
     <process id="integrationGatewayProcess">
         <startEvent id="start"/>
         <sequenceFlow id="flow1" sourceRef="start" targetRef="integrationGateway"/>
-        <serviceTask id="integrationGateway" activiti:delegateExpression="#{activitiDelegate}"/>
+        <serviceTask id="integrationGateway" activiti:delegateExpression="#{flowableDelegate}"/>
         <sequenceFlow id="scriptFlow" sourceRef="integrationGateway" targetRef="scriptTask"/>
         <scriptTask id="scriptTask" scriptFormat="groovy">
             <script>

@@ -22,15 +22,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.common.runtime.Clock;
-import org.activiti.engine.history.HistoricIdentityLink;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.history.HistoricIdentityLink;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 /**
  * @author Tom Baeyens
@@ -592,7 +592,7 @@ public class HistoricTaskInstanceTest extends PluggableActivitiTestCase {
     try {
       historyService.getHistoricIdentityLinksForTask(task.getId()).size();
       fail("Exception expected");
-    } catch(ActivitiObjectNotFoundException aonfe) {
+    } catch(FlowableObjectNotFoundException aonfe) {
       assertEquals(HistoricTaskInstance.class, aonfe.getObjectClass());
     }
   }
@@ -601,21 +601,21 @@ public class HistoricTaskInstanceTest extends PluggableActivitiTestCase {
     try {
       historyService.createHistoricTaskInstanceQuery().asc();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       
     }
     
     try {
       historyService.createHistoricTaskInstanceQuery().desc();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       
     }
     
     try {
       historyService.createHistoricTaskInstanceQuery().orderByProcessInstanceId().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       
     }
   }

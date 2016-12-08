@@ -15,7 +15,6 @@ package org.activiti5.engine.impl.cmd;
 
 import java.io.InputStream;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiObjectNotFoundException;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
@@ -31,6 +30,7 @@ import org.activiti5.engine.impl.util.IoUtil;
 import org.activiti5.engine.runtime.ProcessInstance;
 import org.activiti5.engine.task.Attachment;
 import org.activiti5.engine.task.Task;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 
 /**
@@ -96,9 +96,9 @@ public class CreateAttachmentCmd implements Command<Attachment> {
     	}
     	
     	commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_CREATED, attachment, processInstanceId, processInstanceId, processDefinitionId));
+    			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, attachment, processInstanceId, processInstanceId, processDefinitionId));
     	commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_INITIALIZED, attachment, processInstanceId, processInstanceId, processDefinitionId));
+    			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, attachment, processInstanceId, processInstanceId, processDefinitionId));
     }
     
     return attachment;

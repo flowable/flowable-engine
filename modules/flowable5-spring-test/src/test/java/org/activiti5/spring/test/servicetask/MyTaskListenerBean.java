@@ -12,9 +12,9 @@
  */
 package org.activiti5.spring.test.servicetask;
 
-import org.activiti.engine.delegate.DelegateTask;
-import org.activiti.engine.delegate.TaskListener;
 import org.activiti5.engine.impl.el.FixedValue;
+import org.flowable.engine.delegate.DelegateTask;
+import org.flowable.engine.delegate.TaskListener;
 
 /**
  * @author Joram Barrez

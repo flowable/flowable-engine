@@ -15,8 +15,8 @@ package org.activiti5.engine.test.concurrency;
 
 import java.util.Random;
 
-import org.activiti.engine.delegate.DelegateTask;
-import org.activiti.engine.delegate.TaskListener;
+import org.flowable.engine.delegate.DelegateTask;
+import org.flowable.engine.delegate.TaskListener;
 
 
 /**

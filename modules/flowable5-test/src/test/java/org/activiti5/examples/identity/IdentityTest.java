@@ -17,9 +17,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.activiti.idm.api.Group;
-import org.activiti.idm.api.User;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.User;
 
 /**
  * @author Tom Baeyens

@@ -2,9 +2,9 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="org.activiti.app.domain.editor.Model">
+<mapper namespace="org.flowable.app.domain.editor.Model">
 
-	<resultMap id="modelResultMap" type="org.activiti.app.domain.editor.Model">
+	<resultMap id="modelResultMap" type="org.flowable.app.domain.editor.Model">
 		<id property="id" column="id" jdbcType="VARCHAR" />
 		<result property="name" column="name" jdbcType="VARCHAR" />
 		<result property="key" column="model_key" jdbcType="VARCHAR" />
@@ -20,7 +20,7 @@
 		<result property="thumbnail" column="thumbnail" jdbcType="BLOB" />
 	</resultMap>
 
-    <insert id="insertModel" parameterType="org.activiti.app.domain.editor.Model">
+    <insert id="insertModel" parameterType="org.flowable.app.domain.editor.Model">
         insert into ${prefix}ACT_DE_MODEL (
             id,
             name,
@@ -52,7 +52,7 @@
           )
     </insert>
     
-    <update id="updateModel" parameterType="org.activiti.app.domain.editor.Model">
+    <update id="updateModel" parameterType="org.flowable.app.domain.editor.Model">
         update ${prefix}ACT_DE_MODEL
         <set>
             name = #{name, jdbcType=VARCHAR},
@@ -116,7 +116,7 @@
 	   where m.created_by = #{createdBy, jdbcType=VARCHAR} and m.model_type = #{modelType, jdbcType=INTEGER}
 	</select>
 
-	<delete id="deleteModel" parameterType="org.activiti.app.domain.editor.Model">
+	<delete id="deleteModel" parameterType="org.flowable.app.domain.editor.Model">
 		delete from ${prefix}ACT_DE_MODEL where id = #{id}
 	</delete>
     

@@ -14,10 +14,10 @@ package org.activiti5.standalone.escapeclause;
 
 import java.util.List;
 
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
 import org.junit.Test;
 
 public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {

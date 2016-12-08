@@ -17,10 +17,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.DataObject;
-import org.activiti.bpmn.model.FlowElement;
 import org.activiti5.engine.parse.BpmnParseHandler;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.DataObject;
+import org.flowable.bpmn.model.FlowElement;
 import org.slf4j.Logger;
 
 

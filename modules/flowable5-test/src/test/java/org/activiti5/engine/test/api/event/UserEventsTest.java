@@ -12,14 +12,14 @@
  */
 package org.activiti5.engine.test.api.event;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.idm.api.User;
-import org.activiti.idm.api.event.ActivitiIdmEventType;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.idm.api.User;
+import org.flowable.idm.api.event.FlowableIdmEventType;
 
 /**
- * Test case for all {@link ActivitiEvent}s related to users.
+ * Test case for all {@link FlowableEvent}s related to users.
  * 
  * @author Frederik Heremans
  */
@@ -39,22 +39,22 @@ public class UserEventsTest extends PluggableActivitiTestCase {
 			identityService.saveUser(user);
 
 			assertEquals(2, listener.getEventsReceived().size());
-			ActivitiEntityEvent event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(ActivitiIdmEventType.ENTITY_CREATED, event.getType());
+			FlowableEntityEvent event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+			assertEquals(FlowableIdmEventType.ENTITY_CREATED, event.getType());
 			assertTrue(event.getEntity() instanceof User);
 			User userFromEvent = (User) event.getEntity();
 			assertEquals("fred", userFromEvent.getId());
 			
-			event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
-			assertEquals(ActivitiIdmEventType.ENTITY_INITIALIZED, event.getType());
+			event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
+			assertEquals(FlowableIdmEventType.ENTITY_INITIALIZED, event.getType());
 			listener.clearEventsReceived();
 
 			// Update user
 			user.setFirstName("Anna");
 			identityService.saveUser(user);
 			assertEquals(1, listener.getEventsReceived().size());
-			event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(ActivitiIdmEventType.ENTITY_UPDATED, event.getType());
+			event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+			assertEquals(FlowableIdmEventType.ENTITY_UPDATED, event.getType());
 			assertTrue(event.getEntity() instanceof User);
 			userFromEvent = (User) event.getEntity();
 			assertEquals("fred", userFromEvent.getId());
@@ -65,8 +65,8 @@ public class UserEventsTest extends PluggableActivitiTestCase {
 			identityService.deleteUser(user.getId());
 			
 			assertEquals(1, listener.getEventsReceived().size());
-			event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(ActivitiIdmEventType.ENTITY_DELETED, event.getType());
+			event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+			assertEquals(FlowableIdmEventType.ENTITY_DELETED, event.getType());
 			assertTrue(event.getEntity() instanceof User);
 			userFromEvent = (User) event.getEntity();
 			assertEquals("fred", userFromEvent.getId());

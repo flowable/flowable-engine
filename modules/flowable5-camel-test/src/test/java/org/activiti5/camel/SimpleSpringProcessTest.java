@@ -17,8 +17,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.camel.ActivitiProducer;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.spring.impl.test.SpringActivitiTestCase;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
@@ -26,6 +24,8 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
+import org.flowable.camel.FlowableProducer;
+import org.flowable.engine.test.Deployment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -79,7 +79,7 @@ public class SimpleSpringProcessTest extends SpringActivitiTestCase {
     tpl.send("direct:start", exchange);
 
     String instanceId = (String) exchange.getProperty("PROCESS_ID_PROPERTY");
-    tpl.sendBodyAndProperty("direct:receive", null, ActivitiProducer.PROCESS_ID_PROPERTY, instanceId);
+    tpl.sendBodyAndProperty("direct:receive", null, FlowableProducer.PROCESS_ID_PROPERTY, instanceId);
 
     assertProcessEnded(instanceId);
 
@@ -97,10 +97,10 @@ public class SimpleSpringProcessTest extends SpringActivitiTestCase {
     MockEndpoint me = (MockEndpoint) ctx.getEndpoint("mock:service1");
     me.expectedBodiesReceived("ala");
 
-    tpl.sendBodyAndProperty("direct:start", Collections.singletonMap("var1", "ala"), ActivitiProducer.PROCESS_KEY_PROPERTY, "key1");
+    tpl.sendBodyAndProperty("direct:start", Collections.singletonMap("var1", "ala"), FlowableProducer.PROCESS_KEY_PROPERTY, "key1");
 
     String instanceId = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("key1").singleResult().getProcessInstanceId();
-    tpl.sendBodyAndProperty("direct:receive", null, ActivitiProducer.PROCESS_KEY_PROPERTY, "key1");
+    tpl.sendBodyAndProperty("direct:receive", null, FlowableProducer.PROCESS_KEY_PROPERTY, "key1");
 
     assertProcessEnded(instanceId);
 

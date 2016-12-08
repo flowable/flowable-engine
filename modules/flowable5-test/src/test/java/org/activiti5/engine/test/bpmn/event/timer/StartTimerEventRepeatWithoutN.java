@@ -13,12 +13,12 @@
 
 package org.activiti5.engine.test.bpmn.event.timer;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.test.Deployment;
 
 /**
  * @author Saeid Mirzaei
@@ -30,11 +30,11 @@ public class StartTimerEventRepeatWithoutN extends PluggableActivitiTestCase {
 	protected long counter = 0;
 	protected StartEventListener startEventListener;
 	
-	class StartEventListener implements ActivitiEventListener {
+	class StartEventListener implements FlowableEventListener {
 
 		@Override
-		public void onEvent(ActivitiEvent event) {
-			if (event.getType().equals(ActivitiEngineEventType.TIMER_FIRED)) {
+		public void onEvent(FlowableEvent event) {
+			if (event.getType().equals(FlowableEngineEventType.TIMER_FIRED)) {
 				counter++;
 			}
 		}
@@ -67,7 +67,7 @@ public class StartTimerEventRepeatWithoutN extends PluggableActivitiTestCase {
 		try {
 			waitForJobExecutorToProcessAllJobs(5500, 500);
 			fail("job is finished sooner than expected");
-		} catch (ActivitiException e) {
+		} catch (FlowableException e) {
 			assertTrue(e.getMessage().startsWith("time limit"));
 			assertTrue(counter >= 2);
 		}

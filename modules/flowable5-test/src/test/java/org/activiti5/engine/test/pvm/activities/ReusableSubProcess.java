@@ -15,12 +15,12 @@ package org.activiti5.engine.test.pvm.activities;
 
 import java.util.List;
 
-import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti5.engine.impl.pvm.PvmProcessDefinition;
 import org.activiti5.engine.impl.pvm.PvmProcessInstance;
 import org.activiti5.engine.impl.pvm.PvmTransition;
 import org.activiti5.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti5.engine.impl.pvm.delegate.SubProcessActivityBehavior;
+import org.flowable.engine.delegate.DelegateExecution;
 
 
 /**

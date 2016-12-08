@@ -13,16 +13,16 @@
 
 package org.activiti5.engine.test.concurrency;
 
-import org.activiti.engine.common.api.ActivitiOptimisticLockingException;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.impl.RuntimeServiceImpl;
-import org.activiti.engine.impl.cfg.CommandExecutorImpl;
-import org.activiti.engine.impl.delegate.ActivityBehavior;
-import org.activiti.engine.impl.interceptor.CommandInterceptor;
-import org.activiti.engine.impl.interceptor.RetryInterceptor;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.FlowableOptimisticLockingException;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.RuntimeServiceImpl;
+import org.flowable.engine.impl.cfg.CommandExecutorImpl;
+import org.flowable.engine.impl.delegate.ActivityBehavior;
+import org.flowable.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.engine.impl.interceptor.RetryInterceptor;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +40,7 @@ public class CompetingSignalsTest extends PluggableActivitiTestCase {
   public class SignalThread extends ControllableThread {
     
     String executionId;
-    ActivitiOptimisticLockingException exception;
+    FlowableOptimisticLockingException exception;
     
     public SignalThread(String executionId) {
       this.executionId = executionId;
@@ -55,7 +55,7 @@ public class CompetingSignalsTest extends PluggableActivitiTestCase {
     public void run() {
       try {
         runtimeService.trigger(executionId);
-      } catch (ActivitiOptimisticLockingException e) {
+      } catch (FlowableOptimisticLockingException e) {
         this.exception = e;
       }
       log.debug("{} ends", getName());

@@ -12,7 +12,7 @@
 
   <spring:bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
       <spring:property name="driverClass" value="org.h2.Driver"/>
-      <spring:property name="url" value="jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000"/>
+      <spring:property name="url" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000"/>
       <spring:property name="username" value="sa"/>
       <spring:property name="password" value=""/>
   </spring:bean>
@@ -21,7 +21,7 @@
       <spring:property name="dataSource" ref="dataSource"/>
   </spring:bean>
 
-  <spring:bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
+  <spring:bean id="processEngineConfiguration" class="org.flowable.spring.SpringProcessEngineConfiguration">
     <spring:property name="dataSource" ref="dataSource"/>
     <spring:property name="transactionManager" ref="transactionManager"/>
     <spring:property name="databaseSchemaUpdate" value="true" />
@@ -32,7 +32,7 @@
     </spring:property>
   </spring:bean>
 
-  <spring:bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
+  <spring:bean id="processEngine" class="org.flowable.spring.ProcessEngineFactoryBean">
     <spring:property name="processEngineConfiguration" ref="processEngineConfiguration" />
   </spring:bean>
 

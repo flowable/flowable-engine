@@ -12,7 +12,7 @@
  */
 package org.activiti5.spring.test.transaction;
 
-import org.activiti.engine.RepositoryService;
+import org.flowable.engine.RepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 

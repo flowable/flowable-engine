@@ -15,10 +15,10 @@ package org.activiti5.engine.impl.webservice;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.impl.bpmn.webservice.BpmnInterface;
-import org.activiti.engine.impl.bpmn.webservice.BpmnInterfaceImplementation;
 import org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti5.engine.impl.util.ReflectUtil;
+import org.flowable.engine.impl.bpmn.webservice.BpmnInterface;
+import org.flowable.engine.impl.bpmn.webservice.BpmnInterfaceImplementation;
 
 /**
  * Represents a WS implementation of a {@link BpmnInterface}

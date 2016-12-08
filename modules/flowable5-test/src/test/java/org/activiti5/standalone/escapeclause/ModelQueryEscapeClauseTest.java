@@ -12,8 +12,8 @@
  */
 package org.activiti5.standalone.escapeclause;
 
-import org.activiti.engine.repository.Model;
-import org.activiti.engine.repository.ModelQuery;
+import org.flowable.engine.repository.Model;
+import org.flowable.engine.repository.ModelQuery;
 
 public class ModelQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
 

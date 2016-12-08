@@ -21,12 +21,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.activiti.engine.impl.bpmn.data.SimpleStructureDefinition;
-import org.activiti.engine.impl.bpmn.data.StructureDefinition;
-import org.activiti.engine.impl.util.ReflectUtil;
-import org.activiti.engine.impl.webservice.CxfWSDLImporter;
-import org.activiti.engine.impl.webservice.WSOperation;
-import org.activiti.engine.impl.webservice.WSService;
+import org.flowable.engine.impl.bpmn.data.SimpleStructureDefinition;
+import org.flowable.engine.impl.bpmn.data.StructureDefinition;
+import org.flowable.engine.impl.util.ReflectUtil;
+import org.flowable.engine.impl.webservice.CxfWSDLImporter;
+import org.flowable.engine.impl.webservice.WSOperation;
+import org.flowable.engine.impl.webservice.WSService;
 import org.junit.Before;
 import org.junit.Test;
 

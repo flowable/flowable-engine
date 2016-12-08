@@ -20,26 +20,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.impl.ProcessEngineImpl;
-import org.activiti.engine.impl.bpmn.deployer.ResourceNameUtil;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.db.DbSqlSession;
-import org.activiti.engine.impl.interceptor.Command;
-import org.activiti.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.impl.util.ReflectUtil;
-import org.activiti.engine.repository.DeploymentBuilder;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
 import org.activiti5.engine.test.TestActivityBehaviorFactory;
 import org.activiti5.engine.test.mock.ActivitiMockSupport;
 import org.activiti5.engine.test.mock.MockServiceTask;
 import org.activiti5.engine.test.mock.MockServiceTasks;
 import org.activiti5.engine.test.mock.NoOpServiceTasks;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.impl.ProcessEngineImpl;
+import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.db.DbSqlSession;
+import org.flowable.engine.impl.interceptor.Command;
+import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.ReflectUtil;
+import org.flowable.engine.repository.DeploymentBuilder;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,7 +118,7 @@ public abstract class TestHelper {
       try {
         ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
         processEngineConfig.getActiviti5CompatibilityHandler().deleteDeployment(deploymentId, true);
-      } catch (ActivitiObjectNotFoundException e) {
+      } catch (FlowableObjectNotFoundException e) {
         // Deployment was already deleted by the test case. Ignore.
       }
     }

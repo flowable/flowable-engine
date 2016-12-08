@@ -1,7 +1,7 @@
 package org.activiti5.engine.repository;
 
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti5.engine.query.NativeQuery;
+import org.flowable.engine.repository.ProcessDefinition;
 
 /**
  * Allows querying of {@link org.activiti5.engine.repository.ProcessDefinition}s via native (SQL) queries

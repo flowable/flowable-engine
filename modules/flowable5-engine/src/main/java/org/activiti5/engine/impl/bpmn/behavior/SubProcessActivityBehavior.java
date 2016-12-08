@@ -15,7 +15,6 @@ package org.activiti5.engine.impl.bpmn.behavior;
 
 import java.util.Map;
 
-import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.impl.bpmn.helper.ScopeUtil;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
@@ -25,6 +24,7 @@ import org.activiti5.engine.impl.pvm.PvmActivity;
 import org.activiti5.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti5.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
+import org.flowable.engine.delegate.DelegateExecution;
 
 
 /**

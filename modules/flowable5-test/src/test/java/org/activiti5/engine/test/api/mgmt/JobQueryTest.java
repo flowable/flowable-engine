@@ -20,14 +20,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.runtime.Clock;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.runtime.Job;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.runtime.TimerJobQuery;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.cmd.CancelJobsCmd;
 import org.activiti5.engine.impl.interceptor.Command;
 import org.activiti5.engine.impl.interceptor.CommandContext;
@@ -36,6 +28,14 @@ import org.activiti5.engine.impl.persistence.entity.JobEntity;
 import org.activiti5.engine.impl.persistence.entity.JobEntityManager;
 import org.activiti5.engine.impl.persistence.entity.TimerJobEntity;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.TimerJobQuery;
+import org.flowable.engine.test.Deployment;
 
 
 /**
@@ -136,7 +136,7 @@ public class JobQueryTest extends PluggableActivitiTestCase {
     try {
       managementService.createJobQuery().processInstanceId(null);
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (FlowableIllegalArgumentException e) {}
   }
   
   public void testQueryByExecutionId() {
@@ -153,7 +153,7 @@ public class JobQueryTest extends PluggableActivitiTestCase {
     try {
       managementService.createTimerJobQuery().executionId(null).list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {}
+    } catch (FlowableIllegalArgumentException e) {}
   }
   
   public void testQueryByRetriesLeft() {
@@ -193,7 +193,7 @@ public class JobQueryTest extends PluggableActivitiTestCase {
     try {
       managementService.createJobQuery().timers().messages().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       assertTextPresent("Cannot combine onlyTimers() with onlyMessages() in the same query", e.getMessage());
     }
   }
@@ -263,7 +263,7 @@ public class JobQueryTest extends PluggableActivitiTestCase {
     try {
       managementService.createJobQuery().exceptionMessage(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       assertEquals("Provided exception message is null", e.getMessage());
     }
   }
@@ -339,14 +339,14 @@ public class JobQueryTest extends PluggableActivitiTestCase {
     try {
       managementService.createJobQuery().orderByJobId().list();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       assertTextPresent("call asc() or desc() after using orderByXX()", e.getMessage());
     }
     
     try {
       managementService.createJobQuery().asc();
       fail();
-    } catch (ActivitiIllegalArgumentException e) {
+    } catch (FlowableIllegalArgumentException e) {
       assertTextPresent("You should call any of the orderBy methods first before specifying a direction", e.getMessage());
     }
   }
@@ -415,7 +415,7 @@ public class JobQueryTest extends PluggableActivitiTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ActivitiException e) {}
+    } catch (FlowableException e) {}
   }
   
   private void createJobWithoutExceptionMsg() {

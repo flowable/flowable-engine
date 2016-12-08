@@ -15,7 +15,7 @@
   
 	<properties>
 	  <activiti.artifact>
-	    org.activiti.jmx
+	    org.flowable.jmx
 	  </activiti.artifact>
 	</properties>
 

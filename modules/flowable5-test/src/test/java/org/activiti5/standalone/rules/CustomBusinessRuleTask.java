@@ -15,11 +15,11 @@ package org.activiti5.standalone.rules;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.delegate.BusinessRuleTaskDelegate;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.Expression;
 import org.activiti5.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.activiti5.engine.impl.pvm.delegate.ActivityExecution;
+import org.flowable.engine.delegate.BusinessRuleTaskDelegate;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.Expression;
 
 public class CustomBusinessRuleTask extends AbstractBpmnActivityBehavior implements BusinessRuleTaskDelegate {
   

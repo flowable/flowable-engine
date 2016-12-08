@@ -1,0 +1,2 @@
+# The LocalProcessEngineLookup implementation is enabled by default 
+org.flowable.cdi.impl.LocalProcessEngineLookup

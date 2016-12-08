@@ -12,12 +12,12 @@
  */
 package org.activiti5.engine.test.mock;
 
-import org.activiti.engine.delegate.VariableScope;
 import org.activiti5.engine.impl.scripting.Resolver;
 import org.activiti5.engine.impl.scripting.ResolverFactory;
+import org.flowable.engine.delegate.VariableScope;
 
 /**
- * This is a bridge resolver, making available any objects registered through {@link org.activiti.engine.test.mock.Mocks#register} inside scripts supported by Activiti. <br>
+ * This is a bridge resolver, making available any objects registered through {@link org.flowable.engine.test.mock.Mocks#register} inside scripts supported by Activiti. <br>
  * <br>
  * In order to use it, you need to declare it as ResolverFactory, for example by using activiti.cfg.xml like this: <br>
  * <br>

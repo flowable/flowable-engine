@@ -13,10 +13,10 @@
 
 package org.activiti5.engine.impl.variable;
 
-import org.activiti.engine.impl.variable.ValueFields;
-import org.activiti.engine.impl.variable.VariableType;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.impl.context.Context;
+import org.flowable.engine.impl.variable.ValueFields;
+import org.flowable.engine.impl.variable.VariableType;
 
 
 /**

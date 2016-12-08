@@ -15,18 +15,18 @@ package org.activiti5.engine.test.bpmn.parse;
 
 import java.util.List;
 
-import org.activiti.bpmn.exceptions.XMLException;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.Process;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti5.engine.impl.pvm.PvmTransition;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
 import org.activiti5.engine.impl.pvm.process.TransitionImpl;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti5.engine.impl.test.TestHelper;
+import org.flowable.bpmn.exceptions.XMLException;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.Process;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.test.Deployment;
 
 
 /**

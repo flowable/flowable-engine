@@ -3,10 +3,10 @@ package org.activiti5.spring.test.jpa;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
 import org.activiti5.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
 import org.springframework.test.context.ContextConfiguration;
 
 /**

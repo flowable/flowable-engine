@@ -12,11 +12,11 @@
  */
 package org.activiti5.engine.test.bpmn.event.end;
 
-import org.activiti.engine.common.api.ActivitiOptimisticLockingException;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.common.api.FlowableOptimisticLockingException;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 /**
  * @author Joram Barrez
@@ -76,7 +76,7 @@ public class EndEventTest extends PluggableActivitiTestCase {
       try {
         taskService.complete(taskId);
         succeeded = true;
-      } catch (ActivitiOptimisticLockingException ae) {
+      } catch (FlowableOptimisticLockingException ae) {
         // Exception is expected for one of the threads
       }
     }

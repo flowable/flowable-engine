@@ -23,18 +23,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
-import org.activiti.engine.common.impl.util.CollectionUtil;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricProcessInstanceQuery;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.history.HistoricTaskInstanceQuery;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.task.TaskQuery;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti5.engine.test.api.runtime.ProcessInstanceQueryTest;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.history.HistoricProcessInstanceQuery;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.history.HistoricTaskInstanceQuery;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.task.TaskQuery;
+import org.flowable.engine.test.Deployment;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -221,7 +221,7 @@ public class HistoryServiceTest extends PluggableActivitiTestCase {
     try {
       historyService.createHistoricProcessInstanceQuery().processInstanceIds(new HashSet<String>());
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException re) {
+    } catch (FlowableIllegalArgumentException re) {
       assertTextPresent("Set of process instance ids is empty", re.getMessage());
     }
   }
@@ -230,7 +230,7 @@ public class HistoryServiceTest extends PluggableActivitiTestCase {
     try {
       historyService.createHistoricProcessInstanceQuery().processInstanceIds(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIllegalArgumentException re) {
+    } catch (FlowableIllegalArgumentException re) {
       assertTextPresent("Set of process instance ids is null", re.getMessage());
     }
   }
@@ -280,7 +280,7 @@ public class HistoryServiceTest extends PluggableActivitiTestCase {
   
   @Deployment(resources = { "org/activiti5/engine/test/api/oneTaskProcess.bpmn20.xml", "org/activiti5/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })
   public void testHistoricProcessInstanceQueryByDeploymentId() {
-    org.activiti.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
+    org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
     HashSet<String> processInstanceIds = new HashSet<String>();
     for (int i = 0; i < 4; i++) {
       processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", i + "").getId());
@@ -301,7 +301,7 @@ public class HistoryServiceTest extends PluggableActivitiTestCase {
   
   @Deployment(resources = { "org/activiti5/engine/test/api/oneTaskProcess.bpmn20.xml", "org/activiti5/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })
   public void testHistoricProcessInstanceQueryByDeploymentIdIn() {
-    org.activiti.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
+    org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
     HashSet<String> processInstanceIds = new HashSet<String>();
     for (int i = 0; i < 4; i++) {
       processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", i + "").getId());
@@ -326,7 +326,7 @@ public class HistoryServiceTest extends PluggableActivitiTestCase {
   
   @Deployment(resources = { "org/activiti5/engine/test/api/oneTaskProcess.bpmn20.xml", "org/activiti5/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })
   public void testHistoricTaskInstanceQueryByDeploymentId() {
-    org.activiti.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
+    org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
     HashSet<String> processInstanceIds = new HashSet<String>();
     for (int i = 0; i < 4; i++) {
       processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", i + "").getId());
@@ -346,7 +346,7 @@ public class HistoryServiceTest extends PluggableActivitiTestCase {
   
   @Deployment(resources = { "org/activiti5/engine/test/api/oneTaskProcess.bpmn20.xml", "org/activiti5/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })
   public void testHistoricTaskInstanceQueryByDeploymentIdIn() {
-    org.activiti.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
+    org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
     HashSet<String> processInstanceIds = new HashSet<String>();
     for (int i = 0; i < 4; i++) {
       processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", i + "").getId());
@@ -374,7 +374,7 @@ public class HistoryServiceTest extends PluggableActivitiTestCase {
   
   @Deployment(resources = { "org/activiti5/engine/test/api/oneTaskProcess.bpmn20.xml", "org/activiti5/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })
   public void testHistoricTaskInstanceOrQueryByDeploymentId() {
-    org.activiti.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
+    org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
     HashSet<String> processInstanceIds = new HashSet<String>();
     for (int i = 0; i < 4; i++) {
       processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", i + "").getId());
@@ -458,7 +458,7 @@ public class HistoryServiceTest extends PluggableActivitiTestCase {
   
   @Deployment(resources = { "org/activiti5/engine/test/api/oneTaskProcess.bpmn20.xml", "org/activiti5/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })
   public void testHistoricTaskInstanceOrQueryByDeploymentIdIn() {
-    org.activiti.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
+    org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
     HashSet<String> processInstanceIds = new HashSet<String>();
     for (int i = 0; i < 4; i++) {
       processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", i + "").getId());
@@ -698,7 +698,7 @@ public class HistoryServiceTest extends PluggableActivitiTestCase {
     try {
       historyService.createHistoricProcessInstanceQuery().variableValueEqualsIgnoreCase("upper", null).singleResult();
       fail("Exception expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertEquals("value is null", ae.getMessage());
     }
     
@@ -706,7 +706,7 @@ public class HistoryServiceTest extends PluggableActivitiTestCase {
     try {
       historyService.createHistoricProcessInstanceQuery().variableValueEqualsIgnoreCase(null, "abcdefg").singleResult();
       fail("Exception expected");
-    } catch(ActivitiIllegalArgumentException ae) {
+    } catch(FlowableIllegalArgumentException ae) {
       assertEquals("name is null", ae.getMessage());
     }
   }

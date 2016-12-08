@@ -18,7 +18,6 @@ package org.activiti5.engine.impl.juel;
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
-import org.activiti.engine.impl.bpmn.data.ItemInstance;
 import org.activiti5.engine.impl.javax.el.ArrayELResolver;
 import org.activiti5.engine.impl.javax.el.BeanELResolver;
 import org.activiti5.engine.impl.javax.el.CompositeELResolver;
@@ -28,6 +27,7 @@ import org.activiti5.engine.impl.javax.el.ELResolver;
 import org.activiti5.engine.impl.javax.el.ListELResolver;
 import org.activiti5.engine.impl.javax.el.MapELResolver;
 import org.activiti5.engine.impl.javax.el.ResourceBundleELResolver;
+import org.flowable.engine.impl.bpmn.data.ItemInstance;
 
 /**
  * Simple resolver implementation. This resolver handles root properties (top-level identifiers).

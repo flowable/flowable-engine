@@ -12,17 +12,17 @@
  */
 package org.activiti5.engine.impl.bpmn.helper;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 
 /**
- * Base implementation of a {@link ActivitiEventListener}, used when creating event-listeners
+ * Base implementation of a {@link FlowableEventListener}, used when creating event-listeners
  * that are part of a BPMN definition.
  * 
  * @author Frederik Heremans
  */
-public abstract class BaseDelegateEventListener implements ActivitiEventListener {
+public abstract class BaseDelegateEventListener implements FlowableEventListener {
 
 	protected Class<?> entityClass;
 	
@@ -30,11 +30,11 @@ public abstract class BaseDelegateEventListener implements ActivitiEventListener
 	  this.entityClass = entityClass;
   }
 	
-	protected boolean isValidEvent(ActivitiEvent event) {
+	protected boolean isValidEvent(FlowableEvent event) {
 		boolean valid = false;
 	  if(entityClass != null) {
-	  	if(event instanceof ActivitiEntityEvent) {
-	  		Object entity = ((ActivitiEntityEvent) event).getEntity();
+	  	if(event instanceof FlowableEntityEvent) {
+	  		Object entity = ((FlowableEntityEvent) event).getEntity();
 	  		if(entity != null) {
 	  			valid = entityClass.isAssignableFrom(entity.getClass());
 	  		}

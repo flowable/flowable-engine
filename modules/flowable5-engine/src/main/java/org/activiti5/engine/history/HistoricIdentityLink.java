@@ -13,10 +13,10 @@
 
 package org.activiti5.engine.history;
 
-import org.activiti.engine.task.IdentityLink;
-import org.activiti.idm.api.GroupQuery;
-import org.activiti.idm.api.UserQuery;
 import org.activiti5.engine.task.IdentityLinkType;
+import org.flowable.engine.task.IdentityLink;
+import org.flowable.idm.api.GroupQuery;
+import org.flowable.idm.api.UserQuery;
 
 
 /**

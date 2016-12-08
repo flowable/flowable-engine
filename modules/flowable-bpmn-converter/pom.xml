@@ -15,10 +15,10 @@
   
   <properties>
     <activiti.artifact>
-      org.activiti.bpmn.converter
+      org.flowable.bpmn.converter
     </activiti.artifact>
     <activiti.osgi.export.additional>
-      org.activiti.bpmn.constants,org.activiti.bpmn.util,org.activiti.bpmn.exceptions
+      org.flowable.bpmn.constants,org.flowable.bpmn.util,org.flowable.bpmn.exceptions
     </activiti.osgi.export.additional>
   </properties>
 

@@ -12,7 +12,7 @@
  */
 package org.activiti5.engine.test.bpmn.servicetask;
 
-import org.activiti.engine.test.Deployment;
+import org.flowable.engine.test.Deployment;
 
 /**
  * @author Esteban Robles Luna

@@ -15,15 +15,15 @@ package org.activiti5.examples.bpmn.servicetask;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.common.api.ActivitiClassLoadingException;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti5.engine.impl.util.CollectionUtil;
+import org.flowable.engine.common.api.FlowableClassLoadingException;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 /**
  * @author Joram Barrez
@@ -111,10 +111,10 @@ public class JavaServiceTaskTest extends PluggableActivitiTestCase {
     try {
       runtimeService.startProcessInstanceByKey("unexistingClassDelegation");
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertTrue(e.getMessage().contains("couldn't instantiate class org.activiti.BogusClass"));
       assertNotNull(e.getCause());
-      assertTrue(e.getCause() instanceof ActivitiClassLoadingException);
+      assertTrue(e.getCause() instanceof FlowableClassLoadingException);
     }
   }
 
@@ -124,7 +124,7 @@ public class JavaServiceTaskTest extends PluggableActivitiTestCase {
           .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
           .deploy();
       fail();
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertTrue(e.getMessage().contains("resultVariable"));
     }
   }

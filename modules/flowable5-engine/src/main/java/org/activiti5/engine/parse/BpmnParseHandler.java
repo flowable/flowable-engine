@@ -14,10 +14,10 @@ package org.activiti5.engine.parse;
 
 import java.util.Collection;
 
-import org.activiti.bpmn.model.BaseElement;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti5.engine.impl.bpmn.parser.handler.AbstractBpmnParseHandler;
 import org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.bpmn.model.BaseElement;
 
 /**
  * Allows to hook into the parsing of one or more elements during the parsing of a BPMN 2.0 process.

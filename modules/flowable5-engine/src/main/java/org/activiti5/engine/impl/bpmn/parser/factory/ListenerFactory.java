@@ -12,14 +12,14 @@
  */
 package org.activiti5.engine.impl.bpmn.parser.factory;
 
-import org.activiti.bpmn.model.ActivitiListener;
-import org.activiti.bpmn.model.EventListener;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.ExecutionListener;
-import org.activiti.engine.delegate.TaskListener;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParser;
 import org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.EventListener;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.delegate.ExecutionListener;
+import org.flowable.engine.delegate.TaskListener;
 
 /**
  * Factory class used by the {@link BpmnParser} and {@link BpmnParse} to instantiate
@@ -50,10 +50,10 @@ public interface ListenerFactory {
 
   public abstract ExecutionListener createDelegateExpressionExecutionListener(ActivitiListener activitiListener);
   
-  public abstract ActivitiEventListener createClassDelegateEventListener(EventListener eventListener);
+  public abstract FlowableEventListener createClassDelegateEventListener(EventListener eventListener);
   
-  public abstract ActivitiEventListener createDelegateExpressionEventListener(EventListener eventListener);
+  public abstract FlowableEventListener createDelegateExpressionEventListener(EventListener eventListener);
   
-  public abstract ActivitiEventListener createEventThrowingEventListener(EventListener eventListener);
+  public abstract FlowableEventListener createEventThrowingEventListener(EventListener eventListener);
 
 }

@@ -15,8 +15,8 @@ package org.activiti5.standalone.escapeclause;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.runtime.ProcessInstance;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.junit.Test;
 
 public class ProcessInstanceQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {

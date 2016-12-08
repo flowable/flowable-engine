@@ -12,10 +12,10 @@
  */
 package org.activiti5.standalone.parsing;
 
-import org.activiti.bpmn.model.ActivitiListener;
-import org.activiti.engine.delegate.DelegateTask;
-import org.activiti.engine.delegate.TaskListener;
 import org.activiti5.engine.impl.bpmn.parser.factory.DefaultListenerFactory;
+import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.engine.delegate.DelegateTask;
+import org.flowable.engine.delegate.TaskListener;
 
 /**
  * @author Joram Barrez

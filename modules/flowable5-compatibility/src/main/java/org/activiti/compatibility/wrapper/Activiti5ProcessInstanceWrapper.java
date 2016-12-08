@@ -16,8 +16,8 @@ package org.activiti.compatibility.wrapper;
 import java.util.Date;
 import java.util.Map;
 
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.engine.runtime.ProcessInstance;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.engine.runtime.ProcessInstance;
 
 /**
  * Wraps an Activiti 5 process instance to an Activiti 6 {@link ProcessInstance}.

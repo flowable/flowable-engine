@@ -3,10 +3,10 @@ package org.activiti5.engine.impl.event.logger.handler;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEntityWithVariablesEvent;
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.persistence.entity.EventLogEntryEntity;
 import org.activiti5.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.delegate.event.FlowableEntityWithVariablesEvent;
 
 /**
  * @author Joram Barrez
@@ -16,7 +16,7 @@ public class TaskCompletedEventHandler extends AbstractTaskEventHandler {
   @Override
 	public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
 
-	  ActivitiEntityWithVariablesEvent eventWithVariables = (ActivitiEntityWithVariablesEvent) event;
+	  FlowableEntityWithVariablesEvent eventWithVariables = (FlowableEntityWithVariablesEvent) event;
 		TaskEntity task = (TaskEntity) eventWithVariables.getEntity();
 		Map<String, Object> data = handleCommonTaskFields(task);
 		

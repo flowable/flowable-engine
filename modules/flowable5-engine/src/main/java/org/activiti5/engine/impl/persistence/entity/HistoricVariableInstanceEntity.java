@@ -17,14 +17,14 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 
-import org.activiti.engine.impl.variable.ValueFields;
-import org.activiti.engine.impl.variable.VariableType;
 import org.activiti5.engine.history.HistoricVariableInstance;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.db.BulkDeleteable;
 import org.activiti5.engine.impl.db.HasRevision;
 import org.activiti5.engine.impl.db.PersistentObject;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.engine.impl.variable.ValueFields;
+import org.flowable.engine.impl.variable.VariableType;
 
 /**
  * @author Christian Lipphardt (camunda)

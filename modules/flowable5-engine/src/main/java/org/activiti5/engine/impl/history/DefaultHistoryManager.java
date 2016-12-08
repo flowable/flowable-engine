@@ -17,8 +17,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.history.HistoricActivityInstance;
 import org.activiti5.engine.impl.HistoricActivityInstanceQueryImpl;
@@ -43,6 +41,8 @@ import org.activiti5.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
 import org.activiti5.engine.impl.pvm.runtime.InterpretableExecution;
 import org.activiti5.engine.task.Event;
+import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +106,7 @@ public void recordProcessInstanceEnd(String processInstanceId, String deleteReas
         ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
         if (config != null && config.getEventDispatcher().isEnabled()) {
           config.getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
+          ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
         }
       }
     }
@@ -139,7 +139,7 @@ public void recordProcessInstanceStart(ExecutionEntity processInstance) {
       ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
       if (config != null && config.getEventDispatcher().isEnabled()) {
         config.getEventDispatcher().dispatchEvent(
-            ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
+            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
       }
   
       // Also record the start-event manually, as there is no "start" activity history listener for this
@@ -170,7 +170,7 @@ public void recordProcessInstanceStart(ExecutionEntity processInstance) {
       // Fire event
       if (config != null && config.getEventDispatcher().isEnabled()) {
         config.getEventDispatcher().dispatchEvent(
-            ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstance));
+            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstance));
       }
       
     }
@@ -197,7 +197,7 @@ public void recordSubProcessInstanceStart(ExecutionEntity parentExecution, Execu
       ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
       if (config != null && config.getEventDispatcher().isEnabled()) {
         config.getEventDispatcher().dispatchEvent(
-            ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
+            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
       }
       
       HistoricActivityInstanceEntity activitiyInstance = findActivityInstance(parentExecution);
@@ -225,7 +225,7 @@ public void recordSubProcessInstanceStart(ExecutionEntity parentExecution, Execu
       // Fire event
       if (config != null && config.getEventDispatcher().isEnabled()) {
         config.getEventDispatcher().dispatchEvent(
-            ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstance));
+            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstance));
       }
       
     }
@@ -267,7 +267,7 @@ public void recordActivityStart(ExecutionEntity executionEntity) {
     		ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
     		if (config != null && config.getEventDispatcher().isEnabled()) {
     		  config.getEventDispatcher().dispatchEvent(
-    		      ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstance));
+    		      ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstance));
     		}
     		 
     	}
@@ -298,7 +298,7 @@ public void recordActivityStart(ExecutionEntity executionEntity) {
     ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
     if (config != null && config.getEventDispatcher().isEnabled()) {
       config.getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
+          ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
     }
   }
   

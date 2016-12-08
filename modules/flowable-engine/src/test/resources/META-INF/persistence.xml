@@ -6,31 +6,31 @@
   <persistence-unit name="flowable-jpa-pu">
     <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
     
-    <class>org.activiti.standalone.jpa.FieldAccessJPAEntity</class>
-    <class>org.activiti.standalone.jpa.PropertyAccessJPAEntity</class>
-    <class>org.activiti.standalone.jpa.SubclassFieldAccessJPAEntity</class>
-    <class>org.activiti.standalone.jpa.SubclassPropertyAccessJPAEntity</class>
+    <class>org.flowable.standalone.jpa.FieldAccessJPAEntity</class>
+    <class>org.flowable.standalone.jpa.PropertyAccessJPAEntity</class>
+    <class>org.flowable.standalone.jpa.SubclassFieldAccessJPAEntity</class>
+    <class>org.flowable.standalone.jpa.SubclassPropertyAccessJPAEntity</class>
     <!-- Mapped superclasses -->
-    <class>org.activiti.standalone.jpa.MappedSuperClassFieldAccessJPAEntity</class>
-    <class>org.activiti.standalone.jpa.MappedSuperClassPropertyAccessJPAEntity</class>
+    <class>org.flowable.standalone.jpa.MappedSuperClassFieldAccessJPAEntity</class>
+    <class>org.flowable.standalone.jpa.MappedSuperClassPropertyAccessJPAEntity</class>
     
     <!-- Variable types -->
-    <class>org.activiti.standalone.jpa.ByteIdJPAEntity</class>
-    <class>org.activiti.standalone.jpa.ShortIdJPAEntity</class>
-    <class>org.activiti.standalone.jpa.IntegerIdJPAEntity</class>
-    <class>org.activiti.standalone.jpa.LongIdJPAEntity</class>
-    <class>org.activiti.standalone.jpa.FloatIdJPAEntity</class>
-    <class>org.activiti.standalone.jpa.DoubleIdJPAEntity</class>
-    <class>org.activiti.standalone.jpa.CharIdJPAEntity</class>
-    <class>org.activiti.standalone.jpa.StringIdJPAEntity</class>
-    <class>org.activiti.standalone.jpa.DateIdJPAEntity</class>
-    <class>org.activiti.standalone.jpa.SQLDateIdJPAEntity</class>
-    <class>org.activiti.standalone.jpa.BigIntegerIdJPAEntity</class>
-    <class>org.activiti.standalone.jpa.BigDecimalIdJPAEntity</class>
+    <class>org.flowable.standalone.jpa.ByteIdJPAEntity</class>
+    <class>org.flowable.standalone.jpa.ShortIdJPAEntity</class>
+    <class>org.flowable.standalone.jpa.IntegerIdJPAEntity</class>
+    <class>org.flowable.standalone.jpa.LongIdJPAEntity</class>
+    <class>org.flowable.standalone.jpa.FloatIdJPAEntity</class>
+    <class>org.flowable.standalone.jpa.DoubleIdJPAEntity</class>
+    <class>org.flowable.standalone.jpa.CharIdJPAEntity</class>
+    <class>org.flowable.standalone.jpa.StringIdJPAEntity</class>
+    <class>org.flowable.standalone.jpa.DateIdJPAEntity</class>
+    <class>org.flowable.standalone.jpa.SQLDateIdJPAEntity</class>
+    <class>org.flowable.standalone.jpa.BigIntegerIdJPAEntity</class>
+    <class>org.flowable.standalone.jpa.BigDecimalIdJPAEntity</class>
     
     <!-- Exceptional entities -->
-    <class>org.activiti.standalone.jpa.CompoundIdJPAEntity</class>
-    <class>org.activiti.standalone.jpa.EmbeddableCompoundId</class>
+    <class>org.flowable.standalone.jpa.CompoundIdJPAEntity</class>
+    <class>org.flowable.standalone.jpa.EmbeddableCompoundId</class>
     
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>

@@ -22,20 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.bpmn.constants.BpmnXMLConstants;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.ExtensionElement;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.Process;
-import org.activiti.bpmn.model.SubProcess;
-import org.activiti.bpmn.model.UserTask;
-import org.activiti.bpmn.model.ValuedDataObject;
-import org.activiti.engine.DynamicBpmnConstants;
-import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
-import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
-import org.activiti.engine.runtime.Job;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.DynamicBpmnService;
 import org.activiti5.engine.ProcessEngineConfiguration;
@@ -72,6 +58,20 @@ import org.activiti5.engine.impl.persistence.entity.TimerJobEntity;
 import org.activiti5.engine.impl.util.IoUtil;
 import org.activiti5.engine.task.IdentityLinkType;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.constants.BpmnXMLConstants;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ExtensionElement;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.SubProcess;
+import org.flowable.bpmn.model.UserTask;
+import org.flowable.bpmn.model.ValuedDataObject;
+import org.flowable.engine.DynamicBpmnConstants;
+import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
+import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -225,7 +225,7 @@ public class BpmnDeployer implements Deployer {
         
         if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
         	commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-        			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_CREATED, processDefinition));
+        			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processDefinition));
         }
 
         removeObsoleteTimers(processDefinition);
@@ -242,7 +242,7 @@ public class BpmnDeployer implements Deployer {
 
         if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
         	commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-        			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_INITIALIZED, processDefinition));
+        			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, processDefinition));
         }
 
         scheduleTimers(timers);

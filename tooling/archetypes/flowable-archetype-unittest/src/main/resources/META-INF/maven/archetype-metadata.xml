@@ -17,7 +17,7 @@
      <directory>src/test/resources</directory>
      <includes>
        <include>log4j.properties</include>
-       <include>activiti.cfg.xml</include>
+       <include>flowable.cfg.xml</include>
      </includes>
    </fileSet>
  </fileSets>

@@ -13,9 +13,9 @@
 
 package org.activiti5.engine.test.bpmn.deployment;
 
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.runtime.Job;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.runtime.Job;
 
 /**
  * A test specifically written to test how events (start/boundary) are handled 

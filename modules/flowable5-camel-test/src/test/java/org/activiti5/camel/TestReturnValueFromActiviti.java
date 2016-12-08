@@ -15,8 +15,6 @@ package org.activiti5.camel;
 
 import java.util.List;
 
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.spring.impl.test.SpringActivitiTestCase;
 import org.apache.camel.CamelContext;
 import org.apache.camel.EndpointInject;
@@ -25,6 +23,8 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.test.Deployment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 

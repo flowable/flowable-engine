@@ -12,10 +12,10 @@
  */
 package org.activiti5.standalone.parsing;
 
-import org.activiti.bpmn.model.StartEvent;
-import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti5.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
 import org.activiti5.engine.impl.bpmn.parser.factory.DefaultActivityBehaviorFactory;
+import org.flowable.bpmn.model.StartEvent;
+import org.flowable.engine.delegate.DelegateExecution;
 
 /**
  * @author Joram Barrez

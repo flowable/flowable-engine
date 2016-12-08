@@ -12,10 +12,10 @@
  */
 package org.activiti5.engine.test.jobexecutor;
 
-import org.activiti.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.impl.jobexecutor.JobHandler;
-import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.activiti.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.jobexecutor.JobHandler;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

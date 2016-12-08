@@ -17,14 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.VariableScope;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.impl.persistence.entity.VariableInstance;
-import org.activiti.engine.task.IdentityLink;
 import org.activiti5.engine.runtime.Execution;
 import org.activiti5.engine.runtime.ExecutionQuery;
 import org.activiti5.engine.runtime.NativeExecutionQuery;
@@ -34,6 +26,14 @@ import org.activiti5.engine.runtime.ProcessInstanceBuilder;
 import org.activiti5.engine.runtime.ProcessInstanceQuery;
 import org.activiti5.engine.task.Event;
 import org.activiti5.engine.task.IdentityLinkType;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.delegate.VariableScope;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.impl.persistence.entity.VariableInstance;
+import org.flowable.engine.task.IdentityLink;
 
 /**
  * 
@@ -55,7 +55,7 @@ public interface RuntimeService {
    * 
    * @param processDefinitionKey
    *          key of process definition, cannot be null.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no process definition is deployed with the given key.
    */
   ProcessInstance startProcessInstanceByKey(String processDefinitionKey);
@@ -76,7 +76,7 @@ public interface RuntimeService {
    * @param businessKey
    *          a key that uniquely identifies the process instance in the context
    *          or the given process definition.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no process definition is deployed with the given key.
    */
   ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey);
@@ -89,7 +89,7 @@ public interface RuntimeService {
    *          key of process definition, cannot be null.
    * @param variables
    *          the variables to pass, can be null.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no process definition is deployed with the given key.
    */
   ProcessInstance startProcessInstanceByKey(String processDefinitionKey, Map<String, Object> variables);
@@ -114,7 +114,7 @@ public interface RuntimeService {
    * @param businessKey
    *          a key that uniquely identifies the process instance in the context
    *          or the given process definition.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no process definition is deployed with the given key.
    */
   ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey, Map<String, Object> variables);
@@ -145,7 +145,7 @@ public interface RuntimeService {
    * 
    * @param processDefinitionId
    *          the id of the process definition, cannot be null.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no process definition is deployed with the given key.
    */
   ProcessInstance startProcessInstanceById(String processDefinitionId);
@@ -166,7 +166,7 @@ public interface RuntimeService {
    * @param businessKey
    *          a key that uniquely identifies the process instance in the context
    *          or the given process definition.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no process definition is deployed with the given key.
    */
   ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey);
@@ -179,7 +179,7 @@ public interface RuntimeService {
    *          the id of the process definition, cannot be null.
    * @param variables
    *          variables to be passed, can be null
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no process definition is deployed with the given key.
    */
   ProcessInstance startProcessInstanceById(String processDefinitionId, Map<String, Object> variables);
@@ -199,7 +199,7 @@ public interface RuntimeService {
    *          the id of the process definition, cannot be null.
    * @param variables
    *          variables to be passed, can be null
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no process definition is deployed with the given key.
    */
   ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, Map<String, Object> variables);
@@ -336,7 +336,7 @@ public interface RuntimeService {
    *          id of process instance to delete, cannot be null.
    * @param deleteReason
    *          reason for deleting, can be null.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no process instance is found with the given id.
    */
   void deleteProcessInstance(String processInstanceId, String deleteReason);
@@ -347,7 +347,7 @@ public interface RuntimeService {
    * 
    * @param executionId
    *          id of the execution, cannot be null.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no execution exists with the given executionId.
    */
   List<String> getActiveActivityIds(String executionId);
@@ -358,7 +358,7 @@ public interface RuntimeService {
    * 
    * @param executionId
    *          id of execution to signal, cannot be null.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no execution is found for the given executionId.
    */
   void signal(String executionId);
@@ -371,7 +371,7 @@ public interface RuntimeService {
    *          id of execution to signal, cannot be null.
    * @param processVariables
    *          a map of process variables
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no execution is found for the given executionId.
    */
   void signal(String executionId, Map<String, Object> processVariables);
@@ -406,7 +406,7 @@ public interface RuntimeService {
    * @param identityLinkType
    *          type of identityLink, cannot be null (@see
    *          {@link IdentityLinkType}).
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when the process instance doesn't exist.
    */
   void addUserIdentityLink(String processInstanceId, String userId, String identityLinkType);
@@ -417,7 +417,7 @@ public interface RuntimeService {
    * @param processInstanceId id of the process instance, cannot be null.
    * @param groupId id of the group to involve, cannot be null.
    * @param identityLinkType type of identity, cannot be null (@see {@link IdentityLinkType}).
-   * @throws ActivitiObjectNotFoundException when the  process instance or group doesn't exist.
+   * @throws FlowableObjectNotFoundException when the  process instance or group doesn't exist.
    */
   void addGroupIdentityLink(String processInstanceId, String groupId, String identityLinkType);
   
@@ -425,7 +425,7 @@ public interface RuntimeService {
    * Convenience shorthand for {@link #addUserIdentityLink(String, String, String)}; with type {@link IdentityLinkType#CANDIDATE}
    * @param processInstanceId id of the process instance, cannot be null.
    * @param userId id of the user to use as candidate, cannot be null.
-   * @throws ActivitiObjectNotFoundException when the task or user doesn't exist.
+   * @throws FlowableObjectNotFoundException when the task or user doesn't exist.
    */
   void addParticipantUser(String processInstanceId, String userId);
   
@@ -433,7 +433,7 @@ public interface RuntimeService {
    * Convenience shorthand for {@link #addGroupIdentityLink(String, String, String)}; with type {@link IdentityLinkType#CANDIDATE}
    * @param processInstanceId id of the process instance, cannot be null.
    * @param groupId id of the group to use as candidate, cannot be null.
-   * @throws ActivitiObjectNotFoundException when the task or group doesn't exist.
+   * @throws FlowableObjectNotFoundException when the task or group doesn't exist.
    */
   void addParticipantGroup(String processInstanceId, String groupId);
   
@@ -441,7 +441,7 @@ public interface RuntimeService {
    * Convenience shorthand for {@link #deleteUserIdentityLink(String, String, String)}; with type {@link IdentityLinkType#CANDIDATE}
    * @param processInstanceId id of the process instance, cannot be null.
    * @param userId id of the user to use as candidate, cannot be null.
-   * @throws ActivitiObjectNotFoundException when the task or user doesn't exist.
+   * @throws FlowableObjectNotFoundException when the task or user doesn't exist.
    */
   void deleteParticipantUser(String processInstanceId, String userId);
   
@@ -449,7 +449,7 @@ public interface RuntimeService {
    * Convenience shorthand for {@link #deleteGroupIdentityLink(String, String, String)}; with type {@link IdentityLinkType#CANDIDATE}
    * @param processInstanceId id of the process instance, cannot be null.
    * @param groupId id of the group to use as candidate, cannot be null.
-   * @throws ActivitiObjectNotFoundException when the task or group doesn't exist.
+   * @throws FlowableObjectNotFoundException when the task or group doesn't exist.
    */
   void deleteParticipantGroup(String processInstanceId, String groupId);
   
@@ -458,7 +458,7 @@ public interface RuntimeService {
    * @param processInstanceId id of the process instance, cannot be null.
    * @param userId id of the user involve, cannot be null.
    * @param identityLinkType type of identityLink, cannot be null (@see {@link IdentityLinkType}).
-   * @throws ActivitiObjectNotFoundException when the task or user doesn't exist.
+   * @throws FlowableObjectNotFoundException when the task or user doesn't exist.
    */
   void deleteUserIdentityLink(String processInstanceId, String userId, String identityLinkType);
   
@@ -467,7 +467,7 @@ public interface RuntimeService {
    * @param processInstanceId id of the process instance, cannot be null.
    * @param groupId id of the group to involve, cannot be null.
    * @param identityLinkType type of identity, cannot be null (@see {@link IdentityLinkType}).
-   * @throws ActivitiObjectNotFoundException when the task or group doesn't exist.
+   * @throws FlowableObjectNotFoundException when the task or group doesn't exist.
    */
   void deleteGroupIdentityLink(String processInstanceId, String groupId, String identityLinkType);
 
@@ -488,7 +488,7 @@ public interface RuntimeService {
    * @param executionId
    *          id of execution, cannot be null.
    * @return the variables or an empty map if no such variables are found.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no execution is found for the given executionId.
    */
   Map<String, Object> getVariables(String executionId);
@@ -499,7 +499,7 @@ public interface RuntimeService {
    * @param executionId
    *          id of execution, cannot be null.
    * @return the variable instances or an empty map if no such variables are found.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no execution is found for the given executionId.
    */
   Map<String, VariableInstance> getVariableInstances(String executionId);
@@ -523,7 +523,7 @@ public interface RuntimeService {
    * @param executionId
    *          id of execution, cannot be null.
    * @return the variables or an empty map if no such variables are found.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no execution is found for the given executionId.
    */
   Map<String, Object> getVariablesLocal(String executionId);
@@ -535,7 +535,7 @@ public interface RuntimeService {
    * @param executionId
    *          id of execution, cannot be null.
    * @return the variables or an empty map if no such variables are found.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no execution is found for the given executionId.
    */
   Map<String, VariableInstance> getVariableInstancesLocal(String executionId);
@@ -550,7 +550,7 @@ public interface RuntimeService {
    * @param variableNames
    *          the collection of variable names that should be retrieved.
    * @return the variables or an empty map if no such variables are found.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no execution is found for the given executionId.
    */
   Map<String, Object> getVariables(String executionId, Collection<String> variableNames);
@@ -563,7 +563,7 @@ public interface RuntimeService {
    * @param variableNames
    *          the collection of variable names that should be retrieved. 
    * @return the variables or an empty map if no such variables are found.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no execution is found for the given executionId.
    */
   Map<String, VariableInstance> getVariableInstances(String executionId, Collection<String> variableNames);
@@ -577,7 +577,7 @@ public interface RuntimeService {
    * @param variableNames
    *          the collection of variable names that should be retrieved.
    * @return the variables or an empty map if no such variables are found.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no execution is found for the given executionId.
    */
   Map<String, Object> getVariablesLocal(String executionId, Collection<String> variableNames);
@@ -590,7 +590,7 @@ public interface RuntimeService {
    * @param variableNames
    *          the collection of variable names that should be retrieved.
    * @return the variables or an empty map if no such variables are found.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no execution is found for the given executionId.
    */
   Map<String, VariableInstance> getVariableInstancesLocal(String executionId, Collection<String> variableNames);
@@ -607,7 +607,7 @@ public interface RuntimeService {
    *          name of variable, cannot be null.
    * @return the variable value or null if the variable is undefined or the
    *         value of the variable is null.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no execution is found for the given executionId.
    */
   Object getVariable(String executionId, String variableName);
@@ -621,7 +621,7 @@ public interface RuntimeService {
    * @param variableName
    *          name of variable, cannot be null.
    * @return the variable or null if the variable is undefined.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no execution is found for the given executionId.
    */
   VariableInstance getVariableInstance(String executionId, String variableName);
@@ -641,7 +641,7 @@ public interface RuntimeService {
    *          name of variable, cannot be null.
    * @return the variable value or null if the variable is undefined or the
    *         value of the variable is null.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no execution is found for the given executionId.
    */
   <T> T getVariable(String executionId, String variableName, Class<T> variableClass);
@@ -670,7 +670,7 @@ public interface RuntimeService {
    * @param variableName
    *          name of variable, cannot be null.
    * @return the variable or null if the variable is undefined.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no execution is found for the given executionId.
    */
   VariableInstance getVariableInstanceLocal(String executionId, String variableName);
@@ -706,7 +706,7 @@ public interface RuntimeService {
    * @param value
    *          value to set. When null is passed, the variable is not removed,
    *          only it's value will be set to null.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no execution is found for the given executionId.
    */
   void setVariable(String executionId, String variableName, Object value);
@@ -723,7 +723,7 @@ public interface RuntimeService {
    * @param value
    *          value to set. When null is passed, the variable is not removed,
    *          only it's value will be set to null.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no execution is found for the given executionId.
    */
   void setVariableLocal(String executionId, String variableName, Object value);
@@ -743,7 +743,7 @@ public interface RuntimeService {
    *          id of the execution, cannot be null.
    * @param variables
    *          map containing name (key) and value of variables, can be null.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no execution is found for the given executionId.
    */
   void setVariables(String executionId, Map<String, ? extends Object> variables);
@@ -757,7 +757,7 @@ public interface RuntimeService {
    *          id of the execution, cannot be null.
    * @param variables
    *          map containing name (key) and value of variables, can be null.
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           when no execution is found for the given executionId.
    */
   void setVariablesLocal(String executionId, Map<String, ? extends Object> variables);
@@ -840,7 +840,7 @@ public interface RuntimeService {
    * form the hierarchy will not suspend other process instances form that
    * hierarchy.
    * 
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           if no such processInstance can be found.
    * @throws ActivitiException
    *           the process instance is already in state suspended.
@@ -854,7 +854,7 @@ public interface RuntimeService {
    * form the hierarchy will not suspend other process instances form that
    * hierarchy.
    * 
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           if no such processInstance can be found.
    * @throws ActivitiException
    *           if the process instance is already in state active.
@@ -928,7 +928,7 @@ public interface RuntimeService {
    *          the name of the signal event
    * @param executionId
    *          the id of the execution to deliver the signal to
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           if no such execution exists.
    * @throws ActivitiException
    *           if the execution has not subscribed to the signal.
@@ -947,7 +947,7 @@ public interface RuntimeService {
    *          the id of the execution to deliver the signal to
    * @param processVariables
    *          a map of variables added to the execution(s)
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           if no such execution exists.
    * @throws ActivitiException
    *           if the execution has not subscribed to the signal
@@ -964,7 +964,7 @@ public interface RuntimeService {
    *          the name of the signal event
    * @param executionId
    *          the id of the execution to deliver the signal to
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           if no such execution exists.
    * @throws ActivitiException
    *           if the execution has not subscribed to the signal.
@@ -982,7 +982,7 @@ public interface RuntimeService {
    *          the name of the message event
    * @param executionId
    *          the id of the execution to deliver the message to
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           if no such execution exists.
    * @throws ActivitiException
    *           if the execution has not subscribed to the signal
@@ -1020,7 +1020,7 @@ public interface RuntimeService {
    *          the id of the execution to deliver the message to
    * @param processVariables
    *          a map of variables added to the execution
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           if no such execution exists.
    * @throws ActivitiException
    *           if the execution has not subscribed to the signal
@@ -1038,7 +1038,7 @@ public interface RuntimeService {
    *          the name of the message event
    * @param executionId
    *          the id of the execution to deliver the message to
-   * @throws ActivitiObjectNotFoundException
+   * @throws FlowableObjectNotFoundException
    *           if no such execution exists.
    * @throws ActivitiException
    *           if the execution has not subscribed to the signal
@@ -1052,7 +1052,7 @@ public interface RuntimeService {
    * @param listenerToAdd
    *          the listener to add
    */
-  void addEventListener(ActivitiEventListener listenerToAdd);
+  void addEventListener(FlowableEventListener listenerToAdd);
 
   /**
    * Adds an event-listener which will only be notified when an event occurs,
@@ -1063,7 +1063,7 @@ public interface RuntimeService {
    * @param types
    *          types of events the listener should be notified for
    */
-  void addEventListener(ActivitiEventListener listenerToAdd, ActivitiEngineEventType... types);
+  void addEventListener(FlowableEventListener listenerToAdd, FlowableEngineEventType... types);
 
   /**
    * Removes the given listener from this dispatcher. The listener will no
@@ -1073,7 +1073,7 @@ public interface RuntimeService {
    * @param listenerToRemove
    *          listener to remove
    */
-  void removeEventListener(ActivitiEventListener listenerToRemove);
+  void removeEventListener(FlowableEventListener listenerToRemove);
 
   /**
    * Dispatches the given event to any listeners that are registered.
@@ -1083,17 +1083,17 @@ public interface RuntimeService {
    * 
    * @throws ActivitiException
    *           if an exception occurs when dispatching the event or when the
-   *           {@link ActivitiEventDispatcher} is disabled.
+   *           {@link FlowableEventDispatcher} is disabled.
    * @throws ActivitiIllegalArgumentException
    *           when the given event is not suitable for dispatching.
    */
-  void dispatchEvent(ActivitiEvent event);
+  void dispatchEvent(FlowableEvent event);
   
   /**
    * Sets the name for the process instance with the given id.
    * @param processInstanceId id of the process instance to update
    * @param name new name for the process instance
-   * @throws ActivitiObjectNotFoundException 
+   * @throws FlowableObjectNotFoundException 
    *    when the given process instance does not exist.
    */
   void setProcessInstanceName(String processInstanceId, String name);

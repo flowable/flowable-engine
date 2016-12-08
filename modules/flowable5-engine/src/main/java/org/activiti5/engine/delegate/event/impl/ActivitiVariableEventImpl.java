@@ -12,23 +12,23 @@
  */
 package org.activiti5.engine.delegate.event.impl;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.delegate.event.ActivitiVariableEvent;
-import org.activiti.engine.impl.variable.VariableType;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.delegate.event.FlowableVariableEvent;
+import org.flowable.engine.impl.variable.VariableType;
 
 /**
- * Implementation of {@link ActivitiVariableEvent}.
+ * Implementation of {@link FlowableVariableEvent}.
  * 
  * @author Frederik Heremans
  */
-public class ActivitiVariableEventImpl extends ActivitiEventImpl implements ActivitiVariableEvent {
+public class ActivitiVariableEventImpl extends ActivitiEventImpl implements FlowableVariableEvent {
 
 	protected String variableName;
 	protected Object variableValue;
 	protected VariableType variableType;
 	protected String taskId;
 	
-	public ActivitiVariableEventImpl(ActivitiEngineEventType type) {
+	public ActivitiVariableEventImpl(FlowableEngineEventType type) {
 	  super(type);
   }
 

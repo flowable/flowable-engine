@@ -14,14 +14,14 @@ package org.activiti5.engine.impl.pvm.runtime;
 
 import java.util.List;
 
-import org.activiti.engine.delegate.ExecutionListener;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.pvm.PvmException;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
 import org.activiti5.engine.impl.pvm.process.ScopeImpl;
 import org.activiti5.engine.impl.pvm.process.TransitionImpl;
+import org.flowable.engine.delegate.ExecutionListener;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +72,7 @@ public class AtomicOperationTransitionNotifyListenerTake implements AtomicOperat
       // Firing event that transition is being taken     	
       if(Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createSequenceFlowTakenEvent(ActivitiEngineEventType.SEQUENCEFLOW_TAKEN, transition.getId(),
+    			ActivitiEventBuilder.createSequenceFlowTakenEvent(FlowableEngineEventType.SEQUENCEFLOW_TAKEN, transition.getId(),
     					activity.getId(), (String) activity.getProperties().get("name") ,(String) activity.getProperties().get("type"), activity.getActivityBehavior().getClass().getCanonicalName(),
     					nextScope.getId(), (String) nextScope.getProperties().get("name"), (String) nextScope.getProperties().get("type"), nextScope.getActivityBehavior().getClass().getCanonicalName()));
       }

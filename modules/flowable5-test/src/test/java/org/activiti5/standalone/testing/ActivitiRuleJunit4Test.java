@@ -15,13 +15,13 @@ package org.activiti5.standalone.testing;
 
 import static org.junit.Assert.assertEquals;
 
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.JobTestHelper;
 import org.activiti5.engine.test.ActivitiRule;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 import org.junit.Rule;
 import org.junit.Test;
 

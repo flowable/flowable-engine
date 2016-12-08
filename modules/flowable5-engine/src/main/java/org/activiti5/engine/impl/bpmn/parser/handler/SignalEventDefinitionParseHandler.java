@@ -12,16 +12,16 @@
  */
 package org.activiti5.engine.impl.bpmn.parser.handler;
 
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.BoundaryEvent;
-import org.activiti.bpmn.model.IntermediateCatchEvent;
-import org.activiti.bpmn.model.Signal;
-import org.activiti.bpmn.model.SignalEventDefinition;
-import org.activiti.bpmn.model.StartEvent;
-import org.activiti.bpmn.model.ThrowEvent;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti5.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.IntermediateCatchEvent;
+import org.flowable.bpmn.model.Signal;
+import org.flowable.bpmn.model.SignalEventDefinition;
+import org.flowable.bpmn.model.StartEvent;
+import org.flowable.bpmn.model.ThrowEvent;
 
 /**
  * @author Joram Barrez

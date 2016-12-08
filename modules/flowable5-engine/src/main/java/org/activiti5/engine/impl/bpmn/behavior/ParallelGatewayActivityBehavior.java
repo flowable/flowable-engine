@@ -15,12 +15,12 @@ package org.activiti5.engine.impl.bpmn.behavior;
 
 import java.util.List;
 
-import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti5.engine.impl.pvm.PvmActivity;
 import org.activiti5.engine.impl.pvm.PvmTransition;
 import org.activiti5.engine.impl.pvm.delegate.ActivityExecution;
+import org.flowable.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -12,10 +12,10 @@
  */
 package org.activiti5.standalone.parsing;
 
-import org.activiti.bpmn.model.UserTask;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti5.engine.impl.bpmn.parser.handler.UserTaskParseHandler;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
+import org.flowable.bpmn.model.UserTask;
 
 
 /**

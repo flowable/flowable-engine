@@ -12,10 +12,10 @@
  */
 package org.activiti5.spring.test.servicetask;
 
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
-import org.activiti.engine.impl.context.Context;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.JavaDelegate;
+import org.flowable.engine.impl.context.Context;
 
 /**
  * @author Joram Barrez

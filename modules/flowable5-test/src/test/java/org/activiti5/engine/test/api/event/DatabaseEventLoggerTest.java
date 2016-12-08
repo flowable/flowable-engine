@@ -6,16 +6,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.event.EventLogEntry;
-import org.activiti.engine.impl.identity.Authentication;
-import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
 import org.activiti5.engine.impl.event.logger.EventLogger;
 import org.activiti5.engine.impl.event.logger.handler.Fields;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti5.engine.impl.util.CollectionUtil;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.event.EventLogEntry;
+import org.flowable.engine.impl.identity.Authentication;
+import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -84,7 +84,7 @@ public class DatabaseEventLoggerTest extends PluggableActivitiTestCase {
 			if (i == 0) {
 				
 				assertNotNull(entry.getType());
-				assertEquals(entry.getType(), ActivitiEngineEventType.VARIABLE_CREATED.name());
+				assertEquals(entry.getType(), FlowableEngineEventType.VARIABLE_CREATED.name());
 				assertNotNull(entry.getProcessDefinitionId());
 				assertNotNull(entry.getProcessInstanceId());
 				assertNotNull(entry.getTimeStamp());
@@ -125,7 +125,7 @@ public class DatabaseEventLoggerTest extends PluggableActivitiTestCase {
 			// Activity started
 			if (i == 2 || i == 5 || i == 8 || i == 12) {
 				assertNotNull(entry.getType());
-				assertEquals(entry.getType(), ActivitiEngineEventType.ACTIVITY_STARTED.name());
+				assertEquals(entry.getType(), FlowableEngineEventType.ACTIVITY_STARTED.name());
 				assertNotNull(entry.getProcessDefinitionId());
 				assertNotNull(entry.getProcessInstanceId());
 				assertNotNull(entry.getTimeStamp());
@@ -147,7 +147,7 @@ public class DatabaseEventLoggerTest extends PluggableActivitiTestCase {
 			if (i == 3) {
 				
 				assertNotNull(entry.getType());
-				assertEquals(entry.getType(), ActivitiEngineEventType.ACTIVITY_COMPLETED.name());
+				assertEquals(entry.getType(), FlowableEngineEventType.ACTIVITY_COMPLETED.name());
 				assertNotNull(entry.getProcessDefinitionId());
 				assertNotNull(entry.getProcessInstanceId());
 				assertNotNull(entry.getTimeStamp());
@@ -169,7 +169,7 @@ public class DatabaseEventLoggerTest extends PluggableActivitiTestCase {
 			// Sequence flow taken
 			if (i == 4 || i == 7 || i == 11) {
 				assertNotNull(entry.getType());
-				assertEquals(entry.getType(), ActivitiEngineEventType.SEQUENCEFLOW_TAKEN.name());
+				assertEquals(entry.getType(), FlowableEngineEventType.SEQUENCEFLOW_TAKEN.name());
 				assertNotNull(entry.getProcessDefinitionId());
 				assertNotNull(entry.getProcessInstanceId());
 				assertNotNull(entry.getTimeStamp());
@@ -193,7 +193,7 @@ public class DatabaseEventLoggerTest extends PluggableActivitiTestCase {
 			if (i == 6) {
 				
 				assertNotNull(entry.getType());
-				assertEquals(entry.getType(), ActivitiEngineEventType.ACTIVITY_COMPLETED.name());
+				assertEquals(entry.getType(), FlowableEngineEventType.ACTIVITY_COMPLETED.name());
 				assertNotNull(entry.getProcessDefinitionId());
 				assertNotNull(entry.getProcessInstanceId());
 				assertNotNull(entry.getTimeStamp());
@@ -215,7 +215,7 @@ public class DatabaseEventLoggerTest extends PluggableActivitiTestCase {
 			if (i == 10 || i == 14) {
 			
 				assertNotNull(entry.getType());
-				assertEquals(entry.getType(), ActivitiEngineEventType.TASK_CREATED.name());
+				assertEquals(entry.getType(), FlowableEngineEventType.TASK_CREATED.name());
 				assertNotNull(entry.getTimeStamp());
 				assertNotNull(entry.getProcessDefinitionId());
 				assertNotNull(entry.getProcessInstanceId());
@@ -246,7 +246,7 @@ public class DatabaseEventLoggerTest extends PluggableActivitiTestCase {
 			if (i == 9 || i == 13) {
 				
 				assertNotNull(entry.getType());
-				assertEquals(entry.getType(), ActivitiEngineEventType.TASK_ASSIGNED.name());
+				assertEquals(entry.getType(), FlowableEngineEventType.TASK_ASSIGNED.name());
 				assertNotNull(entry.getTimeStamp());
 				assertNotNull(entry.getProcessDefinitionId());
 				assertNotNull(entry.getProcessInstanceId());
@@ -297,7 +297,7 @@ public class DatabaseEventLoggerTest extends PluggableActivitiTestCase {
 			// Task completion 
 			if (i == 1 || i == 6) {
 				assertNotNull(entry.getType());
-				assertEquals(ActivitiEngineEventType.TASK_COMPLETED.name(), entry.getType());
+				assertEquals(FlowableEngineEventType.TASK_COMPLETED.name(), entry.getType());
 				assertNotNull(entry.getProcessDefinitionId());
 				assertNotNull(entry.getProcessInstanceId());
 				assertNotNull(entry.getExecutionId());
@@ -331,7 +331,7 @@ public class DatabaseEventLoggerTest extends PluggableActivitiTestCase {
 			// Activity Completed
 			if (i == 2 || i == 7 || i == 10 || i == 13) {
 				assertNotNull(entry.getType());
-				assertEquals(ActivitiEngineEventType.ACTIVITY_COMPLETED.name(), entry.getType());
+				assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED.name(), entry.getType());
 				assertNotNull(entry.getProcessDefinitionId());
 				assertNotNull(entry.getProcessInstanceId());
 				assertNotNull(entry.getTimeStamp());
@@ -363,7 +363,7 @@ public class DatabaseEventLoggerTest extends PluggableActivitiTestCase {
 			// Sequence flow taken
 			if (i == 3 || i == 8 || i == 11) {
 				assertNotNull(entry.getType());
-				assertEquals(entry.getType(), ActivitiEngineEventType.SEQUENCEFLOW_TAKEN.name());
+				assertEquals(entry.getType(), FlowableEngineEventType.SEQUENCEFLOW_TAKEN.name());
 				assertNotNull(entry.getProcessDefinitionId());
 				assertNotNull(entry.getProcessInstanceId());
 				assertNotNull(entry.getTimeStamp());
@@ -442,7 +442,7 @@ public class DatabaseEventLoggerTest extends PluggableActivitiTestCase {
 			EventLogEntry entry = eventLogEntries.get(i);
 			
 			if (i == 0) {
-				assertEquals(entry.getType(), ActivitiEngineEventType.VARIABLE_CREATED.name());
+				assertEquals(entry.getType(), FlowableEngineEventType.VARIABLE_CREATED.name());
 				Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>(){});
 				assertNull(data.get(Fields.TENANT_ID));
 			}
@@ -456,7 +456,7 @@ public class DatabaseEventLoggerTest extends PluggableActivitiTestCase {
 			
 			// Activity started
 			if (i == 2 || i == 5 || i == 8 || i == 12) {
-				assertEquals(entry.getType(), ActivitiEngineEventType.ACTIVITY_STARTED.name());
+				assertEquals(entry.getType(), FlowableEngineEventType.ACTIVITY_STARTED.name());
 				Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>(){});
 				assertNull(data.get(Fields.TENANT_ID));
 			}
@@ -464,34 +464,34 @@ public class DatabaseEventLoggerTest extends PluggableActivitiTestCase {
 			
 			// Leaving start
 			if (i == 3) {
-				assertEquals(entry.getType(), ActivitiEngineEventType.ACTIVITY_COMPLETED.name());
+				assertEquals(entry.getType(), FlowableEngineEventType.ACTIVITY_COMPLETED.name());
 				Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>(){});
 				assertNull(data.get(Fields.TENANT_ID));
 			}
 			
 			// Sequence flow taken
 			if (i == 4 || i == 7 || i == 11) {
-				assertEquals(entry.getType(), ActivitiEngineEventType.SEQUENCEFLOW_TAKEN.name());
+				assertEquals(entry.getType(), FlowableEngineEventType.SEQUENCEFLOW_TAKEN.name());
 				Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>(){});
 				assertNull(data.get(Fields.TENANT_ID));
 			}
 			
 			// Leaving parallel gateway
 			if (i == 6) {
-				assertEquals(entry.getType(), ActivitiEngineEventType.ACTIVITY_COMPLETED.name());
+				assertEquals(entry.getType(), FlowableEngineEventType.ACTIVITY_COMPLETED.name());
 				Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>(){});
 				assertNull(data.get(Fields.TENANT_ID));
 			}
 			
 			// Tasks
 			if (i == 10 || i == 14) {
-				assertEquals(entry.getType(), ActivitiEngineEventType.TASK_CREATED.name());
+				assertEquals(entry.getType(), FlowableEngineEventType.TASK_CREATED.name());
 				Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>(){});
 				assertNull(data.get(Fields.TENANT_ID));
 			}
 			
 			if (i == 9 || i == 13) {
-				assertEquals(entry.getType(), ActivitiEngineEventType.TASK_ASSIGNED.name());
+				assertEquals(entry.getType(), FlowableEngineEventType.TASK_ASSIGNED.name());
 				Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>(){});
 				assertNull(data.get(Fields.TENANT_ID));
 			}

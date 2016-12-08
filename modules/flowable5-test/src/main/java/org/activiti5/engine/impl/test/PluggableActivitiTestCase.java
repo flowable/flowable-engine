@@ -13,9 +13,9 @@
 
 package org.activiti5.engine.impl.test;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngines;
-import org.activiti.engine.common.api.ActivitiException;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngines;
+import org.flowable.engine.common.api.FlowableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +46,7 @@ public abstract class PluggableActivitiTestCase extends AbstractActivitiTestCase
       
       cachedProcessEngine = ProcessEngines.getDefaultProcessEngine();
       if (cachedProcessEngine==null) {
-        throw new ActivitiException("no default process engine available");
+        throw new FlowableException("no default process engine available");
       }
     }
     processEngine = cachedProcessEngine;

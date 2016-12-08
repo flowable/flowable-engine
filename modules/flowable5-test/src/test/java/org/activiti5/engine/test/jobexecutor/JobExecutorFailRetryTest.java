@@ -12,8 +12,8 @@
  */
 package org.activiti5.engine.test.jobexecutor;
 
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.test.Deployment;
 
 /**
  * @author Saeid Mirzaei

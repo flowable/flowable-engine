@@ -15,7 +15,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <activiti.artifact>
-            org.activiti.dmn.spring
+            org.flowable.dmn.spring
         </activiti.artifact>
         <activiti.osgi.import.additional>
           org.springframework.test.context*;resolution:=optional,

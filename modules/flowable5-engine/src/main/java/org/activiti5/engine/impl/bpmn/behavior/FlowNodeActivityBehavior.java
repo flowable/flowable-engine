@@ -12,10 +12,10 @@
  */
 package org.activiti5.engine.impl.bpmn.behavior;
 
-import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti5.engine.impl.pvm.delegate.SignallableActivityBehavior;
+import org.flowable.engine.delegate.DelegateExecution;
 
 
 /**

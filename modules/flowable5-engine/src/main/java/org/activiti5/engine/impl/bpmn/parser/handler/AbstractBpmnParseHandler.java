@@ -20,32 +20,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.bpmn.model.ActivitiListener;
-import org.activiti.bpmn.model.Activity;
-import org.activiti.bpmn.model.Artifact;
-import org.activiti.bpmn.model.Association;
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.DataSpec;
-import org.activiti.bpmn.model.EventDefinition;
-import org.activiti.bpmn.model.EventGateway;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.Gateway;
-import org.activiti.bpmn.model.ImplementationType;
-import org.activiti.bpmn.model.IntermediateCatchEvent;
-import org.activiti.bpmn.model.SequenceFlow;
-import org.activiti.bpmn.model.ValuedDataObject;
-import org.activiti.engine.delegate.ExecutionListener;
-import org.activiti.engine.impl.bpmn.data.Data;
-import org.activiti.engine.impl.bpmn.data.DataRef;
-import org.activiti.engine.impl.bpmn.data.IOSpecification;
-import org.activiti.engine.impl.bpmn.data.ItemDefinition;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti5.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
 import org.activiti5.engine.impl.pvm.process.ScopeImpl;
 import org.activiti5.engine.impl.pvm.process.TransitionImpl;
 import org.activiti5.engine.parse.BpmnParseHandler;
+import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.Activity;
+import org.flowable.bpmn.model.Artifact;
+import org.flowable.bpmn.model.Association;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.DataSpec;
+import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.EventGateway;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.Gateway;
+import org.flowable.bpmn.model.ImplementationType;
+import org.flowable.bpmn.model.IntermediateCatchEvent;
+import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.ValuedDataObject;
+import org.flowable.engine.delegate.ExecutionListener;
+import org.flowable.engine.impl.bpmn.data.Data;
+import org.flowable.engine.impl.bpmn.data.DataRef;
+import org.flowable.engine.impl.bpmn.data.IOSpecification;
+import org.flowable.engine.impl.bpmn.data.ItemDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -175,7 +175,7 @@ public abstract class AbstractBpmnParseHandler<T extends BaseElement> implements
     return eventBasedGatewayId;
   }
   
-  protected IOSpecification createIOSpecification(BpmnParse bpmnParse, org.activiti.bpmn.model.IOSpecification specificationModel) {
+  protected IOSpecification createIOSpecification(BpmnParse bpmnParse, org.flowable.bpmn.model.IOSpecification specificationModel) {
     IOSpecification ioSpecification = new IOSpecification();
 
     for (DataSpec dataInputElement : specificationModel.getDataInputs()) {

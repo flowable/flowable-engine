@@ -15,10 +15,10 @@ package org.activiti5.engine.test.db;
 
 import javax.sql.DataSource;
 
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti5.engine.impl.test.PvmTestCase;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 
 /**

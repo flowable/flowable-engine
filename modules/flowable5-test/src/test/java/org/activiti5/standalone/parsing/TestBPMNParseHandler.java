@@ -13,10 +13,10 @@
 
 package org.activiti5.standalone.parsing;
 
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.Process;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti5.engine.impl.bpmn.parser.handler.AbstractBpmnParseHandler;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.Process;
 
 
 /**

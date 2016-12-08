@@ -12,11 +12,11 @@
  */
 package org.activiti5.engine.impl.cmd;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.impl.interceptor.Command;
 import org.activiti5.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
  * Command that adds an event-listener to the Activiti engine.
@@ -25,15 +25,15 @@ import org.activiti5.engine.impl.interceptor.CommandContext;
  */
 public class AddEventListenerCommand implements Command<Void> {
 	
-	protected ActivitiEventListener listener;
-	protected ActivitiEngineEventType[] types;
+	protected FlowableEventListener listener;
+	protected FlowableEngineEventType[] types;
 	
-	public AddEventListenerCommand(ActivitiEventListener listener, ActivitiEngineEventType[] types) {
+	public AddEventListenerCommand(FlowableEventListener listener, FlowableEngineEventType[] types) {
 	  this.listener = listener;
 	  this.types = types;
   }
 
-	public AddEventListenerCommand(ActivitiEventListener listener) {
+	public AddEventListenerCommand(FlowableEventListener listener) {
 	  super();
 	  this.listener = listener;
   }

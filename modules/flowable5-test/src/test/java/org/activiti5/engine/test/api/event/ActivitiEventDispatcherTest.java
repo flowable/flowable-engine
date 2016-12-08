@@ -12,10 +12,6 @@
  */
 package org.activiti5.engine.test.api.event;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.delegate.event.BaseEntityEventListener;
-import org.activiti.engine.delegate.event.impl.ActivitiEventDispatcherImpl;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.delegate.event.impl.ActivitiEntityEventImpl;
@@ -25,6 +21,10 @@ import org.activiti5.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti5.engine.impl.persistence.entity.TaskEntity;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti5.engine.task.Task;
+import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.delegate.event.BaseEntityEventListener;
+import org.flowable.engine.delegate.event.impl.FlowableEventDispatcherImpl;
 
 /**
  * 
@@ -32,13 +32,13 @@ import org.activiti5.engine.task.Task;
  */
 public abstract class ActivitiEventDispatcherTest extends PluggableActivitiTestCase {
 
-	protected ActivitiEventDispatcher dispatcher;
+	protected FlowableEventDispatcher dispatcher;
 
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		dispatcher = new ActivitiEventDispatcherImpl();
+		dispatcher = new FlowableEventDispatcherImpl();
 	}
 
 	/**
@@ -52,8 +52,8 @@ public abstract class ActivitiEventDispatcherTest extends PluggableActivitiTestC
 		// Add event-listener to dispatcher
 		dispatcher.addEventListener(newListener);
 
-		ActivitiEntityEventImpl event1 = new ActivitiEntityEventImpl(new TaskEntity(), ActivitiEngineEventType.ENTITY_CREATED);
-		ActivitiEntityEventImpl event2 = new ActivitiEntityEventImpl(new TaskEntity(), ActivitiEngineEventType.ENTITY_CREATED);
+		ActivitiEntityEventImpl event1 = new ActivitiEntityEventImpl(new TaskEntity(), FlowableEngineEventType.ENTITY_CREATED);
+		ActivitiEntityEventImpl event2 = new ActivitiEntityEventImpl(new TaskEntity(), FlowableEngineEventType.ENTITY_CREATED);
 
 		// Dispatch events
 		dispatcher.dispatchEvent(event1);
@@ -81,11 +81,11 @@ public abstract class ActivitiEventDispatcherTest extends PluggableActivitiTestC
 		TestActivitiEventListener newListener = new TestActivitiEventListener();
 
 		// Add event-listener to dispatcher
-		dispatcher.addEventListener(newListener, ActivitiEngineEventType.ENTITY_CREATED, ActivitiEngineEventType.ENTITY_DELETED);
+		dispatcher.addEventListener(newListener, FlowableEngineEventType.ENTITY_CREATED, FlowableEngineEventType.ENTITY_DELETED);
 
-		ActivitiEntityEventImpl event1 = new ActivitiEntityEventImpl(new TaskEntity(), ActivitiEngineEventType.ENTITY_CREATED);
-		ActivitiEntityEventImpl event2 = new ActivitiEntityEventImpl(new TaskEntity(), ActivitiEngineEventType.ENTITY_DELETED);
-		ActivitiEntityEventImpl event3 = new ActivitiEntityEventImpl(new TaskEntity(), ActivitiEngineEventType.ENTITY_UPDATED);
+		ActivitiEntityEventImpl event1 = new ActivitiEntityEventImpl(new TaskEntity(), FlowableEngineEventType.ENTITY_CREATED);
+		ActivitiEntityEventImpl event2 = new ActivitiEntityEventImpl(new TaskEntity(), FlowableEngineEventType.ENTITY_DELETED);
+		ActivitiEntityEventImpl event3 = new ActivitiEntityEventImpl(new TaskEntity(), FlowableEngineEventType.ENTITY_UPDATED);
 
 		// Dispatch events, only 2 out of 3 should have entered the listener
 		dispatcher.dispatchEvent(event1);
@@ -114,10 +114,10 @@ public abstract class ActivitiEventDispatcherTest extends PluggableActivitiTestC
 		TestActivitiEventListener newListener = new TestActivitiEventListener();
 
 		// Add event-listener to dispatcher
-		dispatcher.addEventListener(newListener, (ActivitiEngineEventType) null);
+		dispatcher.addEventListener(newListener, (FlowableEngineEventType) null);
 
-		ActivitiEntityEventImpl event1 = new ActivitiEntityEventImpl(new TaskEntity(), ActivitiEngineEventType.ENTITY_CREATED);
-		ActivitiEntityEventImpl event2 = new ActivitiEntityEventImpl(new TaskEntity(), ActivitiEngineEventType.ENTITY_DELETED);
+		ActivitiEntityEventImpl event1 = new ActivitiEntityEventImpl(new TaskEntity(), FlowableEngineEventType.ENTITY_CREATED);
+		ActivitiEntityEventImpl event2 = new ActivitiEntityEventImpl(new TaskEntity(), FlowableEngineEventType.ENTITY_DELETED);
 
 		// Dispatch events, all should have entered the listener
 		dispatcher.dispatchEvent(event1);
@@ -135,12 +135,12 @@ public abstract class ActivitiEventDispatcherTest extends PluggableActivitiTestC
 		dispatcher.addEventListener(listener);
 
 		ActivitiEntityEventImpl createEvent = new ActivitiEntityEventImpl(new TaskEntity(),
-		    ActivitiEngineEventType.ENTITY_CREATED);
+		    FlowableEngineEventType.ENTITY_CREATED);
 		ActivitiEntityEventImpl deleteEvent = new ActivitiEntityEventImpl(new TaskEntity(),
-		    ActivitiEngineEventType.ENTITY_DELETED);
+		    FlowableEngineEventType.ENTITY_DELETED);
 		ActivitiEntityEventImpl updateEvent = new ActivitiEntityEventImpl(new TaskEntity(),
-		    ActivitiEngineEventType.ENTITY_UPDATED);
-		ActivitiEntityEventImpl otherEvent = new ActivitiEntityEventImpl(new TaskEntity(), ActivitiEngineEventType.CUSTOM);
+		    FlowableEngineEventType.ENTITY_UPDATED);
+		ActivitiEntityEventImpl otherEvent = new ActivitiEntityEventImpl(new TaskEntity(), FlowableEngineEventType.CUSTOM);
 
 		// Dispatch create event
 		dispatcher.dispatchEvent(createEvent);
@@ -187,7 +187,7 @@ public abstract class ActivitiEventDispatcherTest extends PluggableActivitiTestC
 
 		// Dispatch event for a execution, should NOT be received
 		ActivitiEntityEventImpl createEventForExecution = new ActivitiEntityEventImpl(new ExecutionEntity(),
-		    ActivitiEngineEventType.ENTITY_CREATED);
+		    FlowableEngineEventType.ENTITY_CREATED);
 
 		dispatcher.dispatchEvent(createEventForExecution);
 		assertFalse(listener.isCreateReceived());
@@ -204,7 +204,7 @@ public abstract class ActivitiEventDispatcherTest extends PluggableActivitiTestC
 		dispatcher.addEventListener(listener);
 		dispatcher.addEventListener(secondListener);
 
-		ActivitiEventImpl event = new ActivitiEventImpl(ActivitiEngineEventType.ENTITY_CREATED);
+		ActivitiEventImpl event = new ActivitiEventImpl(FlowableEngineEventType.ENTITY_CREATED);
 		try {
 			dispatcher.dispatchEvent(event);
 			assertEquals(1, secondListener.getEventsReceived().size());
@@ -237,44 +237,44 @@ public abstract class ActivitiEventDispatcherTest extends PluggableActivitiTestC
 
 	/**
 	 * Test conversion of string-value (and list) in list of
-	 * {@link ActivitiEngineEventType}s, used in configuration of process-engine
+	 * {@link FlowableEngineEventType}s, used in configuration of process-engine
 	 * {@link ProcessEngineConfigurationImpl#setTypedEventListeners(java.util.Map)}
 	 * .
 	 */
 	public void activitiEventTypeParsing() throws Exception {
 		// Check with empty null
-		ActivitiEngineEventType[] types = ActivitiEngineEventType.getTypesFromString(null);
+		FlowableEngineEventType[] types = FlowableEngineEventType.getTypesFromString(null);
 		assertNotNull(types);
 		assertEquals(0, types.length);
 
 		// Check with empty string
-		types = ActivitiEngineEventType.getTypesFromString("");
+		types = FlowableEngineEventType.getTypesFromString("");
 		assertNotNull(types);
 		assertEquals(0, types.length);
 
 		// Single value
-		types = ActivitiEngineEventType.getTypesFromString("ENTITY_CREATED");
+		types = FlowableEngineEventType.getTypesFromString("ENTITY_CREATED");
 		assertNotNull(types);
 		assertEquals(1, types.length);
-		assertEquals(ActivitiEngineEventType.ENTITY_CREATED, types[0]);
+		assertEquals(FlowableEngineEventType.ENTITY_CREATED, types[0]);
 
 		// Multiple value
-		types = ActivitiEngineEventType.getTypesFromString("ENTITY_CREATED,ENTITY_DELETED");
+		types = FlowableEngineEventType.getTypesFromString("ENTITY_CREATED,ENTITY_DELETED");
 		assertNotNull(types);
 		assertEquals(2, types.length);
-		assertEquals(ActivitiEngineEventType.ENTITY_CREATED, types[0]);
-		assertEquals(ActivitiEngineEventType.ENTITY_DELETED, types[1]);
+		assertEquals(FlowableEngineEventType.ENTITY_CREATED, types[0]);
+		assertEquals(FlowableEngineEventType.ENTITY_DELETED, types[1]);
 		
 		// Additional separators should be ignored
-		types = ActivitiEngineEventType.getTypesFromString(",ENTITY_CREATED,,ENTITY_DELETED,,,");
+		types = FlowableEngineEventType.getTypesFromString(",ENTITY_CREATED,,ENTITY_DELETED,,,");
 		assertNotNull(types);
 		assertEquals(2, types.length);
-		assertEquals(ActivitiEngineEventType.ENTITY_CREATED, types[0]);
-		assertEquals(ActivitiEngineEventType.ENTITY_DELETED, types[1]);
+		assertEquals(FlowableEngineEventType.ENTITY_CREATED, types[0]);
+		assertEquals(FlowableEngineEventType.ENTITY_DELETED, types[1]);
 
 		// Invalid type name
 		try {
-			ActivitiEngineEventType.getTypesFromString("WHOOPS,ENTITY_DELETED");
+			FlowableEngineEventType.getTypesFromString("WHOOPS,ENTITY_DELETED");
 			fail("Exception expected");
 		} catch(ActivitiIllegalArgumentException expected) {
 			// Expected exception

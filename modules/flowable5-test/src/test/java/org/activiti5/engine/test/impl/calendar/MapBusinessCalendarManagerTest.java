@@ -20,10 +20,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.impl.calendar.BusinessCalendar;
-import org.activiti.engine.impl.calendar.CycleBusinessCalendar;
-import org.activiti.engine.impl.calendar.MapBusinessCalendarManager;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.impl.calendar.BusinessCalendar;
+import org.flowable.engine.impl.calendar.CycleBusinessCalendar;
+import org.flowable.engine.impl.calendar.MapBusinessCalendarManager;
 
 import junit.framework.TestCase;
 
@@ -47,7 +47,7 @@ public class MapBusinessCalendarManagerTest extends TestCase {
     try {
       businessCalendarManager.getBusinessCalendar("INVALID");
       fail("ActivitiException expected");
-    } catch (ActivitiException e) {
+    } catch (FlowableException e) {
       assertThat(e.getMessage(), containsString("INVALID does not exist"));
     }
   }

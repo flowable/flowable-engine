@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 
 import java.util.Map;
 
-import org.activiti.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.junit.Test;
 
 public class JavaDelegateTest extends AbstractActiviti6CompatibilityTest {

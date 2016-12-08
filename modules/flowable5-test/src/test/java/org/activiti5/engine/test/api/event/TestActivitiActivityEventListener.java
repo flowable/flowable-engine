@@ -15,27 +15,27 @@ package org.activiti5.engine.test.api.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiActivityEvent;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.delegate.event.FlowableActivityEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
- * Test event listener that only records events related to activities ({@link ActivitiActivityEvent}s).
+ * Test event listener that only records events related to activities ({@link FlowableActivityEvent}s).
  *  
  * @author Frederik Heremans
  */
-public class TestActivitiActivityEventListener implements ActivitiEventListener {
+public class TestActivitiActivityEventListener implements FlowableEventListener {
 
-	private List<ActivitiEvent> eventsReceived;
+	private List<FlowableEvent> eventsReceived;
 	private boolean ignoreRawActivityEvents;
 	
 	public TestActivitiActivityEventListener(boolean ignoreRawActivityEvents) {
-		eventsReceived = new ArrayList<ActivitiEvent>();
+		eventsReceived = new ArrayList<FlowableEvent>();
 		this.ignoreRawActivityEvents = ignoreRawActivityEvents;
   }
 	
-	public List<ActivitiEvent> getEventsReceived() {
+	public List<FlowableEvent> getEventsReceived() {
 	  return eventsReceived;
   }
 	
@@ -44,10 +44,10 @@ public class TestActivitiActivityEventListener implements ActivitiEventListener 
 	}
 	
 	@Override
-	public void onEvent(ActivitiEvent event) {
-		if(event instanceof ActivitiActivityEvent) {
-			if(!ignoreRawActivityEvents || (event.getType() != ActivitiEngineEventType.ACTIVITY_STARTED && 
-					event.getType() != ActivitiEngineEventType.ACTIVITY_COMPLETED)) {
+	public void onEvent(FlowableEvent event) {
+		if(event instanceof FlowableActivityEvent) {
+			if(!ignoreRawActivityEvents || (event.getType() != FlowableEngineEventType.ACTIVITY_STARTED && 
+					event.getType() != FlowableEngineEventType.ACTIVITY_COMPLETED)) {
 				eventsReceived.add(event);
 			}
 		}

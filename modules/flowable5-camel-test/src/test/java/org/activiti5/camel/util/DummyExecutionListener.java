@@ -1,7 +1,7 @@
 package org.activiti5.camel.util;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.ExecutionListener;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.ExecutionListener;
 
 /**
  * Attach to the ReceiveTask (end event).

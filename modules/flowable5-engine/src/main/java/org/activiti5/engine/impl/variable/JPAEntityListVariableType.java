@@ -8,11 +8,11 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.impl.variable.ValueFields;
-import org.activiti.engine.impl.variable.VariableType;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.impl.context.Context;
+import org.flowable.engine.impl.variable.ValueFields;
+import org.flowable.engine.impl.variable.VariableType;
 
 /**
  * Variable type capable of storing a list of reference to JPA-entities. Only JPA-Entities which

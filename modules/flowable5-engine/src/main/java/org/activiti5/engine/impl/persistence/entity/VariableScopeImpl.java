@@ -22,15 +22,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.engine.delegate.VariableScope;
-import org.activiti.engine.impl.persistence.entity.TransientVariableInstance;
-import org.activiti.engine.impl.persistence.entity.VariableInstance;
-import org.activiti.engine.impl.variable.VariableType;
-import org.activiti.engine.impl.variable.VariableTypes;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.javax.el.ELContext;
+import org.flowable.engine.delegate.VariableScope;
+import org.flowable.engine.impl.persistence.entity.TransientVariableInstance;
+import org.flowable.engine.impl.persistence.entity.VariableInstance;
+import org.flowable.engine.impl.variable.VariableType;
+import org.flowable.engine.impl.variable.VariableTypes;
 
 
 

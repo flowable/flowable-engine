@@ -14,17 +14,17 @@ package org.activiti5.engine.impl.bpmn.helper;
 
 import java.util.List;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
-import org.activiti.engine.impl.delegate.event.ActivitiEngineEvent;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.impl.delegate.event.ActivitiEngineEvent;
+import org.flowable.engine.repository.ProcessDefinition;
 
 /**
- * An {@link ActivitiEventListener} that throws a signal event when an event is
+ * An {@link FlowableEventListener} that throws a signal event when an event is
  * dispatched to it.
  * 
  * @author Frederik Heremans
@@ -36,7 +36,7 @@ public class SignalThrowingEventListener extends BaseDelegateEventListener {
 	protected boolean processInstanceScope = true;
 
 	@Override
-	public void onEvent(ActivitiEvent event) {
+	public void onEvent(FlowableEvent event) {
 	  if (isValidEvent(event) && event instanceof ActivitiEngineEvent) {
       ActivitiEngineEvent engineEvent = (ActivitiEngineEvent) event;
 

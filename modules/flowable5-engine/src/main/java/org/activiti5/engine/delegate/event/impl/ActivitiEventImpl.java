@@ -12,18 +12,18 @@
  */
 package org.activiti5.engine.delegate.event.impl;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
- * Base class for all {@link ActivitiEvent} implementations.
+ * Base class for all {@link FlowableEvent} implementations.
  * 
  * @author Frederik Heremans
  */
-public class ActivitiEventImpl implements ActivitiEvent {
+public class ActivitiEventImpl implements FlowableEvent {
 
-	protected ActivitiEngineEventType type;
+	protected FlowableEngineEventType type;
 	protected String executionId;
 	protected String processInstanceId;
 	protected String processDefinitionId;
@@ -31,14 +31,14 @@ public class ActivitiEventImpl implements ActivitiEvent {
 	/**
 	 * Creates a new event implementation, not part of an execution context.
 	 */
-	public ActivitiEventImpl(ActivitiEngineEventType type) {
+	public ActivitiEventImpl(FlowableEngineEventType type) {
 		this(type, null, null, null);
 	}
 
 	/**
 	 * Creates a new event implementation, part of an execution context.
 	 */
-	public ActivitiEventImpl(ActivitiEngineEventType type, String executionId, String processInstanceId,
+	public ActivitiEventImpl(FlowableEngineEventType type, String executionId, String processInstanceId,
       String processDefinitionId) {
 		if(type == null) {
 			throw new ActivitiIllegalArgumentException("type is null");
@@ -49,11 +49,11 @@ public class ActivitiEventImpl implements ActivitiEvent {
 	  this.processDefinitionId = processDefinitionId;
   }
 
-	public ActivitiEngineEventType getType() {
+	public FlowableEngineEventType getType() {
 		return type;
 	}
 
-	public void setType(ActivitiEngineEventType type) {
+	public void setType(FlowableEngineEventType type) {
 		this.type = type;
 	}
 	

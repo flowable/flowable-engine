@@ -12,16 +12,16 @@
  */
 package org.activiti5.engine.impl.bpmn.parser.handler;
 
-import org.activiti.bpmn.constants.BpmnXMLConstants;
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.CancelEventDefinition;
-import org.activiti.bpmn.model.EndEvent;
-import org.activiti.bpmn.model.EventDefinition;
-import org.activiti.bpmn.model.TerminateEventDefinition;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
 import org.activiti5.engine.impl.pvm.process.ScopeImpl;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.constants.BpmnXMLConstants;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.CancelEventDefinition;
+import org.flowable.bpmn.model.EndEvent;
+import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.TerminateEventDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,8 +46,8 @@ public class EndEventParseHandler extends AbstractActivityBpmnParseHandler<EndEv
     }
     
     // Error end event
-    if (eventDefinition instanceof org.activiti.bpmn.model.ErrorEventDefinition) {
-      org.activiti.bpmn.model.ErrorEventDefinition errorDefinition = (org.activiti.bpmn.model.ErrorEventDefinition) eventDefinition;
+    if (eventDefinition instanceof org.flowable.bpmn.model.ErrorEventDefinition) {
+      org.flowable.bpmn.model.ErrorEventDefinition errorDefinition = (org.flowable.bpmn.model.ErrorEventDefinition) eventDefinition;
       if (bpmnParse.getBpmnModel().containsErrorRef(errorDefinition.getErrorCode())) {
         String errorCode = bpmnParse.getBpmnModel().getErrors().get(errorDefinition.getErrorCode());
         if (StringUtils.isEmpty(errorCode)) {

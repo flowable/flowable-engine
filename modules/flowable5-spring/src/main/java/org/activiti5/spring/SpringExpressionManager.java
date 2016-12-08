@@ -15,7 +15,6 @@ package org.activiti5.spring;
 
 import java.util.Map;
 
-import org.activiti.engine.delegate.VariableScope;
 import org.activiti5.engine.impl.el.ExpressionManager;
 import org.activiti5.engine.impl.el.ReadOnlyMapELResolver;
 import org.activiti5.engine.impl.el.VariableScopeElResolver;
@@ -25,6 +24,7 @@ import org.activiti5.engine.impl.javax.el.CompositeELResolver;
 import org.activiti5.engine.impl.javax.el.ELResolver;
 import org.activiti5.engine.impl.javax.el.ListELResolver;
 import org.activiti5.engine.impl.javax.el.MapELResolver;
+import org.flowable.engine.delegate.VariableScope;
 import org.springframework.context.ApplicationContext;
 
 /**

@@ -12,10 +12,10 @@
  */
 package org.activiti5.spring.test.taskassignment;
 
-import org.activiti.engine.delegate.DelegateExecution;
-
 import java.util.Arrays;
 import java.util.List;
+
+import org.flowable.engine.delegate.DelegateExecution;
 
 /**
  * @author Joram Barrez

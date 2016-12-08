@@ -18,8 +18,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.engine.delegate.VariableScope;
-import org.activiti.engine.impl.persistence.entity.VariableInstance;
+import org.flowable.engine.delegate.VariableScope;
+import org.flowable.engine.impl.persistence.entity.VariableInstance;
 
 
 /**

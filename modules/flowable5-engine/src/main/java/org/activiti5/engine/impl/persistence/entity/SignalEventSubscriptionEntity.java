@@ -15,7 +15,7 @@ package org.activiti5.engine.impl.persistence.entity;
 
 import java.text.MessageFormat;
 
-import org.activiti.bpmn.model.Signal;
+import org.flowable.bpmn.model.Signal;
 
 
 

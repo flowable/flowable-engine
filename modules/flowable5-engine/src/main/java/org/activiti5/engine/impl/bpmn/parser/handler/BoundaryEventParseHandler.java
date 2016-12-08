@@ -12,16 +12,16 @@
  */
 package org.activiti5.engine.impl.bpmn.parser.handler;
 
-import org.activiti.bpmn.constants.BpmnXMLConstants;
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.BoundaryEvent;
-import org.activiti.bpmn.model.CancelEventDefinition;
-import org.activiti.bpmn.model.EventDefinition;
-import org.activiti.bpmn.model.MessageEventDefinition;
-import org.activiti.bpmn.model.SignalEventDefinition;
-import org.activiti.bpmn.model.TimerEventDefinition;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti5.engine.impl.pvm.process.ActivityImpl;
+import org.flowable.bpmn.constants.BpmnXMLConstants;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.CancelEventDefinition;
+import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.MessageEventDefinition;
+import org.flowable.bpmn.model.SignalEventDefinition;
+import org.flowable.bpmn.model.TimerEventDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,11 +54,11 @@ public class BoundaryEventParseHandler extends AbstractFlowNodeBpmnParseHandler<
     }
     
     if (eventDefinition instanceof TimerEventDefinition
-            || eventDefinition instanceof org.activiti.bpmn.model.ErrorEventDefinition
+            || eventDefinition instanceof org.flowable.bpmn.model.ErrorEventDefinition
             || eventDefinition instanceof SignalEventDefinition
             || eventDefinition instanceof CancelEventDefinition
             || eventDefinition instanceof MessageEventDefinition
-            || eventDefinition instanceof org.activiti.bpmn.model.CompensateEventDefinition) {
+            || eventDefinition instanceof org.flowable.bpmn.model.CompensateEventDefinition) {
 
       bpmnParse.getBpmnParserHandlers().parseElement(bpmnParse, eventDefinition);
       

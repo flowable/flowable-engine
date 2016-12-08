@@ -12,11 +12,11 @@
  */
 package org.activiti5.standalone.event;
 
-import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventImpl;
 import org.activiti5.engine.impl.test.ResourceActivitiTestCase;
 import org.activiti5.engine.test.api.event.TestActivitiEventListener;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
  * Test to verify event-listeners, which are configured in the cfg.xml, are notified.
@@ -38,7 +38,7 @@ public class EventListenersConfigurationTest extends ResourceActivitiTestCase {
     listener.clearEventsReceived();
   	
   	// Dispath a custom event
-  	ActivitiEvent event = new ActivitiEventImpl(ActivitiEngineEventType.CUSTOM);
+  	FlowableEvent event = new ActivitiEventImpl(FlowableEngineEventType.CUSTOM);
   	processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
   	
   	assertEquals(1, listener.getEventsReceived().size());

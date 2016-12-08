@@ -12,7 +12,7 @@
  */
 package org.activiti5.spring.test.servicetask;
 
-import org.activiti.engine.RuntimeService;
+import org.flowable.engine.RuntimeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

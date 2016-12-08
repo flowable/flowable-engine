@@ -21,9 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti5.engine.ProcessEngineConfiguration;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
@@ -37,6 +34,9 @@ import org.activiti5.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti5.engine.impl.pvm.runtime.InterpretableExecution;
 import org.activiti5.engine.impl.task.TaskDefinition;
 import org.activiti5.engine.task.IdentityLinkType;
+import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.repository.ProcessDefinition;
 
 
 /**
@@ -124,7 +124,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     
     if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
         Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_CREATED, processInstance));
+                ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processInstance));
     }
     
     return processInstance;

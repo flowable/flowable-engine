@@ -12,12 +12,12 @@
  */
 package org.activiti5.examples.bpmn.tasklistener;
 
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.impl.history.HistoryLevel;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 /**
  * @author Rich Kroll, Tijs Rademakers

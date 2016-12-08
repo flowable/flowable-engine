@@ -13,8 +13,6 @@
 
 package org.activiti5.engine.impl.el;
 
-import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.delegate.VariableScope;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.delegate.ExpressionGetInvocation;
@@ -24,6 +22,8 @@ import org.activiti5.engine.impl.javax.el.ELException;
 import org.activiti5.engine.impl.javax.el.MethodNotFoundException;
 import org.activiti5.engine.impl.javax.el.PropertyNotFoundException;
 import org.activiti5.engine.impl.javax.el.ValueExpression;
+import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.delegate.VariableScope;
 
 
 /**

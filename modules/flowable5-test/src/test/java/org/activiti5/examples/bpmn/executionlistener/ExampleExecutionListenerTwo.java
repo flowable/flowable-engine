@@ -13,8 +13,8 @@
 
 package org.activiti5.examples.bpmn.executionlistener;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.ExecutionListener;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.ExecutionListener;
 
 /**
  * Simple {@link ExecutionListener} that sets 2 variables on the execution.

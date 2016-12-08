@@ -23,9 +23,6 @@ import java.util.Map;
 import javax.activation.DataSource;
 import javax.naming.NamingException;
 
-import org.activiti.engine.cfg.MailServerInfo;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.Expression;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -36,6 +33,9 @@ import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.apache.commons.mail.MultiPartEmail;
 import org.apache.commons.mail.SimpleEmail;
+import org.flowable.engine.cfg.MailServerInfo;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

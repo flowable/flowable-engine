@@ -16,7 +16,6 @@ package org.activiti5.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.ModelQueryImpl;
 import org.activiti5.engine.impl.Page;
@@ -27,6 +26,7 @@ import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.persistence.AbstractManager;
 import org.activiti5.engine.repository.Model;
 import org.activiti5.engine.repository.ModelQuery;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 
 /**
@@ -45,9 +45,9 @@ public class ModelEntityManager extends AbstractManager {
     
     if(Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
     	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_CREATED, model));
+    			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, model));
     	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_INITIALIZED, model));
+    			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, model));
     }
   }
 
@@ -59,7 +59,7 @@ public class ModelEntityManager extends AbstractManager {
     
     if(Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
     	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_UPDATED, updatedModel));
+    			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, updatedModel));
     }
   }
 
@@ -71,7 +71,7 @@ public class ModelEntityManager extends AbstractManager {
     
     if(Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
     	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_DELETED, model));
+    			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, model));
     }
   }
   

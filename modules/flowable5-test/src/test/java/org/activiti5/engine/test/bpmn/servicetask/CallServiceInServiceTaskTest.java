@@ -14,12 +14,12 @@ package org.activiti5.engine.test.bpmn.servicetask;
 
 import java.util.List;
 
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
-import org.activiti.idm.api.Group;
-import org.activiti.idm.api.User;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.User;
 
 /**
  * @author Joram Barrez

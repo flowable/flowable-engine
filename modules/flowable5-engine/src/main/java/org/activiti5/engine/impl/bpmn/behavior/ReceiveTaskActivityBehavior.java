@@ -13,9 +13,9 @@
 
 package org.activiti5.engine.impl.bpmn.behavior;
 
-import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti5.engine.RuntimeService;
 import org.activiti5.engine.impl.pvm.delegate.ActivityExecution;
+import org.flowable.engine.delegate.DelegateExecution;
 
 
 /**

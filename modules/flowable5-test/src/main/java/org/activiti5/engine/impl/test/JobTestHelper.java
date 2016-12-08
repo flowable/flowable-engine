@@ -18,11 +18,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
 
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.common.api.ActivitiException;
-import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti5.engine.test.ActivitiRule;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
 
 
 
@@ -73,7 +73,7 @@ public class JobTestHelper {
         timer.cancel();
       }
       if (areJobsAvailable) {
-        throw new ActivitiException("time limit of " + maxMillisToWait + " was exceeded");
+        throw new FlowableException("time limit of " + maxMillisToWait + " was exceeded");
       }
 
     } finally {
@@ -115,7 +115,7 @@ public class JobTestHelper {
         timer.cancel();
       }
       if (areJobsAvailable) {
-        throw new ActivitiException("time limit of " + maxMillisToWait + " was exceeded");
+        throw new FlowableException("time limit of " + maxMillisToWait + " was exceeded");
       }
 
     } finally {
@@ -149,13 +149,13 @@ public class JobTestHelper {
       } catch (InterruptedException e) {
         // ignore
       } catch (Exception e) {
-        throw new ActivitiException("Exception while waiting on condition: "+e.getMessage(), e);
+        throw new FlowableException("Exception while waiting on condition: "+e.getMessage(), e);
       } finally {
         timer.cancel();
       }
       
       if (conditionIsViolated) {
-        throw new ActivitiException("time limit of " + maxMillisToWait + " was exceeded");
+        throw new FlowableException("time limit of " + maxMillisToWait + " was exceeded");
       }
 
     } finally {

@@ -12,19 +12,19 @@
  */
 package org.activiti5.engine.delegate.event.impl;
 
-import org.activiti.engine.delegate.event.ActivitiErrorEvent;
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.delegate.event.FlowableErrorEvent;
 
 /**
- * Implementation of an {@link ActivitiErrorEvent}.
+ * Implementation of an {@link FlowableErrorEvent}.
  * @author Frederik Heremans
  */
-public class ActivitiErrorEventImpl extends ActivitiActivityEventImpl implements ActivitiErrorEvent {
+public class ActivitiErrorEventImpl extends ActivitiActivityEventImpl implements FlowableErrorEvent {
 
   protected String errorId;
 	protected String errorCode;
 	
-	public ActivitiErrorEventImpl(ActivitiEngineEventType type) {
+	public ActivitiErrorEventImpl(FlowableEngineEventType type) {
 	  super(type);
   }
 	

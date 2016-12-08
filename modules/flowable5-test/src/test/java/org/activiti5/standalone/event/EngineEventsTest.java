@@ -12,10 +12,10 @@
  */
 package org.activiti5.standalone.event;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.ProcessEngine;
 import org.activiti5.engine.impl.test.ResourceActivitiTestCase;
 import org.activiti5.engine.test.api.event.TestActivitiEventListener;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
  * Test to verify event-listeners, which are configured in the cfg.xml, are notified.
@@ -35,15 +35,15 @@ public class EngineEventsTest extends ResourceActivitiTestCase {
   	
   	// Check create-event
   	assertEquals(2, listener.getEventsReceived().size());
-  	assertEquals(ActivitiEngineEventType.ENGINE_CREATED, listener.getEventsReceived().get(0).getType());
-  	assertEquals(ActivitiEngineEventType.ENGINE_CREATED, listener.getEventsReceived().get(1).getType());
+  	assertEquals(FlowableEngineEventType.ENGINE_CREATED, listener.getEventsReceived().get(0).getType());
+  	assertEquals(FlowableEngineEventType.ENGINE_CREATED, listener.getEventsReceived().get(1).getType());
   	listener.clearEventsReceived();
   	
   	// Check close-event
   	ProcessEngine activiti5ProcessEngine = (ProcessEngine) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessEngine();
   	activiti5ProcessEngine.close();
   	assertEquals(1, listener.getEventsReceived().size());
-  	assertEquals(ActivitiEngineEventType.ENGINE_CLOSED, listener.getEventsReceived().get(0).getType());
+  	assertEquals(FlowableEngineEventType.ENGINE_CLOSED, listener.getEventsReceived().get(0).getType());
   	
   }
   

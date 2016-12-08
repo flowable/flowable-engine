@@ -2,11 +2,11 @@ package org.activiti5.standalone.cfg;
 
 import java.util.List;
 
-import org.activiti.engine.task.Task;
 import org.activiti5.engine.impl.interceptor.Command;
 import org.activiti5.engine.impl.interceptor.CommandContext;
 import org.activiti5.engine.impl.test.ResourceActivitiTestCase;
 import org.activiti5.engine.task.Attachment;
+import org.flowable.engine.task.Task;
 
 /**
  * @author Bassam Al-Sarori

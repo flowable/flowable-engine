@@ -15,12 +15,12 @@ package org.activiti5.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.persistence.AbstractManager;
 import org.activiti5.engine.task.Attachment;
 import org.activiti5.engine.task.Task;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 
 /**
@@ -68,7 +68,7 @@ public class AttachmentEntityManager extends AbstractManager {
       getDbSqlSession().delete(attachment);
       if(dispatchEvents) {
       	getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-      			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_DELETED, attachment, executionId, processInstanceId, processDefinitionId));
+      			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, attachment, executionId, processInstanceId, processDefinitionId));
       }
     }
   }

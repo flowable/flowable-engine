@@ -13,8 +13,8 @@
 
 package org.activiti5.engine.impl.test;
 
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.ProcessEngines;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.ProcessEngines;
 
 
 /**

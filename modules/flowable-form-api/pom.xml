@@ -16,7 +16,7 @@
 
 	<properties>
 		<activiti.artifact>
-			org.activiti.form.api
+			org.flowable.form.api
 		</activiti.artifact>
 	</properties>
 	

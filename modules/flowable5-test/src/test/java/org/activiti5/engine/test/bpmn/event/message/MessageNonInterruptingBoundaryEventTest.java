@@ -13,10 +13,10 @@
 
 package org.activiti5.engine.test.bpmn.event.message;
 
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.Deployment;
 
 /**
  * 
