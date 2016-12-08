@@ -4,6 +4,7 @@ services:
         image: flowable/flowable-modeler
         external_links:
             - flowable-modeler-db:db
+            - flowable-idm-app:idm
         environment:
             - datasource.driver=org.postgresql.Driver
             - datasource.url=jdbc:postgresql://db:5432/flowable
@@ -15,7 +16,7 @@ services:
             - idm.admin.password=test
         ports:
             - 8888:8888
-    flowable-modeler-app:
+    flowable-idm-app:
         image: flowable/flowable-idm
         external_links:
             - flowable-modeler-db:db
