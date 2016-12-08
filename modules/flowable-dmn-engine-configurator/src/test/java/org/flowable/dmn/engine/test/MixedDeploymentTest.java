@@ -10,11 +10,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.dmn.engine.test;
+package org.flowable.dmn.engine.test;
 
-import org.activiti.dmn.api.DecisionTable;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.test.Deployment;
+import org.flowable.dmn.api.DecisionTable;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.test.Deployment;
 import org.junit.Test;
 
 import java.util.List;
@@ -28,8 +28,8 @@ import static org.junit.Assert.assertNotNull;
 public class MixedDeploymentTest extends AbstractActivitiDmnEngineConfiguratorTest {
 
   @Test
-  @Deployment(resources = {"org/activiti/dmn/engine/test/deployment/oneDecisionTaskProcess.bpmn20.xml",
-      "org/activiti/dmn/engine/test/deployment/simple.dmn"})
+  @Deployment(resources = {"org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcess.bpmn20.xml",
+      "org/flowable/dmn/engine/test/deployment/simple.dmn"})
   public void deploySingleProcessAndDecisionTable() {
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
         .latestVersion()

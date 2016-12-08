@@ -10,24 +10,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.form.engine.test;
+package org.flowable.form.engine.test;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.test.ActivitiRule;
-import org.activiti.form.api.FormRepositoryService;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.test.FlowableRule;
+import org.flowable.form.api.FormRepositoryService;
 import org.junit.Before;
 import org.junit.Rule;
 
 /**
  * @author Yvo Swillens
  */
-public class AbstractActivitiFormEngineConfiguratorTest {
+public class AbstractFlowableFormEngineConfiguratorTest {
 
-  public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000";
+  public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000";
 
   @Rule
-  public ActivitiRule activitiRule = new ActivitiRule();
+  public FlowableRule activitiRule = new FlowableRule();
 
   protected static ProcessEngine cachedProcessEngine;
   protected RepositoryService repositoryService;

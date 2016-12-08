@@ -10,11 +10,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.form.engine.test;
+package org.flowable.form.engine.test;
 
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.test.Deployment;
-import org.activiti.form.api.FormDefinition;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.test.Deployment;
+import org.flowable.form.api.FormDefinition;
 import org.junit.Test;
 
 import java.util.List;
@@ -25,11 +25,11 @@ import static org.junit.Assert.assertNotNull;
 /**
  * @author Yvo Swillens
  */
-public class MixedDeploymentTest extends AbstractActivitiFormEngineConfiguratorTest {
+public class MixedDeploymentTest extends AbstractFlowableFormEngineConfiguratorTest {
 
   @Test
-  @Deployment(resources = {"org/activiti/form/engine/test/deployment/oneTaskWithFormKeyProcess.bpmn20.xml",
-      "org/activiti/form/engine/test/deployment/simple.form"})
+  @Deployment(resources = {"org/flowable/form/engine/test/deployment/oneTaskWithFormKeyProcess.bpmn20.xml",
+      "org/flowable/form/engine/test/deployment/simple.form"})
   public void deploySingleProcessAndForm() {
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
         .latestVersion()

@@ -10,13 +10,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.dmn.engine.test;
+package org.flowable.dmn.engine.test;
 
-import org.activiti.dmn.api.DmnRepositoryService;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.test.ActivitiRule;
-import org.activiti.form.api.FormRepositoryService;
+import org.flowable.dmn.api.DmnRepositoryService;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.test.FlowableRule;
 import org.junit.Before;
 import org.junit.Rule;
 
@@ -28,7 +27,7 @@ public class AbstractActivitiDmnEngineConfiguratorTest {
   public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000";
 
   @Rule
-  public ActivitiRule activitiRule = new ActivitiRule();
+  public FlowableRule flowableRule = new FlowableRule();
 
   protected static ProcessEngine cachedProcessEngine;
   protected RepositoryService repositoryService;
@@ -37,7 +36,7 @@ public class AbstractActivitiDmnEngineConfiguratorTest {
   @Before
   public void initProcessEngine() {
     if (cachedProcessEngine == null) {
-      cachedProcessEngine = activitiRule.getProcessEngine();
+      cachedProcessEngine = flowableRule.getProcessEngine();
     }
 
     this.repositoryService = cachedProcessEngine.getRepositoryService();
