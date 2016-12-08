@@ -37,10 +37,12 @@ public class DatabaseConfiguration {
   @Bean
   public DataSource dataSource() {
 
-    String jdbcUrl = environment.getProperty("jdbc.url", "jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000");
-    String jdbcDriver = environment.getProperty("jdbc.driver", "org.h2.Driver");
-    String jdbcUsername = environment.getProperty("jdbc.username", "sa");
-    String jdbcPassword = environment.getProperty("jdbc.password", "");
+    String jdbcUrl = environment.getProperty("datasource.url", "jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000");
+    System.out.println("JDBC.URL: "+ jdbcUrl);
+
+    String jdbcDriver = environment.getProperty("datasource.driver", "org.h2.Driver");
+    String jdbcUsername = environment.getProperty("datasource.username", "sa");
+    String jdbcPassword = environment.getProperty("datasource.password", "");
 
     HikariDataSource dataSource = new HikariDataSource();
     dataSource.setJdbcUrl(jdbcUrl);
