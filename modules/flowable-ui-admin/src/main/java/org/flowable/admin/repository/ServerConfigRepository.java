@@ -10,17 +10,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.service.idm;
+package org.flowable.admin.repository;
 
-import org.flowable.app.model.common.RemoteToken;
-import org.flowable.app.model.common.RemoteUser;
+import java.util.List;
 
-public interface RemoteIdmService {
-  
-  RemoteUser authenticateUser(String username, String password);
-  
-  RemoteToken getToken(String tokenValue);
-  
-  RemoteUser getUser(String userId);
+import org.flowable.admin.domain.EndpointType;
+import org.flowable.admin.domain.ServerConfig;
+
+public interface ServerConfigRepository {
+
+    ServerConfig get(String id);
+
+    List<ServerConfig> getAll();
+
+    List<ServerConfig> getByEndpointType(EndpointType endpointType);
+
+    void save(ServerConfig serverConfig);
 
 }

@@ -10,17 +10,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.service.idm;
+package org.flowable.admin.conf;
 
-import org.flowable.app.model.common.RemoteToken;
-import org.flowable.app.model.common.RemoteUser;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-public interface RemoteIdmService {
-  
-  RemoteUser authenticateUser(String username, String password);
-  
-  RemoteToken getToken(String tokenValue);
-  
-  RemoteUser getUser(String userId);
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+/**
+ * @author Joram Barrez
+ */
+@Configuration
+public class JacksonConfiguration {
+
+    @Bean()
+    public ObjectMapper objectMapper() {
+        // To avoid instantiating and configuring the mapper everywhere
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper;
+    }
 
 }
