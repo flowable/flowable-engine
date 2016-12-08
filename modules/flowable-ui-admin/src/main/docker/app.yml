@@ -19,7 +19,7 @@ services:
     flowable-idm-app:
         image: flowable/flowable-idm
         external_links:
-            - flowable-task-db:db
+            - flowable-admin-db:db
         environment:
             - datasource.driver=org.postgresql.Driver
             - datasource.url=jdbc:postgresql://db:5432/flowable
