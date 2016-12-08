@@ -27,7 +27,7 @@ public class AbstractFlowableFormEngineConfiguratorTest {
   public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000";
 
   @Rule
-  public FlowableRule activitiRule = new FlowableRule();
+  public FlowableRule flowableRule = new FlowableRule();
 
   protected static ProcessEngine cachedProcessEngine;
   protected RepositoryService repositoryService;
@@ -36,7 +36,7 @@ public class AbstractFlowableFormEngineConfiguratorTest {
   @Before
   public void initProcessEngine() {
     if (cachedProcessEngine == null) {
-      cachedProcessEngine = activitiRule.getProcessEngine();
+      cachedProcessEngine = flowableRule.getProcessEngine();
     }
 
     this.repositoryService = cachedProcessEngine.getRepositoryService();

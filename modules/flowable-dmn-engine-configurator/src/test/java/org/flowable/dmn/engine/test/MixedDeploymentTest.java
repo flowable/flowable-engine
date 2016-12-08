@@ -25,7 +25,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * @author Yvo Swillens
  */
-public class MixedDeploymentTest extends AbstractActivitiDmnEngineConfiguratorTest {
+public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTest {
 
   @Test
   @Deployment(resources = {"org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcess.bpmn20.xml",

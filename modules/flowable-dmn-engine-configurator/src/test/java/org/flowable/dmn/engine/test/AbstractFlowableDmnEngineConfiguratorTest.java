@@ -22,9 +22,9 @@ import org.junit.Rule;
 /**
  * @author Yvo Swillens
  */
-public class AbstractActivitiDmnEngineConfiguratorTest {
+public class AbstractFlowableDmnEngineConfiguratorTest {
 
-  public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000";
+  public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000";
 
   @Rule
   public FlowableRule flowableRule = new FlowableRule();
