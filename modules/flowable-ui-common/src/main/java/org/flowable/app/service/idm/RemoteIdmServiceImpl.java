@@ -67,8 +67,18 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
     adminPassword = environment.getRequiredProperty(PROPERTY_ADMIN_PASSWORD);
   }
   
+  @Override
+  public RemoteUser authenticateUser(String username, String password) {
+    JsonNode json = callRemoteIdmService(url + "/api/idm/users/" + encode(username), username, password);
+    if (json != null) {
+      return parseUserInfo(json);
+    }
+    return null;
+  }
+  
+  @Override
   public RemoteToken getToken(String tokenValue) {
-    JsonNode json = callRemoteIdmService(url + "/api/idm/tokens/" + encode(tokenValue));
+    JsonNode json = callRemoteIdmService(url + "/api/idm/tokens/" + encode(tokenValue), adminUser, adminPassword);
     if (json != null) {
       RemoteToken token = new RemoteToken();
       token.setId(json.get("id").asText());
@@ -81,36 +91,17 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
 
   @Override
   public RemoteUser getUser(String userId) {
-    JsonNode json = callRemoteIdmService(url + "/api/idm/users/" + encode(userId));
+    JsonNode json = callRemoteIdmService(url + "/api/idm/users/" + encode(userId), adminUser, adminPassword);
     if (json != null) {
-      RemoteUser user = new RemoteUser();
-      user.setId(json.get("id").asText());
-      user.setFirstName(json.get("firstName").asText());
-      user.setLastName(json.get("lastName").asText());
-      user.setEmail(json.get("email").asText());
-      user.setFullName(json.get("fullName").asText());
-      
-      if (json.has("groups")) {
-        for (JsonNode groupNode : ((ArrayNode) json.get("groups"))) {
-          user.getGroups().add(new RemoteGroup(groupNode.get("id").asText(), groupNode.get("name").asText()));
-        }
-      }
-      
-      if (json.has("privileges")) {
-        for (JsonNode privilegeNode : ((ArrayNode) json.get("privileges"))) {
-          user.getPrivileges().add(privilegeNode.asText());
-        }
-      }
-      
-      return user;
+      return parseUserInfo(json);
     }
     return null;
   }
   
-  protected JsonNode callRemoteIdmService(String url) {
+  protected JsonNode callRemoteIdmService(String url, String username, String password) {
     HttpGet httpGet = new HttpGet(url);
     httpGet.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
-        Base64.encodeBase64((adminUser + ":" + adminPassword).getBytes(Charset.forName("UTF-8")))));
+        Base64.encodeBase64((username + ":" + password).getBytes(Charset.forName("UTF-8")))));
     
     HttpClientBuilder clientBuilder = HttpClientBuilder.create();
     SSLConnectionSocketFactory sslsf = null;
@@ -142,6 +133,29 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
       }
     }
     return null;
+  }
+  
+  protected RemoteUser parseUserInfo(JsonNode json) {
+    RemoteUser user = new RemoteUser();
+    user.setId(json.get("id").asText());
+    user.setFirstName(json.get("firstName").asText());
+    user.setLastName(json.get("lastName").asText());
+    user.setEmail(json.get("email").asText());
+    user.setFullName(json.get("fullName").asText());
+    
+    if (json.has("groups")) {
+      for (JsonNode groupNode : ((ArrayNode) json.get("groups"))) {
+        user.getGroups().add(new RemoteGroup(groupNode.get("id").asText(), groupNode.get("name").asText()));
+      }
+    }
+    
+    if (json.has("privileges")) {
+      for (JsonNode privilegeNode : ((ArrayNode) json.get("privileges"))) {
+        user.getPrivileges().add(privilegeNode.asText());
+      }
+    }
+    
+    return user;
   }
   
   protected String encode(String s) {

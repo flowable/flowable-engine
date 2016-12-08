@@ -10,17 +10,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.service.idm;
+package org.flowable.admin.app.rest.client.modelinfo;
 
-import org.flowable.app.model.common.RemoteToken;
-import org.flowable.app.model.common.RemoteUser;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
-public interface RemoteIdmService {
-  
-  RemoteUser authenticateUser(String username, String password);
-  
-  RemoteToken getToken(String tokenValue);
-  
-  RemoteUser getUser(String userId);
+public interface InfoMapper {
 
+	ArrayNode map(Object element);
 }

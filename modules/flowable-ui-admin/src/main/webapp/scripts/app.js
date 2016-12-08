@@ -114,12 +114,7 @@ activitiAdminApp
                     controller: 'MonitoringController',
                     reloadOnSearch: true
                 })
-                .when('/logout', {
-              		templateUrl: 'views/login.html',
-              		controller: 'LogoutController',
-                  	reloadOnSearch: true
-              	})
-              	.when('/', {
+                .when('/', {
               	  	redirectTo: '/engine'
                 })
               	.when('/process-definitions-refresh', {
@@ -197,22 +192,22 @@ activitiAdminApp
                 suffix: '.json'
             });
 
-            $translateProvider.registerAvailableLanguageKeys(['en', 'de', 'es', 'fr', 'it', 'nl', 'ja'], {
-                'en_*': 'en',
-                'de_*': 'de',
-                'es_*': 'es',
-                'fr_*': 'fr',
-                'it_*': 'it',
-                'en-*': 'en',
-                'de-*': 'de',
-                'es-*': 'es',
-                'fr-*': 'fr',
-                'it-*': 'it',
-                'nl-*': 'nl',
-                'ja-*': 'ja'
+            $translateProvider.registerAvailableLanguageKeys(['en'], {
+                'en_*': 'en'
             }).determinePreferredLanguage();
 
         }])
+        
+    .service('NotPermittedInterceptor', [ '$window', function($window) {
+		var service = this;
+		service.responseError = function(response) {
+			if (response.status === 403) {
+				$rootScope.login = null;
+				$rootScope.authenticated = false;
+			}
+			return response;
+		};
+	}])     
 
     // Custom Http interceptor that adds the correct prefix to each url
     .config(['$httpProvider', function ($httpProvider) {
@@ -231,6 +226,8 @@ activitiAdminApp
                 }
             };
         });
+        
+        $httpProvider.interceptors.push('NotPermittedInterceptor');
     }])
 
     /* Filters */
@@ -291,8 +288,8 @@ activitiAdminApp
             return input;
           };
         })
-        .run(['$rootScope', '$http', '$timeout', '$location', '$cookies', '$modal', '$translate',
-            function($rootScope, $http, $timeout, $location, $cookies, $modal, $translate) {
+        .run(['$rootScope', '$http', '$timeout', '$location', '$cookies', '$modal', '$translate', '$window',
+            function($rootScope, $http, $timeout, $location, $cookies, $modal, $translate, $window) {
 
                 $rootScope.serverStatus = {
                 };
@@ -416,6 +413,16 @@ activitiAdminApp
 	                    $rootScope.addAlert(data, type);
 	                });
 	            };
+	            
+	            $rootScope.logout = function () {
+					$rootScope.authenticated = false;
+					$rootScope.authenticationError = false;
+					$http.get('/app/logout')
+						.success(function (data, status, headers, config) {
+							$rootScope.login = null;
+							$rootScope.authenticated = false;
+						});
+				}; 
 
 	            $rootScope.executeWhenReady = function(callback) {
 	                if ($rootScope.activeServers) {
