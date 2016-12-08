@@ -54,28 +54,4 @@ public class IntermediateThrowEventParseHandler extends AbstractActivityBpmnPars
       logger.warn("Unsupported intermediate throw event type for throw event " + intermediateEvent.getId());
     }
   }
-
-  //
-  // Seems not to be used anymore?
-  //
-  // protected CompensateEventDefinition
-  // createCompensateEventDefinition(BpmnParse bpmnParse,
-  // org.activiti.bpmn.model.CompensateEventDefinition eventDefinition,
-  // ScopeImpl scopeElement) {
-  // if(StringUtils.isNotEmpty(eventDefinition.getActivityRef())) {
-  // if(scopeElement.findActivity(eventDefinition.getActivityRef()) == null) {
-  // bpmnParse.getBpmnModel().addProblem("Invalid attribute value for 'activityRef': no activity with id '"
-  // + eventDefinition.getActivityRef() +
-  // "' in current scope " + scopeElement.getId(), eventDefinition);
-  // }
-  // }
-  //
-  // CompensateEventDefinition compensateEventDefinition = new
-  // CompensateEventDefinition();
-  // compensateEventDefinition.setActivityRef(eventDefinition.getActivityRef());
-  // compensateEventDefinition.setWaitForCompletion(eventDefinition.isWaitForCompletion());
-  //
-  // return compensateEventDefinition;
-  // }
-
 }

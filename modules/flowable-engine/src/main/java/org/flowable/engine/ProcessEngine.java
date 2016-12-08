@@ -28,7 +28,7 @@ import org.flowable.idm.api.IdmIdentityService;
  * <li>
  * <b>{@link org.flowable.engine.TaskService}: </b> Exposes operations to manage human (standalone) {@link org.flowable.engine.task.Task}s, such as claiming, completing and assigning tasks</li>
  * <li>
- * <b>{@link org.flowable.engine.IdentityService}: </b> Used for managing {@link org.flowable.engine.identity.User}s, {@link org.activiti.engine.identity.Group}s and the relations between them<</li>
+ * <b>{@link org.flowable.engine.IdentityService}: </b> Used for managing {@link org.flowable.engine.identity.User}s, {@link org.flowable.engine.identity.Group}s and the relations between them<</li>
  * <li>
  * <b>{@link org.flowable.engine.ManagementService}: </b> Exposes engine admin and maintenance operations</li>
  * <li>

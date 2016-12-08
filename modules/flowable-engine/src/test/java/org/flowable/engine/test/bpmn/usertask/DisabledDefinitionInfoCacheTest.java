@@ -97,7 +97,7 @@ public class DisabledDefinitionInfoCacheTest extends AbstractFlowableTestCase {
     processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
     
     String processDefinitionId = processInstance.getProcessDefinitionId();
-    ObjectNode infoNode = dynamicBpmnService.changeServiceTaskClassName("service", "org.activiti.engine.test.bpmn.servicetask.DummyServiceTask2");
+    ObjectNode infoNode = dynamicBpmnService.changeServiceTaskClassName("service", "org.flowable.engine.test.bpmn.servicetask.DummyServiceTask2");
     dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, infoNode);
     
     task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();

@@ -2,12 +2,12 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.List;
 
-import org.activiti.validation.ProcessValidator;
-import org.activiti.validation.ValidationError;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.validation.ProcessValidator;
+import org.flowable.validation.ValidationError;
 
 /**
  * @author Joram Barrez

@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.flowable.engine.ActivitiTaskAlreadyClaimedException;
+import org.flowable.engine.FlowableTaskAlreadyClaimedException;
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.JobNotFoundException;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
@@ -85,7 +85,7 @@ public class CommandContext extends AbstractCommandContext {
   }
 
   protected void logException() {
-    if (exception instanceof JobNotFoundException || exception instanceof ActivitiTaskAlreadyClaimedException) {
+    if (exception instanceof JobNotFoundException || exception instanceof FlowableTaskAlreadyClaimedException) {
       // reduce log level, because this may have been caused because of job deletion due to cancelActiviti="true"
       log.info("Error while closing command context", exception);
     } else {

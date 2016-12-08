@@ -31,7 +31,7 @@ import org.flowable.engine.impl.el.VariableScopeElResolver;
  * 
  * <pre>
  * &lt;property name="expressionManager"&gt;
- *      &lt;bean class="org.activiti.cdi.CdiExpressionManager" /&gt;
+ *      &lt;bean class="org.flowable.cdi.CdiExpressionManager" /&gt;
  * &lt;/property&gt;
  * </pre>
  * 

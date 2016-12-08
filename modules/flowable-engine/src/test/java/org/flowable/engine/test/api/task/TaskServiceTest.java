@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.ActivitiTaskAlreadyClaimedException;
+import org.flowable.engine.FlowableTaskAlreadyClaimedException;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
@@ -504,7 +504,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
     try {
       taskService.claim(task.getId(), secondUser.getId());
       fail("ActivitiException expected");
-    } catch (ActivitiTaskAlreadyClaimedException ae) {
+    } catch (FlowableTaskAlreadyClaimedException ae) {
       assertTextPresent("Task '" + task.getId() + "' is already claimed by someone else.", ae.getMessage());
     }
 

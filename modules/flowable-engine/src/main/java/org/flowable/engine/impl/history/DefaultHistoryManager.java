@@ -63,7 +63,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# isHistoryLevelAtLeast(org.activiti.engine.impl.history.HistoryLevel)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# isHistoryLevelAtLeast(org.flowable.engine.impl.history.HistoryLevel)
    */
   @Override
   public boolean isHistoryLevelAtLeast(HistoryLevel level) {
@@ -78,7 +78,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface#isHistoryEnabled ()
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface#isHistoryEnabled ()
    */
   @Override
   public boolean isHistoryEnabled() {
@@ -93,7 +93,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# recordProcessInstanceEnd(java.lang.String, java.lang.String, java.lang.String)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordProcessInstanceEnd(java.lang.String, java.lang.String, java.lang.String)
    */
   @Override
   public void recordProcessInstanceEnd(String processInstanceId, String deleteReason, String activityId) {
@@ -130,7 +130,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# recordProcessInstanceStart (org.activiti.engine.impl.persistence.entity.ExecutionEntity)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordProcessInstanceStart (org.flowable.engine.impl.persistence.entity.ExecutionEntity)
    */
   @Override
   public void recordProcessInstanceStart(ExecutionEntity processInstance, FlowElement startElement) {
@@ -154,8 +154,8 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# recordSubProcessInstanceStart (org.activiti.engine.impl.persistence.entity.ExecutionEntity,
-   * org.activiti.engine.impl.persistence.entity.ExecutionEntity)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordSubProcessInstanceStart (org.flowable.engine.impl.persistence.entity.ExecutionEntity,
+   * org.flowable.engine.impl.persistence.entity.ExecutionEntity)
    */
   @Override
   public void recordSubProcessInstanceStart(ExecutionEntity parentExecution, ExecutionEntity subProcessInstance, FlowElement initialElement) {
@@ -189,7 +189,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface#recordActivityStart (org.activiti.engine.impl.persistence.entity.ExecutionEntity)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface#recordActivityStart (org.flowable.engine.impl.persistence.entity.ExecutionEntity)
    */
   @Override
   public void recordActivityStart(ExecutionEntity executionEntity) {
@@ -222,7 +222,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface#recordActivityEnd (org.activiti.engine.impl.persistence.entity.ExecutionEntity)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface#recordActivityEnd (org.flowable.engine.impl.persistence.entity.ExecutionEntity)
    */
   @Override
   public void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason) {
@@ -351,7 +351,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# recordProcessDefinitionChange(java.lang.String, java.lang.String)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordProcessDefinitionChange(java.lang.String, java.lang.String)
    */
   @Override
   public void recordProcessDefinitionChange(String processInstanceId, String processDefinitionId) {
@@ -368,8 +368,8 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface#recordTaskCreated (org.activiti.engine.impl.persistence.entity.TaskEntity,
-   * org.activiti.engine.impl.persistence.entity.ExecutionEntity)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface#recordTaskCreated (org.flowable.engine.impl.persistence.entity.TaskEntity,
+   * org.flowable.engine.impl.persistence.entity.ExecutionEntity)
    */
   @Override
   public void recordTaskCreated(TaskEntity task, ExecutionEntity execution) {
@@ -384,7 +384,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface#recordTaskAssignment (org.activiti.engine.impl.persistence.entity.TaskEntity)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface#recordTaskAssignment (org.flowable.engine.impl.persistence.entity.TaskEntity)
    */
   @Override
   public void recordTaskAssignment(TaskEntity task) {
@@ -402,7 +402,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    *
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface#recordTaskClaim (org.activiti.engine.impl.persistence.entity.TaskEntity)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface#recordTaskClaim (org.flowable.engine.impl.persistence.entity.TaskEntity)
    */
 
   @Override
@@ -418,7 +418,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface#recordTaskId (org.activiti.engine.impl.persistence.entity.TaskEntity)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface#recordTaskId (org.flowable.engine.impl.persistence.entity.TaskEntity)
    */
   @Override
   public void recordTaskId(TaskEntity task) {
@@ -436,7 +436,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface#recordTaskEnd (java.lang.String, java.lang.String)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface#recordTaskEnd (java.lang.String, java.lang.String)
    */
   @Override
   public void recordTaskEnd(String taskId, String deleteReason) {
@@ -451,7 +451,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# recordTaskAssigneeChange(java.lang.String, java.lang.String)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordTaskAssigneeChange(java.lang.String, java.lang.String)
    */
   @Override
   public void recordTaskAssigneeChange(String taskId, String assignee) {
@@ -466,7 +466,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# recordTaskOwnerChange(java.lang.String, java.lang.String)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordTaskOwnerChange(java.lang.String, java.lang.String)
    */
   @Override
   public void recordTaskOwnerChange(String taskId, String owner) {
@@ -481,7 +481,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface#recordTaskNameChange (java.lang.String, java.lang.String)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface#recordTaskNameChange (java.lang.String, java.lang.String)
    */
   @Override
   public void recordTaskNameChange(String taskId, String taskName) {
@@ -496,7 +496,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# recordTaskDescriptionChange(java.lang.String, java.lang.String)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordTaskDescriptionChange(java.lang.String, java.lang.String)
    */
   @Override
   public void recordTaskDescriptionChange(String taskId, String description) {
@@ -511,7 +511,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# recordTaskDueDateChange(java.lang.String, java.util.Date)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordTaskDueDateChange(java.lang.String, java.util.Date)
    */
   @Override
   public void recordTaskDueDateChange(String taskId, Date dueDate) {
@@ -526,7 +526,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# recordTaskPriorityChange(java.lang.String, int)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordTaskPriorityChange(java.lang.String, int)
    */
   @Override
   public void recordTaskPriorityChange(String taskId, int priority) {
@@ -541,7 +541,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# recordTaskCategoryChange(java.lang.String, java.lang.String)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordTaskCategoryChange(java.lang.String, java.lang.String)
    */
   @Override
   public void recordTaskCategoryChange(String taskId, String category) {
@@ -566,7 +566,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# recordTaskParentTaskIdChange(java.lang.String, java.lang.String)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordTaskParentTaskIdChange(java.lang.String, java.lang.String)
    */
   @Override
   public void recordTaskParentTaskIdChange(String taskId, String parentTaskId) {
@@ -581,7 +581,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# recordTaskExecutionIdChange(java.lang.String, java.lang.String)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordTaskExecutionIdChange(java.lang.String, java.lang.String)
    */
   @Override
   public void recordTaskExecutionIdChange(String taskId, String executionId) {
@@ -596,7 +596,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# recordTaskDefinitionKeyChange (org.activiti.engine.impl.persistence.entity.TaskEntity, java.lang.String)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordTaskDefinitionKeyChange (org.flowable.engine.impl.persistence.entity.TaskEntity, java.lang.String)
    */
   @Override
   public void recordTaskDefinitionKeyChange(String taskId, String taskDefinitionKey) {
@@ -609,7 +609,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   }
   
   /* (non-Javadoc)
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface#recordTaskProcessDefinitionChange(java.lang.String, java.lang.String)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface#recordTaskProcessDefinitionChange(java.lang.String, java.lang.String)
    */
   @Override
   public void recordTaskProcessDefinitionChange(String taskId, String processDefinitionId) {
@@ -626,7 +626,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface#recordVariableCreate (org.activiti.engine.impl.persistence.entity.VariableInstanceEntity)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface#recordVariableCreate (org.flowable.engine.impl.persistence.entity.VariableInstanceEntity)
    */
   @Override
   public void recordVariableCreate(VariableInstanceEntity variable) {
@@ -639,8 +639,8 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# recordHistoricDetailVariableCreate (org.activiti.engine.impl.persistence.entity.VariableInstanceEntity,
-   * org.activiti.engine.impl.persistence.entity.ExecutionEntity, boolean)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordHistoricDetailVariableCreate (org.flowable.engine.impl.persistence.entity.VariableInstanceEntity,
+   * org.flowable.engine.impl.persistence.entity.ExecutionEntity, boolean)
    */
   @Override
   public void recordHistoricDetailVariableCreate(VariableInstanceEntity variable, ExecutionEntity sourceActivityExecution, boolean useActivityId) {
@@ -660,7 +660,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface#recordVariableUpdate (org.activiti.engine.impl.persistence.entity.VariableInstanceEntity)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface#recordVariableUpdate (org.flowable.engine.impl.persistence.entity.VariableInstanceEntity)
    */
   @Override
   public void recordVariableUpdate(VariableInstanceEntity variable) {
@@ -685,7 +685,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# createIdentityLinkComment(java.lang.String, java.lang.String, java.lang.String, java.lang.String, boolean)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# createIdentityLinkComment(java.lang.String, java.lang.String, java.lang.String, java.lang.String, boolean)
    */
   @Override
   public void createIdentityLinkComment(String taskId, String userId, String groupId, String type, boolean create) {
@@ -710,7 +710,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# createIdentityLinkComment(java.lang.String, java.lang.String, java.lang.String, java.lang.String, boolean, boolean)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# createIdentityLinkComment(java.lang.String, java.lang.String, java.lang.String, java.lang.String, boolean, boolean)
    */
   @Override
   public void createIdentityLinkComment(String taskId, String userId, String groupId, String type, boolean create, boolean forceNullUserId) {
@@ -777,7 +777,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# createAttachmentComment(java.lang.String, java.lang.String, java.lang.String, boolean)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# createAttachmentComment(java.lang.String, java.lang.String, java.lang.String, boolean)
    */
   @Override
   public void createAttachmentComment(String taskId, String processInstanceId, String attachmentName, boolean create) {
@@ -802,7 +802,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# reportFormPropertiesSubmitted (org.activiti.engine.impl.persistence.entity.ExecutionEntity, java.util.Map, java.lang.String)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# reportFormPropertiesSubmitted (org.flowable.engine.impl.persistence.entity.ExecutionEntity, java.util.Map, java.lang.String)
    */
   @Override
   public void recordFormPropertiesSubmitted(ExecutionEntity processInstance, Map<String, String> properties, String taskId) {
@@ -818,7 +818,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# recordIdentityLinkCreated (org.activiti.engine.impl.persistence.entity.IdentityLinkEntity)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordIdentityLinkCreated (org.flowable.engine.impl.persistence.entity.IdentityLinkEntity)
    */
   @Override
   public void recordIdentityLinkCreated(IdentityLinkEntity identityLink) {
@@ -840,7 +840,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# deleteHistoricIdentityLink(java.lang.String)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# deleteHistoricIdentityLink(java.lang.String)
    */
   @Override
   public void deleteHistoricIdentityLink(String id) {
@@ -852,7 +852,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
   /*
    * (non-Javadoc)
    * 
-   * @see org.activiti.engine.impl.history.HistoryManagerInterface# updateProcessBusinessKeyInHistory (org.activiti.engine.impl.persistence.entity.ExecutionEntity)
+   * @see org.flowable.engine.impl.history.HistoryManagerInterface# updateProcessBusinessKeyInHistory (org.flowable.engine.impl.persistence.entity.ExecutionEntity)
    */
   @Override
   public void updateProcessBusinessKeyInHistory(ExecutionEntity processInstance) {

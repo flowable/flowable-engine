@@ -16,7 +16,6 @@ package org.activiti5.engine.test.bpmn.deployment;
 import java.io.InputStream;
 import java.util.List;
 
-import org.activiti.validation.validator.Problems;
 import org.activiti5.engine.impl.RepositoryServiceImpl;
 import org.activiti5.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
@@ -30,6 +29,7 @@ import org.flowable.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
+import org.flowable.validation.validator.Problems;
 
 
 /**

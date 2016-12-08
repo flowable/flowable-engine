@@ -152,7 +152,7 @@ public interface TaskService {
    *          user that claims the task. When userId is null the task is unclaimed, assigned to no one.
    * @throws FlowableObjectNotFoundException
    *           when the task doesn't exist.
-   * @throws ActivitiTaskAlreadyClaimedException
+   * @throws FlowableTaskAlreadyClaimedException
    *           when the task is already claimed by another user.
    */
   void claim(String taskId, String userId);

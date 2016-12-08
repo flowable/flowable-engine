@@ -48,9 +48,9 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
  * value into Camel as a String body and copying the Camel body into that same Activiti variable. The variable in Activiti must be named "camelBody".
  * 
  * The chosen implementation should be set within your ProcessEngineConfiguration. To specify the implementation using Spring, include the following line in your configuration file as part of the
- * properties for "org.activiti.spring.SpringProcessEngineConfiguration":
+ * properties for "org.flowable.spring.SpringProcessEngineConfiguration":
  * 
- * <property name="camelBehaviorClass" value="org.activiti.camel.impl.CamelBehaviorCamelBodyImpl"/>
+ * <property name="camelBehaviorClass" value="org.flowable.camel.impl.CamelBehaviorCamelBodyImpl"/>
  * 
  * Note also that the manner in which variables are copied to Activiti from Camel has changed. It will always copy Camel properties to the Activiti variable set; they can safely be ignored, of course,
  * if not required. It will conditionally copy the Camel body to the "camelBody" variable if it is of type java.lang.String, OR it will copy the Camel body to individual variables within Activiti if

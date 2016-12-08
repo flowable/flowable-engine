@@ -3,7 +3,7 @@ package org.flowable.dmn.api;
 import org.flowable.engine.common.api.query.NativeQuery;
 
 /**
- * Allows querying of {@link org.activiti.engine.repository.DmnDeployment}s via native (SQL) queries
+ * Allows querying of {@link org.flowable.engine.repository.DmnDeployment}s via native (SQL) queries
  * 
  * @author Tijs Rademakers
  */

@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.cmd;
 
-import org.flowable.engine.ActivitiTaskAlreadyClaimedException;
+import org.flowable.engine.FlowableTaskAlreadyClaimedException;
 import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
@@ -47,7 +47,7 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
           // When the task is already claimed by another user, throw
           // exception. Otherwise, ignore
           // this, post-conditions of method already met.
-          throw new ActivitiTaskAlreadyClaimedException(task.getId(), task.getAssignee());
+          throw new FlowableTaskAlreadyClaimedException(task.getId(), task.getAssignee());
         }
       } else {
         commandContext.getTaskEntityManager().changeTaskAssignee(task, userId);

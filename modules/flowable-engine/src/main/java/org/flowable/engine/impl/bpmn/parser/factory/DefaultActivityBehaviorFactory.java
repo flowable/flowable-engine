@@ -215,13 +215,13 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
   protected ActivityBehavior createMuleActivityBehavior(TaskWithFieldExtensions task, List<FieldExtension> fieldExtensions) {
     try {
 
-      Class<?> theClass = Class.forName("org.flowable.mule.MuleSendFlowableBehavior");
+      Class<?> theClass = Class.forName("org.flowable.mule.MuleSendActivityBehavior");
       List<FieldDeclaration> fieldDeclarations = createFieldDeclarations(fieldExtensions);
       return (ActivityBehavior) ClassDelegate.defaultInstantiateDelegate(
           theClass, fieldDeclarations);
 
     } catch (ClassNotFoundException e) {
-      throw new FlowableException("Could not find org.flowable.mule.MuleSendFlowableBehavior: ", e);
+      throw new FlowableException("Could not find org.flowable.mule.MuleSendActivityBehavior: ", e);
     }
   }
 

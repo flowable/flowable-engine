@@ -19,7 +19,7 @@ import org.flowable.form.model.FormModel;
 /**
  * Builder for creating new deployments.
  * 
- * A builder instance can be obtained through {@link org.activiti.form.engine.FormRepositoryService#createDeployment()}.
+ * A builder instance can be obtained through {@link org.flowable.form.engine.FormRepositoryService#createDeployment()}.
  * 
  * Multiple resources can be added to one deployment before calling the {@link #deploy()} operation.
  * 

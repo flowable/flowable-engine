@@ -120,7 +120,7 @@
                                 <configuration>
                                     <tasks>
                                         <echo message="dropping schema in ${database}" />
-                                        <java classname="org.activiti.db.DbScriptUtil" classpathref="maven.test.classpath" />
+                                        <java classname="org.flowable.db.DbScriptUtil" classpathref="maven.test.classpath" />
                                     </tasks>
                                 </configuration>
                             </execution>

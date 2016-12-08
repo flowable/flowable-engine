@@ -1,12 +1,12 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000;MVCC=TRUE" />
+    <property name="URL" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
 
-  <bean id="configurationFactory" class="org.activiti.osgi.blueprint.ConfigurationFactory">
+  <bean id="configurationFactory" class="org.flowable.osgi.blueprint.ConfigurationFactory">
     <property name="dataSource" ref="dataSource" />
     <property name="databaseSchemaUpdate" value="true" />
   </bean>
@@ -14,7 +14,7 @@
   <bean id="configuration" factory-ref="configurationFactory" factory-method="getConfiguration" />
 
   <bean id="processEngineFactory"
-      class="org.activiti.osgi.blueprint.ProcessEngineFactoryWithELResolver"
+      class="org.flowable.osgi.blueprint.ProcessEngineFactoryWithELResolver"
       init-method="init"
       destroy-method="destroy">
       
@@ -30,23 +30,23 @@
   <bean id="historyService" factory-ref="processEngine" factory-method="getHistoryService" />
     
   <reference-list id="activityProviders" availability="optional" 
-      interface="org.activiti.engine.delegate.JavaDelegate"
+      interface="org.flowable.engine.delegate.JavaDelegate"
       activation="eager">
       
       <reference-listener ref="blueprintELResolver" bind-method="bindService" unbind-method="unbindService"/>
   </reference-list>
   
   <reference-list id="activityProvidersActivityBehaviour" availability="optional"
-                  interface="org.activiti.engine.impl.delegate.ActivityBehavior"
+                  interface="org.flowable.engine.impl.delegate.ActivityBehavior"
                   activation="eager">
     <reference-listener ref="blueprintELResolver" bind-method="bindActivityBehaviourService" unbind-method="unbindActivityBehaviourService"/>
   </reference-list>
   
-  <bean id="blueprintELResolver" class="org.activiti.osgi.blueprint.BlueprintELResolver" />
+  <bean id="blueprintELResolver" class="org.flowable.osgi.blueprint.BlueprintELResolver" />
   
-  <service ref="processEngine" interface="org.activiti.engine.ProcessEngine" />
-  <service ref="runtimeService" interface="org.activiti.engine.RuntimeService" />
-  <service ref="repositoryService" interface="org.activiti.engine.RepositoryService" />
-  <service ref="historyService" interface="org.activiti.engine.HistoryService" />
+  <service ref="processEngine" interface="org.flowable.engine.ProcessEngine" />
+  <service ref="runtimeService" interface="org.flowable.engine.RuntimeService" />
+  <service ref="repositoryService" interface="org.flowable.engine.RepositoryService" />
+  <service ref="historyService" interface="org.flowable.engine.HistoryService" />
 
 </blueprint>

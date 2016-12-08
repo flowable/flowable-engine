@@ -16,7 +16,7 @@
 
 	<properties>
 		<activiti.artifact>
-			org.activiti.image
+			org.flowable.image
 		</activiti.artifact>
 		<activiti.osgi.import.additional>
 	      javax.imageio*;resolution:=optional,

@@ -17,7 +17,6 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
-import org.activiti.validation.ValidationError;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.dmn.api.DecisionTable;
 import org.flowable.engine.RepositoryService;
@@ -72,6 +71,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.flowable.engine.task.IdentityLink;
 import org.flowable.form.api.FormDefinition;
+import org.flowable.validation.ValidationError;
 
 /**
  * @author Tom Baeyens

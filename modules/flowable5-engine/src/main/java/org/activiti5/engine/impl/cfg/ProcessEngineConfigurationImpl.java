@@ -30,9 +30,6 @@ import javax.naming.InitialContext;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
-import org.activiti.image.impl.DefaultProcessDiagramGenerator;
-import org.activiti.validation.ProcessValidator;
-import org.activiti.validation.ProcessValidatorFactory;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.DynamicBpmnService;
 import org.activiti5.engine.FormService;
@@ -225,6 +222,9 @@ import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.impl.variable.VariableType;
 import org.flowable.engine.impl.variable.VariableTypes;
 import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.image.impl.DefaultProcessDiagramGenerator;
+import org.flowable.validation.ProcessValidator;
+import org.flowable.validation.ProcessValidatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

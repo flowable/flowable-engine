@@ -46,7 +46,7 @@
     <scriptTask id="longTimerExpire" name="Execute script" scriptFormat="groovy">
       <script>
         if(throwException == 'true') {
-          throw new java.lang.RuntimeException('Activiti Engine Rocks!');
+          throw new java.lang.RuntimeException('Flowable Engine Rocks!');
         }
       </script>
     </scriptTask>
@@ -68,7 +68,7 @@
     <scriptTask id="shortTimerExpire" name="Execute script" scriptFormat="js">
       <script>
         if(throwException == 'true') {
-          throw new java.lang.RuntimeException('Activiti Engine Rocks!');
+          throw new java.lang.RuntimeException('Flowable Engine Rocks!');
         }
       </script>
     </scriptTask>

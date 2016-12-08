@@ -16,7 +16,6 @@ package org.flowable.engine.test.bpmn.deployment;
 import java.io.InputStream;
 import java.util.List;
 
-import org.activiti.validation.validator.Problems;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.StartEvent;
@@ -31,6 +30,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.ReflectUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
+import org.flowable.validation.validator.Problems;
 
 /**
  * @author Joram Barrez

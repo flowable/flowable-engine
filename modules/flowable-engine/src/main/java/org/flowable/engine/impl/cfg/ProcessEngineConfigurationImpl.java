@@ -35,9 +35,6 @@ import java.util.concurrent.ConcurrentMap;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
-import org.activiti.image.impl.DefaultProcessDiagramGenerator;
-import org.activiti.validation.ProcessValidator;
-import org.activiti.validation.ProcessValidatorFactory;
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
@@ -337,6 +334,9 @@ import org.flowable.engine.impl.variable.VariableTypes;
 import org.flowable.engine.parse.BpmnParseHandler;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.image.impl.DefaultProcessDiagramGenerator;
+import org.flowable.validation.ProcessValidator;
+import org.flowable.validation.ProcessValidatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

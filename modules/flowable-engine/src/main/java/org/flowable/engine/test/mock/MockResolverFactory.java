@@ -29,15 +29,15 @@ import org.flowable.engine.impl.scripting.ResolverFactory;
  * xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd&quot;&gt;<br>
  * <br>
  * &lt;bean id=&quot;processEngineConfiguration&quot;<br>
- * class=&quot;org.activiti.engine.impl.cfg. StandaloneInMemProcessEngineConfiguration&quot;&gt;<br>
+ * class=&quot;org.flowable.engine.impl.cfg. StandaloneInMemProcessEngineConfiguration&quot;&gt;<br>
  * &lt;property name=&quot;jobExecutorActivate&quot; value=&quot;false&quot; /&gt;<br>
  * &lt;property name=&quot;expressionManager&quot;&gt;<br>
- * &lt;bean class=&quot;org.activiti.engine.test.mock.MockExpressionManager&quot; /&gt;<br>
+ * &lt;bean class=&quot;org.flowable.engine.test.mock.MockExpressionManager&quot; /&gt;<br>
  * &lt;/property&gt;<br>
  * &lt;property name=&quot;resolverFactories&quot;&gt;<br>
  * &lt;list&gt;<br>
- * &lt;bean class=&quot;org.activiti.engine.impl.scripting.VariableScopeResolverFactory &quot; /&gt;<br>
- * &lt;bean class=&quot;org.activiti.engine.impl.scripting.BeansResolverFactory&quot; /&gt;<br>
+ * &lt;bean class=&quot;org.flowable.engine.impl.scripting.VariableScopeResolverFactory &quot; /&gt;<br>
+ * &lt;bean class=&quot;org.flowable.engine.impl.scripting.BeansResolverFactory&quot; /&gt;<br>
  * &lt;bean class=&quot;com.deenero.activiti.MockResolverFactory&quot; /&gt;<br>
  * &lt;/list&gt;<br>
  * &lt;/property&gt;<br>

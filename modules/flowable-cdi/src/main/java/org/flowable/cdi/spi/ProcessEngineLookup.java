@@ -23,7 +23,7 @@ import org.flowable.engine.ProcessEngine;
  * 
  * <p>
  * Implementations of this class are looked up using the Java SE 6 {@link ServiceLoader} facilities. Users of this class that provide a custom implementation, must declare it in a file named
- * <code>META-INF/services/org.activiti.cdi.spi.ProcessEngineLookup</code> in order for it to be found.
+ * <code>META-INF/services/org.flowable.cdi.spi.ProcessEngineLookup</code> in order for it to be found.
  * </p>
  * 
  * <p>

@@ -34,7 +34,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
-@ComponentScan({ "org.activiti.rest.content.exception", "org.activiti.rest.content.service.api" })
+@ComponentScan({ "org.flowable.rest.content.exception", "org.flowable.rest.content.service.api" })
 public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
   private final Logger log = LoggerFactory.getLogger(DispatcherServletConfiguration.class);

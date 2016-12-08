@@ -167,7 +167,7 @@ public interface IdmIdentityService {
   TokenQuery createTokenQuery();
 
   /**
-   * Returns a new {@link org.activiti.idm.engine.query.NativeQuery} for tokens.
+   * Returns a new {@link org.flowable.idm.engine.query.NativeQuery} for tokens.
    */
   NativeTokenQuery createNativeTokenQuery();
 

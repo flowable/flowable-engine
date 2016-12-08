@@ -249,7 +249,7 @@ public enum FlowableEngineEventType implements FlowableEventType {
   /**
    * A process has been cancelled. Dispatched when process instance is deleted by
    * 
-   * @see org.activiti.engine.impl.RuntimeServiceImpl#deleteProcessInstance(java.lang.String, java.lang.String), before DB delete.
+   * @see org.flowable.engine.impl.RuntimeServiceImpl#deleteProcessInstance(java.lang.String, java.lang.String), before DB delete.
    */
   PROCESS_CANCELLED,
   

@@ -22,8 +22,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.validation.ProcessValidator;
-import org.activiti.validation.ValidationError;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
@@ -70,6 +68,8 @@ import org.flowable.engine.impl.bpmn.webservice.BpmnInterfaceImplementation;
 import org.flowable.engine.impl.bpmn.webservice.MessageDefinition;
 import org.flowable.engine.impl.bpmn.webservice.Operation;
 import org.flowable.engine.impl.bpmn.webservice.OperationImplementation;
+import org.flowable.validation.ProcessValidator;
+import org.flowable.validation.ValidationError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

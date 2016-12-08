@@ -16,7 +16,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ComponentScan(basePackages = { "org.activiti.rest.content.conf.common", "org.activiti.rest.content.conf.engine" })
+@ComponentScan(basePackages = { "org.flowable.rest.content.conf.common", "org.flowable.rest.content.conf.engine" })
 public class ApplicationConfiguration {
 
 }

@@ -16,7 +16,7 @@
 
 	<properties>
 		<activiti.artifact>
-			org.activiti.validation
+			org.flowable.validation
 		</activiti.artifact>
 	</properties>
 

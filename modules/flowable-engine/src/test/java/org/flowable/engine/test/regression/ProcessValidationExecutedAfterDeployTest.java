@@ -2,10 +2,10 @@ package org.flowable.engine.test.regression;
 
 import java.util.List;
 
-import org.activiti.validation.ProcessValidator;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.validation.ProcessValidator;
 
 /**
  * From http://forums.activiti.org/content/skip-parse-validation-while-fetching- startformdata

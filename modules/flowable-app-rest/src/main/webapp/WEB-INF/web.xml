@@ -18,6 +18,6 @@
 
     <!-- All the Servlets and Filters are configured by this ServletContextListener : -->
     <listener>
-        <listener-class>org.activiti.rest.servlet.WebConfigurer</listener-class>
+        <listener-class>org.flowable.rest.servlet.WebConfigurer</listener-class>
     </listener>
 </web-app>

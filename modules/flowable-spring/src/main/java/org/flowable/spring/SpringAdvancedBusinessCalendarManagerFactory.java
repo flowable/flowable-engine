@@ -10,13 +10,13 @@ import org.flowable.engine.impl.calendar.*;
  * Create a factory bean
  * 
  * <pre>
- * &lt;bean id="businessCalendarManagerFactory" class="org.activiti.spring.SpringAdvancedBusinessCalendarManagerFactory" /&gt;
+ * &lt;bean id="businessCalendarManagerFactory" class="org.flowable.spring.SpringAdvancedBusinessCalendarManagerFactory" /&gt;
  * </pre>
  * 
- * Add the manager to your org.activiti.spring.SpringProcessEngineConfiguration bean
+ * Add the manager to your org.flowable.spring.SpringProcessEngineConfiguration bean
  * 
  * <pre>
- *  &lt;bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration"&gt;
+ *  &lt;bean id="processEngineConfiguration" class="org.flowable.spring.SpringProcessEngineConfiguration"&gt;
  *    ...
  *    &lt;property name="businessCalendarManager"&gt;
  *      &lt;bean id="advancedBusinessCalendarManager" factory-bean="businessCalendarManagerFactory" factory-method="getBusinessCalendarManager" /&gt;
