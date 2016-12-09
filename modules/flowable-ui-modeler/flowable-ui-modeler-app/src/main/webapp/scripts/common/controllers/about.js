@@ -24,9 +24,6 @@ activitiApp.controller('AboutActivitiPopupCrtl', ['$rootScope', '$scope', '$http
             $scope.popup.licenseHolder = response.holder;
             $scope.popup.activitiVersion = response.versionInfo.edition + ' v' + response.versionInfo.majorVersion + '.' + response.versionInfo.minorVersion + '.' + response.versionInfo.revisionVersion;
             $scope.popup.activitiVersionType = response.versionInfo.type;
-            if (response.goodBeforeDate) {
-                $scope.popup.goodBeforeDate = $dateFormatter.formatDate(new Date(response.goodBeforeDate));
-            }
             $scope.popup.loading = false;
         }).
         error(function(response, status, headers, config) {

@@ -11,14 +11,6 @@
 		</div>
 
 		<div class="btn-group pull-right" ng-if="!(currentKickstartModel)">
-			<button type="button" ng-click="toggleFavorite()" class="btn btn-default" title="{{'DECISION-TABLE.ACTION.FAVORITE' | translate}}"
-			    title="{{'DECISION-TABLE.ACTION.FAVORITE' | translate}}" ng-disabled="!model.decisionTable.latestVersion || model.favoritePending">
-				<i class="glyphicon" ng-class="{'glyphicon-star highlight': model.decisionTable.favorite, 'glyphicon-star-empty': !model.decisionTable.favorite}"></i>
-			</button>
-			<button type="button" ng-click="shareDecisionTable()" class="btn btn-default" title="{{'DECISION-TABLE.ACTION.SHARE' | translate}}"
-			    title="{{'DECISION-TABLE.ACTION.SHARE' | translate}}" ng-disabled="!model.decisionTable.latestVersion || model.decisionTable.createdBy != account.id">
-				<i class="glyphicon glyphicon-share"></i>
-			</button>
 			<a href="{{model.decisionTableDownloadUrl}}" class="btn btn-default" title="{{'DECISION-TABLE.ACTION.EXPORT' | translate}}">
  	            <i class="glyphicon glyphicon-save"></i>
  	        </a>
@@ -50,15 +42,6 @@
 			</div>
 			<div class="col-xs-8 details clearfix">
 			    <div class="related btn-group">
-					<button id="toggle-comment" type="button" class="btn btn-subtle" ng-disabled="!model.decisionTable.latestVersion" ng-click="toggleComments($event)"
-						title="{{'DECISION-TABLE.ACTION.ADD-COMMENT' | translate}}">
-                        <span ng-if="!model.comments.data.length">
-						    {{'DECISION-TABLE.ACTION.ADD-COMMENT' | translate}}
-                        </span>
-                        <span ng-if="model.comments.data.length">
-						    {{'DECISION-TABLE.DETAILS.COMMENTS-TITLE' | translate}} <span class="counter">{{model.comments.data.length}}</span>
-                        </span>
-					</button>
 					<button id="toggle-history" ng-if="!(currentKickstartModel)" type="button" class="btn btn-subtle" ng-click="toggleHistory($event)"
 						title="{{'DECISION-TABLE.ACTION.EDIT' | translate}}">
 						{{'DECISION-TABLE.DETAILS.HISTORY-TITLE' | translate}} <span class="counter" ng-show="model.versions.data.length">{{model.versions.data.length}}</span>
@@ -67,7 +50,6 @@
 				<p ng-if="model.decisionTable.description">
 					{{model.decisionTable.description}}
 				</p>
-				<span class="detail" ng-if="model.decisionTable.comment" title="{{'DECISION-TABLE.VERSION-COMMENT' | translate}}"><i class="glyphicon glyphicon-comment"></i>{{model.decisionTable.comment}}</span>
 			</div>
 		</div>
 	</div>

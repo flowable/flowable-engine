@@ -25,7 +25,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @author Frederik Heremans
  * @author Joram Barrez
  */
-public class ActivitiAppUser extends User {
+public class FlowableAppUser extends User {
 
     private static final long serialVersionUID = 1L;
     
@@ -34,7 +34,7 @@ public class ActivitiAppUser extends User {
     /**
      * The userId needs to be passed explicitly. It can be the email, but also the external id when eg LDAP is being used. 
      */
-    public ActivitiAppUser(org.flowable.idm.api.User user, String userId, Collection<? extends GrantedAuthority> authorities) {
+    public FlowableAppUser(org.flowable.idm.api.User user, String userId, Collection<? extends GrantedAuthority> authorities) {
         super(userId, user.getPassword() != null ? user.getPassword() : "", authorities); // password needs to be non null
         this.userObject = user;
     }

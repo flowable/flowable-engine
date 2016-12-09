@@ -47,27 +47,27 @@ public final class SecurityUtils {
     }
 
     User user = null;
-    ActivitiAppUser appUser = getCurrentActivitiAppUser();
+    FlowableAppUser appUser = getCurrentActivitiAppUser();
     if (appUser != null) {
       user = appUser.getUserObject();
     }
     return user;
   }
 
-  public static ActivitiAppUser getCurrentActivitiAppUser() {
-    ActivitiAppUser user = null;
+  public static FlowableAppUser getCurrentActivitiAppUser() {
+    FlowableAppUser user = null;
     SecurityContext securityContext = SecurityContextHolder.getContext();
     if (securityContext != null && securityContext.getAuthentication() != null) {
       Object principal = securityContext.getAuthentication().getPrincipal();
-      if (principal != null && principal instanceof ActivitiAppUser) {
-        user = (ActivitiAppUser) principal;
+      if (principal != null && principal instanceof FlowableAppUser) {
+        user = (FlowableAppUser) principal;
       }
     }
     return user;
   }
 
   public static boolean currentUserHasCapability(String capability) {
-    ActivitiAppUser user = getCurrentActivitiAppUser();
+    FlowableAppUser user = getCurrentActivitiAppUser();
     for (GrantedAuthority grantedAuthority : user.getAuthorities()) {
       if (capability.equals(grantedAuthority.getAuthority())) {
         return true;
