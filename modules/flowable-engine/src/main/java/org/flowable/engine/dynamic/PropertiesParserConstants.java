@@ -10,31 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.engine.event;
-
-import java.util.Date;
+package org.flowable.engine.dynamic;
 
 /**
- * @author Joram Barrez
+ * Created by Pardo David on 5/12/2016.
  */
-public interface EventLogEntry {
-	
-		long getLogNumber();
-		
-		String getType();
-		
-		String getProcessDefinitionId();
-		
-		String getProcessInstanceId();
-		
-		String getExecutionId();
-		
-		String getTaskId();
-		
-		Date getTimeStamp();
-		
-		String getUserId();
-		
-		byte[] getData();
-		
+public interface PropertiesParserConstants {
+	String ELEMENT_ID = "elementId";
+	String ELEMENT_TYPE = "elementType";
+	String ELEMENT_PROPERTIES = "elementProperties";
+	String BPMN_MODEL_VALUE = "bpmnmodel";
+	String DYNAMIC_VALUE = "dynamic";
 }

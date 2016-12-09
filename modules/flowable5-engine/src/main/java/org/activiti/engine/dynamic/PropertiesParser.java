@@ -10,31 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.engine.event;
+package org.activiti.engine.dynamic;
 
-import java.util.Date;
+import org.flowable.bpmn.model.FlowElement;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * @author Joram Barrez
+ * Created by Pardo David on 5/12/2016.
  */
-public interface EventLogEntry {
-	
-		long getLogNumber();
-		
-		String getType();
-		
-		String getProcessDefinitionId();
-		
-		String getProcessInstanceId();
-		
-		String getExecutionId();
-		
-		String getTaskId();
-		
-		Date getTimeStamp();
-		
-		String getUserId();
-		
-		byte[] getData();
-		
+public interface PropertiesParser {
+	ObjectNode parseElement(FlowElement flowElement, ObjectNode flowElementNode, ObjectMapper mapper);
+	boolean supports(FlowElement flowElement);
 }

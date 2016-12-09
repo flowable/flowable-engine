@@ -13,6 +13,10 @@
 
 package org.flowable.engine;
 
+import java.util.List;
+
+import org.flowable.engine.dynamic.DynamicProcessDefinitionSummary;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /** Service providing access to the repository of process definitions and deployments.
@@ -81,6 +85,60 @@ public interface DynamicBpmnService {
   
   void changeUserTaskCandidateGroup(String id, String candidateGroup, boolean overwriteOtherChangedEntries, ObjectNode infoNode);
   
+  /**
+   * Creates a new processDefinitionInfo with {@link DynamicBpmnConstants#USER_TASK_CANDIDATE_USERS} for the given BPMN element.
+   *
+   * <p color="red">
+   *     Don't forget to call {@link DynamicBpmnService#saveProcessDefinitionInfo(String, ObjectNode)}
+   * </p>
+   *
+   * @param id the bpmn element id (ex. sid-3392FDEE-DD6F-484E-97FE-55F30BFEA77E)
+   * @param candidateUsers the candidate users.
+   * @return a new processDefinitionNode with the candidate users for the given bpmn element.
+   */
+  ObjectNode changeUserTaskCandidateUsers(String id, List<String> candidateUsers);
+
+  /**
+   * Updates a processDefinitionInfo's {@link DynamicBpmnConstants#USER_TASK_CANDIDATE_USERS} with the new list.
+   * Previous values for the BPMN Element with {@link DynamicBpmnConstants#USER_TASK_CANDIDATE_USERS} as key are ignored.
+   *
+   * <p color="red">
+   *     Don't forget to call {@link DynamicBpmnService#saveProcessDefinitionInfo(String, ObjectNode)}
+   * </p>
+   *
+   * @param id the bpmn element id (ex. sid-3392FDEE-DD6F-484E-97FE-55F30BFEA77E)
+   * @param candidateUsers the candidate users.
+   * @param infoNode the current processDefinitionInfo. This object will be modified.
+   */
+  void changeUserTaskCandidateUsers(String id, List<String> candidateUsers, ObjectNode infoNode);
+
+  /**
+   * Creates a new processDefinitionInfo with {@link DynamicBpmnConstants#USER_TASK_CANDIDATE_USERS} for the given BPMN element.
+   *
+   * <p color="red">
+   *     Don't forget to call {@link DynamicBpmnService#saveProcessDefinitionInfo(String, ObjectNode)}
+   * </p>
+   *
+   * @param id the bpmn element id (ex. sid-3392FDEE-DD6F-484E-97FE-55F30BFEA77E)
+   * @param candidateGroups the candidate groups.
+   * @return a new processDefinitionNode with the candidate users for the given bpmn element.
+   */
+  ObjectNode changeUserTaskCandidateGroups(String id, List<String> candidateGroups);
+
+  /**
+   * Updates a processDefinitionInfo's {@link DynamicBpmnConstants#USER_TASK_CANDIDATE_USERS} with the new list.
+   * Previous values for the BPMN Element with {@link DynamicBpmnConstants#USER_TASK_CANDIDATE_USERS} as key are ignored.
+   *
+   * <p color="red">
+   *     Don't forget to call {@link DynamicBpmnService#saveProcessDefinitionInfo(String, ObjectNode)}
+   * </p>
+   *
+   * @param id the bpmn element id (ex. sid-3392FDEE-DD6F-484E-97FE-55F30BFEA77E)
+   * @param candidateGroups the candidate groups.
+   * @param infoNode the current processDefinitionInfo. This object will be modified.
+   */
+  void changeUserTaskCandidateGroups(String id, List<String> candidateGroups, ObjectNode infoNode);
+  
   ObjectNode changeDmnTaskDecisionTableKey(String id, String decisionTableKey);
 
   void changeDmnTaskDecisionTableKey(String id, String decisionTableKey, ObjectNode infoNode);
@@ -100,4 +158,29 @@ public interface DynamicBpmnService {
   void changeLocalizationDescription(String language, String id, String value, ObjectNode infoNode);
   
   ObjectNode getLocalizationElementProperties(String language, String id, ObjectNode infoNode);
+  
+  /**
+   * <p>
+   *  Clears the field from the infoNode. So the engine uses the {@link org.activiti.bpmn.model.BpmnModel} value
+   *  On next instance.
+   * </p>
+   *
+   * <p color="red">
+   *     Don't forget to save the modified infoNode by calling {@link DynamicBpmnService#saveProcessDefinitionInfo(String, ObjectNode)}
+   * </p>
+   *
+   * @param elementId the flow elements id.
+   * @param property {@link DynamicBpmnConstants} property
+   * @param infoNode to modify
+   */
+  void resetProperty(String elementId, String property, ObjectNode infoNode);
+
+  /**
+   * Gives a summary between the {@link org.activiti.bpmn.model.BpmnModel} and {@link DynamicBpmnService#getProcessDefinitionInfo(String)}
+   *
+   * @param processDefinitionId the process definition id (key:version:sequence)
+   * @return DynamicProcessDefinitionSummary if the processdefinition exists
+   * @throws IllegalStateException if there is no processDefinition found for the provided processDefinitionId.
+   */
+  DynamicProcessDefinitionSummary getDynamicProcessDefinitionSummary(String processDefinitionId);
 }

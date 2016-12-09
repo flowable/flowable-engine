@@ -13,13 +13,20 @@
 
 package org.activiti.engine.impl;
 
+import java.util.List;
+
+import org.activiti.engine.ActivitiException;
 import org.activiti.engine.DynamicBpmnService;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.activiti.engine.impl.cmd.GetBpmnModelCmd;
 import org.activiti.engine.impl.cmd.GetProcessDefinitionInfoCmd;
 import org.activiti.engine.impl.cmd.SaveProcessDefinitionInfoCmd;
+import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.DynamicBpmnConstants;
+import org.flowable.engine.dynamic.DynamicProcessDefinitionSummary;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -210,6 +217,38 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
     setElementProperty(id, USER_TASK_CANDIDATE_GROUPS, valuesNode, infoNode);
   }
   
+  @Override
+  public ObjectNode changeUserTaskCandidateUsers(String id, List<String> candidateUsers) {
+    ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+    changeUserTaskCandidateUsers(id,candidateUsers,infoNode);
+    return infoNode;
+  }
+
+  @Override
+  public void changeUserTaskCandidateUsers(String id, List<String> candidateUsers, ObjectNode infoNode) {
+    ArrayNode candidateUsersNode = processEngineConfiguration.getObjectMapper().createArrayNode();
+    for(String candidateUser : candidateUsers){
+      candidateUsersNode.add(candidateUser);
+    }
+    setElementProperty(id,USER_TASK_CANDIDATE_USERS,candidateUsersNode,infoNode);
+  }
+
+  @Override
+  public ObjectNode changeUserTaskCandidateGroups(String id, List<String> candidateGroups) {
+    ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+    changeUserTaskCandidateGroups(id,candidateGroups,infoNode);
+    return infoNode;
+  }
+
+  @Override
+  public void changeUserTaskCandidateGroups(String id, List<String> candidateGroups, ObjectNode infoNode) {
+    ArrayNode candidateGroupsNode = processEngineConfiguration.getObjectMapper().createArrayNode();
+    for(String candidateGroup : candidateGroups){
+      candidateGroupsNode.add(candidateGroup);
+    }
+    setElementProperty(id,USER_TASK_CANDIDATE_GROUPS,candidateGroupsNode,infoNode);
+  }
+  
   public ObjectNode changeSequenceFlowCondition(String id, String condition) {
     ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
     changeSequenceFlowCondition(id, condition, infoNode);
@@ -259,6 +298,34 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
       }
     }
     return propertiesNode;
+  }
+  
+  @Override
+  public void resetProperty(String elementId, String property, ObjectNode infoNode) {
+    ObjectNode path = (ObjectNode) infoNode.path(BPMN_NODE).path(elementId);
+    if (!path.isMissingNode()) {
+      path.remove(property);
+    }
+  }
+
+  @Override
+  public DynamicProcessDefinitionSummary getDynamicProcessDefinitionSummary(String processDefinitionId) {
+    ObjectNode infoNode = getProcessDefinitionInfo(processDefinitionId);
+    ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
+    BpmnModel bpmnModel = commandExecutor.execute(new GetBpmnModelCmd(processDefinitionId));
+
+    // agressive exception. this  method should not be called if the process definition does not exists.
+    if (bpmnModel == null) {
+      throw new ActivitiException("ProcessDefinition " + processDefinitionId + " does not exists");
+    }
+
+    //to avoid redundant null checks we create an new node
+    if (infoNode == null) {
+      infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+      createOrGetBpmnNode(infoNode);
+    }
+
+    return new DynamicProcessDefinitionSummary(bpmnModel,infoNode,objectMapper);
   }
   
   protected boolean doesElementPropertyExist(String id, String propertyName, ObjectNode infoNode) {
