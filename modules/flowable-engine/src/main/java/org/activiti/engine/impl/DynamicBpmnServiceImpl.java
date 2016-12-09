@@ -13,7 +13,8 @@
 
 package org.activiti.engine.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.DynamicBpmnConstants;
 import org.activiti.engine.DynamicBpmnService;
@@ -24,10 +25,9 @@ import org.activiti.engine.impl.cmd.GetProcessDefinitionInfoCmd;
 import org.activiti.engine.impl.cmd.SaveProcessDefinitionInfoCmd;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import java.util.List;
 
 
 /**
@@ -312,7 +312,7 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
   protected void setElementProperty(String id, String propertyName, String propertyValue, ObjectNode infoNode) {
     ObjectNode bpmnNode = createOrGetBpmnNode(infoNode);
     if (bpmnNode.has(id) == false) {
-      bpmnNode.put(id, processEngineConfiguration.getObjectMapper().createObjectNode());
+      bpmnNode.set(id, processEngineConfiguration.getObjectMapper().createObjectNode());
     }
     
     ((ObjectNode) bpmnNode.get(id)).put(propertyName, propertyValue);
@@ -321,15 +321,15 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
   protected void setElementProperty(String id, String propertyName, JsonNode propertyValue, ObjectNode infoNode) {
     ObjectNode bpmnNode = createOrGetBpmnNode(infoNode);
     if (bpmnNode.has(id) == false) {
-      bpmnNode.put(id, processEngineConfiguration.getObjectMapper().createObjectNode());
+      bpmnNode.set(id, processEngineConfiguration.getObjectMapper().createObjectNode());
     }
     
-    ((ObjectNode) bpmnNode.get(id)).put(propertyName, propertyValue);
+    ((ObjectNode) bpmnNode.get(id)).set(propertyName, propertyValue);
   }
   
   protected ObjectNode createOrGetBpmnNode(ObjectNode infoNode) {
     if (infoNode.has(BPMN_NODE) == false) {
-      infoNode.put(BPMN_NODE, processEngineConfiguration.getObjectMapper().createObjectNode());
+      infoNode.set(BPMN_NODE, processEngineConfiguration.getObjectMapper().createObjectNode());
     }
     return (ObjectNode) infoNode.get(BPMN_NODE);
   }
@@ -341,12 +341,12 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
   protected void setLocalizationProperty(String language, String id, String propertyName, String propertyValue, ObjectNode infoNode) {
     ObjectNode localizationNode = createOrGetLocalizationNode(infoNode);
     if (localizationNode.has(language) == false) {
-      localizationNode.put(language, processEngineConfiguration.getObjectMapper().createObjectNode());
+      localizationNode.set(language, processEngineConfiguration.getObjectMapper().createObjectNode());
     }
     
     ObjectNode languageNode = (ObjectNode) localizationNode.get(language);
     if (languageNode.has(id) == false) {
-      languageNode.put(id, processEngineConfiguration.getObjectMapper().createObjectNode());
+      languageNode.set(id, processEngineConfiguration.getObjectMapper().createObjectNode());
     }
     
     ((ObjectNode) languageNode.get(id)).put(propertyName, propertyValue);
@@ -354,7 +354,7 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
   
   protected ObjectNode createOrGetLocalizationNode(ObjectNode infoNode) {
     if (infoNode.has(LOCALIZATION_NODE) == false) {
-      infoNode.put(LOCALIZATION_NODE, processEngineConfiguration.getObjectMapper().createObjectNode());
+      infoNode.set(LOCALIZATION_NODE, processEngineConfiguration.getObjectMapper().createObjectNode());
     }
     return (ObjectNode) infoNode.get(LOCALIZATION_NODE);
   }
@@ -366,7 +366,7 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
   @Override
   public void resetProperty(String elementId, String property, ObjectNode infoNode) {
     ObjectNode path = (ObjectNode) infoNode.path(BPMN_NODE).path(elementId);
-    if(!path.isMissingNode()){
+    if (!path.isMissingNode()) {
       path.remove(property);
     }
   }
@@ -377,13 +377,13 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
     ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
     BpmnModel bpmnModel = commandExecutor.execute(new GetBpmnModelCmd(processDefinitionId));
 
-    //agressive exception. this  method should not be called if the processdefinition does not exists.
-    if(bpmnModel == null){
+    // agressive exception. this  method should not be called if the process definition does not exists.
+    if (bpmnModel == null) {
       throw new IllegalStateException("ProcessDefinition " + processDefinitionId + " does not exists");
     }
 
     //to avoid redundant null checks we create an new node
-    if(infoNode == null){
+    if (infoNode == null) {
       infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
       createOrGetBpmnNode(infoNode);
     }

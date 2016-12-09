@@ -1,13 +1,29 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.engine.dynamic;
+
+import java.util.HashMap;
+
+import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.Process;
+import org.activiti.bpmn.model.ScriptTask;
+import org.activiti.bpmn.model.UserTask;
+import org.activiti.engine.DynamicBpmnConstants;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.activiti.bpmn.model.*;
-import org.activiti.bpmn.model.Process;
-import org.activiti.engine.DynamicBpmnConstants;
-
-import java.util.HashMap;
 
 /**
  * Pojo class who can be used to check information between {@link org.activiti.engine.DynamicBpmnService#getProcessDefinitionInfo(String)}
@@ -16,7 +32,8 @@ import java.util.HashMap;
  * Created by Pardo David on 5/12/2016.
  */
 public class DynamicProcessDefinitionSummary implements DynamicBpmnConstants {
-	private static final HashMap<String, PropertiesParser> summaryParsers = new HashMap<String,PropertiesParser>();
+	
+  private static final HashMap<String, PropertiesParser> summaryParsers = new HashMap<String,PropertiesParser>();
 	private static final PropertiesParser defaultParser = new DefaultPropertiesParser();
 	private BpmnModel bpmnModel;
 	private ObjectNode processInfo;
@@ -69,26 +86,25 @@ public class DynamicProcessDefinitionSummary implements DynamicBpmnConstants {
 	public ObjectNode getElement(String elementId) throws IllegalStateException{
 
 		FlowElement flowElement = bpmnModel.getFlowElement(elementId);
-		if(flowElement == null){
+		if (flowElement == null) {
 			throw new IllegalStateException("No flow element with id " + elementId + " found in bpmnmodel " + bpmnModel.getMainProcess().getId());
 		}
 
 		PropertiesParser propertiesParser = summaryParsers.get(flowElement.getClass().getSimpleName());
 		ObjectNode bpmnProperties = getBpmnProperties(elementId, processInfo);
-		if(propertiesParser != null){
+		if (propertiesParser != null){
 			return propertiesParser.parseElement(flowElement,bpmnProperties,objectMapper);
-		}else{
+		} else {
 			//if there is no parser for an element we have to use the default summary parser.
 			return defaultParser.parseElement(flowElement,bpmnProperties,objectMapper);
 		}
 	}
 
-
 	public ObjectNode getSummary() {
 		ObjectNode summary = objectMapper.createObjectNode();
 
-		for(Process process : bpmnModel.getProcesses()){
-			for(FlowElement flowElement : process.getFlowElements()){
+		for (Process process : bpmnModel.getProcesses()){
+			for (FlowElement flowElement : process.getFlowElements()){
 				summary.set(flowElement.getId(),getElement(flowElement.getId()));
 			}
 		}
@@ -96,16 +112,16 @@ public class DynamicProcessDefinitionSummary implements DynamicBpmnConstants {
 		return summary;
 	}
 
-	private ObjectNode getBpmnProperties(String elementId, ObjectNode processInfoNode){
+	protected ObjectNode getBpmnProperties(String elementId, ObjectNode processInfoNode){
 		JsonNode bpmnNode = processInfoNode.get(BPMN_NODE);
-		if(bpmnNode != null){
+		if (bpmnNode != null){
 			JsonNode elementNode = bpmnNode.get(elementId);
-			if(elementNode == null){
+			if (elementNode == null){
 				return objectMapper.createObjectNode();
-			}else{
+			} else{
 				return (ObjectNode) elementNode;
 			}
-		}else{
+		} else{
 			return objectMapper.createObjectNode();
 		}
 	}

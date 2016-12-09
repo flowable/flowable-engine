@@ -1,21 +1,35 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.engine.test.bpmn.dynamic;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
+import java.util.ArrayList;
+
 import org.activiti.engine.DynamicBpmnConstants;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.test.Deployment;
 
-import java.util.ArrayList;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Created by Pardo David on 7/12/2016.
  */
 public class DynamicCandidateGroupsTest extends PluggableActivitiTestCase implements DynamicBpmnConstants {
-	private final String TASK_ONE_SID = "sid-B94D5D22-E93E-4401-ADC5-C5C073E1EEB4";
+	
+  private final String TASK_ONE_SID = "sid-B94D5D22-E93E-4401-ADC5-C5C073E1EEB4";
 	private final String TASK_TWO_SID = "sid-B1C37EBE-A273-4DDE-B909-89302638526A";
 	private final String SCRIPT_TASK_SID = "sid-A403BAE0-E367-449A-90B2-48834FCAA2F9";
 
@@ -59,8 +73,5 @@ public class DynamicCandidateGroupsTest extends PluggableActivitiTestCase implem
 
 		assertThat(hrTaskCount,is(0L));
 		assertThat(salesTaskCount,is(0L));
-
 	}
-
-
 }
