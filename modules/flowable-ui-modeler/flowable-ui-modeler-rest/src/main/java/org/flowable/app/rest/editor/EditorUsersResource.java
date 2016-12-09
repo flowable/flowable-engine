@@ -15,32 +15,30 @@ package org.flowable.app.rest.editor;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.app.model.common.GroupRepresentation;
-import org.flowable.app.model.common.RemoteGroup;
 import org.flowable.app.model.common.ResultListDataRepresentation;
+import org.flowable.app.model.common.UserRepresentation;
 import org.flowable.app.service.idm.RemoteIdmService;
+import org.flowable.idm.api.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Rest resource for managing groups, used in the editor app.
- */
 @RestController
-public class EditorGroupsResource {
-
+public class EditorUsersResource {
+  
   @Autowired
   protected RemoteIdmService remoteIdmService;
-  
-  @RequestMapping(value = "/rest/editor-groups", method = RequestMethod.GET)
-  public ResultListDataRepresentation getGroups(@RequestParam(required = false, value = "filter") String filter) {
-    List<GroupRepresentation> result = new ArrayList<GroupRepresentation>();
-    List<RemoteGroup> groups = remoteIdmService.findGroupsByNameFilter(filter);
-    for (RemoteGroup group : groups) {
-      result.add(new GroupRepresentation(group));
+
+  @RequestMapping(value = "/rest/editor-users", method = RequestMethod.GET)
+  public ResultListDataRepresentation getUsers(@RequestParam(value = "filter", required = false) String filter) {
+    List<? extends User> matchingUsers = remoteIdmService.findUsersByNameFilter(filter);
+    List<UserRepresentation> userRepresentations = new ArrayList<UserRepresentation>(matchingUsers.size());
+    for (User user : matchingUsers) {
+      userRepresentations.add(new UserRepresentation(user));
     }
-    return new ResultListDataRepresentation(groups);
+    return new ResultListDataRepresentation(userRepresentations);
   }
+
 }

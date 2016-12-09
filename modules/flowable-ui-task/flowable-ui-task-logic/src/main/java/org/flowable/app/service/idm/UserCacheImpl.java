@@ -20,10 +20,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 
 import org.flowable.app.service.api.UserCache;
-import org.flowable.engine.IdentityService;
 import org.flowable.idm.api.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.LockedException;
@@ -47,13 +44,11 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 @Service
 public class UserCacheImpl implements UserCache {
 
-  private final Logger logger = LoggerFactory.getLogger(UserCacheImpl.class);
-
   @Autowired
   protected Environment environment;
 
   @Autowired
-  protected IdentityService identityService;
+  protected RemoteIdmService remoteIdmService;
 
   protected LoadingCache<String, CachedUser> userCache;
 
@@ -66,14 +61,14 @@ public class UserCacheImpl implements UserCache {
         .expireAfterAccess(userCacheMaxAge != null ? userCacheMaxAge : (24 * 60 * 60), TimeUnit.SECONDS).recordStats().build(new CacheLoader<String, CachedUser>() {
 
           public CachedUser load(final String userId) throws Exception {
-            User userFromDatabase = identityService.createUserQuery().userId(userId).singleResult();
-            if (userFromDatabase == null) {
+            User user = remoteIdmService.getUser(userId);
+            if (user == null) {
               throw new UsernameNotFoundException("User " + userId + " was not found in the database");
             }
             
             Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
             
-            return new CachedUser(userFromDatabase, grantedAuthorities);
+            return new CachedUser(user, grantedAuthorities);
           }
 
         });

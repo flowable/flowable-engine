@@ -18,16 +18,10 @@ import java.util.List;
 import org.flowable.app.model.common.UserRepresentation;
 import org.flowable.app.model.runtime.TaskRepresentation;
 import org.flowable.app.security.SecurityUtils;
-import org.flowable.app.service.api.UserCache;
 import org.flowable.app.service.api.UserCache.CachedUser;
 import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.app.service.exception.NotFoundException;
 import org.flowable.app.service.exception.NotPermittedException;
-import org.flowable.app.service.util.TaskUtil;
-import org.flowable.engine.HistoryService;
-import org.flowable.engine.IdentityService;
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.TaskService;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.history.HistoricIdentityLink;
 import org.flowable.engine.task.IdentityLink;
@@ -37,7 +31,6 @@ import org.flowable.engine.task.TaskInfo;
 import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,27 +41,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Service
 @Transactional
-public class FlowableTaskActionService {
+public class FlowableTaskActionService extends FlowableAbstractTaskService {
 
   private static final Logger logger = LoggerFactory.getLogger(FlowableTaskActionService.class);
-
-  @Autowired
-  protected RepositoryService repositoryService;
-  
-  @Autowired
-  protected TaskService taskService;
-
-  @Autowired
-  protected PermissionService permissionService;
-
-  @Autowired
-  protected IdentityService identityService;
-  
-  @Autowired
-  protected HistoryService historyService;
-  
-  @Autowired
-  protected UserCache userCache;
 
   public void completeTask(String taskId) {
     User currentUser = SecurityUtils.getCurrentUserObject();
@@ -119,7 +94,7 @@ public class FlowableTaskActionService {
 
     task = taskService.createTaskQuery().taskId(taskId).singleResult();
     TaskRepresentation rep = new TaskRepresentation(task);
-    TaskUtil.fillPermissionInformation(rep, task, currentUser, identityService, historyService, repositoryService);
+    fillPermissionInformation(rep, task, currentUser);
 
     populateAssignee(task, rep);
     rep.setInvolvedPeople(getInvolvedUsers(taskId));

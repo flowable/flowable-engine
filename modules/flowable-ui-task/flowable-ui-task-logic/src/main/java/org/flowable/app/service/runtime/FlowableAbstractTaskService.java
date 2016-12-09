@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.service.util;
+package org.flowable.app.service.runtime;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,24 +20,44 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.flowable.app.model.runtime.TaskRepresentation;
+import org.flowable.app.service.api.UserCache;
+import org.flowable.app.service.idm.RemoteIdmService;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.HistoryService;
-import org.flowable.engine.IdentityService;
 import org.flowable.engine.RepositoryService;
+import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.task.TaskInfo;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class TaskUtil {
+public abstract class FlowableAbstractTaskService {
+  
+  @Autowired
+  protected RemoteIdmService remoteIdmService;
+  
+  @Autowired
+  protected HistoryService historyService;
+  
+  @Autowired 
+  protected RepositoryService repositoryService;
+  
+  @Autowired
+  protected TaskService taskService;
 
-  public static void fillPermissionInformation(TaskRepresentation taskRepresentation, TaskInfo task, User currentUser, 
-      IdentityService identityService, HistoryService historyService, RepositoryService repositoryService) {
+  @Autowired
+  protected UserCache userCache;
+
+  @Autowired
+  protected PermissionService permissionService;
+  
+  public void fillPermissionInformation(TaskRepresentation taskRepresentation, TaskInfo task, User currentUser) {
 
     String processInstanceStartUserId = null;
     boolean initiatorCanCompleteTask = true;
@@ -77,7 +97,7 @@ public class TaskUtil {
           }
 
           if (CollectionUtils.isNotEmpty(userTask.getCandidateGroups())) {
-            List<Group> groups = identityService.createGroupQuery().groupMember(currentUser.getId()).list();
+            List<? extends Group> groups = remoteIdmService.getUser(currentUser.getId()).getGroups();
             if (CollectionUtils.isNotEmpty(groups)) {
 
               List<String> groupIds = new ArrayList<String>();
@@ -149,4 +169,5 @@ public class TaskUtil {
     taskRepresentation.setMemberOfCandidateGroup(isMemberOfCandidateGroup);
     taskRepresentation.setMemberOfCandidateUsers(isMemberOfCandidateUsers);
   }
+
 }

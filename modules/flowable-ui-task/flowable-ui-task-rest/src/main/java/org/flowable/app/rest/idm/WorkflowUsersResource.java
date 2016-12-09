@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.rest.runtime;
+package org.flowable.app.rest.idm;
 
 import org.flowable.app.model.common.ResultListDataRepresentation;
 import org.springframework.web.bind.annotation.RequestMapping;

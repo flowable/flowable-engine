@@ -15,6 +15,8 @@ package org.flowable.app.service.idm;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 
@@ -98,6 +100,24 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
     return null;
   }
   
+  @Override
+  public List<RemoteUser> findUsersByNameFilter(String filter) {
+    JsonNode json = callRemoteIdmService(url + "/api/idm/users?filter=" + encode(filter), adminUser, adminPassword);
+    if (json != null) {
+      return parseUsersInfo(json);
+    }
+    return new ArrayList<RemoteUser>();
+  }
+  
+  @Override
+  public List<RemoteGroup> findGroupsByNameFilter(String filter) {
+    JsonNode json = callRemoteIdmService(url + "/api/idm/groups?filter=" + encode(filter), adminUser, adminPassword);
+    if (json != null) {
+      return parseGroupsInfo(json);
+    }
+    return new ArrayList<RemoteGroup>();
+  }
+  
   protected JsonNode callRemoteIdmService(String url, String username, String password) {
     HttpGet httpGet = new HttpGet(url);
     httpGet.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
@@ -135,6 +155,17 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
     return null;
   }
   
+  protected List<RemoteUser> parseUsersInfo(JsonNode json) {
+    List<RemoteUser> result = new ArrayList<RemoteUser>();
+    if (json != null && json.isArray()) {
+      ArrayNode array = (ArrayNode) json;
+      for (JsonNode userJson : array) {
+        result.add(parseUserInfo(userJson));
+      }
+    }
+    return result;
+  }
+  
   protected RemoteUser parseUserInfo(JsonNode json) {
     RemoteUser user = new RemoteUser();
     user.setId(json.get("id").asText());
@@ -158,7 +189,29 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
     return user;
   }
   
+  protected List<RemoteGroup> parseGroupsInfo(JsonNode json) {
+    List<RemoteGroup> result = new ArrayList<RemoteGroup>();
+    if (json != null && json.isArray()) {
+      ArrayNode array = (ArrayNode) json;
+      for (JsonNode userJson : array) {
+        result.add(parseGroupInfo(userJson));
+      }
+    }
+    return result;
+  }
+  
+  protected RemoteGroup parseGroupInfo(JsonNode json) {
+    RemoteGroup group = new RemoteGroup();
+    group.setId(json.get("id").asText());
+    group.setName(json.get("name").asText());
+    return group;
+  }
+  
   protected String encode(String s) {
+    if (s == null) {
+      return "";
+    }
+    
     try {
       return URLEncoder.encode(s, "UTF-8");
     } catch (Exception e) {

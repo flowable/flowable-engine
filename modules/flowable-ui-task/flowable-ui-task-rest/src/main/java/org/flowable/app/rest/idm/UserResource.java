@@ -18,7 +18,7 @@ import org.flowable.app.model.common.UserRepresentation;
 import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.exception.NotFoundException;
 import org.flowable.app.service.exception.NotPermittedException;
-import org.flowable.engine.IdentityService;
+import org.flowable.app.service.idm.RemoteIdmService;
 import org.flowable.idm.api.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,11 +33,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserResource {
 
   @Autowired
-  protected IdentityService identityService;
+  protected RemoteIdmService remoteIdmService;
 
   @RequestMapping(value = "/rest/users/{userId}", method = RequestMethod.GET, produces = "application/json")
   public UserRepresentation getUser(@PathVariable String userId, HttpServletResponse response) {
-    User user = identityService.createUserQuery().userId(userId).singleResult();
+    User user = remoteIdmService.getUser(userId); 
 
     if (user == null) {
       throw new NotFoundException("User with id: " + userId + " does not exist or is inactive");
