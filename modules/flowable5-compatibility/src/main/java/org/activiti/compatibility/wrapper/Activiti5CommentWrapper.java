@@ -24,9 +24,9 @@ import org.flowable.engine.task.Comment;
  */
 public class Activiti5CommentWrapper implements Comment {
 
-  private org.activiti5.engine.task.Comment activit5Comment;
+  private org.activiti.engine.task.Comment activit5Comment;
   
-  public Activiti5CommentWrapper(org.activiti5.engine.task.Comment activit5Comment) {
+  public Activiti5CommentWrapper(org.activiti.engine.task.Comment activit5Comment) {
     this.activit5Comment = activit5Comment;
   }
 
@@ -65,7 +65,7 @@ public class Activiti5CommentWrapper implements Comment {
     return activit5Comment.getFullMessage();
   }
   
-  public org.activiti5.engine.task.Comment getRawObject() {
+  public org.activiti.engine.task.Comment getRawObject() {
     return activit5Comment;
   }
 }

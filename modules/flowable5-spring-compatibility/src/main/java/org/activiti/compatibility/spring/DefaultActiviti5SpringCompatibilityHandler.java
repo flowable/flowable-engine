@@ -15,7 +15,7 @@ package org.activiti.compatibility.spring;
 
 import org.activiti.compatibility.DefaultActiviti5CompatibilityHandler;
 import org.activiti.compatibility.DefaultProcessEngineFactory;
-import org.activiti5.spring.SpringProcessEngineConfiguration;
+import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.apache.commons.lang3.StringUtils;
 
 

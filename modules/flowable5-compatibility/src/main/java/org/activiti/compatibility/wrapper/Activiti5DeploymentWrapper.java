@@ -21,9 +21,9 @@ import org.flowable.engine.repository.Deployment;
  */
 public class Activiti5DeploymentWrapper implements Deployment {
   
-  protected org.activiti5.engine.repository.Deployment activiti5Deployment;
+  protected org.activiti.engine.repository.Deployment activiti5Deployment;
   
-  public Activiti5DeploymentWrapper(org.activiti5.engine.repository.Deployment activiti5Deployment) {
+  public Activiti5DeploymentWrapper(org.activiti.engine.repository.Deployment activiti5Deployment) {
     this.activiti5Deployment = activiti5Deployment;
   }
 
@@ -57,7 +57,7 @@ public class Activiti5DeploymentWrapper implements Deployment {
     return activiti5Deployment.getTenantId();
   }
   
-  public org.activiti5.engine.repository.Deployment getRawObject() {
+  public org.activiti.engine.repository.Deployment getRawObject() {
     return activiti5Deployment;
   }
   

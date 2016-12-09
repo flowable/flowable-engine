@@ -26,9 +26,9 @@ import org.flowable.engine.runtime.ProcessInstance;
  */
 public class Activiti5ProcessInstanceWrapper implements ProcessInstance {
 
-  private org.activiti5.engine.runtime.ProcessInstance activiti5ProcessInstance;
+  private org.activiti.engine.runtime.ProcessInstance activiti5ProcessInstance;
   
-  public Activiti5ProcessInstanceWrapper(org.activiti5.engine.runtime.ProcessInstance activiti5ProcessInstance) {
+  public Activiti5ProcessInstanceWrapper(org.activiti.engine.runtime.ProcessInstance activiti5ProcessInstance) {
     this.activiti5ProcessInstance = activiti5ProcessInstance;
   }
 
@@ -137,7 +137,7 @@ public class Activiti5ProcessInstanceWrapper implements ProcessInstance {
     return activiti5ProcessInstance.getLocalizedDescription();
   }
 
-  public org.activiti5.engine.runtime.ProcessInstance getRawObject() {
+  public org.activiti.engine.runtime.ProcessInstance getRawObject() {
     return activiti5ProcessInstance;
   }
 

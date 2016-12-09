@@ -20,12 +20,12 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.xml.namespace.QName;
 
-import org.activiti5.engine.ActivitiException;
-import org.activiti5.engine.ProcessEngine;
-import org.activiti5.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
-import org.activiti5.engine.impl.bpmn.parser.factory.ListenerFactory;
-import org.activiti5.engine.impl.history.HistoryLevel;
-import org.activiti5.engine.parse.BpmnParseHandler;
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
+import org.activiti.engine.impl.bpmn.parser.factory.ListenerFactory;
+import org.activiti.engine.impl.history.HistoryLevel;
+import org.activiti.engine.parse.BpmnParseHandler;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.flowable.engine.impl.persistence.deploy.Deployer;
@@ -38,9 +38,9 @@ public class DefaultProcessEngineFactory {
    * Takes in an Activiti 6 process engine config, gives back an Activiti 5 Process engine.
    */
   public ProcessEngine buildProcessEngine(ProcessEngineConfigurationImpl activiti6Configuration) {
-    org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration = null;
+    org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration = null;
     if (activiti6Configuration instanceof StandaloneProcessEngineConfiguration) {
-      activiti5Configuration = new org.activiti5.engine.impl.cfg.StandaloneProcessEngineConfiguration();
+      activiti5Configuration = new org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration();
       copyConfigItems(activiti6Configuration, activiti5Configuration);
       return activiti5Configuration.buildProcessEngine();
     } else {
@@ -48,7 +48,7 @@ public class DefaultProcessEngineFactory {
     }
   }
    
-  protected void copyConfigItems(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
+  protected void copyConfigItems(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
     activiti5Configuration.setActiviti5CompatibilityHandler(activiti6Configuration.getActiviti5CompatibilityHandler());
     
     copyJdbcConfig(activiti6Configuration, activiti5Configuration);
@@ -70,7 +70,7 @@ public class DefaultProcessEngineFactory {
     activiti5Configuration.setBusinessCalendarManager(activiti6Configuration.getBusinessCalendarManager());
   }
 
-  protected void copyJdbcConfig(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
+  protected void copyJdbcConfig(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
     if (activiti6Configuration.getIdGeneratorDataSource() != null) {
       activiti5Configuration.setIdGeneratorDataSource(activiti6Configuration.getIdGeneratorDataSource());
     } else if (activiti6Configuration.getIdGeneratorDataSourceJndiName() != null) {
@@ -105,23 +105,23 @@ public class DefaultProcessEngineFactory {
     }
   }
 
-  protected void copyHistoryConfig(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
+  protected void copyHistoryConfig(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
     activiti5Configuration.setHistoryLevel(HistoryLevel.getHistoryLevelForKey(activiti6Configuration.getHistoryLevel().getKey()));
   }
   
-  protected void copyIdentityConfig(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
+  protected void copyIdentityConfig(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
     activiti5Configuration.setIdmEngineInitialized(activiti6Configuration.isIdmEngineInitialized());
     activiti5Configuration.setIdmIdentityService(activiti6Configuration.getIdmIdentityService());
   }
 
-  protected void copyDiagramConfig(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
+  protected void copyDiagramConfig(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
     activiti5Configuration.setCreateDiagramOnDeploy(activiti6Configuration.isCreateDiagramOnDeploy());
     activiti5Configuration.setActivityFontName(activiti6Configuration.getActivityFontName());
     activiti5Configuration.setLabelFontName(activiti6Configuration.getLabelFontName());
     activiti5Configuration.setAnnotationFontName(activiti6Configuration.getAnnotationFontName());
   }
 
-  protected void copyMailConfig(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
+  protected void copyMailConfig(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
     activiti5Configuration.setMailServerDefaultFrom(activiti6Configuration.getMailServerDefaultFrom());
     activiti5Configuration.setMailServerHost(activiti6Configuration.getMailServerHost());
     activiti5Configuration.setMailServerPassword(activiti6Configuration.getMailServerPassword());
@@ -138,7 +138,7 @@ public class DefaultProcessEngineFactory {
     }
   }
 
-  protected void copyAsyncExecutorConfig(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
+  protected void copyAsyncExecutorConfig(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
     if (activiti6Configuration.isAsyncExecutorActivate()) {
       activiti5Configuration.setAsyncExecutorActivate(true);
     }
@@ -147,7 +147,7 @@ public class DefaultProcessEngineFactory {
     activiti5Configuration.setAsyncExecutor(activiti6Configuration.getAsyncExecutor());
   }
 
-  protected void copyJpaConfig(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
+  protected void copyJpaConfig(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
     activiti5Configuration.setJpaCloseEntityManager(activiti6Configuration.isJpaCloseEntityManager());
     activiti5Configuration.setJpaHandleTransaction(activiti6Configuration.isJpaHandleTransaction());
     
@@ -159,13 +159,13 @@ public class DefaultProcessEngineFactory {
     }
   }
 
-  protected void copyBeans(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
+  protected void copyBeans(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
     if (activiti6Configuration.getBeans() != null) {
       activiti5Configuration.setBeans(activiti6Configuration.getBeans());
     }
   }
 
-  protected void copyCaches(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
+  protected void copyCaches(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
     activiti5Configuration.setProcessDefinitionCacheLimit(activiti6Configuration.getProcessDefinitionCacheLimit());
     activiti5Configuration.setEnableProcessDefinitionInfoCache(activiti6Configuration.isEnableProcessDefinitionInfoCache());
     activiti5Configuration.setProcessDefinitionCache(activiti6Configuration.getProcessDefinitionCache());
@@ -174,19 +174,19 @@ public class DefaultProcessEngineFactory {
     activiti5Configuration.setKnowledgeBaseCache(activiti6Configuration.getKnowledgeBaseCache());
   }
 
-  protected void copyActivityBehaviorFactory(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
+  protected void copyActivityBehaviorFactory(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
     if (activiti6Configuration.getActiviti5ActivityBehaviorFactory() != null) {
       activiti5Configuration.setActivityBehaviorFactory((ActivityBehaviorFactory) activiti6Configuration.getActiviti5ActivityBehaviorFactory());
     }
   }
 
-  protected void copyListenerFactory(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
+  protected void copyListenerFactory(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
     if (activiti6Configuration.getActiviti5ListenerFactory() != null) {
       activiti5Configuration.setListenerFactory((ListenerFactory) activiti6Configuration.getActiviti5ListenerFactory());
     }
   }
 
-  protected void copyCustomMybatisMappers(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
+  protected void copyCustomMybatisMappers(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
     if (activiti6Configuration.getActiviti5CustomMybatisMappers() != null) {
       activiti5Configuration.setCustomMybatisMappers(activiti6Configuration.getActiviti5CustomMybatisMappers());
     }
@@ -196,7 +196,7 @@ public class DefaultProcessEngineFactory {
     }
   }
   
-  protected void copyWsConfig(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
+  protected void copyWsConfig(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
     if (activiti6Configuration.getWsSyncFactoryClassName() != null) {
       activiti5Configuration.setWsSyncFactoryClassName(activiti6Configuration.getWsSyncFactoryClassName());
     }
@@ -209,12 +209,12 @@ public class DefaultProcessEngineFactory {
     }
   }
 
-  protected void copyPostDeployers(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
+  protected void copyPostDeployers(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
     if (activiti6Configuration.getCustomPostDeployers() != null) {
-      List<org.activiti5.engine.impl.persistence.deploy.Deployer> activiti5Deployers = new ArrayList<org.activiti5.engine.impl.persistence.deploy.Deployer>();
+      List<org.activiti.engine.impl.persistence.deploy.Deployer> activiti5Deployers = new ArrayList<org.activiti.engine.impl.persistence.deploy.Deployer>();
       for (Deployer deployer : activiti6Configuration.getCustomPostDeployers()) {
         if (deployer instanceof RulesDeployer) {
-          activiti5Deployers.add(new org.activiti5.engine.impl.rules.RulesDeployer());
+          activiti5Deployers.add(new org.activiti.engine.impl.rules.RulesDeployer());
           break;
         }
       }
@@ -229,7 +229,7 @@ public class DefaultProcessEngineFactory {
     }
   }
 
-  protected void convertParseHandlers(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
+  protected void convertParseHandlers(ProcessEngineConfigurationImpl activiti6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration) {
     activiti5Configuration.setPreBpmnParseHandlers(convert(activiti6Configuration.getActiviti5PreBpmnParseHandlers()));
     activiti5Configuration.setPostBpmnParseHandlers(convert(activiti6Configuration.getActiviti5PostBpmnParseHandlers()));
     activiti5Configuration.setCustomDefaultBpmnParseHandlers(convert(activiti6Configuration.getActiviti5CustomDefaultBpmnParseHandlers()));

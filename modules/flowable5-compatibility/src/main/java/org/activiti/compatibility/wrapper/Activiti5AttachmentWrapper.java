@@ -15,7 +15,7 @@ package org.activiti.compatibility.wrapper;
 
 import java.util.Date;
 
-import org.activiti5.engine.impl.persistence.entity.AttachmentEntity;
+import org.activiti.engine.impl.persistence.entity.AttachmentEntity;
 import org.flowable.engine.task.Attachment;
 
 /**
@@ -25,9 +25,9 @@ import org.flowable.engine.task.Attachment;
  */
 public class Activiti5AttachmentWrapper implements Attachment {
 
-  private org.activiti5.engine.task.Attachment activiti5Attachment;
+  private org.activiti.engine.task.Attachment activiti5Attachment;
   
-  public Activiti5AttachmentWrapper(org.activiti5.engine.task.Attachment activit5Attachment) {
+  public Activiti5AttachmentWrapper(org.activiti.engine.task.Attachment activit5Attachment) {
     this.activiti5Attachment = activit5Attachment;
   }
   
@@ -96,7 +96,7 @@ public class Activiti5AttachmentWrapper implements Attachment {
     return ((AttachmentEntity) activiti5Attachment).getContentId();
   }
 
-  public org.activiti5.engine.task.Attachment getRawObject() {
+  public org.activiti.engine.task.Attachment getRawObject() {
     return activiti5Attachment;
   }
 

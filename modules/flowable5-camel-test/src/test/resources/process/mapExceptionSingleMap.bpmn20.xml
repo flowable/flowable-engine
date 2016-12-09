@@ -15,7 +15,7 @@
 
         <serviceTask id="exceptionRoute" activiti:type="camel">
 	      <extensionElements>
-	        <activiti:mapException xmlns:activiti="http://activiti.org/bpmn" errorCode="myErrorCode1" >org.activiti5.camel.MapExceptionParent</activiti:mapException>
+	        <activiti:mapException xmlns:activiti="http://activiti.org/bpmn" errorCode="myErrorCode1" >org.activiti.camel.MapExceptionParent</activiti:mapException>
 	      </extensionElements>
         	
         </serviceTask>
@@ -26,7 +26,7 @@
 	    </boundaryEvent>
         <sequenceFlow id="flow3" sourceRef="catchError" targetRef="setFlagService"/>
         
-		<serviceTask id="setFlagService" activiti:class="org.activiti5.camel.util.FlagJavaDelegate" />
+		<serviceTask id="setFlagService" activiti:class="org.activiti.camel.util.FlagJavaDelegate" />
         <sequenceFlow id="flow4" sourceRef="setFlagService" targetRef="end"/>
         
         <endEvent id="end"/>
