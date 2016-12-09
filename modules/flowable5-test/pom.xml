@@ -195,7 +195,7 @@
 	                <configuration>
 	                  <tasks>
 	                    <echo message="dropping schema in ${database}" />
-	                    <java classname="org.activiti.engine.impl.db.DbSchemaDrop" classpathref="maven.test.classpath" />
+	                    <java classname="org.flowable.engine.impl.db.DbSchemaDrop" classpathref="maven.test.classpath" />
 	                  </tasks>
 	                </configuration>
 	              </execution>
