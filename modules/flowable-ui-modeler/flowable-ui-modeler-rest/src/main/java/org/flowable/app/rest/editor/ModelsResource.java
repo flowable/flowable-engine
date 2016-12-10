@@ -26,7 +26,7 @@ import org.flowable.app.model.editor.ModelRepresentation;
 import org.flowable.app.model.editor.decisiontable.DecisionTableDefinitionRepresentation;
 import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.api.ModelService;
-import org.flowable.app.service.editor.ActivitiModelQueryService;
+import org.flowable.app.service.editor.FlowableModelQueryService;
 import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.app.service.exception.InternalServerErrorException;
 import org.flowable.form.model.FormModel;
@@ -52,7 +52,7 @@ public class ModelsResource {
   private final Logger logger = LoggerFactory.getLogger(ModelsResource.class);
   
   @Autowired
-  protected ActivitiModelQueryService modelQueryService;
+  protected FlowableModelQueryService modelQueryService;
   
   @Autowired
   protected ModelService modelService;

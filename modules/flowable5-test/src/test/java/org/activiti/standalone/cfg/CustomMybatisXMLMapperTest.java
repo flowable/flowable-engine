@@ -26,7 +26,7 @@ public class CustomMybatisXMLMapperTest extends ResourceActivitiTestCase {
     final String taskId = createTask("4", null, null, 0);
     
     org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl)
-        processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+        processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
     
     CustomTask customTask = activiti5ProcessEngineConfig.getManagementService().executeCommand(new Command<CustomTask>() {
       @Override
@@ -55,7 +55,7 @@ public class CustomMybatisXMLMapperTest extends ResourceActivitiTestCase {
     }
     
     org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl)
-        processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+        processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
     
     List<CustomTask> tasks = activiti5ProcessEngineConfig.getManagementService().executeCommand(new Command<List<CustomTask>>() {
 
@@ -80,7 +80,7 @@ public class CustomMybatisXMLMapperTest extends ResourceActivitiTestCase {
     createTask("Owned task", "kermit", null, 0);
     
     org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl)
-        processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+        processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
     
     List<CustomTask> tasks = new CustomTaskQuery(activiti5ProcessEngineConfig.getManagementService()).unOwned().list();
     
@@ -101,7 +101,7 @@ public class CustomMybatisXMLMapperTest extends ResourceActivitiTestCase {
     createTask("Owned task", "kermit", null, 0);
     
     org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl)
-        processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+        processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
     
     CustomTask task = new CustomTaskQuery(activiti5ProcessEngineConfig.getManagementService()).taskOwner("kermit").singleResult();
     
@@ -119,7 +119,7 @@ public class CustomMybatisXMLMapperTest extends ResourceActivitiTestCase {
     }
     
     org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl)
-        processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+        processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
     
     List<CustomTask> tasks = new CustomTaskQuery(activiti5ProcessEngineConfig.getManagementService()).listPage(0, 10);
     
@@ -138,7 +138,7 @@ public class CustomMybatisXMLMapperTest extends ResourceActivitiTestCase {
     }
     
     org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl)
-        processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+        processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
     
     List<CustomTask> tasks = new CustomTaskQuery(activiti5ProcessEngineConfig.getManagementService()).orderByTaskPriority().desc().list();
     
@@ -180,7 +180,7 @@ public class CustomMybatisXMLMapperTest extends ResourceActivitiTestCase {
     }
     
     org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl)
-        processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+        processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
     
     assertEquals(attachmentId, new AttachmentQuery(activiti5ProcessEngineConfig.getManagementService()).attachmentId(attachmentId).singleResult().getId());
     

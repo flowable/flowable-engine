@@ -26,7 +26,7 @@ import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.process.ScopeImpl;
 import org.activiti.engine.impl.pvm.process.TransitionImpl;
 import org.activiti.engine.parse.BpmnParseHandler;
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.Artifact;
 import org.flowable.bpmn.model.Association;
@@ -115,19 +115,19 @@ public abstract class AbstractBpmnParseHandler<T extends BaseElement> implements
     return activity;
   }
   
-  protected void createExecutionListenersOnScope(BpmnParse bpmnParse, List<ActivitiListener> activitiListenerList, ScopeImpl scope) {
-    for (ActivitiListener activitiListener : activitiListenerList) {
+  protected void createExecutionListenersOnScope(BpmnParse bpmnParse, List<FlowableListener> activitiListenerList, ScopeImpl scope) {
+    for (FlowableListener activitiListener : activitiListenerList) {
       scope.addExecutionListener(activitiListener.getEvent(), createExecutionListener(bpmnParse, activitiListener));
     }
   }
   
-  protected void createExecutionListenersOnTransition(BpmnParse bpmnParse, List<ActivitiListener> activitiListenerList, TransitionImpl transition) {
-    for (ActivitiListener activitiListener : activitiListenerList) {
+  protected void createExecutionListenersOnTransition(BpmnParse bpmnParse, List<FlowableListener> activitiListenerList, TransitionImpl transition) {
+    for (FlowableListener activitiListener : activitiListenerList) {
       transition.addExecutionListener(createExecutionListener(bpmnParse, activitiListener));
     }
   }
   
-  protected ExecutionListener createExecutionListener(BpmnParse bpmnParse, ActivitiListener activitiListener) {
+  protected ExecutionListener createExecutionListener(BpmnParse bpmnParse, FlowableListener activitiListener) {
     ExecutionListener executionListener = null;
   
     if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(activitiListener.getImplementationType())) {

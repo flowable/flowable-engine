@@ -44,7 +44,7 @@ public class DuplicateVariableInsertTest extends PluggableActivitiTestCase {
 		final List<Exception> exceptions = new ArrayList<Exception>();
 		
 		final org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl) 
-        processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+        processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
 		
 		Thread firstInstertThread = new Thread(new Runnable() {
 			@Override
@@ -100,7 +100,7 @@ public class DuplicateVariableInsertTest extends PluggableActivitiTestCase {
 		final List<Exception> exceptions = new ArrayList<Exception>();
 		
 		final org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl) 
-        processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+        processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
 		
 		Thread firstInstertThread = new Thread(new Runnable() {
 			@Override

@@ -157,7 +157,7 @@ public class RepositoryServiceTest extends PluggableActivitiTestCase {
             .addClasspathResource("org/activiti/engine/test/api/oneTaskProcess.bpmn20.xml")
             .addClasspathResource("org/activiti/engine/test/api/twoTasksProcess.bpmn20.xml")
             .activateProcessDefinitionsOn(inThreeDays)
-            .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+            .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
             .deploy();
     
     assertEquals(1, repositoryService.createDeploymentQuery().count());
@@ -389,7 +389,7 @@ public class RepositoryServiceTest extends PluggableActivitiTestCase {
 	  assertNotNull(zipInputStream);
 	  repositoryService.createDeployment()
 	  	.addZipInputStream(zipInputStream)
-	  	.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+	  	.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 	  	.deploy();
 	  
 	  assertEquals(6, repositoryService.createProcessDefinitionQuery().count());

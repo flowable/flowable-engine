@@ -21,8 +21,8 @@
         <property name="dataSource" ref="dataSource"/>
         <property name="transactionManager" ref="transactionManager"/>
         <property name="databaseSchemaUpdate" value="true"/>
-        <property name="activiti5CompatibilityEnabled" value="true" />
-        <property name="activiti5CompatibilityHandlerFactory" ref="activiti5CompabilityFactory" />
+        <property name="flowable5CompatibilityEnabled" value="true" />
+        <property name="flowable5CompatibilityHandlerFactory" ref="flowable5CompabilityFactory" />
         <property name="asyncExecutorActivate" value="false"/>
     </bean>
 
@@ -42,6 +42,6 @@
 
     <tx:annotation-driven transaction-manager="transactionManager"/>
     
-    <bean id="activiti5CompabilityFactory" class="org.activiti.compatibility.spring.SpringActiviti5CompatibilityHandlerFactory" />
+    <bean id="flowable5CompabilityFactory" class="org.activiti.compatibility.spring.SpringFlowable5CompatibilityHandlerFactory" />
 
 </beans>

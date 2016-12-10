@@ -27,7 +27,7 @@ import org.flowable.idm.api.User;
 import org.flowable.ldap.LDAPGroupCache.LDAPGroupCacheListener;
 
 /**
- * A {@link ProcessEngineConfigurator} that integrates a LDAP system with the Activiti process engine. The LDAP system will be consulted primarily for getting user information and in particular for
+ * A {@link ProcessEngineConfigurator} that integrates a LDAP system with the Flowable process engine. The LDAP system will be consulted primarily for getting user information and in particular for
  * fetching groups of a user.
  * 
  * This class is extensible and many methods can be overriden when the default behavior is not fitting your use case.
@@ -296,9 +296,9 @@ public class LDAPConfigurator extends AbstractProcessEngineConfigurator {
   /**
    * Name of the attribute that matches the user id.
    * 
-   * This property is used when looking for a {@link User} object and the mapping between the LDAP object and the Activiti {@link User} object is done.
+   * This property is used when looking for a {@link User} object and the mapping between the LDAP object and the Flowable {@link User} object is done.
    * 
-   * This property is optional and is only needed if searching for {@link User} objects using the Activiti API.
+   * This property is optional and is only needed if searching for {@link User} objects using the Flowable API.
    */
   public void setUserIdAttribute(String userIdAttribute) {
     this.userIdAttribute = userIdAttribute;
@@ -311,7 +311,7 @@ public class LDAPConfigurator extends AbstractProcessEngineConfigurator {
   /**
    * Name of the attribute that matches the user first name.
    * 
-   * This property is used when looking for a {@link User} object and the mapping between the LDAP object and the Activiti {@link User} object is done.
+   * This property is used when looking for a {@link User} object and the mapping between the LDAP object and the Flowable {@link User} object is done.
    */
   public void setUserFirstNameAttribute(String userFirstNameAttribute) {
     this.userFirstNameAttribute = userFirstNameAttribute;
@@ -324,7 +324,7 @@ public class LDAPConfigurator extends AbstractProcessEngineConfigurator {
   /**
    * Name of the attribute that matches the user last name.
    * 
-   * This property is used when looking for a {@link User} object and the mapping between the LDAP object and the Activiti {@link User} object is done.
+   * This property is used when looking for a {@link User} object and the mapping between the LDAP object and the Flowable {@link User} object is done.
    */
   public void setUserLastNameAttribute(String userLastNameAttribute) {
     this.userLastNameAttribute = userLastNameAttribute;
@@ -337,7 +337,7 @@ public class LDAPConfigurator extends AbstractProcessEngineConfigurator {
   /**
    * Name of the attribute that matches the user email.
    * 
-   * This property is used when looking for a {@link User} object and the mapping between the LDAP object and the Activiti {@link User} object is done.
+   * This property is used when looking for a {@link User} object and the mapping between the LDAP object and the Flowable {@link User} object is done.
    */
   public void setUserEmailAttribute(String userEmailAttribute) {
     this.userEmailAttribute = userEmailAttribute;
@@ -350,7 +350,7 @@ public class LDAPConfigurator extends AbstractProcessEngineConfigurator {
   /**
    * Name of the attribute that matches the group id.
    * 
-   * This property is used when looking for a {@link Group} object and the mapping between the LDAP object and the Activiti {@link Group} object is done.
+   * This property is used when looking for a {@link Group} object and the mapping between the LDAP object and the Flowable {@link Group} object is done.
    */
   public void setGroupIdAttribute(String groupIdAttribute) {
     this.groupIdAttribute = groupIdAttribute;
@@ -363,7 +363,7 @@ public class LDAPConfigurator extends AbstractProcessEngineConfigurator {
   /**
    * Name of the attribute that matches the group name.
    * 
-   * This property is used when looking for a {@link Group} object and the mapping between the LDAP object and the Activiti {@link Group} object is done.
+   * This property is used when looking for a {@link Group} object and the mapping between the LDAP object and the Flowable {@link Group} object is done.
    */
   public void setGroupNameAttribute(String groupNameAttribute) {
     this.groupNameAttribute = groupNameAttribute;
@@ -376,7 +376,7 @@ public class LDAPConfigurator extends AbstractProcessEngineConfigurator {
   /**
    * Name of the attribute that matches the group type.
    * 
-   * This property is used when looking for a {@link Group} object and the mapping between the LDAP object and the Activiti {@link Group} object is done.
+   * This property is used when looking for a {@link Group} object and the mapping between the LDAP object and the Flowable {@link Group} object is done.
    */
   public void setGroupTypeAttribute(String groupTypeAttribute) {
     this.groupTypeAttribute = groupTypeAttribute;

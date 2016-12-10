@@ -54,7 +54,7 @@ public class BpmnDeploymentTest extends PluggableActivitiTestCase {
     assertFalse(processDefinition.hasStartFormKey());
     
     org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl) 
-        processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+        processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
     ReadOnlyProcessDefinition readOnlyProcessDefinition = ((RepositoryServiceImpl) activiti5ProcessEngineConfig.getRepositoryService()).getDeployedProcessDefinition(processDefinition.getId());
     assertNull(readOnlyProcessDefinition.getDiagramResourceName());
     
@@ -137,7 +137,7 @@ public class BpmnDeploymentTest extends PluggableActivitiTestCase {
     repositoryService.createDeployment().enableDuplicateFiltering()
       .addClasspathResource(bpmnResourceName)
       .name("twice")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy();
     
     String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
@@ -150,7 +150,7 @@ public class BpmnDeploymentTest extends PluggableActivitiTestCase {
     repositoryService.createDeployment().enableDuplicateFiltering()
       .addClasspathResource(bpmnResourceName)
       .name("twice")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy();
     List<org.flowable.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().list();
     assertEquals(1, deploymentList.size());
@@ -165,7 +165,7 @@ public class BpmnDeploymentTest extends PluggableActivitiTestCase {
       repositoryService.createDeployment().enableDuplicateFiltering()
               .addClasspathResource(bpmnResourceName)
               .addClasspathResource(bpmnResourceName2)
-              .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+              .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
               .name("duplicateAtTheSameTime").deploy();
       fail();
     } catch (Exception e) {
@@ -179,7 +179,7 @@ public class BpmnDeploymentTest extends PluggableActivitiTestCase {
     repositoryService.createDeployment().enableDuplicateFiltering()
       .addClasspathResource(bpmnResourceName)
       .name("twice")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy();
     
     String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
@@ -193,7 +193,7 @@ public class BpmnDeploymentTest extends PluggableActivitiTestCase {
     repositoryService.createDeployment().enableDuplicateFiltering()
       .addClasspathResource(bpmnResourceName)
       .name("twice")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy();
     
     List<org.flowable.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().list();
@@ -207,13 +207,13 @@ public class BpmnDeploymentTest extends PluggableActivitiTestCase {
   public void testDiagramCreationDisabled() {
     // disable diagram generation
     org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl)
-        processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+        processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
     activiti5ProcessEngineConfig.setCreateDiagramOnDeploy(false);
 
     try {
       repositoryService.createDeployment()
         .addClasspathResource("org/activiti/engine/test/bpmn/parse/BpmnParseTest.testParseDiagramInterchangeElements.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
 
       // Graphical information is not yet exposed publicly, so we need to do some plumbing
@@ -276,7 +276,7 @@ public class BpmnDeploymentTest extends PluggableActivitiTestCase {
   public void testProcessDefinitionDescription() {
     String id = repositoryService.createProcessDefinitionQuery().singleResult().getId();
     org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl) 
-        processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+        processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
     ReadOnlyProcessDefinition processDefinition = ((RepositoryServiceImpl) activiti5ProcessEngineConfig.getRepositoryService()).getDeployedProcessDefinition(id);
     assertEquals("This is really good process documentation!", processDefinition.getDescription());
   }
@@ -287,7 +287,7 @@ public class BpmnDeploymentTest extends PluggableActivitiTestCase {
     try {
       repositoryService.createDeployment()
         .addClasspathResource("org/activiti/engine/test/bpmn/deployment/BpmnDeploymentTest.testInvalidExpression.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
 
       fail("Expected exception when deploying process with invalid expression.");
@@ -305,7 +305,7 @@ public class BpmnDeploymentTest extends PluggableActivitiTestCase {
       .addClasspathResource(bpmnResourceName)
       .name("twice")
       .tenantId("Tenant_A")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy();
     
     String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
@@ -319,7 +319,7 @@ public class BpmnDeploymentTest extends PluggableActivitiTestCase {
       .addClasspathResource(bpmnResourceName)
       .name("twice")
       .tenantId("Tenant_B")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy();
     
     List<org.flowable.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().list();

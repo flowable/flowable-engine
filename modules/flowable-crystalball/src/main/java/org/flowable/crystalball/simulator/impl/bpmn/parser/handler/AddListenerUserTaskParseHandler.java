@@ -1,6 +1,6 @@
 package org.flowable.crystalball.simulator.impl.bpmn.parser.handler;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.delegate.TaskListener;
@@ -25,7 +25,7 @@ public class AddListenerUserTaskParseHandler extends UserTaskParseHandler {
   protected void executeParse(BpmnParse bpmnParse, UserTask userTask) {
     super.executeParse(bpmnParse, userTask);
     
-    ActivitiListener listener = new ActivitiListener();
+    FlowableListener listener = new FlowableListener();
     listener.setEvent(eventName);
     listener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_INSTANCE);
     listener.setInstance(taskListener);

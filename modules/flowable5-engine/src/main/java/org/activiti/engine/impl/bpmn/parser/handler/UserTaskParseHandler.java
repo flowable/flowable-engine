@@ -24,7 +24,7 @@ import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.task.TaskDefinition;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.UserTask;
@@ -89,7 +89,7 @@ public class UserTaskParseHandler extends AbstractActivityBpmnParseHandler<UserT
     // Activiti custom extension
     
     // Task listeners
-    for (ActivitiListener taskListener : userTask.getTaskListeners()) {
+    for (FlowableListener taskListener : userTask.getTaskListeners()) {
       taskDefinition.addTaskListener(taskListener.getEvent(), createTaskListener(bpmnParse, taskListener, userTask.getId()));
     }
 
@@ -144,7 +144,7 @@ public class UserTaskParseHandler extends AbstractActivityBpmnParseHandler<UserT
     return taskDefinition;
   }
   
-  protected TaskListener createTaskListener(BpmnParse bpmnParse, ActivitiListener activitiListener, String taskId) {
+  protected TaskListener createTaskListener(BpmnParse bpmnParse, FlowableListener activitiListener, String taskId) {
     TaskListener taskListener = null;
 
     if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(activitiListener.getImplementationType())) {

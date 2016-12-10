@@ -23,7 +23,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.flowable.admin.domain.ServerConfig;
-import org.flowable.admin.service.engine.exception.ActivitiServiceException;
+import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +44,7 @@ public class FormDeploymentService {
 	private final Logger log = LoggerFactory.getLogger(FormDeploymentService.class);
 
 	@Autowired
-	protected ActivitiClientService clientUtil;
+	protected FlowableClientService clientUtil;
 
 	public JsonNode listDeployments(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
 
@@ -53,7 +53,7 @@ public class FormDeploymentService {
 			builder = new URIBuilder("form-repository/deployments");
 		} catch (Exception e) {
 			log.error("Error building uri", e);
-			throw new ActivitiServiceException("Error building uri", e);
+			throw new FlowableServiceException("Error building uri", e);
 		}
 
 		for (String name : parameterMap.keySet()) {

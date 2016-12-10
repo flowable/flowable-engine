@@ -47,7 +47,7 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
       .createDeployment()
       .tenantId("One%")
       .addClasspathResource("org/activiti/standalone/escapeclause/oneTaskProcessEscapeClauseTest.bpmn20.xml")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy()
       .getId();
 
@@ -55,7 +55,7 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
       .createDeployment()
       .tenantId("Two_")
       .addClasspathResource("org/activiti/standalone/escapeclause/oneTaskProcessEscapeClauseTest.bpmn20.xml")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy()
       .getId();
     

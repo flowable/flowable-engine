@@ -36,7 +36,7 @@ public class ActivitiMockSupport {
   public ActivitiMockSupport(ProcessEngine processEngine) {
     ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
     org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfiguration = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl) 
-        processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+        processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
     ActivityBehaviorFactory existingActivityBehaviorFactory = activiti5ProcessEngineConfiguration.getActivityBehaviorFactory();
     this.testActivityBehaviorFactory = new TestActivityBehaviorFactory(existingActivityBehaviorFactory);
 

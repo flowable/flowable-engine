@@ -72,11 +72,11 @@ public class JobQueryTest extends PluggableActivitiTestCase {
     
     Clock clock = processEngineConfiguration.getClock();
     
-    this.commandExecutor = (CommandExecutor) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawCommandExecutor();
+    this.commandExecutor = (CommandExecutor) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawCommandExecutor();
     
     deploymentId = repositoryService.createDeployment()
         .addClasspathResource("org/activiti/engine/test/api/mgmt/timerOnTask.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy()
         .getId();
     
@@ -419,7 +419,7 @@ public class JobQueryTest extends PluggableActivitiTestCase {
   }
   
   private void createJobWithoutExceptionMsg() {
-    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawCommandExecutor();
+    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawCommandExecutor();
     commandExecutor.execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
         JobEntityManager jobManager = commandContext.getJobEntityManager();
@@ -447,7 +447,7 @@ public class JobQueryTest extends PluggableActivitiTestCase {
   }
   
   private void createJobWithoutExceptionStacktrace() {
-    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawCommandExecutor();
+    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawCommandExecutor();
     commandExecutor.execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
         JobEntityManager jobManager = commandContext.getJobEntityManager();
@@ -471,7 +471,7 @@ public class JobQueryTest extends PluggableActivitiTestCase {
   }  
   
   private void deleteJobInDatabase() {
-      CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawCommandExecutor();
+      CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawCommandExecutor();
       commandExecutor.execute(new Command<Void>() {
         public Void execute(CommandContext commandContext) {
           

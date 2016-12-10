@@ -106,7 +106,7 @@ public class CompensateEventTest extends PluggableActivitiTestCase {
     try {
       repositoryService.createDeployment()
         .addClasspathResource("org/activiti/engine/test/bpmn/event/compensate/CompensateEventTest.testMultipleCompensationCatchEventsFails.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
       fail("exception expected");
     } catch (Exception e) {
@@ -117,7 +117,7 @@ public class CompensateEventTest extends PluggableActivitiTestCase {
     try {
       repositoryService.createDeployment()
         .addClasspathResource("org/activiti/engine/test/bpmn/event/compensate/CompensateEventTest.testInvalidActivityRefFails.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
       fail("exception expected");
     } catch (Exception e) {

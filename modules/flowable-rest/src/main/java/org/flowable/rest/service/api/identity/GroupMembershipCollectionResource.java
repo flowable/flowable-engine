@@ -20,7 +20,7 @@ import io.swagger.annotations.*;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.idm.api.Group;
-import org.flowable.rest.exception.ActivitiConflictException;
+import org.flowable.rest.exception.FlowableConflictException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,7 +55,7 @@ public class GroupMembershipCollectionResource extends BaseGroupResource {
     // exception
     if (identityService.createUserQuery().memberOfGroup(group.getId()).userId(memberShip.getUserId()).count() > 0) {
 
-      throw new ActivitiConflictException("User '" + memberShip.getUserId() + "' is already part of group '" + group.getId() + "'.");
+      throw new FlowableConflictException("User '" + memberShip.getUserId() + "' is already part of group '" + group.getId() + "'.");
     }
 
     identityService.createMembership(memberShip.getUserId(), group.getId());

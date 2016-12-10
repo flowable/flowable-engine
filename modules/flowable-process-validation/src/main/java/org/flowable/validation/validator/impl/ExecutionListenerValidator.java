@@ -14,7 +14,7 @@ package org.flowable.validation.validator.impl;
 
 import java.util.List;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
@@ -39,9 +39,9 @@ public class ExecutionListenerValidator extends ProcessLevelValidator {
     }
   }
 
-  protected void validateListeners(Process process, BaseElement baseElement, List<ActivitiListener> listeners, List<ValidationError> errors) {
+  protected void validateListeners(Process process, BaseElement baseElement, List<FlowableListener> listeners, List<ValidationError> errors) {
     if (listeners != null) {
-      for (ActivitiListener listener : listeners) {
+      for (FlowableListener listener : listeners) {
         if (listener.getImplementation() == null || listener.getImplementationType() == null) {
           addError(errors, Problems.EXECUTION_LISTENER_IMPLEMENTATION_MISSING, process, baseElement, "Element 'class' or 'expression' is mandatory on executionListener");
         }

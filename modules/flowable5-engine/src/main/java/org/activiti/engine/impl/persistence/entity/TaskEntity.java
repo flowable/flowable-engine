@@ -39,7 +39,7 @@ import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
@@ -896,7 +896,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
     this.eventName = eventName;
   }
   @Override
-  public ActivitiListener getCurrentActivitiListener() {
+  public FlowableListener getCurrentActivitiListener() {
     throw new UnsupportedOperationException();
   }
   public void setExecutionId(String executionId) {

@@ -21,7 +21,7 @@ import java.util.Map;
 
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.interceptor.Command;
@@ -49,12 +49,12 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
   public Deployment execute(CommandContext commandContext) {
 
     // Backwards compatibility with Activiti v5
-    if (commandContext.getProcessEngineConfiguration().isActiviti5CompatibilityEnabled()
+    if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled()
         && deploymentBuilder.getDeploymentProperties() != null 
-        && deploymentBuilder.getDeploymentProperties().containsKey(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION)
-        && deploymentBuilder.getDeploymentProperties().get(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION).equals(Boolean.TRUE)) {
+        && deploymentBuilder.getDeploymentProperties().containsKey(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION)
+        && deploymentBuilder.getDeploymentProperties().get(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION).equals(Boolean.TRUE)) {
       
-        return deployAsActiviti5ProcessDefinition(commandContext);
+        return deployAsFlowable5ProcessDefinition(commandContext);
     }
 
     return executeDeploy(commandContext);
@@ -120,13 +120,13 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
     return deployment;
   }
 
-  protected Deployment deployAsActiviti5ProcessDefinition(CommandContext commandContext) {
-    Activiti5CompatibilityHandler activiti5CompatibilityHandler = commandContext.getProcessEngineConfiguration().getActiviti5CompatibilityHandler();
-    if (activiti5CompatibilityHandler == null) {
-      throw new FlowableException("Found Activiti 5 process definition, but no compatibility handler on the classpath. " 
-          + "Cannot use the deployment property " + DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION);
+  protected Deployment deployAsFlowable5ProcessDefinition(CommandContext commandContext) {
+    Flowable5CompatibilityHandler flowable5CompatibilityHandler = commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler();
+    if (flowable5CompatibilityHandler == null) {
+      throw new FlowableException("Found Flowable 5 process definition, but no compatibility handler on the classpath. " 
+          + "Cannot use the deployment property " + DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION);
     }
-    return activiti5CompatibilityHandler.deploy(deploymentBuilder);
+    return flowable5CompatibilityHandler.deploy(deploymentBuilder);
   }
 
   protected boolean deploymentsDiffer(DeploymentEntity deployment, DeploymentEntity saved) {

@@ -27,7 +27,7 @@ import org.flowable.engine.impl.persistence.entity.SuspensionState;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.impl.persistence.entity.SuspensionState.SuspensionStateUtil;
-import org.flowable.engine.impl.util.Activiti5Util;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.Execution;
 
 /**
@@ -57,11 +57,11 @@ public abstract class AbstractSetProcessInstanceStateCmd implements Command<Void
       throw new FlowableException("Cannot set suspension state for execution '" + processInstanceId + "': not a process instance.");
     }
     
-    if (Activiti5Util.isActiviti5ProcessDefinitionId(commandContext, executionEntity.getProcessDefinitionId())) {
+    if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, executionEntity.getProcessDefinitionId())) {
       if (getNewState() == SuspensionState.ACTIVE) {
-        commandContext.getProcessEngineConfiguration().getActiviti5CompatibilityHandler().activateProcessInstance(processInstanceId);
+        commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().activateProcessInstance(processInstanceId);
       } else {
-        commandContext.getProcessEngineConfiguration().getActiviti5CompatibilityHandler().suspendProcessInstance(processInstanceId);
+        commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().suspendProcessInstance(processInstanceId);
       }
       return null;
     }

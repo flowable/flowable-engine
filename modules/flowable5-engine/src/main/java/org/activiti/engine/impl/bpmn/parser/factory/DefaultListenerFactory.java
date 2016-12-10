@@ -33,7 +33,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Attachment;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.EventListener;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
@@ -64,28 +64,28 @@ public class DefaultListenerFactory extends AbstractBehaviorFactory implements L
 		ENTITY_MAPPING.put("task", Task.class);
 	}
 
-  public TaskListener createClassDelegateTaskListener(ActivitiListener activitiListener) {
+  public TaskListener createClassDelegateTaskListener(FlowableListener activitiListener) {
     return new ClassDelegate(activitiListener.getImplementation(), createFieldDeclarations(activitiListener.getFieldExtensions()));
   }
   
-  public TaskListener createExpressionTaskListener(ActivitiListener activitiListener) {
+  public TaskListener createExpressionTaskListener(FlowableListener activitiListener) {
     return new ExpressionTaskListener(expressionManager.createExpression(activitiListener.getImplementation()));
   }
   
-  public TaskListener createDelegateExpressionTaskListener(ActivitiListener activitiListener) {
+  public TaskListener createDelegateExpressionTaskListener(FlowableListener activitiListener) {
     return new DelegateExpressionTaskListener(expressionManager.createExpression(activitiListener.getImplementation()), 
             createFieldDeclarations(activitiListener.getFieldExtensions()));
   }
 
-  public ExecutionListener createClassDelegateExecutionListener(ActivitiListener activitiListener) {
+  public ExecutionListener createClassDelegateExecutionListener(FlowableListener activitiListener) {
     return new ClassDelegate(activitiListener.getImplementation(), createFieldDeclarations(activitiListener.getFieldExtensions()));
   }
   
-  public ExecutionListener createExpressionExecutionListener(ActivitiListener activitiListener) {
+  public ExecutionListener createExpressionExecutionListener(FlowableListener activitiListener) {
     return new ExpressionExecutionListener(expressionManager.createExpression(activitiListener.getImplementation()));
   }
   
-  public ExecutionListener createDelegateExpressionExecutionListener(ActivitiListener activitiListener) {
+  public ExecutionListener createDelegateExpressionExecutionListener(FlowableListener activitiListener) {
     return new DelegateExpressionExecutionListener(expressionManager.createExpression(activitiListener.getImplementation()), 
             createFieldDeclarations(activitiListener.getFieldExtensions()));
   }

@@ -15,7 +15,7 @@ package org.activiti.engine.impl.bpmn.parser.factory;
 import org.activiti.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti.engine.impl.bpmn.parser.BpmnParser;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.EventListener;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.delegate.ExecutionListener;
@@ -38,17 +38,17 @@ import org.flowable.engine.delegate.TaskListener;
  */
 public interface ListenerFactory {
 
-  public abstract TaskListener createClassDelegateTaskListener(ActivitiListener activitiListener);
+  public abstract TaskListener createClassDelegateTaskListener(FlowableListener activitiListener);
 
-  public abstract TaskListener createExpressionTaskListener(ActivitiListener activitiListener);
+  public abstract TaskListener createExpressionTaskListener(FlowableListener activitiListener);
 
-  public abstract TaskListener createDelegateExpressionTaskListener(ActivitiListener activitiListener);
+  public abstract TaskListener createDelegateExpressionTaskListener(FlowableListener activitiListener);
 
-  public abstract ExecutionListener createClassDelegateExecutionListener(ActivitiListener activitiListener);
+  public abstract ExecutionListener createClassDelegateExecutionListener(FlowableListener activitiListener);
 
-  public abstract ExecutionListener createExpressionExecutionListener(ActivitiListener activitiListener);
+  public abstract ExecutionListener createExpressionExecutionListener(FlowableListener activitiListener);
 
-  public abstract ExecutionListener createDelegateExpressionExecutionListener(ActivitiListener activitiListener);
+  public abstract ExecutionListener createDelegateExpressionExecutionListener(FlowableListener activitiListener);
   
   public abstract FlowableEventListener createClassDelegateEventListener(EventListener eventListener);
   

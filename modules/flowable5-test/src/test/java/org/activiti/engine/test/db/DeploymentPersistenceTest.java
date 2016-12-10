@@ -37,7 +37,7 @@ public class DeploymentPersistenceTest extends PluggableActivitiTestCase {
       .name("strings")
       .addString("org/activiti/test/HelloWorld.string", "hello world")
       .addString("org/activiti/test/TheAnswer.string", "42")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy();
     
     List<Deployment> deployments = repositoryService.createDeploymentQuery().list();

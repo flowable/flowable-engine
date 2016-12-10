@@ -420,7 +420,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableActivitiTestCase {
     for (int i=0; i<nrOfProcessDefinitions; i++) {
       repositoryService.createDeployment()
         .addClasspathResource("org/activiti/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
     }
     assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().count());
@@ -468,7 +468,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableActivitiTestCase {
     for (int i=0; i<nrOfProcessDefinitions; i++) {
       repositoryService.createDeployment()
         .addClasspathResource("org/activiti/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
     }
     assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().count());

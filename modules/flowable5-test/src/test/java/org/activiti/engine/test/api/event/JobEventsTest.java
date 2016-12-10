@@ -216,7 +216,7 @@ public class JobEventsTest extends PluggableActivitiTestCase {
     // deploy process definition
     String deployment1 = repositoryService.createDeployment()
         .addClasspathResource("org/activiti/engine/test/api/event/JobEventsTest.testTimerFiredForTimerStart.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy()
         .getId();
     listener.clearEventsReceived();
@@ -224,7 +224,7 @@ public class JobEventsTest extends PluggableActivitiTestCase {
     // WHEN
     String deployment2 = repositoryService.createDeployment()
         .addClasspathResource("org/activiti/engine/test/api/event/JobEventsTest.testTimerFiredForTimerStart.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy()
         .getId();
 

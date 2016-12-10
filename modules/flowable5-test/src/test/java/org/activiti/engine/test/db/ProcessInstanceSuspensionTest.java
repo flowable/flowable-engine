@@ -91,7 +91,7 @@ public class ProcessInstanceSuspensionTest extends PluggableActivitiTestCase {
   }
 
   protected void makeSureJobDue(final Job job) {
-    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawCommandExecutor();
+    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawCommandExecutor();
     commandExecutor.execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
         Date currentTime = processEngineConfiguration.getClock().getCurrentTime();

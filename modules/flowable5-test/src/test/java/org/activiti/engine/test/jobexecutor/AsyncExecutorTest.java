@@ -310,7 +310,7 @@ public class AsyncExecutorTest {
 		ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
 		processEngineConfiguration.setJdbcUrl("jdbc:h2:mem:activiti-AsyncExecutorTest;DB_CLOSE_DELAY=1000");
 		processEngineConfiguration.setDatabaseSchemaUpdate("true");
-		processEngineConfiguration.setActiviti5CompatibilityEnabled(true);
+		processEngineConfiguration.setFlowable5CompatibilityEnabled(true);
 		
 		if (enableAsyncExecutor) {
 			processEngineConfiguration.setAsyncExecutorActivate(true);
@@ -361,7 +361,7 @@ public class AsyncExecutorTest {
 	
 	private String deploy(ProcessEngine processEngine, String resource) {
 		return processEngine.getRepositoryService().createDeployment().addClasspathResource("org/activiti/engine/test/jobexecutor/" + resource)
-		    .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+		    .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 		    .deploy()
 		    .getId();
 	}

@@ -15,7 +15,7 @@ package org.flowable.admin.app.rest.client;
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.TaskService;
-import org.flowable.admin.service.engine.exception.ActivitiServiceException;
+import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.app.service.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,7 +49,7 @@ public class TaskClientResource extends AbstractClientResource {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			return clientService.getTask(serverConfig, taskId, runtime);
-		} catch (ActivitiServiceException e) {
+		} catch (FlowableServiceException e) {
 			throw new BadRequestException(e.getMessage());
 		}
 	}
@@ -60,7 +60,7 @@ public class TaskClientResource extends AbstractClientResource {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			clientService.deleteTask(serverConfig, taskId);
-		} catch (ActivitiServiceException e) {
+		} catch (FlowableServiceException e) {
 			throw new BadRequestException(e.getMessage());
 		}
 	}
@@ -71,7 +71,7 @@ public class TaskClientResource extends AbstractClientResource {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			clientService.executeTaskAction(serverConfig, taskId, actionBody);
-		} catch (ActivitiServiceException e) {
+		} catch (FlowableServiceException e) {
 			throw new BadRequestException(e.getMessage());
 		}
 	}
@@ -82,7 +82,7 @@ public class TaskClientResource extends AbstractClientResource {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			clientService.updateTask(serverConfig, taskId, actionBody);
-		} catch (ActivitiServiceException e) {
+		} catch (FlowableServiceException e) {
 			throw new BadRequestException(e.getMessage());
 		}
 	}
@@ -92,7 +92,7 @@ public class TaskClientResource extends AbstractClientResource {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			return clientService.getSubTasks(serverConfig, taskId);
-		} catch (ActivitiServiceException e) {
+		} catch (FlowableServiceException e) {
 			throw new BadRequestException(e.getMessage());
 		}
 	}
@@ -102,7 +102,7 @@ public class TaskClientResource extends AbstractClientResource {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			return clientService.getVariables(serverConfig, taskId);
-		} catch (ActivitiServiceException e) {
+		} catch (FlowableServiceException e) {
 			throw new BadRequestException(e.getMessage());
 		}
 	}
@@ -112,7 +112,7 @@ public class TaskClientResource extends AbstractClientResource {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			return clientService.getIdentityLinks(serverConfig, taskId);
-		} catch (ActivitiServiceException e) {
+		} catch (FlowableServiceException e) {
 			throw new BadRequestException(e.getMessage());
 		}
 	}

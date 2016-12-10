@@ -104,7 +104,7 @@ public class VariableScopeTest extends PluggableActivitiTestCase {
     runtimeService.setVariableLocal(subProcessTask.getExecutionId(), "subProcessLocalVariable", "Hello SubProcess");
 
     // Returns a set of local variablenames of pi
-    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawCommandExecutor();
+    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawCommandExecutor();
     List<String> result = commandExecutor.execute(new GetVariableNamesCommand(pi.getProcessInstanceId(), true));
     
     // pi contains local the variablenames "test", "helloWorld" and "mainProcessLocalVariable" but not "subProcessLocalVariable"

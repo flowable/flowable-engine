@@ -54,7 +54,7 @@ public class ProcessDefinitionCacheTest extends PvmTestCase {
     ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
     processEngineConfiguration.setEngineName("reboot-test-schema");
     processEngineConfiguration.setJdbcUrl("jdbc:h2:mem:activiti-reboot-test;DB_CLOSE_DELAY=1000");
-    processEngineConfiguration.setActiviti5CompatibilityEnabled(true);
+    processEngineConfiguration.setFlowable5CompatibilityEnabled(true);
     ProcessEngine schemaProcessEngine = processEngineConfiguration.buildProcessEngine();
     
     // Create process engine and deploy test process
@@ -63,12 +63,12 @@ public class ProcessDefinitionCacheTest extends PvmTestCase {
     standaloneProcessEngineConfiguration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE);
     standaloneProcessEngineConfiguration.setJdbcUrl("jdbc:h2:mem:activiti-reboot-test;DB_CLOSE_DELAY=1000");
     standaloneProcessEngineConfiguration.setAsyncExecutorActivate(false);
-    standaloneProcessEngineConfiguration.setActiviti5CompatibilityEnabled(true);
+    standaloneProcessEngineConfiguration.setFlowable5CompatibilityEnabled(true);
     ProcessEngine processEngine = standaloneProcessEngineConfiguration.buildProcessEngine();;
      
     processEngine.getRepositoryService()
         .createDeployment()
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .addClasspathResource("org/activiti/engine/test/cache/originalProcess.bpmn20.xml")
         .deploy();
   
@@ -95,7 +95,7 @@ public class ProcessDefinitionCacheTest extends PvmTestCase {
     standaloneProcessEngineConfiguration.setDatabaseSchemaUpdate(org.activiti.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE);
     standaloneProcessEngineConfiguration.setJdbcUrl("jdbc:h2:mem:activiti-reboot-test;DB_CLOSE_DELAY=1000");
     standaloneProcessEngineConfiguration.setAsyncExecutorActivate(false);
-    standaloneProcessEngineConfiguration.setActiviti5CompatibilityEnabled(true);
+    standaloneProcessEngineConfiguration.setFlowable5CompatibilityEnabled(true);
     processEngine = standaloneProcessEngineConfiguration.buildProcessEngine();
      
     // Check if the existing process instance is still alive
@@ -144,7 +144,7 @@ public class ProcessDefinitionCacheTest extends PvmTestCase {
     standaloneProcessEngineConfiguration.setDatabaseSchemaUpdate(org.activiti.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
     standaloneProcessEngineConfiguration.setJdbcUrl("jdbc:h2:mem:activiti-process-cache-test;DB_CLOSE_DELAY=1000");
     standaloneProcessEngineConfiguration.setAsyncExecutorActivate(false);
-    standaloneProcessEngineConfiguration.setActiviti5CompatibilityEnabled(true);
+    standaloneProcessEngineConfiguration.setFlowable5CompatibilityEnabled(true);
     ProcessEngine processEngine1 = standaloneProcessEngineConfiguration.buildProcessEngine();
     RepositoryService repositoryService1 = processEngine1.getRepositoryService();
     
@@ -153,7 +153,7 @@ public class ProcessDefinitionCacheTest extends PvmTestCase {
     standaloneProcessEngineConfiguration2.setDatabaseSchemaUpdate(org.activiti.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE);
     standaloneProcessEngineConfiguration2.setJdbcUrl("jdbc:h2:mem:activiti-process-cache-test;DB_CLOSE_DELAY=1000");
     standaloneProcessEngineConfiguration2.setAsyncExecutorActivate(false);
-    standaloneProcessEngineConfiguration2.setActiviti5CompatibilityEnabled(true);
+    standaloneProcessEngineConfiguration2.setFlowable5CompatibilityEnabled(true);
     ProcessEngine processEngine2  = standaloneProcessEngineConfiguration2.buildProcessEngine();
     RepositoryService repositoryService2 = processEngine2.getRepositoryService();
     RuntimeService runtimeService2 = processEngine2.getRuntimeService();
@@ -162,7 +162,7 @@ public class ProcessDefinitionCacheTest extends PvmTestCase {
     // Deploy first version of process: start->originalTask->end on first process engine
     String deploymentId = repositoryService1.createDeployment()
       .addClasspathResource("org/activiti/engine/test/cache/originalProcess.bpmn20.xml")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy()
       .getId();
     
@@ -185,7 +185,7 @@ public class ProcessDefinitionCacheTest extends PvmTestCase {
     // as in the original deployment, making the second process engine using the old cached process definition.
     deploymentId = repositoryService1.createDeployment()
       .addClasspathResource("org/activiti/engine/test/cache/revisedProcess.bpmn20.xml")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy()
       .getId();
     

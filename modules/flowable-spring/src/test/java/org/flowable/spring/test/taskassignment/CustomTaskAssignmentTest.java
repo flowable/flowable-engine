@@ -14,14 +14,14 @@ package org.flowable.spring.test.taskassignment;
 
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.test.Deployment;
-import org.flowable.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
  * @author Joram Barrez
  */
 @ContextConfiguration("classpath:org/flowable/spring/test/taskassignment/taskassignment-context.xml")
-public class CustomTaskAssignmentTest extends SpringActivitiTestCase {
+public class CustomTaskAssignmentTest extends SpringFlowableTestCase {
 
   @Deployment
   public void testSetAssigneeThroughSpringService() {

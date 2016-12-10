@@ -15,14 +15,14 @@ package org.flowable.engine.impl.cmd;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
-import org.flowable.engine.impl.util.Activiti5Util;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
@@ -87,8 +87,8 @@ public class AddCommentCmd implements Command<Comment> {
       processDefinitionId = task.getProcessDefinitionId();
     }
     
-    if (processDefinitionId != null && Activiti5Util.isActiviti5ProcessDefinitionId(commandContext, processDefinitionId)) {
-      Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
+    if (processDefinitionId != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processDefinitionId)) {
+      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
       return activiti5CompatibilityHandler.addComment(taskId, processInstanceId, type, message);
     }
 

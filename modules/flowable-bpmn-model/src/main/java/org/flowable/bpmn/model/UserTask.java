@@ -35,7 +35,7 @@ public class UserTask extends Task {
   protected List<String> candidateUsers = new ArrayList<String>();
   protected List<String> candidateGroups = new ArrayList<String>();
   protected List<FormProperty> formProperties = new ArrayList<FormProperty>();
-  protected List<ActivitiListener> taskListeners = new ArrayList<ActivitiListener>();
+  protected List<FlowableListener> taskListeners = new ArrayList<FlowableListener>();
   protected String skipExpression;
 
   protected Map<String, Set<String>> customUserIdentityLinks = new HashMap<String, Set<String>>(); 
@@ -134,11 +134,11 @@ public class UserTask extends Task {
     this.formProperties = formProperties;
   }
 
-  public List<ActivitiListener> getTaskListeners() {
+  public List<FlowableListener> getTaskListeners() {
     return taskListeners;
   }
 
-  public void setTaskListeners(List<ActivitiListener> taskListeners) {
+  public void setTaskListeners(List<FlowableListener> taskListeners) {
     this.taskListeners = taskListeners;
   }
 
@@ -225,9 +225,9 @@ public class UserTask extends Task {
       }
     }
 
-    taskListeners = new ArrayList<ActivitiListener>();
+    taskListeners = new ArrayList<FlowableListener>();
     if (otherElement.getTaskListeners() != null && !otherElement.getTaskListeners().isEmpty()) {
-      for (ActivitiListener listener : otherElement.getTaskListeners()) {
+      for (FlowableListener listener : otherElement.getTaskListeners()) {
         taskListeners.add(listener.clone());
       }
     }

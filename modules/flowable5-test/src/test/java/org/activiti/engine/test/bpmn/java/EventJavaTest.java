@@ -17,7 +17,7 @@ import java.io.ByteArrayInputStream;
 
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.ImplementationType;
@@ -47,7 +47,7 @@ public class EventJavaTest extends PluggableActivitiTestCase {
     TimerEventDefinition timerDef = new TimerEventDefinition();
     timerDef.setTimeDuration("PT5M");
     startEvent.getEventDefinitions().add(timerDef);
-    ActivitiListener listener = new ActivitiListener();
+    FlowableListener listener = new FlowableListener();
     listener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
     listener.setImplementation("${test}");
     listener.setEvent("end");
@@ -71,7 +71,7 @@ public class EventJavaTest extends PluggableActivitiTestCase {
     new BpmnXMLConverter().validateModel(new InputStreamSource(new ByteArrayInputStream(xml)));
     
     Deployment deployment = repositoryService.createDeployment().name("test").addString("test.bpmn20.xml", new String(xml))
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
     repositoryService.deleteDeployment(deployment.getId());
   }

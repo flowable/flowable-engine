@@ -15,7 +15,7 @@
     
     <property name="xmlEncoding" value="ISO-8859-1" />
     
-    <property name="activiti5CompatibilityEnabled" value="true" />
+    <property name="flowable5CompatibilityEnabled" value="true" />
     
   </bean>
 

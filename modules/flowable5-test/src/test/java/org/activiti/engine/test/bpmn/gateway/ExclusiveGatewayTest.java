@@ -193,7 +193,7 @@ public class ExclusiveGatewayTest extends PluggableActivitiTestCase {
     
     try {
     	repositoryService.createDeployment().addString("myprocess.bpmn20.xml", defaultFlowWithCondition)
-    	    .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+    	    .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
     	    .deploy();
     	fail();
     } catch (Exception e) {}
@@ -208,7 +208,7 @@ public class ExclusiveGatewayTest extends PluggableActivitiTestCase {
             "</definitions>";    
     try {
       repositoryService.createDeployment().addString("myprocess.bpmn20.xml", noOutgoingFlow)
-          .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+          .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
           .deploy();
       fail("Could deploy a process definition with a XOR Gateway without outgoing sequence flows.");
     }

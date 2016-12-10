@@ -97,7 +97,7 @@ public class ProcessDefinitionEventsTest extends PluggableActivitiTestCase {
   @Deployment(resources= {"org/activiti/engine/test/bpmn/event/timer/StartTimerEventTest.testDurationStartTimerEvent.bpmn20.xml"})
   public void testTimerStartEventDeployment() {
     org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl) 
-        processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+        processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
     
     ProcessDefinition processDefinition = activiti5ProcessConfig.getRepositoryService().
         createProcessDefinitionQuery().processDefinitionKey("startTimerEventExample").singleResult();

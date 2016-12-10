@@ -15,9 +15,9 @@
     <!-- Database configurations -->
     <property name="databaseSchemaUpdate" value="true" />
     
-    <property name="activiti5CompatibilityEnabled" value="true" />
+    <property name="flowable5CompatibilityEnabled" value="true" />
     
-     <property name="activiti5PreBpmnParseHandlers">
+     <property name="flowable5PreBpmnParseHandlers">
       <list>
         <bean class="org.activiti.compatibility.test.parsehandler.RenameTaskBpmnParseHandler" />
       </list>

@@ -36,7 +36,7 @@ public class MuleVMTest extends AbstractMuleTest {
     RepositoryService repositoryService = processEngine.getRepositoryService();
     Deployment deployment = repositoryService.createDeployment()
         .addClasspathResource("org/activiti/mule/testVM.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
 
     RuntimeService runtimeService = processEngine.getRuntimeService();

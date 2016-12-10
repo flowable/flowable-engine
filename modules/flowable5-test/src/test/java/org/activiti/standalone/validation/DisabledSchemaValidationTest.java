@@ -38,7 +38,7 @@ public class DisabledSchemaValidationTest {
 	public void setup() {
 		StandaloneInMemProcessEngineConfiguration processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
 		processEngineConfiguration.setJdbcUrl("jdbc:h2:mem:activiti-process-validation;DB_CLOSE_DELAY=1000");
-		processEngineConfiguration.setActiviti5CompatibilityEnabled(true);
+		processEngineConfiguration.setFlowable5CompatibilityEnabled(true);
 		
 		this.processEngine = processEngineConfiguration.buildProcessEngine();
 		this.repositoryService = processEngine.getRepositoryService();
@@ -62,7 +62,7 @@ public class DisabledSchemaValidationTest {
 		try {
 			repositoryService.createDeployment()
 				.addClasspathResource("org/activiti/standalone/validation/invalid_process_xsd_error.bpmn20.xml")
-				.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+				.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 				.deploy();
 			Assert.fail();
 		} catch (XMLException e) {
@@ -73,7 +73,7 @@ public class DisabledSchemaValidationTest {
 		try {
 			repositoryService.createDeployment()
 				.addClasspathResource("org/activiti/standalone/validation/invalid_process_xsd_error.bpmn20.xml")
-				.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+				.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 				.disableSchemaValidation()
 				.deploy();
 			Assert.fail();

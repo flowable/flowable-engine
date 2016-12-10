@@ -158,7 +158,7 @@ public class SignalEventTest extends PluggableActivitiTestCase {
     try {
       repositoryService.createDeployment()
         .addClasspathResource("org/activiti/engine/test/bpmn/event/signal/SignalEventTests.duplicateSignalNames.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
       fail("exception expected");
     } catch (Exception e) {
@@ -172,7 +172,7 @@ public class SignalEventTest extends PluggableActivitiTestCase {
     try {
       repositoryService.createDeployment()
         .addClasspathResource("org/activiti/engine/test/bpmn/event/signal/SignalEventTests.noSignalName.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
       fail("exception expected");
     } catch (Exception e) {
@@ -186,7 +186,7 @@ public class SignalEventTest extends PluggableActivitiTestCase {
     try {
       repositoryService.createDeployment()
         .addClasspathResource("org/activiti/engine/test/bpmn/event/signal/SignalEventTests.signalNoId.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
       fail("exception expected");
     } catch (Exception e) {
@@ -200,7 +200,7 @@ public class SignalEventTest extends PluggableActivitiTestCase {
     try {
       repositoryService.createDeployment()
         .addClasspathResource("org/activiti/engine/test/bpmn/event/signal/SignalEventTests.signalNoRef.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
       fail("exception expected");
     } catch (Exception e) {
@@ -387,7 +387,7 @@ public class SignalEventTest extends PluggableActivitiTestCase {
   	// Deploy test processes
   	repositoryService.createDeployment()
   		.addClasspathResource("org/activiti/engine/test/bpmn/event/signal/SignalEventTest.testSignalStartEvent.bpmn20.xml")
-  		.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+  		.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
   		.deploy();
   	
   	// Starting the process that fires the signal should start three process instances that are listening on that signal
@@ -427,7 +427,7 @@ public class SignalEventTest extends PluggableActivitiTestCase {
   	// Deploy test processes
   	repositoryService.createDeployment()
   		.addClasspathResource("org/activiti/engine/test/bpmn/event/signal/SignalEventTest.testSignalStartEventAsync.bpmn20.xml")
-  		.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+  		.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
   		.deploy();
   	
   	// Starting the process that fires the signal should start 1 process instance that are listening on that signal, the others are done async
@@ -479,7 +479,7 @@ public class SignalEventTest extends PluggableActivitiTestCase {
  	// Deploy test processes
  	repositoryService.createDeployment()
  		.addClasspathResource("org/activiti/engine/test/bpmn/event/signal/SignalEventTest.testSignalStartEvent.bpmn20.xml")
- 		.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+ 		.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
  		.deploy();
  	
  	runtimeService.signalEventReceived("The Signal");
@@ -518,7 +518,7 @@ public class SignalEventTest extends PluggableActivitiTestCase {
  	// Deploy test processes
  	repositoryService.createDeployment()
  		.addClasspathResource("org/activiti/engine/test/bpmn/event/signal/SignalEventTest.testSignalStartEventAsync.bpmn20.xml")
- 		.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+ 		.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
  		.deploy();
  	
  	runtimeService.signalEventReceivedAsync("The Signal");
@@ -588,17 +588,17 @@ public class SignalEventTest extends PluggableActivitiTestCase {
 		// Deploy test processes
   	repositoryService.createDeployment()
   		.addClasspathResource("org/activiti/engine/test/bpmn/event/signal/SignalEventTest.testSignalStartEvent.bpmn20.xml")
-  		.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+  		.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
   		.deploy();
   	
   	// Deploy new versions
   	repositoryService.createDeployment()
 			.addClasspathResource("org/activiti/engine/test/bpmn/event/signal/SignalEventTest.testSignalStartEvent.bpmn20.xml")
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy();
    	repositoryService.createDeployment()
    		.addClasspathResource("org/activiti/engine/test/bpmn/event/signal/SignalEventTest.testSignalStartEvent.bpmn20.xml")
-   		.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+   		.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
    		.deploy();
   	
   	// Firing a signal start event should only start ONE process instance

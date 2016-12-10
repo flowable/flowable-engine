@@ -53,7 +53,7 @@ public class CallActivityTest extends ResourceActivitiTestCase {
         .createDeployment()
         .name("messageTriggeredProcessDeployment")
         .addBpmnModel("messageTriggered.bpmn20.xml", messageTriggeredBpmnModel)
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
 
     ProcessInstance childProcessInstance = runtimeService.startProcessInstanceByMessage("TRIGGER_PROCESS_MESSAGE");
@@ -67,7 +67,7 @@ public class CallActivityTest extends ResourceActivitiTestCase {
         .createDeployment()
         .name("messageTriggeredProcessDeployment")
         .addBpmnModel("messageTriggered.bpmn20.xml", messageTriggeredBpmnModel)
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
 
     suspendProcessDefinitions(messageTriggeredBpmnDeployment);
@@ -88,7 +88,7 @@ public class CallActivityTest extends ResourceActivitiTestCase {
         .createDeployment()
         .name("childProcessDeployment")
         .addBpmnModel("childProcess.bpmn20.xml", childBpmnModel)
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
 
     ProcessInstance childProcessInstance = runtimeService.startProcessInstanceByKey("childProcess");
@@ -102,7 +102,7 @@ public class CallActivityTest extends ResourceActivitiTestCase {
         .createDeployment()
         .name("childProcessDeployment")
         .addBpmnModel("childProcess.bpmn20.xml", childBpmnModel)
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
 
     suspendProcessDefinitions(childDeployment);
@@ -125,14 +125,14 @@ public class CallActivityTest extends ResourceActivitiTestCase {
         .createDeployment()
         .name("childProcessDeployment")
         .addBpmnModel("childProcess.bpmn20.xml", childBpmnModel)
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
 
     processEngine.getRepositoryService()
         .createDeployment()
         .name("masterProcessDeployment")
         .addBpmnModel("masterProcess.bpmn20.xml", mainBpmnModel)
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
 
     suspendProcessDefinitions(childDeployment);

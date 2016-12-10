@@ -15,7 +15,7 @@ package org.flowable.engine.impl.bpmn.listener;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.HasExecutionListeners;
 import org.flowable.bpmn.model.ImplementationType;
@@ -45,10 +45,10 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 public class ListenerNotificationHelper {
   
   public void executeExecutionListeners(HasExecutionListeners elementWithExecutionListeners, DelegateExecution execution, String eventType) {
-    List<ActivitiListener> listeners = elementWithExecutionListeners.getExecutionListeners();
+    List<FlowableListener> listeners = elementWithExecutionListeners.getExecutionListeners();
     if (listeners != null && listeners.size() > 0) {
       ListenerFactory listenerFactory = Context.getProcessEngineConfiguration().getListenerFactory();
-      for (ActivitiListener activitiListener : listeners) {
+      for (FlowableListener activitiListener : listeners) {
 
         if (eventType.equals(activitiListener.getEvent())) {
 
@@ -84,7 +84,7 @@ public class ListenerNotificationHelper {
     }
   }
 
-  protected void planTransactionDependentExecutionListener(ListenerFactory listenerFactory, DelegateExecution execution, TransactionDependentExecutionListener executionListener, ActivitiListener activitiListener) {
+  protected void planTransactionDependentExecutionListener(ListenerFactory listenerFactory, DelegateExecution execution, TransactionDependentExecutionListener executionListener, FlowableListener activitiListener) {
     Map<String, Object> executionVariablesToUse = execution.getVariables();
     CustomPropertiesResolver customPropertiesResolver = createCustomPropertiesResolver(activitiListener);
     Map<String, Object> customPropertiesMapToUse = invokeCustomPropertiesResolver(execution, customPropertiesResolver);
@@ -107,7 +107,7 @@ public class ListenerNotificationHelper {
   }
   
   public void executeTaskListeners(UserTask userTask, TaskEntity taskEntity, String eventType) {
-    for (ActivitiListener activitiListener : userTask.getTaskListeners()) {
+    for (FlowableListener activitiListener : userTask.getTaskListeners()) {
       String event = activitiListener.getEvent();
       if (event.equals(eventType) || event.equals(TaskListener.EVENTNAME_ALL_EVENTS)) {
         BaseTaskListener taskListener = createTaskListener(activitiListener);
@@ -131,7 +131,7 @@ public class ListenerNotificationHelper {
     }
   }
   
-  protected BaseTaskListener createTaskListener(ActivitiListener activitiListener) {
+  protected BaseTaskListener createTaskListener(FlowableListener activitiListener) {
     BaseTaskListener taskListener = null;
 
     ListenerFactory listenerFactory = Context.getProcessEngineConfiguration().getListenerFactory();
@@ -151,7 +151,7 @@ public class ListenerNotificationHelper {
     return taskListener;
   }
   
-  protected void planTransactionDependentTaskListener(DelegateExecution execution, TransactionDependentTaskListener taskListener, ActivitiListener activitiListener) {
+  protected void planTransactionDependentTaskListener(DelegateExecution execution, TransactionDependentTaskListener taskListener, FlowableListener activitiListener) {
     Map<String, Object> executionVariablesToUse = execution.getVariables();
     CustomPropertiesResolver customPropertiesResolver = createCustomPropertiesResolver(activitiListener);
     Map<String, Object> customPropertiesMapToUse = invokeCustomPropertiesResolver(execution, customPropertiesResolver);
@@ -161,7 +161,7 @@ public class ListenerNotificationHelper {
     addTransactionListener(activitiListener, new ExecuteTaskListenerTransactionListener(taskListener, scope));
   }
   
-  protected CustomPropertiesResolver createCustomPropertiesResolver(ActivitiListener activitiListener) {
+  protected CustomPropertiesResolver createCustomPropertiesResolver(FlowableListener activitiListener) {
     CustomPropertiesResolver customPropertiesResolver = null;
     ListenerFactory listenerFactory = Context.getProcessEngineConfiguration().getListenerFactory();
     if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(activitiListener.getCustomPropertiesResolverImplementationType())) {
@@ -182,7 +182,7 @@ public class ListenerNotificationHelper {
     return customPropertiesMapToUse;
   }
   
-  protected void addTransactionListener(ActivitiListener activitiListener, TransactionListener transactionListener) {
+  protected void addTransactionListener(FlowableListener activitiListener, TransactionListener transactionListener) {
     TransactionContext transactionContext = Context.getTransactionContext();
     if (TransactionDependentExecutionListener.ON_TRANSACTION_BEFORE_COMMIT.equals(activitiListener.getOnTransaction())) {
       transactionContext.addTransactionListener(TransactionState.COMMITTING, transactionListener);

@@ -57,7 +57,7 @@ import org.activiti.engine.impl.pvm.runtime.OutgoingExecution;
 import org.activiti.engine.impl.pvm.runtime.StartingExecution;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
@@ -1314,12 +1314,12 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
   
   @Override
-  public ActivitiListener getCurrentActivitiListener() {
+  public FlowableListener getCurrentActivitiListener() {
     throw new UnsupportedOperationException();
   }
   
   @Override
-  public void setCurrentActivitiListener(ActivitiListener currentActivitiListener) {
+  public void setCurrentActivitiListener(FlowableListener currentActivitiListener) {
     throw new UnsupportedOperationException();
   }
   

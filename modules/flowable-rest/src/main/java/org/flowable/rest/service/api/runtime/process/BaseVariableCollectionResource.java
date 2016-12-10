@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.rest.exception.ActivitiConflictException;
+import org.flowable.rest.exception.FlowableConflictException;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,7 +120,7 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
         }
 
         if (!override && hasVariableOnScope(execution, var.getName(), varScope)) {
-          throw new ActivitiConflictException("Variable '" + var.getName() + "' is already present on execution '" + execution.getId() + "'.");
+          throw new FlowableConflictException("Variable '" + var.getName() + "' is already present on execution '" + execution.getId() + "'.");
         }
 
         Object actualVariableValue = restResponseFactory.getVariableValue(var);

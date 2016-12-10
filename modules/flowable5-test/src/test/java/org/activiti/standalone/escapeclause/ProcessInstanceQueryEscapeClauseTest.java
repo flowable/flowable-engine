@@ -35,7 +35,7 @@ public class ProcessInstanceQueryEscapeClauseTest extends AbstractEscapeClauseTe
       .createDeployment()
       .tenantId("One%")
       .addClasspathResource("org/activiti/engine/test/api/oneTaskProcess.bpmn20.xml")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy()
       .getId();
 
@@ -43,7 +43,7 @@ public class ProcessInstanceQueryEscapeClauseTest extends AbstractEscapeClauseTe
       .createDeployment()
       .tenantId("Two_")
       .addClasspathResource("org/activiti/engine/test/api/oneTaskProcess.bpmn20.xml")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy()
       .getId();
     

@@ -100,7 +100,7 @@ public abstract class TestHelper {
       DeploymentBuilder deploymentBuilder = processEngine.getRepositoryService()
         .createDeployment()
         .name(testClass.getSimpleName()+"."+methodName)
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE);
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE);
       
       for (String resource: resources) {
         deploymentBuilder.addClasspathResource(resource);
@@ -117,7 +117,7 @@ public abstract class TestHelper {
     if (deploymentId != null) {
       try {
         ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
-        processEngineConfig.getActiviti5CompatibilityHandler().deleteDeployment(deploymentId, true);
+        processEngineConfig.getFlowable5CompatibilityHandler().deleteDeployment(deploymentId, true);
       } catch (FlowableObjectNotFoundException e) {
         // Deployment was already deleted by the test case. Ignore.
       }

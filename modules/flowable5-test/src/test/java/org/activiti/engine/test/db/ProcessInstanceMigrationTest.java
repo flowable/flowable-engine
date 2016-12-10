@@ -79,7 +79,7 @@ public class ProcessInstanceMigrationTest extends PluggableActivitiTestCase {
   }
 
   public void testSetProcessDefinitionVersionNonExistingPI() {
-    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawCommandExecutor();
+    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawCommandExecutor();
     try {
       commandExecutor.execute(new SetProcessDefinitionVersionCmd("42", 23));    
       fail("ActivitiException expected");
@@ -97,7 +97,7 @@ public class ProcessInstanceMigrationTest extends PluggableActivitiTestCase {
     Execution execution = runtimeService.createExecutionQuery()
       .activityId("receivePayment")
       .singleResult();
-    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawCommandExecutor();
+    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawCommandExecutor();
     SetProcessDefinitionVersionCmd command = new SetProcessDefinitionVersionCmd(execution.getId(), 1);
     try {
       commandExecutor.execute(command);
@@ -112,7 +112,7 @@ public class ProcessInstanceMigrationTest extends PluggableActivitiTestCase {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("receiveTask");
 
-    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawCommandExecutor();
+    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawCommandExecutor();
     try {
       commandExecutor.execute(new SetProcessDefinitionVersionCmd(pi.getId(), 23));    
       fail("ActivitiException expected");
@@ -137,12 +137,12 @@ public class ProcessInstanceMigrationTest extends PluggableActivitiTestCase {
     org.flowable.engine.repository.Deployment deployment = repositoryService
       .createDeployment()
       .addClasspathResource(TEST_PROCESS_ACTIVITY_MISSING)
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy();
     assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
 
     // migrate process instance to new process definition version
-    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawCommandExecutor();
+    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawCommandExecutor();
     SetProcessDefinitionVersionCmd setProcessDefinitionVersionCmd = new SetProcessDefinitionVersionCmd(pi.getId(), 2);
     try {
       commandExecutor.execute(setProcessDefinitionVersionCmd);
@@ -171,12 +171,12 @@ public class ProcessInstanceMigrationTest extends PluggableActivitiTestCase {
     org.flowable.engine.repository.Deployment deployment = repositoryService
       .createDeployment()
       .addClasspathResource(TEST_PROCESS)
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy();
     assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
 
     // migrate process instance to new process definition version
-    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawCommandExecutor();
+    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawCommandExecutor();
     commandExecutor.execute(new SetProcessDefinitionVersionCmd(pi.getId(), 2));
 
     // signal process instance
@@ -228,12 +228,12 @@ public class ProcessInstanceMigrationTest extends PluggableActivitiTestCase {
     org.flowable.engine.repository.Deployment deployment = repositoryService
       .createDeployment()
       .addClasspathResource(TEST_PROCESS_WITH_PARALLEL_GATEWAY)
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy();
     assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
 
     // migrate process instance to new process definition version
-    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawCommandExecutor();
+    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawCommandExecutor();
     commandExecutor.execute(new SetProcessDefinitionVersionCmd(pi.getId(), 2));
 
     // check that all executions of the instance now use the new process definition version
@@ -271,12 +271,12 @@ public class ProcessInstanceMigrationTest extends PluggableActivitiTestCase {
     org.flowable.engine.repository.Deployment deployment = repositoryService
       .createDeployment()
       .addClasspathResource(TEST_PROCESS_CALL_ACTIVITY)
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy();
     assertEquals(2, repositoryService.createProcessDefinitionQuery().processDefinitionKey("parentProcess").count());
 
     // migrate process instance to new process definition version
-    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawCommandExecutor();
+    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawCommandExecutor();
     commandExecutor.execute(new SetProcessDefinitionVersionCmd(pi.getId(), 2));
 
     // signal process instance
@@ -301,7 +301,7 @@ public class ProcessInstanceMigrationTest extends PluggableActivitiTestCase {
       // deploy new version of the process definition
       org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment()
         .addClasspathResource(TEST_PROCESS_USER_TASK_V2)
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
       
       assertEquals(2, repositoryService.createProcessDefinitionQuery().processDefinitionKey("userTask").count());
@@ -309,7 +309,7 @@ public class ProcessInstanceMigrationTest extends PluggableActivitiTestCase {
       ProcessDefinition newProcessDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("userTask").processDefinitionVersion(2).singleResult();
   
       // migrate process instance to new process definition version
-      CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawCommandExecutor();
+      CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawCommandExecutor();
       commandExecutor.execute(new SetProcessDefinitionVersionCmd(pi.getId(), 2));
       
       // check UserTask
@@ -348,12 +348,12 @@ public class ProcessInstanceMigrationTest extends PluggableActivitiTestCase {
     org.flowable.engine.repository.Deployment deployment = repositoryService
             .createDeployment()
             .addClasspathResource(TEST_PROCESS_NESTED_SUB_EXECUTIONS)
-            .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+            .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
             .deploy();
     assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
 
     // migrate process instance to new process definition version
-    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawCommandExecutor();
+    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawCommandExecutor();
     commandExecutor.execute(new SetProcessDefinitionVersionCmd(pi.getId(), 2));
 
     // check that all executions of the instance now use the new process definition version

@@ -15,12 +15,12 @@ package org.flowable.engine.impl.bpmn.helper;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.delegate.event.ActivitiEngineEvent;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.util.Activiti5Util;
+import org.flowable.engine.impl.util.Flowable5Util;
 
 /**
  * An {@link FlowableEventListener} that throws a error event when an event is dispatched to it.
@@ -40,9 +40,9 @@ public class ErrorThrowingEventListener extends BaseDelegateEventListener {
       CommandContext commandContext = Context.getCommandContext();
       
       if (engineEvent.getProcessDefinitionId() != null && 
-          Activiti5Util.isActiviti5ProcessDefinitionId(commandContext, engineEvent.getProcessDefinitionId())) {
+          Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, engineEvent.getProcessDefinitionId())) {
         
-        Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
+        Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
         activiti5CompatibilityHandler.throwErrorEvent(event);
         return;
       }

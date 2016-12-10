@@ -16,13 +16,13 @@ import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.form.StartFormData;
 import org.flowable.engine.impl.form.FormEngine;
 import org.flowable.engine.impl.form.StartFormHandler;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.util.Activiti5Util;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.FormHandlerUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 
@@ -44,10 +44,10 @@ public class GetRenderedStartFormCmd implements Command<Object>, Serializable {
   public Object execute(CommandContext commandContext) {
     ProcessDefinition processDefinition = commandContext.getProcessEngineConfiguration().getDeploymentManager().findDeployedProcessDefinitionById(processDefinitionId);
     
-    if (commandContext.getProcessEngineConfiguration().isActiviti5CompatibilityEnabled() && 
-        Activiti5CompatibilityHandler.ACTIVITI_5_ENGINE_TAG.equals(processDefinition.getEngineVersion())) {
+    if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled() && 
+        Flowable5CompatibilityHandler.FLOWABLE_5_ENGINE_TAG.equals(processDefinition.getEngineVersion())) {
       
-      return Activiti5Util.getActiviti5CompatibilityHandler().getRenderedStartForm(processDefinitionId, formEngineName); 
+      return Flowable5Util.getFlowable5CompatibilityHandler().getRenderedStartForm(processDefinitionId, formEngineName); 
     }
     
     if (processDefinition == null) {

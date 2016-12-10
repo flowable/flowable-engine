@@ -13,7 +13,7 @@
     <property name="idBlockSize" value="3" />
     <property name="idGeneratorDataSource" ref="idGeneratorDataSource" />
     
-    <property name="activiti5CompatibilityEnabled" value="true" />
+    <property name="flowable5CompatibilityEnabled" value="true" />
     
     <!-- job executor configurations -->
     <property name="asyncExecutorActivate" value="false" />

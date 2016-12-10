@@ -7,7 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FormProperty;
@@ -72,20 +72,20 @@ public class UserTaskConverterTest extends AbstractConverterTest {
     assertTrue(StringUtils.isEmpty(formProperty.getVariable()));
     assertTrue(StringUtils.isEmpty(formProperty.getExpression()));
 
-    List<ActivitiListener> listeners = userTask.getTaskListeners();
+    List<FlowableListener> listeners = userTask.getTaskListeners();
     assertEquals(3, listeners.size());
-    ActivitiListener listener = (ActivitiListener) listeners.get(0);
+    FlowableListener listener = (FlowableListener) listeners.get(0);
     assertTrue(ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(listener.getImplementationType()));
     assertEquals("org.test.TestClass", listener.getImplementation());
     assertEquals("create", listener.getEvent());
     assertEquals(2, listener.getFieldExtensions().size());
     assertEquals("testField", listener.getFieldExtensions().get(0).getFieldName());
     assertEquals("test", listener.getFieldExtensions().get(0).getStringValue());
-    listener = (ActivitiListener) listeners.get(1);
+    listener = (FlowableListener) listeners.get(1);
     assertTrue(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equals(listener.getImplementationType()));
     assertEquals("${someExpression}", listener.getImplementation());
     assertEquals("assignment", listener.getEvent());
-    listener = (ActivitiListener) listeners.get(2);
+    listener = (FlowableListener) listeners.get(2);
     assertTrue(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(listener.getImplementationType()));
     assertEquals("${someDelegateExpression}", listener.getImplementation());
     assertEquals("complete", listener.getEvent());

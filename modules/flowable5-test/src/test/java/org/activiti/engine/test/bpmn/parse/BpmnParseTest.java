@@ -39,7 +39,7 @@ public class BpmnParseTest extends PluggableActivitiTestCase {
     try {
       String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidProcessDefinition");
       repositoryService.createDeployment().name(resource).addClasspathResource(resource)
-          .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+          .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
           .deploy();
       fail();
     } catch (XMLException e) {
@@ -50,7 +50,7 @@ public class BpmnParseTest extends PluggableActivitiTestCase {
   public void testParseWithBpmnNamespacePrefix() {
       repositoryService.createDeployment()
         .addClasspathResource("org/activiti/engine/test/bpmn/parse/BpmnParseTest.testParseWithBpmnNamespacePrefix.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
       assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
       
@@ -60,7 +60,7 @@ public class BpmnParseTest extends PluggableActivitiTestCase {
   public void testParseWithMultipleDocumentation() {
       repositoryService.createDeployment()
         .addClasspathResource("org/activiti/engine/test/bpmn/parse/BpmnParseTest.testParseWithMultipleDocumentation.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
       assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
       
@@ -70,7 +70,7 @@ public class BpmnParseTest extends PluggableActivitiTestCase {
   @Deployment
   public void testParseDiagramInterchangeElements() {
 
-    ProcessDefinition processDefinition = processEngineConfiguration.getActiviti5CompatibilityHandler().getProcessDefinitionByKey("myProcess");
+    ProcessDefinition processDefinition = processEngineConfiguration.getFlowable5CompatibilityHandler().getProcessDefinitionByKey("myProcess");
     ProcessDefinitionEntity rawEntity = (ProcessDefinitionEntity) processDefinition;
     
     assertNotNull(rawEntity);
@@ -124,7 +124,7 @@ public class BpmnParseTest extends PluggableActivitiTestCase {
   
   @Deployment
   public void testParseNamespaceInConditionExpressionType() {
-    ProcessDefinition processDefinition = processEngineConfiguration.getActiviti5CompatibilityHandler().getProcessDefinitionByKey("resolvableNamespacesProcess");
+    ProcessDefinition processDefinition = processEngineConfiguration.getFlowable5CompatibilityHandler().getProcessDefinitionByKey("resolvableNamespacesProcess");
     ProcessDefinitionEntity rawEntity = (ProcessDefinitionEntity) processDefinition;
     
     // Test that the process definition has been deployed
@@ -156,7 +156,7 @@ public class BpmnParseTest extends PluggableActivitiTestCase {
   public void testParseSwitchedSourceAndTargetRefsForAssociations() {
     repositoryService.createDeployment()
       .addClasspathResource("org/activiti/engine/test/bpmn/parse/BpmnParseTest.testParseSwitchedSourceAndTargetRefsForAssociations.bpmn20.xml")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy();
     
     assertEquals(1, repositoryService.createProcessDefinitionQuery().count());

@@ -14,8 +14,8 @@
 
         <!-- Database configurations -->
         <property name="databaseSchemaUpdate" value="true"/>
-        <property name="activiti5CompatibilityEnabled" value="true" />
-        <property name="activiti5CompatibilityHandlerFactory" ref="activiti5CompabilityFactory" />
+        <property name="flowable5CompatibilityEnabled" value="true" />
+        <property name="flowable5CompatibilityHandlerFactory" ref="flowable5CompabilityFactory" />
 
         <!-- job executor configurations -->
         <property name="asyncExecutorActivate" value="false" />
@@ -24,6 +24,6 @@
         <property name="mailServerPort" value="5025"/>
     </bean>
     
-    <bean id="activiti5CompabilityFactory" class="org.activiti.compatibility.spring.SpringActiviti5CompatibilityHandlerFactory" />
+    <bean id="flowable5CompabilityFactory" class="org.activiti.compatibility.spring.SpringFlowable5CompatibilityHandlerFactory" />
 
 </beans>

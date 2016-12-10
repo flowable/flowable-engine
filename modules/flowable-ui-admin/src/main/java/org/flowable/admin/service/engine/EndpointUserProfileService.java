@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class EndpointUserProfileService extends AbstractEncryptingService {
 
 	@Autowired
-    protected ActivitiClientService clientUtil;
+    protected FlowableClientService clientUtil;
 
     public String getEndpointUserTenantIdUsingEncryptedPassword(String contextRoot, String restRoot,
                                           String serverAddress, Integer port,

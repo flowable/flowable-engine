@@ -164,7 +164,7 @@ public class ModelQueryTest extends PluggableActivitiTestCase {
   
   public void testByDeploymentId() {
     Deployment deployment = repositoryService.createDeployment().addString("test", "test")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
     
     assertEquals(0, repositoryService.createModelQuery().deploymentId(deployment.getId()).count());

@@ -51,7 +51,7 @@ public class DatabaseTablePrefixTest extends TestCase {
             .setDataSource(pooledDataSource)
             .setDatabaseSchemaUpdate("NO_CHECK"); // disable auto create/drop schema
     config1.setDatabaseTablePrefix("SCHEMA1.");
-    config1.setActiviti5CompatibilityEnabled(true);
+    config1.setFlowable5CompatibilityEnabled(true);
     config1.getPerformanceSettings().setValidateExecutionRelationshipCountConfigOnBoot(false);
     ProcessEngine engine1 = config1.buildProcessEngine();
     
@@ -60,7 +60,7 @@ public class DatabaseTablePrefixTest extends TestCase {
             .setDataSource(pooledDataSource)
             .setDatabaseSchemaUpdate("NO_CHECK"); // disable auto create/drop schema        
     config2.setDatabaseTablePrefix("SCHEMA2.");
-    config2.setActiviti5CompatibilityEnabled(true);
+    config2.setFlowable5CompatibilityEnabled(true);
     config2.getPerformanceSettings().setValidateExecutionRelationshipCountConfigOnBoot(false);
     ProcessEngine engine2 = config2.buildProcessEngine();
     
@@ -81,7 +81,7 @@ public class DatabaseTablePrefixTest extends TestCase {
       engine1.getRepositoryService()
         .createDeployment()
         .addClasspathResource("org/activiti/engine/test/db/oneJobProcess.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
 
       assertEquals(1, engine1.getRepositoryService().createDeploymentQuery().count());

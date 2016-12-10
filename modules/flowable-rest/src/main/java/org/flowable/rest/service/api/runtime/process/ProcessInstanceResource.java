@@ -20,7 +20,7 @@ import io.swagger.annotations.*;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.rest.exception.ActivitiConflictException;
+import org.flowable.rest.exception.FlowableConflictException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -90,7 +90,7 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
 
   protected ProcessInstanceResponse activateProcessInstance(ProcessInstance processInstance) {
     if (!processInstance.isSuspended()) {
-      throw new ActivitiConflictException("Process instance with id '" + processInstance.getId() + "' is already active.");
+      throw new FlowableConflictException("Process instance with id '" + processInstance.getId() + "' is already active.");
     }
     runtimeService.activateProcessInstanceById(processInstance.getId());
 
@@ -104,7 +104,7 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
 
   protected ProcessInstanceResponse suspendProcessInstance(ProcessInstance processInstance) {
     if (processInstance.isSuspended()) {
-      throw new ActivitiConflictException("Process instance with id '" + processInstance.getId() + "' is already suspended.");
+      throw new FlowableConflictException("Process instance with id '" + processInstance.getId() + "' is already suspended.");
     }
     runtimeService.suspendProcessInstanceById(processInstance.getId());
 

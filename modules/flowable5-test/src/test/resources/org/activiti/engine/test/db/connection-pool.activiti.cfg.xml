@@ -17,7 +17,7 @@
     <!-- job executor configurations -->
     <property name="asyncExecutorActivate" value="false" />
     
-    <property name="activiti5CompatibilityEnabled" value="true" />
+    <property name="flowable5CompatibilityEnabled" value="true" />
     
   </bean>
 

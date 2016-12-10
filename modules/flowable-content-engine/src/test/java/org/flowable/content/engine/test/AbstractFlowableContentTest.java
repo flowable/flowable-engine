@@ -20,7 +20,7 @@ import org.junit.Before;
 import org.junit.Rule;
 
 /**
- * Parent class for internal Activiti Form tests.
+ * Parent class for internal Flowable Form tests.
  * 
  * Boots up a dmn engine and caches it.
  * 
@@ -31,7 +31,7 @@ import org.junit.Rule;
  */
 public class AbstractFlowableContentTest {
 
-  public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:activiticontent;DB_CLOSE_DELAY=1000";
+  public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowablecontent;DB_CLOSE_DELAY=1000";
 
   @Rule
   public FlowableContentRule activitiRule = new FlowableContentRule();

@@ -13,7 +13,7 @@
 package org.flowable.engine.common.api;
 
 /**
- * Runtime exception that is the superclass of all Activiti exceptions.
+ * Runtime exception that is the superclass of all Flowable exceptions.
  * 
  * @author Tom Baeyens
  */

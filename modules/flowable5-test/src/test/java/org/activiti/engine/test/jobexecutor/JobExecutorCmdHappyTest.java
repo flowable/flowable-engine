@@ -33,7 +33,7 @@ import org.flowable.engine.runtime.Job;
 public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
 
   public void testJobCommandsWithMessage() {
-    ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (ProcessEngineConfigurationImpl) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+    ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (ProcessEngineConfigurationImpl) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
     CommandExecutor commandExecutor = activiti5ProcessEngineConfig.getCommandExecutor();
     
     String jobId = commandExecutor.execute(new Command<String>() {
@@ -61,7 +61,7 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
   static final long SECOND = 1000;
 
   public void testJobCommandsWithTimer() {
-    ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (ProcessEngineConfigurationImpl) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+    ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (ProcessEngineConfigurationImpl) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
     
     // clock gets automatically reset in LogTestCase.runTest
     Clock clock = processEngineConfiguration.getClock();
@@ -69,7 +69,7 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
     processEngineConfiguration.setClock(clock);
 
     AsyncExecutor asyncExecutor = processEngineConfiguration.getAsyncExecutor();
-    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawCommandExecutor();
+    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawCommandExecutor();
     
     String jobId = commandExecutor.execute(new Command<String>() {
 

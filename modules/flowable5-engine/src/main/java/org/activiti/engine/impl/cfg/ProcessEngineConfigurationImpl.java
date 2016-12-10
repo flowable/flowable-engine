@@ -205,7 +205,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.impl.util.DefaultClockImpl;
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.form.AbstractFormType;
 import org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.engine.impl.bpmn.data.ItemInstance;
@@ -598,8 +598,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   
   protected boolean enableProcessDefinitionInfoCache = false;
   
-  // Activiti 5 backwards compatibility handler
-  protected Activiti5CompatibilityHandler activiti5CompatibilityHandler;
+  // Flowable 5 backwards compatibility handler
+  protected Flowable5CompatibilityHandler flowable5CompatibilityHandler;
   
   // buildProcessEngine ///////////////////////////////////////////////////////
   
@@ -2342,12 +2342,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public Activiti5CompatibilityHandler getActiviti5CompatibilityHandler() {
-    return activiti5CompatibilityHandler;
+  public Flowable5CompatibilityHandler getFlowable5CompatibilityHandler() {
+    return flowable5CompatibilityHandler;
   }
 
-  public ProcessEngineConfigurationImpl setActiviti5CompatibilityHandler(Activiti5CompatibilityHandler activiti5CompatibilityHandler) {
-    this.activiti5CompatibilityHandler = activiti5CompatibilityHandler;
+  public ProcessEngineConfigurationImpl setFlowable5CompatibilityHandler(Flowable5CompatibilityHandler flowable5CompatibilityHandler) {
+    this.flowable5CompatibilityHandler = flowable5CompatibilityHandler;
     return this;
   }
 

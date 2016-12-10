@@ -16,7 +16,7 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
@@ -25,7 +25,7 @@ import java.util.List;
  * @author Joram Barrez
  */
 @ContextConfiguration("classpath:org/flowable/spring/test/servicetask/servicetaskSpringTest-context.xml")
-public class UseActivitiServiceInServiceTaskTest extends SpringActivitiTestCase {
+public class UseActivitiServiceInServiceTaskTest extends SpringFlowableTestCase {
 
   /**
    * This test will use the regular mechanism (delegateExecution.getProcessEngine().getRuntimeService()) to obtain the {@link RuntimeService} to start a new process.

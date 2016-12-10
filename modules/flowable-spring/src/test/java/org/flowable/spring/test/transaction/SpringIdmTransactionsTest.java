@@ -33,7 +33,7 @@ import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
-import org.flowable.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -45,7 +45,7 @@ import org.springframework.transaction.support.TransactionTemplate;
  * @author Joram Barrez
  */
 @ContextConfiguration("classpath:org/flowable/spring/test/transaction/SpringIdmTransactionsTest-context.xml")
-public class SpringIdmTransactionsTest extends SpringActivitiTestCase {
+public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
   
   @Autowired
   protected PlatformTransactionManager transactionManager;

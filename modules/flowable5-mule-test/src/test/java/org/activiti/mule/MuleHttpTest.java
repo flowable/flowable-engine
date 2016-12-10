@@ -34,7 +34,7 @@ public class MuleHttpTest extends AbstractMuleTest {
     ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine();
     Deployment deployment = processEngine.getRepositoryService().createDeployment()
         .addClasspathResource("org/activiti/mule/testHttp.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy();
     RuntimeService runtimeService = processEngine.getRuntimeService();
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("muleProcess");

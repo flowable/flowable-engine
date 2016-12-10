@@ -56,7 +56,7 @@ public class SpringAutoDeployTest extends AbstractTestCase {
     super.tearDown();
   }
 
-  public void testBasicActivitiSpringIntegration() {
+  public void testBasicFlowableSpringIntegration() {
     createAppContext("org/flowable/spring/test/autodeployment/SpringAutoDeployTest-context.xml");
     List<FormDefinition> formDefinitions = repositoryService.createFormDefinitionQuery().orderByFormDefinitionKey().asc().list();
 

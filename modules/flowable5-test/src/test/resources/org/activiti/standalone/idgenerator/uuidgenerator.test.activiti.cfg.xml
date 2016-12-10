@@ -11,7 +11,7 @@
 
 		<property name="databaseSchemaUpdate" value="true" />
 		
-		<property name="activiti5CompatibilityEnabled" value="true" />
+		<property name="flowable5CompatibilityEnabled" value="true" />
 		
 		<property name="idGenerator">
 			<bean class="org.flowable.engine.common.impl.persistence.StrongUuidGenerator" />

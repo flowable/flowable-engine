@@ -25,8 +25,8 @@
     <spring:property name="dataSource" ref="dataSource"/>
     <spring:property name="transactionManager" ref="transactionManager"/>
     <spring:property name="databaseSchemaUpdate" value="true" />
-    <spring:property name="activiti5CompatibilityEnabled" value="true" />
-    <spring:property name="activiti5CompatibilityHandlerFactory" ref="activiti5CompabilityFactory" />
+    <spring:property name="flowable5CompatibilityEnabled" value="true" />
+    <spring:property name="flowable5CompatibilityHandlerFactory" ref="flowable5CompabilityFactory" />
     <spring:property name="asyncExecutorActivate" value="false" />
     <spring:property name="beans">
       <spring:map>
@@ -44,7 +44,7 @@
   <spring:bean id="taskService" factory-bean="processEngine" factory-method="getTaskService" />
   <spring:bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService" />
   
-  <spring:bean id="activiti5CompabilityFactory" class="org.activiti.compatibility.spring.SpringActiviti5CompatibilityHandlerFactory" />
+  <spring:bean id="flowable5CompabilityFactory" class="org.activiti.compatibility.spring.SpringFlowable5CompatibilityHandlerFactory" />
 
   <flow name="test">
     <vm:inbound-endpoint path="in" exchange-pattern="request-response" />

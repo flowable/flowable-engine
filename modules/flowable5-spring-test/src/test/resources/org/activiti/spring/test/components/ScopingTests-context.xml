@@ -34,7 +34,7 @@
         <property name="dataSource" ref="dataSource"/>
         <property name="transactionManager" ref="transactionManager"/>
         <property name="databaseSchemaUpdate" value="true"/>
-        <property name="activiti5CompatibilityHandlerFactory" ref="activiti5CompabilityFactory" />
+        <property name="flowable5CompatibilityHandlerFactory" ref="flowable5CompabilityFactory" />
         <property name="asyncExecutorActivate" value="false"/>
     </bean>
 
@@ -48,6 +48,6 @@
     <bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService"/>
     <bean id="managementService" factory-bean="processEngine" factory-method="getManagementService"/>
     
-    <bean id="activiti5CompabilityFactory" class="org.activiti.compatibility.spring.SpringActiviti5CompatibilityHandlerFactory" />
+    <bean id="flowable5CompabilityFactory" class="org.activiti.compatibility.spring.SpringFlowable5CompatibilityHandlerFactory" />
 
 </beans>

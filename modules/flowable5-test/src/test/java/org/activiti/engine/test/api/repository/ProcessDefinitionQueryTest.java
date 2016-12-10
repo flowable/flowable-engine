@@ -42,7 +42,7 @@ public class ProcessDefinitionQueryTest extends PluggableActivitiTestCase {
       .name("org/activiti/engine/test/repository/one.bpmn20.xml")
       .addClasspathResource("org/activiti/engine/test/repository/one.bpmn20.xml")
       .addClasspathResource("org/activiti/engine/test/repository/two.bpmn20.xml")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy()
       .getId();
 
@@ -50,7 +50,7 @@ public class ProcessDefinitionQueryTest extends PluggableActivitiTestCase {
       .createDeployment()
       .name("org/activiti/engine/test/repository/one.bpmn20.xml")
       .addClasspathResource("org/activiti/engine/test/repository/one.bpmn20.xml")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy()
       .getId();
     
@@ -294,7 +294,7 @@ public class ProcessDefinitionQueryTest extends PluggableActivitiTestCase {
     Deployment deployment = repositoryService.createDeployment()
       .addClasspathResource("org/activiti/engine/test/api/repository/processWithNewBookingMessage.bpmn20.xml")
       .addClasspathResource("org/activiti/engine/test/api/repository/processWithNewInvoiceMessage.bpmn20.xml")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy();
     
     assertEquals(1,repositoryService.createProcessDefinitionQuery()

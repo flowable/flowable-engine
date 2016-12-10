@@ -98,7 +98,7 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
 	  // Deploy process with listener which references an unexisting class
 		try {
 		  repositoryService.createDeployment().addClasspathResource("org/activiti/standalone/event/invalidEventListenerClass.bpmn20.xml")
-	        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+	        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 	        .deploy();
 			fail("Exception expected");
 			
@@ -121,7 +121,7 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
 			
 			deployment = repositoryService.createDeployment()
 				.addClasspathResource("org/activiti/standalone/event/invalidEventListenerType.bpmn20.xml")
-				.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+				.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 				.deploy();
 			
 			fail("Exception expected");

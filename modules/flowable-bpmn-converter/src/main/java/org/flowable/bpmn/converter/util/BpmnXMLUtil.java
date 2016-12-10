@@ -15,9 +15,9 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
-import org.flowable.bpmn.converter.child.ActivitiEventListenerParser;
-import org.flowable.bpmn.converter.child.ActivitiFailedjobRetryParser;
-import org.flowable.bpmn.converter.child.ActivitiMapExceptionParser;
+import org.flowable.bpmn.converter.child.FlowableEventListenerParser;
+import org.flowable.bpmn.converter.child.FlowableFailedjobRetryParser;
+import org.flowable.bpmn.converter.child.FlowableMapExceptionParser;
 import org.flowable.bpmn.converter.child.BaseChildElementParser;
 import org.flowable.bpmn.converter.child.CancelEventDefinitionParser;
 import org.flowable.bpmn.converter.child.CompensateEventDefinitionParser;
@@ -52,7 +52,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
   private static Map<String, BaseChildElementParser> genericChildParserMap = new HashMap<String, BaseChildElementParser>();
 
   static {
-    addGenericParser(new ActivitiEventListenerParser());
+    addGenericParser(new FlowableEventListenerParser());
     addGenericParser(new CancelEventDefinitionParser());
     addGenericParser(new CompensateEventDefinitionParser());
     addGenericParser(new ConditionExpressionParser());
@@ -75,8 +75,8 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
     addGenericParser(new TimeCycleParser());
     addGenericParser(new TimeDurationParser());
     addGenericParser(new FlowNodeRefParser());
-    addGenericParser(new ActivitiFailedjobRetryParser());
-    addGenericParser(new ActivitiMapExceptionParser());
+    addGenericParser(new FlowableFailedjobRetryParser());
+    addGenericParser(new FlowableMapExceptionParser());
   }
 
   private static void addGenericParser(BaseChildElementParser parser) {

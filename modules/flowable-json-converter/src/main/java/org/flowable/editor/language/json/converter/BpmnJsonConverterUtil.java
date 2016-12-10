@@ -17,7 +17,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BooleanDataObject;
 import org.flowable.bpmn.model.BpmnModel;
@@ -130,7 +130,7 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
       propertiesNode.set(propertyName, messagesNode);
     }
   
-  public static void convertListenersToJson(List<ActivitiListener> listeners, boolean isExecutionListener, ObjectNode propertiesNode) {
+  public static void convertListenersToJson(List<FlowableListener> listeners, boolean isExecutionListener, ObjectNode propertiesNode) {
       String propertyName = null;
       String valueName = null;
       if (isExecutionListener) {
@@ -144,7 +144,7 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
 
       ObjectNode listenersNode = objectMapper.createObjectNode();
       ArrayNode itemsNode = objectMapper.createArrayNode();
-      for (ActivitiListener listener : listeners) {
+      for (FlowableListener listener : listeners) {
           ObjectNode propertyItemNode = objectMapper.createObjectNode();
 
           propertyItemNode.put(PROPERTY_LISTENER_EVENT, listener.getEvent());
@@ -308,7 +308,7 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
       JsonNode eventNode = listenerNode.get(PROPERTY_LISTENER_EVENT);
       if (eventNode != null && eventNode.isNull() == false && StringUtils.isNotEmpty(eventNode.asText())) {
         
-        ActivitiListener listener = new ActivitiListener();
+        FlowableListener listener = new FlowableListener();
         listener.setEvent(eventNode.asText());
         if (StringUtils.isNotEmpty(getValueAsString(PROPERTY_LISTENER_CLASS_NAME, listenerNode))) {
           listener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);

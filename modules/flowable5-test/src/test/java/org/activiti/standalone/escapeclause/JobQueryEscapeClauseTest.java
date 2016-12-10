@@ -28,7 +28,7 @@ public class JobQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     deploymentId = repositoryService.createDeployment()
         .addClasspathResource("org/activiti/engine/test/api/mgmt/timerOnTask.bpmn20.xml")
         .tenantId("tenant%")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy()
         .getId();
 
@@ -41,7 +41,7 @@ public class JobQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     deploymentThreeId = repositoryService.createDeployment()
         .addClasspathResource("org/activiti/engine/test/api/mgmt/timerOnTask.bpmn20.xml")
         .tenantId("test")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy()
         .getId();
 

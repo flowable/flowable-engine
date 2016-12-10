@@ -18,7 +18,7 @@ import javax.sql.DataSource;
 import org.flowable.bpmn.exceptions.XMLException;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
@@ -27,7 +27,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Tom Baeyens
  */
 @ContextConfiguration("classpath:org/flowable/spring/test/transaction/SpringTransactionIntegrationTest-context.xml")
-public class SpringTransactionIntegrationTest extends SpringActivitiTestCase {
+public class SpringTransactionIntegrationTest extends SpringFlowableTestCase {
 
   @Autowired
   protected UserBean userBean;

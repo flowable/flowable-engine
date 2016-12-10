@@ -16,12 +16,12 @@ package org.flowable.engine.impl.cmd;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.form.StartFormHandler;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.flowable.engine.impl.util.Activiti5Util;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.FormHandlerUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -44,8 +44,8 @@ public class SubmitStartFormCmd extends NeedsActiveProcessDefinitionCmd<ProcessI
   }
 
   protected ProcessInstance execute(CommandContext commandContext, ProcessDefinitionEntity processDefinition) {
-    if (Activiti5Util.isActiviti5ProcessDefinition(commandContext, processDefinition)) {
-      Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
+    if (Flowable5Util.isFlowable5ProcessDefinition(commandContext, processDefinition)) {
+      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
       return activiti5CompatibilityHandler.submitStartFormData(processDefinition.getId(), businessKey, properties);
     }
     

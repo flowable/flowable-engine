@@ -29,7 +29,7 @@ public class CustomDeploymentCacheTest extends ResourceActivitiTestCase {
   }
   
   public void testCustomDeploymentCacheUsed() {
-    ProcessEngineConfigurationImpl activiti5Config = (ProcessEngineConfigurationImpl) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+    ProcessEngineConfigurationImpl activiti5Config = (ProcessEngineConfigurationImpl) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
     CustomDeploymentCache customCache = (CustomDeploymentCache) activiti5Config.getProcessDefinitionCache();
     assertNull(customCache.getCachedProcessDefinition());
 
@@ -37,7 +37,7 @@ public class CustomDeploymentCacheTest extends ResourceActivitiTestCase {
     for (int i = 1; i <= 5; i++) {
       repositoryService.createDeployment()
               .addString("Process " + i + ".bpmn20.xml", MessageFormat.format(processDefinitionTemplate, i))
-              .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+              .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
               .deploy();
       
       assertNotNull(customCache.getCachedProcessDefinition());

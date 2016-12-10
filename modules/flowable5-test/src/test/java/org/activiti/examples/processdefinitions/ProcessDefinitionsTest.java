@@ -162,7 +162,7 @@ public class ProcessDefinitionsTest extends PluggableActivitiTestCase {
   private String deployProcessString(String processString) {
     String resourceName = "xmlString." + ResourceNameUtil.BPMN_RESOURCE_SUFFIXES[0];
     return repositoryService.createDeployment().addString(resourceName, processString)
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy().getId();
   }
   

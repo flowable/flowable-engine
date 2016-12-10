@@ -8,9 +8,9 @@
   
     <property name="databaseSchemaUpdate" value="true" />
     
-    <property name="activiti5CompatibilityEnabled" value="true" />
+    <property name="flowable5CompatibilityEnabled" value="true" />
   
-    <property name="activiti5ActivityBehaviorFactory">
+    <property name="flowable5ActivityBehaviorFactory">
         <bean class="org.activiti.standalone.parsing.CustomActivityBehaviorFactory" />
     </property>
     

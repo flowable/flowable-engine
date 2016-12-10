@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.Artifact;
 import org.flowable.bpmn.model.Association;
 import org.flowable.bpmn.model.BaseElement;
@@ -61,7 +61,7 @@ public abstract class AbstractBpmnParseHandler<T extends BaseElement> implements
 
   protected abstract void executeParse(BpmnParse bpmnParse, T element);
 
-  protected ExecutionListener createExecutionListener(BpmnParse bpmnParse, ActivitiListener activitiListener) {
+  protected ExecutionListener createExecutionListener(BpmnParse bpmnParse, FlowableListener activitiListener) {
     ExecutionListener executionListener = null;
 
     if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(activitiListener.getImplementationType())) {

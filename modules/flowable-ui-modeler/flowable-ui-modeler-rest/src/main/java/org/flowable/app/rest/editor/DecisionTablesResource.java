@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.flowable.app.model.common.ResultListDataRepresentation;
-import org.flowable.app.service.editor.ActivitiDecisionTableService;
+import org.flowable.app.service.editor.FlowableDecisionTableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class DecisionTablesResource {
 
   @Autowired
-  protected ActivitiDecisionTableService decisionTableService;
+  protected FlowableDecisionTableService decisionTableService;
 
   @RequestMapping(method = RequestMethod.GET, produces = "application/json")
   public ResultListDataRepresentation getDecisionTables(HttpServletRequest request) {

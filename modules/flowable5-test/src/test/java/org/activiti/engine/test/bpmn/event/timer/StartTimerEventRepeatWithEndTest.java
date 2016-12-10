@@ -64,7 +64,7 @@ public class StartTimerEventRepeatWithEndTest extends PluggableActivitiTestCase 
     //deploy the process
     repositoryService.createDeployment()
             .addClasspathResource("org/activiti/engine/test/bpmn/event/timer/StartTimerEventRepeatWithEndTest.testCycleDateStartTimerEvent.bpmn20.xml")
-            .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+            .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
             .deploy();
     assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
 

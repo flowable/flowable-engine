@@ -27,7 +27,7 @@ public class HistoricActivityInstanceEscapeClauseTest extends AbstractEscapeClau
       .createDeployment()
       .tenantId("One%")
       .addClasspathResource("org/activiti/engine/test/history/HistoricActivityInstanceTest.testHistoricActivityInstanceQuery.bpmn20.xml")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy()
       .getId();
 
@@ -35,7 +35,7 @@ public class HistoricActivityInstanceEscapeClauseTest extends AbstractEscapeClau
       .createDeployment()
       .tenantId("Two_")
       .addClasspathResource("org/activiti/engine/test/history/HistoricActivityInstanceTest.testHistoricActivityInstanceQuery.bpmn20.xml")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy()
       .getId();
     

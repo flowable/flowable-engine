@@ -18,13 +18,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.HistoricTaskInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.data.HistoricTaskInstanceDataManager;
-import org.flowable.engine.impl.util.Activiti5Util;
+import org.flowable.engine.impl.util.Flowable5Util;
 
 /**
  * @author Tom Baeyens
@@ -92,8 +92,8 @@ public class HistoricTaskInstanceEntityManagerImpl extends AbstractEntityManager
       if (historicTaskInstance != null) {
         
         if (historicTaskInstance.getProcessDefinitionId() != null 
-            && Activiti5Util.isActiviti5ProcessDefinitionId(getCommandContext(), historicTaskInstance.getProcessDefinitionId())) {
-          Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
+            && Flowable5Util.isFlowable5ProcessDefinitionId(getCommandContext(), historicTaskInstance.getProcessDefinitionId())) {
+          Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
           activiti5CompatibilityHandler.deleteHistoricTask(id);
           return;
         }

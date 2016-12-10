@@ -12,7 +12,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.task.TaskQuery;
 import org.flowable.engine.test.Deployment;
-import org.flowable.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -22,7 +22,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Sang Venkatraman
  */
 @ContextConfiguration("classpath:org/flowable/spring/test/expression/callactivity/testCallActivityByExpression-context.xml")
-public class CallActivityBasedOnSpringBeansExpressionTest extends SpringActivitiTestCase {
+public class CallActivityBasedOnSpringBeansExpressionTest extends SpringFlowableTestCase {
 
   @Deployment(resources = { "org/flowable/spring/test/expression/callactivity/CallActivityBasedOnSpringBeansExpressionTest.testCallActivityByExpression.bpmn20.xml",
       "org/flowable/spring/test/expression/callactivity/simpleSubProcess.bpmn20.xml" })

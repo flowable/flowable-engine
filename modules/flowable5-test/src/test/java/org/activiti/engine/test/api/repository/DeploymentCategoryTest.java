@@ -40,7 +40,7 @@ public class DeploymentCategoryTest extends PluggableActivitiTestCase {
         .createDeployment()
         .name("0")
         .addClasspathResource("org/activiti/engine/test/service/oneTaskProcess.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy()
         .getId();
 
@@ -49,7 +49,7 @@ public class DeploymentCategoryTest extends PluggableActivitiTestCase {
         .name("1")
         .category("one")
         .addClasspathResource("org/activiti/engine/test/repository/one.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy()
         .getId();
 
@@ -58,7 +58,7 @@ public class DeploymentCategoryTest extends PluggableActivitiTestCase {
         .name("2v1")
         .category("two")
         .addClasspathResource("org/activiti/engine/test/repository/two.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy()
         .getId();
       
@@ -67,7 +67,7 @@ public class DeploymentCategoryTest extends PluggableActivitiTestCase {
         .name("2v2")
         .category("two")
         .addClasspathResource("org/activiti/engine/test/repository/two.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy()
         .getId();
             
@@ -97,7 +97,7 @@ public class DeploymentCategoryTest extends PluggableActivitiTestCase {
           .createDeployment()
           .name("noCategory")
           .addClasspathResource("org/activiti/engine/test/repository/two.bpmn20.xml")
-          .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+          .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
           .deploy()
           .getId();
       

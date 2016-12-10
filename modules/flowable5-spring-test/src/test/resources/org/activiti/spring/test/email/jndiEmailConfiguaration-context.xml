@@ -21,8 +21,8 @@
         <property name="mailSessionJndi" value="Session"/>
         <property name="transactionManager" ref="transactionManager"/>
         <property name="databaseSchemaUpdate" value="true"/>
-        <property name="activiti5CompatibilityEnabled" value="true" />
-        <property name="activiti5CompatibilityHandlerFactory" ref="activiti5CompabilityFactory" />
+        <property name="flowable5CompatibilityEnabled" value="true" />
+        <property name="flowable5CompatibilityHandlerFactory" ref="flowable5CompabilityFactory" />
         <property name="asyncExecutorActivate" value="false"/>
     </bean>
 
@@ -38,5 +38,5 @@
 
     <bean id="throwBpmnErrorDelegate" class="org.activiti.spring.test.servicetask.ThrowBpmnErrorDelegate"/>
     
-    <bean id="activiti5CompabilityFactory" class="org.activiti.compatibility.spring.SpringActiviti5CompatibilityHandlerFactory" />
+    <bean id="flowable5CompabilityFactory" class="org.activiti.compatibility.spring.SpringFlowable5CompatibilityHandlerFactory" />
 </beans>

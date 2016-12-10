@@ -26,7 +26,7 @@ import io.swagger.annotations.*;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.task.Task;
-import org.flowable.rest.exception.ActivitiConflictException;
+import org.flowable.rest.exception.FlowableConflictException;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
@@ -162,7 +162,7 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
         }
 
         if (hasVariableOnScope(task, var.getName(), varScope)) {
-          throw new ActivitiConflictException("Variable '" + var.getName() + "' is already present on task '" + task.getId() + "'.");
+          throw new FlowableConflictException("Variable '" + var.getName() + "' is already present on task '" + task.getId() + "'.");
         }
 
         Object actualVariableValue = restResponseFactory.getVariableValue(var);

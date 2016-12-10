@@ -53,7 +53,7 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
       // Push on stack
       Context.setCommandContext(context);
       Context.setProcessEngineConfiguration(processEngineConfiguration);
-      org.flowable.engine.impl.context.Context.setFallbackActiviti5CompatibilityHandler(processEngineConfiguration.getActiviti5CompatibilityHandler());
+      org.flowable.engine.impl.context.Context.setFallbackFlowable5CompatibilityHandler(processEngineConfiguration.getFlowable5CompatibilityHandler());
       
       return next.execute(config, command);
       

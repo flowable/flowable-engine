@@ -13,7 +13,7 @@
 package org.flowable.bpmn.converter.child;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.HasExecutionListeners;
 import org.flowable.bpmn.model.SequenceFlow;
@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Tijs Rademakers
  */
-public class ExecutionListenerParser extends ActivitiListenerParser {
+public class ExecutionListenerParser extends FlowableListenerParser {
   
   private static Logger logger = LoggerFactory.getLogger(ExecutionListenerParser.class);
 
@@ -31,7 +31,7 @@ public class ExecutionListenerParser extends ActivitiListenerParser {
     return ELEMENT_EXECUTION_LISTENER;
   }
 
-  public void addListenerToParent(ActivitiListener listener, BaseElement parentElement) {
+  public void addListenerToParent(FlowableListener listener, BaseElement parentElement) {
     if (parentElement instanceof HasExecutionListeners) {
       if (StringUtils.isEmpty(listener.getEvent()) && parentElement instanceof SequenceFlow) {
         // No event type on a sequenceflow = 'take' implied

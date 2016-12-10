@@ -24,7 +24,7 @@ import io.swagger.annotations.*;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.task.Task;
-import org.flowable.rest.exception.ActivitiForbiddenException;
+import org.flowable.rest.exception.FlowableForbiddenException;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -151,7 +151,7 @@ public class TaskResource extends TaskBaseResource {
     Task taskToDelete = getTaskFromRequest(taskId);
     if (taskToDelete.getExecutionId() != null) {
       // Can't delete a task that is part of a process instance
-      throw new ActivitiForbiddenException("Cannot delete a task that is part of a process-instance.");
+      throw new FlowableForbiddenException("Cannot delete a task that is part of a process-instance.");
     }
 
     if (cascadeHistory != null) {
@@ -209,7 +209,7 @@ public class TaskResource extends TaskBaseResource {
 
   protected void claimTask(Task task, TaskActionRequest actionRequest) {
     // In case the task is already claimed, a
-    // ActivitiTaskAlreadyClaimedException is thrown and converted to
+    // FlowableTaskAlreadyClaimedException is thrown and converted to
     // a CONFLICT response by the ExceptionHandlerAdvice
     taskService.claim(task.getId(), actionRequest.getAssignee());
   }

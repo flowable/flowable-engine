@@ -14,7 +14,7 @@ package org.flowable.engine.impl.cmd;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.interceptor.Command;
@@ -47,10 +47,10 @@ public class SetDeploymentCategoryCmd implements Command<Void> {
       throw new FlowableObjectNotFoundException("No deployment found for id = '" + deploymentId + "'", Deployment.class);
     }
     
-    if (commandContext.getProcessEngineConfiguration().isActiviti5CompatibilityEnabled() && 
-        Activiti5CompatibilityHandler.ACTIVITI_5_ENGINE_TAG.equals(deployment.getEngineVersion())) {
+    if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled() && 
+        Flowable5CompatibilityHandler.FLOWABLE_5_ENGINE_TAG.equals(deployment.getEngineVersion())) {
       
-      commandContext.getProcessEngineConfiguration().getActiviti5CompatibilityHandler().setDeploymentCategory(deploymentId, category);
+      commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().setDeploymentCategory(deploymentId, category);
     }
 
     // Update category

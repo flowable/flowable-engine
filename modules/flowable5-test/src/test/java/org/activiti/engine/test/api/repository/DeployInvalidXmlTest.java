@@ -41,7 +41,7 @@ public class DeployInvalidXmlTest extends PluggableActivitiTestCase {
     try {
       repositoryService.createDeployment()
         .addClasspathResource("org/activiti/engine/test/api/repository/nonSchemaConformantXml.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy()
         .getId();
       fail();
@@ -55,7 +55,7 @@ public class DeployInvalidXmlTest extends PluggableActivitiTestCase {
     try {
       repositoryService.createDeployment()
             .addClasspathResource("org/activiti/engine/test/api/repository/noWayPointsForSequenceFlowInDiagramInterchange.bpmn20.xml")
-            .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+            .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
             .deploy()
             .getId();
       fail();
@@ -126,7 +126,7 @@ public class DeployInvalidXmlTest extends PluggableActivitiTestCase {
     public void run() {
       try {
         String deploymentId = repositoryService.createDeployment().addString("test.bpmn20.xml", UNSAFE_XML)
-            .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+            .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
             .deploy().getId();
         assertEquals(1, repositoryService.createProcessDefinitionQuery().singleResult());
         repositoryService.deleteDeployment(deploymentId, true);
@@ -143,7 +143,7 @@ public class DeployInvalidXmlTest extends PluggableActivitiTestCase {
   public void testExternalEntityResolvingTest() {
   	String deploymentId = repositoryService.createDeployment()
   	    .addClasspathResource("org/activiti/engine/test/api/repository/DeployInvalidXmlTest.testExternalEntityResolvingTest.bpmn20.xml")
-  	    .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+  	    .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
   	    .deploy().getId();
   	try {
   		ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();

@@ -28,12 +28,12 @@ public abstract class JobExecutorTestCase extends PluggableActivitiTestCase {
   protected TweetHandler tweetHandler = new TweetHandler();
 
   public void setUp() throws Exception {
-    ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (ProcessEngineConfigurationImpl) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+    ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (ProcessEngineConfigurationImpl) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
     activiti5ProcessEngineConfig.getJobHandlers().put(tweetHandler.getType(), tweetHandler);
   }
 
   public void tearDown() throws Exception {
-    ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (ProcessEngineConfigurationImpl) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+    ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (ProcessEngineConfigurationImpl) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
     activiti5ProcessEngineConfig.getJobHandlers().remove(tweetHandler.getType());
   }
 

@@ -480,7 +480,7 @@ public class HistoricProcessInstanceTest extends PluggableActivitiTestCase {
   	String deploymentId = repositoryService.createDeployment()
   		.addClasspathResource("org/activiti/engine/test/history/oneTaskProcess.bpmn20.xml")
   		.tenantId(tenantId)
-  		.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+  		.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
   		.deploy()
   		.getId();
   	

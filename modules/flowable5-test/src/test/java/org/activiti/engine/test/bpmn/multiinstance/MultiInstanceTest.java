@@ -1203,7 +1203,7 @@ public class MultiInstanceTest extends PluggableActivitiTestCase {
   	
   	// Add bean temporary to process engine
   	final org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl) 
-  	    processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+  	    processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
   	Map<Object, Object> originalBeans = activiti5ProcessEngineConfig.getExpressionManager().getBeans();
   	
   	try {

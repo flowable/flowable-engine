@@ -156,7 +156,7 @@ public class StartTimerEventTest extends PluggableActivitiTestCase {
     String process = new String(IoUtil.readInputStream(getClass().getResourceAsStream("StartTimerEventTest.testVersionUpgradeShouldCancelJobs.bpmn20.xml"), "")).replaceAll("beforeChange","changed");
     String id = repositoryService.createDeployment().addInputStream("StartTimerEventTest.testVersionUpgradeShouldCancelJobs.bpmn20.xml",
         new ByteArrayInputStream(process.getBytes()))
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy()
         .getId();
 
@@ -207,7 +207,7 @@ public class StartTimerEventTest extends PluggableActivitiTestCase {
     String processXml = new String(IoUtil.readInputStream(getClass().getResourceAsStream("StartTimerEventTest.testTimerShouldNotBeRemovedWhenUndeployingOldVersion.bpmn20.xml"), ""));
     String firstDeploymentId = repositoryService.createDeployment().addInputStream("StartTimerEventTest.testVersionUpgradeShouldCancelJobs.bpmn20.xml",
             new ByteArrayInputStream(processXml.getBytes()))
-            .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+            .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
             .deploy()
             .getId();
     
@@ -219,7 +219,7 @@ public class StartTimerEventTest extends PluggableActivitiTestCase {
     String processChanged = processXml.replaceAll("beforeChange","changed");
     String secondDeploymentId = repositoryService.createDeployment().addInputStream("StartTimerEventTest.testVersionUpgradeShouldCancelJobs.bpmn20.xml",
         new ByteArrayInputStream(processChanged.getBytes()))
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
         .deploy()
         .getId();
     assertEquals(1, jobQuery.count());
@@ -242,7 +242,7 @@ public class StartTimerEventTest extends PluggableActivitiTestCase {
   	
 	  	repositoryService.createDeployment()
 	  		.addClasspathResource("org/activiti/engine/test/bpmn/event/timer/StartTimerEventTest.testOldJobsDeletedOnRedeploy.bpmn20.xml")
-	  		.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+	  		.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 	  		.deploy();
   	
 	  	assertEquals(i+1, repositoryService.createDeploymentQuery().count());
@@ -269,7 +269,7 @@ public class StartTimerEventTest extends PluggableActivitiTestCase {
   	// Deploy v1
   	String deployment1 = repositoryService.createDeployment()
 			.addClasspathResource("org/activiti/engine/test/bpmn/event/timer/StartTimerEventTest.testTimersRecreatedOnDeploymentDelete_v1.bpmn20.xml")
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy()
 			.getId();
   	
@@ -280,7 +280,7 @@ public class StartTimerEventTest extends PluggableActivitiTestCase {
   	// Deploy v2: no timer -> previous should be deleted
   	String deployment2 = repositoryService.createDeployment()
 			.addClasspathResource("org/activiti/engine/test/bpmn/event/timer/StartTimerEventTest.testTimersRecreatedOnDeploymentDelete_v2.bpmn20.xml")
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy().getId();
 	
   	assertEquals(2, repositoryService.createDeploymentQuery().count());
@@ -290,7 +290,7 @@ public class StartTimerEventTest extends PluggableActivitiTestCase {
     // Deploy v3: no timer 
   	String deployment3 = repositoryService.createDeployment()
  			.addClasspathResource("org/activiti/engine/test/bpmn/event/timer/StartTimerEventTest.testTimersRecreatedOnDeploymentDelete_v3.bpmn20.xml")
- 			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+ 			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
  			.deploy().getId();
  	
    	assertEquals(3, repositoryService.createDeploymentQuery().count());
@@ -300,7 +300,7 @@ public class StartTimerEventTest extends PluggableActivitiTestCase {
     // Deploy v4: 1 start timer 
    	String deployment4 = repositoryService.createDeployment()
  			.addClasspathResource("org/activiti/engine/test/bpmn/event/timer/StartTimerEventTest.testTimersRecreatedOnDeploymentDelete_v4.bpmn20.xml")
- 			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+ 			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
  			.deploy().getId();
  	
    	assertEquals(4, repositoryService.createDeploymentQuery().count());
@@ -341,7 +341,7 @@ public class StartTimerEventTest extends PluggableActivitiTestCase {
   	for (int i=1; i<=4; i++) {
   		repositoryService.createDeployment()
 				.addClasspathResource("org/activiti/engine/test/bpmn/event/timer/StartTimerEventTest.testTimersRecreatedOnDeploymentDelete_v" + i + ".bpmn20.xml")
-				.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+				.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 				.deploy();
   	}
   	
@@ -351,7 +351,7 @@ public class StartTimerEventTest extends PluggableActivitiTestCase {
   	String deployment1 = repositoryService.createDeployment()
 			.addClasspathResource("org/activiti/engine/test/bpmn/event/timer/StartTimerEventTest.testTimersRecreatedOnDeploymentDelete_v1.bpmn20.xml")
 			.tenantId(testTenant)
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy().getId();
   	
   	assertEquals(1, repositoryService.createDeploymentQuery().deploymentTenantId(testTenant).count());
@@ -362,7 +362,7 @@ public class StartTimerEventTest extends PluggableActivitiTestCase {
   	String deployment2 = repositoryService.createDeployment()
 			.addClasspathResource("org/activiti/engine/test/bpmn/event/timer/StartTimerEventTest.testTimersRecreatedOnDeploymentDelete_v2.bpmn20.xml")
 			.tenantId(testTenant)
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy().getId();
   	
   	assertEquals(2, repositoryService.createDeploymentQuery().deploymentTenantId(testTenant).count());
@@ -373,7 +373,7 @@ public class StartTimerEventTest extends PluggableActivitiTestCase {
   	String deployment3 = repositoryService.createDeployment()
  			.addClasspathResource("org/activiti/engine/test/bpmn/event/timer/StartTimerEventTest.testTimersRecreatedOnDeploymentDelete_v3.bpmn20.xml")
  			.tenantId(testTenant)
- 			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+ 			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
  			.deploy().getId();
   	
   	assertEquals(3, repositoryService.createDeploymentQuery().deploymentTenantId(testTenant).count());
@@ -384,7 +384,7 @@ public class StartTimerEventTest extends PluggableActivitiTestCase {
    	String deployment4 = repositoryService.createDeployment()
  			.addClasspathResource("org/activiti/engine/test/bpmn/event/timer/StartTimerEventTest.testTimersRecreatedOnDeploymentDelete_v4.bpmn20.xml")
  			.tenantId(testTenant)
- 			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+ 			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
  			.deploy().getId();
    	
   	assertEquals(4, repositoryService.createDeploymentQuery().deploymentTenantId(testTenant).count());
@@ -525,7 +525,7 @@ public class StartTimerEventTest extends PluggableActivitiTestCase {
   
   private void cleanDB() {
     String jobId = managementService.createTimerJobQuery().singleResult().getId();
-    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawCommandExecutor();
+    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawCommandExecutor();
     commandExecutor.execute(new CancelJobsCmd(jobId));
   }
 

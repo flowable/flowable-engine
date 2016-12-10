@@ -44,7 +44,7 @@ public class HistoricJPAVariableTest extends AbstractActivitiTestCase {
       cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
       
       org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl) 
-          ((ProcessEngineConfigurationImpl) cachedProcessEngine.getProcessEngineConfiguration()).getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+          ((ProcessEngineConfigurationImpl) cachedProcessEngine.getProcessEngineConfiguration()).getFlowable5CompatibilityHandler().getRawProcessConfiguration();
 
       EntityManagerSessionFactory entityManagerSessionFactory = (EntityManagerSessionFactory) activiti5ProcessEngineConfig
         .getSessionFactories()

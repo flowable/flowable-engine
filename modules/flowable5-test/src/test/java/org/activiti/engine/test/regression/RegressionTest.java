@@ -31,7 +31,7 @@ public class RegressionTest extends PluggableActivitiTestCase {
     String deploymentId = repositoryService.createDeployment()
       .addClasspathResource("org/activiti/engine/test/regression/act1623-processOne.bpmn")
       .addClasspathResource("org/activiti/engine/test/regression/act1623-processTwo.bpmn")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy()
       .getId();
     

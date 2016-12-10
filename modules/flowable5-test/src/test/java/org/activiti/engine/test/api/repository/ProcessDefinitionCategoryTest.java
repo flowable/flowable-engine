@@ -31,7 +31,7 @@ public class ProcessDefinitionCategoryTest extends PluggableActivitiTestCase {
       .addClasspathResource("org/activiti/engine/test/api/repository/processCategoryOne.bpmn20.xml")
       .addClasspathResource("org/activiti/engine/test/api/repository/processCategoryTwo.bpmn20.xml")
       .addClasspathResource("org/activiti/engine/test/api/repository/processCategoryThree.bpmn20.xml")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy();
     
     HashSet<String> processDefinitionNames = getProcessDefinitionNames(repositoryService.createProcessDefinitionQuery()

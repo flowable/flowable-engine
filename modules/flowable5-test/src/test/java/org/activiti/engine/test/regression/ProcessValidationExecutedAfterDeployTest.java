@@ -22,13 +22,13 @@ public class ProcessValidationExecutedAfterDeployTest extends PluggableActivitiT
 	protected ProcessValidator processValidator;
 	
 	private void disableValidation() {
-	  ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (ProcessEngineConfigurationImpl) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+	  ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (ProcessEngineConfigurationImpl) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
 	  processValidator = activiti5ProcessEngineConfig.getProcessValidator();
 	  activiti5ProcessEngineConfig.setProcessValidator(null);
   }
 	
 	private void enableValidation() {
-	  ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (ProcessEngineConfigurationImpl) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+	  ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (ProcessEngineConfigurationImpl) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
 	  activiti5ProcessEngineConfig.setProcessValidator(processValidator);
   }
 	
@@ -61,7 +61,7 @@ public class ProcessValidationExecutedAfterDeployTest extends PluggableActivitiT
   	disableValidation();
   	repositoryService.createDeployment()
   		.addClasspathResource("org/activiti/engine/test/regression/ProcessValidationExecutedAfterDeployTest.bpmn20.xml")
-  		.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+  		.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
   		.deploy();
   	enableValidation();
   	clearDeploymentCache();
@@ -87,7 +87,7 @@ public class ProcessValidationExecutedAfterDeployTest extends PluggableActivitiT
   	disableValidation();
   	repositoryService.createDeployment()
   		.addClasspathResource("org/activiti/engine/test/regression/ProcessValidationExecutedAfterDeployTest.bpmn20.xml")
-  		.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+  		.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
   		.deploy();
   	enableValidation();
   	clearDeploymentCache();

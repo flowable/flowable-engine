@@ -32,7 +32,7 @@ public class SubProcessTest extends PluggableActivitiTestCase {
     Deployment deployment = 
       repositoryService.createDeployment()
                   .addClasspathResource("org/activiti/examples/bpmn/subprocess/SubProcessTest.fixSystemFailureProcess.bpmn20.xml")
-                  .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+                  .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
                   .deploy();
     
     // After staring the process, both tasks in the subprocess should be active

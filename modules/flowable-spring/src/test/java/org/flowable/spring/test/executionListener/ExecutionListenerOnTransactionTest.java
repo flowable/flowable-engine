@@ -20,14 +20,14 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
  * @author Yvo Swillens
  */
 @ContextConfiguration("classpath:org/flowable/spring/test/executionListener/TransactionDependentListenerTest-context.xml")
-public class ExecutionListenerOnTransactionTest extends SpringActivitiTestCase {
+public class ExecutionListenerOnTransactionTest extends SpringFlowableTestCase {
 
   @Deployment
   public void testOnClosedExecutionListenersWithRollback() {

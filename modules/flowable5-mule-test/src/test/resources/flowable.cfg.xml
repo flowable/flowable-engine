@@ -13,7 +13,7 @@
 
     <!-- Database configurations -->
     <property name="databaseSchemaUpdate" value="drop-create" />
-    <property name="activiti5CompatibilityEnabled" value="true" />
+    <property name="flowable5CompatibilityEnabled" value="true" />
 
     <!-- job executor configurations -->
     <property name="asyncExecutorActivate" value="false" />

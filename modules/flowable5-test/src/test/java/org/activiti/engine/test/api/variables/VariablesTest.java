@@ -30,7 +30,7 @@ public class VariablesTest extends PluggableActivitiTestCase {
 	  
 	  repositoryService.createDeployment()
 	  	.addClasspathResource("org/activiti/engine/test/api/variables/VariablesTest.bpmn20.xml")
-	  	.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+	  	.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 	  	.deploy();
 	  
 	  // Creating 50 vars in total

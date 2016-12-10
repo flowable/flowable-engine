@@ -66,7 +66,7 @@ public interface FormDeploymentBuilder {
   FormDeploymentBuilder enableDuplicateFiltering();
 
   /**
-   * Deploys all provided sources to the Activiti engine.
+   * Deploys all provided sources to the Flowable engine.
    */
   FormDeployment deploy();
 

@@ -43,7 +43,7 @@ public class ProcessEngineInfoService {
     public static final String CONTENT_ENGINE_INFO_URL = "content-management/engine";
 
     @Autowired
-    protected ActivitiClientService clientUtil;
+    protected FlowableClientService clientUtil;
 
     @Autowired
     protected ObjectMapper objectMapper;

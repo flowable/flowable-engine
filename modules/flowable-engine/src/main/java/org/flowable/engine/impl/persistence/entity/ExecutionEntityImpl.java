@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
@@ -46,7 +46,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
   // current position /////////////////////////////////////////////////////////
 
   protected FlowElement currentFlowElement; 
-  protected ActivitiListener currentActivitiListener; // Only set when executing an execution listener
+  protected FlowableListener currentActivitiListener; // Only set when executing an execution listener
 
   /**
    * the process instance. this is the root of the execution tree. the processInstance of a process instance is a self reference.
@@ -276,11 +276,11 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
     }
   }
   
-  public ActivitiListener getCurrentActivitiListener() {
+  public FlowableListener getCurrentActivitiListener() {
     return currentActivitiListener;
   }
 
-  public void setCurrentActivitiListener(ActivitiListener currentActivitiListener) {
+  public void setCurrentActivitiListener(FlowableListener currentActivitiListener) {
     this.currentActivitiListener = currentActivitiListener;
   }
 

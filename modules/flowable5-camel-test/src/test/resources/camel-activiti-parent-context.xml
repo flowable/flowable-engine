@@ -27,8 +27,8 @@
         <property name="dataSource" ref="dataSource"/>
         <property name="transactionManager" ref="transactionManager"/>
         <property name="databaseSchemaUpdate" value="true"/>
-        <property name="activiti5CompatibilityEnabled" value="true" />
-        <property name="activiti5CompatibilityHandlerFactory" ref="activiti5CompabilityFactory" />
+        <property name="flowable5CompatibilityEnabled" value="true" />
+        <property name="flowable5CompatibilityHandlerFactory" ref="flowable5CompabilityFactory" />
         <property name="asyncExecutor" ref="asyncExecutor" />
         <property name="asyncExecutorActivate" value="false" />
     </bean>
@@ -49,7 +49,7 @@
         <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
     </bean>
     
-    <bean id="activiti5CompabilityFactory" class="org.activiti.compatibility.spring.SpringActiviti5CompatibilityHandlerFactory" />
+    <bean id="flowable5CompabilityFactory" class="org.activiti.compatibility.spring.SpringFlowable5CompatibilityHandlerFactory" />
 
     <bean id="sleepBean" class="org.activiti.camel.util.SleepBean"/>
 

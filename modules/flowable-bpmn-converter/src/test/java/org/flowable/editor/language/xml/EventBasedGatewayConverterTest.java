@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventGateway;
 import org.flowable.bpmn.model.FlowElement;
@@ -36,9 +36,9 @@ public class EventBasedGatewayConverterTest extends AbstractConverterTest {
     assertTrue(flowElement instanceof EventGateway);
 
     EventGateway gateway = (EventGateway) flowElement;
-    List<ActivitiListener> listeners = gateway.getExecutionListeners();
+    List<FlowableListener> listeners = gateway.getExecutionListeners();
     assertEquals(1, listeners.size());
-    ActivitiListener listener = listeners.get(0);
+    FlowableListener listener = listeners.get(0);
     assertTrue(ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(listener.getImplementationType()));
     assertEquals("org.test.TestClass", listener.getImplementation());
     assertEquals("start", listener.getEvent());

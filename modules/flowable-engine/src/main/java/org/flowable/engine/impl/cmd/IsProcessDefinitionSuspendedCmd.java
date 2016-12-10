@@ -15,10 +15,10 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.util.Activiti5Util;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 
 /**
@@ -35,8 +35,8 @@ public class IsProcessDefinitionSuspendedCmd implements Command<Boolean>, Serial
 
   public Boolean execute(CommandContext commandContext) {
     // Backwards compatibility
-    if (Activiti5Util.isActiviti5ProcessDefinitionId(commandContext, processDefinitionId)) {
-      Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
+    if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processDefinitionId)) {
+      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
       return activiti5CompatibilityHandler.isProcessDefinitionSuspended(processDefinitionId);
     }
     

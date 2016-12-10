@@ -19,7 +19,7 @@ import io.swagger.annotations.*;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.rest.exception.ActivitiConflictException;
+import org.flowable.rest.exception.FlowableConflictException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -103,7 +103,7 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
   protected ProcessDefinitionResponse activateProcessDefinition(ProcessDefinition processDefinition, boolean suspendInstances, Date date) {
 
     if (!repositoryService.isProcessDefinitionSuspended(processDefinition.getId())) {
-      throw new ActivitiConflictException("Process definition with id '" + processDefinition.getId() + " ' is already active");
+      throw new FlowableConflictException("Process definition with id '" + processDefinition.getId() + " ' is already active");
     }
     repositoryService.activateProcessDefinitionById(processDefinition.getId(), suspendInstances, date);
 
@@ -118,7 +118,7 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
   protected ProcessDefinitionResponse suspendProcessDefinition(ProcessDefinition processDefinition, boolean suspendInstances, Date date) {
 
     if (repositoryService.isProcessDefinitionSuspended(processDefinition.getId())) {
-      throw new ActivitiConflictException("Process definition with id '" + processDefinition.getId() + " ' is already suspended");
+      throw new FlowableConflictException("Process definition with id '" + processDefinition.getId() + " ' is already suspended");
     }
     repositoryService.suspendProcessDefinitionById(processDefinition.getId(), suspendInstances, date);
 

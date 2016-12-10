@@ -121,7 +121,7 @@ public class JavaServiceTaskTest extends PluggableActivitiTestCase {
   public void testIllegalUseOfResultVariableName() {
     try {
       repositoryService.createDeployment().addClasspathResource("org/activiti/examples/bpmn/servicetask/JavaServiceTaskTest.testIllegalUseOfResultVariableName.bpmn20.xml")
-          .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+          .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
           .deploy();
       fail();
     } catch (FlowableException e) {

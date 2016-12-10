@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.task.DelegationState;
 import org.flowable.engine.task.IdentityLink;
@@ -97,7 +97,7 @@ public interface DelegateTask extends VariableScope {
    */
   String getEventName();
 
-  ActivitiListener getCurrentActivitiListener();
+  FlowableListener getCurrentActivitiListener();
 
   /**
    * The current {@link org.flowable.engine.task.DelegationState} for this task.

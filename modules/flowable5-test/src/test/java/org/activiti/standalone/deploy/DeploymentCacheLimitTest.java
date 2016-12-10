@@ -33,7 +33,7 @@ public class DeploymentCacheLimitTest extends ResourceActivitiTestCase {
     int processDefinitionCacheLimit = 3; // This is set in the configuration above
     
     org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl) 
-        processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+        processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
     
     DefaultDeploymentCache<ProcessDefinitionCacheEntry> processDefinitionCache = (DefaultDeploymentCache<ProcessDefinitionCacheEntry>) 
         activiti5ProcessEngineConfig.getProcessDefinitionCache();
@@ -44,7 +44,7 @@ public class DeploymentCacheLimitTest extends ResourceActivitiTestCase {
     for (int i = 1; i <= 5; i++) {
       repositoryService.createDeployment()
               .addString("Process " + i + ".bpmn20.xml", MessageFormat.format(processDefinitionTemplate, i))
-              .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+              .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
               .deploy();
       
       if (i < processDefinitionCacheLimit) {

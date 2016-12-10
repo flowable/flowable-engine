@@ -21,7 +21,7 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
 import org.flowable.engine.impl.interceptor.Command;
@@ -34,7 +34,7 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManage
 import org.flowable.engine.impl.persistence.entity.SuspensionState;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.impl.persistence.entity.SuspensionState.SuspensionStateUtil;
-import org.flowable.engine.impl.util.Activiti5Util;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 
@@ -71,14 +71,14 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
     List<ProcessDefinitionEntity> processDefinitions = findProcessDefinition(commandContext);
     boolean hasActiviti5ProcessDefinitions = false;
     for (ProcessDefinitionEntity processDefinitionEntity : processDefinitions) {
-      if (Activiti5Util.isActiviti5ProcessDefinition(commandContext, processDefinitionEntity)) {
+      if (Flowable5Util.isFlowable5ProcessDefinition(commandContext, processDefinitionEntity)) {
         hasActiviti5ProcessDefinitions = true;
         break;
       }
     }
     
     if (hasActiviti5ProcessDefinitions) {
-      Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
+      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
       if (getProcessDefinitionSuspensionState() == SuspensionState.ACTIVE) {
         activiti5CompatibilityHandler.activateProcessDefinition(processDefinitionId, processDefinitionKey, includeProcessInstances, executionDate, tenantId);
       } else if (getProcessDefinitionSuspensionState() == SuspensionState.SUSPENDED) {
@@ -146,7 +146,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
   protected void createTimerForDelayedExecution(CommandContext commandContext, List<ProcessDefinitionEntity> processDefinitions) {
     for (ProcessDefinitionEntity processDefinition : processDefinitions) {
       
-      if (Activiti5Util.isActiviti5ProcessDefinition(commandContext, processDefinition)) continue;
+      if (Flowable5Util.isFlowable5ProcessDefinition(commandContext, processDefinition)) continue;
       
       TimerJobEntity timer = commandContext.getTimerJobEntityManager().create();
       timer.setJobType(JobEntity.JOB_TYPE_TIMER);
@@ -167,7 +167,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
   protected void changeProcessDefinitionState(CommandContext commandContext, List<ProcessDefinitionEntity> processDefinitions) {
     for (ProcessDefinitionEntity processDefinition : processDefinitions) {
 
-      if (Activiti5Util.isActiviti5ProcessDefinition(commandContext, processDefinition)) continue;
+      if (Flowable5Util.isFlowable5ProcessDefinition(commandContext, processDefinition)) continue;
       
       SuspensionStateUtil.setSuspensionState(processDefinition, getProcessDefinitionSuspensionState());
 

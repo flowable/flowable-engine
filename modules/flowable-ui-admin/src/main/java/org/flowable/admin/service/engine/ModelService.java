@@ -31,7 +31,7 @@ public class ModelService {
     public static final String MODEL_LIST_URL = "enterprise/models";
     
     @Autowired
-    protected ActivitiClientService clientUtil;
+    protected FlowableClientService clientUtil;
 
     public JsonNode listModels(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
         URIBuilder builder =  clientUtil.createUriBuilder(MODEL_LIST_URL);

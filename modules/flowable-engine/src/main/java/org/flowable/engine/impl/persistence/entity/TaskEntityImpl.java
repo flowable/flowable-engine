@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
@@ -83,7 +83,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Ser
   protected boolean isCanceled;
 
   protected String eventName;
-  protected ActivitiListener currentActivitiListener;
+  protected FlowableListener currentActivitiListener;
 
   protected String tenantId = ProcessEngineConfiguration.NO_TENANT_ID;
 
@@ -458,11 +458,11 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Ser
     this.eventName = eventName;
   }
   
-  public ActivitiListener getCurrentActivitiListener() {
+  public FlowableListener getCurrentActivitiListener() {
     return currentActivitiListener;
   }
 
-  public void setCurrentActivitiListener(ActivitiListener currentActivitiListener) {
+  public void setCurrentActivitiListener(FlowableListener currentActivitiListener) {
     this.currentActivitiListener = currentActivitiListener;
   }
 

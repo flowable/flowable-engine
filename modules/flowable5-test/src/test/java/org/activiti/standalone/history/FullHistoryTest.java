@@ -1307,7 +1307,7 @@ public class FullHistoryTest extends ResourceActivitiTestCase {
   @Deployment(resources = { "org/activiti/standalone/jpa/JPAVariableTest.testQueryJPAVariable.bpmn20.xml" })
   public void testReadJpaVariableValueFromHistoricVariableUpdate() {
     org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl) 
-        processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+        processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
     
     EntityManagerSessionFactory entityManagerSessionFactory = (EntityManagerSessionFactory) activiti5ProcessEngineConfig
             .getSessionFactories()

@@ -20,7 +20,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.flowable.admin.domain.ServerConfig;
-import org.flowable.admin.service.engine.exception.ActivitiServiceException;
+import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +35,7 @@ import java.util.Map;
 public class FormInstanceService {
 
   @Autowired
-  protected ActivitiClientService clientUtil;
+  protected FlowableClientService clientUtil;
 
   @Autowired
   protected ObjectMapper objectMapper;
@@ -67,7 +67,7 @@ public class FormInstanceService {
 
       resultNode = clientUtil.executeRequest(post, serverConfig);
     } catch (Exception ex) {
-      throw new ActivitiServiceException(ex.getMessage(), ex);
+      throw new FlowableServiceException(ex.getMessage(), ex);
     }
 
     return resultNode;
@@ -111,7 +111,7 @@ public class FormInstanceService {
       returnNode.put("total", formFieldValues.size());
       returnNode.set("data", formFieldValues);
     } catch (Exception ex) {
-      throw new ActivitiServiceException(ex.getMessage(), ex);
+      throw new FlowableServiceException(ex.getMessage(), ex);
     }
 
     return returnNode;

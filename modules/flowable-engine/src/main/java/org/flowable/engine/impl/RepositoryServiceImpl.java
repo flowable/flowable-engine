@@ -149,7 +149,7 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
     return commandExecutor.execute(new GetDeploymentProcessDefinitionCmd(processDefinitionId));
   }
   
-  public Boolean isActiviti5ProcessDefinition(String processDefinitionId) {
+  public Boolean isFlowable5ProcessDefinition(String processDefinitionId) {
     return commandExecutor.execute(new IsActiviti5ProcessDefinitionCmd(processDefinitionId));
   }
 

@@ -59,7 +59,7 @@ public class TenancyTest extends PluggableActivitiTestCase {
 	  String id = repositoryService.createDeployment()
 			.addBpmnModel("testProcess.bpmn20.xml", createOneTaskTestProcess())
 			.tenantId(tenantId)
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy()
 			.getId();
 	  
@@ -77,7 +77,7 @@ public class TenancyTest extends PluggableActivitiTestCase {
 	  String id = repositoryService.createDeployment()
 			.addBpmnModel("testProcess.bpmn20.xml", createTwoTasksTestProcess())
 			.tenantId(TEST_TENANT_ID)
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy()
 			.getId();
 	  
@@ -92,7 +92,7 @@ public class TenancyTest extends PluggableActivitiTestCase {
 	private String deployTestProcessWithTwoTasksNoTenant() {
 	  String id = repositoryService.createDeployment()
 			.addBpmnModel("testProcess.bpmn20.xml", createTwoTasksTestProcess())
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy()
 			.getId();
 	  
@@ -244,7 +244,7 @@ public class TenancyTest extends PluggableActivitiTestCase {
 		String deploymentId = repositoryService.createDeployment()
 			.addClasspathResource("org/activiti/engine/test/api/tenant/TenancyTest.testJobTenancy.bpmn20.xml")
 			.tenantId(TEST_TENANT_ID)
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy()
 			.getId();
 		
@@ -270,7 +270,7 @@ public class TenancyTest extends PluggableActivitiTestCase {
 		// Do the same, but now without a tenant
 		String deploymentId2 = repositoryService.createDeployment()
 				.addClasspathResource("org/activiti/engine/test/api/tenant/TenancyTest.testJobTenancy.bpmn20.xml")
-				.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+				.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 				.deploy()
 				.getId();
 		
@@ -413,7 +413,7 @@ public class TenancyTest extends PluggableActivitiTestCase {
 		String deploymentId = repositoryService.createDeployment()
 			.addClasspathResource("org/activiti/engine/test/api/tenant/TenancyTest.testJobTenancy.bpmn20.xml")
 			.tenantId(TEST_TENANT_ID)
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy()
 			.getId();
 		
@@ -593,12 +593,12 @@ public class TenancyTest extends PluggableActivitiTestCase {
 		// Deploy process both with and without tenant
 		repositoryService.createDeployment()
 			.addClasspathResource("org/activiti/engine/test/api/tenant/TenancyTest.testMultiTenancySignals.bpmn20.xml")
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy();
 		repositoryService.createDeployment()
 			.addClasspathResource("org/activiti/engine/test/api/tenant/TenancyTest.testMultiTenancySignals.bpmn20.xml")
 			.tenantId(TEST_TENANT_ID)
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy();
 		
 		// Start 3 proc instances for the one with a tenant and 2 for the one without tenant
@@ -634,12 +634,12 @@ public class TenancyTest extends PluggableActivitiTestCase {
 		// Deploy process both with and without tenant
 		repositoryService.createDeployment()
 			.addClasspathResource("org/activiti/engine/test/api/tenant/TenancyTest.testMultiTenancySignals.bpmn20.xml")
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy();
 		repositoryService.createDeployment()
 			.addClasspathResource("org/activiti/engine/test/api/tenant/TenancyTest.testMultiTenancySignals.bpmn20.xml")
 			.tenantId(TEST_TENANT_ID)
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy();
 		
 		// Start 4 proc instances for the one with a tenant and 5 for the one without tenant
@@ -678,12 +678,12 @@ public class TenancyTest extends PluggableActivitiTestCase {
 		// Deploy process both with and without tenant
 		repositoryService.createDeployment()
 			.addClasspathResource("org/activiti/engine/test/api/tenant/TenancyTest.testMultiTenancySignals.bpmn20.xml")
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy();
 		repositoryService.createDeployment()
 			.addClasspathResource("org/activiti/engine/test/api/tenant/TenancyTest.testMultiTenancySignals.bpmn20.xml")
 			.tenantId(TEST_TENANT_ID)
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy();
 		
 		// Start 4 proc instances for the one with a tenant and 5 for the one without tenant
@@ -723,12 +723,12 @@ public class TenancyTest extends PluggableActivitiTestCase {
 		// Deploy process both with and without tenant
 		repositoryService.createDeployment()
 			.addClasspathResource("org/activiti/engine/test/api/tenant/TenancyTest.testMultiTenancySignals.bpmn20.xml")
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy();
 		repositoryService.createDeployment()
 			.addClasspathResource("org/activiti/engine/test/api/tenant/TenancyTest.testMultiTenancySignals.bpmn20.xml")
 			.tenantId(TEST_TENANT_ID)
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy();
 		
 		// Start 4 proc instances for the one with a tenant and 5 for the one without tenant
@@ -782,12 +782,12 @@ public class TenancyTest extends PluggableActivitiTestCase {
 		// Deploy process both with and without tenant
 		repositoryService.createDeployment()
 			.addClasspathResource("org/activiti/engine/test/api/tenant/TenancyTest.testStartProcessInstanceBySignalTenancy.bpmn20.xml")
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy();
 		repositoryService.createDeployment()
 			.addClasspathResource("org/activiti/engine/test/api/tenant/TenancyTest.testStartProcessInstanceBySignalTenancy.bpmn20.xml")
 			.tenantId(TEST_TENANT_ID)
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy();
 		
 		// Signaling without tenant
@@ -828,12 +828,12 @@ public class TenancyTest extends PluggableActivitiTestCase {
 		// Deploy process both with and without tenant
 		repositoryService.createDeployment()
 			.addClasspathResource("org/activiti/engine/test/api/tenant/TenancyTest.testMessageTenancy.bpmn20.xml")
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy();
 		repositoryService.createDeployment()
 			.addClasspathResource("org/activiti/engine/test/api/tenant/TenancyTest.testMessageTenancy.bpmn20.xml")
 			.tenantId(TEST_TENANT_ID)
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy();
 		
 		// Verify query
@@ -868,12 +868,12 @@ public class TenancyTest extends PluggableActivitiTestCase {
 		// Deploy process both with and without tenant
 		repositoryService.createDeployment()
 			.addClasspathResource("org/activiti/engine/test/api/tenant/TenancyTest.testMessageTenancy.bpmn20.xml")
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy();
 		repositoryService.createDeployment()
 			.addClasspathResource("org/activiti/engine/test/api/tenant/TenancyTest.testMessageTenancy.bpmn20.xml")
 			.tenantId(TEST_TENANT_ID)
-			.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+			.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 			.deploy();
 		
 		// Start a process instance by message with tenant
@@ -907,12 +907,12 @@ public class TenancyTest extends PluggableActivitiTestCase {
   		repositoryService.createDeployment()
   		  .addClasspathResource("org/activiti/engine/test/api/tenant/TenancyTest.testCallActivityWithTenant-process01.bpmn20.xml")
   		  .tenantId(tenantId)
-  		  .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+  		  .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
   		  .deploy();
   		repositoryService.createDeployment()
   		  .addClasspathResource("org/activiti/engine/test/api/tenant/TenancyTest.testCallActivityWithTenant-process02.bpmn20.xml")
   		  .tenantId(tenantId)
-  		  .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+  		  .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
   		  .deploy();
   		  
   		//Starting Process 1. Process 1 will be executed successfully but when the call to process 2 is made internally it will throw the exception

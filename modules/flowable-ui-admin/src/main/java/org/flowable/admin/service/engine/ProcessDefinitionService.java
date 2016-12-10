@@ -27,7 +27,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.flowable.admin.domain.ServerConfig;
-import org.flowable.admin.service.engine.exception.ActivitiServiceException;
+import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.slf4j.Logger;
@@ -48,7 +48,7 @@ public class ProcessDefinitionService {
 	private final Logger log = LoggerFactory.getLogger(ProcessDefinitionService.class);
 
 	@Autowired
-    protected ActivitiClientService clientUtil;
+    protected FlowableClientService clientUtil;
 
 	@Autowired
 	protected ObjectMapper objectMapper;
@@ -61,7 +61,7 @@ public class ProcessDefinitionService {
 			builder = new URIBuilder("repository/process-definitions");
 		} catch (Exception e) {
 			log.error("Error building uri", e);
-			throw new ActivitiServiceException("Error building uri", e);
+			throw new FlowableServiceException("Error building uri", e);
 		}
 
 		for (String name : parameterMap.keySet()) {
@@ -95,7 +95,7 @@ public class ProcessDefinitionService {
 
 	protected BpmnModel executeRequestForXML(HttpUriRequest request, ServerConfig serverConfig, int expectedStatusCode) {
 
-		ActivitiServiceException exception = null;
+		FlowableServiceException exception = null;
 		CloseableHttpClient client = clientUtil.getHttpClient(serverConfig);
 		try {
 			CloseableHttpResponse response = client.execute(request);
@@ -112,7 +112,7 @@ public class ProcessDefinitionService {
 				if (success) {
 					return bpmnModel;
 				} else {
-					exception = new ActivitiServiceException("An error occured while calling Activiti: " + response.getStatusLine());
+					exception = new FlowableServiceException("An error occured while calling Activiti: " + response.getStatusLine());
 				}
 			} catch (Exception e) {
 				log.warn("Error consuming response from uri " + request.getURI(), e);

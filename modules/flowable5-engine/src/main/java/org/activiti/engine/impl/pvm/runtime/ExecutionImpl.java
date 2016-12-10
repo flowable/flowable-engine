@@ -33,7 +33,7 @@ import org.activiti.engine.impl.pvm.delegate.SignallableActivityBehavior;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti.engine.impl.pvm.process.TransitionImpl;
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.engine.impl.persistence.entity.VariableInstance;
 import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -423,12 +423,12 @@ public class ExecutionImpl implements
  }
   
   @Override
-  public ActivitiListener getCurrentActivitiListener() {
+  public FlowableListener getCurrentActivitiListener() {
     throw new UnsupportedOperationException();
   }
   
   @Override
-  public void setCurrentActivitiListener(ActivitiListener currentActivitiListener) {
+  public void setCurrentActivitiListener(FlowableListener currentActivitiListener) {
     throw new UnsupportedOperationException();
   }
   

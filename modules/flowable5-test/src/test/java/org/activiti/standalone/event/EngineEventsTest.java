@@ -40,7 +40,7 @@ public class EngineEventsTest extends ResourceActivitiTestCase {
   	listener.clearEventsReceived();
   	
   	// Check close-event
-  	ProcessEngine activiti5ProcessEngine = (ProcessEngine) processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessEngine();
+  	ProcessEngine activiti5ProcessEngine = (ProcessEngine) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessEngine();
   	activiti5ProcessEngine.close();
   	assertEquals(1, listener.getEventsReceived().size());
   	assertEquals(FlowableEngineEventType.ENGINE_CLOSED, listener.getEventsReceived().get(0).getType());

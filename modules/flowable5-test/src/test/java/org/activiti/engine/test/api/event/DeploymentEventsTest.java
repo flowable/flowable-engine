@@ -37,7 +37,7 @@ public class DeploymentEventsTest extends PluggableActivitiTestCase {
 			listener.clearEventsReceived();
 			deployment = repositoryService.createDeployment()
 					.addClasspathResource("org/activiti/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
-					.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+					.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 					.deploy();
 			assertNotNull(deployment);
 			

@@ -17,10 +17,10 @@
     
     <property name="databaseSchemaUpdate" value="true" />
     
-    <property name="activiti5CompatibilityEnabled" value="true" />
+    <property name="flowable5CompatibilityEnabled" value="true" />
     
     <!-- The custom mybatis mappers -->
-    <property name="activiti5CustomMybatisMappers">
+    <property name="flowable5CustomMybatisMappers">
         <set>
             <value>org.activiti.standalone.cfg.MyTestMapper</value>
         </set>

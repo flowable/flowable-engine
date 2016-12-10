@@ -84,7 +84,7 @@ public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStr
   }
 
   @Test(expected = FlowableException.class)
-  public void testDeployResourcesIOExceptionYieldsActivitiException() throws Exception {
+  public void testDeployResourcesIOExceptionYieldsFlowableException() throws Exception {
     when(resourceMock3.getInputStream()).thenThrow(new IOException());
 
     final Resource[] resources = new Resource[] { resourceMock3 };

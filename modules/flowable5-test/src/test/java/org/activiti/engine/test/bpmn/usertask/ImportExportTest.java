@@ -27,7 +27,7 @@ public class ImportExportTest extends ResourceActivitiTestCase {
         byte[] xml = new BpmnXMLConverter().convertToXML(bpmnModel);
 
         processEngine.getRepositoryService().createDeployment().name("test1").addString("test1.bpmn20.xml", new String(xml))
-            .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+            .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
             .deploy();
 
         String processInstanceKey = runtimeService.startProcessInstanceByKey("process").getId();

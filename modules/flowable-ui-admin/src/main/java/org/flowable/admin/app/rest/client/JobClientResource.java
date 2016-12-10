@@ -16,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.JobService;
-import org.flowable.admin.service.engine.exception.ActivitiServiceException;
+import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.app.service.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,7 +46,7 @@ public class JobClientResource extends AbstractClientResource {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			return clientService.getJob(serverConfig, jobId);
-		} catch (ActivitiServiceException e) {
+		} catch (FlowableServiceException e) {
 			throw new BadRequestException(e.getMessage());
 		}
 	}
@@ -61,7 +61,7 @@ public class JobClientResource extends AbstractClientResource {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			clientService.deleteJob(serverConfig, jobId);
-		} catch (ActivitiServiceException e) {
+		} catch (FlowableServiceException e) {
 			throw new BadRequestException(e.getMessage());
 		}
 	}
@@ -76,7 +76,7 @@ public class JobClientResource extends AbstractClientResource {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			 clientService.executeJob(serverConfig, jobId);
-		} catch (ActivitiServiceException e) {
+		} catch (FlowableServiceException e) {
 			throw new BadRequestException(e.getMessage());
 		}
 	}
@@ -94,7 +94,7 @@ public class JobClientResource extends AbstractClientResource {
 				trace = StringUtils.trim(trace);
 			}
 			return trace;
-		} catch (ActivitiServiceException e) {
+		} catch (FlowableServiceException e) {
 			throw new BadRequestException(e.getMessage());
 		}
 	}

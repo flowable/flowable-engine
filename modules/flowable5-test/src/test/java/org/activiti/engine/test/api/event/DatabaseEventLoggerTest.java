@@ -55,7 +55,7 @@ public class DatabaseEventLoggerTest extends PluggableActivitiTestCase {
 		String deploymentId = repositoryService.createDeployment()
 				.addClasspathResource("org/activiti/engine/test/api/event/DatabaseEventLoggerProcess.bpmn20.xml")
 				.tenantId(testTenant)
-				.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+				.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 				.deploy().getId();
 		
 		// Run process to gather data
@@ -416,7 +416,7 @@ public class DatabaseEventLoggerTest extends PluggableActivitiTestCase {
 		
 		String deploymentId = repositoryService.createDeployment()
 				.addClasspathResource("org/activiti/engine/test/api/event/DatabaseEventLoggerProcess.bpmn20.xml")
-				.deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+				.deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
 				.deploy().getId();
 		
 		// Run process to gather data

@@ -23,7 +23,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.child.BaseChildElementParser;
-import org.flowable.bpmn.converter.export.ActivitiListenerExport;
+import org.flowable.bpmn.converter.export.FlowableListenerExport;
 import org.flowable.bpmn.converter.export.FailedJobRetryCountExport;
 import org.flowable.bpmn.converter.export.MultiInstanceExport;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
@@ -373,7 +373,7 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
   }
 
   protected boolean writeListeners(BaseElement element, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
-    return ActivitiListenerExport.writeListeners(element, didWriteExtensionStartElement, xtw);
+    return FlowableListenerExport.writeListeners(element, didWriteExtensionStartElement, xtw);
   }
 
   protected void writeEventDefinitions(Event parentEvent, List<EventDefinition> eventDefinitions, BpmnModel model, XMLStreamWriter xtw) throws Exception {

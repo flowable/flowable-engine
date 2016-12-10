@@ -24,13 +24,13 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration("classpath:generic-camel-activiti-context.xml")
-public class AsyncPingTest extends SpringActivitiTestCase {
+public class AsyncPingTest extends SpringFlowableTestCase {
 
   @Autowired
   protected CamelContext camelContext;

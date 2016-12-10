@@ -15,7 +15,7 @@ package org.flowable.spring.test.servicetask;
 
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
-import org.flowable.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -24,7 +24,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @see https://activiti.atlassian.net/browse/ACT-1166
  */
 @ContextConfiguration("classpath:org/flowable/spring/test/servicetask/serviceraskSpringTestCatchError-context.xml")
-public class BoundaryErrorEventSpringTest extends SpringActivitiTestCase {
+public class BoundaryErrorEventSpringTest extends SpringFlowableTestCase {
 
   @Deployment
   public void testCatchErrorThrownByJavaDelegateOnServiceTask() {

@@ -40,7 +40,7 @@ public class VariablesTest extends PluggableActivitiTestCase {
   public void testBasicVariableOperations() {
     
     org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl) 
-        processEngineConfiguration.getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+        processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
     
     activiti5ProcessEngineConfig.getVariableTypes().addType(CustomVariableType.instance);
 

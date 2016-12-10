@@ -46,7 +46,7 @@ public class JPAEnhancedVariableTest extends AbstractActivitiTestCase {
       cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
       
       activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl) 
-          ((ProcessEngineConfigurationImpl) cachedProcessEngine.getProcessEngineConfiguration()).getActiviti5CompatibilityHandler().getRawProcessConfiguration();
+          ((ProcessEngineConfigurationImpl) cachedProcessEngine.getProcessEngineConfiguration()).getFlowable5CompatibilityHandler().getRawProcessConfiguration();
 
       EntityManagerSessionFactory entityManagerSessionFactory = (EntityManagerSessionFactory) activiti5ProcessEngineConfig
           .getSessionFactories()

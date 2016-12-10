@@ -36,7 +36,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
- * Provides sane definitions for the various beans required to be productive with Activiti in Spring.
+ * Provides sane definitions for the various beans required to be productive with Flowable in Spring.
  *
  * @author Josh Long
  */

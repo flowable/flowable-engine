@@ -18,7 +18,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.flowable.camel.util.FlagJavaDelegate;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -26,7 +26,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Saeid Mirzaei
  */
 @ContextConfiguration("classpath:generic-camel-activiti-context.xml")
-public class ErrorMapExceptionTest extends SpringActivitiTestCase {
+public class ErrorMapExceptionTest extends SpringFlowableTestCase {
 
   @Autowired
   protected CamelContext camelContext;
