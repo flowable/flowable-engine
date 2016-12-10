@@ -106,7 +106,12 @@ public abstract class AbstractPaginateList {
     response.setSize(list.size()); 
     response.setSort(sort);
     response.setOrder(order);
-    response.setTotal(query.count());
+    if (start == 0 && list.size() < size) {
+      response.setTotal(list.size());
+    } else {
+      response.setTotal(query.count());
+    }
+    
     response.setData(list);
     return response;
   }
