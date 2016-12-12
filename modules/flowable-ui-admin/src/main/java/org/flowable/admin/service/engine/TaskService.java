@@ -22,7 +22,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URIBuilder;
 import org.flowable.admin.domain.ServerConfig;
-import org.flowable.admin.service.engine.exception.ActivitiServiceException;
+import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,7 +51,7 @@ public class TaskService {
 	private static final String DEFAULT_VARIABLE_RESULT_SIZE = "1024";
 
 	@Autowired
-    protected ActivitiClientService clientUtil;
+    protected FlowableClientService clientUtil;
 
 	@Autowired
 	protected ObjectMapper objectMapper;
@@ -68,7 +68,7 @@ public class TaskService {
 			post.setEntity(clientUtil.createStringEntity(bodyNode.toString()));
 			resultNode = clientUtil.executeRequest(post, serverConfig);
 		} catch (Exception e) {
-			throw new ActivitiServiceException(e.getMessage(), e);
+			throw new FlowableServiceException(e.getMessage(), e);
 		}
 		return resultNode;
 	}

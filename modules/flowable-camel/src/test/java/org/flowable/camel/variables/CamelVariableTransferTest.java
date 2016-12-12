@@ -24,7 +24,7 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
-import org.flowable.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -33,7 +33,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Saeid Mirzaei
  */
 @ContextConfiguration("classpath:generic-camel-activiti-context.xml")
-public class CamelVariableTransferTest extends SpringActivitiTestCase {
+public class CamelVariableTransferTest extends SpringFlowableTestCase {
   @Autowired
   protected CamelContext camelContext;
   

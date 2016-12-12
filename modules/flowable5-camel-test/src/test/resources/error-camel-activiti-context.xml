@@ -10,13 +10,13 @@
 
 	<import resource="classpath*:camel-activiti-parent-context.xml" />
 
-    <bean id="outbound" class="org.activiti5.camel.error.route.OutboundErrorRoute"/>
-    <bean id="inbound" class="org.activiti5.camel.error.route.InboundErrorRoute"/>
+    <bean id="outbound" class="org.activiti.camel.error.route.OutboundErrorRoute"/>
+    <bean id="inbound" class="org.activiti.camel.error.route.InboundErrorRoute"/>
   
-    <bean id="brokenService" class="org.activiti5.camel.util.BrokenService"/>
+    <bean id="brokenService" class="org.activiti.camel.util.BrokenService"/>
     
-    <bean id="dummyDelegate" class="org.activiti5.camel.util.DummyJavaDelegate"/>
-    <bean id="dummyListener" class="org.activiti5.camel.util.DummyExecutionListener"/>
+    <bean id="dummyDelegate" class="org.activiti.camel.util.DummyJavaDelegate"/>
+    <bean id="dummyListener" class="org.activiti.camel.util.DummyExecutionListener"/>
 
     <camelContext id="camelContext" xmlns="http://camel.apache.org/schema/spring">
         <routeBuilder ref="outbound"/>

@@ -42,7 +42,7 @@ import org.flowable.bpmn.converter.alfresco.AlfrescoUserTaskXMLConverter;
 import org.flowable.bpmn.converter.child.DocumentationParser;
 import org.flowable.bpmn.converter.child.IOSpecificationParser;
 import org.flowable.bpmn.converter.child.MultiInstanceParser;
-import org.flowable.bpmn.converter.export.ActivitiListenerExport;
+import org.flowable.bpmn.converter.export.FlowableListenerExport;
 import org.flowable.bpmn.converter.export.BPMNDIExport;
 import org.flowable.bpmn.converter.export.CollaborationExport;
 import org.flowable.bpmn.converter.export.DataStoreExport;
@@ -603,7 +603,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
         xtw.writeEndElement();
       }
 
-      boolean didWriteExtensionStartElement = ActivitiListenerExport.writeListeners(subProcess, false, xtw);
+      boolean didWriteExtensionStartElement = FlowableListenerExport.writeListeners(subProcess, false, xtw);
 
       didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(subProcess, didWriteExtensionStartElement, model.getNamespaces(), xtw);
       if (didWriteExtensionStartElement) {

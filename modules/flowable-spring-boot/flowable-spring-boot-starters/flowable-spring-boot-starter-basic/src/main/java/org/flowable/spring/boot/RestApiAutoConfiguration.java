@@ -22,7 +22,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Auto-configuration and starter for the Activiti REST APIs.
+ * Auto-configuration and starter for the Flowable REST APIs.
  *
  * @author Joram Barrez
  * @author Josh Long

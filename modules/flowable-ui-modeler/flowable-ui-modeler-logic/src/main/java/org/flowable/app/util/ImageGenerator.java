@@ -20,7 +20,7 @@ import javax.imageio.ImageIO;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.image.ProcessDiagramGenerator;
-import org.flowable.image.exception.ActivitiImageException;
+import org.flowable.image.exception.FlowableImageException;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 
 public class ImageGenerator {
@@ -43,7 +43,7 @@ public class ImageGenerator {
 	    	ImageIO.write(image, imageType, out);
 	      
 	    } catch (IOException e) {
-	      throw new ActivitiImageException("Error while generating byte array for process image", e);
+	      throw new FlowableImageException("Error while generating byte array for process image", e);
 	    } finally {
 	    	try {
 	    		if (out != null) {

@@ -14,11 +14,11 @@
 package org.flowable.engine.impl.cmd;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.form.DefaultFormHandler;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.util.Activiti5Util;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.FormHandlerUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -61,10 +61,10 @@ public class GetFormKeyCmd implements Command<String> {
   public String execute(CommandContext commandContext) {
     ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
     
-    if (commandContext.getProcessEngineConfiguration().isActiviti5CompatibilityEnabled() && 
-        Activiti5CompatibilityHandler.ACTIVITI_5_ENGINE_TAG.equals(processDefinition.getEngineVersion())) {
+    if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled() && 
+        Flowable5CompatibilityHandler.FLOWABLE_5_ENGINE_TAG.equals(processDefinition.getEngineVersion())) {
       
-      return Activiti5Util.getActiviti5CompatibilityHandler().getFormKey(processDefinitionId, taskDefinitionKey); 
+      return Flowable5Util.getFlowable5CompatibilityHandler().getFormKey(processDefinitionId, taskDefinitionKey); 
     }
     
     DefaultFormHandler formHandler;

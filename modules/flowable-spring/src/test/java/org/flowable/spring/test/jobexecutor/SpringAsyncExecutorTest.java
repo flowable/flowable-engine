@@ -8,7 +8,7 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.spring.impl.test.CleanTestExecutionListener;
-import org.flowable.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestExecutionListeners(CleanTestExecutionListener.class)
 @ContextConfiguration("classpath:org/flowable/spring/test/components/SpringjobExecutorTest-context.xml")
-public class SpringAsyncExecutorTest extends SpringActivitiTestCase {
+public class SpringAsyncExecutorTest extends SpringFlowableTestCase {
   
   @Autowired
   protected ManagementService managementService;

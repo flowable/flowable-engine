@@ -14,7 +14,7 @@ package org.flowable.validation.validator.impl;
 
 import java.util.List;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.UserTask;
@@ -32,7 +32,7 @@ public class UserTaskValidator extends ProcessLevelValidator {
     List<UserTask> userTasks = process.findFlowElementsOfType(UserTask.class);
     for (UserTask userTask : userTasks) {
       if (userTask.getTaskListeners() != null) {
-        for (ActivitiListener listener : userTask.getTaskListeners()) {
+        for (FlowableListener listener : userTask.getTaskListeners()) {
           if (listener.getImplementation() == null || listener.getImplementationType() == null) {
             addError(errors, Problems.USER_TASK_LISTENER_IMPLEMENTATION_MISSING, process, userTask, "Element 'class' or 'expression' is mandatory on executionListener");
           }

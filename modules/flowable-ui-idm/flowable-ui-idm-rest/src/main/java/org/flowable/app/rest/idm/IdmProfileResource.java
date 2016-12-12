@@ -56,7 +56,7 @@ public class IdmProfileResource {
 
   @RequestMapping(value = "/profile", method = RequestMethod.GET, produces = "application/json")
   public UserRepresentation getProfile() {
-    User user = SecurityUtils.getCurrentActivitiAppUser().getUserObject();
+    User user = SecurityUtils.getCurrentFlowableAppUser().getUserObject();
     UserRepresentation userRepresentation = new UserRepresentation(user);
     for (Group group : groupService.getGroupsForUser(user.getId())) {
       userRepresentation.getGroups().add(new GroupRepresentation(group));

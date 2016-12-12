@@ -22,14 +22,8 @@ import org.flowable.app.model.common.UserRepresentation;
 import org.flowable.app.model.runtime.TaskRepresentation;
 import org.flowable.app.model.runtime.TaskUpdateRepresentation;
 import org.flowable.app.security.SecurityUtils;
-import org.flowable.app.service.api.UserCache;
 import org.flowable.app.service.api.UserCache.CachedUser;
 import org.flowable.app.service.exception.NotFoundException;
-import org.flowable.app.service.util.TaskUtil;
-import org.flowable.engine.HistoryService;
-import org.flowable.engine.IdentityService;
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.TaskService;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.history.HistoricIdentityLink;
 import org.flowable.engine.history.HistoricTaskInstance;
@@ -40,7 +34,6 @@ import org.flowable.engine.task.TaskInfo;
 import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,27 +42,9 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class FlowableTaskService {
+public class FlowableTaskService extends FlowableAbstractTaskService {
 
   private static final Logger logger = LoggerFactory.getLogger(FlowableTaskService.class);
-
-  @Autowired
-  protected TaskService taskService;
-
-  @Autowired
-  protected HistoryService historyService;
-
-  @Autowired
-  protected UserCache userCache;
-
-  @Autowired
-  protected PermissionService permissionService;
-
-  @Autowired
-  protected RepositoryService repositoryService;
-
-  @Autowired
-  protected IdentityService identityService;
 
   public TaskRepresentation getTask(String taskId, HttpServletResponse response) {
     User currentUser = SecurityUtils.getCurrentUserObject();
@@ -85,7 +60,7 @@ public class FlowableTaskService {
     }
 
     TaskRepresentation rep = new TaskRepresentation(task, processDefinition);
-    TaskUtil.fillPermissionInformation(rep, task, currentUser, identityService, historyService, repositoryService);
+    fillPermissionInformation(rep, task, currentUser);
 
     // Populate the people
     populateAssignee(task, rep);

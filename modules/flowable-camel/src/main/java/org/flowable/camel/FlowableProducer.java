@@ -26,9 +26,9 @@ import org.flowable.engine.IdentityService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.util.Activiti5Util;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 
@@ -82,8 +82,8 @@ public class FlowableProducer extends DefaultProducer {
     if (returnVars != null && returnVars.size() > 0) {
 
       Map<String, Object> processVariables = null;
-      if (repositoryService.isActiviti5ProcessDefinition(pi.getProcessDefinitionId())) {
-        Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
+      if (repositoryService.isFlowable5ProcessDefinition(pi.getProcessDefinitionId())) {
+        Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
         processVariables = activiti5CompatibilityHandler.getVariables(pi);
       } else {
         processVariables = ((ExecutionEntity) pi).getVariables();

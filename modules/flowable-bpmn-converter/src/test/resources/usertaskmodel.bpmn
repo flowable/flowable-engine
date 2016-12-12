@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/test">
   <process id="process" name="process1" isExecutable="true">
     <endEvent id="endEvent"></endEvent>
     <sequenceFlow id="sid-10FF0337-D8FC-495E-92C4-82C2FD5F44F8" sourceRef="sid-12DAA756-C12D-42B6-9AB7-D08C7C8283C1" targetRef="usertask"></sequenceFlow>
     <startEvent id="sid-12DAA756-C12D-42B6-9AB7-D08C7C8283C1"></startEvent>
     <sequenceFlow id="sid-AA1205FD-63BD-47BA-9FB3-AA9F7C1E31F0" sourceRef="usertask" targetRef="endEvent"></sequenceFlow>
-    <userTask id="usertask" name="User task" activiti:category="Test Category" activiti:async="true" activiti:exclusive="false" activiti:assignee="kermit" activiti:candidateUsers="kermit,fozzie" activiti:candidateGroups="management,sales" activiti:dueDate="2012-11-01" activiti:businessCalendarName="customCalendarName" activiti:formKey="testKey" activiti:priority="40">
+    <userTask id="usertask" name="User task" flowable:category="Test Category" flowable:async="true" flowable:exclusive="false" flowable:assignee="kermit" flowable:candidateUsers="kermit,fozzie" flowable:candidateGroups="management,sales" flowable:dueDate="2012-11-01" flowable:businessCalendarName="customCalendarName" flowable:formKey="testKey" flowable:priority="40">
       <extensionElements>
-        <activiti:customResource name="businessAdministrator">
+        <flowable:customResource name="businessAdministrator">
          <resourceAssignmentExpression>
           <formalExpression>user(kermit), group(management)</formalExpression>
          </resourceAssignmentExpression>
-        </activiti:customResource>
-        <activiti:customResource activiti:name="manager">
+        </flowable:customResource>
+        <flowable:customResource flowable:name="manager">
          <resourceAssignmentExpression>
           <formalExpression>group(management)</formalExpression>
          </resourceAssignmentExpression>
-        </activiti:customResource>
-        <activiti:formProperty id="formId" name="formName" type="string" expression="${expression}" variable="variable"></activiti:formProperty>
-        <activiti:formProperty id="formId2" name="anotherName" type="long"></activiti:formProperty>
-        <activiti:formProperty id="formId3" name="enumName" type="enum">
-        	<activiti:value id="test" name="Test" />
-        	<activiti:value id="test2" name="Test2" />
-        </activiti:formProperty>
-        <activiti:taskListener event="create" class="org.test.TestClass" onTransaction="before-commit" customPropertiesResolverClass="org.test.TestResolverClass"></activiti:taskListener>
-        <activiti:taskListener event="assignment" expression="${someExpression}" onTransaction="committed" customPropertiesResolverExpression="${testResolverExpression}"></activiti:taskListener>
-        <activiti:taskListener event="complete" delegateExpression="${someDelegateExpression}" onTransaction="rolled-back" customPropertiesResolverDelegateExpression="${delegateResolverExpression}"></activiti:taskListener>
-      	<activiti:executionListener expression="${someExpression}" event="end" onTransaction="before-commit" customPropertiesResolverClass="org.test.TestResolverClass"/>
+        </flowable:customResource>
+        <flowable:formProperty id="formId" name="formName" type="string" expression="${expression}" variable="variable"></flowable:formProperty>
+        <flowable:formProperty id="formId2" name="anotherName" type="long"></flowable:formProperty>
+        <flowable:formProperty id="formId3" name="enumName" type="enum">
+        	<flowable:value id="test" name="Test" />
+        	<flowable:value id="test2" name="Test2" />
+        </flowable:formProperty>
+        <flowable:taskListener event="create" class="org.test.TestClass" onTransaction="before-commit" customPropertiesResolverClass="org.test.TestResolverClass"></flowable:taskListener>
+        <flowable:taskListener event="assignment" expression="${someExpression}" onTransaction="committed" customPropertiesResolverExpression="${testResolverExpression}"></flowable:taskListener>
+        <flowable:taskListener event="complete" delegateExpression="${someDelegateExpression}" onTransaction="rolled-back" customPropertiesResolverDelegateExpression="${delegateResolverExpression}"></flowable:taskListener>
+      	<flowable:executionListener expression="${someExpression}" event="end" onTransaction="before-commit" customPropertiesResolverClass="org.test.TestResolverClass"/>
       </extensionElements>
     </userTask>
     <boundaryEvent id="escalationTimer" cancelActivity="true" attachedToRef="usertask">

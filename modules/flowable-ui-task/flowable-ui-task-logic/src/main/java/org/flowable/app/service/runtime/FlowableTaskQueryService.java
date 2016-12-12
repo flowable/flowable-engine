@@ -191,8 +191,8 @@ public class FlowableTaskQueryService {
   private void handleTextFiltering(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode textNode) {
     String text = textNode.asText();
 
-    // [4/9/2014] Used to be an or on description too, but doesnt work combined with the or query for an app.
-    // (Would need a change in Activiti)
+    // [4/9/2014] Used to be an or on description too, but doesn't work combined with the or query for an app.
+    // (Would need a change in Flowable)
     taskInfoQueryWrapper.getTaskInfoQuery().taskNameLikeIgnoreCase("%" + text + "%");
   }
 

@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.bpmn.parser.factory;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.EventListener;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.delegate.CustomPropertiesResolver;
@@ -38,19 +38,19 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
  */
 public interface ListenerFactory {
 
-  public abstract TaskListener createClassDelegateTaskListener(ActivitiListener activitiListener);
+  public abstract TaskListener createClassDelegateTaskListener(FlowableListener activitiListener);
 
-  public abstract TaskListener createExpressionTaskListener(ActivitiListener activitiListener);
+  public abstract TaskListener createExpressionTaskListener(FlowableListener activitiListener);
 
-  public abstract TaskListener createDelegateExpressionTaskListener(ActivitiListener activitiListener);
+  public abstract TaskListener createDelegateExpressionTaskListener(FlowableListener activitiListener);
 
-  public abstract ExecutionListener createClassDelegateExecutionListener(ActivitiListener activitiListener);
+  public abstract ExecutionListener createClassDelegateExecutionListener(FlowableListener activitiListener);
 
-  public abstract ExecutionListener createExpressionExecutionListener(ActivitiListener activitiListener);
+  public abstract ExecutionListener createExpressionExecutionListener(FlowableListener activitiListener);
 
-  public abstract ExecutionListener createDelegateExpressionExecutionListener(ActivitiListener activitiListener);
+  public abstract ExecutionListener createDelegateExpressionExecutionListener(FlowableListener activitiListener);
 
-  public abstract TransactionDependentExecutionListener createTransactionDependentDelegateExpressionExecutionListener(ActivitiListener activitiListener);
+  public abstract TransactionDependentExecutionListener createTransactionDependentDelegateExpressionExecutionListener(FlowableListener activitiListener);
 
   public abstract FlowableEventListener createClassDelegateEventListener(EventListener eventListener);
 
@@ -58,11 +58,11 @@ public interface ListenerFactory {
 
   public abstract FlowableEventListener createEventThrowingEventListener(EventListener eventListener);
 
-  public abstract CustomPropertiesResolver createClassDelegateCustomPropertiesResolver(ActivitiListener activitiListener);
+  public abstract CustomPropertiesResolver createClassDelegateCustomPropertiesResolver(FlowableListener activitiListener);
 
-  public abstract CustomPropertiesResolver createExpressionCustomPropertiesResolver(ActivitiListener activitiListener);
+  public abstract CustomPropertiesResolver createExpressionCustomPropertiesResolver(FlowableListener activitiListener);
 
-  public abstract CustomPropertiesResolver createDelegateExpressionCustomPropertiesResolver(ActivitiListener activitiListener);
+  public abstract CustomPropertiesResolver createDelegateExpressionCustomPropertiesResolver(FlowableListener activitiListener);
 
-  public abstract TransactionDependentTaskListener createTransactionDependentDelegateExpressionTaskListener(ActivitiListener activitiListener);
+  public abstract TransactionDependentTaskListener createTransactionDependentDelegateExpressionTaskListener(FlowableListener activitiListener);
 }

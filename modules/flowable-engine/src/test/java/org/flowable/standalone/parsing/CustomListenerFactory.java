@@ -12,7 +12,7 @@
  */
 package org.flowable.standalone.parsing;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.bpmn.parser.factory.DefaultListenerFactory;
@@ -23,7 +23,7 @@ import org.flowable.engine.impl.bpmn.parser.factory.DefaultListenerFactory;
 public class CustomListenerFactory extends DefaultListenerFactory {
 
   @Override
-  public TaskListener createExpressionTaskListener(ActivitiListener activitiListener) {
+  public TaskListener createExpressionTaskListener(FlowableListener activitiListener) {
     return new TaskListener() {
       public void notify(DelegateTask delegateTask) {
         CustomListenerFactoryTest.COUNTER.addAndGet(100);

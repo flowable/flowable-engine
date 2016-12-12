@@ -57,8 +57,8 @@
                 <i class="glyphicon {{currentAppDefinition.definition.icon}}"></i>
 
                 <div class="dropdown btn-group btn-group-sm" activiti-fix-dropdown-bug>
-                    <button type="button" class="btn btn-default dropdown-toggle"
-                            data-toggle="dropdown">{{account.firstName}} {{account.lastName}}
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    	{{account.firstName && account.firstName != 'null' ? account.firstName : ''}} {{account.lastName && account.lastName != 'null' ? account.lastName : ''}}
                         <span class="glyphicon glyphicon-chevron-down" style="font-size: 10px" aria-hidden="true"></span>
                     </button>
                     <ul class="dropdown-menu pull-right">

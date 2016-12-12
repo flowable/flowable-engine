@@ -16,13 +16,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.CommentEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.util.Activiti5Util;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Task;
 
@@ -54,16 +54,16 @@ public class DeleteCommentCmd implements Command<Void>, Serializable {
       
       if (comment.getProcessInstanceId() != null) {
         ExecutionEntity execution = (ExecutionEntity) commandContext.getExecutionEntityManager().findById(comment.getProcessInstanceId());
-        if (execution != null && Activiti5Util.isActiviti5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
-          Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
+        if (execution != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
+          Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
           activiti5CompatibilityHandler.deleteComment(commentId, taskId, processInstanceId);
           return null;
         }
       
       } else if (comment.getTaskId() != null) {
         Task task = commandContext.getTaskEntityManager().findById(comment.getTaskId());
-        if (task != null && task.getProcessDefinitionId() != null && Activiti5Util.isActiviti5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
-          Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
+        if (task != null && task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
+          Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
           activiti5CompatibilityHandler.deleteComment(commentId, taskId, processInstanceId);
           return null;
         }
@@ -77,8 +77,8 @@ public class DeleteCommentCmd implements Command<Void>, Serializable {
       if (processInstanceId != null) {
         
         ExecutionEntity execution = (ExecutionEntity) commandContext.getExecutionEntityManager().findById(processInstanceId);
-        if (execution != null && Activiti5Util.isActiviti5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
-          Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
+        if (execution != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
+          Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
           activiti5CompatibilityHandler.deleteComment(commentId, taskId, processInstanceId);
           return null;
         }
@@ -88,8 +88,8 @@ public class DeleteCommentCmd implements Command<Void>, Serializable {
       if (taskId != null) {
         
         Task task = commandContext.getTaskEntityManager().findById(taskId);
-        if (task != null && task.getProcessDefinitionId() != null && Activiti5Util.isActiviti5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
-          Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
+        if (task != null && task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
+          Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
           activiti5CompatibilityHandler.deleteComment(commentId, taskId, processInstanceId);
           return null;
         }

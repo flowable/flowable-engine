@@ -18,7 +18,7 @@ import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
@@ -26,7 +26,7 @@ import org.flowable.engine.impl.TaskQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.data.TaskDataManager;
-import org.flowable.engine.impl.util.Activiti5Util;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.task.IdentityLinkType;
 import org.flowable.engine.task.Task;
 
@@ -284,8 +284,8 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         throw new FlowableException("The task cannot be deleted because is part of a running process");
       }
       
-      if (Activiti5Util.isActiviti5ProcessDefinitionId(getCommandContext(), task.getProcessDefinitionId())) {
-        Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
+      if (Flowable5Util.isFlowable5ProcessDefinitionId(getCommandContext(), task.getProcessDefinitionId())) {
+        Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
         activiti5CompatibilityHandler.deleteTask(taskId, deleteReason, cascade);
         return;
       }

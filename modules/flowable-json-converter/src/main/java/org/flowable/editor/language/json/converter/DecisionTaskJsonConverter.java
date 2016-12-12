@@ -15,8 +15,6 @@ package org.flowable.editor.language.json.converter;
 import java.util.Map;
 
 import org.flowable.bpmn.model.BaseElement;
-import org.flowable.bpmn.model.ExtensionAttribute;
-import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ServiceTask;
@@ -81,12 +79,4 @@ public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter implements 
   public void setDecisionTableMap(Map<String, String> decisionTableMap) {
     this.decisionTableMap = decisionTableMap;
   }
-
-  protected void addExtensionAttributeToExtension(ExtensionElement element, String attributeName, String value) {
-    ExtensionAttribute extensionAttribute = new ExtensionAttribute(NAMESPACE, attributeName);
-    extensionAttribute.setNamespacePrefix("modeler");
-    extensionAttribute.setValue(value);
-    element.addAttribute(extensionAttribute);
-  }
-
 }

@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.binary.Base64;
 import org.flowable.app.model.common.RemoteToken;
 import org.flowable.app.model.common.RemoteUser;
-import org.flowable.app.security.ActivitiAppUser;
+import org.flowable.app.security.FlowableAppUser;
 import org.flowable.app.security.CookieConstants;
 import org.flowable.app.service.idm.RemoteIdmService;
 import org.flowable.engine.common.api.FlowableException;
@@ -67,7 +67,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
   // Caching the persistent tokens and users to avoid hitting the database too often 
   // (eg when doing multiple requests at the same time)
   protected LoadingCache<String, RemoteToken> tokenCache;
-  protected LoadingCache<String, ActivitiAppUser> userCache;
+  protected LoadingCache<String, FlowableAppUser> userCache;
   
   @PostConstruct
   protected void initCaches() {
@@ -108,9 +108,9 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
     Long userMaxSize = env.getProperty("cache.login-users.max.size", Long.class, 2048l);
     Long userMaxAge = env.getProperty("cache.login-users.max.age", Long.class, 30l);
     userCache = CacheBuilder.newBuilder().maximumSize(userMaxSize).expireAfterWrite(userMaxAge, TimeUnit.SECONDS).recordStats()
-        .build(new CacheLoader<String, ActivitiAppUser>() {
+        .build(new CacheLoader<String, FlowableAppUser>() {
 
-          public ActivitiAppUser load(final String userId) throws Exception {
+          public FlowableAppUser load(final String userId) throws Exception {
             RemoteUser user = remoteIdmService.getUser(userId);
             if (user == null) {
               throw new FlowableException("user not found " + userId);
@@ -122,7 +122,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
             }
 
             // put account into security context (for controllers to use)
-            ActivitiAppUser appUser = new ActivitiAppUser(user, user.getId(), grantedAuthorities);
+            FlowableAppUser appUser = new FlowableAppUser(user, user.getId(), grantedAuthorities);
             return appUser;
           }
 
@@ -188,7 +188,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
   
   protected void onValidTokenFound(HttpServletRequest request, HttpServletResponse response, RemoteToken token) {
     try {
-      ActivitiAppUser appUser = userCache.get(token.getUserId());
+      FlowableAppUser appUser = userCache.get(token.getUserId());
       
       SecurityContextHolder.getContext().setAuthentication(new RememberMeAuthenticationToken(token.getId(), 
           appUser, appUser.getAuthorities()));

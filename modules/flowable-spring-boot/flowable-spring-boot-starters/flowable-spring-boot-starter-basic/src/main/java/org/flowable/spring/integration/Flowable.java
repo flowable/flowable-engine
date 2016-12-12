@@ -34,7 +34,7 @@ public class Flowable {
 
     /**
      * This is the bean to expose and then reference
-     * from your Activiti BPMN flow in an expression.
+     * from your Flowable BPMN flow in an expression.
      */
     public static IntegrationActivityBehavior inboundGatewayActivityBehavior(FlowableInboundGateway gateway) {
         return new IntegrationActivityBehavior(gateway);

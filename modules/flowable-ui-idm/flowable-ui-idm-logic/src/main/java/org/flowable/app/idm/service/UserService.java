@@ -22,7 +22,7 @@ import org.flowable.idm.api.User;
  */
 public interface UserService {
   
-  List<User> getUsers(String filter, String sort, Integer start, String groupId);
+  List<User> getUsers(String filter, String sort, Integer start);
   
   long getUserCount(String filter, String sort, Integer start, String groupId);
   

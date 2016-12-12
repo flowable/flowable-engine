@@ -25,12 +25,12 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.flowable.camel.FlowableProducer;
 import org.flowable.engine.test.Deployment;
-import org.flowable.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration("classpath:generic-camel-activiti-context.xml")
-public class CustomContextTest extends SpringActivitiTestCase {
+public class CustomContextTest extends SpringFlowableTestCase {
 
   @Autowired
   protected CamelContext camelContext;

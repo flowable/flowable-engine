@@ -95,7 +95,7 @@ public class WebConfigurer implements ServletContextListener {
         appDispatcherServlet.setLoadOnStartup(1);
         appDispatcherServlet.setAsyncSupported(true);
 
-        log.debug("Registering Activiti public REST API");
+        log.debug("Registering Flowable public REST API");
         AnnotationConfigWebApplicationContext apiDispatcherServletConfiguration = new AnnotationConfigWebApplicationContext();
         apiDispatcherServletConfiguration.setParent(rootContext);
         apiDispatcherServletConfiguration.register(ApiDispatcherServletConfiguration.class);

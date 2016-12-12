@@ -50,7 +50,7 @@ import org.junit.runners.model.Statement;
  * through the getters of the activitiRule. The dmnEngine will be initialized by
  * default with the activiti.dmn.cfg.xml resource on the classpath. To specify a
  * different configuration file, pass the resource location in
- * {@link #ActivitiRule(String) the appropriate constructor}. Process engines
+ * {@link #FlowableDmnRule(String) the appropriate constructor}. Process engines
  * will be cached statically. Right before the first time the setUp is called
  * for a given configuration resource, the process engine will be constructed.
  * </p>

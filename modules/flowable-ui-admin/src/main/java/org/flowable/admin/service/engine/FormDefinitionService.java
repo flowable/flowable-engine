@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class FormDefinitionService {
 
 	@Autowired
-	protected ActivitiClientService clientUtil;
+	protected FlowableClientService clientUtil;
 
 	public JsonNode listForms(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
 	    URIBuilder builder = clientUtil.createUriBuilder("form-repository/forms");

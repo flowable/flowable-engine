@@ -12,6 +12,9 @@
  */
 package org.flowable.app.service.idm;
 
+import java.util.List;
+
+import org.flowable.app.model.common.RemoteGroup;
 import org.flowable.app.model.common.RemoteToken;
 import org.flowable.app.model.common.RemoteUser;
 
@@ -22,5 +25,9 @@ public interface RemoteIdmService {
   RemoteToken getToken(String tokenValue);
   
   RemoteUser getUser(String userId);
+  
+  List<RemoteUser> findUsersByNameFilter(String filter);
+  
+  List<RemoteGroup> findGroupsByNameFilter(String filter);
 
 }

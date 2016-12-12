@@ -15,7 +15,7 @@ package org.flowable.examples.bpmn.executionlistener;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.SequenceFlow;
@@ -43,7 +43,7 @@ public class CustomSequenceFlowBpmnParseHandler extends SequenceFlowParseHandler
         customFlowListener.addCondition(conditionElement.getElementText());
       }
       
-      ActivitiListener activitiListener = new ActivitiListener();
+      FlowableListener activitiListener = new FlowableListener();
       activitiListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_INSTANCE);
       activitiListener.setInstance(customFlowListener);
       activitiListener.setEvent("start");

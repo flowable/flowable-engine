@@ -17,12 +17,6 @@
             </button>
 		</div>
 		<div class="btn-group pull-right">
-			<button type="button" ng-click="shareApp()" class="btn btn-default" title="{{'APP.ACTION.SHARE' | translate}}"
-			    title="{{'APP.ACTION.SHARE' | translate}}" ng-disabled="!model.app.latestVersion || model.app.createdBy != account.id">
-				<i class="glyphicon glyphicon-share"></i>
-			</button>
-		</div>
-		<div class="btn-group pull-right">
 			<button type="button" class="btn btn-default" ng-click="editApp()" ng-disabled="!model.app.latestVersion"
 				title="{{'APP.ACTION.EDIT' | translate}}">
 				<i class="glyphicon glyphicon-pencil"></i>

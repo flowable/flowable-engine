@@ -12,10 +12,10 @@
  */
 package org.flowable.engine.impl.cmd;
 
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
-import org.flowable.engine.impl.util.Activiti5Util;
+import org.flowable.engine.impl.util.Flowable5Util;
 
 /**
  * @author Joram Barrez
@@ -32,8 +32,8 @@ public class SetTaskPriorityCmd extends NeedsActiveTaskCmd<Void> {
   }
 
   protected Void execute(CommandContext commandContext, TaskEntity task) {
-    if (Activiti5Util.isActiviti5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
-      Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
+    if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
+      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
       activiti5CompatibilityHandler.setTaskPriority(taskId, priority);
       return null;
     }

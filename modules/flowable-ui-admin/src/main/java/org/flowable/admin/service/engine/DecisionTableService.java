@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class DecisionTableService {
 
 	@Autowired
-	protected ActivitiClientService clientUtil;
+	protected FlowableClientService clientUtil;
 
 	public JsonNode listDecisionTables(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
 	    URIBuilder builder = clientUtil.createUriBuilder("dmn-repository/decision-tables");

@@ -23,8 +23,8 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.child.BaseChildElementParser;
-import org.flowable.bpmn.converter.export.ActivitiListenerExport;
 import org.flowable.bpmn.converter.export.FailedJobRetryCountExport;
+import org.flowable.bpmn.converter.export.FlowableListenerExport;
 import org.flowable.bpmn.converter.export.MultiInstanceExport;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.Activity;
@@ -68,9 +68,11 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
 
   protected static final List<ExtensionAttribute> defaultElementAttributes = Arrays.asList(new ExtensionAttribute(ATTRIBUTE_ID), new ExtensionAttribute(ATTRIBUTE_NAME));
 
-  protected static final List<ExtensionAttribute> defaultActivityAttributes = Arrays.asList(new ExtensionAttribute(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_ACTIVITY_ASYNCHRONOUS),
-      new ExtensionAttribute(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_ACTIVITY_EXCLUSIVE), new ExtensionAttribute(ATTRIBUTE_DEFAULT), new ExtensionAttribute(ACTIVITI_EXTENSIONS_NAMESPACE,
-          ATTRIBUTE_ACTIVITY_ISFORCOMPENSATION));
+  protected static final List<ExtensionAttribute> defaultActivityAttributes = Arrays.asList(
+      new ExtensionAttribute(ATTRIBUTE_ACTIVITY_ASYNCHRONOUS),
+      new ExtensionAttribute(ATTRIBUTE_ACTIVITY_EXCLUSIVE), 
+      new ExtensionAttribute(ATTRIBUTE_DEFAULT), 
+      new ExtensionAttribute(ATTRIBUTE_ACTIVITY_ISFORCOMPENSATION));
 
   public void convertToBpmnModel(XMLStreamReader xtr, BpmnModel model, Process activeProcess, List<SubProcess> activeSubProcessList) throws Exception {
 
@@ -281,7 +283,7 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
 
   protected boolean parseAsync(XMLStreamReader xtr) {
     boolean async = false;
-    String asyncString = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_ACTIVITY_ASYNCHRONOUS);
+    String asyncString = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_ACTIVITY_ASYNCHRONOUS, xtr);
     if (ATTRIBUTE_VALUE_TRUE.equalsIgnoreCase(asyncString)) {
       async = true;
     }
@@ -290,7 +292,7 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
 
   protected boolean parseNotExclusive(XMLStreamReader xtr) {
     boolean notExclusive = false;
-    String exclusiveString = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_ACTIVITY_EXCLUSIVE);
+    String exclusiveString = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_ACTIVITY_EXCLUSIVE, xtr);
     if (ATTRIBUTE_VALUE_FALSE.equalsIgnoreCase(exclusiveString)) {
       notExclusive = true;
     }
@@ -336,7 +338,7 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
             didWriteExtensionStartElement = true;
           }
 
-          xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, ELEMENT_FORMPROPERTY, ACTIVITI_EXTENSIONS_NAMESPACE);
+          xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_FORMPROPERTY, FLOWABLE_EXTENSIONS_NAMESPACE);
           writeDefaultAttribute(ATTRIBUTE_FORM_ID, property.getId(), xtw);
 
           writeDefaultAttribute(ATTRIBUTE_FORM_NAME, property.getName(), xtw);
@@ -357,7 +359,7 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
 
           for (FormValue formValue : property.getFormValues()) {
             if (StringUtils.isNotEmpty(formValue.getId())) {
-              xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, ELEMENT_VALUE, ACTIVITI_EXTENSIONS_NAMESPACE);
+              xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_VALUE, FLOWABLE_EXTENSIONS_NAMESPACE);
               xtw.writeAttribute(ATTRIBUTE_ID, formValue.getId());
               xtw.writeAttribute(ATTRIBUTE_NAME, formValue.getName());
               xtw.writeEndElement();
@@ -373,7 +375,7 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
   }
 
   protected boolean writeListeners(BaseElement element, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
-    return ActivitiListenerExport.writeListeners(element, didWriteExtensionStartElement, xtw);
+    return FlowableListenerExport.writeListeners(element, didWriteExtensionStartElement, xtw);
   }
 
   protected void writeEventDefinitions(Event parentEvent, List<EventDefinition> eventDefinitions, BpmnModel model, XMLStreamWriter xtw) throws Exception {
@@ -414,7 +416,7 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
       xtw.writeStartElement(ATTRIBUTE_TIMER_CYCLE);
       
       if (StringUtils.isNotEmpty(timerDefinition.getEndDate())) {
-        xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE,ATTRIBUTE_END_DATE,timerDefinition.getEndDate());
+        xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_END_DATE, timerDefinition.getEndDate());
       }
       
       xtw.writeCharacters(timerDefinition.getTimeCycle());

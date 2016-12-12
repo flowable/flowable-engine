@@ -48,7 +48,7 @@ public class TerminateEventDefinitionParser extends BaseChildElementParser {
   }
 
   protected void parseTerminateAllAttribute(XMLStreamReader xtr, TerminateEventDefinition eventDefinition) {
-    String terminateAllValue = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TERMINATE_ALL);
+    String terminateAllValue = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TERMINATE_ALL, xtr);
     if (terminateAllValue != null && "true".equals(terminateAllValue)) {
     	eventDefinition.setTerminateAll(true);
     } else {
@@ -57,7 +57,7 @@ public class TerminateEventDefinitionParser extends BaseChildElementParser {
   }
   
   protected void parseTerminateMultiInstanceAttribute(XMLStreamReader xtr, TerminateEventDefinition eventDefinition) {
-    String terminateMiValue = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TERMINATE_MULTI_INSTANCE);
+    String terminateMiValue = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TERMINATE_MULTI_INSTANCE, xtr);
     if (terminateMiValue != null && "true".equals(terminateMiValue)) {
       eventDefinition.setTerminateMultiInstance(true);
     } else {

@@ -33,7 +33,7 @@ import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.scripting.ScriptingEngines;
-import org.flowable.engine.impl.util.Activiti5Util;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -65,13 +65,13 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
     String usernameValue = this.getStringFromField(this.username, execution);
     String passwordValue = this.getStringFromField(this.password, execution);
 
-    boolean isActiviti5Execution = false;
+    boolean isFlowable5Execution = false;
     Object payload = null;
-    if ((Context.getCommandContext() != null && Activiti5Util.isActiviti5ProcessDefinitionId(Context.getCommandContext(), execution.getProcessDefinitionId())) ||
-        (Context.getCommandContext() == null && Activiti5Util.getActiviti5CompatibilityHandler() != null)) {
+    if ((Context.getCommandContext() != null && Flowable5Util.isFlowable5ProcessDefinitionId(Context.getCommandContext(), execution.getProcessDefinitionId())) ||
+        (Context.getCommandContext() == null && Flowable5Util.getFlowable5CompatibilityHandler() != null)) {
       
-      payload = Activiti5Util.getActiviti5CompatibilityHandler().getScriptingEngineValue(payloadExpressionValue, languageValue, execution);
-      isActiviti5Execution = true;
+      payload = Flowable5Util.getFlowable5CompatibilityHandler().getScriptingEngineValue(payloadExpressionValue, languageValue, execution);
+      isFlowable5Execution = true;
       
     } else {
       ScriptingEngines scriptingEngines = Context.getProcessEngineConfiguration().getScriptingEngines();
@@ -147,8 +147,8 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
       }
     }
 
-    if (isActiviti5Execution) {
-      Activiti5Util.getActiviti5CompatibilityHandler().leaveExecution(execution);
+    if (isFlowable5Execution) {
+      Flowable5Util.getFlowable5CompatibilityHandler().leaveExecution(execution);
       
     } else {
       this.leave(execution);

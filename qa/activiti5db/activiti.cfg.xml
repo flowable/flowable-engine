@@ -4,7 +4,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="processEngineConfiguration" class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+  <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
   
     <property name="jdbcUrl" value="@jdbc.url@" />
     <property name="jdbcDriver" value="@jdbc.driver@" />
@@ -14,7 +14,7 @@
     <!-- Database configurations -->
     <property name="databaseSchemaUpdate" value="drop-create" />
     
-    <property name="activiti5CompatibilityEnabled" value="true" />
+    <property name="flowable5CompatibilityEnabled" value="true" />
     
     <!-- job executor configurations -->
     <property name="asyncExecutor" ref="asyncExecutor" />
@@ -29,7 +29,7 @@
     <property name="mailServers">
       <map>
         <entry key="myEmailTenant">
-          <bean class="org.activiti.engine.cfg.MailServerInfo">
+          <bean class="org.flowable.engine.cfg.MailServerInfo">
             <property name="mailServerHost" value="localhost" />
             <property name="mailServerPort" value="5025" />
             <property name="mailServerUseSSL" value="false" />
@@ -45,7 +45,7 @@
     <property name="enableProcessDefinitionInfoCache" value="true" />
   </bean>
   
-  <bean id="asyncExecutor" class="org.activiti.engine.impl.asyncexecutor.DefaultAsyncJobExecutor">
+  <bean id="asyncExecutor" class="org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor">
     <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
     <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
   </bean>

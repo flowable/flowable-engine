@@ -52,7 +52,7 @@ public class AppService {
     public static final String APP_BY_DEPLOYMENT_URL = "enterprise/runtime-app-deployment";
 
     @Autowired
-    protected ActivitiClientService clientUtil;
+    protected FlowableClientService clientUtil;
 
     public JsonNode listAppDefinitions(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
         URIBuilder builder =  clientUtil.createUriBuilder(APP_LIST_URL);

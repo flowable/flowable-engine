@@ -18,6 +18,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.service.exception.NotFoundException;
 import org.flowable.app.service.exception.NotPermittedException;
+import org.flowable.app.service.idm.RemoteIdmService;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
@@ -25,7 +26,6 @@ import org.flowable.bpmn.model.UserTask;
 import org.flowable.content.api.ContentItem;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.HistoryService;
-import org.flowable.engine.IdentityService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -62,7 +62,7 @@ public class PermissionService {
   protected HistoryService historyService;
   
   @Autowired
-  protected IdentityService identityService;
+  protected RemoteIdmService remoteIdmService;
 
   /**
    * Check if the given user is allowed to read the task.
@@ -105,7 +105,7 @@ public class PermissionService {
 
   private List<String> getGroupIdsForUser(User user) {
     List<String> groupIds = new ArrayList<String>();
-    for (Group group : identityService.createGroupQuery().groupMember(user.getId()).list()) {
+    for (Group group : remoteIdmService.getUser(user.getId()).getGroups()) {
       groupIds.add(String.valueOf(group.getId()));
     }
     return groupIds;

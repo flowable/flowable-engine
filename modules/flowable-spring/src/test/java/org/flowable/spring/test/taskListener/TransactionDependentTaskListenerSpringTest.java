@@ -15,7 +15,7 @@ package org.flowable.spring.test.taskListener;
 
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
-import org.flowable.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -23,7 +23,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Yvo Swillens
  */
 @ContextConfiguration("classpath:org/flowable/spring/test/taskListener/TaskListenerDelegateExpressionTest-context.xml")
-public class TransactionDependentTaskListenerSpringTest extends SpringActivitiTestCase {
+public class TransactionDependentTaskListenerSpringTest extends SpringFlowableTestCase {
 
   @Autowired
   MyTransactionDependentTaskListener listener;

@@ -15,7 +15,7 @@ package org.flowable.admin.app.rest.client;
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.ProcessInstanceService;
-import org.flowable.admin.service.engine.exception.ActivitiServiceException;
+import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.app.service.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,7 +45,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			return clientService.getProcessInstance(serverConfig, processInstanceId);
-		} catch (ActivitiServiceException e) {
+		} catch (FlowableServiceException e) {
 			throw new BadRequestException(e.getMessage());
 		}
 	}
@@ -55,7 +55,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			return clientService.getTasks(serverConfig, processInstanceId);
-		} catch (ActivitiServiceException e) {
+		} catch (FlowableServiceException e) {
 			throw new BadRequestException(e.getMessage());
 		}
 	}
@@ -65,7 +65,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			return clientService.getVariables(serverConfig, processInstanceId);
-		} catch (ActivitiServiceException e) {
+		} catch (FlowableServiceException e) {
 			throw new BadRequestException(e.getMessage());
 		}
 	}
@@ -76,7 +76,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
             clientService.updateVariable(serverConfig, processInstanceId, variableName, body);
-        } catch (ActivitiServiceException e) {
+        } catch (FlowableServiceException e) {
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -87,7 +87,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
             clientService.createVariable(serverConfig, processInstanceId, body);
-        } catch (ActivitiServiceException e) {
+        } catch (FlowableServiceException e) {
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -99,7 +99,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
             clientService.deleteVariable(serverConfig, processInstanceId, variableName);
-        } catch (ActivitiServiceException e) {
+        } catch (FlowableServiceException e) {
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -109,7 +109,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			return clientService.getSubProcesses(serverConfig, processInstanceId);
-		} catch (ActivitiServiceException e) {
+		} catch (FlowableServiceException e) {
 			throw new BadRequestException(e.getMessage());
 		}
 	}
@@ -119,7 +119,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			return clientService.getJobs(serverConfig, processInstanceId);
-		} catch (ActivitiServiceException e) {
+		} catch (FlowableServiceException e) {
 			throw new BadRequestException(e.getMessage());
 		}
 	}
@@ -130,7 +130,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
 			clientService.executeAction(serverConfig, processInstanceId, actionBody);
-		} catch (ActivitiServiceException e) {
+		} catch (FlowableServiceException e) {
 			throw new BadRequestException(e.getMessage());
 		}
 	}

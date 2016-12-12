@@ -15,7 +15,7 @@ package org.flowable.cdi.impl.event;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BusinessRuleTask;
 import org.flowable.bpmn.model.CallActivity;
@@ -150,7 +150,7 @@ public class CdiEventSupportBpmnParseHandler implements BpmnParseHandler {
   }
 
   protected void addActivitiListenerToElement(FlowElement flowElement, String event, Object instance) {
-    ActivitiListener listener = new ActivitiListener();
+    FlowableListener listener = new FlowableListener();
     listener.setEvent(event);
     listener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_INSTANCE);
     listener.setInstance(instance);
@@ -158,7 +158,7 @@ public class CdiEventSupportBpmnParseHandler implements BpmnParseHandler {
   }
   
   protected void addActivitiListenerToUserTask(UserTask userTask, String event, Object instance) {
-    ActivitiListener listener = new ActivitiListener();
+    FlowableListener listener = new FlowableListener();
     listener.setEvent(event);
     listener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_INSTANCE);
     listener.setInstance(instance);

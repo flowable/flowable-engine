@@ -12,8 +12,8 @@
  */
 package org.activiti.compatibility.test.parsehandler;
 
-import org.activiti5.engine.impl.bpmn.parser.BpmnParse;
-import org.activiti5.engine.impl.bpmn.parser.handler.AbstractBpmnParseHandler;
+import org.activiti.engine.impl.bpmn.parser.BpmnParse;
+import org.activiti.engine.impl.bpmn.parser.handler.AbstractBpmnParseHandler;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.UserTask;
 

@@ -16,7 +16,7 @@ package org.flowable.engine.test.bpmn.java;
 import java.io.ByteArrayInputStream;
 
 import org.flowable.bpmn.converter.BpmnXMLConverter;
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.ImplementationType;
@@ -45,7 +45,7 @@ public class EventJavaTest extends PluggableFlowableTestCase {
     TimerEventDefinition timerDef = new TimerEventDefinition();
     timerDef.setTimeDuration("PT5M");
     startEvent.getEventDefinitions().add(timerDef);
-    ActivitiListener listener = new ActivitiListener();
+    FlowableListener listener = new FlowableListener();
     listener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
     listener.setImplementation("${test}");
     listener.setEvent("end");

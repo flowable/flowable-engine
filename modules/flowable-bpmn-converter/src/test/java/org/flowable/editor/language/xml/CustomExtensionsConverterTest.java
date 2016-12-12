@@ -8,7 +8,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionAttribute;
@@ -56,7 +56,7 @@ public class CustomExtensionsConverterTest extends AbstractConverterTest {
     assertEquals("version", attribute.getName());
     assertEquals("9", attribute.getValue());
 
-    List<ActivitiListener> listeners = model.getMainProcess().getExecutionListeners();
+    List<FlowableListener> listeners = model.getMainProcess().getExecutionListeners();
     validateExecutionListeners(listeners);
     Map<String, List<ExtensionElement>> extensionElementMap = model.getMainProcess().getExtensionElements();
     validateExtensionElements(extensionElementMap);
@@ -93,21 +93,21 @@ public class CustomExtensionsConverterTest extends AbstractConverterTest {
     validateExtensionElements(extensionElementMap);
   }
 
-  protected void validateExecutionListeners(List<ActivitiListener> listeners) {
+  protected void validateExecutionListeners(List<FlowableListener> listeners) {
     assertEquals(3, listeners.size());
-    ActivitiListener listener = (ActivitiListener) listeners.get(0);
+    FlowableListener listener = (FlowableListener) listeners.get(0);
     assertTrue(ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(listener.getImplementationType()));
     assertEquals("org.test.TestClass", listener.getImplementation());
     assertEquals("start", listener.getEvent());
     assertEquals("before-commit", listener.getOnTransaction());
     assertEquals("org.test.TestResolverClass", listener.getCustomPropertiesResolverImplementation());
-    listener = (ActivitiListener) listeners.get(1);
+    listener = (FlowableListener) listeners.get(1);
     assertTrue(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equals(listener.getImplementationType()));
     assertEquals("${testExpression}", listener.getImplementation());
     assertEquals("end", listener.getEvent());
     assertEquals("committed", listener.getOnTransaction());
     assertEquals("${testResolverExpression}", listener.getCustomPropertiesResolverImplementation());
-    listener = (ActivitiListener) listeners.get(2);
+    listener = (FlowableListener) listeners.get(2);
     assertTrue(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(listener.getImplementationType()));
     assertEquals("${delegateExpression}", listener.getImplementation());
     assertEquals("start", listener.getEvent());

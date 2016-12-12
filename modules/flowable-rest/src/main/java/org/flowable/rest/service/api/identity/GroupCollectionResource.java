@@ -26,7 +26,7 @@ import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.GroupQueryProperty;
 import org.flowable.rest.api.DataResponse;
-import org.flowable.rest.exception.ActivitiConflictException;
+import org.flowable.rest.exception.FlowableConflictException;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -114,7 +114,7 @@ public class GroupCollectionResource {
 
     // Check if a user with the given ID already exists so we return a CONFLICT
     if (identityService.createGroupQuery().groupId(groupRequest.getId()).count() > 0) {
-      throw new ActivitiConflictException("A group with id '" + groupRequest.getId() + "' already exists.");
+      throw new FlowableConflictException("A group with id '" + groupRequest.getId() + "' already exists.");
     }
 
     Group created = identityService.newGroup(groupRequest.getId());

@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
@@ -75,10 +75,10 @@ public abstract class AbstractInfoMapper implements InfoMapper {
 
 	protected abstract void mapProperties(Object element);
 	
-	protected void createListenerPropertyNodes(String name, List<ActivitiListener> listeners) {
+	protected void createListenerPropertyNodes(String name, List<FlowableListener> listeners) {
 	    if (CollectionUtils.isNotEmpty(listeners)) {
             List<String> listenerValues = new ArrayList<String>();
-            for (ActivitiListener listener : listeners) {
+            for (FlowableListener listener : listeners) {
                 StringBuilder listenerBuilder = new StringBuilder();
                 listenerBuilder.append(listener.getEvent());
                 if (StringUtils.isNotEmpty(listener.getImplementation())) {

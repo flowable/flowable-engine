@@ -31,7 +31,7 @@ public class FormJsonConverter {
   
       return definition;
     } catch (Exception e) {
-      throw new ActivitiFormJsonException("Error reading form json", e);
+      throw new FlowableFormJsonException("Error reading form json", e);
     }
   }
 
@@ -39,7 +39,7 @@ public class FormJsonConverter {
     try {
       return objectMapper.writeValueAsString(definition);
     } catch (Exception e) {
-      throw new ActivitiFormJsonException("Error writing form json", e);
+      throw new FlowableFormJsonException("Error writing form json", e);
     }
   }
 }

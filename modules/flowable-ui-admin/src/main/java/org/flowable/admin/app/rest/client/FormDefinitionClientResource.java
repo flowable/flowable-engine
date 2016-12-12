@@ -15,7 +15,7 @@ package org.flowable.admin.app.rest.client;
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.FormDefinitionService;
-import org.flowable.admin.service.engine.exception.ActivitiServiceException;
+import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.app.service.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,7 +41,7 @@ public class FormDefinitionClientResource extends AbstractClientResource {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
         try {
             return clientService.getForm(serverConfig, formDefinitionId);
-        } catch (ActivitiServiceException e) {
+        } catch (FlowableServiceException e) {
             throw new BadRequestException(e.getMessage());
         }
     }

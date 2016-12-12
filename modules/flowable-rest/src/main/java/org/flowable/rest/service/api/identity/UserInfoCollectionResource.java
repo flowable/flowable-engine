@@ -23,7 +23,7 @@ import io.swagger.annotations.*;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.idm.api.User;
-import org.flowable.rest.exception.ActivitiConflictException;
+import org.flowable.rest.exception.FlowableConflictException;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -79,7 +79,7 @@ public class UserInfoCollectionResource extends BaseUserResource {
 
     String existingValue = identityService.getUserInfo(user.getId(), userRequest.getKey());
     if (existingValue != null) {
-      throw new ActivitiConflictException("User info with key '" + userRequest.getKey() + "' already exists for this user.");
+      throw new FlowableConflictException("User info with key '" + userRequest.getKey() + "' already exists for this user.");
     }
 
     identityService.setUserInfo(user.getId(), userRequest.getKey(), userRequest.getValue());

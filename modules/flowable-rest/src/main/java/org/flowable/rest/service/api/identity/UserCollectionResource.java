@@ -26,7 +26,7 @@ import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
 import org.flowable.idm.api.UserQueryProperty;
 import org.flowable.rest.api.DataResponse;
-import org.flowable.rest.exception.ActivitiConflictException;
+import org.flowable.rest.exception.FlowableConflictException;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -129,7 +129,7 @@ public class UserCollectionResource {
     // Check if a user with the given ID already exists so we return a
     // CONFLICT
     if (identityService.createUserQuery().userId(userRequest.getId()).count() > 0) {
-      throw new ActivitiConflictException("A user with id '" + userRequest.getId() + "' already exists.");
+      throw new FlowableConflictException("A user with id '" + userRequest.getId() + "' already exists.");
     }
 
     User created = identityService.newUser(userRequest.getId());

@@ -41,7 +41,7 @@ angular.module('activitiModeler').service('UserService', ['$http', '$q',
 
             return httpAsPromise({
                 method: 'GET',
-                url: FLOWABLE.CONFIG.contextRoot + '/app/rest/workflow-users',
+                url: FLOWABLE.CONFIG.contextRoot + '/app/rest/editor-users',
                 params: params
             });
         };

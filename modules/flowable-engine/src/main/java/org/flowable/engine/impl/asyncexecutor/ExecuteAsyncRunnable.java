@@ -14,7 +14,7 @@ package org.flowable.engine.impl.asyncexecutor;
 
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -26,7 +26,7 @@ import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.jobexecutor.FailedJobCommandFactory;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.impl.util.Activiti5Util;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,12 +79,12 @@ public class ExecuteAsyncRunnable implements Runnable {
   }
 
   protected boolean isHandledByActiviti5Engine() {
-    boolean isActiviti5ProcessDefinition = Activiti5Util.isActiviti5ProcessDefinitionId(processEngineConfiguration, job.getProcessDefinitionId());
-    if (isActiviti5ProcessDefinition) {
+    boolean isFlowable5ProcessDefinition = Flowable5Util.isFlowable5ProcessDefinitionId(processEngineConfiguration, job.getProcessDefinitionId());
+    if (isFlowable5ProcessDefinition) {
       return processEngineConfiguration.getCommandExecutor().execute(new Command<Boolean>() {
         @Override
         public Boolean execute(CommandContext commandContext) {
-          commandContext.getProcessEngineConfiguration().getActiviti5CompatibilityHandler().executeJobWithLockAndRetry(job);
+          commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().executeJobWithLockAndRetry(job);
           return true;
         }
       });
@@ -178,8 +178,8 @@ public class ExecuteAsyncRunnable implements Runnable {
 
       @Override
       public Void execute(CommandContext commandContext) {
-        if (job.getProcessDefinitionId() != null && Activiti5Util.isActiviti5ProcessDefinitionId(commandContext, job.getProcessDefinitionId())) {
-          Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
+        if (job.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, job.getProcessDefinitionId())) {
+          Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
           activiti5CompatibilityHandler.handleFailedJob(job, exception);
           return null;
         }

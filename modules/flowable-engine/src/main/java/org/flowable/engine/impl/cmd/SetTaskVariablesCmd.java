@@ -15,10 +15,10 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Map;
 
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
-import org.flowable.engine.impl.util.Activiti5Util;
+import org.flowable.engine.impl.util.Flowable5Util;
 
 /**
  * @author Tom Baeyens
@@ -40,8 +40,8 @@ public class SetTaskVariablesCmd extends NeedsActiveTaskCmd<Object> {
 
   protected Object execute(CommandContext commandContext, TaskEntity task) {
     
-    if (task.getProcessDefinitionId() != null && Activiti5Util.isActiviti5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
-      Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
+    if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
+      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
       activiti5CompatibilityHandler.setTaskVariables(taskId, variables, isLocal);
       return null;
     }

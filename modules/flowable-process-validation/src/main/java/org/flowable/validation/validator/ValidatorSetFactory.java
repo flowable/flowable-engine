@@ -12,7 +12,7 @@
  */
 package org.flowable.validation.validator;
 
-import org.flowable.validation.validator.impl.ActivitiEventListenerValidator;
+import org.flowable.validation.validator.impl.FlowableEventListenerValidator;
 import org.flowable.validation.validator.impl.AssociationValidator;
 import org.flowable.validation.validator.impl.BoundaryEventValidator;
 import org.flowable.validation.validator.impl.BpmnModelValidator;
@@ -44,7 +44,7 @@ import org.flowable.validation.validator.impl.UserTaskValidator;
  */
 public class ValidatorSetFactory {
 
-  public ValidatorSet createActivitiExecutableProcessValidatorSet() {
+  public ValidatorSet createFlowableExecutableProcessValidatorSet() {
     ValidatorSet validatorSet = new ValidatorSet(ValidatorSetNames.ACTIVITI_EXECUTABLE_PROCESS);
 
     validatorSet.addValidator(new AssociationValidator());
@@ -74,7 +74,7 @@ public class ValidatorSetFactory {
     validatorSet.addValidator(new EndEventValidator());
 
     validatorSet.addValidator(new ExecutionListenerValidator());
-    validatorSet.addValidator(new ActivitiEventListenerValidator());
+    validatorSet.addValidator(new FlowableEventListenerValidator());
 
     validatorSet.addValidator(new DiagramInterchangeInfoValidator());
 

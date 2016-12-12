@@ -52,7 +52,7 @@ public class ProcessDefinitionUtil {
 
   public static Process getProcess(String processDefinitionId) {
     if (Context.getProcessEngineConfiguration() == null) {
-      return Activiti5Util.getActiviti5CompatibilityHandler().getProcessDefinitionProcessObject(processDefinitionId);
+      return Flowable5Util.getFlowable5CompatibilityHandler().getProcessDefinitionProcessObject(processDefinitionId);
       
     } else {
       DeploymentManager deploymentManager = Context.getProcessEngineConfiguration().getDeploymentManager();
@@ -65,7 +65,7 @@ public class ProcessDefinitionUtil {
 
   public static BpmnModel getBpmnModel(String processDefinitionId) {
     if (Context.getProcessEngineConfiguration() == null) {
-      return Activiti5Util.getActiviti5CompatibilityHandler().getProcessDefinitionBpmnModel(processDefinitionId);
+      return Flowable5Util.getFlowable5CompatibilityHandler().getProcessDefinitionBpmnModel(processDefinitionId);
       
     } else {
       DeploymentManager deploymentManager = Context.getProcessEngineConfiguration().getDeploymentManager();

@@ -51,7 +51,7 @@ public class IdmUsersResource {
       
       int startValue = start != null ? start.intValue() : 0;
 
-      List<User> users = userService.getUsers(filter, sort, start, groupId);
+      List<User> users = userService.getUsers(filter, sort, start);
       ResultListDataRepresentation result = new ResultListDataRepresentation();
       result.setTotal(userService.getUserCount(filter, sort, startValue, groupId));
       result.setStart(startValue);

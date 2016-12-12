@@ -20,9 +20,7 @@ angular.module('activitiModeler')
 
 	  $scope.model = {
         filters: [
-            {id: 'myApps', labelKey: 'MY-APPS'},
-            {id: 'sharedWithMe', labelKey: 'SHARED-WITH-ME'},
-            {id: 'sharedWithOthers', labelKey: 'SHARED-WITH-OTHERS'}
+            {id: 'myApps', labelKey: 'MY-APPS'}
 		],
 
 		sorts: [

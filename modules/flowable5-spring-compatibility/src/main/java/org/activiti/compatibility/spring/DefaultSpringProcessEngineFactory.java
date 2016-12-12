@@ -14,7 +14,7 @@
 package org.activiti.compatibility.spring;
 
 import org.activiti.compatibility.DefaultProcessEngineFactory;
-import org.activiti5.engine.ProcessEngine;
+import org.activiti.engine.ProcessEngine;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 
@@ -27,11 +27,11 @@ public class DefaultSpringProcessEngineFactory extends DefaultProcessEngineFacto
   @Override
   public ProcessEngine buildProcessEngine(ProcessEngineConfigurationImpl activiti6Configuration) {
 
-    org.activiti5.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration = null;
+    org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration = null;
     if (activiti6Configuration instanceof SpringProcessEngineConfiguration) {
-      activiti5Configuration = new org.activiti5.spring.SpringProcessEngineConfiguration();
+      activiti5Configuration = new org.activiti.spring.SpringProcessEngineConfiguration();
       super.copyConfigItems(activiti6Configuration, activiti5Configuration);
-      copySpringConfigItems((SpringProcessEngineConfiguration) activiti6Configuration, (org.activiti5.spring.SpringProcessEngineConfiguration) activiti5Configuration);
+      copySpringConfigItems((SpringProcessEngineConfiguration) activiti6Configuration, (org.activiti.spring.SpringProcessEngineConfiguration) activiti5Configuration);
       return activiti5Configuration.buildProcessEngine();
     
     } else {
@@ -40,7 +40,7 @@ public class DefaultSpringProcessEngineFactory extends DefaultProcessEngineFacto
       
   }
   
-  protected void copySpringConfigItems(SpringProcessEngineConfiguration activiti6Configuration, org.activiti5.spring.SpringProcessEngineConfiguration activiti5Configuration) {
+  protected void copySpringConfigItems(SpringProcessEngineConfiguration activiti6Configuration, org.activiti.spring.SpringProcessEngineConfiguration activiti5Configuration) {
     activiti5Configuration.setApplicationContext(activiti6Configuration.getApplicationContext());
     activiti5Configuration.setTransactionManager(activiti6Configuration.getTransactionManager());
   }

@@ -166,7 +166,7 @@ public abstract class AbstractEngineConfiguration {
   protected String databaseSchema;
 
   /**
-   * Set to true in case the defined databaseTablePrefix is a schema-name, instead of an actual table name prefix. This is relevant for checking if Activiti-tables exist, the databaseTablePrefix will
+   * Set to true in case the defined databaseTablePrefix is a schema-name, instead of an actual table name prefix. This is relevant for checking if Flowable-tables exist, the databaseTablePrefix will
    * not be used here - since the schema is taken into account already, adding a prefix for the table-check will result in wrong table-names.
    */
   protected boolean tablePrefixIsSchema;

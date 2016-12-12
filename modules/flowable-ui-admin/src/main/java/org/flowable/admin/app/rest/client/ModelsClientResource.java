@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.ModelService;
-import org.flowable.admin.service.engine.exception.ActivitiServiceException;
+import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.app.service.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,7 +49,7 @@ public class ModelsClientResource extends AbstractClientResource {
     	try {
     		return clientService.listModels(serverConfig, parameterMap);
 	        
-        } catch (ActivitiServiceException e) {
+        } catch (FlowableServiceException e) {
         	throw new BadRequestException(e.getMessage());
         }
     }

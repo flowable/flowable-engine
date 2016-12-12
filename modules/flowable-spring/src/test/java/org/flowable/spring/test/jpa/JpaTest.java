@@ -6,7 +6,7 @@ import java.util.Map;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
-import org.flowable.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -14,7 +14,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Frederik Heremans
  */
 @ContextConfiguration(locations = "JPASpringTest-context.xml")
-public class JpaTest extends SpringActivitiTestCase {
+public class JpaTest extends SpringFlowableTestCase {
 
   public void testJpaVariableHappyPath() {
     before();
