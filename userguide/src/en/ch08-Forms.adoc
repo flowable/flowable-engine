@@ -60,10 +60,10 @@ For example:
 ----
 <userTask id="task">
   <extensionElements>
-    <activiti:formProperty id="room" />
-    <activiti:formProperty id="duration" type="long"/>
-    <activiti:formProperty id="speaker" variable="SpeakerName" writable="false" />
-    <activiti:formProperty id="street" expression="#{address.street}" required="true" />
+    <flowable:formProperty id="room" />
+    <flowable:formProperty id="duration" type="long"/>
+    <flowable:formProperty id="speaker" variable="SpeakerName" writable="false" />
+    <flowable:formProperty id="street" expression="#{address.street}" required="true" />
   </extensionElements>
 </userTask>
 ----
@@ -78,11 +78,11 @@ It's also possible to provide type metadata as part of the FormData that is retu
 
 We support the following form property types:
 
-* +string+ (org.activiti.engine.impl.form.StringFormType
-* +long+ (org.activiti.engine.impl.form.LongFormType)
-* +enum+ (org.activiti.engine.impl.form.EnumFormType)
-* +date+ (org.activiti.engine.impl.form.DateFormType)
-* +boolean+ (org.activiti.engine.impl.form.BooleanFormType)
+* +string+ (org.flowable.engine.impl.form.StringFormType
+* +long+ (org.flowable.engine.impl.form.LongFormType)
+* +enum+ (org.flowable.engine.impl.form.EnumFormType)
+* +date+ (org.flowable.engine.impl.form.DateFormType)
+* +boolean+ (org.flowable.engine.impl.form.BooleanFormType)
 
 For each form property declared, the following +FormProperty+ information will be made available through +List<FormProperty> formService.getStartFormData(String processDefinitionId).getFormProperties()+ and +List<FormProperty> formService.getTaskFormData(String taskId).getFormProperties()+
 
@@ -115,21 +115,21 @@ For example:
 ----
 <startEvent id="start">
   <extensionElements>
-    <activiti:formProperty id="speaker"
+    <flowable:formProperty id="speaker"
       name="Speaker"
       variable="SpeakerName"
       type="string" />
 
-    <activiti:formProperty id="start"
+    <flowable:formProperty id="start"
       type="date"
       datePattern="dd-MMM-yyyy" />
 
-    <activiti:formProperty id="direction" type="enum">
-      <activiti:value id="left" name="Go Left" />
-      <activiti:value id="right" name="Go Right" />
-      <activiti:value id="up" name="Go Up" />
-      <activiti:value id="down" name="Go Down" />
-    </activiti:formProperty>
+    <flowable:formProperty id="direction" type="enum">
+      <flowable:value id="left" name="Go Left" />
+      <flowable:value id="right" name="Go Right" />
+      <flowable:value id="up" name="Go Up" />
+      <flowable:value id="down" name="Go Down" />
+    </flowable:formProperty>
 
   </extensionElements>
 </startEvent>
@@ -143,9 +143,9 @@ The following XML snippet
 ----
 <startEvent>
   <extensionElements>
-    <activiti:formProperty id="numberOfDays" name="Number of days" value="${numberOfDays}" type="long" required="true"/>
-    <activiti:formProperty id="startDate" name="First day of holiday (dd-MM-yyy)" value="${startDate}" datePattern="dd-MM-yyyy hh:mm" type="date" required="true" />
-    <activiti:formProperty id="vacationMotivation" name="Motivation" value="${vacationMotivation}" type="string" />
+    <flowable:formProperty id="numberOfDays" name="Number of days" value="${numberOfDays}" type="long" required="true"/>
+    <flowable:formProperty id="startDate" name="First day of holiday (dd-MM-yyy)" value="${startDate}" datePattern="dd-MM-yyyy hh:mm" type="date" required="true" />
+    <flowable:formProperty id="vacationMotivation" name="Motivation" value="${vacationMotivation}" type="string" />
   </extensionElements>
 </userTask>
 
@@ -171,4 +171,4 @@ You can place any form template resource inside the business archives that you d
 
 You can use this capability of accessing the deployment resources beyond task forms for any other purposes as well.
 
-The attribute +<userTask activiti:formKey="..."+ is exposed by the API through +String FormService.getStartFormData(String processDefinitionId).getFormKey()+ and +String FormService.getTaskFormData(String taskId).getFormKey()+. You could use this to store the full name of the template within your deployment (e.g. ++org/activiti/example/form/my-custom-form.xml++), but this is not required at all. For instance, you could also store a generic key in the form attribute and apply an algorithm or transformation to get to the actual template that needs to be used. This might be handy when you want to render different forms for different UI technologies like e.g. one form for usage in a web app of normal screen size, one form for mobile phone's small screens and maybe even a template for an IM form or an email form.
+The attribute +<userTask flowable:formKey="..."+ is exposed by the API through +String FormService.getStartFormData(String processDefinitionId).getFormKey()+ and +String FormService.getTaskFormData(String taskId).getFormKey()+. You could use this to store the full name of the template within your deployment (e.g. ++org/flowable/example/form/my-custom-form.xml++), but this is not required at all. For instance, you could also store a generic key in the form attribute and apply an algorithm or transformation to get to the actual template that needs to be used. This might be handy when you want to render different forms for different UI technologies like e.g. one form for usage in a web app of normal screen size, one form for mobile phone's small screens and maybe even a template for an IM form or an email form.

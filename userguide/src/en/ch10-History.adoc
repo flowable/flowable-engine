@@ -24,7 +24,7 @@ Later on, this information will be exposed in the Flowable app. Also, it will be
 
 In the API, it's possible to query all 5 of the History entities. The HistoryService exposes the methods +createHistoricProcessInstanceQuery()+, +createHistoricVariableInstanceQuery()+, +createHistoricActivityInstanceQuery()+,  +createHistoricDetailQuery()+ and +createHistoricTaskInstanceQuery()+.
 
-Below are a couple of examples that show some of the possibilities of the query API for history. Full description of the possibilities can be found in the link:$$http://flowable.org/javadocs/index.html$$[javadocs], in the +org.activiti.engine.history+ package.
+Below are a couple of examples that show some of the possibilities of the query API for history. Full description of the possibilities can be found in the link:$$http://flowable.org/javadocs/index.html$$[javadocs], in the +org.flowable.engine.history+ package.
 
 [[historyQueryProcessInstance]]
 
@@ -159,7 +159,7 @@ historyService.createHistoricTaskInstanceQuery()
 
 === History configuration
 
-The history level can be configured programmatically, using the enum org.activiti.engine.impl.history.HistoryLevel (or _HISTORY_ constants defined on +ProcessEngineConfiguration+ for versions prior to 5.11):
+The history level can be configured programmatically, using the enum org.flowable.engine.impl.history.HistoryLevel (or _HISTORY_ constants defined on +ProcessEngineConfiguration+ for versions prior to 5.11):
 
 [source,java,linenums]
 ----
@@ -169,11 +169,11 @@ ProcessEngine processEngine = ProcessEngineConfiguration
   .buildProcessEngine();
 ----
 
-The level can also be configured in activiti.cfg.xml or in a spring-context:
+The level can also be configured in flowable.cfg.xml or in a spring-context:
 
 [source,xml,linenums]
 ----
-<bean id="processEngineConfiguration" class="org.activiti.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+<bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
   <property name="history" value="audit" />
   ...
 </bean>

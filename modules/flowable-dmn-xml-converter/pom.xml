@@ -14,9 +14,9 @@
 	</parent>
 
 	<properties>
-		<activiti.artifact>
+		<flowable.artifact>
 			org.flowable.dmn.converter
-		</activiti.artifact>
+		</flowable.artifact>
 	</properties>
 
 	<dependencies>

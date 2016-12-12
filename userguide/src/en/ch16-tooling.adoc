@@ -34,10 +34,10 @@ After adding the dependency and building process engine, the JMX connection is r
 
 
 ----
-service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi/activiti
+service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi/flowable
 ----
 
-You can find the exact local URL in your log files. After connecting, you can see the standard JVM statistics and MBeans. You can view Flowable specific MBeans by selecting MBeans tab and select "org.activiti.jmx.Mbeans" on the right panel. By selecting any MBean, you can query information or change configuration. This snapshot shows how the jconsole looks like:
+You can find the exact local URL in your log files. After connecting, you can see the standard JVM statistics and MBeans. You can view Flowable specific MBeans by selecting MBeans tab and select "org.flowable.jmx.Mbeans" on the right panel. By selecting any MBean, you can query information or change configuration. This snapshot shows how the jconsole looks like:
 
 Any JMX client not limited to jconsole can be used to access MBeans. Most of data center monitoring tools have some connectors which enables them to connect to JMX MBeans.
 
@@ -75,10 +75,10 @@ JMX uses default configuration to make it easy to deploy with the most used conf
   ...
   <property name="configurators">
     <list>
-	  <bean class="org.activiti.management.jmx.JMXConfigurator">
+	  <bean class="org.flowable.management.jmx.JMXConfigurator">
 
 	    <property name="connectorPort" value="1912" />
-        <property name="serviceUrlPath" value="/jmxrmi/activiti" />
+        <property name="serviceUrlPath" value="/jmxrmi/flowable" />
 
 		...
       </bean>
@@ -93,11 +93,11 @@ This table shows what parameters you can configure along with their default valu
 |===============
 |Name|Default value|Description
 |disabled|false|if set, JMX will not be started even in presence of the dependency
-|domain|org.activiti.jmx.Mbeans|Domain of MBean
+|domain|org.flowable.jmx.Mbeans|Domain of MBean
 |createConnector|true|if true, creates a connector for the started MbeanServer
 |MBeanDomain|DefaultDomain|domain of MBean server
 |registryPort|1099|appears in the service URL as registry port
-|serviceUrlPath|/jmxrmi/activiti|appears in the service URL
+|serviceUrlPath|/jmxrmi/flowable|appears in the service URL
 |connectorPort|-1|if greater than zero, will appear in service URL as connector port
 
 |===============
@@ -174,7 +174,7 @@ The directory structure of the generated project would be like this:
         │       └── myGroup
         │           └── MyUnitTest.java
         └── resources
-            ├── activiti.cfg.xml
+            ├── flowable.cfg.xml
             ├── log4j.properties
             └── org
                 └── myGroup

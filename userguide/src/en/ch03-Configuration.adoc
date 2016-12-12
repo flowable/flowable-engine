@@ -6,16 +6,16 @@
 === Creating a ProcessEngine
 
 
-The Flowable process engine is configured through an XML file called +activiti.cfg.xml+. Note that this is *not* applicable if you're using <<springintegration,the Spring style of building a process engine>>.
+The Flowable process engine is configured through an XML file called +flowable.cfg.xml+. Note that this is *not* applicable if you're using <<springintegration,the Spring style of building a process engine>>.
 
-The easiest way to obtain a +ProcessEngine+, is to use the +org.activiti.engine.ProcessEngines+ class:
+The easiest way to obtain a +ProcessEngine+, is to use the +org.flowable.engine.ProcessEngines+ class:
 
 [source,java,linenums]
 ----
 ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine()
 ----
 
-This will look for an +activiti.cfg.xml+ file on the classpath and construct an engine based on the configuration in that file. The following snippet shows an example configuration.  The following sections will give a detailed overview of the configuration properties.
+This will look for an +flowable.cfg.xml+ file on the classpath and construct an engine based on the configuration in that file. The following snippet shows an example configuration.  The following sections will give a detailed overview of the configuration properties.
 
 [source,xml,linenums]
 ----
@@ -23,9 +23,9 @@ This will look for an +activiti.cfg.xml+ file on the classpath and construct an 
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="processEngineConfiguration" class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+  <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
 
-    <property name="jdbcUrl" value="jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000" />
+    <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000" />
     <property name="jdbcDriver" value="org.h2.Driver" />
     <property name="jdbcUsername" value="sa" />
     <property name="jdbcPassword" value="" />
@@ -84,20 +84,20 @@ ProcessEngine processEngine = ProcessEngineConfiguration.createStandaloneInMemPr
 === ProcessEngineConfiguration bean
 
 
-The +activiti.cfg.xml+ must contain a bean that has the id +$$'processEngineConfiguration'$$+.
+The +flowable.cfg.xml+ must contain a bean that has the id +$$'processEngineConfiguration'$$+.
 
 [source,xml,linenums]
 ----
- <bean id="processEngineConfiguration" class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+ <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
 ----
 
 
 This bean is then used to construct the +ProcessEngine+. There are multiple classes available that can be used to define the +processEngineConfiguration+. These classes represent different environments, and set defaults accordingly. It's a best practice to select the class the matches (the most) your environment, to minimalise the number of properties needed to configure the engine. The following classes are currently available (more will follow in future releases): [[configurationClasses]]
 
-* *org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration*: the process engine is used in a standalone way. Flowable will take care of the transactions. By default, the database will only be checked when the engine boots (and an exception is thrown if there is no Flowable schema or the schema version is incorrect).
-* *org.activiti.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration*: this is a convenience class for unit testing purposes. Flowable will take care of the transactions. An H2 in-memory database is used by default. The database will be created and dropped when the engine boots and shuts down. When using this, probably no additional configuration is needed (except when using for example the job executor or mail capabilities).
-* *org.activiti.spring.SpringProcessEngineConfiguration*: To be used when the process engine is used in a Spring environment.  See <<springintegration,the Spring integration section>> for more information.
-* *org.activiti.engine.impl.cfg.JtaProcessEngineConfiguration*: To be used when the engine runs in standalone mode, with JTA transactions.
+* *org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration*: the process engine is used in a standalone way. Flowable will take care of the transactions. By default, the database will only be checked when the engine boots (and an exception is thrown if there is no Flowable schema or the schema version is incorrect).
+* *org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration*: this is a convenience class for unit testing purposes. Flowable will take care of the transactions. An H2 in-memory database is used by default. The database will be created and dropped when the engine boots and shuts down. When using this, probably no additional configuration is needed (except when using for example the job executor or mail capabilities).
+* *org.flowable.spring.SpringProcessEngineConfiguration*: To be used when the process engine is used in a Spring environment.  See <<springintegration,the Spring integration section>> for more information.
+* *org.flowable.engine.impl.cfg.JtaProcessEngineConfiguration*: To be used when the engine runs in standalone mode, with JTA transactions.
 
 
 [[databaseConfiguration]]
@@ -123,7 +123,7 @@ Example database configuration:
 
 [source,xml,linenums]
 ----
-<property name="jdbcUrl" value="jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000" />
+<property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000" />
 <property name="jdbcDriver" value="org.h2.Driver" />
 <property name="jdbcUsername" value="sa" />
 <property name="jdbcPassword" value="" />
@@ -135,13 +135,13 @@ Our benchmarks have shown that the MyBatis connection pool is not the most effic
 ----
 <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" >
   <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-  <property name="url" value="jdbc:mysql://localhost:3306/activiti" />
-  <property name="username" value="activiti" />
-  <property name="password" value="activiti" />
+  <property name="url" value="jdbc:mysql://localhost:3306/flowable" />
+  <property name="username" value="flowable" />
+  <property name="password" value="flowable" />
   <property name="defaultAutoCommit" value="false" />
 </bean>
 
-<bean id="processEngineConfiguration" class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+<bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
 
     <property name="dataSource" ref="dataSource" />
     ...
@@ -176,17 +176,17 @@ By using JNDI (Java Naming and Directory Interface) to obtain the database conne
 
 Configuration of the JNDI datasource will differ depending on what servlet container application you are using. The instructions below will work for Tomcat, but for other container applications, please refer to the documentation for your container app.
 
-If using Tomcat, the JNDI resource is configured within $CATALINA_BASE/conf/[enginename]/[hostname]/[warname].xml (for the Flowable UI this will usually be $CATALINA_BASE/conf/Catalina/localhost/activiti-app.xml). The default context is copied from the Flowable war file when the application is first deployed, so if it already exists, you will need to replace it. To change the JNDI resource so that the application connects to MySQL instead of H2, for example, change the file to the following:
+If using Tomcat, the JNDI resource is configured within $CATALINA_BASE/conf/[enginename]/[hostname]/[warname].xml (for the Flowable UI this will usually be $CATALINA_BASE/conf/Catalina/localhost/flowable-app.xml). The default context is copied from the Flowable war file when the application is first deployed, so if it already exists, you will need to replace it. To change the JNDI resource so that the application connects to MySQL instead of H2, for example, change the file to the following:
 
 [source,xml,linenums]
 ----
 <?xml version="1.0" encoding="UTF-8"?>
-    <Context antiJARLocking="true" path="/activiti-app">
+    <Context antiJARLocking="true" path="/flowable-app">
         <Resource auth="Container"
             name="jdbc/activitiDB"
             type="javax.sql.DataSource"
             description="JDBC DataSource"
-            url="jdbc:mysql://localhost:3306/activiti"
+            url="jdbc:mysql://localhost:3306/flowable"
             driverClassName="com.mysql.jdbc.Driver"
             username="sa"
             password=""
@@ -217,12 +217,12 @@ Listed below are the types (case sensitive!) that Flowable uses to refer to data
 [options="header"]
 |===============
 |Flowable database type|Example JDBC URL|Notes
-|h2|jdbc:h2:tcp://localhost/activiti|Default configured database
-|mysql|jdbc:mysql://localhost:3306/activiti?autoReconnect=true|Tested using mysql-connector-java database driver
+|h2|jdbc:h2:tcp://localhost/flowable|Default configured database
+|mysql|jdbc:mysql://localhost:3306/flowable?autoReconnect=true|Tested using mysql-connector-java database driver
 |oracle|jdbc:oracle:thin:@localhost:1521:xe|
-|postgres|jdbc:postgresql://localhost:5432/activiti|
-|db2|jdbc:db2://localhost:50000/activiti|
-|mssql|jdbc:sqlserver://localhost:1433;databaseName=activiti (jdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver) _OR_ jdbc:jtds:sqlserver://localhost:1433/activiti (jdbc.driver=net.sourceforge.jtds.jdbc.Driver)|Tested using Microsoft JDBC Driver 4.0 (sqljdbc4.jar) and JTDS Driver
+|postgres|jdbc:postgresql://localhost:5432/flowable|
+|db2|jdbc:db2://localhost:50000/flowable|
+|mssql|jdbc:sqlserver://localhost:1433;databaseName=flowable (jdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver) _OR_ jdbc:jtds:sqlserver://localhost:1433/flowable (jdbc.driver=net.sourceforge.jtds.jdbc.Driver)|Tested using Microsoft JDBC Driver 4.0 (sqljdbc4.jar) and JTDS Driver
 |===============
 
 
@@ -234,13 +234,13 @@ The easiest way to create the database tables for your database is to:
 
 * Add the flowable-engine jars to your classpath
 * Add a suitable database driver
-* Add a Flowable configuration file (__activiti.cfg.xml__) to your classpath, pointing to your database (see <<databaseConfiguration,database configuration section>>)
+* Add a Flowable configuration file (__flowable.cfg.xml__) to your classpath, pointing to your database (see <<databaseConfiguration,database configuration section>>)
 * Execute the main method of the _DbSchemaCreate_ class
 
-However, often only database administrators can execute DDL statements on a database. On a production system, this is also the wisest of choices. The SQL DDL statements can be found on the Flowable downloads page or inside the Flowable distribution folder, in the +database+ subdirectory. The scripts are also in the engine jar (__flowable-engine-x.jar__), in the package __org/activiti/db/create__ (the __drop__ folder contains the drop statements). The SQL files are of the form
+However, often only database administrators can execute DDL statements on a database. On a production system, this is also the wisest of choices. The SQL DDL statements can be found on the Flowable downloads page or inside the Flowable distribution folder, in the +database+ subdirectory. The scripts are also in the engine jar (__flowable-engine-x.jar__), in the package __org/flowable/db/create__ (the __drop__ folder contains the drop statements). The SQL files are of the form
 
 ----
-activiti.{db}.{create|drop}.{type}.sql
+flowable.{db}.{create|drop}.{type}.sql
 ----
 
 Where __db__ is any of the <<supporteddatabases,supported databases>> and __type__ is
@@ -286,13 +286,13 @@ Make sure you make a backup of your database (using your database backup capabil
 By default, a version check will be performed each time a process engine is created. This typically happens once at boot time of your application or of the Flowable webapps. If the Flowable library notices a difference between the library version and the version of the Flowable database tables, then an exception is thrown.
 
 
-To upgrade, you have to start with putting the following configuration property in your activiti.cfg.xml configuration file:
+To upgrade, you have to start with putting the following configuration property in your flowable.cfg.xml configuration file:
 
 [source,xml,linenums]
 ----
 <beans >
 
-  <bean id="processEngineConfiguration" class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+  <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
     <!-- ... -->
     <property name="databaseSchemaUpdate" value="true" />
     <!-- ... -->
@@ -320,7 +320,7 @@ Moreover, if running under Java EE 7, JSR-236 compliant +ManagedAsyncJobExecutor
    <property name="jndiName" value="java:jboss/ee/concurrency/factory/default" />
 </bean>
 
-<bean id="customJobExecutor" class="org.activiti.engine.impl.jobexecutor.ManagedAsyncJobExecutor">
+<bean id="customJobExecutor" class="org.flowable.engine.impl.jobexecutor.ManagedAsyncJobExecutor">
    <!-- ... -->
    <property name="threadFactory" ref="threadFactory" />
    <!-- ... -->
@@ -368,7 +368,7 @@ Customizing the configuration of history storage is optional. This allows you to
 
 === Exposing configuration beans in expressions and scripts
 
-By default, all beans that you specify in the +activiti.cfg.xml+ configuration or in your own Spring configuration file are available to expressions and in the scripts. If you want to limit the visibility of beans in your configuration file, you can configure a property called +beans+ in your process engine configuration. The beans property in +ProcessEngineConfiguration+ is a map. When you specify that property, only beans specified in that map will be visible to expressions and scripts.  The exposed beans will be exposed with the names as you specify in that map.
+By default, all beans that you specify in the +flowable.cfg.xml+ configuration or in your own Spring configuration file are available to expressions and in the scripts. If you want to limit the visibility of beans in your configuration file, you can configure a property called +beans+ in your process engine configuration. The beans property in +ProcessEngineConfiguration+ is a map. When you specify that property, only beans specified in that map will be visible to expressions and scripts.  The exposed beans will be exposed with the names as you specify in that map.
 
 
 [[processDefinitionCacheConfiguration]]
@@ -386,12 +386,12 @@ All process definition are cached (after they're parsed) to avoid hitting the da
 
 Setting this property will swap the default hashmap cache with a LRU cache that has the provided hard limit. Of course, the 'best' value of this property depends on the total amount of process definitions stored and the number of process definitions actually used at runtime by all the runtime process instances.
 
-You can also inject your own cache implementation. This must be a bean that implements the org.activiti.engine.impl.persistence.deploy.DeploymentCache interface:
+You can also inject your own cache implementation. This must be a bean that implements the org.flowable.engine.impl.persistence.deploy.DeploymentCache interface:
 
 [source,xml,linenums]
 ----
 <property name="processDefinitionCache">
-  <bean class="org.activiti.MyCache" />
+  <bean class="org.flowable.MyCache" />
 </property>
 ----
 
@@ -468,21 +468,21 @@ The event mechanism in the Flowable engine allows you to get notified when vario
 It's possible to register a listener for certain types of events as opposed to getting notified when any type of event is dispatched. You can either add engine-wide event listeners <<eventDispatcherConfiguration,through the configuration>>, add engine-wide event listeners <<eventDispatcherConfigurationRuntime,at runtime using the API>> or add event-listeners to <<eventDispatcherConfigurationProcessDefinition,specific process definitions in the BPMN XML>>.
 
 
-All events dispatched are a subtype of +org.activiti.engine.delegate.event.ActivitiEvent+. The event exposes (if available) the +type+, +executionId+, +processInstanceId+ and +processDefinitionId+. Certain events contain additional context related to the event that occurred, additional information about additional payload can be found in the list of <<eventDispatcherEventTypes,all supported event types>>.
+All events dispatched are a subtype of +org.flowable.engine.common.api.delegate.event.FlowableEvent+. The event exposes (if available) the +type+, +executionId+, +processInstanceId+ and +processDefinitionId+. Certain events contain additional context related to the event that occurred, additional information about additional payload can be found in the list of <<eventDispatcherEventTypes,all supported event types>>.
 
 [[eventDispatcherListener]]
 
 
 ==== Event listener implementation
 
-The only requirement an event-listener has, is to implement +org.activiti.engine.delegate.event.ActivitiEventListener+. Below is an example implementation of a listener, which outputs all events received to the standard-out, with exception of events related to job-execution:
+The only requirement an event-listener has, is to implement +org.flowable.engine.delegate.event.FlowableEventListener+. Below is an example implementation of a listener, which outputs all events received to the standard-out, with exception of events related to job-execution:
 
 [source,java,linenums]
 ----
-public class MyEventListener implements ActivitiEventListener {
+public class MyEventListener implements FlowableEventListener {
 
   @Override
-  public void onEvent(ActivitiEvent event) {
+  public void onEvent(FlowableEvent event) {
     switch (event.getType()) {
 
       case JOB_EXECUTION_SUCCESS:
@@ -512,7 +512,7 @@ The +isFailOnException()+ method determines the behaviour in case the +onEvent(.
 
 There are a few base implementations provided by Flowable to facilitate common use cases of event-listeners. These can be used as base-class or as an example listener implementation:
 
-* *org.activiti.engine.delegate.event.BaseEntityEventListener*: An event-listener base-class that can be used to listen for entity-related events for a specific type of entity or for all entities. It hides away the type-checking and offers 4 methods that should be overridden: +onCreate(..)+, +onUpdate(..)+ and +onDelete(..)+ when an entity is created, updated or deleted. For all other entity-related events, the ++onEntityEvent(..) ++is called.
+* *org.flowable.engine.delegate.event.BaseEntityEventListener*: An event-listener base-class that can be used to listen for entity-related events for a specific type of entity or for all entities. It hides away the type-checking and offers 4 methods that should be overridden: +onCreate(..)+, +onUpdate(..)+ and +onDelete(..)+ when an entity is created, updated or deleted. For all other entity-related events, the ++onEntityEvent(..) ++is called.
 
 
 
@@ -523,31 +523,31 @@ There are a few base implementations provided by Flowable to facilitate common u
 
 If an event-listener is configured in the process engine configuration, it will be active when the process engine starts and will remain active after subsequent reboots of the engine.
 
-The property +eventListeners+ expects a list of +org.activiti.engine.delegate.event.ActivitiEventListener+ instances. As usual, you can either declare an inline bean definition or use a +ref+ to an existing bean instead. The snippet below adds an event-listener to the configuration that is notified when any event is dispatched, regardless of its type:
+The property +eventListeners+ expects a list of +org.flowable.engine.delegate.event.FlowableEventListener+ instances. As usual, you can either declare an inline bean definition or use a +ref+ to an existing bean instead. The snippet below adds an event-listener to the configuration that is notified when any event is dispatched, regardless of its type:
 
 [source,xml,linenums]
 ----
-<bean id="processEngineConfiguration" class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+<bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
     ...
     <property name="eventListeners">
       <list>
-         <bean class="org.activiti.engine.example.MyEventListener" />
+         <bean class="org.flowable.engine.example.MyEventListener" />
       </list>
     </property>
 </bean>
 ----
 
-To get notified when certain types of events get dispatched, use the +typedEventListeners+ property, which expects a map. The key of a map-entry is a comma-separated list of event-names (or a single event-name). The value of a map-entry is a list of +org.activiti.engine.delegate.event.ActivitiEventListener+ instances. The snippet below adds an event-listener to the configuration, that is notified when a job execution was successful or failed:
+To get notified when certain types of events get dispatched, use the +typedEventListeners+ property, which expects a map. The key of a map-entry is a comma-separated list of event-names (or a single event-name). The value of a map-entry is a list of +org.flowable.engine.delegate.event.ActivitiEventListener+ instances. The snippet below adds an event-listener to the configuration, that is notified when a job execution was successful or failed:
 
 [source,xml,linenums]
 ----
-<bean id="processEngineConfiguration" class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+<bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
     ...
     <property name="typedEventListeners">
       <map>
         <entry key="JOB_EXECUTION_SUCCESS,JOB_EXECUTION_FAILURE" >
           <list>
-            <bean class="org.activiti.engine.example.MyJobEventListener" />
+            <bean class="org.flowable.engine.example.MyJobEventListener" />
           </list>
         </entry>
       </map>
@@ -608,8 +608,8 @@ The snippet below adds 2 listeners to a process-definition. The first listener w
 ----
 <process id="testEventListeners">
   <extensionElements>
-    <activiti:eventListener class="org.activiti.engine.test.MyEventListener" />
-    <activiti:eventListener delegateExpression="${testEventListener}" events="JOB_EXECUTION_SUCCESS,JOB_EXECUTION_FAILURE" />
+    <flowable:eventListener class="org.flowable.engine.test.MyEventListener" />
+    <flowable:eventListener delegateExpression="${testEventListener}" events="JOB_EXECUTION_SUCCESS,JOB_EXECUTION_FAILURE" />
   </extensionElements>
 
   ...
@@ -623,8 +623,8 @@ For events related to entities, it's also possible to add listeners to a process
 ----
 <process id="testEventListeners">
   <extensionElements>
-    <activiti:eventListener class="org.activiti.engine.test.MyEventListener" entityType="task" />
-    <activiti:eventListener delegateExpression="${testEventListener}" events="ENTITY_CREATED" entityType="task" />
+    <flowable:eventListener class="org.flowable.engine.test.MyEventListener" entityType="task" />
+    <flowable:eventListener delegateExpression="${testEventListener}" events="ENTITY_CREATED" entityType="task" />
   </extensionElements>
 
   ...
@@ -647,7 +647,7 @@ Another way of handling events being dispatched is to throw a BPMN event. Please
 ----
 <process id="testEventListeners">
   <extensionElements>
-    <activiti:eventListener throwEvent="signal" signalName="My signal" events="TASK_ASSIGNED" />
+    <flowable:eventListener throwEvent="signal" signalName="My signal" events="TASK_ASSIGNED" />
   </extensionElements>
 </process>
 ----
@@ -656,7 +656,7 @@ Another way of handling events being dispatched is to throw a BPMN event. Please
 ----
 <process id="testEventListeners">
   <extensionElements>
-    <activiti:eventListener throwEvent="globalSignal" signalName="My signal" events="TASK_ASSIGNED" />
+    <flowable:eventListener throwEvent="globalSignal" signalName="My signal" events="TASK_ASSIGNED" />
   </extensionElements>
 </process>
 ----
@@ -666,7 +666,7 @@ Another way of handling events being dispatched is to throw a BPMN event. Please
 ----
 <process id="testEventListeners">
   <extensionElements>
-    <activiti:eventListener throwEvent="message" messageName="My message" events="TASK_ASSIGNED" />
+    <flowable:eventListener throwEvent="message" messageName="My message" events="TASK_ASSIGNED" />
   </extensionElements>
 </process>
 ----
@@ -675,12 +675,12 @@ Another way of handling events being dispatched is to throw a BPMN event. Please
 ----
 <process id="testEventListeners">
   <extensionElements>
-    <activiti:eventListener throwEvent="error" errorCode="123" events="TASK_ASSIGNED" />
+    <flowable:eventListener throwEvent="error" errorCode="123" events="TASK_ASSIGNED" />
   </extensionElements>
 </process>
 ----
 
-If additional logic is needed to decide whether or not to throw the BPMN-event, it's possible to extend the listener-classes provided by Flowable. By overriding the +isValidEvent(ActivitiEvent event) in your subclass, the BPMN-event throwing can be prevented. The classes involved are +org.activiti.engine.test.api.event.SignalThrowingEventListenerTest+, +org.activiti.engine.impl.bpmn.helper.MessageThrowingEventListener+ and +org.activiti.engine.impl.bpmn.helper.ErrorThrowingEventListener+.
+If additional logic is needed to decide whether or not to throw the BPMN-event, it's possible to extend the listener-classes provided by Flowable. By overriding the +isValidEvent(ActivitiEvent event) in your subclass, the BPMN-event throwing can be prevented. The classes involved are +org.flowable.engine.test.api.event.SignalThrowingEventListenerTest+, +org.flowable.engine.impl.bpmn.helper.MessageThrowingEventListener+ and +org.flowable.engine.impl.bpmn.helper.ErrorThrowingEventListener+.
 
 
 ===== Notes on listeners on a process-definition
@@ -716,50 +716,50 @@ We opened up the event-dispatching mechanism through the API, to allow you to di
 
 ==== Supported event types
 
-Listed below are all event types that can occur in the engine. Each type corresponds to an enum value in the +org.activiti.engine.delegate.event.ActivitiEventType+.
+Listed below are all event types that can occur in the engine. Each type corresponds to an enum value in the +org.flowable.engine.common.api.delegate.event.ActivitiEventType+.
 
 [[eventTypes]]
 .Supported events
 [options="header"]
 |===============
 |Event name|Description|Event classes
-|ENGINE_CREATED|The process-engine this listener is attached to, has been created and is ready for API-calls.|+org.activiti...ActivitiEvent+
-|ENGINE_CLOSED|The process-engine this listener is attached to, has been closed. API-calls to the engine are no longer possible.|+org.activiti...ActivitiEvent+
-|ENTITY_CREATED|A new entity is created. The new entity is contained in the event.|+org.activiti...ActivitiEntityEvent+
-|ENTITY_INITIALIZED|A new entity has been created and is fully initialized. If any children are created as part of the creation of an entity, this event will be fired AFTER the create/initialisation of the child entities as opposed to the +$$ENTITY_CREATE$$+ event.|+org.activiti...ActivitiEntityEvent+
-|ENTITY_UPDATED|An existing is updated. The updated entity is contained in the event.|+org.activiti...ActivitiEntityEvent+
-|ENTITY_DELETED|An existing entity is deleted. The deleted entity is contained in the event.|+org.activiti...ActivitiEntityEvent+
-|ENTITY_SUSPENDED|An existing entity is suspended. The suspended entity is contained in the event. Will be dispatched for ProcessDefinitions, ProcessInstances and Tasks.|+org.activiti...ActivitiEntityEvent+
-|ENTITY_ACTIVATED|An existing entity is activated. The activated entity is contained in the event. Will be dispatched for ProcessDefinitions, ProcessInstances and Tasks.|+org.activiti...ActivitiEntityEvent+
-|JOB_EXECUTION_SUCCESS|A job has been executed successfully. The event contains the job that was executed.|+org.activiti...ActivitiEntityEvent+
-|JOB_EXECUTION_FAILURE|The execution of a job has failed. The event contains the job that was executed and the exception.|+org.activiti...ActivitiEntityEvent+ and +org.activiti...ActivitiExceptionEvent+
-|JOB_RETRIES_DECREMENTED|The number of job retries have been decremented due to a failed job. The event contains the job that was updated.|+org.activiti...ActivitiEntityEvent+
-|TIMER_SCHEDULED|A timer job has been created and is scheduled for being executed at a future point in time.|+org.activiti...ActivitiEntityEvent+
-|TIMER_FIRED|A timer has been fired. The event contains the job that was executed?|+org.activiti...ActivitiEntityEvent+
-|JOB_CANCELED|A job has been canceled. The event contains the job that was canceled. Job can be canceled by API call, task was completed and associated boundary timer was canceled, on the new process definition deployment.|+org.activiti...ActivitiEntityEvent+
-|ACTIVITY_STARTED|An activity is starting to execute|+org.activiti...ActivitiActivityEvent+
-|ACTIVITY_COMPLETED|An activity is completed successfully|+org.activiti...ActivitiActivityEvent+
-|ACTIVITY_CANCELLED|An activity is going to be cancelled. There can be three reasons for activity cancellation (MessageEventSubscriptionEntity, SignalEventSubscriptionEntity, TimerEntity).|+org.activiti...ActivitiActivityCancelledEvent+
-|ACTIVITY_SIGNALED|An activity received a signal|+org.activiti...ActivitiSignalEvent+
-|ACTIVITY_MESSAGE_RECEIVED|An activity received a message. Dispatched before the activity receives the message. When received, a +$$ACTIVITY_SIGNAL$$+ or +$$ACTIVITY_STARTED$$+ will be dispatched for this activity, depending on the type (boundary-event or event-subprocess start-event)|+org.activiti...ActivitiMessageEvent+
-|ACTIVITY_MESSAGE_WAITING|An activity has created a message event subscription and is waiting for its receival.|+org.activiti...ActivitiMessageEvent+
-|ACTIVITY_MESSAGE_CANCELLED|An activity for which a message event subscription has been created is cancelled and thus receiving the message will not trigger this particular message anymore.|+org.activiti...ActivitiMessageEvent+
-|ACTIVITY_ERROR_RECEIVED|An activity has received an error event. Dispatched before the actual error has been handled by the activity. The event's +activityId+ contains a reference to the error-handling activity. This event will be either followed by a +$$ACTIVITY_SIGNALLED$$+ event or +$$ACTIVITY_COMPLETE$$+ for the involved activity, if the error was delivered successfully.|+org.activiti...ActivitiErrorEvent+
-|UNCAUGHT_BPMN_ERROR|An uncaught BPMN error has been thrown. The process did not have any handlers for that specific error. The event's +activityId+ will be empty.|+org.activiti...ActivitiErrorEvent+
-|ACTIVITY_COMPENSATE|An activity is about to be compensated. The event contains the id of the activity that is will be executed for compensation.|+org.activiti...ActivitiActivityEvent+
-|VARIABLE_CREATED|A variable has been created. The event contains the variable name, value and related execution and task (if any).|+org.activiti...ActivitiVariableEvent+
-|VARIABLE_UPDATED|An existing variable has been updated. The event contains the variable name, updated value and related execution and task (if any).|+org.activiti...ActivitiVariableEvent+
-|VARIABLE_DELETED|An existing variable has been deleted. The event contains the variable name, last known value and related execution and task (if any).|+org.activiti...ActivitiVariableEvent+
-|TASK_ASSIGNED|A task has been assigned to a user. The event contains the task|+org.activiti...ActivitiEntityEvent+
-|TASK_CREATED|A task has been created. This is dispatched after the +$$ENTITY_CREATE$$+ event. In case the task is part of a process, this event will be fired before the task listeners are executed. |+org.activiti...ActivitiEntityEvent+
-|TASK_COMPLETED|A task has been completed. This is dispatched before the +$$ENTITY_DELETE$$+ event. In case the task is part of a process, this event will be fired before the process has moved on and will be followed by a +$$ACTIVITY_COMPLETE$$+ event, targeting the activity that represents the completed task.|+org.activiti...ActivitiEntityEvent+
-|PROCESS_CREATED|A process instance has been created. All basic properties have been set, but variables not yet.|+org.activiti...ActivitiEntityEvent+
-|PROCESS_STARTED|A process instance has been started. Dispatched when starting a process instance previously created. The event PROCESS_STARTED is dispatched after the associated event ENTITY_INITIALIZED and after the variables have been set.|+org.activiti...ActivitiEntityEvent+
-|PROCESS_COMPLETED| A process has been completed. Dispatched after the last activity +$$ACTIVITY_COMPLETED $$+ event. Process is completed when it reaches state in which process instance does not have any transition to take. |+org.activiti...ActivitiEntityEvent+
-|PROCESS_CANCELLED|A process has been cancelled. Dispatched before the process instance is deleted from runtime. Process instance is cancelled by API call +RuntimeService.deleteProcessInstance+|+org.activiti...ActivitiCancelledEvent+
-|MEMBERSHIP_CREATED|A user has been added to a group. The event contains the ids of the user and group involved.|+org.activiti...ActivitiMembershipEvent+
-|MEMBERSHIP_DELETED|A user has been removed from a group. The event contains the ids of the user and group involved.|+org.activiti...ActivitiMembershipEvent+
-|MEMBERSHIPS_DELETED|All members will be removed from a group. The event is thrown before the members are removed, so they are still accessible. No individual +$$MEMBERSHIP_DELETED$$+ events will be thrown if all members are deleted at once, for performance reasons.|+org.activiti...ActivitiMembershipEvent+
+|ENGINE_CREATED|The process-engine this listener is attached to, has been created and is ready for API-calls.|+org.flowable...FlowableEvent+
+|ENGINE_CLOSED|The process-engine this listener is attached to, has been closed. API-calls to the engine are no longer possible.|+org.flowable...FlowableEvent+
+|ENTITY_CREATED|A new entity is created. The new entity is contained in the event.|+org.flowable...FlowableEntityEvent+
+|ENTITY_INITIALIZED|A new entity has been created and is fully initialized. If any children are created as part of the creation of an entity, this event will be fired AFTER the create/initialisation of the child entities as opposed to the +$$ENTITY_CREATE$$+ event.|+org.flowable...FlowableEntityEvent+
+|ENTITY_UPDATED|An existing is updated. The updated entity is contained in the event.|+org.flowable...FlowableEntityEvent+
+|ENTITY_DELETED|An existing entity is deleted. The deleted entity is contained in the event.|+org.flowable...FlowableEntityEvent+
+|ENTITY_SUSPENDED|An existing entity is suspended. The suspended entity is contained in the event. Will be dispatched for ProcessDefinitions, ProcessInstances and Tasks.|+org.flowable...FlowableEntityEvent+
+|ENTITY_ACTIVATED|An existing entity is activated. The activated entity is contained in the event. Will be dispatched for ProcessDefinitions, ProcessInstances and Tasks.|+org.flowable...FlowableEntityEvent+
+|JOB_EXECUTION_SUCCESS|A job has been executed successfully. The event contains the job that was executed.|+org.flowable...FlowableEntityEvent+
+|JOB_EXECUTION_FAILURE|The execution of a job has failed. The event contains the job that was executed and the exception.|+org.flowable...FlowableEntityEvent+ and +org.flowable...ActivitiExceptionEvent+
+|JOB_RETRIES_DECREMENTED|The number of job retries have been decremented due to a failed job. The event contains the job that was updated.|+org.flowable...FlowableEntityEvent+
+|TIMER_SCHEDULED|A timer job has been created and is scheduled for being executed at a future point in time.|+org.flowable...FlowableEntityEvent+
+|TIMER_FIRED|A timer has been fired. The event contains the job that was executed?|+org.flowable...FlowableEntityEvent+
+|JOB_CANCELED|A job has been canceled. The event contains the job that was canceled. Job can be canceled by API call, task was completed and associated boundary timer was canceled, on the new process definition deployment.|+org.flowable...FlowableEntityEvent+
+|ACTIVITY_STARTED|An activity is starting to execute|+org.flowable...ActivitiActivityEvent+
+|ACTIVITY_COMPLETED|An activity is completed successfully|+org.flowable...ActivitiActivityEvent+
+|ACTIVITY_CANCELLED|An activity is going to be cancelled. There can be three reasons for activity cancellation (MessageEventSubscriptionEntity, SignalEventSubscriptionEntity, TimerEntity).|+org.flowable...FlowableActivityCancelledEvent+
+|ACTIVITY_SIGNALED|An activity received a signal|+org.flowable...ActivitiSignalEvent+
+|ACTIVITY_MESSAGE_RECEIVED|An activity received a message. Dispatched before the activity receives the message. When received, a +$$ACTIVITY_SIGNAL$$+ or +$$ACTIVITY_STARTED$$+ will be dispatched for this activity, depending on the type (boundary-event or event-subprocess start-event)|+org.flowable...ActivitiMessageEvent+
+|ACTIVITY_MESSAGE_WAITING|An activity has created a message event subscription and is waiting for its receival.|+org.flowable...ActivitiMessageEvent+
+|ACTIVITY_MESSAGE_CANCELLED|An activity for which a message event subscription has been created is cancelled and thus receiving the message will not trigger this particular message anymore.|+org.flowable...FlowableMessageEvent+
+|ACTIVITY_ERROR_RECEIVED|An activity has received an error event. Dispatched before the actual error has been handled by the activity. The event's +activityId+ contains a reference to the error-handling activity. This event will be either followed by a +$$ACTIVITY_SIGNALLED$$+ event or +$$ACTIVITY_COMPLETE$$+ for the involved activity, if the error was delivered successfully.|+org.flowable...FlowableErrorEvent+
+|UNCAUGHT_BPMN_ERROR|An uncaught BPMN error has been thrown. The process did not have any handlers for that specific error. The event's +activityId+ will be empty.|+org.flowable...ActivitiErrorEvent+
+|ACTIVITY_COMPENSATE|An activity is about to be compensated. The event contains the id of the activity that is will be executed for compensation.|+org.flowable...FlowableActivityEvent+
+|VARIABLE_CREATED|A variable has been created. The event contains the variable name, value and related execution and task (if any).|+org.flowable...FlowableVariableEvent+
+|VARIABLE_UPDATED|An existing variable has been updated. The event contains the variable name, updated value and related execution and task (if any).|+org.flowable...FlowableVariableEvent+
+|VARIABLE_DELETED|An existing variable has been deleted. The event contains the variable name, last known value and related execution and task (if any).|+org.flowable...FlowableVariableEvent+
+|TASK_ASSIGNED|A task has been assigned to a user. The event contains the task|+org.flowable...FlowableEntityEvent+
+|TASK_CREATED|A task has been created. This is dispatched after the +$$ENTITY_CREATE$$+ event. In case the task is part of a process, this event will be fired before the task listeners are executed. |+org.flowable...FlowableEntityEvent+
+|TASK_COMPLETED|A task has been completed. This is dispatched before the +$$ENTITY_DELETE$$+ event. In case the task is part of a process, this event will be fired before the process has moved on and will be followed by a +$$ACTIVITY_COMPLETE$$+ event, targeting the activity that represents the completed task.|+org.flowable...FlowableEntityEvent+
+|PROCESS_CREATED|A process instance has been created. All basic properties have been set, but variables not yet.|+org.flowable...FlowableEntityEvent+
+|PROCESS_STARTED|A process instance has been started. Dispatched when starting a process instance previously created. The event PROCESS_STARTED is dispatched after the associated event ENTITY_INITIALIZED and after the variables have been set.|+org.flowable...FlowableEntityEvent+
+|PROCESS_COMPLETED| A process has been completed. Dispatched after the last activity +$$ACTIVITY_COMPLETED $$+ event. Process is completed when it reaches state in which process instance does not have any transition to take. |+org.flowable...FlowableEntityEvent+
+|PROCESS_CANCELLED|A process has been cancelled. Dispatched before the process instance is deleted from runtime. Process instance is cancelled by API call +RuntimeService.deleteProcessInstance+|+org.flowable...FlowableCancelledEvent+
+|MEMBERSHIP_CREATED|A user has been added to a group. The event contains the ids of the user and group involved.|+org.flowable...FlowableMembershipEvent+
+|MEMBERSHIP_DELETED|A user has been removed from a group. The event contains the ids of the user and group involved.|+org.flowable...FlowableMembershipEvent+
+|MEMBERSHIPS_DELETED|All members will be removed from a group. The event is thrown before the members are removed, so they are still accessible. No individual +$$MEMBERSHIP_DELETED$$+ events will be thrown if all members are deleted at once, for performance reasons.|+org.flowable...FlowableMembershipEvent+
 
 |===============
 

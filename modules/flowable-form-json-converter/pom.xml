@@ -11,9 +11,9 @@
 	<packaging>jar</packaging>
 	
 	<properties>
-		<activiti.artifact>
+		<flowable.artifact>
 			org.flowable.form.json.converter
-		</activiti.artifact>
+		</flowable.artifact>
 	</properties>
 
 	<dependencies>

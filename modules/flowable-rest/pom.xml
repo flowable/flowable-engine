@@ -15,9 +15,9 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <activiti.artifact>
+    <flowable.artifact>
       org.flowable.rest.service
-    </activiti.artifact>
+    </flowable.artifact>
   </properties>
 
   <build>

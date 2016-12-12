@@ -139,15 +139,15 @@
   </dependencies>
 
   <properties>
-    <activiti.osgi.activator>
+    <flowable.osgi.activator>
       org.flowable.osgi.Activator
-    </activiti.osgi.activator>
-    <activiti.osgi.import.pkg>
+    </flowable.osgi.activator>
+    <flowable.osgi.import.pkg>
       org.apache.felix.fileinstall;resolution:=optional,*
-    </activiti.osgi.import.pkg>
-    <activiti.artifact>
+    </flowable.osgi.import.pkg>
+    <flowable.artifact>
       org.flowable.osgi
-    </activiti.artifact>
+    </flowable.artifact>
   </properties>
 
   <profiles>

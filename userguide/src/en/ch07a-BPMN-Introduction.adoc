@@ -33,7 +33,7 @@ The root element of the BPMN 2.0 schema is the +definitions+ element. Within thi
 ----
 <definitions
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:flowable="http://flowable.org/bpmn"
   targetNamespace="Examples">
 
   <process id="myProcess" name="My First Process">
@@ -79,7 +79,7 @@ In this section we will cover a (very simple) business process that we will use 
 
 ==== Prerequisites
 
-This tutorial assumes that you have the <<demo.setup.one.minute.version,Flowable demo setup running>>, and that you are using a standalone H2 server. Edit +db.properties+ and set the +jdbc.url=jdbc:h2:tcp://localhost/activiti+, and then run the standalone server according to link:$$http://www.h2database.com/html/tutorial.html#using_server$$[H2's documentation].
+This tutorial assumes that you have the <<demo.setup.one.minute.version,Flowable demo setup running>>, and that you are using a standalone H2 server. Edit +db.properties+ and set the +jdbc.url=jdbc:h2:tcp://localhost/flowable+, and then run the standalone server according to link:$$http://www.h2database.com/html/tutorial.html#using_server$$[H2's documentation].
 
 
 [[bpmn10MinuteTutorialGoal]]
@@ -125,8 +125,8 @@ The XML version of this business process (__FinancialReportProcess.bpmn20.xml__)
 [source,xml,linenums]
 ----
 <definitions id="definitions"
-  targetNamespace="http://activiti.org/bpmn20"
-  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="http://flowable.org/bpmn20"
+  xmlns:flowable="http://flowable.org/bpmn"
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL">
 
 	<process id="financialReport" name="Monthly financial report reminder process">

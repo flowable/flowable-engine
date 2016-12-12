@@ -15,16 +15,16 @@
 	</parent>
 
 	<properties>
-		<activiti.artifact>
+		<flowable.artifact>
 			org.flowable.engine.common.api
-		</activiti.artifact>
-		<activiti.osgi.export.additional>
+		</flowable.artifact>
+		<flowable.osgi.export.additional>
 			org.flowable.engine.common.api,
 			org.flowable.engine.common.api.delegate.event,
 			org.flowable.engine.common.api.io,
 			org.flowable.engine.common.api.management,
 			org.flowable.engine.common.api.query,
-		</activiti.osgi.export.additional>
+		</flowable.osgi.export.additional>
 	</properties>
 
 	<build>

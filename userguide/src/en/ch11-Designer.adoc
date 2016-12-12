@@ -368,7 +368,7 @@ public class AcmeMoneyTask extends AbstractCustomServiceTask {
   /*
    * (non-Javadoc)
    *
-   * @see org.activiti.designer.integration.servicetask.AbstractCustomServiceTask #contributeToPaletteDrawer()
+   * @see org.flowable.designer.integration.servicetask.AbstractCustomServiceTask #contributeToPaletteDrawer()
    */
   @Override
   public String contributeToPaletteDrawer() {
@@ -383,7 +383,7 @@ public class AcmeMoneyTask extends AbstractCustomServiceTask {
   /*
    * (non-Javadoc)
    *
-   * @see org.activiti.designer.integration.servicetask.AbstractCustomServiceTask #getSmallIconPath()
+   * @see org.flowable.designer.integration.servicetask.AbstractCustomServiceTask #getSmallIconPath()
    */
   @Override
   public String getSmallIconPath() {
@@ -428,9 +428,9 @@ There is a special annotation for specifying the runtime characteristics of your
 
 Your +CustomServiceTask+ will result in a normal +ServiceTask+ in the BPMN output of processes modelled with it. Flowable enables <<bpmnJavaServiceTask,several ways>> to define the runtime characteristics of ++ServiceTask++s. Therefore, the +@Runtime+ annotation can take one of three attributes, which match directly to the options Flowable provides, like this:
 
-* +javaDelegateClass+ maps to +activiti:class+ in the BPMN output. Specify the fully qualified classname of a class that implements +JavaDelegate+.
-* +expression+ maps to +activiti:expression+ in the BPMN output. Specify an expression to a method to be executed, such as a method in a Spring Bean. You should _not_ specify any +@Property+ annotations on fields when using this option. For more information, see below.
-* +javaDelegateExpression+ maps to +activiti:delegateExpression+ in the BPMN output. Specify an expression to  a class that implements +JavaDelegate+.
+* +javaDelegateClass+ maps to +flowable:class+ in the BPMN output. Specify the fully qualified classname of a class that implements +JavaDelegate+.
+* +expression+ maps to +flowable:expression+ in the BPMN output. Specify an expression to a method to be executed, such as a method in a Spring Bean. You should _not_ specify any +@Property+ annotations on fields when using this option. For more information, see below.
+* +javaDelegateExpression+ maps to +flowable:delegateExpression+ in the BPMN output. Specify an expression to  a class that implements +JavaDelegate+.
 
 
 The user's property values will be injected into the runtime class if you provide members in the class for Flowable to inject into. The names should match the names of the members in your +CustomServiceTask+. For more information, consult <<serviceTaskFieldInjection,this part>> of the userguide. Note that since version 5.11.0 of the Designer you can use the +Expression+ interface for dynamic field values. This means that the value of the property in the Flowable Designer must contain an expression and this expression will then be injected into an +Expression+ property in the +JavaDelegate+ implementation class.
@@ -583,7 +583,7 @@ public class MyPaletteCustomizer extends AbstractDefaultPaletteCustomizer {
   /*
    * (non-Javadoc)
    *
-   * @see org.activiti.designer.integration.palette.DefaultPaletteCustomizer#disablePaletteEntries()
+   * @see org.flowable.designer.integration.palette.DefaultPaletteCustomizer#disablePaletteEntries()
    */
   @Override
   public List<PaletteEntry> disablePaletteEntries() {
@@ -611,7 +611,7 @@ public class MyPaletteCustomizer extends AbstractDefaultPaletteCustomizer {
   /*
    * (non-Javadoc)
    *
-   * @see org.activiti.designer.integration.palette.DefaultPaletteCustomizer#disablePaletteEntries()
+   * @see org.flowable.designer.integration.palette.DefaultPaletteCustomizer#disablePaletteEntries()
    */
   @Override
   public List<PaletteEntry> disablePaletteEntries() {
@@ -679,14 +679,14 @@ Under review!
 ====
 
 
-Create an extension to the +org.activiti.designer.eclipse.extension.validation.ProcessValidator+ extension point in your +plugin.xml+ file. For this extension point, you are required to subclass the +AbstractProcessValidator+ class.
+Create an extension to the +org.flowable.designer.eclipse.extension.validation.ProcessValidator+ extension point in your +plugin.xml+ file. For this extension point, you are required to subclass the +AbstractProcessValidator+ class.
 
 [source,xml,linenums]
 ----
 <?eclipse version="3.6"?>
 <plugin>
   <extension
-    point="org.activiti.designer.eclipse.extension.validation.ProcessValidator">
+    point="org.flowable.designer.eclipse.extension.validation.ProcessValidator">
     <ProcessValidator
       class="org.acme.validation.AcmeProcessValidator">
     </ProcessValidator>
@@ -723,7 +723,7 @@ Don't forget to invoke +addProblemToDiagram()+ and/or +addWarningToDiagram()+, e
 
 ===== Creating an ExportMarshaller extension
 
-Create an extension to the +org.activiti.designer.eclipse.extension.ExportMarshaller+ extension point in your +plugin.xml+ file. For this extension point, you are required to subclass the +AbstractExportMarshaller+ class. This abstract base class provides you with a number of useful methods when marshalling to your own format, but most importantly it allows you to save resources to the workspace and to invoke validators.
+Create an extension to the +org.flowable.designer.eclipse.extension.ExportMarshaller+ extension point in your +plugin.xml+ file. For this extension point, you are required to subclass the +AbstractExportMarshaller+ class. This abstract base class provides you with a number of useful methods when marshalling to your own format, but most importantly it allows you to save resources to the workspace and to invoke validators.
 
 An example implementation is available in Designer's examples folder. This example shows how to use the methods in the base class to get the basics done, such as accessing the diagram's +InputStream+, using its +BpmnModel+ and saving resources to the workspace.
 
@@ -732,7 +732,7 @@ An example implementation is available in Designer's examples folder. This examp
 <?eclipse version="3.6"?>
 <plugin>
   <extension
-    point="org.activiti.designer.eclipse.extension.ExportMarshaller">
+    point="org.flowable.designer.eclipse.extension.ExportMarshaller">
     <ExportMarshaller
       class="org.acme.export.AcmeExportMarshaller">
     </ExportMarshaller>

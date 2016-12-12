@@ -19,7 +19,7 @@ All REST-resources require a valid Flowable-user to be authenticated by default.
 
 The Flowable REST web application is using Spring Java Configuration for starting the Flowable Engine, defining the basic authentication security using Spring security and to define the variable converters for specific variable handling.
 A small amount of properties can be defined by changing the engine.properties file you can find in the WEB-INF/classes folder.
-If you need more advanced configuration options there's the possibility to override the default Spring beans in XML in the activiti-custom-context.xml file you can also find in the WEB-INF/classes folder.
+If you need more advanced configuration options there's the possibility to override the default Spring beans in XML in the flowable-custom-context.xml file you can also find in the WEB-INF/classes folder.
 An example configuration is already in comments in this file. This is also the place to override the default RestResponseFactory by defining a new Spring bean with the name restResponsefactory and use your custom implementation class for it.
 
 [[restUsageInTomcat]]
@@ -234,7 +234,7 @@ When working with variables (execution/process and task), the REST-api uses some
 
 |===============
 
-It's possible to support additional variable-types with a custom JSON representation (either simple value or complex/nested JSON object). By extending the +initializeVariableConverters()+ method on +org.activiti.rest.service.api.RestResponseFactory+, you can add additional +org.activiti.rest.service.api.engine.variable.RestVariableConverter+ classes to support converting your POJO's to a format suitable for transferring through REST and converting the REST-value back to your POJO. The actual transformation to JSON is done by Jackson.
+It's possible to support additional variable-types with a custom JSON representation (either simple value or complex/nested JSON object). By extending the +initializeVariableConverters()+ method on +org.flowable.rest.service.api.RestResponseFactory+, you can add additional +org.flowable.rest.service.api.engine.variable.RestVariableConverter+ classes to support converting your POJO's to a format suitable for transferring through REST and converting the REST-value back to your POJO. The actual transformation to JSON is done by Jackson.
 
 
 === Deployment
@@ -740,7 +740,7 @@ GET repository/process-definitions/{processDefinitionId}/model
 
 
 *Response body:*
-The response body is a JSON representation of the +org.activiti.bpmn.model.BpmnModel+ and contains the full process definition model.
+The response body is a JSON representation of the +org.flowable.bpmn.model.BpmnModel+ and contains the full process definition model.
 
 [source,json,linenums]
 ----
@@ -6167,7 +6167,7 @@ Returns a read-only view of the engine that is used in this REST-service.
 {
    "name":"default",
    "version":"5.15",
-   "resourceUrl":"file://activiti/activiti.cfg.xml",
+   "resourceUrl":"file://flowable/flowable.cfg.xml",
    "exception":null
 }
 ----

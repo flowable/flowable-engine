@@ -62,4 +62,4 @@ All classes that have +.impl.+ in the package name are internal implementation c
 
 === Internal implementation classes
 
-In the jar file, all classes in packages that have +.impl.+ (e.g. ++org.activiti.engine.impl.db++) in them are implementation classes and should be considered internal. No stability guarantees are given on classes or interfaces that are in implementation classes.
+In the jar file, all classes in packages that have +.impl.+ (e.g. ++org.flowable.engine.impl.db++) in them are implementation classes and should be considered internal. No stability guarantees are given on classes or interfaces that are in implementation classes.

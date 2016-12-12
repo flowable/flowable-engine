@@ -15,9 +15,9 @@
 	</parent>
 
 	<properties>
-		<activiti.artifact>
+		<flowable.artifact>
 			org.flowable.dmn.engine.configurator
-		</activiti.artifact>
+		</flowable.artifact>
 	</properties>
 	
 	<dependencies>

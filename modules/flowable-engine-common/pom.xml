@@ -15,10 +15,10 @@
 	</parent>
 
 	<properties>
-		<activiti.artifact>
+		<flowable.artifact>
 			org.flowable.engine.common
-		</activiti.artifact>
-		<activiti.osgi.export.additional>
+		</flowable.artifact>
+		<flowable.osgi.export.additional>
 			org.flowable.engine.common,
 			org.flowable.engine.common.impl,
 			org.flowable.engine.common.impl.cfg,
@@ -32,10 +32,10 @@
 			org.flowable.engine.common.impl.util,
 			org.flowable.engine.common.impl.util.io,
 			org.flowable.engine.common.runtime,
-		</activiti.osgi.export.additional>
-		<activiti.osgi.import.additional>
+		</flowable.osgi.export.additional>
+		<flowable.osgi.import.additional>
 			org.springframework*;resolution:=optional,
-		</activiti.osgi.import.additional>
+		</flowable.osgi.import.additional>
 	</properties>
 
 	<build>

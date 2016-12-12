@@ -47,7 +47,7 @@ When you are using the demo setup and you want to add your custom classes, you s
 
 ==== Using Spring beans from a process
 
-When expressions or scripts use Spring beans, those beans have to be available to the engine when executing the process definition. If you are building your own webapp and you configure your process engine in your context as described in <<springintegration,the spring integration section>>, that is straightforward. But bear in mind that you also should update the Flowable rest webapp with that context if you use it. You can do that by replacing the +activiti.cfg.xml+ in the +flowable-rest/lib/activiti-cfg.jar+ JAR file with an +activiti-context.xml+ file containing your Spring context configuration.
+When expressions or scripts use Spring beans, those beans have to be available to the engine when executing the process definition. If you are building your own webapp and you configure your process engine in your context as described in <<springintegration,the spring integration section>>, that is straightforward. But bear in mind that you also should update the Flowable rest webapp with that context if you use it. You can do that by replacing the +flowable.cfg.xml+ in the +flowable-rest/lib/flowable-cfg.jar+ JAR file with an +flowable-context.xml+ file containing your Spring context configuration.
 
 ==== Creating a single app
 
@@ -130,10 +130,10 @@ Note how the key for the new process is different from our first process. Even t
 
 A process diagram image can be added to a deployment. This image will be stored in the Flowable repository and is accessible through the API. This image is also used to visualize the process in Flowable apps.
 
-Suppose we have a process on our classpath, +org/activiti/expenseProcess.bpmn20.xml+ that has a process key 'expense'. The following naming conventions for the process diagram image apply (in this specific order):
+Suppose we have a process on our classpath, +org/flowable/expenseProcess.bpmn20.xml+ that has a process key 'expense'. The following naming conventions for the process diagram image apply (in this specific order):
 
-* If an image resource exists in the deployment that has a name of the BPMN 2.0 XML file name concatenated with the process key and an image suffix, this image is used. In our example, this would be +org/activiti/expenseProcess.expense.png+ (or .jpg/gif). In case you have multiple images defined in one BPMN 2.0 XML file, this approach makes most sense. Each diagram image will then have the process key in its file name.
-* If no such image exists, am image resource in the deployment matching the name of the BPMN 2.0 XML file is searched for. In our example this would be +org/activiti/expenseProcess.png+. Note that this means that *every process definition* defined in the same BPMN 2.0 file has the same process diagram image. In case there is only one process definition in each BPMN 2.0 XML file, this is obviously not a problem.
+* If an image resource exists in the deployment that has a name of the BPMN 2.0 XML file name concatenated with the process key and an image suffix, this image is used. In our example, this would be +org/flowable/expenseProcess.expense.png+ (or .jpg/gif). In case you have multiple images defined in one BPMN 2.0 XML file, this approach makes most sense. Each diagram image will then have the process key in its file name.
+* If no such image exists, am image resource in the deployment matching the name of the BPMN 2.0 XML file is searched for. In our example this would be +org/flowable/expenseProcess.png+. Note that this means that *every process definition* defined in the same BPMN 2.0 file has the same process diagram image. In case there is only one process definition in each BPMN 2.0 XML file, this is obviously not a problem.
 
 
 Example when deploying programmatically:
@@ -143,8 +143,8 @@ Example when deploying programmatically:
 
 repositoryService.createDeployment()
   .name("expense-process.bar")
-  .addClasspathResource("org/activiti/expenseProcess.bpmn20.xml")
-  .addClasspathResource("org/activiti/expenseProcess.png")
+  .addClasspathResource("org/flowable/expenseProcess.bpmn20.xml")
+  .addClasspathResource("org/flowable/expenseProcess.png")
   .deploy();
 ----
 

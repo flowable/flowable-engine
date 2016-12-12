@@ -14,12 +14,12 @@
   </parent>
   
   <properties>
-    <activiti.artifact>
+    <flowable.artifact>
       org.flowable.bpmn.model
-    </activiti.artifact>
-    <activiti.osgi.import.additional>
+    </flowable.artifact>
+    <flowable.osgi.import.additional>
       org.apache.commons.lang;resolution:=optional
-    </activiti.osgi.import.additional>
+    </flowable.osgi.import.additional>
   </properties>
 
   <build>

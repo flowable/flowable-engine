@@ -28,13 +28,13 @@ The example configuration below uses the jpaPersistenceUnitName:
 [source,xml,linenums]
 ----
 <bean id="processEngineConfiguration"
-  class="org.activiti.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+  class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
 
 <!-- Database configurations -->
 <property name="databaseSchemaUpdate" value="true" />
 <property name="jdbcUrl" value="jdbc:h2:mem:JpaVariableTest;DB_CLOSE_DELAY=1000" />
 
-<property name="jpaPersistenceUnitName" value="activiti-jpa-pu" />
+<property name="jpaPersistenceUnitName" value="flowable-jpa-pu" />
 <property name="jpaHandleTransaction" value="true" />
 <property name="jpaCloseEntityManager" value="true" />
 
@@ -46,7 +46,7 @@ The example configuration below uses the jpaPersistenceUnitName:
 </bean>
 ----
 
-The next example configuration below provides a +EntityManagerFactory+ which we define ourselves (in this case, an open-jpa entity manager). Note that the snippet only contains the beans that are relevant for the example, the others are omitted. Full working example with open-jpa entity manager can be found in the flowable-spring-examples (++/flowable-spring/src/test/java/org/activiti/spring/test/jpa/JPASpringTest.java++)
+The next example configuration below provides a +EntityManagerFactory+ which we define ourselves (in this case, an open-jpa entity manager). Note that the snippet only contains the beans that are relevant for the example, the others are omitted. Full working example with open-jpa entity manager can be found in the flowable-spring-examples (++/flowable-spring/src/test/java/org/flowable/spring/test/jpa/JPASpringTest.java++)
 
 [source,xml,linenums]
 ----
@@ -59,7 +59,7 @@ The next example configuration below provides a +EntityManagerFactory+ which we 
   </property>
 </bean>
 
-<bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
+<bean id="processEngineConfiguration" class="org.flowable.spring.SpringProcessEngineConfiguration">
   <property name="dataSource" ref="dataSource" />
   <property name="transactionManager" ref="transactionManager" />
   <property name="databaseSchemaUpdate" value="true" />
@@ -76,7 +76,7 @@ The same configurations can also be done when building an engine programmaticall
 ----
 ProcessEngine processEngine = ProcessEngineConfiguration
 .createProcessEngineConfigurationFromResourceDefault()
-.setJpaPersistenceUnitName("activiti-pu")
+.setJpaPersistenceUnitName("flowable-pu")
 .buildProcessEngine();
 ----
 
@@ -145,7 +145,7 @@ The first node in our process definition contains a +serviceTask+ that will invo
 [source,xml,linenums]
 ----
 <serviceTask id='theTask' name='updateJPAEntityTask'
-  activiti:expression="${entityToUpdate.setValue('updatedValue')}" />
+  flowable:expression="${entityToUpdate.setValue('updatedValue')}" />
 ----
 
 When the service-task is finished, the process instance waits in a userTask defined in the process definition, which allows us to inspect the process instance. At this point, the +EntityManager+ has been flushed and the changes to the entity have been pushed to the database. When we get the value of the variable +entityToUpdate+, it's loaded again and we get the entity with its +value+ property set to +updatedValue+.
@@ -175,7 +175,7 @@ A more advanced example, +JPASpringTest+, can be found in +flowable-spring-examp
 
 * An existing Spring-bean which uses JPA entities already exists which allows for Loan Requests to be stored.
 * Using Flowable, we can use the existing entities, obtained through the existing bean, and use them as variable in our process. Process is defined in the following steps:
-** Service task that creates a new LoanRequest, using the existing +LoanRequestBean+ using variables received when starting the process (e.g. could come from a start form). The created entity is stored as a variable, using +activiti:resultVariable+ which stores the expression result as a variable.
+** Service task that creates a new LoanRequest, using the existing +LoanRequestBean+ using variables received when starting the process (e.g. could come from a start form). The created entity is stored as a variable, using +flowable:resultVariable+ which stores the expression result as a variable.
 ** UserTask that allows a manager to review the request and approve/disapprove, which is stored as a boolean variable +approvedByManager+
 ** ServiceTask that updates the loan request entity so the entity is in sync with the process.
 ** Depending on the value of the entity property +approved+, an exclusive gateway is used to make a decision about what path to take next: When the request is approved, process ends, otherwise, an extra task will become available (Send rejection letter), so the customer can be notified manually by a rejection letter.
@@ -190,23 +190,23 @@ image::images/jpa.spring.example.process.png[align="center"]
 <definitions id="taskAssigneeExample"
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:activiti="http://activiti.org/bpmn"
-  targetNamespace="org.activiti.examples">
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="org.flowable.examples">
 
   <process id="LoanRequestProcess" name="Process creating and handling loan request">
     <startEvent id='theStart' />
     <sequenceFlow id='flow1' sourceRef='theStart' targetRef='createLoanRequest' />
 
     <serviceTask id='createLoanRequest' name='Create loan request'
-      activiti:expression="${loanRequestBean.newLoanRequest(customerName, amount)}"
-      activiti:resultVariable="loanRequest"/>
+      flowable:expression="${loanRequestBean.newLoanRequest(customerName, amount)}"
+      flowable:resultVariable="loanRequest"/>
     <sequenceFlow id='flow2' sourceRef='createLoanRequest' targetRef='approveTask' />
 
     <userTask id="approveTask" name="Approve request" />
     <sequenceFlow id='flow3' sourceRef='approveTask' targetRef='approveOrDissaprove' />
 
     <serviceTask id='approveOrDissaprove' name='Store decision'
-      activiti:expression="${loanRequest.setApproved(approvedByManager)}" />
+      flowable:expression="${loanRequest.setApproved(approvedByManager)}" />
     <sequenceFlow id='flow4' sourceRef='approveOrDissaprove' targetRef='exclusiveGw' />
 
     <exclusiveGateway id="exclusiveGw" name="Exclusive Gateway approval" />

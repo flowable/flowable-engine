@@ -40,7 +40,7 @@ The LDAP integration has currently two main use cases:
 
 === Configuration
 
-Integrating the LDAP system with Flowable is done by injecting an instance of +org.activiti.ldap.LDAPConfigurator+ in the +configurators+ section of the process engine configuration. This class is highly extensible: methods can be easily overridden and many dependent beans are pluggable if the default implementation would not fit the use case.
+Integrating the LDAP system with Flowable is done by injecting an instance of +org.flowable.ldap.LDAPConfigurator+ in the +configurators+ section of the process engine configuration. This class is highly extensible: methods can be easily overridden and many dependent beans are pluggable if the default implementation would not fit the use case.
 
 This is an example configuration (note: of course, when creating the engine programmatically this is completely similar). Don't worry about all the properties for now, we'll look at them in detail in a next section.
 
@@ -50,7 +50,7 @@ This is an example configuration (note: of course, when creating the engine prog
         ...
         <property name="configurators">
           <list>
-              <bean class="org.activiti.ldap.LDAPConfigurator">
+              <bean class="org.flowable.ldap.LDAPConfigurator">
 
                 <!-- Server connection params -->
                 <property name="server" value="ldap://localhost" />
@@ -86,7 +86,7 @@ This is an example configuration (note: of course, when creating the engine prog
 === Properties
 
 
-Following properties can be set on ++org.activiti.ldap.LDAPConfigurator++:
+Following properties can be set on ++org.flowable.ldap.LDAPConfigurator++:
 
             .LDAP configuration properties
 [options="header"]
@@ -173,7 +173,7 @@ Following properties are when one wants to customize default behavior or introdu
                             The LDAPQueryBuilder instance is used when the LDAPUserManager or
                             LDAPGroupManage} does an actual query against the LDAP system.
                             The default implementation uses the properties as set on this instance
-                            such as queryGroupsForUser and queryUserById|An instance of org.activiti.ldap.LDAPQueryBuilder|
+                            such as queryGroupsForUser and queryUserById|An instance of org.flowable.ldap.LDAPQueryBuilder|
 |groupCacheSize| Allows to set the size of the group cache.
                             This is an LRU cache that caches groups for users and thus
                             avoids hitting the LDAP system each time the groups of

@@ -73,10 +73,10 @@
 
 
   <properties>
-    <activiti.osgi.import.pkg>*</activiti.osgi.import.pkg>
-    <activiti.artifact>
+    <flowable.osgi.import.pkg>*</flowable.osgi.import.pkg>
+    <flowable.artifact>
       org.flowable.camel
-    </activiti.artifact>
+    </flowable.artifact>
   </properties>
 
   <profiles>

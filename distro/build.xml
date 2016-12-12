@@ -15,7 +15,7 @@
 	<condition property="usingJdk8OrHigher" value=",java8" else="">
 		<not>
 			<or>
-				<!-- Activiti supports java 7 as minimum -->
+				<!-- Flowable supports java 7 as minimum -->
 				<equals arg1="${ant.java.version}" arg2="1.7" />
 			</or>
 		</not>
@@ -301,7 +301,7 @@
 	<target name="build.docs" unless="nodocs">
 		<!-- JAVADOCS -->
 		<exec executable="${mvn.executable}" dir="../modules/flowable-engine">
-			<arg line="-DexcludePackageNames=org.activiti.engine.impl* javadoc:javadoc" />
+			<arg line="-DexcludePackageNames=org.flowable.engine.impl* javadoc:javadoc" />
 		</exec>
 		<mkdir dir="${target.distro.root}/docs/javadocs" />
 		<copy todir="${target.distro.root}/docs/javadocs">
@@ -318,7 +318,7 @@
 	<target name="copy.docs" depends="build.docs" unless="nodocs">
 		<!-- COPY XSD -->
 		<copy todir="${target.distro.root}/docs/xsd">
-			<fileset dir="../modules/flowable-bpmn-converter/src/main/resources/org/activiti/impl/bpmn/parser">
+			<fileset dir="../modules/flowable-bpmn-converter/src/main/resources/org/flowable/impl/bpmn/parser">
 				<include name="*.xsd" />
 			</fileset>
 		</copy>
@@ -343,7 +343,7 @@
 	<target name="copy.sql">
 		<!-- COPY SQL -->
 		<copy todir="${target.distro.root}/database">
-			<fileset dir="../modules/flowable-engine/src/main/resources/org/activiti/db">
+			<fileset dir="../modules/flowable-engine/src/main/resources/org/flowable/db">
 				<include name="create/**" />
 				<include name="drop/**" />
 				<include name="upgrade/**" />

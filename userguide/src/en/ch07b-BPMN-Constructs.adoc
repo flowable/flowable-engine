@@ -17,7 +17,7 @@ The downside of a standard however, is the fact that it is always the result of 
 Although the BPMN 2.0 specification clearly states that it was made for custom extension, we make sure that:
 
 * The prerequisite of such a custom extension is that there *always* must be a simple transformation to the *standard way of doing things*. So when you decide to use a custom extension, you don't have to be afraid  that there is no way back.
-* When using a custom extension, this is always clearly indicated by giving the new XML element, attribute, etc. the *activiti:* namespace prefix.
+* When using a custom extension, this is always clearly indicated by giving the new XML element, attribute, etc. the *flowable:* namespace prefix.
 
 So whether you want to use a custom extension or not, is completely up to you. Several factors will influence this decision (graphical editor usage, company policy, etc.). We only provide them since we believe that some points in the standard can be done simpler or more efficient. Feel free to give us (positive and/or negative) feedback on our extensions, or to post new ideas for custom extensions. Who knows, some day your idea might pop up in the specification!
 
@@ -48,7 +48,7 @@ Timer events are events which are triggered by defined timer. They can be used a
 
 [source,xml,linenums]
 ----
-<timerEventDefinition activiti:businessCalendarName="custom">
+<timerEventDefinition flowable:businessCalendarName="custom">
     ...
 </timerEventDefinition>
 ----
@@ -85,7 +85,7 @@ It accepts as value either static values link:$$http://en.wikipedia.org/wiki/ISO
 [source,xml,linenums]
 ----
 <timerEventDefinition>
-    <timeCycle activiti:endDate="2015-02-25T16:42:11+00:00">R3/PT10H</timeCycle>
+    <timeCycle flowable:endDate="2015-02-25T16:42:11+00:00">R3/PT10H</timeCycle>
 </timerEventDefinition>
 ----
 
@@ -127,7 +127,7 @@ based on process variables. The process variables must contain the ISO 8601 (or 
 </boundaryEvent>
 ----
 
-*Note:* timers are only fired when the job or async executor is enabled (i.e. _jobExecutorActivate_ or _asyncExecutorActivate_ needs to be set to +true+ in the +activiti.cfg.xml+, since the job and async executor are disabled by default).
+*Note:* timers are only fired when the job or async executor is enabled (i.e. _jobExecutorActivate_ or _asyncExecutorActivate_ needs to be set to +true+ in the +flowable.cfg.xml+, since the job and async executor are disabled by default).
 
 
 [[bpmnErrorEventDefinition]]
@@ -186,7 +186,7 @@ The ++signalEventDefinition++s reference the same +signal+ element.
 
 ===== Throwing a Signal Event
 
-A signal can either be thrown by a process instance using a BPMN construct or programmatically using java API. The following methods on the +org.activiti.engine.RuntimeService+ can be used to throw a signal programmatically:
+A signal can either be thrown by a process instance using a BPMN construct or programmatically using java API. The following methods on the +org.flowable.engine.RuntimeService+ can be used to throw a signal programmatically:
 
 [source,java,linenums]
 ----
@@ -237,7 +237,7 @@ To restrict the _scope_ of the signal event, add the (non-BPMN 2.0 standard!) _s
 
 [source,xml,linenums]
 ----
-<signal id="alertSignal" name="alert" activiti:scope="processInstance"/>
+<signal id="alertSignal" name="alert" flowable:scope="processInstance"/>
 ----
 
 The default value for this is attribute is _"global"_.
@@ -281,7 +281,7 @@ A message event definition is declared using the +messageEventDefinition+ elemen
 ----
 <definitions id="definitions"
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:flowable="http://flowable.org/bpmn"
   targetNamespace="Examples"
   xmlns:tns="Examples">
 
@@ -395,7 +395,7 @@ In a start event, following Flowable-specific properties can be specified:
 
 [source,xml,linenums]
 ----
-<startEvent id="request" activiti:initiator="initiator" />
+<startEvent id="request" flowable:initiator="initiator" />
 ----
 
 The authenticated user must be set with the method +IdentityService.setAuthenticatedUserId(String)+ in a try-finally block like this:
@@ -470,7 +470,7 @@ The XML representation of a none start event is the normal start event declarati
 
 [source,xml,linenums]
 ----
-<startEvent id="request" activiti:formKey="org/activiti/examples/taskforms/request.form" />
+<startEvent id="request" flowable:formKey="org/flowable/examples/taskforms/request.form" />
 ----
 
 
@@ -600,7 +600,7 @@ The XML representation of a message start event is the normal start event declar
 ----
 <definitions id="definitions"
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:flowable="http://flowable.org/bpmn"
   targetNamespace="Examples"
   xmlns:tns="Examples">
 
@@ -865,7 +865,7 @@ Note that the _terminateAll_ attribute is optional (and _false_ by default).
 [source,xml,linenums]
 ----
 <endEvent id="myEndEvent >
-  <terminateEventDefinition activiti:terminateAll="true"></terminateEventDefinition>
+  <terminateEventDefinition flowable:terminateAll="true"></terminateEventDefinition>
 </endEvent>
 ----
 
@@ -991,7 +991,7 @@ Since BPMN 2.0 there is the difference between the interrupting and non interrup
 <boundaryEvent id="escalationTimer" cancelActivity="false" attachedToRef="firstLineSupport"/>
 ----
 
-*Note:* boundary timer events are only fired when the job or async executor is enabled (i.e. _jobExecutorActivate_ or _asyncExecutorActivate_ needs to be set to +true+ in the +activiti.cfg.xml+, since the job and async executor are disabled by default).
+*Note:* boundary timer events are only fired when the job or async executor is enabled (i.e. _jobExecutorActivate_ or _asyncExecutorActivate_ needs to be set to +true+ in the +flowable.cfg.xml+, since the job and async executor are disabled by default).
 
 
 [[bpmnKnownIssueBoundaryEvent]]
@@ -1077,7 +1077,7 @@ Following example process shows how an error end event can be used. When the _'R
 
 image::images/bpmn.boundary.error.example.png[align="center"]
 
-This process is shipped as example in the demo setup. The process XML and unit test can be found in the _org.activiti.examples.bpmn.event.error_ package.
+This process is shipped as example in the demo setup. The process XML and unit test can be found in the _org.flowable.examples.bpmn.event.error_ package.
 
 
 [[bpmnBoundarySignalEvent]]
@@ -1289,7 +1289,7 @@ A compensation boundary event is defined as a typical <<bpmnBoundaryEvent,bounda
 
 <association associationDirection="One" id="a1"  sourceRef="compensateBookHotelEvt" targetRef="undoBookHotel" />
 
-<serviceTask id="undoBookHotel" isForCompensation="true" activiti:class="..." />
+<serviceTask id="undoBookHotel" isForCompensation="true" flowable:class="..." />
 ----
 
 Since the compensation boundary event is activated after the activity has completed successfully, the +cancelActivity+ attribute is not supported.
@@ -1497,7 +1497,7 @@ This can be a good hook to monitor some KPI's, basically by adding an <<executio
 ----
 <intermediateThrowEvent id="noneEvent">
   <extensionElements>
-    <activiti:executionListener class="org.activiti.engine.test.bpmn.event.IntermediateNoneEventTest$MyExecutionListener" event="start" />
+    <flowable:executionListener class="org.flowable.engine.test.bpmn.event.IntermediateNoneEventTest$MyExecutionListener" event="start" />
   </extensionElements>
 </intermediateThrowEvent>
 
@@ -1557,7 +1557,7 @@ An asynchronous signal event would look like this:
 [source,xml,linenums]
 ----
 <intermediateThrowEvent id="signal">
-  <signalEventDefinition signalRef="newCustomerSignal" activiti:async="true" />
+  <signalEventDefinition signalRef="newCustomerSignal" flowable:async="true" />
 </intermediateThrowEvent>
 ----
 
@@ -1752,7 +1752,7 @@ Currently conditionalExpressions can *only be used with UEL*, detailed info abou
 ----
 
 
-The Flowable distribution contains the following example process using value and method expressions (see __org.activiti.examples.bpmn.expression)__:
+The Flowable distribution contains the following example process using value and method expressions (see __org.flowable.examples.bpmn.expression)__:
 
 image::images/bpmn.uel-expression.on.seq.flow.png[align="center"]
 
@@ -2144,7 +2144,7 @@ image::images/bpmn.event.based.gateway.example.png[align="center"]
 ----
 <definitions id="definitions"
 	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-	xmlns:activiti="http://activiti.org/bpmn"
+	xmlns:flowable="http://flowable.org/bpmn"
 	targetNamespace="Examples">
 
 	<signal id="alertSignal" name="alert" />
@@ -2264,7 +2264,7 @@ There is an activity extension which allows you to specify an expression in your
 
 [source,xml,linenums]
 ----
-<userTask id="theTask" name="Important task" activiti:dueDate="${dateVariable}"/>
+<userTask id="theTask" name="Important task" flowable:dueDate="${dateVariable}"/>
 ----
 
 The due date of a task can also be altered using the +TaskService+ or in ++TaskListener++s using the passed +DelegateTask+.
@@ -2348,7 +2348,7 @@ It is clear that user and group assignments are quite cumbersome for use cases w
 
 [source,xml,linenums]
 ----
-<userTask id="theTask" name="my task" activiti:assignee="kermit" />
+<userTask id="theTask" name="my task" flowable:assignee="kermit" />
 ----
 
 This is exactly the same as using a *humanPerformer* construct as defined <<bpmnUserTaskAssignment,above>>.
@@ -2357,7 +2357,7 @@ This is exactly the same as using a *humanPerformer* construct as defined <<bpmn
 
 [source,xml,linenums]
 ----
-<userTask id="theTask" name="my task" activiti:candidateUsers="kermit, gonzo" />
+<userTask id="theTask" name="my task" flowable:candidateUsers="kermit, gonzo" />
 ----
 
 This is exactly the same as using a *potentialOwner* construct as defined <<bpmnUserTaskAssignment,above>>. Note that it is not required to use the _user(kermit)_ declaration as is the case with the _potential owner_ construct, since the attribute can only be used for users.
@@ -2366,7 +2366,7 @@ This is exactly the same as using a *potentialOwner* construct as defined <<bpmn
 
 [source,xml,linenums]
 ----
-<userTask id="theTask" name="my task" activiti:candidateGroups="management, accountancy" />
+<userTask id="theTask" name="my task" flowable:candidateGroups="management, accountancy" />
 ----
 
 This is exactly the same as using a *potentialOwner* construct as defined <<bpmnUserTaskAssignment,above>>. Note that it is not required to use the _group(management)_ declaration as is the case with the _potential owner_ construct, since the attribute can only be used for groups.
@@ -2407,11 +2407,11 @@ If additional link types are required, custom resources can be defined as extens
 ----
 <userTask id="theTask" name="make profit">
   <extensionElements>
-    <activiti:customResource activiti:name="businessAdministrator">
+    <flowable:customResource flowable:name="businessAdministrator">
       <resourceAssignmentExpression>
         <formalExpression>user(kermit), group(management)</formalExpression>
       </resourceAssignmentExpression>
-    </activiti:customResource>
+    </flowable:customResource>
   </extensionElements>
 </userTask>
 ----
@@ -2456,7 +2456,7 @@ Finally, the _IdentityLinkType_ class must be extended to support the custom ide
 package com.yourco.engine.task;
 
 public class IdentityLinkType
-    extends org.activiti.engine.task.IdentityLinkType
+    extends org.flowable.engine.task.IdentityLinkType
 {
     public static final String ADMINISTRATOR = "administrator";
 
@@ -2477,7 +2477,7 @@ In case the previous approaches are not sufficient, it is possible to delegate t
 ----
 <userTask id="task1" name="My task" >
   <extensionElements>
-    <activiti:taskListener event="create" class="org.activiti.MyAssignmentHandler" />
+    <flowable:taskListener event="create" class="org.flowable.MyAssignmentHandler" />
   </extensionElements>
 </userTask>
 ----
@@ -2505,14 +2505,14 @@ When using Spring it is possible to use the custom assignment attributes as desc
 
 [source,xml,linenums]
 ----
-<userTask id="task" name="My Task" activiti:assignee="${ldapService.findManagerForEmployee(emp)}"/>
+<userTask id="task" name="My Task" flowable:assignee="${ldapService.findManagerForEmployee(emp)}"/>
 ----
 
 This also works similar for candidate users and groups:
 
 [source,xml,linenums]
 ----
-<userTask id="task" name="My Task" activiti:candidateUsers="${ldapService.findAllSales()}"/>
+<userTask id="task" name="My Task" flowable:candidateUsers="${ldapService.findAllSales()}"/>
 ----
 
 Note that this will only work if the return type of the invoked methods is +String+ or +Collection<String>+ (for candidate users and groups):
@@ -2615,7 +2615,7 @@ It's also possible to set process variables in a script, simply by calling _exec
 
 [source,xml,linenums]
 ----
-<scriptTask id="script" scriptFormat="JavaScript" activiti:autoStoreVariables="false">
+<scriptTask id="script" scriptFormat="JavaScript" flowable:autoStoreVariables="false">
 ----
 
 The default of this parameter is +false+, meaning that if the parameter is omitted from the script task definition, all the declared variables will only exist during the duration of the script.
@@ -2639,11 +2639,11 @@ Note: the following names are reserved and *cannot be used* as variable names: *
 ===== Script results
 
 
-The return value of a script task can be assigned to an already existing or to a new process variable by specifying the process variable name as a literal value for the _'activiti:resultVariable'_ attribute of a script task definition. Any existing value for a specific process variable will be overwritten by the result value of the script execution. When not specifying a result variable name, the script result value gets ignored.
+The return value of a script task can be assigned to an already existing or to a new process variable by specifying the process variable name as a literal value for the _'flowable:resultVariable'_ attribute of a script task definition. Any existing value for a specific process variable will be overwritten by the result value of the script execution. When not specifying a result variable name, the script result value gets ignored.
 
 [source,xml,linenums]
 ----
-<scriptTask id="theScriptTask" name="Execute script" scriptFormat="juel" activiti:resultVariable="myVar">
+<scriptTask id="theScriptTask" name="Execute script" scriptFormat="juel" flowable:resultVariable="myVar">
   <script>#{echo}</script>
 </scriptTask>
 ----
@@ -2696,34 +2696,34 @@ There are 4 ways of declaring how to invoke Java logic:
 * Evaluating a value expression
 
 
-To specify a class that is called during process execution, the fully qualified classname needs to be provided by the *'activiti:class'* attribute.
+To specify a class that is called during process execution, the fully qualified classname needs to be provided by the *'flowable:class'* attribute.
 
 [source,xml,linenums]
 ----
 <serviceTask id="javaService"
              name="My Java Service Task"
-             activiti:class="org.activiti.MyJavaDelegate" />
+             flowable:class="org.flowable.MyJavaDelegate" />
 ----
 
 
 See <<bpmnJavaServiceTaskImplementation,the implementation section>> for more details on how to use such a class.
 
-It is also possible to use an expression that resolves to an object. This object must follow the same rules as objects that are created when the +activiti:class+ attribute is used (see <<bpmnJavaServiceTaskImplementation,further>>).
+It is also possible to use an expression that resolves to an object. This object must follow the same rules as objects that are created when the +flowable:class+ attribute is used (see <<bpmnJavaServiceTaskImplementation,further>>).
 
 [source,xml,linenums]
 ----
-<serviceTask id="serviceTask" activiti:delegateExpression="${delegateExpressionBean}" />
+<serviceTask id="serviceTask" flowable:delegateExpression="${delegateExpressionBean}" />
 ----
 
 Here, the +delegateExpressionBean+ is a bean that implements the +JavaDelegate+ interface, defined in for example the Spring container.
 
-To specify a UEL method expression that should be evaluated, use attribute *activiti:expression*.
+To specify a UEL method expression that should be evaluated, use attribute *flowable:expression*.
 
 [source,xml,linenums]
 ----
 <serviceTask id="javaService"
              name="My Java Service Task"
-             activiti:expression="#{printer.printMessage()}" />
+             flowable:expression="#{printer.printMessage()}" />
 ----
 
 Method ++printMessage++ (without parameters) will be called on the named object called ++printer++.
@@ -2734,18 +2734,18 @@ It's also possible to pass parameters with an method used in the expression.
 ----
 <serviceTask id="javaService"
              name="My Java Service Task"
-             activiti:expression="#{printer.printMessage(execution, myVar)}" />
+             flowable:expression="#{printer.printMessage(execution, myVar)}" />
 ----
 
 Method +printMessage+ will be called on the object named +printer+. The first parameter passed is the +DelegateExecution+, which is available in the expression context by default available as +execution+. The second parameter passed, is the value of the variable with name +myVar+ in the current execution.
 
-To specify a UEL value expression that should be evaluated, use attribute *activiti:expression*.
+To specify a UEL value expression that should be evaluated, use attribute *flowable:expression*.
 
 [source,xml,linenums]
 ----
 <serviceTask id="javaService"
              name="My Java Service Task"
-             activiti:expression="#{split.ready}" />
+             flowable:expression="#{split.ready}" />
 ----
 
 The getter method of property ++ready++, ++getReady++ (without parameters), will be called on the named bean called ++split++. The named objects are resolved in the execution's process variables and (if applicable) in the Spring context.
@@ -2756,9 +2756,9 @@ The getter method of property ++ready++, ++getReady++ (without parameters), will
 
 ===== Implementation
 
-To implement a class that can be called during process execution, this class needs to implement the _org.activiti.engine.delegate.JavaDelegate_ interface and provide the required logic in the _execute_ method. When process execution arrives at this particular step, it will execute this logic defined in that method and leave the activity in the default BPMN 2.0 way.
+To implement a class that can be called during process execution, this class needs to implement the _org.flowable.engine.delegate.JavaDelegate_ interface and provide the required logic in the _execute_ method. When process execution arrives at this particular step, it will execute this logic defined in that method and leave the activity in the default BPMN 2.0 way.
 
-Let's create for example a Java class that can be used to change a process variable String to uppercase. This class needs to implement the _org.activiti.engine.delegate.JavaDelegate_ interface, which requires us to implement the _execute(DelegateExecution)_ method. It's this operation that will be called by the engine and which needs to contain the business logic. Process instance information such as process variables  and other can be accessed and manipulated through the link:$$http://flowable.org/javadocs/org/activiti/engine/delegate/DelegateExecution.html$$[DelegateExecution] interface (click on the link for a detailed Javadoc of its operations).
+Let's create for example a Java class that can be used to change a process variable String to uppercase. This class needs to implement the _org.flowable.engine.delegate.JavaDelegate_ interface, which requires us to implement the _execute(DelegateExecution)_ method. It's this operation that will be called by the engine and which needs to contain the business logic. Process instance information such as process variables  and other can be accessed and manipulated through the link:$$http://flowable.org/javadocs/org/flowable/engine/delegate/DelegateExecution.html$$[DelegateExecution] interface (click on the link for a detailed Javadoc of its operations).
 
 [source,java,linenums]
 ----
@@ -2775,9 +2775,9 @@ public class ToUppercase implements JavaDelegate {
 
 Note: there will be *only one instance of that Java class created for the serviceTask it is defined on*. All process-instances share the same class instance that will be used to call _execute(DelegateExecution)_. This means that the class must not use any member variables and must be thread-safe, since it can be executed simultaneously from different threads. This also influences the way <<serviceTaskFieldInjection,Field injection>> is handled.
 
-The classes that are referenced in the process definition (i.e. by using ++activiti:class++) are *NOT instantiated during deployment*. Only when a process execution arrives for the first time at the point in the process where the class is used, an instance of that class will be created. If the class cannot be found, an +ActivitiException+ will be thrown. The reasoning for this is that the environment (and more specifically the __classpath__) when you are deploying is often different from the actual runtime environment. For example when using _ant_ or the business archive upload in the Flowable app to deploy processes, the classpath does not contain the referenced classes.
+The classes that are referenced in the process definition (i.e. by using ++flowable:class++) are *NOT instantiated during deployment*. Only when a process execution arrives for the first time at the point in the process where the class is used, an instance of that class will be created. If the class cannot be found, an +ActivitiException+ will be thrown. The reasoning for this is that the environment (and more specifically the __classpath__) when you are deploying is often different from the actual runtime environment. For example when using _ant_ or the business archive upload in the Flowable app to deploy processes, the classpath does not contain the referenced classes.
 
-<<internal,[INTERNAL: non-public implementation classes]>> It is also possible to provide a class that implements the _org.activiti.engine.impl.pvm.delegate.ActivityBehavior_ interface. Implementations have then access to the more powerful _ActivityExecution_ that for example also allows to influence the control flow of the process. Note however that this is not a very good practice, and should be avoided as much as possible. So, it is advised to use the _ActivityBehavior_ interface only for advanced use cases and if you know exactly what you're doing.
+<<internal,[INTERNAL: non-public implementation classes]>> It is also possible to provide a class that implements the _org.flowable.engine.impl.pvm.delegate.ActivityBehavior_ interface. Implementations have then access to the more powerful _ActivityExecution_ that for example also allows to influence the control flow of the process. Note however that this is not a very good practice, and should be avoided as much as possible. So, it is advised to use the _ActivityBehavior_ interface only for advanced use cases and if you know exactly what you're doing.
 
 
 [[serviceTaskFieldInjection]]
@@ -2792,7 +2792,7 @@ It's possible to inject values into the fields of the delegated classes. The fol
 
 If available, the value is injected through a public setter method on your delegated class, following the Java Bean naming conventions (e.g. field +firstName+ has setter ++setFirstName(...)++). If no setter is available for that field, the value of private member will be set on the delegate. SecurityManagers in some environments don't allow modifying private fields, so it's safer to expose a public setter-method for the fields you want to have injected.
 
-*Regardless of the type of value declared in the process-definition, the type of the setter/private field on the injection target should always be +org.activiti.engine.delegate.Expression+. When the expression is resolved it can be cast to the appropriate type.*
+*Regardless of the type of value declared in the process-definition, the type of the setter/private field on the injection target should always be +org.flowable.engine.delegate.Expression+. When the expression is resolved it can be cast to the appropriate type.*
 
 Field injection is supported when using the _'actviiti:class'_ attribute. Field injection is also possible when using the _activiti:delegateExpression_ attribute, however special rules with regards to thread-safety apply (see next section).
 
@@ -2802,14 +2802,14 @@ The following code snippet shows how to inject a constant value into a field dec
 ----
 <serviceTask id="javaService"
     name="Java service invocation"
-    activiti:class="org.activiti.examples.bpmn.servicetask.ToUpperCaseFieldInjected">
+    flowable:class="org.flowable.examples.bpmn.servicetask.ToUpperCaseFieldInjected">
     <extensionElements>
-      <activiti:field name="text" stringValue="Hello World" />
+      <flowable:field name="text" stringValue="Hello World" />
   </extensionElements>
 </serviceTask>
 ----
 
-The class +ToUpperCaseFieldInjected+ has a field +text+ which is of type +org.activiti.engine.delegate.Expression+. When calling +text.getValue(execution)+, the configured string value +Hello World+ will be returned:
+The class +ToUpperCaseFieldInjected+ has a field +text+ which is of type +org.flowable.engine.delegate.Expression+. When calling +text.getValue(execution)+, the configured string value +Hello World+ will be returned:
 
 [source,java,linenums]
 ----
@@ -2824,39 +2824,39 @@ public class ToUpperCaseFieldInjected implements JavaDelegate {
 }
 ----
 
-Alternatively, for longs texts (e.g. an inline e-mail) the _'activiti:string'_ sub element can be used:
+Alternatively, for longs texts (e.g. an inline e-mail) the _'flowable:string'_ sub element can be used:
 
 [source,xml,linenums]
 ----
 <serviceTask id="javaService"
     name="Java service invocation"
-    activiti:class="org.activiti.examples.bpmn.servicetask.ToUpperCaseFieldInjected">
+    flowable:class="org.flowable.examples.bpmn.servicetask.ToUpperCaseFieldInjected">
   <extensionElements>
-    <activiti:field name="text">
-        <activiti:string>
+    <flowable:field name="text">
+        <flowable:string>
           This is a long string with a lot of words and potentially way longer even!
-      </activiti:string>
-    </activiti:field>
+      </flowable:string>
+    </flowable:field>
   </extensionElements>
 </serviceTask>
 ----
 
-To inject values that are dynamically resolved at runtime, expressions can be used. Those expressions can use process variables, or Spring defined beans (if Spring is used). As noted in <<bpmnJavaServiceTaskImplementation,Service Task Implementation>>, an instance of the Java class is shared among all process-instances in a service task when using the _activiti:class_ attribute. To have dynamic injection of values in fields, you can inject value and method expressions in a +org.activiti.engine.delegate.Expression+ which can be evaluated/invoked using the +DelegateExecution+ passed in the +execute+ method.
+To inject values that are dynamically resolved at runtime, expressions can be used. Those expressions can use process variables, or Spring defined beans (if Spring is used). As noted in <<bpmnJavaServiceTaskImplementation,Service Task Implementation>>, an instance of the Java class is shared among all process-instances in a service task when using the _activiti:class_ attribute. To have dynamic injection of values in fields, you can inject value and method expressions in a +org.flowable.engine.delegate.Expression+ which can be evaluated/invoked using the +DelegateExecution+ passed in the +execute+ method.
 
-The example class below uses the injected expressions and resolves them using the current +DelegateExecution+. A _generBean_ method call is used while passing the _gender_ variable. Full code and test can be found in +org.activiti.examples.bpmn.servicetask.JavaServiceTaskTest.testExpressionFieldInjection+
+The example class below uses the injected expressions and resolves them using the current +DelegateExecution+. A _generBean_ method call is used while passing the _gender_ variable. Full code and test can be found in +org.flowable.examples.bpmn.servicetask.JavaServiceTaskTest.testExpressionFieldInjection+
 
 [source,xml,linenums]
 ----
 <serviceTask id="javaService" name="Java service invocation"
-  activiti:class="org.activiti.examples.bpmn.servicetask.ReverseStringsFieldInjected">
+  flowable:class="org.flowable.examples.bpmn.servicetask.ReverseStringsFieldInjected">
 
   <extensionElements>
-    <activiti:field name="text1">
-      <activiti:expression>${genderBean.getGenderString(gender)}</activiti:expression>
-    </activiti:field>
-    <activiti:field name="text2">
-       <activiti:expression>Hello ${gender == 'male' ? 'Mr.' : 'Mrs.'} ${name}</activiti:expression>
-    </activiti:field>
+    <flowable:field name="text1">
+      <flowable:expression>${genderBean.getGenderString(gender)}</flowable:expression>
+    </flowable:field>
+    <flowable:field name="text2">
+       <flowable:expression>Hello ${gender == 'male' ? 'Mr.' : 'Mrs.'} ${name}</flowable:expression>
+    </flowable:field>
   </ extensionElements>
 </ serviceTask>
 ----
@@ -2883,8 +2883,8 @@ Alternatively, you can also set the expressions as an attribute instead of a chi
 
 [source,xml,linenums]
 ----
-<activiti:field name="text1" expression="${genderBean.getGenderString(gender)}" />
-<activiti:field name="text1" expression="Hello ${gender == 'male' ? 'Mr.' : 'Mrs.'} ${name}" />
+<flowable:field name="text1" expression="${genderBean.getGenderString(gender)}" />
+<flowable:field name="text1" expression="Hello ${gender == 'male' ? 'Mr.' : 'Mrs.'} ${name}" />
 ----
 
 [[serviceTaskFieldInjectionThreadSafety]]
@@ -2905,17 +2905,17 @@ However, suppose the expression is _${someJavaDelegateBean}_ that resolves to an
 
 [source,xml,linenums]
 ----
-<serviceTask id="serviceTask1" activiti:delegateExpression="${someJavaDelegateBean}">
+<serviceTask id="serviceTask1" flowable:delegateExpression="${someJavaDelegateBean}">
     <extensionElements>
-        <activiti:field name="someField" expression="${input * 2}"/>
+        <flowable:field name="someField" expression="${input * 2}"/>
     </extensionElements>
 </serviceTask>
 
 <!-- other process definition elements -->
 
-<serviceTask id="serviceTask2" activiti:delegateExpression="${someJavaDelegateBean}">
+<serviceTask id="serviceTask2" flowable:delegateExpression="${someJavaDelegateBean}">
     <extensionElements>
-        <activiti:field name="someField" expression="${input * 2000}"/>
+        <flowable:field name="someField" expression="${input * 2000}"/>
     </extensionElements>
 </serviceTask>
 ----
@@ -2927,7 +2927,7 @@ The easiest solution to solve this, is to either
 * rewrite the Java delegate to use an expression and passing the needed data to the delegate via a method arguments.
 * return a new instance of the delegate class each time the delegate expression is resolved. For example when using Spring, this means that the scope of the bean must be set to *prototype* (for example by adding the @Scope(SCOPE_PROTOTYPE) annotation to the delegate class)
 
-As of Flowable version 5.22, the process engine configuration can be configured in a way to disable the use of field injection on delegate epxressions, by setting the value of the _delegateExpressionFieldInjectionMode_ property (which takes one of the values in the _org.activiti.engine.imp.cfg.DelegateExpressionFieldInjectionMode_ enum).
+As of Flowable version 5.22, the process engine configuration can be configured in a way to disable the use of field injection on delegate epxressions, by setting the value of the _delegateExpressionFieldInjectionMode_ property (which takes one of the values in the _org.flowable.engine.imp.cfg.DelegateExpressionFieldInjectionMode_ enum).
 
 Following settings are possible:
 
@@ -2943,10 +2943,10 @@ For example, suppose that we're using _MIXED_ mode and we're using the Spring in
 [source,xml,linenums]
 ----
 <bean id="singletonDelegateExpressionBean"
-  class="org.activiti.spring.test.fieldinjection.SingletonDelegateExpressionBean" />
+  class="org.flowable.spring.test.fieldinjection.SingletonDelegateExpressionBean" />
 
 <bean id="prototypeDelegateExpressionBean"
-  class="org.activiti.spring.test.fieldinjection.PrototypeDelegateExpressionBean"
+  class="org.flowable.spring.test.fieldinjection.PrototypeDelegateExpressionBean"
   scope="prototype" />
 ----
 
@@ -2956,35 +2956,35 @@ Given following process definition:
 
 [source,xml,linenums]
 ----
-<serviceTask id="serviceTask1" activiti:delegateExpression="${prototypeDelegateExpressionBean}">
+<serviceTask id="serviceTask1" flowable:delegateExpression="${prototypeDelegateExpressionBean}">
   <extensionElements>
-    <activiti:field name="fieldA" expression="${input * 2}"/>
-    <activiti:field name="fieldB" expression="${1 + 1}"/>
-    <activiti:field name="resultVariableName" stringValue="resultServiceTask1"/>
+    <flowable:field name="fieldA" expression="${input * 2}"/>
+    <flowable:field name="fieldB" expression="${1 + 1}"/>
+    <flowable:field name="resultVariableName" stringValue="resultServiceTask1"/>
   </extensionElements>
 </serviceTask>
 
-<serviceTask id="serviceTask2" activiti:delegateExpression="${prototypeDelegateExpressionBean}">
+<serviceTask id="serviceTask2" flowable:delegateExpression="${prototypeDelegateExpressionBean}">
   <extensionElements>
-    <activiti:field name="fieldA" expression="${123}"/>
-    <activiti:field name="fieldB" expression="${456}"/>
-    <activiti:field name="resultVariableName" stringValue="resultServiceTask2"/>
+    <flowable:field name="fieldA" expression="${123}"/>
+    <flowable:field name="fieldB" expression="${456}"/>
+    <flowable:field name="resultVariableName" stringValue="resultServiceTask2"/>
   </extensionElements>
 </serviceTask>
 
-<serviceTask id="serviceTask3" activiti:delegateExpression="${singletonDelegateExpressionBean}">
+<serviceTask id="serviceTask3" flowable:delegateExpression="${singletonDelegateExpressionBean}">
   <extensionElements>
-    <activiti:field name="fieldA" expression="${input * 2}"/>
-    <activiti:field name="fieldB" expression="${1 + 1}"/>
-    <activiti:field name="resultVariableName" stringValue="resultServiceTask1"/>
+    <flowable:field name="fieldA" expression="${input * 2}"/>
+    <flowable:field name="fieldB" expression="${1 + 1}"/>
+    <flowable:field name="resultVariableName" stringValue="resultServiceTask1"/>
   </extensionElements>
 </serviceTask>
 
-<serviceTask id="serviceTask4" activiti:delegateExpression="${singletonDelegateExpressionBean}">
+<serviceTask id="serviceTask4" flowable:delegateExpression="${singletonDelegateExpressionBean}">
   <extensionElements>
-    <activiti:field name="fieldA" expression="${123}"/>
-    <activiti:field name="fieldB" expression="${456}"/>
-    <activiti:field name="resultVariableName" stringValue="resultServiceTask2"/>
+    <flowable:field name="fieldA" expression="${123}"/>
+    <flowable:field name="fieldB" expression="${456}"/>
+    <flowable:field name="resultVariableName" stringValue="resultServiceTask2"/>
   </extensionElements>
 </serviceTask>
 ----
@@ -3054,7 +3054,7 @@ public class SingletonDelegateExpressionBean implements JavaDelegate {
 
 The _INSTANCE_COUNT_ will always be _one_ here, as it is a singleton. In this delegate, there are no _Expression_ member fields. This is possible since we're running in _MIXED_ mode. In _COMPATIBILITY_ mode, this would throw an exception as it expects the member fields to be there. _DISABLED_ mode would also work for this bean, but it would disallow the use the prototype bean above that does use field injection.
 
-In this delegate code, the *org.activiti.engine.delegate.DelegateHelper* class is used, that has some useful utility methods to execute the same logic, but in a thread-safe way when the delegate is a singleton. Instead of injecting the _Expression_, it is fetched via the _getFieldExpression_ method. This means that when it comes to the service task xml, the fields are defined exactly the same as for the singleton bean. If you look at the xml snippet above, you can see they are equal in definition and only the implementation logic differs.
+In this delegate code, the *org.flowable.engine.delegate.DelegateHelper* class is used, that has some useful utility methods to execute the same logic, but in a thread-safe way when the delegate is a singleton. Instead of injecting the _Expression_, it is fetched via the _getFieldExpression_ method. This means that when it comes to the service task xml, the fields are defined exactly the same as for the singleton bean. If you look at the xml snippet above, you can see they are equal in definition and only the implementation logic differs.
 
 (Technical note: the _getFieldExpression_ will introspect the BpmnModel and create the Expression on the fly when the method is executed, making it thread-safe)
 
@@ -3065,11 +3065,11 @@ In this delegate code, the *org.activiti.engine.delegate.DelegateHelper* class i
 [source,xml,linenums]
 ----
 <extensionElements>
-  <activiti:executionListener
+  <flowable:executionListener
       delegateExpression="${testExecutionListener}" event="start">
-    <activiti:field name="input" expression="${startValue}" />
-    <activiti:field name="resultVar" stringValue="processStartValue" />
-  </activiti:executionListener>
+    <flowable:field name="input" expression="${startValue}" />
+    <flowable:field name="resultVar" stringValue="processStartValue" />
+  </flowable:executionListener>
 </extensionElements>
 ----
 
@@ -3101,13 +3101,13 @@ public class TestExecutionListener implements ExecutionListener {
 ===== Service task results
 
 
-The return value of a service execution (for service task using expression only) can be assigned to an already existing or to a new process variable by specifying the process variable name as a literal value for the _'activiti:resultVariable'_ attribute of a service task definition. Any existing value for a specific process variable will be overwritten by the result value of the service execution. When not specifying a result variable name, the service execution result value gets ignored.
+The return value of a service execution (for service task using expression only) can be assigned to an already existing or to a new process variable by specifying the process variable name as a literal value for the _'flowable:resultVariable'_ attribute of a service task definition. Any existing value for a specific process variable will be overwritten by the result value of the service execution. When not specifying a result variable name, the service execution result value gets ignored.
 
 [source,xml,linenums]
 ----
 <serviceTask id="aMethodExpressionServiceTask"
-    activiti:expression="#{myService.doSomething()}"
-    activiti:resultVariable="myVar" />
+    flowable:expression="#{myService.doSomething()}"
+    flowable:resultVariable="myVar" />
 ----
 
 In the example above, the result of the service execution (the return value of the __'doSomething()'__ method invocation on an object that is made available under the name __'myService'__ either in the process variables or as a Spring bean) is set to the process variable named __'myVar'__ after the service execution completes.
@@ -3156,25 +3156,25 @@ This mechanism should be used *only for business faults* that shall be handled b
 It is also possible to directly map a java exception to business exception by using +mapException+ extension. Single mapping is the simplest form:
 [source,xml,linenums]
 ----
-<serviceTask id="servicetask1" name="Service Task" activiti:class="...">
+<serviceTask id="servicetask1" name="Service Task" flowable:class="...">
   <extensionElements>
-    <activiti:mapException
-          errorCode="myErrorCode1">org.activiti.SomeException</activiti:mapException>
+    <flowable:mapException
+          errorCode="myErrorCode1">org.flowable.SomeException</flowable:mapException>
   </extensionElements>
 </serviceTask>
 
 ----
-In above code, if an instance of +org.activiti.SomeException+ is thrown in service task, it would be caught and converted to a BPMN exception with the given errorCode. From this point on, it will be handled exactly like a normal BPMN exception.
+In above code, if an instance of +org.flowable.SomeException+ is thrown in service task, it would be caught and converted to a BPMN exception with the given errorCode. From this point on, it will be handled exactly like a normal BPMN exception.
 Any other exception will be treated as if there is no mapping in place. It will be propagated to the API caller.
 
 One can map all the child exception of a certain exception in a single line by using +includeChildExceptions+ attribute.
 
 [source,xml,linenums]
 ----
-<serviceTask id="servicetask1" name="Service Task" activiti:class="...">
+<serviceTask id="servicetask1" name="Service Task" flowable:class="...">
   <extensionElements>
-    <activiti:mapException errorCode="myErrorCode1"
-           includeChildExceptions="true">org.activiti.SomeException</activiti:mapException>
+    <flowable:mapException errorCode="myErrorCode1"
+           includeChildExceptions="true">org.flowable.SomeException</flowable:mapException>
   </extensionElements>
 </serviceTask>
 
@@ -3187,9 +3187,9 @@ The most generic mapping is a default map. Default map is a map with no class. I
 
 [source,xml,linenums]
 ----
-<serviceTask id="servicetask1" name="Service Task" activiti:class="...">
+<serviceTask id="servicetask1" name="Service Task" flowable:class="...">
   <extensionElements>
-    <activiti:mapException errorCode="myErrorCode1"/>
+    <flowable:mapException errorCode="myErrorCode1"/>
   </extensionElements>
 </serviceTask>
 ----
@@ -3212,7 +3212,7 @@ Another option is to route process execution through another path in case some e
 ----
 <serviceTask id="javaService"
   name="Java service invocation"
-  activiti:class="org.activiti.ThrowsExceptionBehavior">
+  flowable:class="org.flowable.ThrowsExceptionBehavior">
 </serviceTask>
 
 <sequenceFlow id="no-exception" sourceRef="javaService" targetRef="theEnd" />
@@ -3248,7 +3248,7 @@ public class ThrowsExceptionBehavior implements ActivityBehavior {
 ===== Using a Flowable service from within a JavaDelegate
 
 
-For some use cases, it might be needed to use the Flowable services from within a Java service task (e.g. starting a process instance through the RuntimeService, if the callActivity doesn't suit your needs). The _org.activiti.engine.delegate.DelegateExecution_ allows to easily use these services through the _org.activiti.engine.EngineServices_ interface:
+For some use cases, it might be needed to use the Flowable services from within a Java service task (e.g. starting a process instance through the RuntimeService, if the callActivity doesn't suit your needs). The _org.flowable.engine.delegate.DelegateExecution_ allows to easily use these services through the _org.flowable.engine.EngineServices_ interface:
 
 [source,java,linenums]
 ----
@@ -3264,7 +3264,7 @@ public class StartProcessInstanceTestDelegate implements JavaDelegate {
 
 All of the Flowable service API's are available through this interface.
 
-All data changes that occur as an effect of using these API calls, will be part of the current transaction. This also works in environments with dependency injection like Spring and CDI with or without a JTA enabled datasource. For example, the following snippet of code will do the same as the snippet above, but now the RuntimeService is injected rather than it is being fetched through the _org.activiti.engine.EngineServices_ interface.
+All data changes that occur as an effect of using these API calls, will be part of the current transaction. This also works in environments with dependency injection like Spring and CDI with or without a JTA enabled datasource. For example, the following snippet of code will do the same as the snippet above, but now the RuntimeService is injected rather than it is being fetched through the _org.flowable.engine.EngineServices_ interface.
 
 [source,java,linenums]
 ----
@@ -3318,7 +3318,7 @@ To use a Web service we need to import its operations and complex types. This ca
 ----
 <import importType="http://schemas.xmlsoap.org/wsdl/"
 	location="http://localhost:63081/counter?wsdl"
-	namespace="http://webservice.activiti.org/" />
+	namespace="http://webservice.flowable.org/" />
 ----
 
 The previous declaration tells Flowable to import the definitions but it doesn't create the item definitions and messages for you. Let's suppose we want to invoke a specific method called 'prettyPrint', therefore we will need to create the corresponding message and item definitions for the request and response messages:
@@ -3481,7 +3481,7 @@ image::images/bpmn.business.rule.task.png[align="center"]
 
 ===== XML representation
 
-To execute one or more business rules that are deployed in the same BAR file as the process definition, we need to define the input and result variables. For the input variable definition a list of process variables can be defined separated by a comma. The output variable definition can only contain one variable name that will be used to store the output objects of the executed business rules in a process variable. Note that the result variable will contain a List of objects. If no result variable name is specified by default org.activiti.engine.rules.OUTPUT is used.
+To execute one or more business rules that are deployed in the same BAR file as the process definition, we need to define the input and result variables. For the input variable definition a list of process variables can be defined separated by a comma. The output variable definition can only contain one variable name that will be used to store the output objects of the executed business rules in a process variable. Note that the result variable will contain a List of objects. If no result variable name is specified by default org.flowable.engine.rules.OUTPUT is used.
 
 The following business rule task executes all business rules deployed with the process definition:
 
@@ -3492,8 +3492,8 @@ The following business rule task executes all business rules deployed with the p
   <startEvent id="theStart" />
   <sequenceFlow sourceRef="theStart" targetRef="businessRuleTask" />
 
-  <businessRuleTask id="businessRuleTask" activiti:ruleVariablesInput="${order}"
-      activiti:resultVariable="rulesOutput" />
+  <businessRuleTask id="businessRuleTask" flowable:ruleVariablesInput="${order}"
+      flowable:resultVariable="rulesOutput" />
 
   <sequenceFlow sourceRef="businessRuleTask" targetRef="theEnd" />
 
@@ -3506,8 +3506,8 @@ The business rule task can also be configured to execute only a defined set of r
 
 [source,xml,linenums]
 ----
-<businessRuleTask id="businessRuleTask" activiti:ruleVariablesInput="${order}"
-      activiti:rules="rule1, rule2" />
+<businessRuleTask id="businessRuleTask" flowable:ruleVariablesInput="${order}"
+      flowable:rules="rule1, rule2" />
 ----
 
 In this case only rule1 and rule2 are executed.
@@ -3516,8 +3516,8 @@ You can also define a list of rules that should be excluded from execution.
 
 [source,xml,linenums]
 ----
-<businessRuleTask id="businessRuleTask" activiti:ruleVariablesInput="${order}"
-      activiti:rules="rule1, rule2" exclude="true" />
+<businessRuleTask id="businessRuleTask" flowable:ruleVariablesInput="${order}"
+      flowable:rules="rule1, rule2" exclude="true" />
 ----
 
 In this case all rules deployed in the same BAR file as the process definition will be executed, except for rule1 and rule2.
@@ -3526,7 +3526,7 @@ As mentioned earlier another option is to hook in the implementation of the Busi
 
 [source,xml,linenums]
 ----
-<businessRuleTask id="businessRuleTask" activiti:class="${MyRuleServiceDelegate}" />
+<businessRuleTask id="businessRuleTask" flowable:class="${MyRuleServiceDelegate}" />
 ----
 
 Now the BusinessRuleTask behaves exactly like a ServiceTask, but still keeps the BusinessRuleTask icon to visualize that we do business rule processing here.
@@ -3545,7 +3545,7 @@ Flowable allows to enhance business processes with automatic mail service tasks 
 
 ===== Mail server configuration
 
-The Flowable engine sends e-mails trough an external mail server with SMTP capabilities. To actually send e-mails, the engine needs to know how to reach the mail server. Following properties can be set in the _activiti.cfg.xml_ configuration file:
+The Flowable engine sends e-mails trough an external mail server with SMTP capabilities. To actually send e-mails, the engine needs to know how to reach the mail server. Following properties can be set in the _flowable.cfg.xml_ configuration file:
 
 [options="header"]
 |===============
@@ -3570,7 +3570,7 @@ The Email task is implemented as a dedicated <<bpmnJavaServiceTask,Service Task>
 
 [source,xml,linenums]
 ----
-<serviceTask id="sendMail" activiti:type="mail">
+<serviceTask id="sendMail" flowable:type="mail">
 ----
 
 The Email task is configured by <<serviceTaskFieldInjection,field injection>>. All the values for these properties can contain EL expression, which are resolved at runtime during process execution. Following properties can be set:
@@ -3609,13 +3609,13 @@ The following XML snippet shows an example of using the Email Task.
 
 [source,xml,linenums]
 ----
-<serviceTask id="sendMail" activiti:type="mail">
+<serviceTask id="sendMail" flowable:type="mail">
   <extensionElements>
-    <activiti:field name="from" stringValue="order-shipping@thecompany.com" />
-    <activiti:field name="to" expression="${recipient}" />
-    <activiti:field name="subject" expression="Your order ${orderId} has been shipped" />
-    <activiti:field name="html">
-      <activiti:expression>
+    <flowable:field name="from" stringValue="order-shipping@thecompany.com" />
+    <flowable:field name="to" expression="${recipient}" />
+    <flowable:field name="subject" expression="Your order ${orderId} has been shipped" />
+    <flowable:field name="html">
+      <flowable:expression>
         <![CDATA[
           <html>
             <body>
@@ -3629,8 +3629,8 @@ The following XML snippet shows an example of using the Email Task.
             </body>
           </html>
         ]]>
-      </activiti:expression>
-    </activiti:field>
+      </flowable:expression>
+    </flowable:field>
   </extensionElements>
 </serviceTask>
 
@@ -3659,7 +3659,7 @@ The Mule task is implemented as a dedicated <<bpmnJavaServiceTask,Service Task>>
 
 [source,xml,linenums]
 ----
-<serviceTask id="sendMule" activiti:type="mule">
+<serviceTask id="sendMule" flowable:type="mule">
 ----
 
 The Mule task is configured by <<serviceTaskFieldInjection,field injection>>. All the values for these properties can contain EL expression, which are resolved at runtime during process execution. Following properties can be set:
@@ -3684,18 +3684,18 @@ The following XML snippet shows an example of using the Mule Task.
 [source,xml,linenums]
 ----
 <extensionElements>
-  <activiti:field name="endpointUrl">
-    <activiti:string>vm://in</activiti:string>
-  </activiti:field>
-  <activiti:field name="language">
-    <activiti:string>juel</activiti:string>
-  </activiti:field>
-  <activiti:field name="payloadExpression">
-    <activiti:string>"hi"</activiti:string>
-  </activiti:field>
-  <activiti:field name="resultVariable">
-    <activiti:string>theVariable</activiti:string>
-  </activiti:field>
+  <flowable:field name="endpointUrl">
+    <flowable:string>vm://in</flowable:string>
+  </flowable:field>
+  <flowable:field name="language">
+    <flowable:string>juel</flowable:string>
+  </flowable:field>
+  <flowable:field name="payloadExpression">
+    <flowable:string>"hi"</flowable:string>
+  </flowable:field>
+  <flowable:field name="resultVariable">
+    <flowable:string>theVariable</flowable:string>
+  </flowable:field>
 </extensionElements>
 ----
 
@@ -3716,7 +3716,7 @@ The Camel task is implemented as a dedicated <<bpmnJavaServiceTask,Service Task>
 
 [source,xml,linenums]
 ----
-<serviceTask id="sendCamel" activiti:type="camel">
+<serviceTask id="sendCamel" flowable:type="camel">
 ----
 
 The process definition itself needs nothing else then the camel type definition on a service task. The integration logic is all delegated to the Camel container. By default the Flowable Engine looks for a camelContext bean in the Spring container. The camelContext bean defines the Camel routes that will be loaded by the Camel container. In the following example the routes are loaded from a specific Java package, but you can also define routes directly in the Spring configuration itself.
@@ -3725,7 +3725,7 @@ The process definition itself needs nothing else then the camel type definition 
 ----
 <camelContext id="camelContext" xmlns="http://camel.apache.org/schema/spring">
   <packageScan>
-    <package>org.activiti.camel.route</package>
+    <package>org.flowable.camel.route</package>
   </packageScan>
 </camelContext>
 ----
@@ -3736,9 +3736,9 @@ If you want to define multiple Camel context beans and/or want to use a differen
 
 [source,xml,linenums]
 ----
-<serviceTask id="serviceTask1" activiti:type="camel">
+<serviceTask id="serviceTask1" flowable:type="camel">
   <extensionElements>
-    <activiti:field name="camelContext" stringValue="customCamelContext" />
+    <flowable:field name="camelContext" stringValue="customCamelContext" />
   </extensionElements>
 </serviceTask>
 ----
@@ -3750,13 +3750,13 @@ If you want to define multiple Camel context beans and/or want to use a differen
 ===== Simple Camel Call example
 
 
-All the files related to this example can be found in org.activiti.camel.examples.simpleCamelCall package of activiti-camel module. The target is simply activating a specific camel route. First of all we need an Spring context which contains the introduction to the routes as mentioned previously. This part of the file serves this purpose:
+All the files related to this example can be found in org.flowable.camel.examples.simpleCamelCall package of flowable-camel module. The target is simply activating a specific camel route. First of all we need an Spring context which contains the introduction to the routes as mentioned previously. This part of the file serves this purpose:
 
 [source,xml,linenums]
 ----
 <camelContext id="camelContext" xmlns="http://camel.apache.org/schema/spring">
   <packageScan>
-    <package>org.activiti.camel.examples.simpleCamelCall</package>
+    <package>org.flowable.camel.examples.simpleCamelCall</package>
   </packageScan>
 </camelContext>
 ----
@@ -3767,7 +3767,7 @@ public class SimpleCamelCallRoute extends RouteBuilder {
 
   @Override
   public void configure() throws Exception {
-    from("activiti:SimpleCamelCallProcess:simpleCall").to("log:org.activiti.camel.examples.SimpleCamelCall");
+    from("flowable:SimpleCamelCallProcess:simpleCall").to("log:org.flowable.camel.examples.SimpleCamelCall");
   }
 }
 ----
@@ -3792,7 +3792,7 @@ Ok, our route is now properly configured and accessible to the Camel. Now comes 
   <startEvent id="start"/>
   <sequenceFlow id="flow1" sourceRef="start" targetRef="simpleCall"/>
 
-  <serviceTask id="simpleCall" activiti:type="camel"/>
+  <serviceTask id="simpleCall" flowable:type="camel"/>
 
   <sequenceFlow id="flow2" sourceRef="simpleCall" targetRef="end"/>
   <endEvent id="end"/>
@@ -3835,9 +3835,9 @@ The variable "input" is actually the input for the Camel route and outputMap is 
 <process id="PingPongProcess">
   <startEvent id="start"/>
   <sequenceFlow id="flow1" sourceRef="start" targetRef="ping"/>
-  <serviceTask id="ping" activiti:type="camel"/>
+  <serviceTask id="ping" flowable:type="camel"/>
   <sequenceFlow id="flow2" sourceRef="ping" targetRef="saveOutput"/>
-  <serviceTask id="saveOutput"  activiti:class="org.activiti.camel.examples.pingPong.SaveOutput" />
+  <serviceTask id="saveOutput"  flowable:class="org.flowable.camel.examples.pingPong.SaveOutput" />
   <sequenceFlow id="flow3" sourceRef="saveOutput" targetRef="end"/>
   <endEvent id="end"/>
 </process>
@@ -3848,14 +3848,14 @@ Note that SaveOutput Service task, stores the value of "Output" variable from co
 
 [source,xml,linenums]
 ----
-<serviceTask id="serviceTask1" activiti:type="camel">
+<serviceTask id="serviceTask1" flowable:type="camel">
   <extensionElements>
-    <activiti:field name="camelBehaviorClass" stringValue="org.activiti.camel.impl.CamelBehaviorCamelBodyImpl" />
+    <flowable:field name="camelBehaviorClass" stringValue="org.flowable.camel.impl.CamelBehaviorCamelBodyImpl" />
   </extensionElements>
 </serviceTask>
 ----
 
-If you do not specify and specific behaviour then, org.activiti.camel.impl.CamelBehaviorDefaultImpl will be set. This behaviour copies the variables to Camel properties of the same name. In return regardless of selected behaviour, if the camel message body is a map, then each of its elements is copied as a variable, else the whole object is copied into a specific variable with the name of "camelBody". Knowing that, this camel route concludes our second example:
+If you do not specify and specific behaviour then, org.flowable.camel.impl.CamelBehaviorDefaultImpl will be set. This behaviour copies the variables to Camel properties of the same name. In return regardless of selected behaviour, if the camel message body is a map, then each of its elements is copied as a variable, else the whole object is copied into a specific variable with the name of "camelBody". Knowing that, this camel route concludes our second example:
 
 [source,java,linenums]
 ----
@@ -3922,7 +3922,7 @@ Previous examples were all synchronous. The workflow stops, until the camel rout
 
 [source,xml,linenums]
 ----
-<serviceTask id="serviceAsyncPing" activiti:type="camel" activiti:async="true"/>
+<serviceTask id="serviceAsyncPing" flowable:type="camel" flowable:async="true"/>
 ----
 
 
@@ -3964,7 +3964,7 @@ It is also possible to set the initiator of the process to some authenticated us
 
 [source,xml,linenums]
 ----
-<startEvent id="start" activiti:initiator="initiator" />
+<startEvent id="start" flowable:initiator="initiator" />
 ----
 
 Then given that the user id is contained in a Camel header named _CamelProcessInitiatorHeader_ the Camel route could be defined as follows:
@@ -4077,7 +4077,7 @@ The shell task is implemented as a dedicated <<bpmnJavaServiceTask,Service Task>
 
 [source,xml,linenums]
 ----
-<serviceTask id="shellEcho" activiti:type="shell">
+<serviceTask id="shellEcho" flowable:type="shell">
 ----
 
 The Shell task is configured by <<serviceTaskFieldInjection,field injection>>. All the values for these properties can contain EL expression, which are resolved at runtime during process execution. Following properties could be set:
@@ -4107,14 +4107,14 @@ The following XML snippet shows an example of using the shell Task. It runs shel
 
 [source,xml,linenums]
 ----
-<serviceTask id="shellEcho" activiti:type="shell" >
+<serviceTask id="shellEcho" flowable:type="shell" >
   <extensionElements>
-    <activiti:field name="command" stringValue="cmd" />
-    <activiti:field name="arg1" stringValue="/c" />
-    <activiti:field name="arg2" stringValue="echo" />
-    <activiti:field name="arg3" stringValue="EchoTest" />
-    <activiti:field name="wait" stringValue="true" />
-    <activiti:field name="outputVariable" stringValue="resultVar" />
+    <flowable:field name="command" stringValue="cmd" />
+    <flowable:field name="arg1" stringValue="/c" />
+    <flowable:field name="arg2" stringValue="echo" />
+    <flowable:field name="arg3" stringValue="EchoTest" />
+    <flowable:field name="wait" stringValue="true" />
+    <flowable:field name="outputVariable" stringValue="resultVar" />
   </extensionElements>
 </serviceTask>
 
@@ -4126,7 +4126,7 @@ The following XML snippet shows an example of using the shell Task. It runs shel
 
 ==== Execution listener
 
-*Compatibility note*: After releasing 5.3, we discovered that execution listeners and task listeners and expressions were still in non-public API. Those classes were in subpackages of +org.activiti.engine.impl...+,  which has +impl+ in it). +org.activiti.engine.impl.pvm.delegate.ExecutionListener+, +org.activiti.engine.impl.pvm.delegate.TaskListener+ and +org.activiti.engine.impl.pvm.el.Expression+ have been deprecated. From now on, you should use +org.activiti.engine.delegate.ExecutionListener+, +org.activiti.engine.delegate.TaskListener+ and +org.activiti.engine.delegate.Expression+. In the new publicly available API, access to +ExecutionListenerExecution.getEventSource()+ has been removed.  Apart from the deprecation compiler warning, the existing code should run fine.  But consider switching to the new public API interfaces (without .impl. in the package name).
+*Compatibility note*: After releasing 5.3, we discovered that execution listeners and task listeners and expressions were still in non-public API. Those classes were in subpackages of +org.flowable.engine.impl...+,  which has +impl+ in it). +org.flowable.engine.impl.pvm.delegate.ExecutionListener+, +org.flowable.engine.impl.pvm.delegate.TaskListener+ and +org.flowable.engine.impl.pvm.el.Expression+ have been deprecated. From now on, you should use +org.flowable.engine.delegate.ExecutionListener+, +org.flowable.engine.delegate.TaskListener+ and +org.flowable.engine.delegate.Expression+. In the new publicly available API, access to +ExecutionListenerExecution.getEventSource()+ has been removed.  Apart from the deprecation compiler warning, the existing code should run fine.  But consider switching to the new public API interfaces (without .impl. in the package name).
 
 Execution listeners allow you to execute external Java code or evaluate an expression when certain events occur during process execution. The events that can be captured are:
 
@@ -4144,7 +4144,7 @@ The following process definition contains 3 execution listeners:
 <process id="executionListenersProcess">
 
   <extensionElements>
-    <activiti:executionListener class="org.activiti.examples.bpmn.executionlistener.ExampleExecutionListenerOne" event="start" />
+    <flowable:executionListener class="org.flowable.examples.bpmn.executionlistener.ExampleExecutionListenerOne" event="start" />
   </extensionElements>
 
   <startEvent id="theStart" />
@@ -4153,13 +4153,13 @@ The following process definition contains 3 execution listeners:
   <userTask id="firstTask" />
   <sequenceFlow sourceRef="firstTask" targetRef="secondTask">
     <extensionElements>
-      <activiti:executionListener class="org.activiti.examples.bpmn.executionListener.ExampleExecutionListenerTwo" />
+      <flowable:executionListener class="org.flowable.examples.bpmn.executionListener.ExampleExecutionListenerTwo" />
     </extensionElements>
   </sequenceFlow>
 
   <userTask id="secondTask" >
     <extensionElements>
-      <activiti:executionListener expression="${myPojo.myMethod(execution.event)}" event="end" />
+      <flowable:executionListener expression="${myPojo.myMethod(execution.event)}" event="end" />
     </extensionElements>
   </userTask>
   <sequenceFlow sourceRef="secondTask" targetRef="thirdTask" />
@@ -4173,7 +4173,7 @@ The following process definition contains 3 execution listeners:
 ----
 
 
-The first execution listener is notified when the process starts. The listener is an external Java-class (like ++ExampleExecutionListenerOne++) and should implement +org.activiti.engine.delegate.ExecutionListener+ interface. When the event occurs (in this case +end+ event) the method +notify(ExecutionListenerExecution execution)+ is called.
+The first execution listener is notified when the process starts. The listener is an external Java-class (like ++ExampleExecutionListenerOne++) and should implement +org.flowable.engine.delegate.ExecutionListener+ interface. When the event occurs (in this case +end+ event) the method +notify(ExecutionListenerExecution execution)+ is called.
 
 [source,java,linenums]
 ----
@@ -4186,7 +4186,7 @@ public class ExampleExecutionListenerOne implements ExecutionListener {
 }
 ----
 
-It is also possible to use a delegation class that implements the +org.activiti.engine.delegate.JavaDelegate+ interface. These delegation classes can then be reused in other constructs, such as a delegation for a serviceTask.
+It is also possible to use a delegation class that implements the +org.flowable.engine.delegate.JavaDelegate+ interface. These delegation classes can then be reused in other constructs, such as a delegation for a serviceTask.
 
 The second execution listener is called when the transition is taken. Note that the +listener+ element doesn't define an +event+, since only +take+ events are fired on transitions. *Values in the +event+ attribute are ignored when a listener is defined on a transition.*
 
@@ -4194,7 +4194,7 @@ The last execution listener is called when activity +secondTask+ ends. Instead o
 
 [source,xml,linenums]
 ----
-<activiti:executionListener expression="${myPojo.myMethod(execution.eventName)}" event="end" />
+<flowable:executionListener expression="${myPojo.myMethod(execution.eventName)}" event="end" />
 ----
 
 As with other expressions, execution variables are resolved and can be used. Because the execution implementation object has a property that exposes the event name, it's possible to pass the event-name to your methods using +execution.eventName+.
@@ -4203,26 +4203,26 @@ Execution listeners also support using a +delegateExpression+, <<bpmnJavaService
 
 [source,xml,linenums]
 ----
-<activiti:executionListener event="start" delegateExpression="${myExecutionListenerBean}" />
+<flowable:executionListener event="start" delegateExpression="${myExecutionListenerBean}" />
 ----
 
 
-A while back, we also introduced a new type of execution listener, the org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener. This script execution listener allows you to execute a piece of script logic for an execution listener event.
+A while back, we also introduced a new type of execution listener, the org.flowable.engine.impl.bpmn.listener.ScriptExecutionListener. This script execution listener allows you to execute a piece of script logic for an execution listener event.
 
 [source,xml,linenums]
 ----
-<activiti:executionListener event="start" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener" >
-  <activiti:field name="script">
-    <activiti:string>
+<flowable:executionListener event="start" class="org.flowable.engine.impl.bpmn.listener.ScriptExecutionListener" >
+  <flowable:field name="script">
+    <flowable:string>
       def bar = "BAR";  // local variable
       foo = "FOO"; // pushes variable to execution context
       execution.setVariable("var1", "test"); // test access to execution instance
       bar // implicit return value
-    </activiti:string>
-  </activiti:field>
-  <activiti:field name="language" stringValue="groovy" />
-  <activiti:field name="resultVariable" stringValue="myVar" />
-</activiti:executionListener>
+    </flowable:string>
+  </flowable:field>
+  <flowable:field name="language" stringValue="groovy" />
+  <flowable:field name="resultVariable" stringValue="myVar" />
+</flowable:executionListener>
 ----
 
 
@@ -4239,10 +4239,10 @@ The fragment below shows a simple example process with an execution listener wit
 ----
 <process id="executionListenersProcess">
   <extensionElements>
-    <activiti:executionListener class="org.activiti.examples.bpmn.executionListener.ExampleFieldInjectedExecutionListener" event="start">
-      <activiti:field name="fixedValue" stringValue="Yes, I am " />
-      <activiti:field name="dynamicValue" expression="${myVar}" />
-    </activiti:executionListener>
+    <flowable:executionListener class="org.flowable.examples.bpmn.executionListener.ExampleFieldInjectedExecutionListener" event="start">
+      <flowable:field name="fixedValue" stringValue="Yes, I am " />
+      <flowable:field name="dynamicValue" expression="${myVar}" />
+    </flowable:executionListener>
   </extensionElements>
 
   <startEvent id="theStart" />
@@ -4273,7 +4273,7 @@ The class +ExampleFieldInjectedExecutionListener+ concatenates the 2 injected fi
 
 [source,java,linenums]
 ----
-@Deployment(resources = {"org/activiti/examples/bpmn/executionListener/ExecutionListenersFieldInjectionProcess.bpmn20.xml"})
+@Deployment(resources = {"org/flowable/examples/bpmn/executionListener/ExecutionListenersFieldInjectionProcess.bpmn20.xml"})
 public void testExecutionListenerFieldInjection() {
   Map<String, Object> variables = new HashMap<String, Object>();
   variables.put("myVar", "listening!");
@@ -4305,7 +4305,7 @@ A task listener can only be added in the process definition as a child element o
 ----
 <userTask id="myTask" name="My Task" >
   <extensionElements>
-    <activiti:taskListener event="create" class="org.activiti.MyTaskCreateListener" />
+    <flowable:taskListener event="create" class="org.flowable.MyTaskCreateListener" />
   </extensionElements>
 </userTask>
 ----
@@ -4317,7 +4317,7 @@ A _task listener_ supports following attributes:
 ** *assignment*: occurs when the task is assigned to somebody. Note: when process execution arrives in a userTask, first an _assignment_ event will be fired, *before* the _create_ event is fired. This might seem an unnatural order, but the reason is pragmatic: when receiving the _create_ event, we usually want to inspect all properties of the task including the assignee.
 ** *complete*: occurs when the task is completed and just before the task is deleted from the runtime data.
 ** *delete*: occurs just before the task is going to be deleted. Notice that it will also be executed when task is normally finished via completeTask.
-* *class*: the delegation class that must be called. This class must implement the +org.activiti.engine.delegate.TaskListener+ interface.
+* *class*: the delegation class that must be called. This class must implement the +org.flowable.engine.delegate.TaskListener+ interface.
 
 [source,java,linenums]
 ----
@@ -4336,32 +4336,32 @@ It is also possible to use <<serviceTaskFieldInjection,field injection>> to pass
 
 [source,java,linenums]
 ----
-<activiti:taskListener event="create" expression="${myObject.callMethod(task, task.eventName)}" />
+<flowable:taskListener event="create" expression="${myObject.callMethod(task, task.eventName)}" />
 ----
 
 * *delegateExpression* allows to specify an expression that resolves to an object implementing the +TaskListener+ interface, <<bpmnJavaServiceTaskXML,similar to a service task>>.
 
 [source,xml,linenums]
 ----
-<activiti:taskListener event="create" delegateExpression="${myTaskListenerBean}" />
+<flowable:taskListener event="create" delegateExpression="${myTaskListenerBean}" />
 ----
 
-* A while back, we also introduced a new type of task listener, the org.activiti.engine.impl.bpmn.listener.ScriptTaskListener. This script task listener allows you to execute a piece of script logic for an task listener event.
+* A while back, we also introduced a new type of task listener, the org.flowable.engine.impl.bpmn.listener.ScriptTaskListener. This script task listener allows you to execute a piece of script logic for an task listener event.
 
 [source,xml,linenums]
 ----
-<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener" >
-  <activiti:field name="script">
-    <activiti:string>
+<flowable:taskListener event="complete" class="org.flowable.engine.impl.bpmn.listener.ScriptTaskListener" >
+  <flowable:field name="script">
+    <flowable:string>
       def bar = "BAR";  // local variable
       foo = "FOO"; // pushes variable to execution context
       task.setOwner("kermit"); // test access to task instance
       bar // implicit return value
-    </activiti:string>
-  </activiti:field>
-  <activiti:field name="language" stringValue="groovy" />
-  <activiti:field name="resultVariable" stringValue="myVar" />
-</activiti:taskListener>
+    </flowable:string>
+  </flowable:field>
+  <flowable:field name="language" stringValue="groovy" />
+  <flowable:field name="resultVariable" stringValue="myVar" />
+</flowable:taskListener>
 ----
 
 
@@ -4455,7 +4455,7 @@ Another way to define the number of instances, is to specify the name of a proce
 
 [source,xml,linenums]
 ----
-<userTask id="miTasks" name="My Task ${loopCounter}" activiti:assignee="${assignee}">
+<userTask id="miTasks" name="My Task ${loopCounter}" flowable:assignee="${assignee}">
   <multiInstanceLoopCharacteristics isSequential="false">
     <loopDataInputRef>assigneeList</loopDataInputRef>
     <inputDataItem name="assignee" />
@@ -4469,9 +4469,9 @@ The downside of the +loopDataInputRef+ and +inputDataItem+ is that 1) the names 
 
 [source,xml,linenums]
 ----
-<userTask id="miTasks" name="My Task" activiti:assignee="${assignee}">
+<userTask id="miTasks" name="My Task" flowable:assignee="${assignee}">
   <multiInstanceLoopCharacteristics isSequential="true"
-     activiti:collection="${myService.resolveUsersForTask()}" activiti:elementVariable="assignee" >
+     flowable:collection="${myService.resolveUsersForTask()}" flowable:elementVariable="assignee" >
   </multiInstanceLoopCharacteristics>
 </userTask>
 ----
@@ -4480,9 +4480,9 @@ A multi-instance activity ends when all instances are finished. However, it is p
 
 [source,xml,linenums]
 ----
-<userTask id="miTasks" name="My Task" activiti:assignee="${assignee}">
+<userTask id="miTasks" name="My Task" flowable:assignee="${assignee}">
   <multiInstanceLoopCharacteristics isSequential="false"
-     activiti:collection="assigneeList" activiti:elementVariable="assignee" >
+     flowable:collection="assigneeList" flowable:elementVariable="assignee" >
     <completionCondition>${nrOfCompletedInstances/nrOfInstances >= 0.6 }</completionCondition>
   </multiInstanceLoopCharacteristics>
 </userTask>
@@ -4512,8 +4512,8 @@ There is a caveat when using execution listeners in combination with multi insta
 [source,xml,linenums]
 ----
 <extensionElements>
-    <activiti:executionListener event="start" class="org.activiti.MyStartListener"/>
-		<activiti:executionListener event="end" class="org.activiti.MyEndListener"/>
+    <flowable:executionListener event="start" class="org.flowable.MyStartListener"/>
+		<flowable:executionListener event="end" class="org.flowable.MyEndListener"/>
 </extensionElements>
 ----
 
@@ -4535,8 +4535,8 @@ For example:
 ----
 <subProcess id="subprocess1" name="Sub Process">
   <extensionElements>
-    <activiti:executionListener event="start" class="org.activiti.MyStartListener"/>
-    <activiti:executionListener event="end" class="org.activiti.MyEndListener"/>
+    <flowable:executionListener event="start" class="org.flowable.MyStartListener"/>
+    <flowable:executionListener event="end" class="org.flowable.MyEndListener"/>
   </extensionElements>
   <multiInstanceLoopCharacteristics isSequential="false">
     <loopDataInputRef>assignees</loopDataInputRef>
@@ -4593,7 +4593,7 @@ In order to declare an activity to be a compensation handler, we need to set the
 
 [source,xml,linenums]
 ----
-<serviceTask id="undoBookHotel" isForCompensation="true" activiti:class="...">
+<serviceTask id="undoBookHotel" isForCompensation="true" flowable:class="...">
 </serviceTask>
 ----
 
@@ -4890,8 +4890,8 @@ You can pass process variables to the sub process and vice versa. The data is co
 ----
 <callActivity id="callSubProcess" calledElement="checkCreditProcess" >
   <extensionElements>
-	  <activiti:in source="someVariableInMainProcess" target="nameOfVariableInSubProcess" />
-	  <activiti:out source="someVariableInSubProcess" target="nameOfVariableInMainProcess" />
+	  <flowable:in source="someVariableInMainProcess" target="nameOfVariableInSubProcess" />
+	  <flowable:out source="someVariableInSubProcess" target="nameOfVariableInMainProcess" />
   </extensionElements>
 </callActivity>
 ----
@@ -4900,7 +4900,7 @@ You can pass all process variables to the sub process by setting the option inhe
 
 [source,xml,linenums]
 ----
-<callActivity id="callSubProcess" calledElement="checkCreditProcess" activiti:inheritVariables="true"/>
+<callActivity id="callSubProcess" calledElement="checkCreditProcess" flowable:inheritVariables="true"/>
 ----
 
 We use a Flowable Extension as a shortcut for the BPMN standard elements called __dataInputAssociation__ and __dataOutputAssociation__, which only work if you declare process variables in the BPMN 2.0 standard way.
@@ -4911,8 +4911,8 @@ It is possible to use expressions here as well:
 ----
 <callActivity id="callSubProcess" calledElement="checkCreditProcess" >
 	<extensionElements>
-	  <activiti:in sourceExpression="${x+5}" target="y" />
-	  <activiti:out source="${y+5}" target="z" />
+	  <flowable:in sourceExpression="${x+5}" target="y" />
+	  <flowable:out source="${y+5}" target="z" />
 	</extensionElements>
 </callActivity>
 ----
@@ -4921,7 +4921,7 @@ So in the end z = y+5 = x+5+5
 
 The callActivity element also supports setting the business key on the started subprocess instance using a custom flowable attribute extension. The 'businessKey' attribute can be used to set a custom business key value on the subprocess instance.
 ----
-<callActivity id="callSubProcess" calledElement="checkCreditProcess" activiti:businessKey="${myVariable}">
+<callActivity id="callSubProcess" calledElement="checkCreditProcess" flowable:businessKey="${myVariable}">
 ...
 </callActivity>
 ----
@@ -4929,7 +4929,7 @@ The callActivity element also supports setting the business key on the started s
 Defining the 'inheritBusinessKey' attribute with a value of true will set the business key value on the subprocess to the value of the business key as defined in the calling process.
 
 ----
-<callActivity id="callSubProcess" calledElement="checkCreditProcess" activiti:inheritBusinessKey="true">
+<callActivity id="callSubProcess" calledElement="checkCreditProcess" flowable:inheritBusinessKey="true">
 ...
 </callActivity>
 ----
@@ -4999,7 +4999,7 @@ In order to use this feature, we can use the _activiti:async="true"_ extension. 
 
 [source,xml,linenums]
 ----
-<serviceTask id="service1" name="Generate Invoice" activiti:class="my.custom.Delegate" activiti:async="true" />
+<serviceTask id="service1" name="Generate Invoice" flowable:class="my.custom.Delegate" flowable:async="true" />
 ----
 
 
@@ -5017,13 +5017,13 @@ On a userTask, receiveTask or other wait states, the async continuation allows u
 Flowable, in its default configuration, reruns a job 3 times in case of any exception in execution of a job. This holds also for asynchronous task jobs. In some cases more flexibility is required. There are two parameters to be configured:
 
 * Number of retries
-* Delay between retries These parameters can be configured by +activiti:failedJobRetryTimeCycle+ element. Here is a sample usage:
+* Delay between retries These parameters can be configured by +flowable:failedJobRetryTimeCycle+ element. Here is a sample usage:
 
 [source,xml,linenums]
 ----
-<serviceTask id="failingServiceTask" activiti:async="true" activiti:class="org.activiti.engine.test.jobexecutor.RetryFailingDelegate">
+<serviceTask id="failingServiceTask" flowable:async="true" flowable:class="org.flowable.engine.test.jobexecutor.RetryFailingDelegate">
 	<extensionElements>
-		<activiti:failedJobRetryTimeCycle>R5/PT7M</activiti:failedJobRetryTimeCycle>
+		<flowable:failedJobRetryTimeCycle>R5/PT7M</flowable:failedJobRetryTimeCycle>
 	</extensionElements>
 </serviceTask>
 ----
@@ -5062,11 +5062,11 @@ Is this a good solution? As we have seen, optimistic locking allows Flowable to 
 
 An exclusive job cannot be performed at the same time as another exclusive job from the same process instance. Consider the process shown above: if we declare the service tasks to be exclusive, the JobExecutor will make sure that the corresponding jobs are not executed concurrently. Instead, it will make sure that whenever it acquires an exclusive job from a certain process instance, it acquires all other exclusive jobs from the same process instance and delegates them to the same worker thread. This ensures sequential execution execution of the jobs.
 
-How can I enable this feature? In recent releases, exclusive jobs are the default configuration. All asynchronous continuations and timer events are thus exclusive by default. In addition, if you want a job to be non-exclusive, you can configure it as such using +activiti:exclusive="false"+. For example, the following servicetask would be asynchronous but non-exclusive.
+How can I enable this feature? In recent releases, exclusive jobs are the default configuration. All asynchronous continuations and timer events are thus exclusive by default. In addition, if you want a job to be non-exclusive, you can configure it as such using +flowable:exclusive="false"+. For example, the following servicetask would be asynchronous but non-exclusive.
 
 [source,xml,linenums]
 ----
-<serviceTask id="service" activiti:expression="${myService.performBooking(hotel, dates)}" activiti:async="true" activiti:exclusive="false" />
+<serviceTask id="service" flowable:expression="${myService.performBooking(hotel, dates)}" flowable:async="true" flowable:exclusive="false" />
 ----
 
 
@@ -5081,29 +5081,29 @@ Is this a good solution? We had some people asking whether this was a good solut
 
 === Process Initiation Authorization
 
-By default everyone is allowed to start a new process instance of deployed process definitions. The process initiation authorization functionality allows to define users and groups so that web clients can optionally restrict users to start a new process instance. NOTE that the authorization definition is NOT validated by the Flowable Engine in any way. This functionality is only meant for developers to ease the implementation of authorization rules in a web client. The syntax is similar to the syntax of user assignment for a user task. A user or group can be assigned as potential initiator of a process using <activiti:potentialStarter> tag. Here is an example:
+By default everyone is allowed to start a new process instance of deployed process definitions. The process initiation authorization functionality allows to define users and groups so that web clients can optionally restrict users to start a new process instance. NOTE that the authorization definition is NOT validated by the Flowable Engine in any way. This functionality is only meant for developers to ease the implementation of authorization rules in a web client. The syntax is similar to the syntax of user assignment for a user task. A user or group can be assigned as potential initiator of a process using <flowable:potentialStarter> tag. Here is an example:
 
 [source,xml,linenums]
 ----
 <process id="potentialStarter">
   <extensionElements>
-    <activiti:potentialStarter>
+    <flowable:potentialStarter>
        <resourceAssignmentExpression>
          <formalExpression>group2, group(group3), user(user3)</formalExpression>
        </resourceAssignmentExpression>
-    </activiti:potentialStarter>
+    </flowable:potentialStarter>
   </extensionElements>
 
   <startEvent id="theStart"/>
   ...
 ----
 
-In the above xml excerpt user(user3) refers directly to user user3 and group(group3) to group group3. No indicator will default to a group type. It is also possible to use attributes of the <process> tag, namely <activiti:candidateStarterUsers> and <activiti:candidateStarterGroups>. Here is an example:
+In the above xml excerpt user(user3) refers directly to user user3 and group(group3) to group group3. No indicator will default to a group type. It is also possible to use attributes of the <process> tag, namely <flowable:candidateStarterUsers> and <flowable:candidateStarterGroups>. Here is an example:
 
 [source,xml,linenums]
 ----
-<process id="potentialStarter" activiti:candidateStarterUsers="user1, user2"
-                               activiti:candidateStarterGroups="group1">
+<process id="potentialStarter" flowable:candidateStarterUsers="user1, user2"
+                               flowable:candidateStarterGroups="group1">
       ...
 ----
 
@@ -5168,7 +5168,7 @@ The data object definitions will be automatically converted to process variables
 <process id="dataObjectScope" name="Data Object Scope" isExecutable="true">
   <dataObject id="dObj123" name="StringTest123" itemSubjectRef="xsd:string">
     <extensionElements>
-      <activiti:value>Testing123</activiti:value>
+      <flowable:value>Testing123</flowable:value>
     </extensionElements>
   </dataObject>
   ...

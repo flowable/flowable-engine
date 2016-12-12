@@ -15,7 +15,7 @@ Common to all the ways of setting up Flowable is the core engine, which can be s
 
 === Flowable and Activiti
 
-Flowable is a fork of Activiti (registered trademark by Alfresco). In all the following sections you’ll notice that the package names, configuration files, etc. use _activiti_.
+Flowable is a fork of Activiti (registered trademark by Alfresco). In all the following sections you’ll notice that the package names, configuration files, etc. use _flowable_.
 
 [[getting.started.command.line]]
 === Building a command-line application
@@ -88,9 +88,9 @@ The first thing we need to do is to instantiate a *ProcessEngine* instance. This
 ----
 package org.flowable;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 
 public class HolidayRequest {
 
@@ -188,7 +188,7 @@ Save the following xml in a file named _holiday-request.bpmn20.xml_ under the _s
   xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
   xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
   xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:flowable="http://flowable.org/bpmn"
   typeLanguage="http://www.w3.org/2001/XMLSchema"
   expressionLanguage="http://www.w3.org/1999/XPath"
   targetNamespace="http://www.flowable.org/processdef">
@@ -217,13 +217,13 @@ Save the following xml in a file named _holiday-request.bpmn20.xml_ under the _s
       </conditionExpression>
     </sequenceFlow>
 
-    <serviceTask id="externalSystemCall" name="Enter holidays in external system"   activiti:class="org.flowable.CallExternalSystemDelegate"/>
+    <serviceTask id="externalSystemCall" name="Enter holidays in external system" flowable:class="org.flowable.CallExternalSystemDelegate"/>
     <sequenceFlow sourceRef="externalSystemCall" targetRef="holidayApprovedTask"/>
 
     <userTask id="holidayApprovedTask" name="Holiday approved"/>
     <sequenceFlow sourceRef="holidayApprovedTask" targetRef="approveEnd"/>
 
-    <serviceTask id="sendRejectionMail" name="Send out rejection email" activiti:class="org.flowable.SendRejectionMail"/>
+    <serviceTask id="sendRejectionMail" name="Send out rejection email" flowable:class="org.flowable.SendRejectionMail"/>
     <sequenceFlow sourceRef="sendRejectionMail" targetRef="rejectEnd"/>
 
     <endEvent id="approveEnd"/>
@@ -237,7 +237,7 @@ Save the following xml in a file named _holiday-request.bpmn20.xml_ under the _s
 
 Lines 2 to 11 look a bit daunting, but for all subsequent process definitions it'll be the same. It's kind of _boilerplate_ stuff that's needed to be fully compatible with the BPMN 2.0 standard specification.
 
-Every step, or in BPMN 2.0 termninology *'activity'* , has an _id_ attribute that gives it a unique identifier in the XML file. All _activities_ can have an optional name too, which increases the readability of the visual diagram of course.
+Every step, or in BPMN 2.0 terminology *'flowable'* , has an _id_ attribute that gives it a unique identifier in the XML file. All _activities_ can have an optional name too, which increases the readability of the visual diagram of course.
 
 The _activities_ are connected with a *sequence flow*, which is a directed arrow in the visual diagram. When executing a process instance, the execution will flow from the _start event_ to the next _activity_, following the _sequence flow_.
 
@@ -332,14 +332,14 @@ We haven't yet configured the assignment for the user tasks. We want the first t
 
 [source,xml]
 ----
-<userTask id="approveTask" name="Approve or reject request" activiti:candidateGroups="managers"/>
+<userTask id="approveTask" name="Approve or reject request" flowable:candidateGroups="managers"/>
 ----
 
 and the _assignee_ attribute to the second task as shown below. Note that we're not using a static value like the 'managers' value above, but a dynamic assignment based on a process variable that we've passed when the process instance was started:
 
 [source,xml]
 ----
-<userTask id="holidayApprovedTask" name="Holiday approved" activiti:assignee="${employee}"/>
+<userTask id="holidayApprovedTask" name="Holiday approved" flowable:assignee="${employee}"/>
 ----
 
 To get the actual task list, we create a _TaskQuery_ via the _TaskService_ and we configure the query to only return the tasks for the 'managers' group:
@@ -388,19 +388,19 @@ There is a last piece of the puzzle still missing: we haven't implemented the au
 
 [source,xml]
 ----
-<serviceTask id="externalSystemCall" name="Enter holidays in external system"   activiti:class="org.flowable.CallExternalSystemDelegate"/>
+<serviceTask id="externalSystemCall" name="Enter holidays in external system" flowable:class="org.flowable.CallExternalSystemDelegate"/>
 ----
 
 In reality, this logic could be anything ranging from doing an HTTP REST call to some system, to doing some legacy code calls to a system the company has been using for decades. We won't implement the actual logic here, but have a simple logging statement inside.
 
-Create a new class (_File -> New -> Class_ in Eclipse), fill in _org.flowable_ as package name and _CallExternalSystemDelegate_ as class name. Make that class implement the _org.activiti.engine.delegate.JavaDelegate_ interface and implement the _execute_ method:
+Create a new class (_File -> New -> Class_ in Eclipse), fill in _org.flowable_ as package name and _CallExternalSystemDelegate_ as class name. Make that class implement the _org.flowable.engine.delegate.JavaDelegate_ interface and implement the _execute_ method:
 
 [source,java,linenums]
 ----
 package org.flowable;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.JavaDelegate;
 
 public class CallExternalSystemDelegate implements JavaDelegate {
 
