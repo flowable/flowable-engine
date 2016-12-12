@@ -94,7 +94,7 @@ public class StartProcessInstanceWithFormCmd implements Command<ProcessInstance>
     }
 
     ProcessInstance processInstance = createAndStartProcessInstance(processDefinition, processInstanceName, 
-        variables, commandContext);
+        formVariables, commandContext);
     
     if (formModel != null) {
       formService.createFormInstance(formVariables, formModel, null, processInstance.getId());
@@ -107,6 +107,7 @@ public class StartProcessInstanceWithFormCmd implements Command<ProcessInstance>
 
   protected ProcessInstance createAndStartProcessInstance(ProcessDefinition processDefinition, String processInstanceName, 
       Map<String,Object> variables, CommandContext commandContext) {
+    
     ProcessInstanceHelper processInstanceHelper = commandContext.getProcessEngineConfiguration().getProcessInstanceHelper();
     return processInstanceHelper.createAndStartProcessInstance(processDefinition, null, processInstanceName, variables, null);
   }
