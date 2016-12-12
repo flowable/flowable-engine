@@ -108,7 +108,7 @@ public class Cookie {
     StringBuilder sb = new StringBuilder();
 
     sb.append(escape(o.getString("name")));
-    sb.append("=");
+    sb.append('=');
     sb.append(escape(o.getString("value")));
     if (o.has("expires")) {
       sb.append(";expires=");

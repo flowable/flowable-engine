@@ -201,13 +201,13 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
     
     if (users!=null) {
       for (String userId: users) {
-        identityList.add("user("+userId+")");
+        identityList.add("user("+userId+ ')');
       }
     }
     
     if (groups!=null) {
       for (String groupId: groups){
-    	  identityList.add("group("+groupId+")");
+    	  identityList.add("group("+groupId+ ')');
       }
     }
     

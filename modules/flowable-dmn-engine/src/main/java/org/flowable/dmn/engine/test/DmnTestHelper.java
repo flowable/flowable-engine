@@ -61,7 +61,7 @@ public abstract class DmnTestHelper {
                 resources = new String[] { resource };
             }
 
-            DmnDeploymentBuilder deploymentBuilder = dmnEngine.getDmnRepositoryService().createDeployment().name(testClass.getSimpleName() + "." + methodName);
+            DmnDeploymentBuilder deploymentBuilder = dmnEngine.getDmnRepositoryService().createDeployment().name(testClass.getSimpleName() + '.' + methodName);
 
             for (String resource : resources) {
                 deploymentBuilder.addClasspathResource(resource);
@@ -93,7 +93,7 @@ public abstract class DmnTestHelper {
      */
     public static String getDmnDecisionResource(Class<?> type, String name) {
         for (String suffix : ParsedDeploymentBuilder.DMN_RESOURCE_SUFFIXES) {
-            String resource = type.getName().replace('.', '/') + "." + name + "." + suffix;
+            String resource = type.getName().replace('.', '/') + '.' + name + '.' + suffix;
             InputStream inputStream = DmnTestHelper.class.getClassLoader().getResourceAsStream(resource);
             if (inputStream == null) {
                 continue;
@@ -101,7 +101,7 @@ public abstract class DmnTestHelper {
                 return resource;
             }
         }
-        return type.getName().replace('.', '/') + "." + name + "." + ParsedDeploymentBuilder.DMN_RESOURCE_SUFFIXES[0];
+        return type.getName().replace('.', '/') + '.' + name + '.' + ParsedDeploymentBuilder.DMN_RESOURCE_SUFFIXES[0];
     }
 
     // Engine startup and shutdown helpers

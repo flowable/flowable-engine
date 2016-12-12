@@ -185,7 +185,7 @@ public final class TreeMethodExpression extends org.activiti.engine.impl.javax.e
 
 	@Override
 	public String toString() {
-		return "TreeMethodExpression(" + expr + ")";
+		return "TreeMethodExpression(" + expr + ')';
 	}
 
 	/**

@@ -83,6 +83,6 @@ public class ResourceEntity implements PersistentObject, Serializable {
 
   @Override
   public String toString() {
-    return "ResourceEntity[id=" + id + ", name=" + name + "]";
+    return "ResourceEntity[id=" + id + ", name=" + name + ']';
   }
 }

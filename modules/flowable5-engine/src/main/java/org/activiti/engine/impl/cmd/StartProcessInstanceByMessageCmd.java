@@ -82,7 +82,7 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
           
     ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) deploymentManager.findDeployedProcessDefinitionById(processDefinitionId);
     if (processDefinition == null) {
-      throw new ActivitiObjectNotFoundException("No process definition found for id '" + processDefinitionId + "'", ProcessDefinition.class);
+      throw new ActivitiObjectNotFoundException("No process definition found for id '" + processDefinitionId + '\'', ProcessDefinition.class);
     }
 
     // Do not start process a process instance if the process definition is suspended

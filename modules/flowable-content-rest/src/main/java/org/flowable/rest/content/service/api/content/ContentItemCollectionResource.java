@@ -246,7 +246,7 @@ public class ContentItemCollectionResource extends ContentItemBaseResource {
               + "\n\n\n"
               + "## Create a new content item with an attached file\n\n"
               + "The request should be of type multipart/form-data. There should be a single file-part included with the binary value of the variable. On top of that, the following additional form-fields can be present:\n"
-              + "\n"
+              + '\n'
               + "- *name*: Required name of the content item.\n\n"
               + "- *mimeType*: Mime type of the content item, optional.\n\n"
               + "- *taskId*: Task identifier for the content item, optional.\n\n"

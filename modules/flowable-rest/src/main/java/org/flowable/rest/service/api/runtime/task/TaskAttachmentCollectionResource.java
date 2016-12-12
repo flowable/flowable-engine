@@ -77,9 +77,9 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
                   + "\n\n\n"
                   + "## Create a new attachment on a task, with an attached file\n\n"
                   + "The request should be of type multipart/form-data. There should be a single file-part included with the binary value of the variable. On top of that, the following additional form-fields can be present:\n"
-                  + "\n"
-                  + "- *name*: Required name of the variable.\n" + "\n"
-                  + "- *description*: Description of the attachment, optional.\n" + "\n"
+                  + '\n'
+                  + "- *name*: Required name of the variable.\n" + '\n'
+                  + "- *description*: Description of the attachment, optional.\n" + '\n'
                   + "- *type*: Type of attachment, optional. Supports any arbitrary string or a valid HTTP content-type."
   )
   @ApiResponses(value = {

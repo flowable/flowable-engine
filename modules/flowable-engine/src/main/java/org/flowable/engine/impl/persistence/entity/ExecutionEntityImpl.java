@@ -931,7 +931,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
   public String toString() {
     if (isProcessInstanceType()) {
-      return "ProcessInstance[" + getId() + "]";
+      return "ProcessInstance[" + getId() + ']';
     } else {
       StringBuilder strb = new StringBuilder();
       if (isScope) {
@@ -945,7 +945,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         strb.append(" - activity '" + activityId);
       }
       if (parentId != null) {
-        strb.append(" - parent '" + parentId + "'");
+        strb.append(" - parent '" + parentId + '\'');
       }
       return strb.toString();
     }

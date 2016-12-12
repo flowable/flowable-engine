@@ -40,7 +40,7 @@ public class SetDeploymentCategoryCmd implements Command<Void> {
     FormDeploymentEntity deployment = commandContext.getDeploymentEntityManager().findById(deploymentId);
 
     if (deployment == null) {
-      throw new FlowableObjectNotFoundException("No deployment found for id = '" + deploymentId + "'");
+      throw new FlowableObjectNotFoundException("No deployment found for id = '" + deploymentId + '\'');
     }
 
     // Update category

@@ -125,8 +125,8 @@ public class Parser {
 
 	private static final String EXPR_FIRST =
 		IDENTIFIER + "|" + 
-		STRING + "|" + FLOAT + "|" + INTEGER + "|" + TRUE + "|" + FALSE + "|" + NULL + "|" +
-		MINUS + "|" + NOT + "|" + EMPTY + "|" +
+		STRING + '|' + FLOAT + '|' + INTEGER + '|' + TRUE + '|' + FALSE + '|' + NULL + '|' +
+		MINUS + '|' + NOT + '|' + EMPTY + '|' +
 		LPAREN;
 	
 	protected final Builder context;
@@ -241,7 +241,7 @@ public class Parser {
 	 * throw exception
 	 */
 	protected void fail(String expected) throws ParseException {
-		throw new ParseException(position, "'" + token.getImage() + "'", expected);
+		throw new ParseException(position, '\'' + token.getImage() + '\'', expected);
 	}
 
 	/**
@@ -656,7 +656,7 @@ public class Parser {
 				String name = consumeToken().getImage();
 				if (token.getSymbol() == COLON && lookahead(0).getSymbol() == IDENTIFIER && lookahead(1).getSymbol() == LPAREN) { // ns:f(...)
 					consumeToken();
-					name += ":" + token.getImage();
+					name += ':' + token.getImage();
 					consumeToken();
 				}
 				if (token.getSymbol() == LPAREN) { // function

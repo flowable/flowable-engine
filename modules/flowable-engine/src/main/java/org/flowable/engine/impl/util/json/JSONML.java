@@ -197,7 +197,7 @@ public class JSONML {
             closeTag = (String) parse(x, arrayForm, newja);
             if (closeTag != null) {
               if (!closeTag.equals(tagName)) {
-                throw x.syntaxError("Mismatched '" + tagName + "' and '" + closeTag + "'");
+                throw x.syntaxError("Mismatched '" + tagName + "' and '" + closeTag + '\'');
               }
               tagName = null;
               if (!arrayForm && newja.length() > 0) {

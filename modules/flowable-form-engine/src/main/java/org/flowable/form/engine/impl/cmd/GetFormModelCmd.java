@@ -60,14 +60,14 @@ public class GetFormModelCmd implements Command<FormModel>, Serializable {
 
       formDefinitionEntity = deploymentManager.findDeployedFormDefinitionById(formDefinitionId);
       if (formDefinitionEntity == null) {
-        throw new FlowableObjectNotFoundException("No form definition found for id = '" + formDefinitionId + "'", FormDefinitionEntity.class);
+        throw new FlowableObjectNotFoundException("No form definition found for id = '" + formDefinitionId + '\'', FormDefinitionEntity.class);
       }
 
     } else if (formDefinitionKey != null && (tenantId == null || FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)) && parentDeploymentId == null) {
 
       formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKey(formDefinitionKey);
       if (formDefinitionEntity == null) {
-        throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey + "'", FormDefinitionEntity.class);
+        throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey + '\'', FormDefinitionEntity.class);
       }
 
     } else if (formDefinitionKey != null && tenantId != null && !FormEngineConfiguration.NO_TENANT_ID.equals(tenantId) && parentDeploymentId == null) {

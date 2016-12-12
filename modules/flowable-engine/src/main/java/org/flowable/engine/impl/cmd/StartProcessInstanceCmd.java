@@ -77,14 +77,14 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
       processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
       if (processDefinition == null) {
-        throw new FlowableObjectNotFoundException("No process definition found for id = '" + processDefinitionId + "'", ProcessDefinition.class);
+        throw new FlowableObjectNotFoundException("No process definition found for id = '" + processDefinitionId + '\'', ProcessDefinition.class);
       }
 
     } else if (processDefinitionKey != null && (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId))) {
 
       processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(processDefinitionKey);
       if (processDefinition == null) {
-        throw new FlowableObjectNotFoundException("No process definition found for key '" + processDefinitionKey + "'", ProcessDefinition.class);
+        throw new FlowableObjectNotFoundException("No process definition found for key '" + processDefinitionKey + '\'', ProcessDefinition.class);
       }
 
     } else if (processDefinitionKey != null && tenantId != null && !ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {

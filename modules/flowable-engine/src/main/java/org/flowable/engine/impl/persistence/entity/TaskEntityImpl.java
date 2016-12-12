@@ -602,7 +602,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Ser
   }
 
   public String toString() {
-    return "Task[id=" + id + ", name=" + name + "]";
+    return "Task[id=" + id + ", name=" + name + ']';
   }
 
 }

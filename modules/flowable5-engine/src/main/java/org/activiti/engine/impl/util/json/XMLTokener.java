@@ -138,7 +138,7 @@ public class XMLTokener extends JSONTokener {
         }
         String s = sb.toString();
         Object e = entity.get(s);
-        return e != null ? e : a + s + ";";
+        return e != null ? e : a + s + ';';
     }
 
 

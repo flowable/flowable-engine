@@ -64,6 +64,6 @@ public class ResourceEntityImpl extends AbstractEntityNoRevision implements Reso
 
   @Override
   public String toString() {
-    return "ResourceEntity[id=" + id + ", name=" + name + "]";
+    return "ResourceEntity[id=" + id + ", name=" + name + ']';
   }
 }

@@ -44,7 +44,7 @@ public class MessageParser implements BpmnXMLConstants {
       if (indexOfP != -1) {
         String prefix = itemRef.substring(0, indexOfP);
         String resolvedNamespace = model.getNamespace(prefix);
-        result = resolvedNamespace + ":" + itemRef.substring(indexOfP + 1);
+        result = resolvedNamespace + ':' + itemRef.substring(indexOfP + 1);
       } else {
         result = itemRef;
       }

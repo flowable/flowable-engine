@@ -108,7 +108,7 @@ public class AstBinary extends AstRightValue {
 
 	@Override
 	public String toString() {
-		return "'" + operator.toString() + "'";
+		return '\'' + operator.toString() + '\'';
 	}	
 
 	@Override 

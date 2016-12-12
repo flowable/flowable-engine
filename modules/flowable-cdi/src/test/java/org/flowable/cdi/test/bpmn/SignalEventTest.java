@@ -37,7 +37,7 @@ public class SignalEventTest extends CdiActivitiTestCase {
     private BusinessProcess businessProcess;
 
     public void execute(DelegateExecution execution) {
-      businessProcess.setVariable("processName", "catchSignal-visited (was " + businessProcess.getVariable("processName") + ")");
+      businessProcess.setVariable("processName", "catchSignal-visited (was " + businessProcess.getVariable("processName") + ')');
     }
   }
 
@@ -51,7 +51,7 @@ public class SignalEventTest extends CdiActivitiTestCase {
     private BusinessProcess businessProcess;
 
     public void execute(DelegateExecution execution) {
-      businessProcess.setVariable("processName", "throwSignal-visited (was " + businessProcess.getVariable("processName") + ")");
+      businessProcess.setVariable("processName", "throwSignal-visited (was " + businessProcess.getVariable("processName") + ')');
 
       String signalProcessInstanceId = (String) execution.getVariable("signalProcessInstanceId");
       String executionId = runtimeService.createExecutionQuery().processInstanceId(signalProcessInstanceId).signalEventSubscriptionName("alert").singleResult().getId();

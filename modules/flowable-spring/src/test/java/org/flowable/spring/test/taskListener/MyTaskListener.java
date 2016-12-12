@@ -26,7 +26,7 @@ public class MyTaskListener implements TaskListener {
   }
 
   public void calledInExpression(DelegateTask task, String eventName) {
-    task.setVariable("calledInExpression", task.getName() + "-" + eventName);
+    task.setVariable("calledInExpression", task.getName() + '-' + eventName);
   }
 
 }

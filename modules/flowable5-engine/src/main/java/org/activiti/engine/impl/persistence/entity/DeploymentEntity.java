@@ -160,7 +160,7 @@ public class DeploymentEntity implements Serializable, Deployment, PersistentObj
 
   @Override
   public String toString() {
-    return "DeploymentEntity[id=" + id + ", name=" + name + "]";
+    return "DeploymentEntity[id=" + id + ", name=" + name + ']';
   }
   
 }

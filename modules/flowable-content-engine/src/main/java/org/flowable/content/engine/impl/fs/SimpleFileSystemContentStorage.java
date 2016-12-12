@@ -106,19 +106,19 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
     switch (determineType(metaData)) {
       case TYPE_PROCESS_INSTANCE:
         String processInstanceId = (String) metaData.get(ContentMetaDataKeys.PROCESS_INSTANCE_ID);
-        contentId = PROCESS_INSTANCE_PREFIX + "." + processInstanceId;
+        contentId = PROCESS_INSTANCE_PREFIX + '.' + processInstanceId;
         break;
         
       case TYPE_TASK:
         String taskId = (String) metaData.get(ContentMetaDataKeys.TASK_ID);
-        contentId = TASK_PREFIX + "." + taskId;
+        contentId = TASK_PREFIX + '.' + taskId;
         break;
   
       default:
         contentId = UNCATEGORIZED_PREFIX;
         break;
     }
-    contentId += "." + uuid;
+    contentId += '.' + uuid;
     return contentId;
   }
 

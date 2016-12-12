@@ -93,7 +93,7 @@ public class FlowableEndpoint extends DefaultEndpoint {
   
   protected void addConsumer(FlowableConsumer consumer) {
     if (activitiConsumer != null) {
-      throw new FlowableException("Activiti consumer already defined for " + getEndpointUri() + "!");
+      throw new FlowableException("Activiti consumer already defined for " + getEndpointUri() + '!');
     }
     activitiConsumer = consumer;
   }

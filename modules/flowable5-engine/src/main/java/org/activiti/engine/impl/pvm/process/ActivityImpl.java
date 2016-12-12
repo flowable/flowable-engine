@@ -75,7 +75,7 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
     
     if (transitionId != null) {
       if (namedOutgoingTransitions.containsKey(transitionId)) {
-        throw new PvmException("activity '"+id+" has duplicate transition '"+transitionId+"'");
+        throw new PvmException("activity '"+id+" has duplicate transition '"+transitionId+ '\'');
       }
       namedOutgoingTransitions.put(transitionId, transition);
     }
@@ -88,7 +88,7 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
   }
   
   public String toString() {
-    return "Activity("+id+")";
+    return "Activity("+id+ ')';
   }
   
   public ActivityImpl getParentActivity() {

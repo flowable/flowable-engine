@@ -55,7 +55,7 @@ public class GetDeploymentResourceCmd implements Command<InputStream>, Serializa
       }
       else
       {
-        throw new ActivitiObjectNotFoundException("no resource found with name '" + resourceName + "' in deployment '" + deploymentId + "'", InputStream.class);
+        throw new ActivitiObjectNotFoundException("no resource found with name '" + resourceName + "' in deployment '" + deploymentId + '\'', InputStream.class);
       }
     }
     return new ByteArrayInputStream(resource.getBytes());

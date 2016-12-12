@@ -905,7 +905,7 @@ public class DbSqlSession implements Session {
 
       // Exception when no match was found: unknown/unsupported version
       if (matchingVersionIndex < 0) {
-        throw new FlowableException("Could not update Flowable database schema: unknown version from database: '" + dbVersion + "'");
+        throw new FlowableException("Could not update Flowable database schema: unknown version from database: '" + dbVersion + '\'');
       }
 
       isUpgradeNeeded = (matchingVersionIndex != (ACTIVITI_VERSIONS.size() - 1));
@@ -924,7 +924,7 @@ public class DbSqlSession implements Session {
         }
 
         // Set upgrade history
-        String dbHistoryValue = dbHistoryProperty.getValue() + " upgrade(" + dbVersion + "->" + ProcessEngine.VERSION + ")";
+        String dbHistoryValue = dbHistoryProperty.getValue() + " upgrade(" + dbVersion + "->" + ProcessEngine.VERSION + ')';
         dbHistoryProperty.setValue(dbHistoryValue);
 
         // Engine upgrade
@@ -1040,7 +1040,7 @@ public class DbSqlSession implements Session {
     int engineMinorVersion = Integer.valueOf(cleanEngineVersionSplitted[1]);
 
     if ((dbMajorVersion > engineMajorVersion) || ((dbMajorVersion <= engineMajorVersion) && (dbMinorVersion > engineMinorVersion))) {
-      throw new FlowableException("Version of flowable database (" + versionInDatabase + ") is more recent than the engine (" + ProcessEngine.VERSION + ")");
+      throw new FlowableException("Version of flowable database (" + versionInDatabase + ") is more recent than the engine (" + ProcessEngine.VERSION + ')');
     } else if (cleanDbVersion.compareTo(cleanEngineVersion) == 0) {
       // Versions don't match exactly, possibly snapshot is being used
       log.warn("Engine-version is the same, but not an exact match: {} vs. {}. Not performing database-upgrade.", versionInDatabase, ProcessEngine.VERSION);
@@ -1093,7 +1093,7 @@ public class DbSqlSession implements Session {
 
   public String getResourceForDbOperation(String directory, String operation, String component) {
     String databaseType = dbSqlSessionFactory.getDatabaseType();
-    return "org/flowable/db/" + directory + "/flowable." + databaseType + "." + operation + "." + component + ".sql";
+    return "org/flowable/db/" + directory + "/flowable." + databaseType + '.' + operation + '.' + component + ".sql";
   }
 
   public void executeSchemaResource(String operation, String component, String resourceName, boolean isOptional) {

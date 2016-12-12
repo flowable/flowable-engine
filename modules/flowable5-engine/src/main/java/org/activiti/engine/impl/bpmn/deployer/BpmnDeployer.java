@@ -212,8 +212,8 @@ public class BpmnDeployer implements Deployer {
 
         String nextId = idGenerator.getNextId();
         String processDefinitionId = processDefinition.getKey() 
-          + ":" + processDefinition.getVersion()
-          + ":" + nextId; // ACT-505
+          + ':' + processDefinition.getVersion()
+          + ':' + nextId; // ACT-505
                    
         // ACT-115: maximum id length is 64 charcaters
         if (processDefinitionId.length() > 64) {          
@@ -716,7 +716,7 @@ public class BpmnDeployer implements Deployer {
 
   protected String getProcessImageResourceName(String bpmnFileResource, String processKey, String diagramSuffix) {
     String bpmnFileResourceBase = stripBpmnFileSuffix(bpmnFileResource);
-    return bpmnFileResourceBase + processKey + "." + diagramSuffix;
+    return bpmnFileResourceBase + processKey + '.' + diagramSuffix;
   }
 
   protected String stripBpmnFileSuffix(String bpmnFileResource) {

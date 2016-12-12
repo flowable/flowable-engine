@@ -183,7 +183,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   }
 
   public String toString() {
-    return "ProcessDefinitionEntity["+id+"]";
+    return "ProcessDefinitionEntity["+id+ ']';
   }
 
 

@@ -90,17 +90,17 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
   @ApiOperation(value = "Create new variables on a task", tags = {"Tasks"},
           notes="## Request body for creating simple (non-binary) variables\n\n"
           + " ```JSON\n" + "[\n" + "  {\n" + "    \"name\" : \"myTaskVariable\",\n" + "    \"scope\" : \"local\",\n" + "    \"type\" : \"string\",\n"
-                  + "    \"value\" : \"Hello my friend\"\n" + "  },\n" + "  {\n" + "\n" + "  }\n" + "] ```"
+                  + "    \"value\" : \"Hello my friend\"\n" + "  },\n" + "  {\n" + '\n' + "  }\n" + "] ```"
           + "\n\n\n"
-          + "The request body should be an array containing one or more JSON-objects representing the variables that should be created.\n" + "\n"
-                  + "- *name*: Required name of the variable\n" + "\n" + "scope: Scope of variable that is created. If omitted, local is assumed.\n" + "\n"
-                  + "- *type*: Type of variable that is created. If omitted, reverts to raw JSON-value type (string, boolean, integer or double).\n" + "\n"
-                  + "- *value*: Variable value.\n" + "\n" + "More information about the variable format can be found in the REST variables section."
+          + "The request body should be an array containing one or more JSON-objects representing the variables that should be created.\n" + '\n'
+                  + "- *name*: Required name of the variable\n" + '\n' + "scope: Scope of variable that is created. If omitted, local is assumed.\n" + '\n'
+                  + "- *type*: Type of variable that is created. If omitted, reverts to raw JSON-value type (string, boolean, integer or double).\n" + '\n'
+                  + "- *value*: Variable value.\n" + '\n' + "More information about the variable format can be found in the REST variables section."
           + "\n\n\n"
           + "## Request body for Creating a new binary variable\n\n"
           + "The request should be of type multipart/form-data. There should be a single file-part included with the binary value of the variable. On top of that, the following additional form-fields can be present:\n"
-                  + "\n"
-                  + "- *name*: Required name of the variable.\n" + "\n" + "scope: Scope of variable that is created. If omitted, local is assumed.\n" + "\n"
+                  + '\n'
+                  + "- *name*: Required name of the variable.\n" + '\n' + "scope: Scope of variable that is created. If omitted, local is assumed.\n" + '\n'
                   + "- *type*: Type of variable that is created. If omitted, binary is assumed and the binary data in the request will be stored as an array of bytes."
           + "\n\n\n"
   )

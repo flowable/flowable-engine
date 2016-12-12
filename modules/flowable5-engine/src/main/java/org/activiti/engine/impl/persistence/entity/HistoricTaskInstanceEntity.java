@@ -256,7 +256,7 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
     sb.append("HistoricTaskInstanceEntity[");
     sb.append("id=").append(id);
     sb.append(", name=").append(name);
-    sb.append("]");
+    sb.append(']');
     return sb.toString();
   }
   

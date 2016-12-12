@@ -116,7 +116,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
 
       ProcessDefinitionEntity processDefinitionEntity = processDefinitionManager.findById(processDefinitionId);
       if (processDefinitionEntity == null) {
-        throw new FlowableObjectNotFoundException("Cannot find process definition for id '" + processDefinitionId + "'", ProcessDefinition.class);
+        throw new FlowableObjectNotFoundException("Cannot find process definition for id '" + processDefinitionId + '\'', ProcessDefinition.class);
       }
       processDefinitionEntities.add(processDefinitionEntity);
 
@@ -132,7 +132,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
 
       List<ProcessDefinition> processDefinitions = query.list();
       if (processDefinitions.isEmpty()) {
-        throw new FlowableException("Cannot find process definition for key '" + processDefinitionKey + "'");
+        throw new FlowableException("Cannot find process definition for key '" + processDefinitionKey + '\'');
       }
 
       for (ProcessDefinition processDefinition : processDefinitions) {

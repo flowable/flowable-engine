@@ -149,9 +149,9 @@ public class ValidationError {
       strb.append("activityName = " + activityName + " | ");
       extraInfoAlreadyPresent = true;
     }
-    strb.append("]");
+    strb.append(']');
     if (xmlLineNumber > 0 && xmlColumnNumber > 0) {
-      strb.append(" ( line: " + xmlLineNumber + ", column: " + xmlColumnNumber + ")");
+      strb.append(" ( line: " + xmlLineNumber + ", column: " + xmlColumnNumber + ')');
     }
     return strb.toString();
   }

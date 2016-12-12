@@ -133,7 +133,7 @@ public class FlowableClientService {
       try {
         InputStream responseContent = response.getEntity().getContent();
         String strResponse = IOUtils.toString(responseContent);
-        
+
         boolean success = response.getStatusLine() != null && response.getStatusLine().getStatusCode() == expectedStatusCode;
         if (success) {
           JsonNode bodyNode = objectMapper.readTree(strResponse);
@@ -577,16 +577,16 @@ public class FlowableClientService {
       actualRestRoot = DEFAULT_FLOWABLE_REST_ROOT;
     }
 
-    String finalUrl = serverAddress + ":" + port;
+    String finalUrl = serverAddress + ':' + port;
     if (StringUtils.isNotEmpty(actualContextRoot)) {
-      finalUrl += "/" + actualContextRoot;
+      finalUrl += '/' + actualContextRoot;
     }
 
     if (StringUtils.isNotEmpty(actualRestRoot)) {
-      finalUrl += "/" + actualRestRoot;
+      finalUrl += '/' + actualRestRoot;
     }
 
-    URIBuilder builder = createUriBuilder(finalUrl + "/" + uri);
+    URIBuilder builder = createUriBuilder(finalUrl + '/' + uri);
 
     return builder.toString();
   }
@@ -599,7 +599,7 @@ public class FlowableClientService {
       contextRoot = DEFAULT_FLOWABLE_CONTEXT_ROOT;
     }
 
-    return "http://" + serverConfig.getServerAddress() + ":" + serverConfig.getPort() + "/" + contextRoot + "/" + uri;
+    return "http://" + serverConfig.getServerAddress() + ':' + serverConfig.getPort() + '/' + contextRoot + '/' + uri;
   }
 
   public URIBuilder createUriBuilder(String url) {

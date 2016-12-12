@@ -50,7 +50,7 @@ public class DatabaseConfiguration {
     String dataSourceJndiName = env.getProperty("datasource.jndi.name");
     if (StringUtils.isNotEmpty(dataSourceJndiName)) {
 
-      log.info("Using jndi datasource '" + dataSourceJndiName + "'");
+      log.info("Using jndi datasource '" + dataSourceJndiName + '\'');
       JndiDataSourceLookup dsLookup = new JndiDataSourceLookup();
       dsLookup.setResourceRef(env.getProperty("datasource.jndi.resourceRef", Boolean.class, Boolean.TRUE));
       DataSource dataSource = dsLookup.getDataSource(dataSourceJndiName);

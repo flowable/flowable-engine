@@ -357,7 +357,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
     ExecutionEntity execution = findById(processInstanceId);
 
     if (execution == null) {
-      throw new FlowableObjectNotFoundException("No process instance found for id '" + processInstanceId + "'", ProcessInstance.class);
+      throw new FlowableObjectNotFoundException("No process instance found for id '" + processInstanceId + '\'', ProcessInstance.class);
     }
 
     deleteProcessInstanceCascade(execution, deleteReason, cascade);
@@ -428,7 +428,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
     ExecutionEntity processInstanceEntity = findById(processInstanceId);
     
     if (processInstanceEntity == null) {
-      throw new FlowableObjectNotFoundException("No process instance found for id '" + processInstanceId + "'", ProcessInstance.class);
+      throw new FlowableObjectNotFoundException("No process instance found for id '" + processInstanceId + '\'', ProcessInstance.class);
     }
     
     if (processInstanceEntity.isDeleted()) {

@@ -89,7 +89,7 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
 
     assertResultsPresentInDataResponse(url + "?processDefinitionKeyLike=" + "oneTask%25", 3, task.getId());
     
-    assertResultsPresentInDataResponse(url + "?taskMinPriority=" + "0", 3, task.getId());
+    assertResultsPresentInDataResponse(url + "?taskMinPriority=" + '0', 3, task.getId());
 
     assertResultsPresentInDataResponse(url + "?taskMaxPriority=" + "60", 3, task.getId());
 

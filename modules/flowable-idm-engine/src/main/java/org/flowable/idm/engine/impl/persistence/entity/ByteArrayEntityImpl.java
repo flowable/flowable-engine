@@ -58,7 +58,7 @@ public class ByteArrayEntityImpl extends AbstractEntity implements ByteArrayEnti
 
   @Override
   public String toString() {
-    return "ByteArrayEntity[id=" + id + ", name=" + name + ", size=" + (bytes != null ? bytes.length : 0) + "]";
+    return "ByteArrayEntity[id=" + id + ", name=" + name + ", size=" + (bytes != null ? bytes.length : 0) + ']';
   }
 
   // Wrapper for a byte array, needed to do byte array comparisons

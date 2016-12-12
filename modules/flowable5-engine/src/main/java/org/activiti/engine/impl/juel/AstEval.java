@@ -59,7 +59,7 @@ public final class AstEval extends AstNode {
 	public void appendStructure(StringBuilder b, Bindings bindings) {
 		b.append(deferred ? "#{" : "${");
 		child.appendStructure(b, bindings);
-		b.append("}");
+		b.append('}');
 	}
 
 	public MethodInfo getMethodInfo(Bindings bindings, ELContext context, Class<?> returnType, Class<?>[] paramTypes) {

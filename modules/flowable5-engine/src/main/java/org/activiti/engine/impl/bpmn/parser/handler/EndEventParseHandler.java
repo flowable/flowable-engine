@@ -62,7 +62,7 @@ public class EndEventParseHandler extends AbstractActivityBpmnParseHandler<EndEv
     } else if (eventDefinition instanceof CancelEventDefinition) {
       ScopeImpl scope = bpmnParse.getCurrentScope();
       if (scope.getProperty("type")==null || !scope.getProperty("type").equals("transaction")) {
-        logger.warn("end event with cancelEventDefinition only supported inside transaction subprocess (id=" + endEvent.getId() + ")");
+        logger.warn("end event with cancelEventDefinition only supported inside transaction subprocess (id=" + endEvent.getId() + ')');
       } else {
         endEventActivity.setProperty("type", "cancelEndEvent");
         endEventActivity.setActivityBehavior(bpmnParse.getActivityBehaviorFactory().createCancelEndEventActivityBehavior(endEvent));

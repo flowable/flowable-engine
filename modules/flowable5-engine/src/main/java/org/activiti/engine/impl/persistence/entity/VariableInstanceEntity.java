@@ -274,7 +274,7 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
     if (byteArrayRef.getId() != null) {
       sb.append(", byteArrayValueId=").append(byteArrayRef.getId());
     }
-    sb.append("]");
+    sb.append(']');
     return sb.toString();
   }
   

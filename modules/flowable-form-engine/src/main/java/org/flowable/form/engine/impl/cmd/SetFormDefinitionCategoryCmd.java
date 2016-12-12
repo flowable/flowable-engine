@@ -43,7 +43,7 @@ public class SetFormDefinitionCategoryCmd implements Command<Void> {
     FormDefinitionEntity formDefinition = commandContext.getFormDefinitionEntityManager().findById(formDefinitionId);
 
     if (formDefinition == null) {
-      throw new FlowableObjectNotFoundException("No form definition found for id = '" + formDefinitionId + "'");
+      throw new FlowableObjectNotFoundException("No form definition found for id = '" + formDefinitionId + '\'');
     }
 
     // Update category

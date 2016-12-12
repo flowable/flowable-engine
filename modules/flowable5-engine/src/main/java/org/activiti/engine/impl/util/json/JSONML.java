@@ -200,7 +200,7 @@ public class JSONML {
 	                	if (closeTag != null) {
 		                	if (!closeTag.equals(tagName)) {
 		                		throw x.syntaxError("Mismatched '" + tagName + 
-		                				"' and '" + closeTag + "'");
+		                				"' and '" + closeTag + '\'');
 					        }
 		                	tagName = null;
 		            		if (!arrayForm && newja.length() > 0) {

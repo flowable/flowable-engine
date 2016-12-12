@@ -34,7 +34,7 @@ public abstract class AbstractDmnTestCase extends TestCase {
    */
   public void assertTextPresent(String expected, String actual) {
     if ((actual == null) || (!actual.contains(expected))) {
-      throw new AssertionFailedError("expected presence of [" + expected + "], but was [" + actual + "]");
+      throw new AssertionFailedError("expected presence of [" + expected + "], but was [" + actual + ']');
     }
   }
 

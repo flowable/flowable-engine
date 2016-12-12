@@ -134,7 +134,7 @@ public class FormInstanceEntityImpl extends AbstractEntityNoRevision implements 
   }
   
   public String toString() {
-    return "SubmittedFormEntity[" + id + "]";
+    return "SubmittedFormEntity[" + id + ']';
   }
 
 }

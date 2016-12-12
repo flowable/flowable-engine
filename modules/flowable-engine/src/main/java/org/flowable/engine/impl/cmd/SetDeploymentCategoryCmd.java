@@ -44,7 +44,7 @@ public class SetDeploymentCategoryCmd implements Command<Void> {
     DeploymentEntity deployment = commandContext.getDeploymentEntityManager().findById(deploymentId);
 
     if (deployment == null) {
-      throw new FlowableObjectNotFoundException("No deployment found for id = '" + deploymentId + "'", Deployment.class);
+      throw new FlowableObjectNotFoundException("No deployment found for id = '" + deploymentId + '\'', Deployment.class);
     }
     
     if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled() && 

@@ -55,7 +55,7 @@ public class ProcessEngineEndpoint extends AbstractEndpoint<Map<String, Object>>
         List<ProcessDefinition> processDefinitions = processEngine.getRepositoryService().createProcessDefinitionQuery().orderByProcessDefinitionKey().asc().list();
         List<String> processDefinitionKeys = new ArrayList<String>();
         for (ProcessDefinition processDefinition : processDefinitions) {
-            processDefinitionKeys.add(processDefinition.getKey() + " (v" + processDefinition.getVersion() + ")");
+            processDefinitionKeys.add(processDefinition.getKey() + " (v" + processDefinition.getVersion() + ')');
         }
         metrics.put("deployedProcessDefinitions", processDefinitionKeys);
 
@@ -63,13 +63,13 @@ public class ProcessEngineEndpoint extends AbstractEndpoint<Map<String, Object>>
         Map<String, Object> processInstanceCountMap = new HashMap<String, Object>();
         metrics.put("runningProcessInstanceCount", processInstanceCountMap);
         for (ProcessDefinition processDefinition : processDefinitions) {
-            processInstanceCountMap.put(processDefinition.getKey() + " (v" + processDefinition.getVersion() + ")",
+            processInstanceCountMap.put(processDefinition.getKey() + " (v" + processDefinition.getVersion() + ')',
                     processEngine.getRuntimeService().createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).count());
         }
         Map<String, Object> completedProcessInstanceCountMap = new HashMap<String, Object>();
         metrics.put("completedProcessInstanceCount", completedProcessInstanceCountMap);
         for (ProcessDefinition processDefinition : processDefinitions) {
-            completedProcessInstanceCountMap.put(processDefinition.getKey() + " (v" + processDefinition.getVersion() + ")",
+            completedProcessInstanceCountMap.put(processDefinition.getKey() + " (v" + processDefinition.getVersion() + ')',
                     processEngine.getHistoryService().createHistoricProcessInstanceQuery().finished().processDefinitionId(processDefinition.getId()).count());
         }
 

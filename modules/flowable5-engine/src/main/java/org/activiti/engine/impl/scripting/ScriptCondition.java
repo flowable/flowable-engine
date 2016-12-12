@@ -54,7 +54,7 @@ public class ScriptCondition implements Condition {
       throw new ActivitiException("condition script returns null: " + expression);
     }
     if (!(result instanceof Boolean)) {
-      throw new ActivitiException("condition script returns non-Boolean: " + result + " (" + result.getClass().getName() + ")");
+      throw new ActivitiException("condition script returns non-Boolean: " + result + " (" + result.getClass().getName() + ')');
     }
     return (Boolean) result;
   }

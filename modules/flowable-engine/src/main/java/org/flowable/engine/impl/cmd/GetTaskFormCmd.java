@@ -41,12 +41,12 @@ public class GetTaskFormCmd implements Command<TaskFormData>, Serializable {
   public TaskFormData execute(CommandContext commandContext) {
     TaskEntity task = commandContext.getTaskEntityManager().findById(taskId);
     if (task == null) {
-      throw new FlowableObjectNotFoundException("No task found for taskId '" + taskId + "'", Task.class);
+      throw new FlowableObjectNotFoundException("No task found for taskId '" + taskId + '\'', Task.class);
     }
     
     TaskFormHandler taskFormHandler = FormHandlerUtil.getTaskFormHandlder(task);
     if (taskFormHandler == null) {
-      throw new FlowableException("No taskFormHandler specified for task '" + taskId + "'");
+      throw new FlowableException("No taskFormHandler specified for task '" + taskId + '\'');
     }
 
     return taskFormHandler.createTaskForm(task);

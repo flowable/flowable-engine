@@ -326,7 +326,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
     if (stringList != null) {
       for (String result : stringList) {
         if (resultString.length() > 0) {
-          resultString.append(",");
+          resultString.append(',');
         }
         resultString.append(result);
       }

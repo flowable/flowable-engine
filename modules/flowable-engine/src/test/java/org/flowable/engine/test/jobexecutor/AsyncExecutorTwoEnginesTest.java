@@ -156,7 +156,7 @@ public class AsyncExecutorTwoEnginesTest {
       logger.info("About to execute job " + job.getId());
       counter.incrementAndGet();
       boolean success = super.executeAsyncJob(job);
-      logger.info("Handed off job " + job.getId() + " to async executor (retries=" + job.getRetries() + ")");
+      logger.info("Handed off job " + job.getId() + " to async executor (retries=" + job.getRetries() + ')');
       return success;
     }
 

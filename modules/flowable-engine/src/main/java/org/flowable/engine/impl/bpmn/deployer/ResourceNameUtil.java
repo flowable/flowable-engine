@@ -37,7 +37,7 @@ public class ResourceNameUtil {
 
   public static String getProcessDiagramResourceName(String bpmnFileResource, String processKey, String diagramSuffix) {
     String bpmnFileResourceBase = ResourceNameUtil.stripBpmnFileSuffix(bpmnFileResource);
-    return bpmnFileResourceBase + processKey + "." + diagramSuffix;
+    return bpmnFileResourceBase + processKey + '.' + diagramSuffix;
   }
   
   /**
@@ -70,7 +70,7 @@ public class ResourceNameUtil {
     String key = processDefinition.getKey();
     
     for (String diagramSuffix : DIAGRAM_SUFFIXES) {
-      String possibleName = bpmnResourceBase + key + "." + diagramSuffix;
+      String possibleName = bpmnResourceBase + key + '.' + diagramSuffix;
       if (resources.containsKey(possibleName)) {
         return possibleName;
       }

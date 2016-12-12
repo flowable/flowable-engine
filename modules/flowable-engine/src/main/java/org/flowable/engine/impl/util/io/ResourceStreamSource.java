@@ -51,6 +51,6 @@ public class ResourceStreamSource implements StreamSource {
   }
 
   public String toString() {
-    return "Resource[" + resource + "]";
+    return "Resource[" + resource + ']';
   }
 }

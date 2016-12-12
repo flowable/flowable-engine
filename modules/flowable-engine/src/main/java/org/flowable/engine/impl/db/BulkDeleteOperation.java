@@ -38,6 +38,6 @@ public class BulkDeleteOperation  {
 
   @Override
   public String toString() {
-    return "bulk delete: " + statement + "(" + parameter + ")";
+    return "bulk delete: " + statement + '(' + parameter + ')';
   }
 }

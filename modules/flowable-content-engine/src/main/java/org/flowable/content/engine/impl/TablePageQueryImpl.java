@@ -67,7 +67,7 @@ public class TablePageQueryImpl implements TablePageQuery, Command<TablePage>, S
     } else {
       order = order + ", ";
     }
-    order = order + column + " " + sortOrder;
+    order = order + column + ' ' + sortOrder;
   }
 
   public TablePage listPage(int firstResult, int maxResults) {

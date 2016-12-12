@@ -231,7 +231,7 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
   
   @Override
   public String toString() {
-    return getClass().getName() + " [id=" + id + "]";
+    return getClass().getName() + " [id=" + id + ']';
   }
 
 }

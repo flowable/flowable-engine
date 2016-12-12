@@ -77,7 +77,7 @@ public class PropertyEntity implements PersistentObject, HasRevision, Serializab
 
   @Override
   public String toString() {
-    return "PropertyEntity[name=" + name + ", value=" + value + "]";
+    return "PropertyEntity[name=" + name + ", value=" + value + ']';
   }
 
 }

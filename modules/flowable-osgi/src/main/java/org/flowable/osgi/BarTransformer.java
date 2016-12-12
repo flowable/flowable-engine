@@ -65,7 +65,7 @@ public class BarTransformer {
       StringBuilder sb = new StringBuilder();
       for (String s : paths) {
         if (sb.length() > 0) {
-          sb.append(",");
+          sb.append(',');
         }
         sb.append(s);
       }
@@ -152,7 +152,7 @@ public class BarTransformer {
             v.append('.');
             v.append(d4);
             if (d5 != null) {
-              v.append(".");
+              v.append('.');
               cleanupModifier(v, d5);
             }
           } else if (d5 != null) {

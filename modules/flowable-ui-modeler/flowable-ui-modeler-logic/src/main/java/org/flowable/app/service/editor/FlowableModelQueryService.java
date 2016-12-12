@@ -218,7 +218,7 @@ public class FlowableModelQueryService {
     if (filterText != null) {
       String trimmed = StringUtils.trim(filterText);
       if (trimmed.length() >= MIN_FILTER_LENGTH) {
-        validFilter = "%" + trimmed.toLowerCase() + "%";
+        validFilter = '%' + trimmed.toLowerCase() + '%';
       }
     }
     return validFilter;

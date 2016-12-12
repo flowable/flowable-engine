@@ -71,7 +71,7 @@ public final class AstText extends AstNode {
 
 	@Override
 	public String toString() {
-		return "\"" + value + "\"";
+		return '"' + value + '"';
 	}	
 
 	@Override 

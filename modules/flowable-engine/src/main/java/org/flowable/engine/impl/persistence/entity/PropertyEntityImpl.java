@@ -63,7 +63,7 @@ public class PropertyEntityImpl extends AbstractEntity implements PropertyEntity
 
   @Override
   public String toString() {
-    return "PropertyEntity[name=" + name + ", value=" + value + "]";
+    return "PropertyEntity[name=" + name + ", value=" + value + ']';
   }
 
 }

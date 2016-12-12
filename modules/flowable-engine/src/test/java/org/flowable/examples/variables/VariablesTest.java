@@ -55,25 +55,25 @@ public class VariablesTest extends PluggableFlowableTestCase {
     // 2000 characters * 2 bytes = 4000 bytes
     StringBuilder long2000StringBuilder = new StringBuilder();
     for (int i = 0; i < 2000; i++) {
-      long2000StringBuilder.append("z");
+      long2000StringBuilder.append('z');
     }
 
     // 2001 characters * 2 bytes  = 4002 bytes
     StringBuilder long2001StringBuilder = new StringBuilder();
 
     for (int i = 0; i < 2000; i++) {
-      long2001StringBuilder.append("a");
+      long2001StringBuilder.append('a');
     }
-    long2001StringBuilder.append("a");
+    long2001StringBuilder.append('a');
 
 
     // 4002 characters
     StringBuilder long4001StringBuilder = new StringBuilder();
 
     for (int i = 0; i < 4000; i++) {
-      long4001StringBuilder.append("a");
+      long4001StringBuilder.append('a');
     }
-    long4001StringBuilder.append("a");
+    long4001StringBuilder.append('a');
 
     // Start process instance with different types of variables
     Map<String, Object> variables = new HashMap<String, Object>();

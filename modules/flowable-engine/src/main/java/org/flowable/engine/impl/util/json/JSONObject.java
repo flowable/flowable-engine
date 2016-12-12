@@ -987,7 +987,7 @@ public class JSONObject {
   public JSONObject putOnce(String key, Object value) throws JSONException {
     if (key != null && value != null) {
       if (opt(key) != null) {
-        throw new JSONException("Duplicate key \"" + key + "\"");
+        throw new JSONException("Duplicate key \"" + key + '"');
       }
       put(key, value);
     }

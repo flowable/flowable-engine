@@ -118,10 +118,10 @@ public class ParsedDeploymentTest extends PluggableFlowableTestCase {
   
   private static String aseembleXmlResourceString(String... definitions) {
     StringBuilder builder = new StringBuilder("<definitions ");
-    builder = builder.append(NAMESPACE).append(" ").append(TARGET_NAMESPACE).append(">\n");
+    builder = builder.append(NAMESPACE).append(' ').append(TARGET_NAMESPACE).append(">\n");
     
     for (String definition : definitions) {
-      builder = builder.append(definition).append("\n");
+      builder = builder.append(definition).append('\n');
     }
     
     builder = builder.append("</definitions>\n");

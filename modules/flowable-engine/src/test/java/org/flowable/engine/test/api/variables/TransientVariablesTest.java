@@ -265,7 +265,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
       for (String s : response.split(";")) {
         String[] data = s.split("=");
         if (data[0].equals("message")) {
-          execution.setVariable("message", data[1] + "!");
+          execution.setVariable("message", data[1] + '!');
         }
       }
     }

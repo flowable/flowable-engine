@@ -42,13 +42,13 @@ public class GetTaskFormCmd implements Command<TaskFormData>, Serializable {
       .getTaskEntityManager()
       .findTaskById(taskId);
     if (task == null) {
-      throw new ActivitiObjectNotFoundException("No task found for taskId '" + taskId +"'", Task.class);
+      throw new ActivitiObjectNotFoundException("No task found for taskId '" + taskId + '\'', Task.class);
     }
     
     if(task.getTaskDefinition() != null) {
       TaskFormHandler taskFormHandler = task.getTaskDefinition().getTaskFormHandler();
       if (taskFormHandler == null) {
-        throw new ActivitiException("No taskFormHandler specified for task '" + taskId +"'");
+        throw new ActivitiException("No taskFormHandler specified for task '" + taskId + '\'');
       }
       
       return taskFormHandler.createTaskForm(task);

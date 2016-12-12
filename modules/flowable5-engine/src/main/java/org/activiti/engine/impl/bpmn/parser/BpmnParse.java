@@ -206,10 +206,10 @@ public class BpmnParse implements BpmnXMLConstants {
 	          for (ValidationError error : validationErrors) {
 	          	if (error.isWarning()) {
 	          		warningBuilder.append(error.toString());
-	          		warningBuilder.append("\n");
+	          		warningBuilder.append('\n');
 	          	} else {
 	          		errorBuilder.append(error.toString());
-	          		errorBuilder.append("\n");
+	          		errorBuilder.append('\n');
 	          	}
 	          }
 	           

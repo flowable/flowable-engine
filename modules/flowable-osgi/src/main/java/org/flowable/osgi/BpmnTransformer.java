@@ -138,7 +138,7 @@ public class BpmnTransformer {
             v.append('.');
             v.append(d4);
             if (d5 != null) {
-              v.append(".");
+              v.append('.');
               cleanupModifier(v, d5);
             }
           } else if (d5 != null) {

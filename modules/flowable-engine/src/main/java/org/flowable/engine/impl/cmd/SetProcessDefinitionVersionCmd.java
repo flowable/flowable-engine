@@ -78,7 +78,7 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
     if (processInstance == null) {
       throw new FlowableObjectNotFoundException("No process instance found for id = '" + processInstanceId + "'.", ProcessInstance.class);
     } else if (!processInstance.isProcessInstanceType()) {
-      throw new FlowableIllegalArgumentException("A process instance id is required, but the provided id " + "'" + processInstanceId + "' " + "points to a child execution of process instance " + "'"
+      throw new FlowableIllegalArgumentException("A process instance id is required, but the provided id " + '\'' + processInstanceId + "' " + "points to a child execution of process instance " + '\''
           + processInstance.getProcessInstanceId() + "'. " + "Please invoke the " + getClass().getSimpleName() + " with a root execution id.");
     }
     

@@ -137,6 +137,6 @@ public class ServerConfig implements Serializable {
   public String toString() {
     return "ServerConfig [id=" + id + ", name=" + name + ", description=" + description + ", serverAddress="
         + serverAddress + ", port=" + port + ", contextRoot=" + contextRoot + ", restRoot=" + restRoot + ", userName="
-        + userName + ", password=" + password + "]";
+        + userName + ", password=" + password + ']';
   }
 }

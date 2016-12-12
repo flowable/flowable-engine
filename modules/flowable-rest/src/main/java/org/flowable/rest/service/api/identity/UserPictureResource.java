@@ -74,7 +74,7 @@ public class UserPictureResource extends BaseUserResource {
 
   @ApiOperation(value = "Updating a user’s picture", tags = {"Users"}, consumes = "multipart/form-data",
           notes = "The request should be of type multipart/form-data. There should be a single file-part included with the binary value of the picture. On top of that, the following additional form-fields can be present:\n"
-                  + "\n"
+                  + '\n'
                   + "mimeType: Optional mime-type for the uploaded picture. If omitted, the default of image/jpeg is used as a mime-type for the picture.")
   @ApiResponses(value = {
           @ApiResponse(code = 200, message = "Indicates the user was found and the picture has been updated. The response-body is left empty intentionally."),

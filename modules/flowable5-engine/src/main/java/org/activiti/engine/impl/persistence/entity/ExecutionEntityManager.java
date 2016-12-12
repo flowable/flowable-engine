@@ -64,7 +64,7 @@ public class ExecutionEntityManager extends AbstractManager {
     ExecutionEntity execution = findExecutionById(processInstanceId);
     
     if (execution == null) {
-      throw new ActivitiObjectNotFoundException("No process instance found for id '" + processInstanceId + "'", ProcessInstance.class);
+      throw new ActivitiObjectNotFoundException("No process instance found for id '" + processInstanceId + '\'', ProcessInstance.class);
     }
 
     deleteProcessInstanceCascade(execution, deleteReason, cascade);

@@ -63,7 +63,7 @@ public abstract class ScopeImpl extends ProcessElementImpl implements PvmScope {
     ActivityImpl activity = new ActivityImpl(activityId, processDefinition);
     if (activityId!=null) {
       if (processDefinition.findActivity(activityId) != null) {
-        throw new PvmException("duplicate activity id '" + activityId + "'");
+        throw new PvmException("duplicate activity id '" + activityId + '\'');
       }
       namedActivities.put(activityId, activity);
     }

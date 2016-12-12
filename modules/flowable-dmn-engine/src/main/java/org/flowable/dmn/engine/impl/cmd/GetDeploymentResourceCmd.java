@@ -49,7 +49,7 @@ public class GetDeploymentResourceCmd implements Command<InputStream>, Serializa
       if (commandContext.getDeploymentEntityManager().findById(deploymentId) == null) {
         throw new FlowableObjectNotFoundException("deployment does not exist: " + deploymentId);
       } else {
-        throw new FlowableObjectNotFoundException("no resource found with name '" + resourceName + "' in deployment '" + deploymentId + "'");
+        throw new FlowableObjectNotFoundException("no resource found with name '" + resourceName + "' in deployment '" + deploymentId + '\'');
       }
     }
     return new ByteArrayInputStream(resource.getBytes());

@@ -37,14 +37,14 @@ public class SimpleContext extends ELContext {
 
 		@Override
 		public Method resolveFunction(String prefix, String localName) {
-			return map.get(prefix + ":" + localName);
+			return map.get(prefix + ':' + localName);
 		}
 
 		public void setFunction(String prefix, String localName, Method method) {
 			if (map.isEmpty()) {
 				map = new HashMap<String, Method>();
 			}
-			map.put(prefix + ":" + localName, method);
+			map.put(prefix + ':' + localName, method);
 		}
 	}
 

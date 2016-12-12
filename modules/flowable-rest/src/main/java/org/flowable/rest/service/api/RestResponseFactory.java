@@ -1191,7 +1191,7 @@ public class RestResponseFactory {
   protected String formatUrl(String serverRootUrl, String[] fragments, Object... arguments) {
     StringBuilder urlBuilder = new StringBuilder(serverRootUrl);
     for (String urlFragment : fragments) {
-      urlBuilder.append("/");
+      urlBuilder.append('/');
       urlBuilder.append(MessageFormat.format(urlFragment, arguments));
     }
     return urlBuilder.toString();

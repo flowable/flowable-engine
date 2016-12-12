@@ -152,7 +152,7 @@ public class JobEntity extends AbstractJobEntity {
 
   @Override
   public String toString() {
-    return "JobEntity [id=" + id + "]";
+    return "JobEntity [id=" + id + ']';
   }
   
 }

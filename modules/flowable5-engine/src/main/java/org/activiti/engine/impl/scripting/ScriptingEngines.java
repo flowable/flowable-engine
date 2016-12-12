@@ -121,7 +121,7 @@ public class ScriptingEngines {
   	}
   	
   	if (scriptEngine == null) {
-      throw new ActivitiException("Can't find scripting engine for '" + language + "'");
+      throw new ActivitiException("Can't find scripting engine for '" + language + '\'');
     }
   	return scriptEngine;
   }

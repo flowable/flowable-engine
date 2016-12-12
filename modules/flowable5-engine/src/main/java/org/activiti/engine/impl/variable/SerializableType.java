@@ -93,7 +93,7 @@ public class SerializableType extends ByteArrayType {
       oos = createObjectOutputStream(baos);
       oos.writeObject(value);
     } catch (Exception e) {
-      throw new ActivitiException("Couldn't serialize value '"+value+"' in variable '"+valueFields.getName()+"'", e);
+      throw new ActivitiException("Couldn't serialize value '"+value+"' in variable '"+valueFields.getName()+ '\'', e);
     } finally {
       IoUtil.closeSilently(oos);
     }
@@ -108,7 +108,7 @@ public class SerializableType extends ByteArrayType {
 
       return deserializedObject;
     } catch (Exception e) {
-      throw new ActivitiException("Couldn't deserialize object in variable '"+valueFields.getName()+"'", e);
+      throw new ActivitiException("Couldn't deserialize object in variable '"+valueFields.getName()+ '\'', e);
     } finally {
       IoUtil.closeSilently(bais);
     }

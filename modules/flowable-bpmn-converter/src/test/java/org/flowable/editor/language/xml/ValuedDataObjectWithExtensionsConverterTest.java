@@ -90,7 +90,7 @@ public class ValuedDataObjectWithExtensionsConverterTest extends AbstractConvert
       sb.append(", resourceBundleKeyForDescription=").append(resourceBundleKeyForDescription);
       sb.append(", labeledEntityIdForName=").append(labeledEntityIdForName);
       sb.append(", labeledEntityIdForDescription=").append(labeledEntityIdForDescription);
-      sb.append("]");
+      sb.append(']');
       return sb.toString();
     }
   }

@@ -73,7 +73,7 @@ public class RuntimeVariablesTest extends PluggableFlowableTestCase {
     
     StringBuilder sb = new StringBuilder("a");
     for (int i = 0; i < 4001; i++) {
-      sb.append("a");
+      sb.append('a');
     }
     String serializableTypeVar = sb.toString();
     

@@ -201,7 +201,7 @@ public final class TreeValueExpression extends org.activiti.engine.impl.javax.el
 
 	@Override
 	public String toString() {
-		return "TreeValueExpression(" + expr + ")";
+		return "TreeValueExpression(" + expr + ')';
 	}
 
 	/**

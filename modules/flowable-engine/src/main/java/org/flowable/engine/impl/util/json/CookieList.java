@@ -79,7 +79,7 @@ public class CookieList {
           sb.append(';');
         }
         sb.append(Cookie.escape(s));
-        sb.append("=");
+        sb.append('=');
         sb.append(Cookie.escape(o.getString(s)));
         b = true;
       }

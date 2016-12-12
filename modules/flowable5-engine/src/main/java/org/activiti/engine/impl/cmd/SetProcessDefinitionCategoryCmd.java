@@ -47,7 +47,7 @@ public class SetProcessDefinitionCategoryCmd implements Command<Void> {
             .findProcessDefinitionById(processDefinitionId);
 
     if (processDefinition == null) {
-      throw new ActivitiObjectNotFoundException("No process definition found for id = '" + processDefinitionId + "'", ProcessDefinition.class);
+      throw new ActivitiObjectNotFoundException("No process definition found for id = '" + processDefinitionId + '\'', ProcessDefinition.class);
     }
     
     // Update category

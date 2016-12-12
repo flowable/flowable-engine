@@ -396,7 +396,7 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
               JsonNode eventValueNode = eventNode.get(PROPERTY_EVENTLISTENER_EVENT);
               if (eventValueNode != null && eventValueNode.isNull() == false && StringUtils.isNotEmpty(eventValueNode.asText())) {
                   if (eventsBuilder.length() > 0) {
-                      eventsBuilder.append(",");
+                      eventsBuilder.append(',');
                   }
                   eventsBuilder.append(eventValueNode.asText());
               }

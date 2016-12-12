@@ -293,7 +293,7 @@ public abstract class AbstractEngineConfiguration {
       logger.debug("database product name: '{}'", databaseProductName);
       databaseType = databaseTypeMappings.getProperty(databaseProductName);
       if (databaseType == null) {
-        throw new FlowableException("couldn't deduct database type from database product name '" + databaseProductName + "'");
+        throw new FlowableException("couldn't deduct database type from database product name '" + databaseProductName + '\'');
       }
       logger.debug("using database type: {}", databaseType);
 
@@ -378,7 +378,7 @@ public abstract class AbstractEngineConfiguration {
         
         String wildcardEscapeClause = "";
         if ((databaseWildcardEscapeCharacter != null) && (databaseWildcardEscapeCharacter.length() != 0)) {
-          wildcardEscapeClause = " escape '" + databaseWildcardEscapeCharacter + "'";
+          wildcardEscapeClause = " escape '" + databaseWildcardEscapeCharacter + '\'';
         }
         properties.put("wildcardEscapeClause", wildcardEscapeClause);
         

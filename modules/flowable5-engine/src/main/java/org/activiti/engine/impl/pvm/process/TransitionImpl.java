@@ -59,7 +59,7 @@ public class TransitionImpl extends ProcessElementImpl implements PvmTransition 
   }
 
   public String toString() {
-    return "("+source.getId()+")--"+(id!=null?id+"-->(":">(")+destination.getId()+")";
+    return '(' +source.getId()+")--"+(id!=null?id+"-->(":">(")+destination.getId()+ ')';
   }
 
   @SuppressWarnings("unchecked")

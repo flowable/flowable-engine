@@ -131,7 +131,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
           try {
             field.setValue(formExpression.getValue(variables));
           } catch (Exception e) {
-            logger.error("Error getting value for expression " + expressionField.getExpression() + " " + e.getMessage());
+            logger.error("Error getting value for expression " + expressionField.getExpression() + ' ' + e.getMessage());
           }
           
         } else if (FormFieldTypes.UPLOAD.equals(field.getType())) {
@@ -168,26 +168,26 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
 
       FormInstanceEntity formInstanceEntity = commandContext.getFormEngineConfiguration().getFormInstanceDataManager().findById(formInstanceId);
       if (formInstanceEntity == null) {
-        throw new FlowableObjectNotFoundException("No form instance found for id = '" + formInstanceId + "'", FormInstanceEntity.class);
+        throw new FlowableObjectNotFoundException("No form instance found for id = '" + formInstanceId + '\'', FormInstanceEntity.class);
       }
 
       formDefinitionEntity = deploymentManager.findDeployedFormDefinitionById(formInstanceEntity.getFormDefinitionId());
       if (formDefinitionEntity == null) {
-        throw new FlowableObjectNotFoundException("No form definition found for id = '" + formDefinitionId + "'", FormDefinitionEntity.class);
+        throw new FlowableObjectNotFoundException("No form definition found for id = '" + formDefinitionId + '\'', FormDefinitionEntity.class);
       }
 
     } else if (formDefinitionId != null) {
 
       formDefinitionEntity = deploymentManager.findDeployedFormDefinitionById(formDefinitionId);
       if (formDefinitionEntity == null) {
-        throw new FlowableObjectNotFoundException("No form definition found for id = '" + formDefinitionId + "'", FormDefinitionEntity.class);
+        throw new FlowableObjectNotFoundException("No form definition found for id = '" + formDefinitionId + '\'', FormDefinitionEntity.class);
       }
 
     } else if (formDefinitionKey != null && (tenantId == null || FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)) && parentDeploymentId == null) {
 
       formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKey(formDefinitionKey);
       if (formDefinitionEntity == null) {
-        throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey + "'", FormDefinitionEntity.class);
+        throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey + '\'', FormDefinitionEntity.class);
       }
 
     } else if (formDefinitionKey != null && tenantId != null && !FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)  && parentDeploymentId == null) {

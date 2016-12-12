@@ -49,7 +49,7 @@ public abstract class ResourceFlowableIdmTestCase extends AbstractFlowableIdmTes
   protected void initializeIdmEngine() {
     IdmEngineConfiguration config = IdmEngineConfiguration.createIdmEngineConfigurationFromResource(activitiIdmConfigurationResource);
     if (idmEngineName != null) {
-      logger.info("Initializing idm engine with name '" + idmEngineName + "'");
+      logger.info("Initializing idm engine with name '" + idmEngineName + '\'');
       config.setEngineName(idmEngineName);
     }
     additionalConfiguration(config);

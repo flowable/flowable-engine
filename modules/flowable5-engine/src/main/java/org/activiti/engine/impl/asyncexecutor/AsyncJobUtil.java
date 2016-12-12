@@ -104,7 +104,7 @@ public class AsyncJobUtil {
         FailedJobCommandFactory failedJobCommandFactory = commandContext.getFailedJobCommandFactory();
         Command<Object> cmd = failedJobCommandFactory.getCommand(job.getId(), exception);
 
-        log.trace("Using FailedJobCommandFactory '" + failedJobCommandFactory.getClass() + "' and command of type '" + cmd.getClass() + "'");
+        log.trace("Using FailedJobCommandFactory '" + failedJobCommandFactory.getClass() + "' and command of type '" + cmd.getClass() + '\'');
         commandExecutor.execute(commandConfig, cmd);
         
         // Dispatch an event, indicating job execution failed in a try-catch block, to prevent the original

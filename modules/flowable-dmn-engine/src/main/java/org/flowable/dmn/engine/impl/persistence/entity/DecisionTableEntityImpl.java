@@ -120,7 +120,7 @@ public class DecisionTableEntityImpl extends AbstractEntityNoRevision implements
   }
   
   public String toString() {
-    return "DecisionTableEntity[" + id + "]";
+    return "DecisionTableEntity[" + id + ']';
   }
 
 }

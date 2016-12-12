@@ -39,7 +39,7 @@ public class UelExpressionCondition implements Condition {
       throw new FlowableException("condition expression returns null");
     }
     if (!(result instanceof Boolean)) {
-      throw new FlowableException("condition expression returns non-Boolean: " + result + " (" + result.getClass().getName() + ")");
+      throw new FlowableException("condition expression returns non-Boolean: " + result + " (" + result.getClass().getName() + ')');
     }
     return (Boolean) result;
   }

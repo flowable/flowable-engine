@@ -144,7 +144,7 @@ public class ModelServiceImpl implements ModelService {
         char firstCharacter = process.getId().charAt(0);
         // no digit is allowed as first character
         if (Character.isDigit(firstCharacter)) {
-          process.setId("a" + process.getId());
+          process.setId('a' + process.getId());
         }
       }
     }
@@ -411,7 +411,7 @@ public class ModelServiceImpl implements ModelService {
             }
           }
         } catch (Exception e) {
-          log.error("Could not deserialize app model json (id = " + latestModel.getId() + ")", e);
+          log.error("Could not deserialize app model json (id = " + latestModel.getId() + ')', e);
         }
       }
     }

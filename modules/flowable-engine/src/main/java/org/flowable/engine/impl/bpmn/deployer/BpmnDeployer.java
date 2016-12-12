@@ -236,7 +236,7 @@ public class BpmnDeployer implements Deployer {
   protected String getIdForNewProcessDefinition(ProcessDefinitionEntity processDefinition) {
     String nextId = idGenerator.getNextId();
     
-    String result = processDefinition.getKey() + ":" + processDefinition.getVersion() + ":" + nextId; // ACT-505
+    String result = processDefinition.getKey() + ':' + processDefinition.getVersion() + ':' + nextId; // ACT-505
     // ACT-115: maximum id length is 64 characters
     if (result.length() > 64) {
       result = nextId;

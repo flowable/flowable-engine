@@ -77,7 +77,7 @@ public class WSDLImporter implements XMLImporter {
   }
 
   public void importFrom(Import theImport, String sourceSystemId) {
-    this.namespace = theImport.getNamespace() == null ? "" : theImport.getNamespace() + ":";
+    this.namespace = theImport.getNamespace() == null ? "" : theImport.getNamespace() + ':';
     this.importFrom(theImport.getLocation());
   }
 

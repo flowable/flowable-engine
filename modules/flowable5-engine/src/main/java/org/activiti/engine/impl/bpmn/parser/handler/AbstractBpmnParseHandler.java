@@ -155,7 +155,7 @@ public abstract class AbstractBpmnParseHandler<T extends BaseElement> implements
             && eventDefinition.isStartEvent() == subscription.isStartEvent()) {
             
             logger.warn("Cannot have more than one message event subscription with name '" + subscription.getEventName() +
-                "' for scope '"+scope.getId()+"'");
+                "' for scope '"+scope.getId()+ '\'');
           }
         }
       }
@@ -180,13 +180,13 @@ public abstract class AbstractBpmnParseHandler<T extends BaseElement> implements
 
     for (DataSpec dataInputElement : specificationModel.getDataInputs()) {
       ItemDefinition itemDefinition = bpmnParse.getItemDefinitions().get(dataInputElement.getItemSubjectRef());
-      Data dataInput = new Data(bpmnParse.getTargetNamespace() + ":" + dataInputElement.getId(), dataInputElement.getId(), itemDefinition);
+      Data dataInput = new Data(bpmnParse.getTargetNamespace() + ':' + dataInputElement.getId(), dataInputElement.getId(), itemDefinition);
       ioSpecification.addInput(dataInput);
     }
 
     for (DataSpec dataOutputElement : specificationModel.getDataOutputs()) {
       ItemDefinition itemDefinition = bpmnParse.getItemDefinitions().get(dataOutputElement.getItemSubjectRef());
-      Data dataOutput = new Data(bpmnParse.getTargetNamespace() + ":" + dataOutputElement.getId(), dataOutputElement.getId(), itemDefinition);
+      Data dataOutput = new Data(bpmnParse.getTargetNamespace() + ':' + dataOutputElement.getId(), dataOutputElement.getId(), itemDefinition);
       ioSpecification.addOutput(dataOutput);
     }
 

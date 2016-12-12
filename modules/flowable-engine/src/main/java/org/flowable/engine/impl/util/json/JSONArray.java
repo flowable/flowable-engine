@@ -119,7 +119,7 @@ public class JSONArray {
       case ']':
       case ')':
         if (q != c) {
-          throw x.syntaxError("Expected a '" + new Character(q) + "'");
+          throw x.syntaxError("Expected a '" + new Character(q) + '\'');
         }
         return;
       default:

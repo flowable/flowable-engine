@@ -219,7 +219,7 @@ public class TimerDeclarationImpl implements Serializable {
   private String prepareRepeat(String dueDate) {
     if (dueDate.startsWith("R") && dueDate.split("/").length==2) {
       SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-      return dueDate.replace("/","/"+sdf.format(Context.getProcessEngineConfiguration().getClock().getCurrentTime())+"/");
+      return dueDate.replace("/", '/' +sdf.format(Context.getProcessEngineConfiguration().getClock().getCurrentTime())+ '/');
     }
     return dueDate;
   }

@@ -115,10 +115,10 @@ public class AppDefinitionExportService {
   }
   
   protected void createZipEntries(Model model, String directoryName, ZipOutputStream zipOutputStream) throws Exception {
-    createZipEntry(zipOutputStream, directoryName + "/" + model.getKey() + ".json", createModelEntryJson(model));
+    createZipEntry(zipOutputStream, directoryName + '/' + model.getKey() + ".json", createModelEntryJson(model));
 
     if (model.getThumbnail() != null) {
-      createZipEntry(zipOutputStream, directoryName + "/" + model.getKey() + ".png", model.getThumbnail());
+      createZipEntry(zipOutputStream, directoryName + '/' + model.getKey() + ".png", model.getThumbnail());
     }
   }
 

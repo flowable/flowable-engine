@@ -56,7 +56,7 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
   @ApiOperation(value = "Update a single or binary variable or multiple variables on a process instance", tags = { "Process Instances" }, nickname = "createOrUpdateProcessVariable",
           notes="## Update multiples variables\n\n"
                   + " ```JSON\n" + "[\n" + "   {\n" + "      \"name\":\"intProcVar\"\n" + "      \"type\":\"integer\"\n" + "      \"value\":123\n" + "   },\n"
-                  + "\n" + "   ...\n" + "] ```"
+                  + '\n' + "   ...\n" + "] ```"
                   + "\n\n\n"
                   +" Any number of variables can be passed into the request body array. More information about the variable format can be found in the REST variables section. Note that scope is ignored, only local variables can be set in a process instance."
                   + "\n\n\n"
@@ -66,7 +66,7 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
                   + "##  Update an existing binary variable\n\n"
                   + "\n\n\n"
                   + "The request should be of type multipart/form-data. There should be a single file-part included with the binary value of the variable. On top of that, the following additional form-fields can be present:\n"
-                  + "\n" + "name: Required name of the variable.\n" + "\n"
+                  + '\n' + "name: Required name of the variable.\n" + '\n'
                   + "type: Type of variable that is created. If omitted, binary is assumed and the binary data in the request will be stored as an array of bytes."
   )
   @ApiResponses(value = {
@@ -87,12 +87,12 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
   @ApiOperation(value = "Create variables or new binary variable on a process instance", tags = { "Process Instances" }, nickname = "createProcessInstanceVariable",
           notes="## Update multiples variables\n\n"
                   + " ```JSON\n" + "[\n" + "   {\n" + "      \"name\":\"intProcVar\"\n" + "      \"type\":\"integer\"\n" + "      \"value\":123\n" + "   },\n"
-                  + "\n" + "   ...\n" + "] ```"
+                  + '\n' + "   ...\n" + "] ```"
                   + "\n\n\n"
                   +" Any number of variables can be passed into the request body array. More information about the variable format can be found in the REST variables section. Note that scope is ignored, only local variables can be set in a process instance."
                   + "\n\n\n"
                   + "The request should be of type multipart/form-data. There should be a single file-part included with the binary value of the variable. On top of that, the following additional form-fields can be present:\n"
-                  + "\n" + "name: Required name of the variable.\n" + "\n"
+                  + '\n' + "name: Required name of the variable.\n" + '\n'
                   + "type: Type of variable that is created. If omitted, binary is assumed and the binary data in the request will be stored as an array of bytes."
   )
   @ApiResponses(value = {

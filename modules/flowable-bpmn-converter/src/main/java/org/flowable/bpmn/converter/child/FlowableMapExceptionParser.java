@@ -47,7 +47,7 @@ public class FlowableMapExceptionParser extends BaseChildElementParser {
     } else if (andChildren.toLowerCase().equals("true")) {
       hasChildrenBool = true;
     } else {
-      throw new XMLException("'" + andChildren + "' is not valid boolean in mapException with errorCode=" + errorCode + " and class=" + exceptionClass);
+      throw new XMLException('\'' + andChildren + "' is not valid boolean in mapException with errorCode=" + errorCode + " and class=" + exceptionClass);
     }
     
     if (StringUtils.isEmpty(errorCode) || StringUtils.isEmpty(errorCode.trim())) {

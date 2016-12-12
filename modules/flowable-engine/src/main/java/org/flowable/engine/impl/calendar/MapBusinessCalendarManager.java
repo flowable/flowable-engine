@@ -40,7 +40,7 @@ public class MapBusinessCalendarManager implements BusinessCalendarManager {
     BusinessCalendar businessCalendar = businessCalendars.get(businessCalendarRef);
     if (businessCalendar == null) {
       throw new FlowableException("Requested business calendar " + businessCalendarRef +
-          " does not exist. Allowed calendars are " + this.businessCalendars.keySet() + ".");
+          " does not exist. Allowed calendars are " + this.businessCalendars.keySet() + '.');
     }
     return businessCalendar;
   }

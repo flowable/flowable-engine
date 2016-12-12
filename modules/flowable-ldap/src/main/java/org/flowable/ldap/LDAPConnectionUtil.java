@@ -38,7 +38,7 @@ public class LDAPConnectionUtil {
   public static InitialDirContext createDirectoryContext(LDAPConfigurator ldapConfigurator, String principal, String credentials) {
     Properties properties = new Properties();
     properties.put(Context.INITIAL_CONTEXT_FACTORY, ldapConfigurator.getInitialContextFactory());
-    properties.put(Context.PROVIDER_URL, ldapConfigurator.getServer() + ":" + ldapConfigurator.getPort());
+    properties.put(Context.PROVIDER_URL, ldapConfigurator.getServer() + ':' + ldapConfigurator.getPort());
     properties.put(Context.SECURITY_AUTHENTICATION, ldapConfigurator.getSecurityAuthentication());
     properties.put(Context.SECURITY_PRINCIPAL, principal);
     properties.put(Context.SECURITY_CREDENTIALS, credentials);

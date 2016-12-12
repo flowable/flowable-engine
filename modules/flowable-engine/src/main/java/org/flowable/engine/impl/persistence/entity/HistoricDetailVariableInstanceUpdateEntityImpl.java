@@ -178,7 +178,7 @@ public class HistoricDetailVariableInstanceUpdateEntityImpl extends HistoricDeta
     if (byteArrayRef != null && byteArrayRef.getId() != null) {
       sb.append(", byteArrayValueId=").append(byteArrayRef.getId());
     }
-    sb.append("]");
+    sb.append(']');
     return sb.toString();
   }
 

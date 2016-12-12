@@ -142,7 +142,7 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
   }
   
   public String toString() {
-    return "ProcessDefinition("+id+")";
+    return "ProcessDefinition("+id+ ')';
   }
 
   public String getName() {

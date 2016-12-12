@@ -23,6 +23,6 @@ public class DeadLetterJobEntityImpl extends AbstractJobEntityImpl implements De
 
   @Override
   public String toString() {
-    return "DeadLetterJobEntity [id=" + id + "]";
+    return "DeadLetterJobEntity [id=" + id + ']';
   }
 }
