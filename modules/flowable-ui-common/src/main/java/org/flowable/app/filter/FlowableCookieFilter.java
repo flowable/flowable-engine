@@ -77,7 +77,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
   }
 
   protected void initIdmAppRedirectUrl() {
-    idmAppUrl = env.getRequiredProperty("idm.app.redirect.url");
+    idmAppUrl = env.getProperty("idm.app.redirect.url");
     if (idmAppUrl == null || idmAppUrl.isEmpty()) {
       idmAppUrl = env.getRequiredProperty("idm.app.url");
     }
