@@ -28,9 +28,6 @@ import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 import javax.management.modelmbean.RequiredModelMBean;
 
-import org.flowable.management.jmx.DefaultManagementAgent;
-import org.flowable.management.jmx.JMXConfigurator;
-import org.flowable.management.jmx.ManagementAgent;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

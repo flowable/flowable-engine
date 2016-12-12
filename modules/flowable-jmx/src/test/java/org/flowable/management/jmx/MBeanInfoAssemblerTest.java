@@ -23,7 +23,6 @@ import javax.management.JMException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.modelmbean.ModelMBeanInfo;
 
-import org.flowable.management.jmx.MBeanInfoAssembler;
 import org.flowable.management.jmx.testMbeans.BadAttributeGetterHavinParameter;
 import org.flowable.management.jmx.testMbeans.BadAttributeGetterNameNotCapital;
 import org.flowable.management.jmx.testMbeans.BadAttributeNameNoGetterSetter;

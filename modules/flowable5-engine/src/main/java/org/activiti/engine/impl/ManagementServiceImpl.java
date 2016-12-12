@@ -12,7 +12,6 @@
  */
 package org.activiti.engine.impl;
 
-import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 
@@ -31,11 +30,8 @@ import org.activiti.engine.impl.cmd.GetTableCountCmd;
 import org.activiti.engine.impl.cmd.GetTableMetaDataCmd;
 import org.activiti.engine.impl.cmd.GetTableNameCmd;
 import org.activiti.engine.impl.cmd.SetJobRetriesCmd;
-import org.activiti.engine.impl.db.DbSqlSession;
-import org.activiti.engine.impl.db.DbSqlSessionFactory;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandConfig;
-import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.management.TableMetaData;
 import org.activiti.engine.management.TablePageQuery;
 import org.activiti.engine.runtime.JobQuery;

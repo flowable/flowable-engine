@@ -21,8 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.app.idm.service.PersistentTokenService;
-import org.flowable.app.security.FlowableAppUser;
-import org.flowable.app.security.CookieConstants;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Token;
 import org.flowable.idm.api.User;

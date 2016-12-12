@@ -29,7 +29,6 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.management.jmx.Utils;
 import org.junit.Test;
 
 /**

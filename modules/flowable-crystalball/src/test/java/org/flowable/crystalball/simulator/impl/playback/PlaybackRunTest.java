@@ -9,13 +9,11 @@ import org.flowable.crystalball.simulator.delegate.event.impl.UserTaskCompleteTr
 import org.flowable.crystalball.simulator.impl.*;
 import org.flowable.crystalball.simulator.impl.clock.DefaultClockFactory;
 import org.flowable.crystalball.simulator.impl.clock.ThreadLocalClock;
-import org.flowable.crystalball.simulator.impl.playback.PlaybackUserTaskCompleteEventHandler;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.RepositoryService;
-import org.flowable.engine.common.*;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.impl.util.DefaultClockImpl;
 import org.flowable.engine.common.runtime.Clock;

@@ -27,7 +27,6 @@ import org.flowable.crystalball.simulator.impl.SimulationProcessEngineFactory;
 import org.flowable.crystalball.simulator.impl.StartProcessByIdEventHandler;
 import org.flowable.crystalball.simulator.impl.clock.DefaultClockFactory;
 import org.flowable.crystalball.simulator.impl.clock.ThreadLocalClock;
-import org.flowable.crystalball.simulator.impl.playback.PlaybackUserTaskCompleteEventHandler;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;

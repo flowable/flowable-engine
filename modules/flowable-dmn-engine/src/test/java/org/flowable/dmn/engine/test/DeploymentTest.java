@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.flowable.dmn.api.DecisionTable;
 import org.flowable.dmn.api.DmnDeployment;
-import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
 import org.junit.Test;
 
 public class DeploymentTest extends AbstractActivitiDmnTest {

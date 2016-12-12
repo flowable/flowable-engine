@@ -26,7 +26,6 @@ import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
 import org.apache.cxf.message.Message;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.delegate.BpmnError;
-import org.flowable.engine.impl.webservice.SyncWebServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
