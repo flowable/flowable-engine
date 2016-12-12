@@ -206,7 +206,7 @@ public class CxfWSDLImporter implements XMLImporter {
   protected static void _importFields(final JDefinedClass theClass, final AtomicInteger index, final SimpleStructureDefinition structure) {
       
     final JClass parentClass = theClass._extends();
-    if (parentClass != null && parentClass instanceof JDefinedClass) {
+    if (parentClass instanceof JDefinedClass) {
       _importFields((JDefinedClass)parentClass, index, structure);
     }
     for (Entry<String, JFieldVar> entry : theClass.fields().entrySet()) {

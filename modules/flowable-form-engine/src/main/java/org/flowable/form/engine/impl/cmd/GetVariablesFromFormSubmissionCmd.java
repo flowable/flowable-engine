@@ -123,7 +123,7 @@ public class GetVariablesFromFormSubmissionCmd implements Command<Map<String, Ob
       }
       
     } else if (formField.getType().equals(FormFieldTypes.DROPDOWN)) {
-      if (formFieldValue != null && formFieldValue instanceof Map<?, ?>) {
+      if (formFieldValue instanceof Map<?, ?>) {
         result = ((Map<?, ?>) formFieldValue).get("id");
         if (result == null) {
           // fallback to name for manual config options
@@ -135,7 +135,7 @@ public class GetVariablesFromFormSubmissionCmd implements Command<Map<String, Ob
       result = (String) formFieldValue;
 
     } else if (formField.getType().equals(FormFieldTypes.PEOPLE) || formField.getType().equals(FormFieldTypes.FUNCTIONAL_GROUP)) {
-      if (formFieldValue != null && formFieldValue instanceof Map<?, ?>) {
+      if (formFieldValue instanceof Map<?, ?>) {
         Map<String, Object> value = (Map<String, Object>) formFieldValue;
         Object id = value.get("id");
         if (id instanceof Number) {

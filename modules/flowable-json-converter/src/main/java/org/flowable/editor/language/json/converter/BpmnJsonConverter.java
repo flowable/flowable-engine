@@ -708,7 +708,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
       } else if (flowElement instanceof SequenceFlow) {
         SequenceFlow sequenceFlow = (SequenceFlow) flowElement;
         FlowElement sourceFlowElement = parentContainer.getFlowElement(sequenceFlow.getSourceRef());
-        if (sourceFlowElement != null && sourceFlowElement instanceof FlowNode) {
+        if (sourceFlowElement instanceof FlowNode) {
 
           FlowWithContainer flowWithContainer = new FlowWithContainer(sequenceFlow, parentContainer);
           if (sequenceFlow.getExtensionElements().get("EDITOR_RESOURCEID") != null && sequenceFlow.getExtensionElements().get("EDITOR_RESOURCEID").size() > 0) {
@@ -730,7 +730,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
           }
         }
         FlowElement targetFlowElement = parentContainer.getFlowElement(sequenceFlow.getTargetRef());
-        if (targetFlowElement != null && targetFlowElement instanceof FlowNode) {
+        if (targetFlowElement instanceof FlowNode) {
           ((FlowNode) targetFlowElement).getIncomingFlows().add(sequenceFlow);
         }
       }
