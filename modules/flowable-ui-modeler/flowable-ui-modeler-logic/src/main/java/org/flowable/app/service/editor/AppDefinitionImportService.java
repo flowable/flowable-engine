@@ -148,7 +148,12 @@ public class AppDefinitionImportService {
     AppDefinitionUpdateResultRepresentation result = new AppDefinitionUpdateResultRepresentation();
 
     // Actual publication
-    appDefinitionPublishService.publishAppDefinition(publishModel.getComment(), appModel, user);
+    try {
+      appDefinitionPublishService.publishAppDefinition(publishModel.getComment(), appModel, user);
+    } catch (Exception ex) {
+      result.setError(true);
+      result.setErrorDescription("Publish app failed");
+    }
 
     result.setAppDefinition(appDefinitionRepresentation);
     return result;

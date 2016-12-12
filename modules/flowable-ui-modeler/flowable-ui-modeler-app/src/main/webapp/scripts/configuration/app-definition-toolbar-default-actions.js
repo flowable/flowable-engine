@@ -104,7 +104,7 @@ angular.module('activitiModeler').controller('SaveAppDefinitionCtrl',
                 // Regular error
                 if (response.error) {
                     $scope.status.loading = false;
-                    
+                    $scope.saveDialog.errorMessage = response.errorDescription;
                 } else {
                     $scope.$hide();
                     $rootScope.addAlert($translate.instant('APP.POPUP.SAVE-APP-SAVE-SUCCESS', 'info'));

@@ -72,7 +72,15 @@ public class AppDefinitionResource {
 
   @RequestMapping(value = "/rest/app-definitions/{modelId}", method = RequestMethod.PUT, produces = "application/json")
   public AppDefinitionUpdateResultRepresentation updateAppDefinition(@PathVariable("modelId") String modelId, @RequestBody AppDefinitionSaveRepresentation updatedModel) {
-    return appDefinitionService.updateAppDefinition(modelId, updatedModel);
+    AppDefinitionUpdateResultRepresentation resultRepresentation = null;
+    try {
+      resultRepresentation = appDefinitionService.updateAppDefinition(modelId, updatedModel);
+    } catch (Exception ex) {
+      resultRepresentation = new AppDefinitionUpdateResultRepresentation();
+      resultRepresentation.setError(true);
+      resultRepresentation.setErrorDescription(ex.getMessage());
+    }
+    return resultRepresentation;
   }
 
   @RequestMapping(value = "/rest/app-definitions/{modelId}/publish", method = RequestMethod.POST, produces = "application/json")
