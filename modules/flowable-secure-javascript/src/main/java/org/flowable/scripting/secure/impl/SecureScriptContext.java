@@ -13,6 +13,7 @@
 package org.flowable.scripting.secure.impl;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
 
 /**
  * @author Joram Barrez
@@ -22,6 +23,10 @@ public class SecureScriptContext extends Context {
     private long startTime;
     private long threadId;
     private long startMemory;
+
+    protected SecureScriptContext(ContextFactory factory) {
+        super(factory);
+    }
 
     public long getStartTime() {
         return startTime;

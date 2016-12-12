@@ -49,7 +49,7 @@ public class SimpleProcessTest extends SpringActivitiTestCase {
       @Override
       public void configure() throws Exception {
         from("direct:start").to("activiti:camelProcess");
-        from("activiti:camelProcess:serviceTask1").setBody().property("var1").to("mock:service1").setProperty("var2").constant("var2").setBody().properties();
+        from("activiti:camelProcess:serviceTask1").setBody().exchangeProperty("var1").to("mock:service1").setProperty("var2").constant("var2").setBody().properties();
         from("direct:receive").to("activiti:camelProcess:receive");
         from("activiti:camelProcess:serviceTask2?copyVariablesToBodyAsMap=true").to("mock:service2");
       }
