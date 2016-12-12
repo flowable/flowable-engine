@@ -30,7 +30,7 @@ import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.rest.exception.ActivitiContentNotSupportedException;
+import org.flowable.rest.exception.FlowableContentNotSupportedException;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
@@ -156,7 +156,7 @@ public class BaseExecutionVariableResource {
 	        setVariable(execution, variableName, value, scope, isNew);
 	        stream.close();
       } else {
-      	throw new ActivitiContentNotSupportedException("Serialized objects are not allowed");
+      	throw new FlowableContentNotSupportedException("Serialized objects are not allowed");
       }
 
       if (responseVariableType == RestResponseFactory.VARIABLE_PROCESS) {
@@ -168,7 +168,7 @@ public class BaseExecutionVariableResource {
     } catch (IOException ioe) {
       throw new FlowableIllegalArgumentException("Could not process multipart content", ioe);
     } catch (ClassNotFoundException ioe) {
-      throw new ActivitiContentNotSupportedException("The provided body contains a serialized object for which the class is nog found: " + ioe.getMessage());
+      throw new FlowableContentNotSupportedException("The provided body contains a serialized object for which the class is nog found: " + ioe.getMessage());
     }
 
   }

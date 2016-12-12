@@ -26,7 +26,7 @@ import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.bpmn.model.Process;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.Expression;
@@ -35,7 +35,7 @@ import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.util.Activiti5Util;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 
@@ -116,15 +116,15 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
     execution.setVariables(ExchangeUtils.prepareVariables(exchange, endpoint));
     
     boolean isActiviti5Execution = false;
-    if ((Context.getCommandContext() != null && Activiti5Util.isActiviti5ProcessDefinitionId(Context.getCommandContext(), execution.getProcessDefinitionId())) ||
-        (Context.getCommandContext() == null && Activiti5Util.getActiviti5CompatibilityHandler() != null)) {
+    if ((Context.getCommandContext() != null && Flowable5Util.isFlowable5ProcessDefinitionId(Context.getCommandContext(), execution.getProcessDefinitionId())) ||
+        (Context.getCommandContext() == null && Flowable5Util.getFlowable5CompatibilityHandler() != null)) {
       
       isActiviti5Execution = true;
     }
     
     if (!handleCamelException(exchange, execution, isActiviti5Execution)) {
       if (isActiviti5Execution) {
-        Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
+        Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
         activiti5CompatibilityHandler.leaveExecution(execution);
         return;
       }
@@ -162,7 +162,7 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
     if (notHandledByCamel) {
       if (camelException instanceof BpmnError) {
         if (isActiviti5Execution) {
-          Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
+          Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
           activiti5CompatibilityHandler.propagateError((BpmnError) camelException, execution);
           return true;
         }
@@ -170,7 +170,7 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
         return true;
       } else {
         if (isActiviti5Execution) {
-          Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
+          Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
           if (activiti5CompatibilityHandler.mapException(camelException, execution, mapExceptions)) {
             return true;
           } else {
@@ -230,10 +230,10 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
     } else {
       // Get the ProcessEngineConfiguration object.
       ProcessEngineConfiguration engineConfiguration = Context.getProcessEngineConfiguration();
-      if ((Context.getCommandContext() != null && Activiti5Util.isActiviti5ProcessDefinitionId(Context.getCommandContext(), execution.getProcessDefinitionId())) ||
-            (Context.getCommandContext() == null && Activiti5Util.getActiviti5CompatibilityHandler() != null)) {
+      if ((Context.getCommandContext() != null && Flowable5Util.isFlowable5ProcessDefinitionId(Context.getCommandContext(), execution.getProcessDefinitionId())) ||
+            (Context.getCommandContext() == null && Flowable5Util.getFlowable5CompatibilityHandler() != null)) {
         
-        Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
+        Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
         camelContextObj = (CamelContext) activiti5CompatibilityHandler.getCamelContextObject(camelContextValue);
         
       } else {

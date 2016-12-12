@@ -15,7 +15,7 @@ package org.flowable.engine.impl.bpmn.parser.factory;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.EventListener;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -79,43 +79,43 @@ public class DefaultListenerFactory extends AbstractBehaviorFactory implements L
   }
 
   @Override
-  public TaskListener createClassDelegateTaskListener(ActivitiListener activitiListener) {
+  public TaskListener createClassDelegateTaskListener(FlowableListener activitiListener) {
     return classDelegateFactory.create(activitiListener.getImplementation(),
         createFieldDeclarations(activitiListener.getFieldExtensions()));
   }
 
   @Override
-  public TaskListener createExpressionTaskListener(ActivitiListener activitiListener) {
+  public TaskListener createExpressionTaskListener(FlowableListener activitiListener) {
     return new ExpressionTaskListener(expressionManager.createExpression(activitiListener.getImplementation()));
   }
 
   @Override
-  public TaskListener createDelegateExpressionTaskListener(ActivitiListener activitiListener) {
+  public TaskListener createDelegateExpressionTaskListener(FlowableListener activitiListener) {
     return new DelegateExpressionTaskListener(expressionManager.createExpression(activitiListener.getImplementation()), createFieldDeclarations(activitiListener.getFieldExtensions()));
   }
 
   @Override
-  public TransactionDependentTaskListener createTransactionDependentDelegateExpressionTaskListener(ActivitiListener activitiListener) {
+  public TransactionDependentTaskListener createTransactionDependentDelegateExpressionTaskListener(FlowableListener activitiListener) {
     return new DelegateExpressionTransactionDependentTaskListener(expressionManager.createExpression(activitiListener.getImplementation()));
   }
 
   @Override
-  public ExecutionListener createClassDelegateExecutionListener(ActivitiListener activitiListener) {
+  public ExecutionListener createClassDelegateExecutionListener(FlowableListener activitiListener) {
     return classDelegateFactory.create(activitiListener.getImplementation(), createFieldDeclarations(activitiListener.getFieldExtensions()));
   }
 
   @Override
-  public ExecutionListener createExpressionExecutionListener(ActivitiListener activitiListener) {
+  public ExecutionListener createExpressionExecutionListener(FlowableListener activitiListener) {
     return new ExpressionExecutionListener(expressionManager.createExpression(activitiListener.getImplementation()));
   }
 
   @Override
-  public ExecutionListener createDelegateExpressionExecutionListener(ActivitiListener activitiListener) {
+  public ExecutionListener createDelegateExpressionExecutionListener(FlowableListener activitiListener) {
     return new DelegateExpressionExecutionListener(expressionManager.createExpression(activitiListener.getImplementation()), createFieldDeclarations(activitiListener.getFieldExtensions()));
   }
 
   @Override
-  public DelegateExpressionTransactionDependentExecutionListener createTransactionDependentDelegateExpressionExecutionListener(ActivitiListener activitiListener) {
+  public DelegateExpressionTransactionDependentExecutionListener createTransactionDependentDelegateExpressionExecutionListener(FlowableListener activitiListener) {
     return new DelegateExpressionTransactionDependentExecutionListener(expressionManager.createExpression(activitiListener.getImplementation()));
   }
 
@@ -157,17 +157,17 @@ public class DefaultListenerFactory extends AbstractBehaviorFactory implements L
   }
 
   @Override
-  public CustomPropertiesResolver createClassDelegateCustomPropertiesResolver(ActivitiListener activitiListener) {
+  public CustomPropertiesResolver createClassDelegateCustomPropertiesResolver(FlowableListener activitiListener) {
     return classDelegateFactory.create(activitiListener.getCustomPropertiesResolverImplementation(), null);
   }
 
   @Override
-  public CustomPropertiesResolver createExpressionCustomPropertiesResolver(ActivitiListener activitiListener) {
+  public CustomPropertiesResolver createExpressionCustomPropertiesResolver(FlowableListener activitiListener) {
     return new ExpressionCustomPropertiesResolver(expressionManager.createExpression(activitiListener.getCustomPropertiesResolverImplementation()));
   }
 
   @Override
-  public CustomPropertiesResolver createDelegateExpressionCustomPropertiesResolver(ActivitiListener activitiListener) {
+  public CustomPropertiesResolver createDelegateExpressionCustomPropertiesResolver(FlowableListener activitiListener) {
     return new DelegateExpressionCustomPropertiesResolver(expressionManager.createExpression(activitiListener.getCustomPropertiesResolverImplementation()));
   }
 

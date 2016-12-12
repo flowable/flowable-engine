@@ -23,7 +23,6 @@ import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
-import org.flowable.engine.IdentityService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -36,7 +35,6 @@ import org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.spring.configurator.SpringFormEngineConfigurator;
-import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.slf4j.Logger;
@@ -175,16 +173,6 @@ public class FlowableEngineConfiguration {
     @Bean
     public FormService formService() {
     	return processEngine().getFormService();
-    }
-    
-    @Bean
-    public IdentityService identityService() {
-    	return processEngine().getIdentityService();
-    }
-    
-    @Bean
-    public IdmIdentityService idmIdentityService() {
-      return processEngine().getIdmIdentityService();
     }
     
     @Bean

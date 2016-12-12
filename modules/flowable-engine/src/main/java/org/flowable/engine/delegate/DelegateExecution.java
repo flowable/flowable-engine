@@ -15,7 +15,7 @@ package org.flowable.engine.delegate;
 
 import java.util.List;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.FlowElement;
 
 /**
@@ -91,16 +91,16 @@ public interface DelegateExecution extends VariableScope {
   void setCurrentFlowElement(FlowElement flowElement);
   
   /**
-   * Returns the {@link ActivitiListener} instance matching an {@link ExecutionListener}
+   * Returns the {@link FlowableListener} instance matching an {@link ExecutionListener}
    * if currently an execution listener is being execution. 
    * Returns null otherwise.
    */
-  ActivitiListener getCurrentActivitiListener();
+  FlowableListener getCurrentActivitiListener();
 
   /**
    * Called when an {@link ExecutionListener} is being executed. 
    */
-  void setCurrentActivitiListener(ActivitiListener currentActivitiListener);
+  void setCurrentActivitiListener(FlowableListener currentActivitiListener);
 
   /* Execution management */
 

@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.app.model.editor.FormSaveRepresentation;
 import org.flowable.app.model.editor.form.FormRepresentation;
-import org.flowable.app.service.editor.ActivitiFormService;
+import org.flowable.app.service.editor.FlowableFormService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class FormResource {
 
   @Autowired
-  protected ActivitiFormService formService;
+  protected FlowableFormService formService;
 
   @RequestMapping(value = "/{formId}", method = RequestMethod.GET, produces = "application/json")
   public FormRepresentation getForm(@PathVariable String formId) {

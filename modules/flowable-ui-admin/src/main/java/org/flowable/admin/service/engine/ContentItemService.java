@@ -33,7 +33,7 @@ public class ContentItemService {
   private final Logger log = LoggerFactory.getLogger(ContentItemService.class);
 
     @Autowired
-    protected ActivitiClientService clientUtil;
+    protected FlowableClientService clientUtil;
 
     public JsonNode listContentItems(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
         URIBuilder builder = clientUtil.createUriBuilder("content-service/content-items");

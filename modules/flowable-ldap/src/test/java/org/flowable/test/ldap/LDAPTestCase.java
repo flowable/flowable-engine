@@ -19,7 +19,7 @@ import javax.annotation.Resource;
 
 import junit.framework.Test;
 
-import org.flowable.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.security.ldap.server.ApacheDSContainer;
 
 /**
@@ -27,7 +27,7 @@ import org.springframework.security.ldap.server.ApacheDSContainer;
  * 
  * @author Joram Barrez
  */
-public class LDAPTestCase extends SpringActivitiTestCase {
+public class LDAPTestCase extends SpringFlowableTestCase {
 
   private static int testCount = 0;
   private static int totalTestCount = -1;

@@ -15,7 +15,7 @@ package org.flowable.admin.app.rest.client;
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.DecisionTableService;
-import org.flowable.admin.service.engine.exception.ActivitiServiceException;
+import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.app.service.exception.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ public class DecisionTableClientResource extends AbstractClientResource {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
         try {
             return clientService.getDecisionTable(serverConfig, decisionTableId);
-        } catch (ActivitiServiceException e) {
+        } catch (FlowableServiceException e) {
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -55,7 +55,7 @@ public class DecisionTableClientResource extends AbstractClientResource {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
         try {
             return clientService.getEditorJsonForDecisionTable(serverConfig, decisionTableId);
-        } catch (ActivitiServiceException e) {
+        } catch (FlowableServiceException e) {
             throw new BadRequestException(e.getMessage());
         }
     }

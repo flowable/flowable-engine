@@ -2,10 +2,10 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Collection;
 
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.util.Activiti5Util;
+import org.flowable.engine.impl.util.Flowable5Util;
 
 /**
  * @author roman.smirnov
@@ -25,8 +25,8 @@ public class RemoveExecutionVariablesCmd extends NeedsActiveExecutionCmd<Void> {
   }
 
   protected Void execute(CommandContext commandContext, ExecutionEntity execution) {
-    if (Activiti5Util.isActiviti5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
-      Activiti5CompatibilityHandler activiti5CompatibilityHandler = Activiti5Util.getActiviti5CompatibilityHandler(); 
+    if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
+      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
       activiti5CompatibilityHandler.removeExecutionVariables(executionId, variableNames, isLocal);
       return null;
     }

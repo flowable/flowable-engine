@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
@@ -52,10 +52,10 @@ public class ChangeDeploymentTenantIdCmd implements Command<Void>, Serializable 
       throw new FlowableObjectNotFoundException("Could not find deployment with id " + deploymentId, Deployment.class);
     }
     
-    if (commandContext.getProcessEngineConfiguration().isActiviti5CompatibilityEnabled() && 
-        Activiti5CompatibilityHandler.ACTIVITI_5_ENGINE_TAG.equals(deployment.getEngineVersion())) {
+    if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled() && 
+        Flowable5CompatibilityHandler.FLOWABLE_5_ENGINE_TAG.equals(deployment.getEngineVersion())) {
       
-      commandContext.getProcessEngineConfiguration().getActiviti5CompatibilityHandler().changeDeploymentTenantId(deploymentId, newTenantId);
+      commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().changeDeploymentTenantId(deploymentId, newTenantId);
       return null;
     }
     

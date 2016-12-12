@@ -27,12 +27,12 @@ import org.flowable.engine.common.api.management.TablePageQuery;
 public interface FormManagementService {
 
   /**
-   * Get the mapping containing {table name, row count} entries of the Activiti database schema.
+   * Get the mapping containing {table name, row count} entries of the Flowable database schema.
    */
   Map<String, Long> getTableCount();
 
   /**
-   * Gets the table name (including any configured prefix) for an Activiti entity like Task, Execution or the like.
+   * Gets the table name (including any configured prefix) for an Flowable entity like Task, Execution or the like.
    */
   String getTableName(Class<?> activitiIdmEntityClass);
 

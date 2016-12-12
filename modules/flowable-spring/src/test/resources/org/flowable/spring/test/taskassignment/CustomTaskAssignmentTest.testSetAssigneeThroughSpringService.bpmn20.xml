@@ -2,7 +2,7 @@
 
 <definitions id="definitions"
              xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-             xmlns:activiti="http://activiti.org/bpmn"
+             xmlns:flowable="http://flowable.org/bpmn"
              targetNamespace="Examples">
 
     <process id="assigneeThroughSpringService">
@@ -10,7 +10,7 @@
         <startEvent id="start"/>
         <sequenceFlow id="flow1" sourceRef="start" targetRef="task"/>
 
-        <userTask id="task" name="Schedule meeting" activiti:assignee="${fakeLdapService.findManagerForEmployee(emp)}"/>
+        <userTask id="task" name="Schedule meeting" flowable:assignee="${fakeLdapService.findManagerForEmployee(emp)}"/>
         <sequenceFlow id="flow2" sourceRef="task" targetRef="end"/>
 
         <endEvent id="end"/>

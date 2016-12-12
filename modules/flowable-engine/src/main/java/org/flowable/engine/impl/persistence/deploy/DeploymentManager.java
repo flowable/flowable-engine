@@ -22,7 +22,7 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
@@ -33,7 +33,7 @@ import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
-import org.flowable.engine.impl.util.Activiti5Util;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.ProcessDefinition;
 
 /**
@@ -122,10 +122,10 @@ public class DeploymentManager {
 
     if (cachedProcessDefinition == null) {
       CommandContext commandContext = Context.getCommandContext();
-      if (commandContext.getProcessEngineConfiguration().isActiviti5CompatibilityEnabled() && 
-          Activiti5Util.isActiviti5ProcessDefinition(Context.getCommandContext(), processDefinition)) {
+      if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled() && 
+          Flowable5Util.isFlowable5ProcessDefinition(Context.getCommandContext(), processDefinition)) {
         
-        return Activiti5Util.getActiviti5CompatibilityHandler().resolveProcessDefinition(processDefinition);
+        return Flowable5Util.getFlowable5CompatibilityHandler().resolveProcessDefinition(processDefinition);
       }
       
       DeploymentEntity deployment = deploymentEntityManager.findById(deploymentId);
@@ -187,10 +187,10 @@ public class DeploymentManager {
       throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.", DeploymentEntity.class);
     }
 
-    if (processEngineConfiguration.isActiviti5CompatibilityEnabled() && 
-        Activiti5CompatibilityHandler.ACTIVITI_5_ENGINE_TAG.equals(deployment.getEngineVersion())) {
+    if (processEngineConfiguration.isFlowable5CompatibilityEnabled() && 
+        Flowable5CompatibilityHandler.FLOWABLE_5_ENGINE_TAG.equals(deployment.getEngineVersion())) {
       
-      processEngineConfiguration.getActiviti5CompatibilityHandler().deleteDeployment(deploymentId, cascade);
+      processEngineConfiguration.getFlowable5CompatibilityHandler().deleteDeployment(deploymentId, cascade);
       return;
     }
 

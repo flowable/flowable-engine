@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.JobService;
-import org.flowable.admin.service.engine.exception.ActivitiServiceException;
+import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.app.service.exception.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +51,7 @@ public class JobsClientResource extends AbstractClientResource {
         
         try {
 	        return jobService.listJobs(serverConfig, parameterMap);
-        } catch (ActivitiServiceException e) {
+        } catch (FlowableServiceException e) {
         	throw new BadRequestException(e.getMessage());
         }
     }

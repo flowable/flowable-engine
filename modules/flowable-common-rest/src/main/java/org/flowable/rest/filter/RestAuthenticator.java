@@ -31,7 +31,7 @@ public interface RestAuthenticator {
   boolean requestRequiresAuthentication(HttpServletRequest request);
 
   /**
-   * Called after a user is successfully authenticated against the Activiti identity-management. The logged in user can be retrieved from the request's clientInfo object.
+   * Called after a user is successfully authenticated against the Flowable identity-management. The logged in user can be retrieved from the request's clientInfo object.
    * 
    * @return true, if the user is authorised to perform the request. Return false, if the request is not authorised for the given user.
    */

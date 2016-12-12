@@ -19,7 +19,7 @@ import org.flowable.app.idm.cache.UserCache;
 import org.flowable.app.idm.cache.UserCache.CachedUser;
 import org.flowable.app.idm.model.UserInformation;
 import org.flowable.app.idm.service.UserService;
-import org.flowable.app.security.ActivitiAppUser;
+import org.flowable.app.security.FlowableAppUser;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +73,7 @@ public class UserDetailsService implements org.springframework.security.core.use
     }
     
     userCache.putUser(userFromDatabase.getId(), new CachedUser(userFromDatabase, grantedAuthorities));
-    return new ActivitiAppUser(userFromDatabase, actualLogin, grantedAuthorities);
+    return new FlowableAppUser(userFromDatabase, actualLogin, grantedAuthorities);
   }
 
   @Transactional
@@ -99,7 +99,7 @@ public class UserDetailsService implements org.springframework.security.core.use
     User user = cachedUser.getUser();
     String actualUserId = user.getEmail();
 
-    return new ActivitiAppUser(cachedUser.getUser(), actualUserId, cachedUser.getGrantedAuthorities());
+    return new FlowableAppUser(cachedUser.getUser(), actualUserId, cachedUser.getGrantedAuthorities());
   }
 
   public void setUserValidityPeriod(long userValidityPeriod) {

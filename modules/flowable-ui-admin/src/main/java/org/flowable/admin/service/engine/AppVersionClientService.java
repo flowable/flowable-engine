@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 public class AppVersionClientService extends AbstractEncryptingService {
 
 	@Autowired
-    protected ActivitiClientService clientUtil;
+    protected FlowableClientService clientUtil;
 
     public String getEndpointTypeUsingEncryptedPassword(String contextRoot, String restRoot,
                                   String serverAddress, Integer port,

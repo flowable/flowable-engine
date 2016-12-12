@@ -69,9 +69,9 @@ import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.common.impl.transaction.ContextAwareJdbcTransactionFactory;
 import org.flowable.engine.common.runtime.Clock;
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandlerFactory;
-import org.flowable.engine.compatibility.DefaultActiviti5CompatibilityHandlerFactory;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandlerFactory;
+import org.flowable.engine.compatibility.DefaultFlowable5CompatibilityHandlerFactory;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventDispatcherImpl;
 import org.flowable.engine.form.AbstractFormType;
@@ -857,18 +857,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   // Backwards compatibility //////////////////////////////////////////////////////////////
 
-  protected boolean isActiviti5CompatibilityEnabled; // Default activiti 5 backwards compatibility is disabled!
-  protected Activiti5CompatibilityHandlerFactory activiti5CompatibilityHandlerFactory;
-  protected Activiti5CompatibilityHandler activiti5CompatibilityHandler;
+  protected boolean isFlowable5CompatibilityEnabled; // Default flowable 5 backwards compatibility is disabled!
+  protected Flowable5CompatibilityHandlerFactory flowable5CompatibilityHandlerFactory;
+  protected Flowable5CompatibilityHandler flowable5CompatibilityHandler;
 
-  // Can't have a dependency on the activiti5-engine module
-  protected Object activiti5ActivityBehaviorFactory;
-  protected Object activiti5ListenerFactory;
-  protected List<Object> activiti5PreBpmnParseHandlers;
-  protected List<Object> activiti5PostBpmnParseHandlers;
-  protected List<Object> activiti5CustomDefaultBpmnParseHandlers;
-  protected Set<Class<?>> activiti5CustomMybatisMappers;
-  protected Set<String> activiti5CustomMybatisXMLMappers;
+  // Can't have a dependency on the Flowable5-engine module
+  protected Object flowable5ActivityBehaviorFactory;
+  protected Object flowable5ListenerFactory;
+  protected List<Object> flowable5PreBpmnParseHandlers;
+  protected List<Object> flowable5PostBpmnParseHandlers;
+  protected List<Object> flowable5CustomDefaultBpmnParseHandlers;
+  protected Set<Class<?>> flowable5CustomMybatisMappers;
+  protected Set<String> flowable5CustomMybatisXMLMappers;
 
   // buildProcessEngine
   // ///////////////////////////////////////////////////////
@@ -878,10 +878,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     init();
     ProcessEngineImpl processEngine = new ProcessEngineImpl(this);
 
-    // trigger build of Activiti 5 Engine
-    if (isActiviti5CompatibilityEnabled && activiti5CompatibilityHandler != null) {
+    // trigger build of Flowable 5 Engine
+    if (isFlowable5CompatibilityEnabled && flowable5CompatibilityHandler != null) {
       Context.setProcessEngineConfiguration(processEngine.getProcessEngineConfiguration());
-      activiti5CompatibilityHandler.getRawProcessEngine();
+      flowable5CompatibilityHandler.getRawProcessEngine();
     }
 
     postProcessEngineInitialisation();
@@ -947,7 +947,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initEventDispatcher();
     initProcessValidator();
     initDatabaseEventLogging();
-    initActiviti5CompatibilityHandler();
+    initFlowable5CompatibilityHandler();
     configuratorsAfterInit();
   }
 
@@ -2040,22 +2040,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
 
-  public void initActiviti5CompatibilityHandler() {
+  public void initFlowable5CompatibilityHandler() {
 
-    // If Activiti 5 compatibility is disabled, no need to do anything
+    // If Flowable 5 compatibility is disabled, no need to do anything
     // If handler is injected, no need to do anything
-    if (!isActiviti5CompatibilityEnabled || activiti5CompatibilityHandler == null) {
+    if (!isFlowable5CompatibilityEnabled || flowable5CompatibilityHandler == null) {
 
       // Create default factory if nothing set
-      if (activiti5CompatibilityHandlerFactory == null) {
-        activiti5CompatibilityHandlerFactory = new DefaultActiviti5CompatibilityHandlerFactory();
+      if (flowable5CompatibilityHandlerFactory == null) {
+        flowable5CompatibilityHandlerFactory = new DefaultFlowable5CompatibilityHandlerFactory();
       }
 
       // Create handler instance
-      activiti5CompatibilityHandler = activiti5CompatibilityHandlerFactory.createActiviti5CompatibilityHandler();
+      flowable5CompatibilityHandler = flowable5CompatibilityHandlerFactory.createFlowable5CompatibilityHandler();
 
-      if (activiti5CompatibilityHandler != null) {
-        log.info("Found compatibility handler instance : " + activiti5CompatibilityHandler.getClass());
+      if (flowable5CompatibilityHandler != null) {
+        log.info("Found compatibility handler instance : " + flowable5CompatibilityHandler.getClass());
       }
     }
 
@@ -3556,8 +3556,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       this.clock.setCurrentCalendar(clock.getCurrentCalendar());
     }
 
-    if (isActiviti5CompatibilityEnabled && activiti5CompatibilityHandler != null) {
-      getActiviti5CompatibilityHandler().setClock(clock);
+    if (isFlowable5CompatibilityEnabled && flowable5CompatibilityHandler != null) {
+      getFlowable5CompatibilityHandler().setClock(clock);
     }
     return this;
   }
@@ -3565,8 +3565,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public void resetClock() {
     if (this.clock != null) {
       clock.reset();
-      if (isActiviti5CompatibilityEnabled && activiti5CompatibilityHandler != null) {
-        getActiviti5CompatibilityHandler().resetClock();
+      if (isFlowable5CompatibilityEnabled && flowable5CompatibilityHandler != null) {
+        getFlowable5CompatibilityHandler().resetClock();
       }
     }
   }
@@ -3589,95 +3589,95 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  // Activiti 5
+  // Flowable 5
 
-  public boolean isActiviti5CompatibilityEnabled() {
-    return isActiviti5CompatibilityEnabled;
+  public boolean isFlowable5CompatibilityEnabled() {
+    return isFlowable5CompatibilityEnabled;
   }
 
-  public ProcessEngineConfigurationImpl setActiviti5CompatibilityEnabled(boolean isActiviti5CompatibilityEnabled) {
-    this.isActiviti5CompatibilityEnabled = isActiviti5CompatibilityEnabled;
+  public ProcessEngineConfigurationImpl setFlowable5CompatibilityEnabled(boolean isFlowable5CompatibilityEnabled) {
+    this.isFlowable5CompatibilityEnabled = isFlowable5CompatibilityEnabled;
     return this;
   }
 
-  public Activiti5CompatibilityHandlerFactory getActiviti5CompatibilityHandlerFactory() {
-    return activiti5CompatibilityHandlerFactory;
+  public Flowable5CompatibilityHandlerFactory getFlowable5CompatibilityHandlerFactory() {
+    return flowable5CompatibilityHandlerFactory;
   }
 
-  public ProcessEngineConfigurationImpl setActiviti5CompatibilityHandlerFactory(Activiti5CompatibilityHandlerFactory activiti5CompatibilityHandlerFactory) {
-    this.activiti5CompatibilityHandlerFactory = activiti5CompatibilityHandlerFactory;
+  public ProcessEngineConfigurationImpl setFlowable5CompatibilityHandlerFactory(Flowable5CompatibilityHandlerFactory flowable5CompatibilityHandlerFactory) {
+    this.flowable5CompatibilityHandlerFactory = flowable5CompatibilityHandlerFactory;
     return this;
   }
 
-  public Activiti5CompatibilityHandler getActiviti5CompatibilityHandler() {
-    return activiti5CompatibilityHandler;
+  public Flowable5CompatibilityHandler getFlowable5CompatibilityHandler() {
+    return flowable5CompatibilityHandler;
   }
 
-  public ProcessEngineConfigurationImpl setActiviti5CompatibilityHandler(Activiti5CompatibilityHandler activiti5CompatibilityHandler) {
-    this.activiti5CompatibilityHandler = activiti5CompatibilityHandler;
+  public ProcessEngineConfigurationImpl setFlowable5CompatibilityHandler(Flowable5CompatibilityHandler flowable5CompatibilityHandler) {
+    this.flowable5CompatibilityHandler = flowable5CompatibilityHandler;
     return this;
   }
 
-  public Object getActiviti5ActivityBehaviorFactory() {
-    return activiti5ActivityBehaviorFactory;
+  public Object getFlowable5ActivityBehaviorFactory() {
+    return flowable5ActivityBehaviorFactory;
   }
 
-  public ProcessEngineConfigurationImpl setActiviti5ActivityBehaviorFactory(Object activiti5ActivityBehaviorFactory) {
-    this.activiti5ActivityBehaviorFactory = activiti5ActivityBehaviorFactory;
+  public ProcessEngineConfigurationImpl setFlowable5ActivityBehaviorFactory(Object flowable5ActivityBehaviorFactory) {
+    this.flowable5ActivityBehaviorFactory = flowable5ActivityBehaviorFactory;
     return this;
   }
 
-  public Object getActiviti5ListenerFactory() {
-    return activiti5ListenerFactory;
+  public Object getFlowable5ListenerFactory() {
+    return flowable5ListenerFactory;
   }
 
-  public ProcessEngineConfigurationImpl setActiviti5ListenerFactory(Object activiti5ListenerFactory) {
-    this.activiti5ListenerFactory = activiti5ListenerFactory;
+  public ProcessEngineConfigurationImpl setFlowable5ListenerFactory(Object flowable5ListenerFactory) {
+    this.flowable5ListenerFactory = flowable5ListenerFactory;
     return this;
   }
 
-  public List<Object> getActiviti5PreBpmnParseHandlers() {
-    return activiti5PreBpmnParseHandlers;
+  public List<Object> getFlowable5PreBpmnParseHandlers() {
+    return flowable5PreBpmnParseHandlers;
   }
 
-  public ProcessEngineConfigurationImpl setActiviti5PreBpmnParseHandlers(List<Object> activiti5PreBpmnParseHandlers) {
-    this.activiti5PreBpmnParseHandlers = activiti5PreBpmnParseHandlers;
+  public ProcessEngineConfigurationImpl setFlowable5PreBpmnParseHandlers(List<Object> flowable5PreBpmnParseHandlers) {
+    this.flowable5PreBpmnParseHandlers = flowable5PreBpmnParseHandlers;
     return this;
   }
 
-  public List<Object> getActiviti5PostBpmnParseHandlers() {
-    return activiti5PostBpmnParseHandlers;
+  public List<Object> getFlowable5PostBpmnParseHandlers() {
+    return flowable5PostBpmnParseHandlers;
   }
 
-  public ProcessEngineConfigurationImpl setActiviti5PostBpmnParseHandlers(List<Object> activiti5PostBpmnParseHandlers) {
-    this.activiti5PostBpmnParseHandlers = activiti5PostBpmnParseHandlers;
+  public ProcessEngineConfigurationImpl setFlowable5PostBpmnParseHandlers(List<Object> flowable5PostBpmnParseHandlers) {
+    this.flowable5PostBpmnParseHandlers = flowable5PostBpmnParseHandlers;
     return this;
   }
 
-  public List<Object> getActiviti5CustomDefaultBpmnParseHandlers() {
-    return activiti5CustomDefaultBpmnParseHandlers;
+  public List<Object> getFlowable5CustomDefaultBpmnParseHandlers() {
+    return flowable5CustomDefaultBpmnParseHandlers;
   }
 
-  public ProcessEngineConfigurationImpl setActiviti5CustomDefaultBpmnParseHandlers(List<Object> activiti5CustomDefaultBpmnParseHandlers) {
-    this.activiti5CustomDefaultBpmnParseHandlers = activiti5CustomDefaultBpmnParseHandlers;
+  public ProcessEngineConfigurationImpl setFlowable5CustomDefaultBpmnParseHandlers(List<Object> flowable5CustomDefaultBpmnParseHandlers) {
+    this.flowable5CustomDefaultBpmnParseHandlers = flowable5CustomDefaultBpmnParseHandlers;
     return this;
   }
 
-  public Set<Class<?>> getActiviti5CustomMybatisMappers() {
-    return activiti5CustomMybatisMappers;
+  public Set<Class<?>> getFlowable5CustomMybatisMappers() {
+    return flowable5CustomMybatisMappers;
   }
 
-  public ProcessEngineConfigurationImpl setActiviti5CustomMybatisMappers(Set<Class<?>> activiti5CustomMybatisMappers) {
-    this.activiti5CustomMybatisMappers = activiti5CustomMybatisMappers;
+  public ProcessEngineConfigurationImpl setFlowable5CustomMybatisMappers(Set<Class<?>> flowable5CustomMybatisMappers) {
+    this.flowable5CustomMybatisMappers = flowable5CustomMybatisMappers;
     return this;
   }
 
-  public Set<String> getActiviti5CustomMybatisXMLMappers() {
-    return activiti5CustomMybatisXMLMappers;
+  public Set<String> getFlowable5CustomMybatisXMLMappers() {
+    return flowable5CustomMybatisXMLMappers;
   }
 
-  public ProcessEngineConfigurationImpl setActiviti5CustomMybatisXMLMappers(Set<String> activiti5CustomMybatisXMLMappers) {
-    this.activiti5CustomMybatisXMLMappers = activiti5CustomMybatisXMLMappers;
+  public ProcessEngineConfigurationImpl setFlowable5CustomMybatisXMLMappers(Set<String> flowable5CustomMybatisXMLMappers) {
+    this.flowable5CustomMybatisXMLMappers = flowable5CustomMybatisXMLMappers;
     return this;
   }
 

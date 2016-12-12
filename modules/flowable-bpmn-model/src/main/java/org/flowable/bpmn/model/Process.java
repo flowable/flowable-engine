@@ -30,7 +30,7 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
   protected boolean executable = true;
   protected String documentation;
   protected IOSpecification ioSpecification;
-  protected List<ActivitiListener> executionListeners = new ArrayList<ActivitiListener>();
+  protected List<FlowableListener> executionListeners = new ArrayList<FlowableListener>();
   protected List<Lane> lanes = new ArrayList<Lane>();
   protected List<FlowElement> flowElementList = new ArrayList<FlowElement>();
   protected List<ValuedDataObject> dataObjects = new ArrayList<ValuedDataObject>();
@@ -79,11 +79,11 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
     this.ioSpecification = ioSpecification;
   }
 
-  public List<ActivitiListener> getExecutionListeners() {
+  public List<FlowableListener> getExecutionListeners() {
     return executionListeners;
   }
 
-  public void setExecutionListeners(List<ActivitiListener> executionListeners) {
+  public void setExecutionListeners(List<FlowableListener> executionListeners) {
     this.executionListeners = executionListeners;
   }
 
@@ -357,9 +357,9 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
       setIoSpecification(otherElement.getIoSpecification().clone());
     }
 
-    executionListeners = new ArrayList<ActivitiListener>();
+    executionListeners = new ArrayList<FlowableListener>();
     if (otherElement.getExecutionListeners() != null && !otherElement.getExecutionListeners().isEmpty()) {
-      for (ActivitiListener listener : otherElement.getExecutionListeners()) {
+      for (FlowableListener listener : otherElement.getExecutionListeners()) {
         executionListeners.add(listener.clone());
       }
     }

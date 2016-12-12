@@ -20,12 +20,12 @@ import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration("classpath:generic-camel-activiti-context.xml")
-public class ParallelProcessTest extends SpringActivitiTestCase {
+public class ParallelProcessTest extends SpringFlowableTestCase {
 
   @Autowired
   protected CamelContext camelContext;

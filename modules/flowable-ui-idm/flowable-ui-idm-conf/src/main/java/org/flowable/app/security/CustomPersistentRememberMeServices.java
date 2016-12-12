@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.app.idm.service.PersistentTokenService;
-import org.flowable.app.security.ActivitiAppUser;
+import org.flowable.app.security.FlowableAppUser;
 import org.flowable.app.security.CookieConstants;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Token;
@@ -112,7 +112,7 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
     String userEmail = successfulAuthentication.getName();
 
     log.debug("Creating new persistent login for user {}", userEmail);
-    ActivitiAppUser activitiAppUser = (ActivitiAppUser) successfulAuthentication.getPrincipal();
+    FlowableAppUser activitiAppUser = (FlowableAppUser) successfulAuthentication.getPrincipal();
 
     Token token = createAndInsertPersistentToken(activitiAppUser.getUserObject(), request.getRemoteAddr(), request.getHeader("User-Agent"));
     addCookie(token, request, response);

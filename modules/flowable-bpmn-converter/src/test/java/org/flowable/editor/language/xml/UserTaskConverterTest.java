@@ -7,7 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FormProperty;
@@ -86,9 +86,9 @@ public class UserTaskConverterTest extends AbstractConverterTest {
     assertTrue(StringUtils.isEmpty(formProperty.getExpression()));
     assertEquals(2, formProperty.getFormValues().size());
 
-    List<ActivitiListener> listeners = userTask.getTaskListeners();
+    List<FlowableListener> listeners = userTask.getTaskListeners();
     assertEquals(3, listeners.size());
-    ActivitiListener listener = listeners.get(0);
+    FlowableListener listener = listeners.get(0);
     assertTrue(ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(listener.getImplementationType()));
     assertEquals("org.test.TestClass", listener.getImplementation());
     assertEquals("create", listener.getEvent());
@@ -107,9 +107,9 @@ public class UserTaskConverterTest extends AbstractConverterTest {
     assertEquals("rolled-back", listener.getOnTransaction());
     assertEquals("${delegateResolverExpression}", listener.getCustomPropertiesResolverImplementation());
 
-    List<ActivitiListener> executionListeners = userTask.getExecutionListeners();
+    List<FlowableListener> executionListeners = userTask.getExecutionListeners();
     assertEquals(1, executionListeners.size());
-    ActivitiListener executionListener = executionListeners.get(0);
+    FlowableListener executionListener = executionListeners.get(0);
     assertEquals("end", executionListener.getEvent());
     assertEquals("before-commit", executionListener.getOnTransaction());
     assertEquals("org.test.TestResolverClass", executionListener.getCustomPropertiesResolverImplementation());

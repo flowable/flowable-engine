@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
@@ -61,7 +61,7 @@ public class SubProcessConverterTest extends AbstractConverterTest {
     assertTrue(subProcess.getFlowElements().size() == 5);
 
     assertEquals(1, subProcess.getExecutionListeners().size());
-    ActivitiListener listenerSubProcess = subProcess.getExecutionListeners().get(0);
+    FlowableListener listenerSubProcess = subProcess.getExecutionListeners().get(0);
     assertEquals("SubProcessTestClass", listenerSubProcess.getImplementation());
     assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, listenerSubProcess.getImplementationType());
     assertEquals("start", listenerSubProcess.getEvent());
@@ -77,7 +77,7 @@ public class SubProcessConverterTest extends AbstractConverterTest {
     assertTrue(boundaryEvent.getEventDefinitions().get(0) instanceof TimerEventDefinition);
 
     assertEquals(1, model.getMainProcess().getExecutionListeners().size());
-    ActivitiListener listenerMainProcess = model.getMainProcess().getExecutionListeners().get(0);
+    FlowableListener listenerMainProcess = model.getMainProcess().getExecutionListeners().get(0);
     assertEquals("TestClass", listenerMainProcess.getImplementation());
     assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, listenerMainProcess.getImplementationType());
     assertEquals("start", listenerMainProcess.getEvent());

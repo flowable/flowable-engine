@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
@@ -52,9 +52,9 @@ public class ServiceTaskConverterTest extends AbstractConverterTest {
     assertEquals("testField2", field.getFieldName());
     assertEquals("${test}", field.getExpression());
 
-    List<ActivitiListener> listeners = serviceTask.getExecutionListeners();
+    List<FlowableListener> listeners = serviceTask.getExecutionListeners();
     assertEquals(3, listeners.size());
-    ActivitiListener listener = listeners.get(0);
+    FlowableListener listener = listeners.get(0);
     assertTrue(ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(listener.getImplementationType()));
     assertEquals("org.test.TestClass", listener.getImplementation());
     assertEquals("start", listener.getEvent());

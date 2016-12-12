@@ -24,7 +24,7 @@ import java.util.Stack;
 
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.common.impl.transaction.TransactionContextHolder;
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.TransactionContext;
 import org.flowable.engine.impl.interceptor.CommandContext;
@@ -43,9 +43,9 @@ public class Context {
   protected static ThreadLocal<Stack<ProcessEngineConfigurationImpl>> processEngineConfigurationStackThreadLocal = new ThreadLocal<Stack<ProcessEngineConfigurationImpl>>();
   protected static ThreadLocal<Map<String, ObjectNode>> bpmnOverrideContextThreadLocal = new ThreadLocal<Map<String, ObjectNode>>();
   
-  protected static ThreadLocal<Activiti5CompatibilityHandler> activiti5CompatibilityHandlerThreadLocal = new ThreadLocal<Activiti5CompatibilityHandler>();
+  protected static ThreadLocal<Flowable5CompatibilityHandler> flowable5CompatibilityHandlerThreadLocal = new ThreadLocal<Flowable5CompatibilityHandler>();
   // Fallback handler is only set by the v5 CommandContextInterceptor
-  protected static ThreadLocal<Activiti5CompatibilityHandler> fallbackActiviti5CompatibilityHandlerThreadLocal = new ThreadLocal<Activiti5CompatibilityHandler>();
+  protected static ThreadLocal<Flowable5CompatibilityHandler> fallbackFlowable5CompatibilityHandlerThreadLocal = new ThreadLocal<Flowable5CompatibilityHandler>();
   
   protected static ResourceBundle.Control resourceBundleControl = new ResourceBundleControl();
   
@@ -173,28 +173,28 @@ public class Context {
     bpmnOverrideMap.put(id, infoNode);
   }
   
-  public static Activiti5CompatibilityHandler getActiviti5CompatibilityHandler() {
-    return activiti5CompatibilityHandlerThreadLocal.get();
+  public static Flowable5CompatibilityHandler getFlowable5CompatibilityHandler() {
+    return flowable5CompatibilityHandlerThreadLocal.get();
   }
 
-  public static void setActiviti5CompatibilityHandler(Activiti5CompatibilityHandler activiti5CompatibilityHandler) {
-    activiti5CompatibilityHandlerThreadLocal.set(activiti5CompatibilityHandler);
+  public static void setFlowable5CompatibilityHandler(Flowable5CompatibilityHandler flowable5CompatibilityHandler) {
+    flowable5CompatibilityHandlerThreadLocal.set(flowable5CompatibilityHandler);
   }
 
-  public static void removeActiviti5CompatibilityHandler() {
-    activiti5CompatibilityHandlerThreadLocal.remove();
+  public static void removeFlowable5CompatibilityHandler() {
+    flowable5CompatibilityHandlerThreadLocal.remove();
   }
   
-  public static Activiti5CompatibilityHandler getFallbackActiviti5CompatibilityHandler() {
-    return fallbackActiviti5CompatibilityHandlerThreadLocal.get();
+  public static Flowable5CompatibilityHandler getFallbackFlowable5CompatibilityHandler() {
+    return fallbackFlowable5CompatibilityHandlerThreadLocal.get();
   }
 
-  public static void setFallbackActiviti5CompatibilityHandler(Activiti5CompatibilityHandler activiti5CompatibilityHandler) {
-    fallbackActiviti5CompatibilityHandlerThreadLocal.set(activiti5CompatibilityHandler);
+  public static void setFallbackFlowable5CompatibilityHandler(Flowable5CompatibilityHandler flowable5CompatibilityHandler) {
+    fallbackFlowable5CompatibilityHandlerThreadLocal.set(flowable5CompatibilityHandler);
   }
 
-  public static void removeFallbackActiviti5CompatibilityHandler() {
-    fallbackActiviti5CompatibilityHandlerThreadLocal.remove();
+  public static void removeFallbackFlowable5CompatibilityHandler() {
+    fallbackFlowable5CompatibilityHandlerThreadLocal.remove();
   }
   
   public static class ResourceBundleControl extends ResourceBundle.Control {

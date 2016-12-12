@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.engine.common.impl.db.HasRevision;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.delegate.DelegateTask;
@@ -47,7 +47,7 @@ public interface TaskEntity extends VariableScope, Task, DelegateTask, Entity, H
 
   void setEventName(String eventName);
   
-  void setCurrentActivitiListener(ActivitiListener currentActivitiListener);
+  void setCurrentActivitiListener(FlowableListener currentActivitiListener);
   
   ExecutionEntity getProcessInstance();
 

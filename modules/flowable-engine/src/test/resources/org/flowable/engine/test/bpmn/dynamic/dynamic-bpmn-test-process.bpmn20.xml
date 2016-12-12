@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
+  <process id="dynamicServiceTest" name="dynamic-bpmn-test-process" isExecutable="true">
+    <startEvent id="sid-0B5FF4AC-12C5-4202-BBB5-BB54E866FE09"/>
+    <userTask id="sid-B94D5D22-E93E-4401-ADC5-C5C073E1EEB4" name="Taak 1" activiti:candidateUsers="david"/>
+    <sequenceFlow id="sid-CD26A84F-7A62-46CB-A6F4-58B264B71E52" sourceRef="sid-0B5FF4AC-12C5-4202-BBB5-BB54E866FE09" targetRef="sid-B94D5D22-E93E-4401-ADC5-C5C073E1EEB4"/>
+    <sequenceFlow id="sid-652E5401-70F4-4136-8BE5-40ECD02C7936" sourceRef="sid-B94D5D22-E93E-4401-ADC5-C5C073E1EEB4" targetRef="sid-A403BAE0-E367-449A-90B2-48834FCAA2F9"/>
+    <userTask id="sid-B1C37EBE-A273-4DDE-B909-89302638526A" name="Taak 2" activiti:candidateUsers="david" activiti:candidateGroups="HR,SALES"/>
+    <sequenceFlow id="sid-68FC6555-6D0A-4546-80CA-852F05E69B5D" sourceRef="sid-A403BAE0-E367-449A-90B2-48834FCAA2F9" targetRef="sid-B1C37EBE-A273-4DDE-B909-89302638526A"/>
+    <endEvent id="sid-1723AC22-2ABB-427A-82F5-01CAEB338783"/>
+    <sequenceFlow id="sid-6B2BCC2A-FA7B-4F68-8739-E7C3BE0DB4DB" sourceRef="sid-B1C37EBE-A273-4DDE-B909-89302638526A" targetRef="sid-1723AC22-2ABB-427A-82F5-01CAEB338783"/>
+    <scriptTask id="sid-A403BAE0-E367-449A-90B2-48834FCAA2F9" name="Service 1" activiti:autoStoreVariables="false">
+      <script><![CDATA[var test = "hallo";]]></script>
+    </scriptTask>
+  </process>
+</definitions>

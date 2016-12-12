@@ -14,7 +14,7 @@ package org.flowable.engine.common.api.delegate.event;
 
 
 /**
- * Describes an event that occurred in the Activiti Engine which is dispatched to external listeners, if any.
+ * Describes an event that occurred in the Flowable Engine which is dispatched to external listeners, if any.
  * 
  * @author Frederik Heremans
  * 

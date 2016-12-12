@@ -33,7 +33,7 @@ public class DecisionAuditService {
 	private final Logger log = LoggerFactory.getLogger(DecisionAuditService.class);
 
 	@Autowired
-	protected ActivitiClientService clientUtil;
+	protected FlowableClientService clientUtil;
 
 	public JsonNode listDecisionAudits(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
 	    URIBuilder builder = clientUtil.createUriBuilder("/enterprise/decisions/audits");

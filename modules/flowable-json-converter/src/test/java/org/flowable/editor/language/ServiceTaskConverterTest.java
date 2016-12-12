@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
@@ -51,17 +51,17 @@ public class ServiceTaskConverterTest extends AbstractConverterTest {
     assertEquals("testField2", field.getFieldName());
     assertEquals("${test}", field.getExpression());
 
-    List<ActivitiListener> listeners = serviceTask.getExecutionListeners();
+    List<FlowableListener> listeners = serviceTask.getExecutionListeners();
     assertEquals(3, listeners.size());
-    ActivitiListener listener = (ActivitiListener) listeners.get(0);
+    FlowableListener listener = (FlowableListener) listeners.get(0);
     assertTrue(ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(listener.getImplementationType()));
     assertEquals("org.test.TestClass", listener.getImplementation());
     assertEquals("start", listener.getEvent());
-    listener = (ActivitiListener) listeners.get(1);
+    listener = (FlowableListener) listeners.get(1);
     assertTrue(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equals(listener.getImplementationType()));
     assertEquals("${testExpression}", listener.getImplementation());
     assertEquals("end", listener.getEvent());
-    listener = (ActivitiListener) listeners.get(2);
+    listener = (FlowableListener) listeners.get(2);
     assertTrue(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(listener.getImplementationType()));
     assertEquals("${delegateExpression}", listener.getImplementation());
     assertEquals("start", listener.getEvent());

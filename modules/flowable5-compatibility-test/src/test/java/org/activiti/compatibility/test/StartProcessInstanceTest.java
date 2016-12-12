@@ -50,7 +50,7 @@ public class StartProcessInstanceTest extends AbstractActiviti6CompatibilityTest
     // Deploying the process definition again. But not yet ready to migrate to Actviti 6...
     repositoryService.createDeployment()
       .addClasspathResource("oneTaskProcess.bpmn20.xml")
-      .deploymentProperty(DeploymentProperties.DEPLOY_AS_ACTIVITI5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
       .deploy();
 
     assertEquals(2, repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").count());

@@ -29,7 +29,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
- * Installs a Spring Security adapter for the Activiti
+ * Installs a Spring Security adapter for the Flowable
  * {@link org.flowable.engine.IdentityService}.
  *
  * @author Josh Long

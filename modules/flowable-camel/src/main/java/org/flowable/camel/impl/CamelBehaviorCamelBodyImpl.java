@@ -18,7 +18,7 @@ import org.flowable.camel.CamelBehavior;
 
 /**
  * This implementation of the CamelBehavior abstract class works by copying a single variable value into the Camel Exchange body. The variable must be named "camelBody" to be copied into the Camel
- * Exchange body on the producer side of the transfer (i.e. when handing control from Activiti to Camel).
+ * Exchange body on the producer side of the transfer (i.e. when handing control from Flowable to Camel).
  * 
  * @author Ryan Johnston (@rjfsu), Tijs Rademakers, Saeid Mirzaei
  */

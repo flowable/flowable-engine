@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.flowable.app.model.editor.DecisionTableSaveRepresentation;
 import org.flowable.app.model.editor.ModelRepresentation;
 import org.flowable.app.model.editor.decisiontable.DecisionTableRepresentation;
-import org.flowable.app.service.editor.ActivitiDecisionTableService;
+import org.flowable.app.service.editor.FlowableDecisionTableService;
 import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.app.service.exception.InternalServerErrorException;
 import org.slf4j.Logger;
@@ -50,7 +50,7 @@ public class DecisionTableResource {
   protected ObjectMapper objectMapper;
 
   @Autowired
-  protected ActivitiDecisionTableService decisionTableService;
+  protected FlowableDecisionTableService decisionTableService;
 
   @RequestMapping(value = "/values", method = RequestMethod.GET, produces = "application/json")
   public List<DecisionTableRepresentation> getDecisionTables(HttpServletRequest request) {

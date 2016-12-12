@@ -50,7 +50,7 @@ import javax.imageio.ImageIO;
 
 import org.flowable.bpmn.model.AssociationDirection;
 import org.flowable.bpmn.model.GraphicInfo;
-import org.flowable.image.exception.ActivitiImageException;
+import org.flowable.image.exception.FlowableImageException;
 import org.flowable.image.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -254,7 +254,7 @@ public class DefaultProcessDiagramCanvas {
    */
   public InputStream generateImage(String imageType) {
     if (closed) {
-      throw new ActivitiImageException("ProcessDiagramGenerator already closed");
+      throw new FlowableImageException("ProcessDiagramGenerator already closed");
     }
 
     ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -262,7 +262,7 @@ public class DefaultProcessDiagramCanvas {
       ImageIO.write(processDiagram, imageType, out);
       
     } catch (IOException e) {
-      throw new ActivitiImageException("Error while generating process image", e);
+      throw new FlowableImageException("Error while generating process image", e);
     } finally {
       try {
         if (out != null) {
@@ -283,7 +283,7 @@ public class DefaultProcessDiagramCanvas {
    */
   public BufferedImage generateBufferedImage(String imageType) {
     if (closed) {
-      throw new ActivitiImageException("ProcessDiagramGenerator already closed");
+      throw new FlowableImageException("ProcessDiagramGenerator already closed");
     }
 
     // Try to remove white space

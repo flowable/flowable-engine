@@ -44,17 +44,17 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
 
   /** default attributes taken from bpmn spec and from activiti extension */
   protected static final List<ExtensionAttribute> defaultUserTaskAttributes = Arrays.asList(
-      new ExtensionAttribute(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORM_FORMKEY), 
-      new ExtensionAttribute(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_USER_DUEDATE), 
-      new ExtensionAttribute(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_USER_BUSINESS_CALENDAR_NAME),
-      new ExtensionAttribute(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_USER_ASSIGNEE), 
-      new ExtensionAttribute(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_USER_OWNER), 
-      new ExtensionAttribute(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_USER_PRIORITY), 
-      new ExtensionAttribute(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_USER_CANDIDATEUSERS), 
-      new ExtensionAttribute(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_USER_CANDIDATEGROUPS),
-      new ExtensionAttribute(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_USER_CATEGORY),
-      new ExtensionAttribute(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_SERVICE_EXTENSIONID),
-      new ExtensionAttribute(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_USER_SKIP_EXPRESSION)
+      new ExtensionAttribute(ATTRIBUTE_FORM_FORMKEY), 
+      new ExtensionAttribute(ATTRIBUTE_TASK_USER_DUEDATE), 
+      new ExtensionAttribute(ATTRIBUTE_TASK_USER_BUSINESS_CALENDAR_NAME),
+      new ExtensionAttribute(ATTRIBUTE_TASK_USER_ASSIGNEE), 
+      new ExtensionAttribute(ATTRIBUTE_TASK_USER_OWNER), 
+      new ExtensionAttribute(ATTRIBUTE_TASK_USER_PRIORITY), 
+      new ExtensionAttribute(ATTRIBUTE_TASK_USER_CANDIDATEUSERS), 
+      new ExtensionAttribute(ATTRIBUTE_TASK_USER_CANDIDATEGROUPS),
+      new ExtensionAttribute(ATTRIBUTE_TASK_USER_CATEGORY),
+      new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_EXTENSIONID),
+      new ExtensionAttribute(ATTRIBUTE_TASK_USER_SKIP_EXPRESSION)
   );
 
   public UserTaskXMLConverter() {
@@ -78,7 +78,8 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
   @Override
   @SuppressWarnings("unchecked")
   protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
-    String formKey = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORM_FORMKEY);
+    String formKey = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_FORM_FORMKEY, xtr);
+    
     UserTask userTask = null;
     if (StringUtils.isNotEmpty(formKey)) {
       if (model.getUserTaskFormTypes() != null && model.getUserTaskFormTypes().contains(formKey)) {
@@ -89,28 +90,28 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
       userTask = new UserTask();
     }
     BpmnXMLUtil.addXMLLocation(userTask, xtr);
-    userTask.setDueDate(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_USER_DUEDATE));
-    userTask.setBusinessCalendarName(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_USER_BUSINESS_CALENDAR_NAME));
-    userTask.setCategory(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_USER_CATEGORY));
+    userTask.setDueDate(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_DUEDATE, xtr));
+    userTask.setBusinessCalendarName(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_BUSINESS_CALENDAR_NAME, xtr));
+    userTask.setCategory(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_CATEGORY, xtr));
     userTask.setFormKey(formKey);
-    userTask.setAssignee(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_USER_ASSIGNEE)); 
-    userTask.setOwner(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_USER_OWNER));
-    userTask.setPriority(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_USER_PRIORITY));
+    userTask.setAssignee(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_ASSIGNEE, xtr)); 
+    userTask.setOwner(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_OWNER, xtr));
+    userTask.setPriority(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_PRIORITY, xtr));
     
-    if (StringUtils.isNotEmpty(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_USER_CANDIDATEUSERS))) {
-      String expression = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_USER_CANDIDATEUSERS);
+    if (StringUtils.isNotEmpty(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_CANDIDATEUSERS, xtr))) {
+      String expression = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_CANDIDATEUSERS, xtr);
       userTask.getCandidateUsers().addAll(parseDelimitedList(expression));
     } 
     
-    if (StringUtils.isNotEmpty(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_USER_CANDIDATEGROUPS))) {
-      String expression = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_USER_CANDIDATEGROUPS);
+    if (StringUtils.isNotEmpty(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_CANDIDATEGROUPS, xtr))) {
+      String expression = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_CANDIDATEGROUPS, xtr);
       userTask.getCandidateGroups().addAll(parseDelimitedList(expression));
     }
     
-    userTask.setExtensionId(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_SERVICE_EXTENSIONID));
+    userTask.setExtensionId(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_EXTENSIONID, xtr));
 
-    if (StringUtils.isNotEmpty(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_USER_SKIP_EXPRESSION))) {
-      String expression = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_USER_SKIP_EXPRESSION);
+    if (StringUtils.isNotEmpty(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_SKIP_EXPRESSION, xtr))) {
+      String expression = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_SKIP_EXPRESSION, xtr);
       userTask.setSkipExpression(expression);
     }
 
@@ -164,7 +165,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
           xtw.writeStartElement(ELEMENT_EXTENSIONS);
           didWriteExtensionStartElement = true;
         }
-        xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, customProperty.getName(), ACTIVITI_EXTENSIONS_NAMESPACE);
+        xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, customProperty.getName(), FLOWABLE_EXTENSIONS_NAMESPACE);
         xtw.writeCharacters(customProperty.getSimpleValue());
         xtw.writeEndElement();
       }
@@ -193,7 +194,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
   }
 
   protected void writeCustomIdentities(UserTask userTask,String identityType, Set<String> users, Set<String> groups, XMLStreamWriter xtw) throws Exception {
-	  xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, ELEMENT_CUSTOM_RESOURCE, ACTIVITI_EXTENSIONS_NAMESPACE);
+	  xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_CUSTOM_RESOURCE, FLOWABLE_EXTENSIONS_NAMESPACE);
 	  writeDefaultAttribute(ATTRIBUTE_NAME, identityType, xtw);
       
     List<String> identityList = new ArrayList<String>();
@@ -301,7 +302,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
     }
 	    
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-	    String identityLinkType = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_NAME);
+	    String identityLinkType = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_NAME, xtr);
 	    
 	    // the attribute value may be unqualified
 	    if (identityLinkType == null) {

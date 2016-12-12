@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FormProperty;
@@ -46,7 +46,7 @@ public class StartEventConverterTest extends AbstractConverterTest {
     assertEquals("startDoc", startEvent.getDocumentation());
     
     assertEquals(2, startEvent.getExecutionListeners().size());
-    ActivitiListener executionListener = startEvent.getExecutionListeners().get(0);
+    FlowableListener executionListener = startEvent.getExecutionListeners().get(0);
     assertEquals("start", executionListener.getEvent());
     assertEquals("org.test.TestClass", executionListener.getImplementation());
     assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, executionListener.getImplementationType());

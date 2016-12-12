@@ -26,7 +26,7 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.engine.task.Task;
-import org.flowable.rest.exception.ActivitiContentNotSupportedException;
+import org.flowable.rest.exception.FlowableContentNotSupportedException;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
@@ -180,7 +180,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
         stream.close();
         
       } else {
-        throw new ActivitiContentNotSupportedException("Serialized objects are not allowed");
+        throw new FlowableContentNotSupportedException("Serialized objects are not allowed");
       }
 
       return restResponseFactory.createBinaryRestVariable(variableName, scope, variableType, task.getId(), null, null);
@@ -188,7 +188,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
     } catch (IOException ioe) {
       throw new FlowableIllegalArgumentException("Error getting binary variable", ioe);
     } catch (ClassNotFoundException ioe) {
-      throw new ActivitiContentNotSupportedException("The provided body contains a serialized object for which the class is nog found: " + ioe.getMessage());
+      throw new FlowableContentNotSupportedException("The provided body contains a serialized object for which the class is nog found: " + ioe.getMessage());
     }
 
   }

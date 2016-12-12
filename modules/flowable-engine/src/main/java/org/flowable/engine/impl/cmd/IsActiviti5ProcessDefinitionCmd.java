@@ -16,7 +16,7 @@ package org.flowable.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.compatibility.Activiti5CompatibilityHandler;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -34,7 +34,7 @@ public class IsActiviti5ProcessDefinitionCmd implements Command<Boolean>, Serial
   }
 
   public Boolean execute(CommandContext commandContext) {
-    if (!commandContext.getProcessEngineConfiguration().isActiviti5CompatibilityEnabled()) {
+    if (!commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled()) {
       return false;
     }
     
@@ -43,8 +43,8 @@ public class IsActiviti5ProcessDefinitionCmd implements Command<Boolean>, Serial
         .findDeployedProcessDefinitionById(processDefinitionId);
     
     if (processDefinition.getEngineVersion() != null) {
-      if (Activiti5CompatibilityHandler.ACTIVITI_5_ENGINE_TAG.equals(processDefinition.getEngineVersion())) {
-        if (commandContext.getProcessEngineConfiguration().isActiviti5CompatibilityEnabled()) {
+      if (Flowable5CompatibilityHandler.FLOWABLE_5_ENGINE_TAG.equals(processDefinition.getEngineVersion())) {
+        if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled()) {
           return true;
         }
       } else {

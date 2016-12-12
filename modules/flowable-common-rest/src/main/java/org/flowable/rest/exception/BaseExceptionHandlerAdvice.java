@@ -21,17 +21,17 @@ public class BaseExceptionHandlerAdvice {
   private static final Logger LOGGER = LoggerFactory.getLogger(BaseExceptionHandlerAdvice.class);
   
   @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE) // 415
-  @ExceptionHandler(ActivitiContentNotSupportedException.class)
+  @ExceptionHandler(FlowableContentNotSupportedException.class)
   @ResponseBody
-  public ErrorInfo handleNotSupported(ActivitiContentNotSupportedException e) {
+  public ErrorInfo handleNotSupported(FlowableContentNotSupportedException e) {
     return new ErrorInfo("Content is not supported", e);
   }
 
   @ResponseStatus(HttpStatus.CONFLICT)
   // 409
-  @ExceptionHandler(ActivitiConflictException.class)
+  @ExceptionHandler(FlowableConflictException.class)
   @ResponseBody
-  public ErrorInfo handleConflict(ActivitiConflictException e) {
+  public ErrorInfo handleConflict(FlowableConflictException e) {
     return new ErrorInfo("Conflict", e);
   }
 
@@ -45,9 +45,9 @@ public class BaseExceptionHandlerAdvice {
 
   @ResponseStatus(HttpStatus.FORBIDDEN)
   // 403
-  @ExceptionHandler(ActivitiForbiddenException.class)
+  @ExceptionHandler(FlowableForbiddenException.class)
   @ResponseBody
-  public ErrorInfo handleForbidden(ActivitiForbiddenException e) {
+  public ErrorInfo handleForbidden(FlowableForbiddenException e) {
     return new ErrorInfo("Forbidden", e);
   }
 

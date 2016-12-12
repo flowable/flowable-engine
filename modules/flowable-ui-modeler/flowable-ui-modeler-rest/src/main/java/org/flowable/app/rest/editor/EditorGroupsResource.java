@@ -12,8 +12,14 @@
  */
 package org.flowable.app.rest.editor;
 
-import org.apache.commons.lang3.StringUtils;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.flowable.app.model.common.GroupRepresentation;
+import org.flowable.app.model.common.RemoteGroup;
 import org.flowable.app.model.common.ResultListDataRepresentation;
+import org.flowable.app.service.idm.RemoteIdmService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,22 +31,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class EditorGroupsResource {
 
+  @Autowired
+  protected RemoteIdmService remoteIdmService;
+  
   @RequestMapping(value = "/rest/editor-groups", method = RequestMethod.GET)
   public ResultListDataRepresentation getGroups(@RequestParam(required = false, value = "filter") String filter) {
-    String groupNameFilter = filter;
-    if (StringUtils.isEmpty(groupNameFilter)) {
-      groupNameFilter = "%";
-    } else {
-      groupNameFilter = "%" + groupNameFilter + "%";
+    List<GroupRepresentation> result = new ArrayList<GroupRepresentation>();
+    List<RemoteGroup> groups = remoteIdmService.findGroupsByNameFilter(filter);
+    for (RemoteGroup group : groups) {
+      result.add(new GroupRepresentation(group));
     }
-    /*List<Group> matchingGroups = identityService.createGroupQuery()
-        .groupNameLike(groupNameFilter)
-        .groupType(GroupTypes.TYPE_ASSIGNMENT)
-        .list();*/
-
-    ResultListDataRepresentation result = new ResultListDataRepresentation();
-    // TODO: get total result count instead of page-count, in case the matching
-    // list's size is equal to the page size
-    return result;
+    return new ResultListDataRepresentation(groups);
   }
 }

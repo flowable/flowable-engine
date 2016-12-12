@@ -17,7 +17,7 @@ import java.util.Map;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
-import org.flowable.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.test.context.ContextConfiguration;
 
 
@@ -25,7 +25,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Joram Barrez
  */
 @ContextConfiguration("classpath:org/flowable/spring/test/fieldinjection/fieldInjectionSpringTest-context.xml")
-public class ServiceTaskFieldInjectionTest extends SpringActivitiTestCase {
+public class ServiceTaskFieldInjectionTest extends SpringFlowableTestCase {
 
     @Deployment
     public void testDelegateExpressionWithSingletonBean() {

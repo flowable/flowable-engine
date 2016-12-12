@@ -17,7 +17,7 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
-import org.flowable.spring.impl.test.SpringActivitiTestCase;
+import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -26,7 +26,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Frederik Heremans
  */
 @ContextConfiguration("classpath:org/flowable/spring/test/expression/expressionLimitedBeans-context.xml")
-public class SpringLimitedExpressionsTest extends SpringActivitiTestCase {
+public class SpringLimitedExpressionsTest extends SpringFlowableTestCase {
 
   @Deployment
   public void testLimitedBeansExposed() throws Exception {

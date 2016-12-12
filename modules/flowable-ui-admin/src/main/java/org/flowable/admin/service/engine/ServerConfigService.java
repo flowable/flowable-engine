@@ -16,7 +16,7 @@ import org.flowable.admin.app.rest.dto.ServerConfigRepresentation;
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.repository.ServerConfigRepository;
-import org.flowable.admin.service.engine.exception.ActivitiServiceException;
+import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -92,11 +92,11 @@ public class ServerConfigService extends AbstractEncryptingService {
     List<ServerConfig> serverConfigs = serverConfigRepository.getByEndpointType(endpointType);
 
     if (serverConfigs == null) {
-      throw new ActivitiServiceException("No server config found");
+      throw new FlowableServiceException("No server config found");
     }
 
     if (serverConfigs.size() > 1) {
-      throw new ActivitiServiceException("Only one server config per endpoint type allowed");
+      throw new FlowableServiceException("Only one server config per endpoint type allowed");
     }
 
     return serverConfigs.get(0);

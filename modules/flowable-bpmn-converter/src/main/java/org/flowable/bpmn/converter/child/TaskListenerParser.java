@@ -12,20 +12,20 @@
  */
 package org.flowable.bpmn.converter.child;
 
-import org.flowable.bpmn.model.ActivitiListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.UserTask;
 
 /**
  * @author Tijs Rademakers
  */
-public class TaskListenerParser extends ActivitiListenerParser {
+public class TaskListenerParser extends FlowableListenerParser {
 
   public String getElementName() {
     return ELEMENT_TASK_LISTENER;
   }
 
-  public void addListenerToParent(ActivitiListener listener, BaseElement parentElement) {
+  public void addListenerToParent(FlowableListener listener, BaseElement parentElement) {
     if (parentElement instanceof UserTask) {
       ((UserTask) parentElement).getTaskListeners().add(listener);
     }

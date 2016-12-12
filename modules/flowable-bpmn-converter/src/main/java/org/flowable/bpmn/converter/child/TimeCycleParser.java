@@ -15,6 +15,7 @@ package org.flowable.bpmn.converter.child;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.TimerEventDefinition;
@@ -34,8 +35,8 @@ public class TimeCycleParser extends BaseChildElementParser {
 
     TimerEventDefinition eventDefinition = (TimerEventDefinition) parentElement;
 
-    if (StringUtils.isNotEmpty(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_END_DATE))) {
-      eventDefinition.setEndDate(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_END_DATE));
+    if (StringUtils.isNotEmpty(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_END_DATE, xtr))) {
+      eventDefinition.setEndDate(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_END_DATE, xtr));
     }
     eventDefinition.setTimeCycle(xtr.getElementText());
   }

@@ -19,7 +19,7 @@ import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.JobService;
 import org.flowable.admin.service.engine.ProcessDefinitionService;
 import org.flowable.admin.service.engine.ProcessInstanceService;
-import org.flowable.admin.service.engine.exception.ActivitiServiceException;
+import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.app.service.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -60,7 +60,7 @@ public class ProcessDefinitionClientResource extends AbstractClientResource {
     ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
     try {
       return clientService.getProcessDefinition(serverConfig, definitionId);
-    } catch (ActivitiServiceException e) {
+    } catch (FlowableServiceException e) {
       throw new BadRequestException(e.getMessage());
     }
   }
@@ -78,7 +78,7 @@ public class ProcessDefinitionClientResource extends AbstractClientResource {
           category = updateBody.get("category").asText();
         }
         return clientService.updateProcessDefinitionCategory(serverConfig, definitionId, category);
-      } catch (ActivitiServiceException e) {
+      } catch (FlowableServiceException e) {
         e.printStackTrace();
         throw new BadRequestException(e.getMessage());
       }
@@ -94,7 +94,7 @@ public class ProcessDefinitionClientResource extends AbstractClientResource {
       ObjectNode bodyNode = objectMapper.createObjectNode();
       bodyNode.put("processDefinitionId", definitionId);
       return processInstanceService.listProcesInstancesForProcessDefinition(bodyNode, serverConfig);
-    } catch (ActivitiServiceException e) {
+    } catch (FlowableServiceException e) {
       throw new BadRequestException(e.getMessage());
     }
   }
@@ -104,7 +104,7 @@ public class ProcessDefinitionClientResource extends AbstractClientResource {
     ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
     try {
       return jobService.listJobs(serverConfig, Collections.singletonMap("processDefinitionId", new String[]{definitionId}));
-    } catch (ActivitiServiceException e) {
+    } catch (FlowableServiceException e) {
       throw new BadRequestException(e.getMessage());
     }
   }

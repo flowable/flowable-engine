@@ -13,7 +13,7 @@
     	<table class="history" >
    			<tr ng-class="{'current' : version.version == model.form.version}" ng-repeat="version in model.versions.data" ng-click="showVersion(version); $event.stopPropagation();">
    				<td><a class="version">{{version.version}}</a></td>
-   				<td><a class="detail"title="{{version.lastUpdated | dateformat:'LLLL'}}">{{version.createdByFullName}} - {{version.lastUpdated | dateformat}}</a>
+   				<td><a class="detail"title="{{version.lastUpdated | dateformat:'LLLL'}}">{{version.createdBy}} - {{version.lastUpdated | dateformat}}</a>
    			</td></tr>
    		</table>
     </div>

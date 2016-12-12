@@ -20,7 +20,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.flowable.admin.domain.ServerConfig;
-import org.flowable.admin.service.engine.exception.ActivitiServiceException;
+import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ public class JobService {
 	private final Logger log = LoggerFactory.getLogger(JobService.class);
 
 	@Autowired
-    protected ActivitiClientService clientUtil;
+    protected FlowableClientService clientUtil;
 
 	public JsonNode listJobs(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
 
@@ -48,7 +48,7 @@ public class JobService {
 			builder = new URIBuilder("management/jobs");
 		} catch (Exception e) {
 			log.error("Error building uri", e);
-			throw new ActivitiServiceException("Error building uri", e);
+			throw new FlowableServiceException("Error building uri", e);
 		}
 
 		for (String name : parameterMap.keySet()) {

@@ -38,7 +38,7 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
   
   private static final int MAX_USER_SIZE = 100;
   
-  public List<User> getUsers(String filter, String sort, Integer start, String groupId) {
+  public List<User> getUsers(String filter, String sort, Integer start) {
     Integer startValue = start != null ? start.intValue() : 0;
     Integer size = MAX_USER_SIZE; // TODO: pass actual size
     return createUserQuery(filter, sort).listPage(startValue, (size != null && size > 0) ? size : MAX_USER_SIZE);

@@ -17,7 +17,7 @@ import java.util.List;
 import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.bpmn.constants.BpmnXMLConstants;
-import org.flowable.bpmn.converter.child.ActivitiEventListenerParser;
+import org.flowable.bpmn.converter.child.FlowableEventListenerParser;
 import org.flowable.bpmn.converter.child.ExecutionListenerParser;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
@@ -47,7 +47,7 @@ public class ExtensionElementsParser implements BpmnXMLConstants {
         if (ELEMENT_EXECUTION_LISTENER.equals(xtr.getLocalName())) {
           new ExecutionListenerParser().parseChildElement(xtr, parentElement, model);
         } else if (ELEMENT_EVENT_LISTENER.equals(xtr.getLocalName())) {
-          new ActivitiEventListenerParser().parseChildElement(xtr, parentElement, model);
+          new FlowableEventListenerParser().parseChildElement(xtr, parentElement, model);
         } else if (ELEMENT_POTENTIAL_STARTER.equals(xtr.getLocalName())) {
           new PotentialStarterParser().parse(xtr, activeProcess);
         } else {

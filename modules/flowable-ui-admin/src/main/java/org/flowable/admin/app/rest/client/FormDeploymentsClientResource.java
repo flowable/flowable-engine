@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.FormDeploymentService;
-import org.flowable.admin.service.engine.exception.ActivitiServiceException;
+import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.app.service.exception.InternalServerErrorException;
 import org.slf4j.Logger;
@@ -60,7 +60,7 @@ public class FormDeploymentsClientResource extends AbstractClientResource {
     try {
       resultNode = clientService.listDeployments(serverConfig, parameterMap);
 
-    } catch (ActivitiServiceException e) {
+    } catch (FlowableServiceException e) {
       throw new BadRequestException(e.getMessage());
     }
 

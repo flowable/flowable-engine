@@ -108,7 +108,12 @@ public abstract class AbstractPaginateList {
 
         // Get result and set pagination parameters
         List list = processList(queryObject.listPage(start, size));
-        response.setTotal(queryObject.count());
+        if (start == 0 && list.size() < size) {
+          response.setTotal(list.size());
+        } else {
+          response.setTotal(queryObject.count());
+        }
+        
         response.setSize(list.size());
         response.setData(list);
 
