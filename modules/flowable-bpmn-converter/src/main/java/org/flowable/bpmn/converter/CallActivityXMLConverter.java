@@ -55,10 +55,9 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
     CallActivity callActivity = new CallActivity();
     BpmnXMLUtil.addXMLLocation(callActivity, xtr);
     callActivity.setCalledElement(xtr.getAttributeValue(null, ATTRIBUTE_CALL_ACTIVITY_CALLEDELEMENT));
-    callActivity.setBusinessKey(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_CALL_ACTIVITY_BUSINESS_KEY));
-    callActivity.setInheritBusinessKey(Boolean.parseBoolean(xtr.getAttributeValue(
-        ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_CALL_ACTIVITY_INHERIT_BUSINESS_KEY)));
-    callActivity.setInheritVariables(Boolean.valueOf(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_CALL_ACTIVITY_INHERITVARIABLES)));
+    callActivity.setBusinessKey(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_BUSINESS_KEY, xtr));
+    callActivity.setInheritBusinessKey(Boolean.parseBoolean(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_INHERIT_BUSINESS_KEY, xtr)));
+    callActivity.setInheritVariables(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_INHERITVARIABLES, xtr)));
     parseChildElements(getXMLElementName(), callActivity, childParserMap, model, xtr);
     return callActivity;
   }
@@ -75,7 +74,7 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
     if (callActivity.isInheritBusinessKey()) {
       writeQualifiedAttribute(ATTRIBUTE_CALL_ACTIVITY_INHERIT_BUSINESS_KEY, "true", xtw);
     }
-    xtw.writeAttribute(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_CALL_ACTIVITY_INHERITVARIABLES, String.valueOf(callActivity.isInheritVariables()));
+    xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_CALL_ACTIVITY_INHERITVARIABLES, String.valueOf(callActivity.isInheritVariables()));
   }
 
   @Override
@@ -105,7 +104,7 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         didWriteExtensionStartElement = true;
       }
 
-      xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, elementName, ACTIVITI_EXTENSIONS_NAMESPACE);
+      xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, elementName, FLOWABLE_EXTENSIONS_NAMESPACE);
       if (StringUtils.isNotEmpty(ioParameter.getSource())) {
         writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE, ioParameter.getSource(), xtw);
       }

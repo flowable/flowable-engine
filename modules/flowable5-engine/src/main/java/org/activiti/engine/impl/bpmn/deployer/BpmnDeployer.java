@@ -498,7 +498,9 @@ public class BpmnDeployer implements Deployer {
     List<ExtensionElement> localizationElements = process.getExtensionElements().get("localization");
     if (localizationElements != null) {
       for (ExtensionElement localizationElement : localizationElements) {
-        if (BpmnXMLConstants.ACTIVITI_EXTENSIONS_PREFIX.equals(localizationElement.getNamespacePrefix())) {
+        if (BpmnXMLConstants.FLOWABLE_EXTENSIONS_PREFIX.equals(localizationElement.getNamespacePrefix()) ||
+            BpmnXMLConstants.ACTIVITI_EXTENSIONS_PREFIX.equals(localizationElement.getNamespacePrefix())) {
+          
           String locale = localizationElement.getAttributeValue(null, "locale");
           String name = localizationElement.getAttributeValue(null, "name");
           String documentation = null;
@@ -550,7 +552,9 @@ public class BpmnDeployer implements Deployer {
         List<ExtensionElement> localizationElements = flowElement.getExtensionElements().get("localization");
         if (localizationElements != null) {
           for (ExtensionElement localizationElement : localizationElements) {
-            if (BpmnXMLConstants.ACTIVITI_EXTENSIONS_PREFIX.equals(localizationElement.getNamespacePrefix())) {
+            if (BpmnXMLConstants.FLOWABLE_EXTENSIONS_PREFIX.equals(localizationElement.getNamespacePrefix()) || 
+                BpmnXMLConstants.ACTIVITI_EXTENSIONS_PREFIX.equals(localizationElement.getNamespacePrefix())) {
+              
               String locale = localizationElement.getAttributeValue(null, "locale");
               String name = localizationElement.getAttributeValue(null, "name");
               String documentation = null;
@@ -610,7 +614,9 @@ public class BpmnDeployer implements Deployer {
       List<ExtensionElement> localizationElements = dataObject.getExtensionElements().get("localization");
       if (localizationElements != null) {
         for (ExtensionElement localizationElement : localizationElements) {
-          if (BpmnXMLConstants.ACTIVITI_EXTENSIONS_PREFIX.equals(localizationElement.getNamespacePrefix())) {
+          if (BpmnXMLConstants.FLOWABLE_EXTENSIONS_PREFIX.equals(localizationElement.getNamespacePrefix()) || 
+              BpmnXMLConstants.ACTIVITI_EXTENSIONS_PREFIX.equals(localizationElement.getNamespacePrefix())) {
+            
             String locale = localizationElement.getAttributeValue(null, "locale");
             String name = localizationElement.getAttributeValue(null, "name");
             String documentation = null;

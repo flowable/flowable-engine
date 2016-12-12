@@ -19,9 +19,9 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
-import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.EventListener;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.HasExecutionListeners;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Process;
@@ -55,7 +55,7 @@ public class FlowableListenerExport implements BpmnXMLConstants {
           didWriteExtensionStartElement = true;
         }
 
-        xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, ELEMENT_EVENT_LISTENER, ACTIVITI_EXTENSIONS_NAMESPACE);
+        xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_EVENT_LISTENER, FLOWABLE_EXTENSIONS_NAMESPACE);
         BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_EVENTS, eventListener.getEvents(), xtw);
         BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_ENTITY_TYPE, eventListener.getEntityType(), xtw);
 
@@ -101,7 +101,7 @@ public class FlowableListenerExport implements BpmnXMLConstants {
             didWriteExtensionStartElement = true;
           }
 
-          xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, xmlElementName, ACTIVITI_EXTENSIONS_NAMESPACE);
+          xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, xmlElementName, FLOWABLE_EXTENSIONS_NAMESPACE);
           BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_EVENT, listener.getEvent(), xtw);
 
           if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(listener.getImplementationType())) {

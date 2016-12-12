@@ -2,7 +2,7 @@
 
 <definitions id="definitions"
              xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-             xmlns:activiti="http://activiti.org/bpmn"
+             xmlns:flowable="http://flowable.org/bpmn"
              targetNamespace="Examples">
 
     <process id="delegateExpressionToSpringBean">
@@ -10,9 +10,9 @@
         <startEvent id="start"/>
         <sequenceFlow id="flow1" sourceRef="start" targetRef="serviceTask"/>
 
-        <serviceTask id="serviceTask" activiti:delegateExpression="${delegateExpressionBean}">
+        <serviceTask id="serviceTask" flowable:delegateExpression="${delegateExpressionBean}">
             <extensionElements>
-                <activiti:field name="someField" stringValue="fieldInjectionWorking"/>
+                <flowable:field name="someField" stringValue="fieldInjectionWorking"/>
             </extensionElements>
         </serviceTask>
 
