@@ -16,7 +16,6 @@ import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.dmn.engine.test.FlowableDmnRule;
 import org.junit.Before;
 import org.junit.Rule;
 

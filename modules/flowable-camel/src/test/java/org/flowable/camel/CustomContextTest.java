@@ -23,7 +23,6 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.flowable.camel.FlowableProducer;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.beans.factory.annotation.Autowired;

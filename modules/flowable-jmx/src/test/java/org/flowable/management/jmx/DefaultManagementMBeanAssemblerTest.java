@@ -26,8 +26,6 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.modelmbean.ModelMBean;
 
-import org.flowable.management.jmx.DefaultManagementMBeanAssembler;
-import org.flowable.management.jmx.NotificationSender;
 import org.flowable.management.jmx.annotations.NotificationSenderAware;
 import org.flowable.management.jmx.testMbeans.TestMbean;
 import org.junit.Test;

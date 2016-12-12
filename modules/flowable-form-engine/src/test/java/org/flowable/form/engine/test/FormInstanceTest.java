@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.form.api.FormInstance;
-import org.flowable.form.engine.test.FormDeploymentAnnotation;
 import org.flowable.form.model.FormModel;
 import org.joda.time.LocalDate;
 import org.junit.Test;

@@ -42,7 +42,6 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.flowable.management.jmx.DefaultManagementMBeanAssembler;
 import org.flowable.management.jmx.ManagementMBeanAssembler;
-import org.flowable.management.jmx.mbeans.ProcessDefinitionsMBean;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

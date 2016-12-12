@@ -30,7 +30,6 @@ import org.flowable.dmn.model.OutputClause;
 import org.flowable.dmn.model.RuleInputClauseContainer;
 import org.flowable.dmn.model.RuleOutputClauseContainer;
 import org.flowable.dmn.model.UnaryTests;
-import org.flowable.editor.dmn.converter.DmnJsonConverter;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;

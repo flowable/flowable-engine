@@ -15,7 +15,6 @@ package org.flowable.content.engine.test;
 import org.flowable.content.api.ContentService;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.ContentEngineConfiguration;
-import org.flowable.content.engine.test.FlowableContentRule;
 import org.junit.Before;
 import org.junit.Rule;
 

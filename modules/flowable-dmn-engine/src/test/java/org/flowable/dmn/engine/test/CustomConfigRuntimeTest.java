@@ -19,8 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.api.RuleEngineExecutionResult;
 import org.flowable.dmn.engine.DmnEngine;
-import org.flowable.dmn.engine.test.FlowableDmnRule;
-import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
