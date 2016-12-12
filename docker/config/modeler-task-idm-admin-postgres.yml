@@ -2,9 +2,11 @@ version: '2'
 services:
     flowable-modeler-app:
           image: flowable/flowable-modeler
+          container_name: flowable-modeler
           depends_on:
               - flowable-db
               - flowable-idm-app
+              - flowable-task-app
           environment:
               - datasource.driver=org.postgresql.Driver
               - datasource.url=jdbc:postgresql://flowable-db:5432/flowable
@@ -18,6 +20,7 @@ services:
               - 8888:8888
     flowable-task-app:
         image: flowable/flowable-task
+        container_name: flowable-task
         depends_on:
             - flowable-db
             - flowable-idm-app
@@ -34,6 +37,7 @@ services:
             - 9999:9999
     flowable-idm-app:
         image: flowable/flowable-idm
+        container_name: flowable-idm
         depends_on:
             - flowable-db
         environment:
@@ -45,6 +49,7 @@ services:
             - 8080:8080
     flowable-admin-app:
         image: flowable/flowable-admin
+        container_name: flowable-admin
         depends_on:
             - flowable-db
             - flowable-idm-app
