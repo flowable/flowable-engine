@@ -12,28 +12,98 @@
  */
 package org.flowable.app.rest.idm;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import org.flowable.app.model.common.ResultListDataRepresentation;
+import org.flowable.app.model.common.UserRepresentation;
+import org.flowable.app.service.idm.RemoteIdmService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.task.IdentityLink;
+import org.flowable.idm.api.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Rest resource for managing users, specifically related to tasks and processes.
+ * Rest resource for managing users, specifically related to tasks and
+ * processes.
  */
 @RestController
-public class WorkflowUsersResource extends AbstractWorkflowUsersResource {
-	
-    @RequestMapping(value = "/rest/workflow-users", method = RequestMethod.GET)
-    public ResultListDataRepresentation getUsers(
-    		@RequestParam(value="filter", required=false) String filter, 
-    		@RequestParam(value="email", required=false) String email,
-    		@RequestParam(value="externalId", required=false) String externalId,
-        @RequestParam(value="excludeTaskId", required=false) String excludeTaskId,
-        @RequestParam(value="excludeProcessId", required=false) String excludeProcessId,
-        @RequestParam(value="groupId", required=false) Long groupId,
-        @RequestParam(value="tenantId", required=false) Long tenantId) {
-    	return super.getUsers(filter, email, excludeTaskId, excludeProcessId, groupId);
+public class WorkflowUsersResource {
+
+  @Autowired
+  private RemoteIdmService remoteIdmService;
+
+  @Autowired
+  private RuntimeService runtimeService;
+
+  @Autowired
+  private TaskService taskService;
+
+  @RequestMapping(value = "/rest/workflow-users", method = RequestMethod.GET)
+  public ResultListDataRepresentation getUsers(@RequestParam(value = "filter", required = false) String filter,
+      @RequestParam(value = "excludeTaskId", required = false) String excludeTaskId,
+      @RequestParam(value = "excludeProcessId", required = false) String excludeProcessId) {
+   
+    List<? extends User> matchingUsers = remoteIdmService.findUsersByNameFilter(filter);
+
+    // Filter out users already part of the task/process of which the ID has been passed
+    if (excludeTaskId != null) {
+      filterUsersInvolvedInTask(excludeTaskId, matchingUsers);
+    } else if (excludeProcessId != null) {
+      filterUsersInvolvedInProcess(excludeProcessId, matchingUsers);
     }
+
+    List<UserRepresentation> userRepresentations = new ArrayList<UserRepresentation>(matchingUsers.size());
+    for (User user : matchingUsers) {
+      userRepresentations.add(new UserRepresentation(user));
+    }
+
+    return new ResultListDataRepresentation(userRepresentations);
     
+  }
+  
+  protected void filterUsersInvolvedInProcess(String excludeProcessId, List<? extends User> matchingUsers) {
+    Set<String> involvedUsers = getInvolvedUsersAsSet(
+        runtimeService.getIdentityLinksForProcessInstance(excludeProcessId));
+    removeinvolvedUsers(matchingUsers, involvedUsers);
+  }
+
+  protected void filterUsersInvolvedInTask(String excludeTaskId, List<? extends User> matchingUsers) {
+    Set<String> involvedUsers = getInvolvedUsersAsSet(taskService.getIdentityLinksForTask(excludeTaskId));
+    removeinvolvedUsers(matchingUsers, involvedUsers);
+  }
+
+  protected Set<String> getInvolvedUsersAsSet(List<IdentityLink> involvedPeople) {
+    Set<String> involved = null;
+    if (involvedPeople.size() > 0) {
+      involved = new HashSet<String>();
+      for (IdentityLink link : involvedPeople) {
+        if (link.getUserId() != null) {
+          involved.add(link.getUserId());
+        }
+      }
+    }
+    return involved;
+  }
+
+  protected void removeinvolvedUsers(List<? extends User> matchingUsers, Set<String> involvedUsers) {
+    if (involvedUsers != null) {
+      // Using iterator to be able to remove without ConcurrentModExceptions
+      Iterator<? extends User> userIt = matchingUsers.iterator();
+      while (userIt.hasNext()) {
+        if (involvedUsers.contains(userIt.next().getId().toString())) {
+          userIt.remove();
+        }
+      }
+    }
+  }
+
 }

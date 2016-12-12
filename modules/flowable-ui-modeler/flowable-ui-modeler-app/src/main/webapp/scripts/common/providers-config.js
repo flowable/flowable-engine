@@ -17,10 +17,11 @@
 
 activitiModule.service('NotPermittedInterceptor', [ '$window', function($window) {
     var service = this;
+
     service.responseError = function(response) {
         if (response.status === 403) {
-            $window.location.href = FLOWABLE.CONFIG.contextRoot + '/views/not-permitted.html';
-            $window.reload();
+            $window.location.href = FLOWABLE.CONFIG.contextRoot;
+            $window.location.reload();
         }
         return response;
     };

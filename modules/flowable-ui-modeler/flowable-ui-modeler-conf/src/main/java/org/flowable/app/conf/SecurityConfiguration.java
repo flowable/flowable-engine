@@ -12,6 +12,8 @@
  */
 package org.flowable.app.conf;
 
+import java.util.Arrays;
+
 import org.flowable.app.filter.FlowableCookieFilter;
 import org.flowable.app.security.AjaxLogoutSuccessHandler;
 import org.flowable.app.security.ClearFlowableCookieLogoutHandler;
@@ -36,10 +38,14 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
+  
+  public static final String REST_ENDPOINTS_PREFIX = "/app/rest";
 	
 	@Bean
 	public FlowableCookieFilter flowableCookieFilter() {
-	  return new FlowableCookieFilter();
+	  FlowableCookieFilter filter = new FlowableCookieFilter();
+	  filter.setRequiredPrivileges(Arrays.asList(DefaultPrivileges.ACCESS_MODELER));
+	  return filter;
 	}
 	
 	@Configuration
@@ -72,7 +78,7 @@ public class SecurityConfiguration {
               	.addHeaderWriter(new XXssProtectionHeaderWriter())
               	.and()
           .authorizeRequests()
-            .antMatchers("/app/rest/**").hasAuthority(DefaultPrivileges.ACCESS_MODELER);
+            .antMatchers(REST_ENDPOINTS_PREFIX + "/**").hasAuthority(DefaultPrivileges.ACCESS_MODELER);
     }
 	}
 }

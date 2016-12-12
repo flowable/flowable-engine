@@ -584,10 +584,6 @@ angular.module('activitiApp')
             $scope.fieldPersonSelected = function (user, field) {
                 field.value = user;
             };
-
-            $scope.fieldPersonEmailSelected = function (email, field) {
-                field.value = email;
-            };
             
             $scope.fieldPersonRemoved = function (user, field) {
                 field.value = undefined;
@@ -688,7 +684,6 @@ angular.module('activitiApp')
                 isEmpty: $scope.isEmpty,
                 isEmptyDropdown: $scope.isEmptyDropdown,
                 fieldPersonSelected: $scope.fieldPersonSelected,
-                fieldPersonEmailSelected: $scope.fieldPersonEmailSelected,
                 fieldPersonRemoved: $scope.fieldPersonRemoved,
                 fieldGroupSelected: $scope.fieldGroupSelected,
                 fieldGroupRemoved: $scope.fieldGroupRemoved,

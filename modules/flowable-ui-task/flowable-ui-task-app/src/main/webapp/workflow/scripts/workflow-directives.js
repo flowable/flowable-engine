@@ -344,10 +344,6 @@ angular.module('activitiApp')
                 $scope.fieldPersonSelected = function(user, field){
                     return $scope.controlCallbacks.fieldPersonSelected(user, field);
                 };
-
-                $scope.fieldPersonEmailSelected = function(email, field){
-                    return $scope.controlCallbacks.fieldPersonEmailSelected(email, field);
-                };
                 
                 $scope.fieldPersonRemoved = function(user, field){
                     return $scope.controlCallbacks.fieldPersonRemoved(user, field);

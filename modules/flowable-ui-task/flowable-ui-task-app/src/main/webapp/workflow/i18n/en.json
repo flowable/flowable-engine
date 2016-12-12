@@ -272,11 +272,8 @@
         }
     },
     "INVOLVE-PEOPLE": {
-        "NO-MATCHING-RESULTS": "Use the search box above to find users or ",
+        "NO-MATCHING-RESULTS": "Use the search box above to find users",
         "SEARCH-PLACEHOLDER": "Search user",
-        "USE-EMAIL": "select someone using an email address",
-        "EMAIL-PLACEHOLDER": "Enter an email address",
-        "EMAIL-HELP": "Press Enter or click the button to continue. This person will be notified by email or invited to sign up",
         "BACK-TO-SEARCH": "Back to search",
         "ACTION-SELECT": "Select"
     },

@@ -68,7 +68,7 @@
         <div id="{{activitiFieldIdPrefix + field.id}}" class="people-select">
             <ul class="simple-list">
                 <li class="action" select-people-popover popover-title="{{field.name}}" placement="bottom-left" on-people-selected="fieldPersonSelected(user, field)"
-                    on-email-selected="fieldPersonEmailSelected(email, field)" restrict-with-group="field.params.restrictWithGroup" ng-required="field.required">
+                    restrict-with-group="field.params.restrictWithGroup" ng-required="field.required">
                     <div ng-if="field.value && field.value.id" user-picture="field.value"></div>
                     <span ng-if="!field.value && !field.placeholder" translate="FORM.MESSAGE.SELECT-PERSON"></span>
                     <span ng-if="!field.value && field.placeholder" translate="{{field.placeholder}}"></span>
