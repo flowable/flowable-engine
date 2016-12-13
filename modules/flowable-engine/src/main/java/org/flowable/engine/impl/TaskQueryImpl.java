@@ -57,6 +57,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
   protected String assignee;
   protected String assigneeLike;
   protected String assigneeLikeIgnoreCase;
+  protected List<String> assigneeIds;
   protected String involvedUser;
   protected String owner;
   protected String ownerLike;
@@ -357,6 +358,38 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
        this.assigneeLikeIgnoreCase = assigneeLikeIgnoreCase.toLowerCase();
      }
      return this;
+  }
+  
+  @Override
+  public TaskQuery taskAssigneeIds(List<String> assigneeIds) {
+    if (assigneeIds == null) {
+      throw new FlowableIllegalArgumentException("Task assignee list is null");
+    }
+    if (assigneeIds.isEmpty()) {
+      throw new FlowableIllegalArgumentException("Task assignee list is empty");
+    }
+    for (String assignee : assigneeIds) {
+      if (assignee == null) {
+        throw new FlowableIllegalArgumentException("None of the given task assignees can be null");
+      }
+    }
+
+    if (assignee != null) {
+      throw new FlowableIllegalArgumentException("Invalid query usage: cannot set both taskAssigneeIds and taskAssignee");
+    }
+    if (assigneeLike != null) {
+      throw new FlowableIllegalArgumentException("Invalid query usage: cannot set both taskAssigneeIds and taskAssigneeLike");
+    }
+    if (assigneeLikeIgnoreCase != null) {
+      throw new FlowableIllegalArgumentException("Invalid query usage: cannot set both taskAssigneeIds and taskAssigneeLikeIgnoreCase");
+    }
+
+    if (orActive) {
+      currentOrQueryObject.assigneeIds = assigneeIds;
+    } else {
+      this.assigneeIds = assigneeIds;
+    }
+    return this;
   }
 
   public TaskQueryImpl taskOwner(String owner) {
@@ -1442,6 +1475,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
   public String getAssigneeLike() {
     return assigneeLike;
+  }
+  
+  public List<String> getAssigneeIds() {
+    return assigneeIds;
   }
 
   public String getInvolvedUser() {

@@ -51,7 +51,7 @@ public class DeleteProcessInstanceTest extends PluggableActivitiTestCase{
   		//Retrieve the HistoricProcessInstance and assert that there is an end time.
   		HistoricProcessInstance hInstanceUser = historyService.createHistoricProcessInstanceQuery().processInstanceId(instanceUser.getId()).singleResult();
   		assertNotNull(hInstanceUser.getEndTime());
-  		log.info("End time for the deleted instance of \"Demo Partial Deletion\" that was started with a Task Type of \"user\": {}.", hInstanceUser.getEndTime()_
+  		log.info("End time for the deleted instance of \"Demo Partial Deletion\" that was started with a Task Type of \"user\": {}.", hInstanceUser.getEndTime());
   		log.info("Successfully deleted the instance of \"Demo Partial Deletion\" that was started with a Task Type of \"user\".");
 		}
 		
