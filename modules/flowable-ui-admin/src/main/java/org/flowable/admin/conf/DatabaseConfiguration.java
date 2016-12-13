@@ -122,7 +122,7 @@ public class DatabaseConfiguration {
                 log.info("datasource driver : {}", dataSourceDriver);
                 log.info("datasource url : {}", dataSourceUrl);
                 log.info("datasource user name : {}", dataSourceUsername);
-                log.info("Min pool size | Max pool size | acquire increment : "{} | {} | {}", minPoolSize, maxPoolSize, acquireIncrement);
+                log.info("Min pool size | Max pool size | acquire increment : {} | {} | {}", minPoolSize, maxPoolSize, acquireIncrement);
             }
 
             ComboPooledDataSource ds = new ComboPooledDataSource();
