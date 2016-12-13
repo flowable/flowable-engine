@@ -1651,7 +1651,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           Class<?> handledType = defaultBpmnParseHandler.getHandledTypes().iterator().next();
           if (customParseHandlerMap.containsKey(handledType)) {
             BpmnParseHandler newBpmnParseHandler = customParseHandlerMap.get(handledType);
-            log.info("Replacing default BpmnParseHandler " + defaultBpmnParseHandler.getClass().getName() + " with " + newBpmnParseHandler.getClass().getName());
+            log.info("Replacing default BpmnParseHandler {} with {}", defaultBpmnParseHandler.getClass().getName(), newBpmnParseHandler.getClass().getName());
             bpmnParserHandlers.set(i, newBpmnParseHandler);
           }
         }
@@ -2033,7 +2033,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       flowable5CompatibilityHandler = flowable5CompatibilityHandlerFactory.createFlowable5CompatibilityHandler();
 
       if (flowable5CompatibilityHandler != null) {
-        log.info("Found compatibility handler instance : " + flowable5CompatibilityHandler.getClass());
+        log.info("Found compatibility handler instance : {}", flowable5CompatibilityHandler.getClass());
       }
     }
 
@@ -3811,7 +3811,5 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.asyncExecutorMessageQueueMode = asyncExecutorMessageQueueMode;
     return this;
   }
-
-
 
 }

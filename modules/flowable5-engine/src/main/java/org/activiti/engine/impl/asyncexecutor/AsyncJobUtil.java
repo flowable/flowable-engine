@@ -28,7 +28,7 @@ public class AsyncJobUtil {
       
     } catch (Throwable lockException) { 
       if (log.isDebugEnabled()) {
-        log.debug("Could not lock exclusive job. Unlocking job so it can be acquired again. Catched exception: " + lockException.getMessage());
+        log.debug("Could not lock exclusive job. Unlocking job so it can be acquired again. Catched exception: {}", lockException.getMessage());
       }
       
       unacquireJob(commandExecutor, job);
@@ -104,7 +104,7 @@ public class AsyncJobUtil {
         FailedJobCommandFactory failedJobCommandFactory = commandContext.getFailedJobCommandFactory();
         Command<Object> cmd = failedJobCommandFactory.getCommand(job.getId(), exception);
 
-        log.trace("Using FailedJobCommandFactory '" + failedJobCommandFactory.getClass() + "' and command of type '" + cmd.getClass() + "'");
+        log.trace("Using FailedJobCommandFactory '{}' and command of type '{}'", failedJobCommandFactory.getClass(), cmd.getClass());
         commandExecutor.execute(commandConfig, cmd);
         
         // Dispatch an event, indicating job execution failed in a try-catch block, to prevent the original

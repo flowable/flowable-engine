@@ -134,7 +134,7 @@ public abstract class VariableEventHandler extends AbstractDatabaseEventLoggerEv
         putInMapIfNotNull(data, Fields.VALUE, value);
       } catch (JsonProcessingException e) {
         // Nothing to do about it
-        logger.debug("Could not serialize variable value " + variableEvent.getVariableValue());
+        logger.debug("Could not serialize variable value {}", variableEvent.getVariableValue());
       }
 
     }

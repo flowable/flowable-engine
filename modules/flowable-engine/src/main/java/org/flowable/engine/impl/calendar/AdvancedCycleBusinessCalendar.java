@@ -79,7 +79,7 @@ public class AdvancedCycleBusinessCalendar extends CycleBusinessCalendar {
 
   @Override
   public Date resolveDuedate(String duedateDescription, int maxIterations) {
-    logger.info("Resolving Due Date: " + duedateDescription);
+    logger.info("Resolving Due Date: {}", duedateDescription);
 
     String timeZone = getValueFrom("DSTZONE", duedateDescription);
     String version = getValueFrom("VER", duedateDescription);
@@ -93,7 +93,7 @@ public class AdvancedCycleBusinessCalendar extends CycleBusinessCalendar {
     duedateDescription = removeValueFrom("VER", removeValueFrom("START", removeValueFrom("DSTZONE", duedateDescription))).trim();
 
     try {
-      logger.info("Base Due Date: " + duedateDescription);
+      logger.info("Base Due Date: {}", duedateDescription);
 
       Date date = resolvers.get(version == null ? getDefaultScheduleVersion() : Integer.valueOf(version)).resolve(duedateDescription, clockReader,
           timeZone == null ? clockReader.getCurrentTimeZone() : TimeZone.getTimeZone(timeZone));

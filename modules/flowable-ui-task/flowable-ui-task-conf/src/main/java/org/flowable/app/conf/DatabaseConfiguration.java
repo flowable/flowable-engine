@@ -50,7 +50,7 @@ public class DatabaseConfiguration {
     String dataSourceJndiName = env.getProperty("datasource.jndi.name");
     if (StringUtils.isNotEmpty(dataSourceJndiName)) {
 
-      log.info("Using jndi datasource '" + dataSourceJndiName + "'");
+      log.info("Using jndi datasource '{}'", dataSourceJndiName);
       JndiDataSourceLookup dsLookup = new JndiDataSourceLookup();
       dsLookup.setResourceRef(env.getProperty("datasource.jndi.resourceRef", Boolean.class, Boolean.TRUE));
       DataSource dataSource = dsLookup.getDataSource(dataSourceJndiName);
@@ -103,10 +103,10 @@ public class DatabaseConfiguration {
 
       if (log.isInfoEnabled()) {
         log.info("Configuring Datasource with following properties (omitted password for security)");
-        log.info("datasource driver: " + dataSourceDriver);
-        log.info("datasource url : " + dataSourceUrl);
-        log.info("datasource user name : " + dataSourceUsername);
-        log.info("Min pool size | Max pool size | acquire increment : " + minPoolSize + " | " + maxPoolSize + " | " + acquireIncrement);
+        log.info("datasource driver : {}", dataSourceDriver);
+        log.info("datasource url : {}", dataSourceUrl);
+        log.info("datasource user name : {}", dataSourceUsername);
+        log.info("Min pool size | Max pool size | acquire increment : {} | {} | {}", minPoolSize, maxPoolSize, acquireIncrement);
       }
 
       ComboPooledDataSource ds = new ComboPooledDataSource();

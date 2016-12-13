@@ -1295,7 +1295,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           Class<?> handledType = defaultBpmnParseHandler.getHandledTypes().iterator().next();
           if (customParseHandlerMap.containsKey(handledType)) {
             BpmnParseHandler newBpmnParseHandler = customParseHandlerMap.get(handledType);
-            log.info("Replacing default BpmnParseHandler " + defaultBpmnParseHandler.getClass().getName() + " with " + newBpmnParseHandler.getClass().getName());
+            log.info("Replacing default BpmnParseHandler {} with {}", defaultBpmnParseHandler.getClass().getName(), newBpmnParseHandler.getClass()
+                    .getName());
             bpmnParserHandlers.set(i, newBpmnParseHandler);
           }
         }

@@ -50,7 +50,7 @@ public abstract class ResourceFlowableTestCase extends AbstractFlowableTestCase 
   protected void initializeProcessEngine() {
     ProcessEngineConfiguration config = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource(activitiConfigurationResource);
     if (processEngineName != null) {
-      logger.info("Initializing process engine with name '" + processEngineName + "'");
+      logger.info("Initializing process engine with name '{}'", processEngineName);
       config.setEngineName(processEngineName);
     }
     additionalConfiguration(config);

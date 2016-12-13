@@ -49,7 +49,7 @@ public class BitronixDataSourceFactoryBean extends ResourceBean implements Facto
       ds.setIgnoreRecoveryFailures(getIgnoreRecoveryFailures());
       ds.setDriverProperties(getDriverProperties());
 
-      LOG.debug("Initializing PoolingDataSource with id " + ds.getUniqueName());
+      LOG.debug("Initializing PoolingDataSource with id {}", ds.getUniqueName());
       ds.init();
     }
     return ds;
@@ -57,7 +57,7 @@ public class BitronixDataSourceFactoryBean extends ResourceBean implements Facto
 
   @Override
   public void destroy() throws Exception {
-    LOG.debug("Closing PoolingDataSource with id " + ds.getUniqueName());
+    LOG.debug("Closing PoolingDataSource with id {}", ds.getUniqueName());
     ds.close();
     ds = null;
   }

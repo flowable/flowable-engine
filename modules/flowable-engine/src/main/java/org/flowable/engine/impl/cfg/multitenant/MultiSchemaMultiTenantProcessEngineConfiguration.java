@@ -151,7 +151,7 @@ public class MultiSchemaMultiTenantProcessEngineConfiguration extends ProcessEng
   }
 
   protected void createTenantSchema(String tenantId) {
-    logger.info("creating/validating database schema for tenant " + tenantId);
+    logger.info("creating/validating database schema for tenant {}", tenantId);
     tenantInfoHolder.setCurrentTenantId(tenantId);
     getCommandExecutor().execute(getSchemaCommandConfig(), new ExecuteSchemaOperationCommand(databaseSchemaUpdate));
     tenantInfoHolder.clearCurrentTenantId();

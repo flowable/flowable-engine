@@ -34,7 +34,7 @@ public class DeleteProcessInstanceTest extends PluggableActivitiTestCase{
 		//Start the process instance & ensure it's started.
 		ProcessInstance instanceUser = runtimeService.startProcessInstanceByKey("DemoPartialDeletion", inputParamsUser);
 		assertNotNull(instanceUser);
-		log.info("Process instance (of process model " + instanceUser.getProcessDefinitionId() + ") started with id: " + instanceUser.getId() + ".");
+		log.info("Process instance (of process model {}) started with id: {}.", instanceUser.getProcessDefinitionId(), instanceUser.getId());
 		
 		//Assert that the process instance is active.
 		Execution executionUser = runtimeService.createExecutionQuery().processInstanceId(instanceUser.getProcessInstanceId()).singleResult();
@@ -51,7 +51,7 @@ public class DeleteProcessInstanceTest extends PluggableActivitiTestCase{
   		//Retrieve the HistoricProcessInstance and assert that there is an end time.
   		HistoricProcessInstance hInstanceUser = historyService.createHistoricProcessInstanceQuery().processInstanceId(instanceUser.getId()).singleResult();
   		assertNotNull(hInstanceUser.getEndTime());
-  		log.info("End time for the deleted instance of \"Demo Partial Deletion\" that was started with a Task Type of \"user\": " + hInstanceUser.getEndTime() + ".");
+  		log.info("End time for the deleted instance of \"Demo Partial Deletion\" that was started with a Task Type of \"user\": {}.", hInstanceUser.getEndTime()_
   		log.info("Successfully deleted the instance of \"Demo Partial Deletion\" that was started with a Task Type of \"user\".");
 		}
 		
@@ -65,7 +65,7 @@ public class DeleteProcessInstanceTest extends PluggableActivitiTestCase{
 		//Start the process instance & ensure it's started.
 		ProcessInstance instanceJava = runtimeService.startProcessInstanceByKey("DemoPartialDeletion", inputParamsJava);
 		assertNotNull(instanceJava);
-		log.info("Process instance (of process model " + instanceJava.getProcessDefinitionId() + ") started with id: " + instanceJava.getId() + ".");
+		log.info("Process instance (of process model {}) started with id: {}.", instanceJava.getProcessDefinitionId(), instanceJava.getId());
 				
 		//Assert that the process instance is active.
 		Execution executionJava = runtimeService.createExecutionQuery().processInstanceId(instanceJava.getProcessInstanceId()).singleResult();

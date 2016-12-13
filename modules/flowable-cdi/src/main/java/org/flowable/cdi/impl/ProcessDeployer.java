@@ -79,7 +79,7 @@ public class ProcessDeployer {
     logger.debug("Start deploying processes.");
     DeploymentBuilder deploymentBuilder = processEngine.getRepositoryService().createDeployment();
     for (String string : resourceNames) {
-      logger.info("Adding '" + string + "' to deployment.");
+      logger.info("Adding '{}' to deployment.", string);
       deploymentBuilder.addClasspathResource(string);
     }
     // deploy the processes

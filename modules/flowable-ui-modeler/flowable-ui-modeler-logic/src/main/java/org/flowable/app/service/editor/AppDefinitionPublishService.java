@@ -98,7 +98,7 @@ public class AppDefinitionPublishService {
 
         AbstractModel processModel = modelService.getModel(appModelDef.getId());
         if (processModel == null) {
-          logger.error("Model " + appModelDef.getId() + " for app definition " + appDefinitionModel.getId() + " could not be found");
+          logger.error("Model {} for app definition {} could not be found", appModelDef.getId(), appDefinitionModel.getId());
           throw new BadRequestException("Model for app definition could not be found");
         }
         

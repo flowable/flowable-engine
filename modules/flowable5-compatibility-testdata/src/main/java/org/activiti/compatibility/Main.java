@@ -42,7 +42,7 @@ public class Main {
 
     logger.info("Test data generation completed.");
     for (String generatorClass : executedGenerators) {
-      logger.info("Executed test data generator " + generatorClass);
+      logger.info("Executed test data generator {}", generatorClass);
     }
   }
   

@@ -84,7 +84,7 @@ public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
         success = true;
       } catch (PersistenceException pe) {
         retries = retries - 1;
-        log.debug("Retrying process start - " + (MAX_RETRIES - retries));
+        log.debug("Retrying process start - {}", (MAX_RETRIES - retries));
         try {
           Thread.sleep(timeout);
         } catch (InterruptedException ignore) {
@@ -93,7 +93,7 @@ public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
       }
     }
     if (!success) {
-      log.debug("Retrying process start FAILED " + MAX_RETRIES + " times");
+      log.debug("Retrying process start FAILED {} times", MAX_RETRIES);
     }
   }
 
@@ -107,7 +107,7 @@ public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
         success = true;
       } catch (PersistenceException pe) {
         retries = retries - 1;
-        log.debug("Retrying task completion - " + (MAX_RETRIES - retries));
+        log.debug("Retrying task completion - {}", (MAX_RETRIES - retries));
         try {
           Thread.sleep(timeout);
         } catch (InterruptedException ignore) {
@@ -117,7 +117,7 @@ public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
     }
 
     if (!success) {
-      log.debug("Retrying task completion FAILED " + MAX_RETRIES + " times");
+      log.debug("Retrying task completion FAILED {} times", MAX_RETRIES);
     }
   }
 

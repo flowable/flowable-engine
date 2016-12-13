@@ -129,7 +129,7 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
                 || eventDefinition instanceof SignalEventDefinition) {
           bpmnParse.getBpmnParserHandlers().parseElement(bpmnParse, eventDefinition);
         } else {
-          logger.warn("start event of event subprocess must be of type 'error', 'message' or 'signal' for start event " + startEvent.getId());
+          logger.warn("start event of event subprocess must be of type 'error', 'message' or 'signal' for start event {}", startEvent.getId());
         }
       }
       

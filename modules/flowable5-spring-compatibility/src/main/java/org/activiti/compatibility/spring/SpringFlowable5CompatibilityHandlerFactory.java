@@ -34,7 +34,8 @@ public class SpringFlowable5CompatibilityHandlerFactory implements Flowable5Comp
         Flowable5CompatibilityHandler handler = (Flowable5CompatibilityHandler) Class.forName(compatibilityHandlerClassName).newInstance();
         return handler;
       } catch (Exception e) {
-        logger.info("Flowable 5 compatibility handler implementation not found or error during instantiation : " + e.getMessage() + ". Flowable 5 backwards compatibility disabled.");
+        logger.info("Flowable 5 compatibility handler implementation not found or error during instantiation : {}. Flowable 5 backwards compatibility disabled.",
+                e.getMessage());
       }
       
     } else {
