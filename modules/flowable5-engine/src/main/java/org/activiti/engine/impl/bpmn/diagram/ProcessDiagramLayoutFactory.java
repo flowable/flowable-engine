@@ -62,8 +62,7 @@ public class ProcessDiagramLayoutFactory {
    * @param imageStream
    *          BPMN 2.0 diagram in PNG format (JPEG and other formats supported
    *          by {@link ImageIO} may also work)
-   * @return Layout of the process diagram
-   * @return null when parameter imageStream is null
+   * @return Layout of the process diagram; null when parameter imageStream is null
    */
   public DiagramLayout getProcessDiagramLayout(InputStream bpmnXmlStream, InputStream imageStream) {
     Document bpmnModel = parseXml(bpmnXmlStream);
@@ -74,13 +73,12 @@ public class ProcessDiagramLayoutFactory {
    * Provides positions and dimensions of elements in a BPMN process diagram as
    * provided by {@link RepositoryService#getProcessDiagram(String)}.
    *
-   * @param bpmnXmlStream
+   * @param bpmnModel
    *          BPMN 2.0 XML document
    * @param imageStream
    *          BPMN 2.0 diagram in PNG format (JPEG and other formats supported
    *          by {@link ImageIO} may also work)
-   * @return Layout of the process diagram
-   * @return null when parameter imageStream is null
+   * @return Layout of the process diagram; null when parameter imageStream is null
    */
   public DiagramLayout getBpmnProcessDiagramLayout(Document bpmnModel, InputStream imageStream) {
     if (imageStream == null) {

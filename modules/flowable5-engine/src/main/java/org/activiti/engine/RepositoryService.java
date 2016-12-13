@@ -46,7 +46,7 @@ public interface RepositoryService {
   
   /** Deletes the given deployment.
    * @param deploymentId id of the deployment, cannot be null.
-   * @throwns RuntimeException if there are still runtime or history process 
+   * @throws RuntimeException if there are still runtime or history process
    * instances or jobs. 
    */
   void deleteDeployment(String deploymentId);
@@ -316,8 +316,8 @@ public interface RepositoryService {
    *
    * This method requires a process model and a diagram image to be deployed.
    * @param processDefinitionId id of a {@link ProcessDefinition}, cannot be null.
-   * @return Map with process element ids as keys and positions and dimensions as values.
-   * @return null when the input stream of a process diagram is null.
+   * @return Map with process element ids as keys and positions and dimensions as values;
+   *         null when the input stream of a process diagram is null.
    * @throws ActivitiObjectNotFoundException when the process model or diagram doesn't exist.
    */
   DiagramLayout getProcessDiagramLayout(String processDefinitionId);

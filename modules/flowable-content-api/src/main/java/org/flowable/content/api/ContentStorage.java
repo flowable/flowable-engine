@@ -24,7 +24,8 @@ import java.util.Map;
 public interface ContentStorage {
 
     /**
-     * @param metadata A key-value collection that can be used to change the way the content is stored.
+     * @param contentStream
+     * @param metaData A key-value collection that can be used to change the way the content is stored.
      * @return reads the given {@link InputStream} and stores it. Returns a {@link ContentObject} with a unique id generated - which can be
      * used for reading the content again.
      */
@@ -32,7 +33,9 @@ public interface ContentStorage {
     
     /**
      * Update the content with the given id to the content present in the given stream.
-     * @param metadata A key-value collection that can be used to change the way the content is stored.
+     * @param id
+     * @param contentStream
+     * @param metaData A key-value collection that can be used to change the way the content is stored.
      * @return Returns a {@link ContentObject} with a unique id generated - which can br used for reading the content again.
      * @throws ContentStorageException When an exception occurred while updating the content and the content
      * is not updated.
@@ -52,6 +55,7 @@ public interface ContentStorage {
     
     /**
      * Deletes the object the given id.
+     * @param id
      * @throws ContentNotFoundException When the content with the given id does not exist 
      * @throws ContentStorageException When an error occurred while deleting the content.
      */

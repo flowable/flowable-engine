@@ -22,7 +22,7 @@ public interface Agenda {
      * Get next operation from agenda and remove operation from the queue.
      *
      * @return next operation from the queue
-     * @throw {@link FlowableException} in the case when agenda is empty
+     * @throws {@link FlowableException} in the case when agenda is empty
      */
     Runnable getNextOperation();
 
@@ -30,7 +30,7 @@ public interface Agenda {
      * Get next operation from agenda and keep operation on the top of the agenda
      *
      * @return the first operation from the agenda
-     * @throw {@link FlowableException} in the case when agenda is empty
+     * @throws {@link FlowableException} in the case when agenda is empty
      */
     Runnable peekOperation();
 

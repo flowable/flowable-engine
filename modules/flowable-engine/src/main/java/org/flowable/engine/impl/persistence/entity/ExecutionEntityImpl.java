@@ -184,7 +184,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
   /**
    * persisted reference to the super execution of this execution
    * 
-   * @See {@link #getSuperExecution()}
+   * @see {@link #getSuperExecution()}
    * @see #setSuperExecution(ExecutionEntityImpl)
    */
   protected String superExecutionId;

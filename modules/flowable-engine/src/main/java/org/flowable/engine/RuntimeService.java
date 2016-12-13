@@ -857,7 +857,7 @@ public interface RuntimeService {
    *
    * @param executionId
    *          id of execution, cannot be null.
-   * @param dataObjectNames
+   * @param dataObjects
    *          the collection of DataObject names that should be retrieved.
    * @return the DataObjects or an empty map if no DataObjects are found.
    * @throws FlowableObjectNotFoundException
@@ -888,7 +888,7 @@ public interface RuntimeService {
    *
    * @param executionId
    *          id of execution, cannot be null.
-   * @param dataObjectName
+   * @param dataObject
    *          name of DataObject, cannot be null.
    * @return the DataObject or null if the variable is undefined.
    * @throws FlowableObjectNotFoundException
