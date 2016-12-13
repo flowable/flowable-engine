@@ -52,7 +52,7 @@ public class ExecutionTreeStringBuilder {
     strb.append(prefix)
         .append(isTail ? "└── " : "├── ")
         .append(execution.getId()).append(" : ")
-        .append("activityId=" + execution.getActivityId())
+        .append("activityId=").append(execution.getActivityId())
         .append(", parent id ")
         .append(execution.getParentId())
         .append(execution.isScope() ? " (scope)" : "")
