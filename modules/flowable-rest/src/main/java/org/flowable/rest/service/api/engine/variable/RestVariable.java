@@ -97,7 +97,7 @@ public class RestVariable {
           return s;
         }
       }
-      throw new FlowableIllegalArgumentException("Invalid variable scope: '" + scope + "'");
+      throw new FlowableIllegalArgumentException("Invalid variable scope: '" + scope + '\'');
     } else {
       return null;
     }

@@ -238,7 +238,7 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, BulkDelet
     if (processDefId != null) {
       sb.append(", processDefId=").append(processDefId);
     }
-    sb.append("]");
+    sb.append(']');
     return sb.toString();
   }
 }

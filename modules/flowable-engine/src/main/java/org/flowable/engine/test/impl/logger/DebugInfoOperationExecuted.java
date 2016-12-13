@@ -61,19 +61,19 @@ public class DebugInfoOperationExecuted extends AbstractDebugInfo {
     StringBuilder strb = new StringBuilder(35);
 
     // Timing info
-    strb.append("[").append(dateFormat.format(new Date(getPreExecutionTime()))).append(" - ")
+    strb.append('[').append(dateFormat.format(new Date(getPreExecutionTime()))).append(" - ")
             .append(dateFormat.format(new Date(getPostExecutionTime()))).append(" (")
             .append(getPostExecutionTime() - getPreExecutionTime()).append("ms)]");
 
     // Operation info
-    strb.append(" ").append(getOperation().getClass().getSimpleName()).append(" ");
+    strb.append(' ').append(getOperation().getClass().getSimpleName()).append(' ');
 
     // Execution info
     if (getExecutionId() != null) {
       strb.append("with execution ").append(getExecutionId());
 
       if (getFlowElementId() != null) {
-        strb.append(" at flow element ").append(getFlowElementId()).append(" (").append(getFlowElementClass().getSimpleName()).append(")");
+        strb.append(" at flow element ").append(getFlowElementId()).append(" (").append(getFlowElementClass().getSimpleName()).append(')');
       }
     }
 

@@ -61,7 +61,7 @@ public class DeploymentManager {
     if (formDefinition == null) {
       formDefinition = engineConfig.getFormDefinitionEntityManager().findById(formDefinitionId);
       if (formDefinition == null) {
-        throw new FlowableObjectNotFoundException("no deployed form definition found with id '" + formDefinitionId + "'");
+        throw new FlowableObjectNotFoundException("no deployed form definition found with id '" + formDefinitionId + '\'');
       }
       formDefinition = resolveFormDefinition(formDefinition).getFormDefinitionEntity();
     }
@@ -72,7 +72,7 @@ public class DeploymentManager {
     FormDefinitionEntity formDefinition = formDefinitionEntityManager.findLatestFormDefinitionByKey(formDefinitionKey);
 
     if (formDefinition == null) {
-      throw new FlowableObjectNotFoundException("no form definitions deployed with key '" + formDefinitionKey + "'");
+      throw new FlowableObjectNotFoundException("no form definitions deployed with key '" + formDefinitionKey + '\'');
     }
     formDefinition = resolveFormDefinition(formDefinition).getFormDefinitionEntity();
     return formDefinition;
@@ -82,7 +82,7 @@ public class DeploymentManager {
     FormDefinitionEntity formDefinition = formDefinitionEntityManager.findLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, tenantId);
     
     if (formDefinition == null) {
-      throw new FlowableObjectNotFoundException("no form definitions deployed with key '" + formDefinitionKey + "' for tenant identifier '" + tenantId + "'");
+      throw new FlowableObjectNotFoundException("no form definitions deployed with key '" + formDefinitionKey + "' for tenant identifier '" + tenantId + '\'');
     }
     formDefinition = resolveFormDefinition(formDefinition).getFormDefinitionEntity();
     return formDefinition;
@@ -93,7 +93,7 @@ public class DeploymentManager {
     
     if (formDefinition == null) {
       throw new FlowableObjectNotFoundException("no form definitions deployed with key '" + formDefinitionKey + 
-          "' for parent deployment id '" + parentDeploymentId + "'");
+          "' for parent deployment id '" + parentDeploymentId + '\'');
     }
     formDefinition = resolveFormDefinition(formDefinition).getFormDefinitionEntity();
     return formDefinition;
@@ -104,7 +104,7 @@ public class DeploymentManager {
     
     if (formDefinition == null) {
       throw new FlowableObjectNotFoundException("no form definitions deployed with key '" + formDefinitionKey + 
-          "' for parent deployment id '" + parentDeploymentId + "' and tenant identifier '" + tenantId + "'");
+          "' for parent deployment id '" + parentDeploymentId + "' and tenant identifier '" + tenantId + '\'');
     }
     formDefinition = resolveFormDefinition(formDefinition).getFormDefinitionEntity();
     return formDefinition;
@@ -114,7 +114,7 @@ public class DeploymentManager {
     FormDefinitionEntity formDefinition = formDefinitionEntityManager.findFormDefinitionByKeyAndVersionAndTenantId(formDefinitionKey, formVersion, tenantId);
     
     if (formDefinition == null) {
-      throw new FlowableObjectNotFoundException("no form definitions deployed with key = '" + formDefinitionKey + "' and version = '" + formVersion + "'");
+      throw new FlowableObjectNotFoundException("no form definitions deployed with key = '" + formDefinitionKey + "' and version = '" + formVersion + '\'');
     }
     
     formDefinition = resolveFormDefinition(formDefinition).getFormDefinitionEntity();

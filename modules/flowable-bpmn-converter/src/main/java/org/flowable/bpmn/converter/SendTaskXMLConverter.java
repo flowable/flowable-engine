@@ -81,9 +81,9 @@ public class SendTaskXMLConverter extends BaseBpmnXMLConverter {
       if (indexOfP != -1) {
         String prefix = operationRef.substring(0, indexOfP);
         String resolvedNamespace = model.getNamespace(prefix);
-        result = resolvedNamespace + ":" + operationRef.substring(indexOfP + 1);
+        result = resolvedNamespace + ':' + operationRef.substring(indexOfP + 1);
       } else {
-        result = model.getTargetNamespace() + ":" + operationRef;
+        result = model.getTargetNamespace() + ':' + operationRef;
       }
     }
     return result;

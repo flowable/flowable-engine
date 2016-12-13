@@ -257,11 +257,11 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
   
   protected String[] decodeCookie(String cookieValue) throws InvalidCookieException {
     for (int j = 0; j < cookieValue.length() % 4; j++) {
-      cookieValue = cookieValue + "=";
+      cookieValue = cookieValue + '=';
     }
 
     if (!Base64.isBase64(cookieValue.getBytes())) {
-      throw new InvalidCookieException("Cookie token was not Base64 encoded; value was '" + cookieValue + "'");
+      throw new InvalidCookieException("Cookie token was not Base64 encoded; value was '" + cookieValue + '\'');
     }
 
     String cookieAsPlainText = new String(Base64.decodeBase64(cookieValue.getBytes()));
@@ -271,7 +271,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
     if ((tokens[0].equalsIgnoreCase("http") || tokens[0].equalsIgnoreCase("https")) && tokens[1].startsWith("//")) {
       // Assume we've accidentally split a URL (OpenID identifier)
       String[] newTokens = new String[tokens.length - 1];
-      newTokens[0] = tokens[0] + ":" + tokens[1];
+      newTokens[0] = tokens[0] + ':' + tokens[1];
       System.arraycopy(tokens, 2, newTokens, 1, newTokens.length - 1);
       tokens = newTokens;
     }

@@ -173,7 +173,7 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
 
   @Override
   public String toString() {
-    return "DeploymentEntity[id=" + id + ", name=" + name + "]";
+    return "DeploymentEntity[id=" + id + ", name=" + name + ']';
   }
 
 }

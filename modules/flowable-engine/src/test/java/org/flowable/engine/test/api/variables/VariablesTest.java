@@ -619,7 +619,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
   public static class TestJavaDelegate6 implements JavaDelegate {
     public void execute(DelegateExecution execution) {
       String var = (String) execution.getVariable("testVar", false);
-      execution.setVariable("testVar", var + "!");
+      execution.setVariable("testVar", var + '!');
     }
   }
 
@@ -652,21 +652,21 @@ public class VariablesTest extends PluggableFlowableTestCase {
   public static class TestJavaDelegate10 implements JavaDelegate {
     public void execute(DelegateExecution execution) {
       String testVar = (String) execution.getVariable("testVar", false);
-      execution.setVariable("testVar", testVar + "2");
+      execution.setVariable("testVar", testVar + '2');
     }
   }
 
   public static class TestJavaDelegate11 implements JavaDelegate {
     public void execute(DelegateExecution execution) {
       String testVar = (String) execution.getVariable("testVar", false);
-      execution.setVariable("testVar", testVar + "3");
+      execution.setVariable("testVar", testVar + '3');
     }
   }
 
   public static class TestJavaDelegate12 implements JavaDelegate {
     public void execute(DelegateExecution execution) {
       String testVar = (String) execution.getVariable("testVar");
-      execution.setVariable("testVar", testVar + "4");
+      execution.setVariable("testVar", testVar + '4');
     }
   }
 

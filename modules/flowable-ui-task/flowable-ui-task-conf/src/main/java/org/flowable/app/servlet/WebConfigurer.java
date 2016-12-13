@@ -139,7 +139,7 @@ public class WebConfigurer implements ServletContextListener {
 
     log.debug("Registering Spring MVC Servlet - " + restContextRoot + " REST");
     ServletRegistration.Dynamic dispatcherServlet = servletContext.addServlet(restContextRoot + "-dispatcher", new DispatcherServlet(dispatcherServletConfiguration));
-    dispatcherServlet.addMapping("/" + restContextRoot + "/*");
+    dispatcherServlet.addMapping('/' + restContextRoot + "/*");
     dispatcherServlet.setLoadOnStartup(1);
     dispatcherServlet.setAsyncSupported(true);
 

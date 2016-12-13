@@ -199,6 +199,6 @@ public class HistoricProcessInstanceEntity extends HistoricScopeInstanceEntity i
 
   @Override
   public String toString() {
-    return "HistoricProcessInstanceEntity[superProcessInstanceId=" + superProcessInstanceId + "]";
+    return "HistoricProcessInstanceEntity[superProcessInstanceId=" + superProcessInstanceId + ']';
   }
 }

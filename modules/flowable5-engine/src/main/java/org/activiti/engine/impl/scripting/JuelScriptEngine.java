@@ -227,7 +227,7 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
     for (Method m : methods) {
       int mod = m.getModifiers();
       if (Modifier.isStatic(mod) && Modifier.isPublic(mod)) {
-        String name = namespace + ":" + m.getName();
+        String name = namespace + ':' + m.getName();
         ctx.setAttribute(name, m, ScriptContext.ENGINE_SCOPE);
       }
     }
@@ -308,7 +308,7 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
     }
 
     private String getFullFunctionName(String prefix, String localName) {
-      return prefix + ":" + localName;
+      return prefix + ':' + localName;
     }
 
     @Override

@@ -65,11 +65,11 @@ public class DmnExtensionAttribute {
         if (namespacePrefix != null) {
             sb.append(namespacePrefix);
             if (name != null)
-                sb.append(":").append(name);
+                sb.append(':').append(name);
         } else
             sb.append(name);
         if (value != null)
-            sb.append("=").append(value);
+            sb.append('=').append(value);
         return sb.toString();
     }
 

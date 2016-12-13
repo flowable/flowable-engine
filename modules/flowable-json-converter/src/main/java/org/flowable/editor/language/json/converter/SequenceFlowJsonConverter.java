@@ -196,7 +196,7 @@ public class SequenceFlowJsonConverter extends BaseBpmnJsonConverter {
     }
 
     if (fieldId != null && operator != null && value != null) {
-      flow.setConditionExpression("${" + fieldId + " " + operator + " " + value + "}");
+      flow.setConditionExpression("${" + fieldId + ' ' + operator + ' ' + value + '}');
       addExtensionElement("conditionFieldId", fieldId, flow);
       addExtensionElement("conditionOperator", operator, flow);
       addExtensionElement("conditionValue", value, flow);
@@ -220,7 +220,7 @@ public class SequenceFlowJsonConverter extends BaseBpmnJsonConverter {
     }
 
     if (formId != null && operator != null && outcomeName != null) {
-      flow.setConditionExpression("${form" + formId + "outcome " + operator + " " + outcomeName + "}");
+      flow.setConditionExpression("${form" + formId + "outcome " + operator + ' ' + outcomeName + '}');
       addExtensionElement("conditionFormId", String.valueOf(formId), flow);
       addExtensionElement("conditionOperator", operator, flow);
       addExtensionElement("conditionOutcomeName", outcomeName, flow);

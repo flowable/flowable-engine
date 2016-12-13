@@ -48,7 +48,7 @@ public class DmnRestUrlBuilder {
   }
 
   public String buildUrl(String[] fragments, Object... arguments) {
-    return new StringBuilder(baseUrl).append("/").append(MessageFormat.format(StringUtils.join(fragments, '/'), arguments)).toString();
+    return new StringBuilder(baseUrl).append('/').append(MessageFormat.format(StringUtils.join(fragments, '/'), arguments)).toString();
   }
 
   /** Uses baseUrl as the base URL */

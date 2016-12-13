@@ -83,7 +83,7 @@ public class CdiBusinessProcessEvent implements BusinessProcessEvent {
 
   @Override
   public String toString() {
-    return "Event '" + processDefinition.getKey() + "' ['" + type + "', " + (type == BusinessProcessEventType.TAKE ? transitionName : activityId) + "]";
+    return "Event '" + processDefinition.getKey() + "' ['" + type + "', " + (type == BusinessProcessEventType.TAKE ? transitionName : activityId) + ']';
   }
 
   @Override

@@ -57,7 +57,7 @@ public class TimerJobEntityImpl extends AbstractJobEntityImpl implements TimerJo
 
   @Override
   public String toString() {
-    return "TimerJobEntity [id=" + id + "]";
+    return "TimerJobEntity [id=" + id + ']';
   }
 
 }

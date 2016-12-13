@@ -263,7 +263,7 @@ public class Extender implements BundleTrackerCustomizer, ServiceTrackerCustomiz
   }
 
   private String cachePath(Bundle bundle, String filePath) {
-    return Integer.toHexString(bundle.hashCode()) + "/" + filePath;
+    return Integer.toHexString(bundle.hashCode()) + '/' + filePath;
   }
 
   private URL getOverrideURLForCachePath(String privatePath) {

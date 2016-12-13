@@ -151,7 +151,7 @@ public class FormDeploymentEntityImpl extends AbstractEntityNoRevision implement
 
   @Override
   public String toString() {
-    return "FormDeploymentEntity[id=" + id + ", name=" + name + "]";
+    return "FormDeploymentEntity[id=" + id + ", name=" + name + ']';
   }
 
 }

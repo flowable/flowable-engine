@@ -193,7 +193,7 @@ public class FlowableTaskQueryService {
 
     // [4/9/2014] Used to be an or on description too, but doesn't work combined with the or query for an app.
     // (Would need a change in Flowable)
-    taskInfoQueryWrapper.getTaskInfoQuery().taskNameLikeIgnoreCase("%" + text + "%");
+    taskInfoQueryWrapper.getTaskInfoQuery().taskNameLikeIgnoreCase('%' + text + '%');
   }
 
   private void handleAssignment(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode assignmentNode, User currentUser) {

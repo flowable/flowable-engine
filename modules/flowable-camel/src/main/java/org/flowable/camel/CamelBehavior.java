@@ -133,7 +133,7 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
   }
 
   protected FlowableEndpoint createEndpoint(DelegateExecution execution) {
-    String uri = "activiti://" + getProcessDefinitionKey(execution) + ":" + execution.getCurrentActivityId();
+    String uri = "activiti://" + getProcessDefinitionKey(execution) + ':' + execution.getCurrentActivityId();
     return getEndpoint(uri);
   }
 
@@ -247,7 +247,7 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
           // Get the CamelContext object and set the super's member variable.
           Object ctx = springConfiguration.getApplicationContext().getBean(camelContextValue);
           if (ctx == null || ctx instanceof CamelContext == false) {
-            throw new FlowableException("Could not find CamelContext named " + camelContextValue + ".");
+            throw new FlowableException("Could not find CamelContext named " + camelContextValue + '.');
           }
           camelContextObj = (CamelContext) ctx;
           

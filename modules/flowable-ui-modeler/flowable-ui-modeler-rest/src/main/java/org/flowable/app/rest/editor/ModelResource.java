@@ -186,7 +186,7 @@ public class ModelResource {
       Date readValue = objectMapper.getDeserializationConfig().getDateFormat().parse(lastUpdatedString);
       lastUpdated = readValue.getTime();
     } catch (ParseException e) {
-      throw new BadRequestException("Invalid lastUpdated date: '" + lastUpdatedString + "'");
+      throw new BadRequestException("Invalid lastUpdated date: '" + lastUpdatedString + '\'');
     }
 
     Model model = modelService.getModel(modelId);

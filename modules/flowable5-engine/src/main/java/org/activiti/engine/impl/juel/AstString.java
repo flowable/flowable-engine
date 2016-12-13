@@ -32,12 +32,12 @@ public final class AstString extends AstLiteral {
 
 	@Override
 	public String toString() {
-		return "\"" + value + "\"";
+		return '"' + value + '"';
 	}	
 
 	@Override 
 	public void appendStructure(StringBuilder b, Bindings bindings) {
-		b.append("'");
+		b.append('\'');
 		int length = value.length();
 		for (int i = 0; i < length; i++) {
 			char c = value.charAt(i);
@@ -46,6 +46,6 @@ public final class AstString extends AstLiteral {
 			}
 			b.append(c);
 		}
-		b.append("'");
+		b.append('\'');
 	}
 }

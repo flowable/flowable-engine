@@ -88,7 +88,7 @@ public abstract class TestHelper {
         resources = new String[] { resource };
       }
 
-      DeploymentBuilder deploymentBuilder = processEngine.getRepositoryService().createDeployment().name(testClass.getSimpleName() + "." + methodName);
+      DeploymentBuilder deploymentBuilder = processEngine.getRepositoryService().createDeployment().name(testClass.getSimpleName() + '.' + methodName);
 
       for (String resource : resources) {
         deploymentBuilder.addClasspathResource(resource);
@@ -192,7 +192,7 @@ public abstract class TestHelper {
    */
   public static String getBpmnProcessDefinitionResource(Class<?> type, String name) {
     for (String suffix : ResourceNameUtil.BPMN_RESOURCE_SUFFIXES) {
-      String resource = type.getName().replace('.', '/') + "." + name + "." + suffix;
+      String resource = type.getName().replace('.', '/') + '.' + name + '.' + suffix;
       InputStream inputStream = ReflectUtil.getResourceAsStream(resource);
       if (inputStream == null) {
         continue;
@@ -200,7 +200,7 @@ public abstract class TestHelper {
         return resource;
       }
     }
-    return type.getName().replace('.', '/') + "." + name + "." + ResourceNameUtil.BPMN_RESOURCE_SUFFIXES[0];
+    return type.getName().replace('.', '/') + '.' + name + '.' + ResourceNameUtil.BPMN_RESOURCE_SUFFIXES[0];
   }
 
   // Engine startup and shutdown helpers

@@ -334,7 +334,7 @@ public class DbSqlSession implements Session {
 
       // Exception when no match was found: unknown/unsupported version
       if (matchingVersionIndex < 0) {
-        throw new FlowableException("Could not update Flowable IDM database schema: unknown version from database: '" + dbVersion + "'");
+        throw new FlowableException("Could not update Flowable IDM database schema: unknown version from database: '" + dbVersion + '\'');
       }
 
       isUpgradeNeeded = (matchingVersionIndex != (FLOWABLE_IDM_VERSIONS.size() - 1));
@@ -345,7 +345,7 @@ public class DbSqlSession implements Session {
         PropertyEntity dbHistoryProperty = selectById(PropertyEntity.class, "schema.history");
 
         // Set upgrade history
-        String dbHistoryValue = dbHistoryProperty.getValue() + " upgrade(" + dbVersion + "->" + IdmEngine.VERSION + ")";
+        String dbHistoryValue = dbHistoryProperty.getValue() + " upgrade(" + dbVersion + "->" + IdmEngine.VERSION + ')';
         dbHistoryProperty.setValue(dbHistoryValue);
 
         // Engine upgrade
@@ -462,7 +462,7 @@ public class DbSqlSession implements Session {
     int engineMinorVersion = Integer.valueOf(cleanEngineVersionSplitted[1]);
 
     if ((dbMajorVersion > engineMajorVersion) || ((dbMajorVersion <= engineMajorVersion) && (dbMinorVersion > engineMinorVersion))) {
-      throw new FlowableException("Version of activiti idm database (" + versionInDatabase + ") is more recent than the engine (" + IdmEngine.VERSION + ")");
+      throw new FlowableException("Version of activiti idm database (" + versionInDatabase + ") is more recent than the engine (" + IdmEngine.VERSION + ')');
     } else if (cleanDbVersion.compareTo(cleanEngineVersion) == 0) {
       // Versions don't match exactly, possibly snapshot is being used
       log.warn("IDM Engine-version is the same, but not an exact match: {} vs. {}. Not performing database-upgrade.", versionInDatabase, IdmEngine.VERSION);
@@ -515,7 +515,7 @@ public class DbSqlSession implements Session {
 
   public String getResourceForDbOperation(String directory, String operation, String component) {
     String databaseType = dbSqlSessionFactory.getDatabaseType();
-    return "org/flowable/idm/db/" + directory + "/flowable." + databaseType + "." + operation + "." + component + ".sql";
+    return "org/flowable/idm/db/" + directory + "/flowable." + databaseType + '.' + operation + '.' + component + ".sql";
   }
 
   public void executeSchemaResource(String operation, String component, String resourceName, boolean isOptional) {

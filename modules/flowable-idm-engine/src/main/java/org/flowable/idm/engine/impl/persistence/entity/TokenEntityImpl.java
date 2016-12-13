@@ -102,7 +102,7 @@ public class TokenEntityImpl extends AbstractEntity implements TokenEntity, Seri
 
   @Override
   public String toString() {
-    return "TokenEntity[tokenValue=" + tokenValue + ", userId=" + userId + "]";
+    return "TokenEntity[tokenValue=" + tokenValue + ", userId=" + userId + ']';
   }
 
 }

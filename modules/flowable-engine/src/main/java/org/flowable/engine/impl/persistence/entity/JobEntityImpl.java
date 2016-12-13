@@ -62,7 +62,7 @@ public class JobEntityImpl extends AbstractJobEntityImpl implements JobEntity {
 
   @Override
   public String toString() {
-    return "JobEntity [id=" + id + "]";
+    return "JobEntity [id=" + id + ']';
   }
 
 }

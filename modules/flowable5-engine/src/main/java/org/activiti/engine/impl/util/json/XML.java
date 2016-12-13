@@ -110,7 +110,7 @@ public class XML {
     	}
     	for (i = 0; i < length; i += 1) {
 		    if (Character.isWhitespace(string.charAt(i))) {
-		    	throw new JSONException("'" + string + 
+		    	throw new JSONException('\'' + string +
 		    			"' contains a space character.");
 		    }
 		}
@@ -429,9 +429,9 @@ public class XML {
             return b.toString();
         } else {
             s = (o == null) ? "null" : escape(o.toString());
-            return (tagName == null) ? "\"" + s + "\"" :
-                (s.length() == 0) ? "<" + tagName + "/>" :
-                "<" + tagName + ">" + s + "</" + tagName + ">";
+            return (tagName == null) ? '"' + s + '"' :
+                (s.length() == 0) ? '<' + tagName + "/>" :
+                        '<' + tagName + '>' + s + "</" + tagName + '>';
         }
     }
 }

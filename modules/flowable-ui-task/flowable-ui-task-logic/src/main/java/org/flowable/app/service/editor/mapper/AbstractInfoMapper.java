@@ -86,7 +86,7 @@ public abstract class AbstractInfoMapper implements InfoMapper {
                     listenerBuilder.append(listener.getImplementation());
                     listenerBuilder.append(" (");
                     listenerBuilder.append(listener.getImplementationType());
-                    listenerBuilder.append(")");
+                    listenerBuilder.append(')');
                 }
                 if (CollectionUtils.isNotEmpty(listener.getFieldExtensions())) {
                     listenerBuilder.append(", field extensions: ");

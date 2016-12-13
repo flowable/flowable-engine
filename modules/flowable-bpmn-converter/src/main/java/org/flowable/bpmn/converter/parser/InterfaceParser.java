@@ -34,7 +34,7 @@ public class InterfaceParser implements BpmnXMLConstants {
 
     Interface interfaceObject = new Interface();
     BpmnXMLUtil.addXMLLocation(interfaceObject, xtr);
-    interfaceObject.setId(model.getTargetNamespace() + ":" + xtr.getAttributeValue(null, ATTRIBUTE_ID));
+    interfaceObject.setId(model.getTargetNamespace() + ':' + xtr.getAttributeValue(null, ATTRIBUTE_ID));
     interfaceObject.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
     interfaceObject.setImplementationRef(parseMessageRef(xtr.getAttributeValue(null, ATTRIBUTE_IMPLEMENTATION_REF), model));
 
@@ -46,7 +46,7 @@ public class InterfaceParser implements BpmnXMLConstants {
         if (xtr.isStartElement() && ELEMENT_OPERATION.equals(xtr.getLocalName())) {
           operation = new Operation();
           BpmnXMLUtil.addXMLLocation(operation, xtr);
-          operation.setId(model.getTargetNamespace() + ":" + xtr.getAttributeValue(null, ATTRIBUTE_ID));
+          operation.setId(model.getTargetNamespace() + ':' + xtr.getAttributeValue(null, ATTRIBUTE_ID));
           operation.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
           operation.setImplementationRef(parseMessageRef(xtr.getAttributeValue(null, ATTRIBUTE_IMPLEMENTATION_REF), model));
 
@@ -91,13 +91,13 @@ public class InterfaceParser implements BpmnXMLConstants {
           // if it's an invalid prefix will consider this is not a
           // namespace prefix so will be used as part of the
           // stringReference
-          messageRef = prefix + ":" + messageRef;
+          messageRef = prefix + ':' + messageRef;
         } else if (!resolvedNamespace.equalsIgnoreCase(model.getTargetNamespace())) {
           // if it's a valid namespace prefix but it's not the
           // targetNamespace then we'll use it as a valid namespace
           // (even out editor does not support defining namespaces it
           // is still a valid xml file)
-          messageRef = resolvedNamespace + ":" + messageRef;
+          messageRef = resolvedNamespace + ':' + messageRef;
         }
       }
       result = messageRef;

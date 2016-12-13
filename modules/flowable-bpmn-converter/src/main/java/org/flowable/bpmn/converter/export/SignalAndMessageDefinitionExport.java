@@ -82,7 +82,7 @@ public class SignalAndMessageDefinitionExport implements BpmnXMLConstants {
           String namespace = model.getNamespace(prefix);
           if (itemRef.startsWith(namespace)) {
             if (prefix.isEmpty()) {
-              itemRef = itemRef.replace(namespace + ":", "");
+              itemRef = itemRef.replace(namespace + ':', "");
             } else {
               itemRef = itemRef.replace(namespace, prefix);
             }

@@ -37,7 +37,7 @@ public class ProcessInstanceLogQueryAndByteArrayTypeVariableTest extends Pluggab
 	static {
 		StringBuilder sb = new StringBuilder("a");
 		for(int i = 0; i < 4001; i++) {
-		     sb.append("a");
+		     sb.append('a');
 		}
 		LARGE_STRING_VALUE = sb.toString();
 	}

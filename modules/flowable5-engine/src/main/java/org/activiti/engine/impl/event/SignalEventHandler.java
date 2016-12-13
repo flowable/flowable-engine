@@ -53,7 +53,7 @@ public class SignalEventHandler extends AbstractEventHandler {
          
   		ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
   		if (processDefinition == null) {
-  			throw new ActivitiObjectNotFoundException("No process definition found for id '" + processDefinitionId + "'", ProcessDefinition.class);
+  			throw new ActivitiObjectNotFoundException("No process definition found for id '" + processDefinitionId + '\'', ProcessDefinition.class);
   		}
  
   		ActivityImpl startActivity = processDefinition.findActivity(eventSubscription.getActivityId());

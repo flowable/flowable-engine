@@ -119,7 +119,7 @@ public class FormDefinitionEntityImpl extends AbstractEntityNoRevision implement
   }
   
   public String toString() {
-    return "FormEntity[" + id + "]";
+    return "FormEntity[" + id + ']';
   }
 
 }

@@ -327,7 +327,7 @@ public class TimerJobEntity extends AbstractJobEntity {
     StringBuilder repeatBuilder = new StringBuilder("R");
     repeatBuilder.append(newRepeatValue);
     for (String value : expression) {
-      repeatBuilder.append("/");
+      repeatBuilder.append('/');
       repeatBuilder.append(value);
     }
     repeat = repeatBuilder.toString();

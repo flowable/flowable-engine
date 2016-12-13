@@ -194,7 +194,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
       orderBy = orderBy + ", ";
     }
 
-    String defaultOrderByClause = column + " " + sortOrder;
+    String defaultOrderByClause = column + ' ' + sortOrder;
 
     if (nullHandlingOnOrder != null) {
 
@@ -215,7 +215,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
 
         if (ProcessEngineConfigurationImpl.DATABASE_TYPE_H2.equals(databaseType) || ProcessEngineConfigurationImpl.DATABASE_TYPE_HSQL.equals(databaseType)
             || ProcessEngineConfigurationImpl.DATABASE_TYPE_POSTGRES.equals(databaseType) || ProcessEngineConfigurationImpl.DATABASE_TYPE_ORACLE.equals(databaseType)) {
-          orderBy = orderBy + column + " " + sortOrder + " NULLS LAST";
+          orderBy = orderBy + column + ' ' + sortOrder + " NULLS LAST";
         } else if (ProcessEngineConfigurationImpl.DATABASE_TYPE_MYSQL.equals(databaseType)) {
           orderBy = orderBy + "isnull(" + column + ") asc," + defaultOrderByClause;
         } else if (ProcessEngineConfigurationImpl.DATABASE_TYPE_DB2.equals(databaseType) || ProcessEngineConfigurationImpl.DATABASE_TYPE_MSSQL.equals(databaseType)) {

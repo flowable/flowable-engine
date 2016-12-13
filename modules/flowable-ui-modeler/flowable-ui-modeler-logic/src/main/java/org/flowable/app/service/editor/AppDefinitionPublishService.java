@@ -177,7 +177,7 @@ public class AppDefinitionPublishService {
         UserTask userTask = (UserTask) flowElement;
         if ("$INITIATOR".equals(userTask.getAssignee())) {
           if (startEventMap.get(process.getId()) != null) {
-            userTask.setAssignee("${" + startEventMap.get(process.getId()).getInitiator() + "}");
+            userTask.setAssignee("${" + startEventMap.get(process.getId()).getInitiator() + '}');
           }
         }
 

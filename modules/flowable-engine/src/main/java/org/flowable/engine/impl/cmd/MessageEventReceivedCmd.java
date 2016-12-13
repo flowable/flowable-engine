@@ -75,7 +75,7 @@ public class MessageEventReceivedCmd extends NeedsActiveExecutionCmd<Void> {
         findEventSubscriptionsByNameAndExecution(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, executionId);
 
     if (eventSubscriptions.isEmpty()) {
-      throw new FlowableException("Execution with id '" + executionId + "' does not have a subscription to a message event with name '" + messageName + "'");
+      throw new FlowableException("Execution with id '" + executionId + "' does not have a subscription to a message event with name '" + messageName + '\'');
     }
 
     // there can be only one:

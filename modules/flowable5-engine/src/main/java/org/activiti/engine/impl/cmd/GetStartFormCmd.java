@@ -43,12 +43,12 @@ public class GetStartFormCmd implements Command<StartFormData>, Serializable {
       .getDeploymentManager()
       .findDeployedProcessDefinitionById(processDefinitionId);
     if (processDefinition == null) {
-      throw new ActivitiObjectNotFoundException("No process definition found for id '" + processDefinitionId +"'", ProcessDefinition.class);
+      throw new ActivitiObjectNotFoundException("No process definition found for id '" + processDefinitionId + '\'', ProcessDefinition.class);
     }
     
     StartFormHandler startFormHandler = processDefinition.getStartFormHandler();
     if (startFormHandler == null) {
-      throw new ActivitiException("No startFormHandler defined in process '" + processDefinitionId +"'");
+      throw new ActivitiException("No startFormHandler defined in process '" + processDefinitionId + '\'');
     }
     
     

@@ -204,13 +204,13 @@ public class DefaultManagementAgent implements ManagementAgent {
     }
 
     // must start with leading slash
-    String path = serviceUrlPath.startsWith("/") ? serviceUrlPath : "/" + serviceUrlPath;
+    String path = serviceUrlPath.startsWith("/") ? serviceUrlPath : '/' + serviceUrlPath;
     // Create an RMI connector and start it
     final JMXServiceURL url;
     if (connectorPort > 0) {
-      url = new JMXServiceURL("service:jmx:rmi://" + host + ":" + connectorPort + "/jndi/rmi://" + host + ":" + registryPort + path);
+      url = new JMXServiceURL("service:jmx:rmi://" + host + ':' + connectorPort + "/jndi/rmi://" + host + ':' + registryPort + path);
     } else {
-      url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + host + ":" + registryPort + path);
+      url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + host + ':' + registryPort + path);
     }
 
     cs = JMXConnectorServerFactory.newJMXConnectorServer(url, null, server);

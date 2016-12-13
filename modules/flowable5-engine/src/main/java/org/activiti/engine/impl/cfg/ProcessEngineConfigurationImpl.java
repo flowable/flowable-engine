@@ -861,7 +861,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       log.debug("database product name: '{}'", databaseProductName);
       databaseType = databaseTypeMappings.getProperty(databaseProductName);
       if (databaseType==null) {
-        throw new ActivitiException("couldn't deduct database type from database product name '"+databaseProductName+"'");
+        throw new ActivitiException("couldn't deduct database type from database product name '"+databaseProductName+ '\'');
       }
       log.debug("using database type: {}", databaseType);
 
@@ -904,7 +904,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         
         String wildcardEscapeClause = "";
         if ((databaseWildcardEscapeCharacter != null) && (databaseWildcardEscapeCharacter.length() != 0)) {
-          wildcardEscapeClause = " escape '" + databaseWildcardEscapeCharacter + "'";
+          wildcardEscapeClause = " escape '" + databaseWildcardEscapeCharacter + '\'';
         }
         properties.put("wildcardEscapeClause", wildcardEscapeClause);
         
@@ -1287,7 +1287,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (defaultBpmnParseHandler.getHandledTypes().size() != 1) {
           StringBuilder supportedTypes = new StringBuilder();
           for (Class<?> type : defaultBpmnParseHandler.getHandledTypes()) {
-            supportedTypes.append(" ").append(type.getCanonicalName()).append(" ");
+            supportedTypes.append(' ').append(type.getCanonicalName()).append(' ');
           }
           throw new ActivitiException("The default BPMN parse handlers should only support one type, but " + defaultBpmnParseHandler.getClass() 
                   + " supports " + supportedTypes.toString() + ". This is likely a programmatic error");

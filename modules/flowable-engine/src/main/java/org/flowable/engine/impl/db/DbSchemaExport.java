@@ -65,13 +65,13 @@ public class DbSchemaExport {
         ResultSet columns = meta.getColumns(null, null, tableName, null);
         while (columns.next()) {
           String columnName = columns.getString(4);
-          String columnTypeAndSize = columns.getString(6) + " " + columns.getInt(7);
+          String columnTypeAndSize = columns.getString(6) + ' ' + columns.getInt(7);
           columnDescriptions.put(columnName, columnTypeAndSize);
         }
 
         System.out.println(tableName);
         for (String columnName : new TreeSet<String>(columnDescriptions.keySet())) {
-          System.out.println("  " + columnName + " " + columnDescriptions.get(columnName));
+          System.out.println("  " + columnName + ' ' + columnDescriptions.get(columnName));
         }
 
         System.out.println("INDEXES");

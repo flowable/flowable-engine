@@ -763,9 +763,9 @@ public class ExecutionImpl implements
   
   public String toString() {
     if (isProcessInstanceType()) {
-      return "ProcessInstance["+getToStringIdentity()+"]";
+      return "ProcessInstance["+getToStringIdentity()+ ']';
     } else {
-      return (isEventScope? "EventScope":"")+(isConcurrent? "Concurrent" : "")+(isScope() ? "Scope" : "")+"Execution["+getToStringIdentity()+"]";
+      return (isEventScope? "EventScope":"")+(isConcurrent? "Concurrent" : "")+(isScope() ? "Scope" : "")+"Execution["+getToStringIdentity()+ ']';
     }
   }
 

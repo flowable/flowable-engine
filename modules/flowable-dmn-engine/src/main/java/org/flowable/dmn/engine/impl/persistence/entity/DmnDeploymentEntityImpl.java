@@ -151,7 +151,7 @@ public class DmnDeploymentEntityImpl extends AbstractEntityNoRevision implements
 
   @Override
   public String toString() {
-    return "DmnDeploymentEntity[id=" + id + ", name=" + name + "]";
+    return "DmnDeploymentEntity[id=" + id + ", name=" + name + ']';
   }
 
 }

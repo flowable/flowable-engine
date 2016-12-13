@@ -454,7 +454,7 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
         JsonNode idNode = fieldNode.get("id");
         if (idNode != null && idNode.isNull() == false && StringUtils.isNotEmpty(idNode.asText())) {
           String id = idNode.asText();
-          candidateUsers.add("field(" + id + ")");
+          candidateUsers.add("field(" + id + ')');
 
           addExtensionElement("user-field-info-name-" + id, fieldNode.get("name"), task);
         }
@@ -500,7 +500,7 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
         JsonNode idNode = fieldNode.get("id");
         if (idNode != null && idNode.isNull() == false && StringUtils.isNotEmpty(idNode.asText())) {
           String id = idNode.asText();
-          candidateGroups.add("field(" + id + ")");
+          candidateGroups.add("field(" + id + ')');
 
           addExtensionElement("group-field-info-name-" + id, fieldNode.get("name"), task);
         }

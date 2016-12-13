@@ -216,7 +216,7 @@ public class ProcessDefinitionEntityImpl extends AbstractEntity implements Proce
   }
   
   public String toString() {
-    return "ProcessDefinitionEntity[" + id + "]";
+    return "ProcessDefinitionEntity[" + id + ']';
   }
 
 }

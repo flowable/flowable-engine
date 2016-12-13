@@ -37,9 +37,9 @@ public final class AstNested extends AstRightValue {
 
 	@Override
 	public void appendStructure(StringBuilder b, Bindings bindings) {
-		b.append("(");
+		b.append('(');
 		child.appendStructure(b, bindings);
-		b.append(")");
+		b.append(')');
 	}
 
 	public int getCardinality() {

@@ -84,7 +84,7 @@ public class TaskResource extends TaskBaseResource {
           notes="## Complete a task - Request Body\n\n"
                   + " ```JSON\n" + "{\n" + "  \"action\" : \"complete\",\n" + "  \"variables\" : []\n" + "} ```"
                   + "Completes the task. Optional variable array can be passed in using the variables property. More information about the variable format can be found in the REST variables section. Note that the variable-scope that is supplied is ignored and the variables are set on the parent-scope unless a variable exists in a local scope, which is overridden in this case. This is the same behavior as the TaskService.completeTask(taskId, variables) invocation.\n"
-                  + "\n"
+                  + '\n'
                   + "Note that also a transientVariables property is accepted as part of this json, that follows the same structure as the variables property."
                   + "\n\n\n"
                   + "## Claim a task - Request Body \n\n"

@@ -23,7 +23,7 @@ public class MvelConclusionExpressionPreParser implements MvelExpressionPreParse
         if (expression.startsWith(".")) {
             parsedExpression += expression;
         } else {
-            parsedExpression += " " + expression;
+            parsedExpression += ' ' + expression;
         }
         return parsedExpression;
     }

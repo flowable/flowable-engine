@@ -38,7 +38,7 @@ public class ScriptCondition implements Condition {
       throw new FlowableException("condition script returns null: " + expression);
     }
     if (!(result instanceof Boolean)) {
-      throw new FlowableException("condition script returns non-Boolean: " + result + " (" + result.getClass().getName() + ")");
+      throw new FlowableException("condition script returns non-Boolean: " + result + " (" + result.getClass().getName() + ')');
     }
     return (Boolean) result;
   }

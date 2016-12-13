@@ -75,7 +75,7 @@ public class DeploymentManager {
     if (processDefinition == null) {
       processDefinition = processDefinitionEntityManager.findById(processDefinitionId);
       if (processDefinition == null) {
-        throw new FlowableObjectNotFoundException("no deployed process definition found with id '" + processDefinitionId + "'", ProcessDefinition.class);
+        throw new FlowableObjectNotFoundException("no deployed process definition found with id '" + processDefinitionId + '\'', ProcessDefinition.class);
       }
       processDefinition = resolveProcessDefinition(processDefinition).getProcessDefinition();
     }
@@ -86,7 +86,7 @@ public class DeploymentManager {
     ProcessDefinition processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKey(processDefinitionKey);
 
     if (processDefinition == null) {
-      throw new FlowableObjectNotFoundException("no processes deployed with key '" + processDefinitionKey + "'", ProcessDefinition.class);
+      throw new FlowableObjectNotFoundException("no processes deployed with key '" + processDefinitionKey + '\'', ProcessDefinition.class);
     }
     processDefinition = resolveProcessDefinition(processDefinition).getProcessDefinition();
     return processDefinition;
@@ -95,7 +95,7 @@ public class DeploymentManager {
   public ProcessDefinition findDeployedLatestProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId) {
     ProcessDefinition processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
     if (processDefinition == null) {
-      throw new FlowableObjectNotFoundException("no processes deployed with key '" + processDefinitionKey + "' for tenant identifier '" + tenantId + "'", ProcessDefinition.class);
+      throw new FlowableObjectNotFoundException("no processes deployed with key '" + processDefinitionKey + "' for tenant identifier '" + tenantId + '\'', ProcessDefinition.class);
     }
     processDefinition = resolveProcessDefinition(processDefinition).getProcessDefinition();
     return processDefinition;
@@ -105,7 +105,7 @@ public class DeploymentManager {
     ProcessDefinition processDefinition = (ProcessDefinitionEntity) processDefinitionEntityManager
         .findProcessDefinitionByKeyAndVersionAndTenantId(processDefinitionKey, processDefinitionVersion, tenantId);
     if (processDefinition == null) {
-      throw new FlowableObjectNotFoundException("no processes deployed with key = '" + processDefinitionKey + "' and version = '" + processDefinitionVersion + "'", ProcessDefinition.class);
+      throw new FlowableObjectNotFoundException("no processes deployed with key = '" + processDefinitionKey + "' and version = '" + processDefinitionVersion + '\'', ProcessDefinition.class);
     }
     processDefinition = resolveProcessDefinition(processDefinition).getProcessDefinition();
     return processDefinition;
@@ -159,7 +159,7 @@ public class DeploymentManager {
         deploy(deployment, null);
       
       } else {
-        throw new FlowableException("No .app resource found for deployment '" + deploymentId + "'");
+        throw new FlowableException("No .app resource found for deployment '" + deploymentId + '\'');
       }
       
       appResourceObject = appResourceCache.get(deploymentId);

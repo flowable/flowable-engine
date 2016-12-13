@@ -43,7 +43,7 @@ public class ProgrammaticBeanLookup {
   public static Object lookup(String name, BeanManager bm) {
     Set<Bean<?>> beans = bm.getBeans(name);
     if (beans.isEmpty()) {
-      throw new IllegalStateException("CDI BeanManager cannot find an instance of requested type '" + name + "'");
+      throw new IllegalStateException("CDI BeanManager cannot find an instance of requested type '" + name + '\'');
     }
     Bean bean = bm.resolve(beans);
     CreationalContext ctx = bm.createCreationalContext(bean);

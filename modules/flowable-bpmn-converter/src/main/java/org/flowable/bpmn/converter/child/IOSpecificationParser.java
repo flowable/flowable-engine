@@ -93,9 +93,9 @@ public class IOSpecificationParser extends BaseChildElementParser {
       if (indexOfP != -1) {
         String prefix = itemSubjectRef.substring(0, indexOfP);
         String resolvedNamespace = model.getNamespace(prefix);
-        result = resolvedNamespace + ":" + itemSubjectRef.substring(indexOfP + 1);
+        result = resolvedNamespace + ':' + itemSubjectRef.substring(indexOfP + 1);
       } else {
-        result = model.getTargetNamespace() + ":" + itemSubjectRef;
+        result = model.getTargetNamespace() + ':' + itemSubjectRef;
       }
     }
     return result;

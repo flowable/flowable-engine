@@ -45,7 +45,7 @@ public class DeleteProcessInstanceCmd implements Command<Void>, Serializable {
     ExecutionEntity processInstanceEntity = commandContext.getExecutionEntityManager().findById(processInstanceId);
     
     if (processInstanceEntity == null) {
-      throw new FlowableObjectNotFoundException("No process instance found for id '" + processInstanceId + "'", ProcessInstance.class);
+      throw new FlowableObjectNotFoundException("No process instance found for id '" + processInstanceId + '\'', ProcessInstance.class);
     }
     
     if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processInstanceEntity.getProcessDefinitionId())) {

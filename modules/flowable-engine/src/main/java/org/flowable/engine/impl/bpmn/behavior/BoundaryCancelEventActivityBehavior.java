@@ -64,7 +64,7 @@ public class BoundaryCancelEventActivityBehavior extends BoundaryEventActivityBe
       leave(execution);
     } else {
       
-      String deleteReason = DeleteReason.BOUNDARY_EVENT_INTERRUPTING + "(" + boundaryEvent.getId() + ")";
+      String deleteReason = DeleteReason.BOUNDARY_EVENT_INTERRUPTING + '(' + boundaryEvent.getId() + ')';
       
       // cancel boundary is always sync
       ScopeUtil.throwCompensationEvent(eventSubscriptions, execution, false);

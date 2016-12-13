@@ -41,7 +41,7 @@ public class SetDecisionTableCategoryCmd implements Command<Void> {
     DecisionTableEntity decisionTable = commandContext.getDecisionTableEntityManager().findById(decisionTableId);
 
     if (decisionTable == null) {
-      throw new FlowableObjectNotFoundException("No decision table found for id = '" + decisionTableId + "'");
+      throw new FlowableObjectNotFoundException("No decision table found for id = '" + decisionTableId + '\'');
     }
 
     // Update category

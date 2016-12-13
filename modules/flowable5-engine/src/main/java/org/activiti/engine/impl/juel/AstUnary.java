@@ -62,7 +62,7 @@ public class AstUnary extends AstRightValue {
 
 	@Override
 	public String toString() {
-		return "'" + operator.toString() + "'";
+		return '\'' + operator.toString() + '\'';
 	}	
 
 	@Override

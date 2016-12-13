@@ -61,7 +61,7 @@ public abstract class FormTestHelper {
         resources = new String[] { resource };
       }
 
-      FormDeploymentBuilder deploymentBuilder = formEngine.getFormRepositoryService().createDeployment().name(testClass.getSimpleName() + "." + methodName);
+      FormDeploymentBuilder deploymentBuilder = formEngine.getFormRepositoryService().createDeployment().name(testClass.getSimpleName() + '.' + methodName);
 
       for (String resource : resources) {
         deploymentBuilder.addClasspathResource(resource);
@@ -90,7 +90,7 @@ public abstract class FormTestHelper {
    */
   public static String getFormResource(Class<?> type, String name) {
     for (String suffix : ParsedDeploymentBuilder.FORM_RESOURCE_SUFFIXES) {
-      String resource = type.getName().replace('.', '/') + "." + name + "." + suffix;
+      String resource = type.getName().replace('.', '/') + '.' + name + '.' + suffix;
       InputStream inputStream = FormTestHelper.class.getClassLoader().getResourceAsStream(resource);
       if (inputStream == null) {
         continue;
@@ -98,7 +98,7 @@ public abstract class FormTestHelper {
         return resource;
       }
     }
-    return type.getName().replace('.', '/') + "." + name + "." + ParsedDeploymentBuilder.FORM_RESOURCE_SUFFIXES[0];
+    return type.getName().replace('.', '/') + '.' + name + '.' + ParsedDeploymentBuilder.FORM_RESOURCE_SUFFIXES[0];
   }
 
   // Engine startup and shutdown helpers

@@ -79,7 +79,7 @@ public class CxfWSDLImporter implements XMLImporter {
   }
   
   public void importFrom(Import theImport, String sourceSystemId) {
-    this.namespace = theImport.getNamespace() == null ? "" : theImport.getNamespace() + ":";
+    this.namespace = theImport.getNamespace() == null ? "" : theImport.getNamespace() + ':';
     try {
       final URIResolver uriResolver = new URIResolver(sourceSystemId, theImport.getLocation());
       if (uriResolver.isResolved()) {

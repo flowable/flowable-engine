@@ -27,7 +27,7 @@ public class ItemDefinitionParser implements BpmnXMLConstants {
 
   public void parse(XMLStreamReader xtr, BpmnModel model) throws Exception {
     if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_ID))) {
-      String itemDefinitionId = model.getTargetNamespace() + ":" + xtr.getAttributeValue(null, ATTRIBUTE_ID);
+      String itemDefinitionId = model.getTargetNamespace() + ':' + xtr.getAttributeValue(null, ATTRIBUTE_ID);
       String structureRef = xtr.getAttributeValue(null, ATTRIBUTE_STRUCTURE_REF);
       if (StringUtils.isNotEmpty(structureRef)) {
         ItemDefinition item = new ItemDefinition();
@@ -38,9 +38,9 @@ public class ItemDefinitionParser implements BpmnXMLConstants {
         if (indexOfP != -1) {
           String prefix = structureRef.substring(0, indexOfP);
           String resolvedNamespace = model.getNamespace(prefix);
-          structureRef = resolvedNamespace + ":" + structureRef.substring(indexOfP + 1);
+          structureRef = resolvedNamespace + ':' + structureRef.substring(indexOfP + 1);
         } else {
-          structureRef = model.getTargetNamespace() + ":" + structureRef;
+          structureRef = model.getTargetNamespace() + ':' + structureRef;
         }
 
         item.setStructureRef(structureRef);

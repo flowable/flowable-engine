@@ -35,13 +35,13 @@ public final class LocalMessages {
 			} catch (MissingResourceException e2) {}
 			b.append(key);
 			if (args != null && args.length > 0) {
-				b.append("(");
+				b.append('(');
 				b.append(args[0]);
 				for (int i = 1; i < args.length; i++) {
 					b.append(", ");
 					b.append(args[i]);
 				}
-				b.append(")");
+				b.append(')');
 			}
 			return b.toString();
 		}

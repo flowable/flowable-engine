@@ -69,7 +69,7 @@ public class DebugInfoExecutionTree {
         strb.append(" in flow element ");
 
         if (activityId != null) {
-          strb.append("'").append(activityId).append("'");
+          strb.append('\'').append(activityId).append('\'');
         }
 
         if (activityName != null) {

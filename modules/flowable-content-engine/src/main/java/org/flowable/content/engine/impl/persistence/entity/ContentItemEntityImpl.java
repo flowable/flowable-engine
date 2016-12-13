@@ -178,7 +178,7 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
   }
   
   public String toString() {
-    return "ContentItemEntity[" + id + "]";
+    return "ContentItemEntity[" + id + ']';
   }
 
 }

@@ -67,16 +67,16 @@ public class TaskVariableResource extends TaskVariableBaseResource {
           + " ```JSON\n" + "{\n" + "  \"name\" : \"myTaskVariable\",\n" + "  \"scope\" : \"local\",\n" + "  \"type\" : \"string\",\n"
                   + "  \"value\" : \"Hello my friend\"\n" + "} ```"
           + "\n\n\n"
-          + "- *name*: Required name of the variable\n" + "\n"
-          + "- *scope*: Scope of variable that is updated. If omitted, local is assumed.\n" + "\n"
-          + "- *type*: Type of variable that is updated. If omitted, reverts to raw JSON-value type (string, boolean, integer or double).\n" + "\n"
+          + "- *name*: Required name of the variable\n" + '\n'
+          + "- *scope*: Scope of variable that is updated. If omitted, local is assumed.\n" + '\n'
+          + "- *type*: Type of variable that is updated. If omitted, reverts to raw JSON-value type (string, boolean, integer or double).\n" + '\n'
           + "- *value*: Variable value."
           + "\n\n\n"
           + "## Request body for updating simple (non-binary) variables\n\n"
           + "The request should be of type multipart/form-data. There should be a single file-part included with the binary value of the variable. On top of that, the following additional form-fields can be present:\n"
-          + "\n"
-          + "- *name*: Required name of the variable.\n" + "\n"
-          + "- *scope*: Scope of variable that is updated. If omitted, local is assumed.\n" + "\n"
+          + '\n'
+          + "- *name*: Required name of the variable.\n" + '\n'
+          + "- *scope*: Scope of variable that is updated. If omitted, local is assumed.\n" + '\n'
           + "- *type*: Type of variable that is updated. If omitted, binary is assumed and the binary data in the request will be stored as an array of bytes."
   )
   @ApiImplicitParams(

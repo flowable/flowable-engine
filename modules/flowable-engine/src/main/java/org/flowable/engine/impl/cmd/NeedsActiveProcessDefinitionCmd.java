@@ -39,7 +39,7 @@ public abstract class NeedsActiveProcessDefinitionCmd<T> implements Command<T>, 
     ProcessDefinitionEntity processDefinition = ProcessDefinitionUtil.getProcessDefinitionFromDatabase(processDefinitionId);
 
     if (processDefinition == null) {
-      throw new FlowableObjectNotFoundException("No process definition found for id = '" + processDefinitionId + "'", ProcessDefinition.class);
+      throw new FlowableObjectNotFoundException("No process definition found for id = '" + processDefinitionId + '\'', ProcessDefinition.class);
     }
 
     if (processDefinition.isSuspended()) {

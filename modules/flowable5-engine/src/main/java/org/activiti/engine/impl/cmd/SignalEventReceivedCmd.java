@@ -77,7 +77,7 @@ public class SignalEventReceivedCmd implements Command<Void> {
       ExecutionEntity execution = commandContext.getExecutionEntityManager().findExecutionById(executionId);
       
       if (execution == null) {
-        throw new ActivitiObjectNotFoundException("Cannot find execution with id '" + executionId + "'", Execution.class);
+        throw new ActivitiObjectNotFoundException("Cannot find execution with id '" + executionId + '\'', Execution.class);
       }
       
       if (execution.isSuspended()) {

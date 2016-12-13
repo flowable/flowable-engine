@@ -690,7 +690,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
       StringBuilder expressionBuilder = new StringBuilder();
       for (String singleItem : stringList) {
         if (expressionBuilder.length() > 0) {
-          expressionBuilder.append(",");
+          expressionBuilder.append(',');
         }
         expressionBuilder.append(singleItem);
       }

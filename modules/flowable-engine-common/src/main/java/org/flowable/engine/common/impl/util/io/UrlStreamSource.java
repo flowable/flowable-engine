@@ -34,7 +34,7 @@ public class UrlStreamSource implements StreamSource {
     try {
       return new BufferedInputStream(url.openStream());
     } catch (IOException e) {
-      throw new FlowableIllegalArgumentException("couldn't open url '" + url + "'", e);
+      throw new FlowableIllegalArgumentException("couldn't open url '" + url + '\'', e);
     }
   }
 }

@@ -291,7 +291,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     if (byteArrayRef.getId() != null) {
       sb.append(", byteArrayValueId=").append(byteArrayRef.getId());
     }
-    sb.append("]");
+    sb.append(']');
     return sb.toString();
   }
   

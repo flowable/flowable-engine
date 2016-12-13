@@ -124,7 +124,7 @@ public class ScriptingEngines {
     }
 
     if (scriptEngine == null) {
-      throw new FlowableException("Can't find scripting engine for '" + language + "'");
+      throw new FlowableException("Can't find scripting engine for '" + language + '\'');
     }
     return scriptEngine;
   }

@@ -55,7 +55,7 @@ public class DeleteTimerJobCmd implements Command<Object>, Serializable {
 
     TimerJobEntity job = commandContext.getTimerJobEntityManager().findById(timerJobId);
     if (job == null) {
-      throw new FlowableObjectNotFoundException("No timer job found with id '" + timerJobId + "'", Job.class);
+      throw new FlowableObjectNotFoundException("No timer job found with id '" + timerJobId + '\'', Job.class);
     }
 
     // We need to check if the job was locked, ie acquired by the job acquisition thread

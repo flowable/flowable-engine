@@ -74,7 +74,7 @@ public class DeploymentManager {
         .getProcessDefinitionEntityManager()
         .findProcessDefinitionById(processDefinitionId);
       if (processDefinition == null) {
-        throw new ActivitiObjectNotFoundException("no deployed process definition found with id '" + processDefinitionId + "'", ProcessDefinition.class);
+        throw new ActivitiObjectNotFoundException("no deployed process definition found with id '" + processDefinitionId + '\'', ProcessDefinition.class);
       }
       processDefinition = resolveProcessDefinition(processDefinition).getProcessDefinition();
       
@@ -94,7 +94,7 @@ public class DeploymentManager {
         .findProcessDefinitionById(processDefinitionId);
     
     if (processDefinition == null) {
-      throw new ActivitiObjectNotFoundException("no deployed process definition found with id '" + processDefinitionId + "'", ProcessDefinition.class);
+      throw new ActivitiObjectNotFoundException("no deployed process definition found with id '" + processDefinitionId + '\'', ProcessDefinition.class);
     }
     
     return processDefinition;
@@ -115,7 +115,7 @@ public class DeploymentManager {
     if (bpmnModel == null) {
       ProcessDefinition processDefinition = findDeployedProcessDefinitionById(processDefinitionId);
       if (processDefinition == null) {
-        throw new ActivitiObjectNotFoundException("no deployed process definition found with id '" + processDefinitionId + "'", ProcessDefinition.class);
+        throw new ActivitiObjectNotFoundException("no deployed process definition found with id '" + processDefinitionId + '\'', ProcessDefinition.class);
       }
       
       // Fetch the resource
@@ -128,7 +128,7 @@ public class DeploymentManager {
               + processDefinition.getDeploymentId(), Deployment.class);
         } else {
           throw new ActivitiObjectNotFoundException("no resource found with name '" + resourceName 
-                  + "' in deployment '" + processDefinition.getDeploymentId() + "'", InputStream.class);
+                  + "' in deployment '" + processDefinition.getDeploymentId() + '\'', InputStream.class);
         }
       }
       
@@ -147,7 +147,7 @@ public class DeploymentManager {
       .findLatestProcessDefinitionByKey(processDefinitionKey);
     
     if (processDefinition==null) {
-      throw new ActivitiObjectNotFoundException("no processes deployed with key '"+processDefinitionKey+"'", ProcessDefinition.class);
+      throw new ActivitiObjectNotFoundException("no processes deployed with key '"+processDefinitionKey+ '\'', ProcessDefinition.class);
     }
     processDefinition = resolveProcessDefinition(processDefinition).getProcessDefinition();
     return processDefinition;
@@ -159,7 +159,7 @@ public class DeploymentManager {
       .getProcessDefinitionEntityManager()
       .findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
     if (processDefinition==null) {
-      throw new ActivitiObjectNotFoundException("no processes deployed with key '"+processDefinitionKey+"' for tenant identifier '" + tenantId + "'", ProcessDefinition.class);
+      throw new ActivitiObjectNotFoundException("no processes deployed with key '"+processDefinitionKey+"' for tenant identifier '" + tenantId + '\'', ProcessDefinition.class);
     }
     processDefinition = resolveProcessDefinition(processDefinition).getProcessDefinition();
     return processDefinition;
@@ -171,7 +171,7 @@ public class DeploymentManager {
       .getProcessDefinitionEntityManager()
       .findProcessDefinitionByKeyAndVersion(processDefinitionKey, processDefinitionVersion);
     if (processDefinition==null) {
-      throw new ActivitiObjectNotFoundException("no processes deployed with key = '" + processDefinitionKey + "' and version = '" + processDefinitionVersion + "'", ProcessDefinition.class);
+      throw new ActivitiObjectNotFoundException("no processes deployed with key = '" + processDefinitionKey + "' and version = '" + processDefinitionVersion + '\'', ProcessDefinition.class);
     }
     processDefinition = resolveProcessDefinition(processDefinition).getProcessDefinition();
     return processDefinition;

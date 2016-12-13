@@ -47,7 +47,7 @@ public class SetProcessDefinitionCategoryCmd implements Command<Void> {
     ProcessDefinitionEntity processDefinition = commandContext.getProcessDefinitionEntityManager().findById(processDefinitionId);
 
     if (processDefinition == null) {
-      throw new FlowableObjectNotFoundException("No process definition found for id = '" + processDefinitionId + "'", ProcessDefinition.class);
+      throw new FlowableObjectNotFoundException("No process definition found for id = '" + processDefinitionId + '\'', ProcessDefinition.class);
     }
     
     if (Flowable5Util.isFlowable5ProcessDefinition(commandContext, processDefinition)) {

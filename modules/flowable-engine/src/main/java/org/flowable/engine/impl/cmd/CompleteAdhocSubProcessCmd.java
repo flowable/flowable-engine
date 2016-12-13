@@ -42,7 +42,7 @@ public class CompleteAdhocSubProcessCmd implements Command<Void>, Serializable {
     ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
     ExecutionEntity execution = executionEntityManager.findById(executionId);
     if (execution == null) {
-      throw new FlowableObjectNotFoundException("No execution found for id '" + executionId + "'", ExecutionEntity.class);
+      throw new FlowableObjectNotFoundException("No execution found for id '" + executionId + '\'', ExecutionEntity.class);
     }
     
     if (execution.getCurrentFlowElement() instanceof AdhocSubProcess == false) {

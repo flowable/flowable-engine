@@ -109,7 +109,7 @@ public class AdvancedCycleBusinessCalendar extends CycleBusinessCalendar {
   }
 
   private String getValueFrom(String field, String duedateDescription) {
-    int fieldIndex = duedateDescription.indexOf(field + ":");
+    int fieldIndex = duedateDescription.indexOf(field + ':');
 
     if (fieldIndex > -1) {
       int nextWhiteSpace = duedateDescription.indexOf(" ", fieldIndex);
@@ -127,7 +127,7 @@ public class AdvancedCycleBusinessCalendar extends CycleBusinessCalendar {
   }
 
   private String removeValueFrom(String field, String duedateDescription) {
-    int fieldIndex = duedateDescription.indexOf(field + ":");
+    int fieldIndex = duedateDescription.indexOf(field + ':');
 
     if (fieldIndex > -1) {
       int nextWhiteSpace = duedateDescription.indexOf(" ", fieldIndex);

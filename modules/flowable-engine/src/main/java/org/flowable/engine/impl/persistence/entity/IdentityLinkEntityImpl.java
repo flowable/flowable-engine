@@ -193,7 +193,7 @@ public class IdentityLinkEntityImpl extends AbstractEntityNoRevision implements 
     if (processDefId != null) {
       sb.append(", processDefId=").append(processDefId);
     }
-    sb.append("]");
+    sb.append(']');
     return sb.toString();
   }
 }

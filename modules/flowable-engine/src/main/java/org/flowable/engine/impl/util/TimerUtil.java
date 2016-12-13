@@ -72,7 +72,7 @@ public class TimerUtil {
     }
 
     if (expression == null) {
-      throw new FlowableException("Timer needs configuration (either timeDate, timeCycle or timeDuration is needed) (" + timerEventDefinition.getId() + ")");
+      throw new FlowableException("Timer needs configuration (either timeDate, timeCycle or timeDuration is needed) (" + timerEventDefinition.getId() + ')');
     }
 
     BusinessCalendar businessCalendar = processEngineConfiguration.getBusinessCalendarManager().getBusinessCalendar(businessCalendarRef);
@@ -156,7 +156,7 @@ public class TimerUtil {
   public static String prepareRepeat(String dueDate) {
     if (dueDate.startsWith("R") && dueDate.split("/").length == 2) {
       SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-      return dueDate.replace("/", "/" + sdf.format(Context.getProcessEngineConfiguration().getClock().getCurrentTime()) + "/");
+      return dueDate.replace("/", '/' + sdf.format(Context.getProcessEngineConfiguration().getClock().getCurrentTime()) + '/');
     }
     return dueDate;
   }

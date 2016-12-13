@@ -237,7 +237,7 @@ public class DmnJsonConverter {
                         ruleInputClauseContainer.setInputClause(ruleInputContainerMap.get(id));
 
                         UnaryTests inputEntry = new UnaryTests();
-                        inputEntry.setId("inputEntry_" + id + "_" + ruleCounter);
+                        inputEntry.setId("inputEntry_" + id + '_' + ruleCounter);
                         inputEntry.setText(ruleNode.get(id).asText());
 
                         ruleInputClauseContainer.setInputEntry(inputEntry);
@@ -251,7 +251,7 @@ public class DmnJsonConverter {
                         ruleOutputClauseContainer.setOutputClause(ruleOutputContainerMap.get(id));
 
                         LiteralExpression outputEntry = new LiteralExpression();
-                        outputEntry.setId("outputEntry_" + id + "_" + ruleCounter);
+                        outputEntry.setId("outputEntry_" + id + '_' + ruleCounter);
                         outputEntry.setText(ruleNode.get(id).asText());
 
                         ruleOutputClauseContainer.setOutputEntry(outputEntry);

@@ -119,7 +119,7 @@ public final class ObjectValueExpression extends org.activiti.engine.impl.javax.
 
 	@Override
 	public String toString() {
-		return "ValueExpression(" + object + ")";
+		return "ValueExpression(" + object + ')';
 	}
 
 	@Override

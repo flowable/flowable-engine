@@ -45,7 +45,7 @@ public class SetDeploymentCategoryCmd implements Command<Void> {
             .findDeploymentById(deploymentId);
 
     if (deployment == null) {
-      throw new ActivitiObjectNotFoundException("No deployment found for id = '" + deploymentId + "'", Deployment.class);
+      throw new ActivitiObjectNotFoundException("No deployment found for id = '" + deploymentId + '\'', Deployment.class);
     }
     
     // Update category

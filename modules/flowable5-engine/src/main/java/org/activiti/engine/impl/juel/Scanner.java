@@ -103,7 +103,7 @@ public class Scanner {
 		}
 		@Override
 		public String toString() {
-			return string == null ? "<" + name() + ">" : string;
+			return string == null ? '<' + name() + '>' : string;
 		}
 	}
 
@@ -416,7 +416,7 @@ public class Scanner {
 			return keyword == null ? token(Symbol.IDENTIFIER, name, i - position) : keyword;
 		}
 
-		throw new ScanException(position, "invalid character '" + c1 + "'", "expression token");
+		throw new ScanException(position, "invalid character '" + c1 + '\'', "expression token");
 	}
 	
 	protected Token nextToken() throws ScanException {

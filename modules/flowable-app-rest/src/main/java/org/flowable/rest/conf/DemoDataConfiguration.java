@@ -200,7 +200,7 @@ public class DemoDataConfiguration {
     StringBuilder strb = new StringBuilder();
     for (int i = 0; i < length; i++) {
       strb.append(words[random.nextInt(words.length)]);
-      strb.append(" ");
+      strb.append(' ');
     }
     return strb.toString().trim();
   }

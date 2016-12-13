@@ -125,7 +125,7 @@ public class HistoricActivityInstanceEntityImpl extends HistoricScopeInstanceEnt
 
   @Override
   public String toString() {
-    return "HistoricActivityInstanceEntity[id=" + id + ", activityId=" + activityId + ", activityName=" + activityName + "]";
+    return "HistoricActivityInstanceEntity[id=" + id + ", activityId=" + activityId + ", activityName=" + activityName + ']';
   }
 
 }

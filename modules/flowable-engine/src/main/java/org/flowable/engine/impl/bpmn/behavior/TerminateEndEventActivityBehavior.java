@@ -224,7 +224,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
   }
   
   protected String createDeleteReason(String activityId) {
-    return DeleteReason.TERMINATE_END_EVENT + " (" + activityId + ")";
+    return DeleteReason.TERMINATE_END_EVENT + " (" + activityId + ')';
   }
 
   public boolean isTerminateAll() {

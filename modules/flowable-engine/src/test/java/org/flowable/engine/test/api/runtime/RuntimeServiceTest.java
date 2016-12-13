@@ -63,7 +63,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     Map<String, Object> vars = new HashMap<String, Object>();
     StringBuilder longString = new StringBuilder();
     for (int i = 0; i < 4001; i++) {
-      longString.append("c");
+      longString.append('c');
     }
     vars.put("longString", longString.toString());
     runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);

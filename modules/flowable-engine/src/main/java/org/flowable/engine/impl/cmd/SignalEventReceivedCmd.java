@@ -76,7 +76,7 @@ public class SignalEventReceivedCmd implements Command<Void> {
       ExecutionEntity execution = commandContext.getExecutionEntityManager().findById(executionId);
 
       if (execution == null) {
-        throw new FlowableObjectNotFoundException("Cannot find execution with id '" + executionId + "'", Execution.class);
+        throw new FlowableObjectNotFoundException("Cannot find execution with id '" + executionId + '\'', Execution.class);
       }
 
       if (execution.isSuspended()) {

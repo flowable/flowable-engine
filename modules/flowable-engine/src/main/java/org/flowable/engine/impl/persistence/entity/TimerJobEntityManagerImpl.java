@@ -222,7 +222,7 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
     StringBuilder repeatBuilder = new StringBuilder("R");
     repeatBuilder.append(newRepeatValue);
     for (String value : expression) {
-      repeatBuilder.append("/");
+      repeatBuilder.append('/');
       repeatBuilder.append(value);
     }
     timerEntity.setRepeat(repeatBuilder.toString());

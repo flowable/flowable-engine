@@ -45,7 +45,7 @@ public class DeleteJobCmd implements Command<Object>, Serializable {
 
     JobEntity job = commandContext.getJobEntityManager().findJobById(jobId);
     if (job == null) {
-      throw new ActivitiObjectNotFoundException("No job found with id '" + jobId + "'", Job.class);
+      throw new ActivitiObjectNotFoundException("No job found with id '" + jobId + '\'', Job.class);
     }
 
     // We need to check if the job was locked, ie acquired by the job acquisition thread

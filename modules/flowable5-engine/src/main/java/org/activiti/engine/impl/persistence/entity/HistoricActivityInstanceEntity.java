@@ -119,7 +119,7 @@ public class HistoricActivityInstanceEntity extends HistoricScopeInstanceEntity 
 
 	@Override
   public String toString() {
-    return "HistoricActivityInstanceEntity[activityId=" + activityId + ", activityName=" + activityName + "]";
+    return "HistoricActivityInstanceEntity[activityId=" + activityId + ", activityName=" + activityName + ']';
   }
 
 }

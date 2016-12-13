@@ -43,14 +43,14 @@ public class AstParameters extends AstRightValue {
 
 	@Override 
 	public void appendStructure(StringBuilder builder, Bindings bindings) {
-		builder.append("(");
+		builder.append('(');
 		for (int i = 0; i < nodes.size(); i++) {
 			if (i > 0) {
 				builder.append(", ");
 			}
 			nodes.get(i).appendStructure(builder, bindings);
 		}
-		builder.append(")");
+		builder.append(')');
 	}
 
 	public int getCardinality() {

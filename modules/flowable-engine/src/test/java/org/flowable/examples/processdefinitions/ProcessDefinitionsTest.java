@@ -35,11 +35,11 @@ public class ProcessDefinitionsTest extends PluggableFlowableTestCase {
 
   public void testGetProcessDefinitions() {
     List<String> deploymentIds = new ArrayList<String>();
-    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report 1' />" + "</definitions>")));
-    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report 2' />" + "</definitions>")));
-    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report 3' />" + "</definitions>")));
-    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='EN' name='Expense Note 1' />" + "</definitions>")));
-    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='EN' name='Expense Note 2' />" + "</definitions>")));
+    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + ' ' + TARGET_NAMESPACE + '>' + "  <process id='IDR' name='Insurance Damage Report 1' />" + "</definitions>")));
+    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + ' ' + TARGET_NAMESPACE + '>' + "  <process id='IDR' name='Insurance Damage Report 2' />" + "</definitions>")));
+    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + ' ' + TARGET_NAMESPACE + '>' + "  <process id='IDR' name='Insurance Damage Report 3' />" + "</definitions>")));
+    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + ' ' + TARGET_NAMESPACE + '>' + "  <process id='EN' name='Expense Note 1' />" + "</definitions>")));
+    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + ' ' + TARGET_NAMESPACE + '>' + "  <process id='EN' name='Expense Note 2' />" + "</definitions>")));
 
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionKey().asc().orderByProcessDefinitionVersion().desc().list();
 
@@ -116,8 +116,8 @@ public class ProcessDefinitionsTest extends PluggableFlowableTestCase {
 
   public void testDeployIdenticalProcessDefinitions() {
     List<String> deploymentIds = new ArrayList<String>();
-    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report' />" + "</definitions>")));
-    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report' />" + "</definitions>")));
+    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + ' ' + TARGET_NAMESPACE + '>' + "  <process id='IDR' name='Insurance Damage Report' />" + "</definitions>")));
+    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + ' ' + TARGET_NAMESPACE + '>' + "  <process id='IDR' name='Insurance Damage Report' />" + "</definitions>")));
 
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionKey().asc().orderByProcessDefinitionVersion().desc().list();
 
@@ -140,7 +140,7 @@ public class ProcessDefinitionsTest extends PluggableFlowableTestCase {
   }
 
   public void testProcessDefinitionDescription() {
-    String deploymentId = deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='test' name='test'><documentation>This is a test</documentation></process></definitions>"));
+    String deploymentId = deployProcessString(("<definitions " + NAMESPACE + ' ' + TARGET_NAMESPACE + '>' + "  <process id='test' name='test'><documentation>This is a test</documentation></process></definitions>"));
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).singleResult();
     assertEquals("This is a test", processDefinition.getDescription());
 

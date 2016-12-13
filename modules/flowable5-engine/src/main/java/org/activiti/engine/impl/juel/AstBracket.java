@@ -40,9 +40,9 @@ public class AstBracket extends AstProperty {
 	@Override 
 	public void appendStructure(StringBuilder b, Bindings bindings) {
 		getChild(0).appendStructure(b, bindings);
-		b.append("[");
+		b.append('[');
 		getChild(1).appendStructure(b, bindings);
-		b.append("]");
+		b.append(']');
 	}
 
 	public int getCardinality() {

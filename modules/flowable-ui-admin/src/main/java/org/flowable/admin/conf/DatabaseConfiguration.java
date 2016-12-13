@@ -55,7 +55,7 @@ public class DatabaseConfiguration {
 
     @Autowired
     private Environment env;
-    
+
     @Autowired
     private ResourceLoader resourceLoader;
 
@@ -66,7 +66,7 @@ public class DatabaseConfiguration {
         String dataSourceJndiName = env.getProperty("datasource.jndi.name");
         if (StringUtils.isNotEmpty(dataSourceJndiName)) {
 
-            log.info("Using jndi datasource '" + dataSourceJndiName + "'");
+            log.info("Using jndi datasource '" + dataSourceJndiName + '\'');
             JndiDataSourceLookup dsLookup = new JndiDataSourceLookup();
             dsLookup.setResourceRef(env.getProperty("datasource.jndi.resourceRef", Boolean.class, Boolean.TRUE));
             DataSource dataSource = dsLookup.getDataSource(dataSourceJndiName);
@@ -153,19 +153,19 @@ public class DatabaseConfiguration {
             return ds;
         }
     }
-    
+
     @Bean
     public PlatformTransactionManager annotationDrivenTransactionManager() {
       DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
       dataSourceTransactionManager.setDataSource(dataSource());
       return dataSourceTransactionManager;
     }
-      
+
     @Bean
     public SqlSessionFactory sqlSessionFactory() {
       SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
       sqlSessionFactoryBean.setDataSource(dataSource());
-      
+
       try {
         Properties properties = new Properties();
         properties.put("prefix", env.getProperty("datasource.prefix", ""));
@@ -179,12 +179,12 @@ public class DatabaseConfiguration {
       }
 
     }
-    
+
     @Bean(destroyMethod="clearCache") // destroyMethod: see https://github.com/mybatis/old-google-code-issues/issues/778
     public SqlSessionTemplate SqlSessionTemplate() {
       return new SqlSessionTemplate(sqlSessionFactory());
     }
-    
+
     @Bean(name="liquibase")
     public Liquibase liquibase() {
       log.debug("Configuring Liquibase");

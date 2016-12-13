@@ -70,7 +70,7 @@ public class StartProcessInstanceWithFormCmd implements Command<ProcessInstance>
     // Find the process definition
     ProcessDefinition processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
     if (processDefinition == null) {
-      throw new FlowableObjectNotFoundException("No process definition found for id = '" + processDefinitionId + "'", ProcessDefinition.class);
+      throw new FlowableObjectNotFoundException("No process definition found for id = '" + processDefinitionId + '\'', ProcessDefinition.class);
     }
     
     FormModel formModel = null;
