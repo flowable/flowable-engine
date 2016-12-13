@@ -293,7 +293,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
       String dbInsert = (String) expectedInserts[i];
       Long count = (Long) expectedInserts[i+1];
       
-      Assert.assertEquals("Insert count for " + dbInsert + "not correct", count, stats.getDbInserts().get("org.flowable.engine.impl.persistence.entity." + dbInsert));
+      Assert.assertEquals("Insert count for " + dbInsert + " not correct", count, stats.getDbInserts().get("org.flowable.engine.impl.persistence.entity." + dbInsert));
     }
   }
   
@@ -308,7 +308,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
       String dbDelete = (String) expectedDeletes[i];
       Long count = (Long) expectedDeletes[i+1];
       
-      Assert.assertEquals("Delete count count for " + dbDelete + "not correct", count, stats.getDbDeletes().get("org.flowable.engine.impl.persistence.entity." + dbDelete));
+      Assert.assertEquals("Delete count count for " + dbDelete + " not correct", count, stats.getDbDeletes().get("org.flowable.engine.impl.persistence.entity." + dbDelete));
     }
   }
   
