@@ -20,7 +20,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.api.delegate.event.FlowableEventType;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.delegate.event.ActivitiEngineEvent;
+import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -100,9 +100,9 @@ public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
   protected BpmnModel extractBpmnModelFromEvent(FlowableEvent event) {
     BpmnModel result = null;
     
-    if (result == null && event instanceof ActivitiEngineEvent && ((ActivitiEngineEvent) event).getProcessDefinitionId() != null) {
+    if (result == null && event instanceof FlowableEngineEvent && ((FlowableEngineEvent) event).getProcessDefinitionId() != null) {
       ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(
-          ((ActivitiEngineEvent) event).getProcessDefinitionId(), true);
+          ((FlowableEngineEvent) event).getProcessDefinitionId(), true);
       
       if (processDefinition != null) {
         result = Context.getProcessEngineConfiguration().getDeploymentManager().resolveProcessDefinition(processDefinition).getBpmnModel();

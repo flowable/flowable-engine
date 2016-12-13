@@ -98,9 +98,9 @@ public class ExpressionManager {
     return elContext;
   }
 
-  protected ActivitiElContext createElContext(VariableScope variableScope) {
+  protected FlowableElContext createElContext(VariableScope variableScope) {
     ELResolver elResolver = createElResolver(variableScope);
-    return new ActivitiElContext(elResolver);
+    return new FlowableElContext(elResolver);
   }
 
   protected ELResolver createElResolver(VariableScope variableScope) {

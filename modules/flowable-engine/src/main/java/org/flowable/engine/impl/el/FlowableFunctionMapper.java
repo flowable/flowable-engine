@@ -10,34 +10,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.flowable.engine.impl.el;
 
-import javax.el.ELContext;
-import javax.el.ELResolver;
+import java.lang.reflect.Method;
+
 import javax.el.FunctionMapper;
-import javax.el.VariableMapper;
 
 /**
- * @author Tom Baeyens
+ * Default implementation of a {@link FunctionMapper}.
+ * 
+ * A non-null implementation is required by the javax.el.* classes, hence the reason for this pretty useless class.
+ * 
  * @author Joram Barrez
  */
-public class ActivitiElContext extends ELContext {
+public class FlowableFunctionMapper extends FunctionMapper {
 
-  protected ELResolver elResolver;
-
-  public ActivitiElContext(ELResolver elResolver) {
-    this.elResolver = elResolver;
-  }
-
-  public ELResolver getELResolver() {
-    return elResolver;
-  }
-
-  public FunctionMapper getFunctionMapper() {
-    return new ActivitiFunctionMapper();
-  }
-
-  public VariableMapper getVariableMapper() {
+  public Method resolveFunction(String prefix, String localName) {
     return null;
   }
+
 }

@@ -32,7 +32,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
@@ -69,9 +68,9 @@ import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.common.impl.transaction.ContextAwareJdbcTransactionFactory;
 import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.compatibility.DefaultFlowable5CompatibilityHandlerFactory;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandlerFactory;
-import org.flowable.engine.compatibility.DefaultFlowable5CompatibilityHandlerFactory;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventDispatcherImpl;
 import org.flowable.engine.form.AbstractFormType;
@@ -717,11 +716,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
   */
   protected ExecuteAsyncRunnableFactory asyncExecutorExecuteAsyncRunnableFactory;
-
-  // ID GENERATOR ///////////////////////////////////////////////////////////////
-
-  protected DataSource idGeneratorDataSource;
-  protected String idGeneratorDataSourceJndiName;
 
   // BPMN PARSER //////////////////////////////////////////////////////////////
 
@@ -1765,23 +1759,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void initIdGenerator() {
     if (idGenerator == null) {
-      CommandExecutor idGeneratorCommandExecutor = null;
-      if (idGeneratorDataSource != null) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneProcessEngineConfiguration();
-        processEngineConfiguration.setDataSource(idGeneratorDataSource);
-        processEngineConfiguration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_FALSE);
-        processEngineConfiguration.init();
-        idGeneratorCommandExecutor = processEngineConfiguration.getCommandExecutor();
-      } else if (idGeneratorDataSourceJndiName != null) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneProcessEngineConfiguration();
-        processEngineConfiguration.setDataSourceJndiName(idGeneratorDataSourceJndiName);
-        processEngineConfiguration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_FALSE);
-        processEngineConfiguration.init();
-        idGeneratorCommandExecutor = processEngineConfiguration.getCommandExecutor();
-      } else {
-        idGeneratorCommandExecutor = getCommandExecutor();
-      }
-
+      CommandExecutor idGeneratorCommandExecutor = getCommandExecutor();
       DbIdGenerator dbIdGenerator = new DbIdGenerator();
       dbIdGenerator.setIdBlockSize(idBlockSize);
       dbIdGenerator.setCommandExecutor(idGeneratorCommandExecutor);
@@ -2843,24 +2821,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setFailedJobCommandFactory(FailedJobCommandFactory failedJobCommandFactory) {
     this.failedJobCommandFactory = failedJobCommandFactory;
-    return this;
-  }
-
-  public DataSource getIdGeneratorDataSource() {
-    return idGeneratorDataSource;
-  }
-
-  public ProcessEngineConfigurationImpl setIdGeneratorDataSource(DataSource idGeneratorDataSource) {
-    this.idGeneratorDataSource = idGeneratorDataSource;
-    return this;
-  }
-
-  public String getIdGeneratorDataSourceJndiName() {
-    return idGeneratorDataSourceJndiName;
-  }
-
-  public ProcessEngineConfigurationImpl setIdGeneratorDataSourceJndiName(String idGeneratorDataSourceJndiName) {
-    this.idGeneratorDataSourceJndiName = idGeneratorDataSourceJndiName;
     return this;
   }
 

@@ -83,42 +83,42 @@ public class DbSqlSession implements Session {
   
   protected static final String LAST_V5_VERSION = "5.99.0.0";
   
-  protected static final List<ActivitiVersion> ACTIVITI_VERSIONS = new ArrayList<ActivitiVersion>();
+  protected static final List<FlowableVersion> FLOWABLE_VERSIONS = new ArrayList<FlowableVersion>();
   static {
 
     /* Previous */
 
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.7"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.8"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.9"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.10"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.11"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.7"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.8"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.9"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.10"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.11"));
 
     // 5.12.1 was a bugfix release on 5.12 and did NOT change the version in ACT_GE_PROPERTY
     // On top of that, DB2 create script for 5.12.1 was shipped with a 'T' suffix ...
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.12", Arrays.asList("5.12.1", "5.12T")));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.12", Arrays.asList("5.12.1", "5.12T")));
 
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.13"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.14"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.15"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.15.1"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.16"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.16.1"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.16.2-SNAPSHOT"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.16.2"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.16.3.0"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.16.4.0"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.13"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.14"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.15"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.15.1"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.16"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.16.1"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.16.2-SNAPSHOT"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.16.2"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.16.3.0"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.16.4.0"));
 
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.17.0.0"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.17.0.1"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.17.0.2"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.18.0.0"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.18.0.1"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.20.0.0"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.20.0.1"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.20.0.2"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.21.0.0"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.22.0.0"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.17.0.0"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.17.0.1"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.17.0.2"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.18.0.0"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.18.0.1"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.20.0.0"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.20.0.1"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.20.0.2"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.21.0.0"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("5.22.0.0"));
     
     /*
      * Version 5.18.0.1 is the latest v5 version in the list here, although if you would look at the v5 code,
@@ -133,16 +133,16 @@ public class DbSqlSession implements Session {
 
     // This is the latest version of the 5 branch. It's a 'virtual' version cause it doesn't exist, but it is
     // there to make sure all previous version can upgrade to the 6 version correctly.
-    ACTIVITI_VERSIONS.add(new ActivitiVersion(LAST_V5_VERSION));
+    FLOWABLE_VERSIONS.add(new FlowableVersion(LAST_V5_VERSION));
     
     // Version 6
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("6.0.0.0"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("6.0.0.1"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("6.0.0.2"));
-    ACTIVITI_VERSIONS.add(new ActivitiVersion("6.0.0.3"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("6.0.0.0"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("6.0.0.1"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("6.0.0.2"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("6.0.0.3"));
     
     /* Current */
-    ACTIVITI_VERSIONS.add(new ActivitiVersion(ProcessEngine.VERSION));
+    FLOWABLE_VERSIONS.add(new FlowableVersion(ProcessEngine.VERSION));
   }
 
   protected SqlSession sqlSession;
@@ -908,7 +908,7 @@ public class DbSqlSession implements Session {
         throw new FlowableException("Could not update Flowable database schema: unknown version from database: '" + dbVersion + "'");
       }
 
-      isUpgradeNeeded = (matchingVersionIndex != (ACTIVITI_VERSIONS.size() - 1));
+      isUpgradeNeeded = (matchingVersionIndex != (FLOWABLE_VERSIONS.size() - 1));
 
       if (isUpgradeNeeded) {
         dbVersionProperty.setValue(ProcessEngine.VERSION);
@@ -953,8 +953,8 @@ public class DbSqlSession implements Session {
   protected int findMatchingVersionIndex(String dbVersion) {
     int index = 0;
     int matchingVersionIndex = -1;
-    while (matchingVersionIndex < 0 && index < ACTIVITI_VERSIONS.size()) {
-      if (ACTIVITI_VERSIONS.get(index).matches(dbVersion)) {
+    while (matchingVersionIndex < 0 && index < FLOWABLE_VERSIONS.size()) {
+      if (FLOWABLE_VERSIONS.get(index).matches(dbVersion)) {
         matchingVersionIndex = index;
       } else {
         index++;
@@ -1070,13 +1070,13 @@ public class DbSqlSession implements Session {
   }
 
   protected void dbSchemaUpgrade(final String component, final int currentDatabaseVersionsIndex) {
-    ActivitiVersion activitiVersion = ACTIVITI_VERSIONS.get(currentDatabaseVersionsIndex);
+    FlowableVersion activitiVersion = FLOWABLE_VERSIONS.get(currentDatabaseVersionsIndex);
     String dbVersion = activitiVersion.getMainVersion();
     log.info("upgrading flowable {} schema from {} to {}", component, dbVersion, ProcessEngine.VERSION);
 
     // Actual execution of schema DDL SQL
-    for (int i = currentDatabaseVersionsIndex + 1; i < ACTIVITI_VERSIONS.size(); i++) {
-      String nextVersion = ACTIVITI_VERSIONS.get(i).getMainVersion();
+    for (int i = currentDatabaseVersionsIndex + 1; i < FLOWABLE_VERSIONS.size(); i++) {
+      String nextVersion = FLOWABLE_VERSIONS.get(i).getMainVersion();
 
       // Taking care of -SNAPSHOT version in development
       if (nextVersion.endsWith("-SNAPSHOT")) {

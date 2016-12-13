@@ -30,7 +30,7 @@ import org.junit.Rule;
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class AbstractActivitiDmnTest {
+public class AbstractFlowableDmnTest {
 
     public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000";
 

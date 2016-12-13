@@ -13,7 +13,7 @@
 package org.flowable.cdi.test.api.annotation;
 
 import org.flowable.cdi.BusinessProcess;
-import org.flowable.cdi.test.CdiActivitiTestCase;
+import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.junit.Test;
 
@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
  * 
  * @author Daniel Meyer
  */
-public class TaskIdTest extends CdiActivitiTestCase {
+public class TaskIdTest extends CdiFlowableTestCase {
 
   @Test
   @Deployment

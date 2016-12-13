@@ -11,14 +11,14 @@ import org.flowable.engine.impl.interceptor.CommandInterceptor;
 /**
  * @author Joram Barrez
  */
-public class ActivitiProfiler implements ProcessEngineConfigurator {
+public class FlowableProfiler implements ProcessEngineConfigurator {
 
-    protected static ActivitiProfiler INSTANCE = new ActivitiProfiler();
+    protected static FlowableProfiler INSTANCE = new FlowableProfiler();
 
     protected ProfileSession currentProfileSession;
     protected List<ProfileSession> profileSessions = new ArrayList<ProfileSession>();
 
-    public static ActivitiProfiler getInstance() {
+    public static FlowableProfiler getInstance() {
         return INSTANCE;
     }
 

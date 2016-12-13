@@ -29,7 +29,7 @@ import org.flowable.engine.task.Task;
  * 
  * @author Frederik Heremans
  */
-public abstract class ActivitiEventDispatcherTest extends PluggableFlowableTestCase {
+public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
 
   protected FlowableEventDispatcher dispatcher;
 

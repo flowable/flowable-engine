@@ -14,7 +14,7 @@ package org.flowable.engine.impl.delegate.event;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 
-public interface ActivitiEngineEvent extends FlowableEvent {
+public interface FlowableEngineEvent extends FlowableEvent {
 
   /**
    * @return the id of the execution this event is associated with. Returns null, if the event was not dispatched from within an active execution.

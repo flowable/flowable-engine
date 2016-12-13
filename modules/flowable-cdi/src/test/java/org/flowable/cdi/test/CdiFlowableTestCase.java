@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * @author Daniel Meyer
  */
 @RunWith(Arquillian.class)
-public abstract class CdiActivitiTestCase {
+public abstract class CdiFlowableTestCase {
 
   protected Logger logger = LoggerFactory.getLogger(getClass().getName());
 

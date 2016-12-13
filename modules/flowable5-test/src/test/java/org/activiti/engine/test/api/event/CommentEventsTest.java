@@ -15,7 +15,7 @@ package org.activiti.engine.test.api.event;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.impl.delegate.event.ActivitiEngineEntityEvent;
+import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Comment;
@@ -45,7 +45,7 @@ public class CommentEventsTest extends PluggableActivitiTestCase {
 			// Create link-comment
 			Comment comment = taskService.addComment(task.getId(), task.getProcessInstanceId(), "comment");
 			assertEquals(2, listener.getEventsReceived().size());
-			ActivitiEngineEntityEvent event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+			FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
 			assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
 			assertEquals(processInstance.getId(), event.getProcessInstanceId());
 			assertEquals(processInstance.getId(), event.getExecutionId());
@@ -53,14 +53,14 @@ public class CommentEventsTest extends PluggableActivitiTestCase {
 			org.activiti.engine.task.Comment commentFromEvent = (org.activiti.engine.task.Comment) event.getEntity();
 			assertEquals(comment.getId(), commentFromEvent.getId());
 			
-			event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
+			event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
 			assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
 			listener.clearEventsReceived();
 			
 			// Finally, delete comment
 			taskService.deleteComment(comment.getId());
 			assertEquals(1, listener.getEventsReceived().size());
-			event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+			event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
 			assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
 			assertEquals(processInstance.getId(), event.getProcessInstanceId());
 			assertEquals(processInstance.getId(), event.getExecutionId());

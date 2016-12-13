@@ -28,7 +28,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author stefan.schulze@accelsis.biz
  * 
  */
-@ContextConfiguration("classpath:error-camel-activiti-context.xml")
+@ContextConfiguration("classpath:error-camel-flowable-context.xml")
 public class ErrorHandlingTest extends SpringFlowableTestCase {
 
   private static final int WAIT = 3000;

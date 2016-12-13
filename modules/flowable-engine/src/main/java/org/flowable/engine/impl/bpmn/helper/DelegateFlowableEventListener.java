@@ -26,13 +26,13 @@ import org.flowable.engine.impl.util.ReflectUtil;
  * 
  * @author Frederik Heremans
  */
-public class DelegateActivitiEventListener extends BaseDelegateEventListener {
+public class DelegateFlowableEventListener extends BaseDelegateEventListener {
 
   protected String className;
   protected FlowableEventListener delegateInstance;
   protected boolean failOnException = false;
 
-  public DelegateActivitiEventListener(String className, Class<?> entityClass) {
+  public DelegateFlowableEventListener(String className, Class<?> entityClass) {
     this.className = className;
     setEntityClass(entityClass);
   }

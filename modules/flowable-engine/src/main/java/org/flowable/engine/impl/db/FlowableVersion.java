@@ -12,17 +12,17 @@ import java.util.List;
  * 
  * @author jbarrez
  */
-public class ActivitiVersion {
+public class FlowableVersion {
 
   protected String mainVersion;
   protected List<String> alternativeVersionStrings;
 
-  public ActivitiVersion(String mainVersion) {
+  public FlowableVersion(String mainVersion) {
     this.mainVersion = mainVersion;
     this.alternativeVersionStrings = Collections.singletonList(mainVersion);
   }
 
-  public ActivitiVersion(String mainVersion, List<String> alternativeVersionStrings) {
+  public FlowableVersion(String mainVersion, List<String> alternativeVersionStrings) {
     this.mainVersion = mainVersion;
     this.alternativeVersionStrings = alternativeVersionStrings;
   }
@@ -42,10 +42,10 @@ public class ActivitiVersion {
   }
 
   public boolean equals(Object obj) {
-    if (!(obj instanceof ActivitiVersion)) {
+    if (!(obj instanceof FlowableVersion)) {
       return false;
     }
-    ActivitiVersion other = (ActivitiVersion) obj;
+    FlowableVersion other = (FlowableVersion) obj;
     boolean mainVersionEqual = mainVersion.equals(other.mainVersion);
     if (!mainVersionEqual) {
       return false;

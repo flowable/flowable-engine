@@ -29,7 +29,7 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.TestHelper;
-import org.flowable.engine.test.mock.ActivitiMockSupport;
+import org.flowable.engine.test.mock.FlowableMockSupport;
 import org.junit.internal.AssumptionViolatedException;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
@@ -88,7 +88,7 @@ public class FlowableRule implements TestRule {
   protected ManagementService managementService;
   protected FormService formService;
 
-  protected ActivitiMockSupport mockSupport;
+  protected FlowableMockSupport mockSupport;
 
   public FlowableRule() {
   }
@@ -234,8 +234,8 @@ public class FlowableRule implements TestRule {
   }
 
   protected void initializeMockSupport() {
-    if (ActivitiMockSupport.isMockSupportPossible(processEngine)) {
-      this.mockSupport = new ActivitiMockSupport(processEngine);
+    if (FlowableMockSupport.isMockSupportPossible(processEngine)) {
+      this.mockSupport = new FlowableMockSupport(processEngine);
     }
   }
 
@@ -338,11 +338,11 @@ public class FlowableRule implements TestRule {
     this.processEngineConfiguration = processEngineConfiguration;
   }
 
-  public ActivitiMockSupport getMockSupport() {
+  public FlowableMockSupport getMockSupport() {
     return mockSupport;
   }
 
-  public ActivitiMockSupport mockSupport() {
+  public FlowableMockSupport mockSupport() {
     return mockSupport;
   }
 

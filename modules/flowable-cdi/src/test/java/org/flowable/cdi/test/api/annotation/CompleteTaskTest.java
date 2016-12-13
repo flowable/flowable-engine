@@ -16,7 +16,7 @@ import static org.junit.Assert.assertNull;
 
 import org.flowable.cdi.BusinessProcess;
 import org.flowable.cdi.impl.annotation.CompleteTaskInterceptor;
-import org.flowable.cdi.test.CdiActivitiTestCase;
+import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.cdi.test.impl.beans.DeclarativeProcessController;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
@@ -27,7 +27,7 @@ import org.junit.Test;
  * 
  * @author Daniel Meyer
  */
-public class CompleteTaskTest extends CdiActivitiTestCase {
+public class CompleteTaskTest extends CdiFlowableTestCase {
 
   @Test
   @Deployment(resources = "org/activiti/cdi/test/api/annotation/CompleteTaskTest.bpmn20.xml")

@@ -14,7 +14,7 @@ package org.flowable.cdi.test.impl.el;
 
 import static org.junit.Assert.assertEquals;
 
-import org.flowable.cdi.test.CdiActivitiTestCase;
+import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.cdi.test.impl.beans.MessageBean;
 import org.flowable.engine.test.Deployment;
 import org.junit.Test;
@@ -22,7 +22,7 @@ import org.junit.Test;
 /**
  * @author Daniel Meyer
  */
-public class ElTest extends CdiActivitiTestCase {
+public class ElTest extends CdiFlowableTestCase {
 
   @Test
   @Deployment

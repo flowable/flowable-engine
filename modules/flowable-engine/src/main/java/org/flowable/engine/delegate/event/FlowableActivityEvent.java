@@ -13,7 +13,7 @@
 package org.flowable.engine.delegate.event;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.impl.delegate.event.ActivitiEngineEvent;
+import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
 
 /**
  * An {@link FlowableEvent} related to an activity within an execution;
@@ -21,7 +21,7 @@ import org.flowable.engine.impl.delegate.event.ActivitiEngineEvent;
  * @author Frederik Heremans
  * @author Joram Barrez
  */
-public interface FlowableActivityEvent extends ActivitiEngineEvent {
+public interface FlowableActivityEvent extends FlowableEngineEvent {
 
   /**
    * @return the id of the activity this event is related to. This corresponds to an id defined in the process definition.

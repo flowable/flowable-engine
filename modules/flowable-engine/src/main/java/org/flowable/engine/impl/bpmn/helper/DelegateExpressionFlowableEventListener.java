@@ -26,12 +26,12 @@ import org.flowable.engine.impl.el.NoExecutionVariableScope;
  * 
  * @author Frederik Heremans
  */
-public class DelegateExpressionActivitiEventListener extends BaseDelegateEventListener {
+public class DelegateExpressionFlowableEventListener extends BaseDelegateEventListener {
 
   protected Expression expression;
   protected boolean failOnException = false;
 
-  public DelegateExpressionActivitiEventListener(Expression expression, Class<?> entityClass) {
+  public DelegateExpressionFlowableEventListener(Expression expression, Class<?> entityClass) {
     this.expression = expression;
     setEntityClass(entityClass);
   }

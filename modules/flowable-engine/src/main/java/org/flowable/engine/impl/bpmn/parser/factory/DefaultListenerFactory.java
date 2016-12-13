@@ -27,8 +27,8 @@ import org.flowable.engine.delegate.TransactionDependentTaskListener;
 import org.flowable.engine.impl.bpmn.helper.BaseDelegateEventListener;
 import org.flowable.engine.impl.bpmn.helper.ClassDelegateFactory;
 import org.flowable.engine.impl.bpmn.helper.DefaultClassDelegateFactory;
-import org.flowable.engine.impl.bpmn.helper.DelegateActivitiEventListener;
-import org.flowable.engine.impl.bpmn.helper.DelegateExpressionActivitiEventListener;
+import org.flowable.engine.impl.bpmn.helper.DelegateFlowableEventListener;
+import org.flowable.engine.impl.bpmn.helper.DelegateExpressionFlowableEventListener;
 import org.flowable.engine.impl.bpmn.helper.ErrorThrowingEventListener;
 import org.flowable.engine.impl.bpmn.helper.MessageThrowingEventListener;
 import org.flowable.engine.impl.bpmn.helper.SignalThrowingEventListener;
@@ -121,12 +121,12 @@ public class DefaultListenerFactory extends AbstractBehaviorFactory implements L
 
   @Override
   public FlowableEventListener createClassDelegateEventListener(EventListener eventListener) {
-    return new DelegateActivitiEventListener(eventListener.getImplementation(), getEntityType(eventListener.getEntityType()));
+    return new DelegateFlowableEventListener(eventListener.getImplementation(), getEntityType(eventListener.getEntityType()));
   }
 
   @Override
   public FlowableEventListener createDelegateExpressionEventListener(EventListener eventListener) {
-    return new DelegateExpressionActivitiEventListener(expressionManager.createExpression(eventListener.getImplementation()), getEntityType(eventListener.getEntityType()));
+    return new DelegateExpressionFlowableEventListener(expressionManager.createExpression(eventListener.getImplementation()), getEntityType(eventListener.getEntityType()));
   }
 
   @Override

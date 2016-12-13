@@ -13,7 +13,7 @@
 package org.flowable.cdi.test.api.annotation;
 
 import org.flowable.cdi.BusinessProcess;
-import org.flowable.cdi.test.CdiActivitiTestCase;
+import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Assert;
@@ -25,7 +25,7 @@ import org.junit.runner.RunWith;
  * @author Daniel Meyer
  */
 @RunWith(Arquillian.class)
-public class ProcessIdTest extends CdiActivitiTestCase {
+public class ProcessIdTest extends CdiFlowableTestCase {
 
   @Test
   @Deployment

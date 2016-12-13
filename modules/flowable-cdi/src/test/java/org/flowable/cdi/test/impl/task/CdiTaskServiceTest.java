@@ -1,10 +1,10 @@
 package org.flowable.cdi.test.impl.task;
 
-import org.flowable.cdi.test.CdiActivitiTestCase;
+import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.engine.task.Task;
 import org.junit.Test;
 
-public class CdiTaskServiceTest extends CdiActivitiTestCase {
+public class CdiTaskServiceTest extends CdiFlowableTestCase {
 
   @Test
   public void testClaimTask() {

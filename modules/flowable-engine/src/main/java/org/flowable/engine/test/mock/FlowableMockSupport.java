@@ -25,15 +25,15 @@ import org.flowable.engine.test.TestActivityBehaviorFactory;
 /**
  * @author Joram Barrez
  */
-public class ActivitiMockSupport {
+public class FlowableMockSupport {
 
   protected TestActivityBehaviorFactory testActivityBehaviorFactory;
 
-  public ActivitiMockSupport(TestActivityBehaviorFactory testActivityBehaviorFactory) {
+  public FlowableMockSupport(TestActivityBehaviorFactory testActivityBehaviorFactory) {
     this.testActivityBehaviorFactory = testActivityBehaviorFactory;
   }
 
-  public ActivitiMockSupport(ProcessEngine processEngine) {
+  public FlowableMockSupport(ProcessEngine processEngine) {
     ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
     ActivityBehaviorFactory existingActivityBehaviorFactory = processEngineConfiguration.getActivityBehaviorFactory();
     this.testActivityBehaviorFactory = new TestActivityBehaviorFactory(existingActivityBehaviorFactory);

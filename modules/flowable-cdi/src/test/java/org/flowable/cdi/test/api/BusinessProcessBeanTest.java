@@ -17,7 +17,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.flowable.cdi.BusinessProcess;
-import org.flowable.cdi.test.CdiActivitiTestCase;
+import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -27,7 +27,7 @@ import org.junit.Test;
 /**
  * @author Daniel Meyer
  */
-public class BusinessProcessBeanTest extends CdiActivitiTestCase {
+public class BusinessProcessBeanTest extends CdiFlowableTestCase {
 
   /* General test asserting that the business process bean is functional */
   @Test

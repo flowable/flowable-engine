@@ -14,7 +14,7 @@ import org.flowable.validation.validator.ValidatorSet;
 /**
  * Sample Process Validator for Activiti Test case.
  */
-public class ActivitiTestCaseProcessValidator implements ProcessValidator {
+public class FlowableTestCaseProcessValidator implements ProcessValidator {
 
   @Override
   public List<ValidationError> validate(BpmnModel bpmnModel) {

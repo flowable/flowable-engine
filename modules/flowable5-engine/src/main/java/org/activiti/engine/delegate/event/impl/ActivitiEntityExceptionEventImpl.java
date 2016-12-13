@@ -16,7 +16,7 @@ import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableExceptionEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.impl.delegate.event.ActivitiEngineEntityEvent;
+import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
 
 /**
  * Base class for all {@link FlowableEvent} implementations, represents an exception occured, related 
@@ -24,7 +24,7 @@ import org.flowable.engine.impl.delegate.event.ActivitiEngineEntityEvent;
  * 
  * @author Frederik Heremans
  */
-public class ActivitiEntityExceptionEventImpl extends ActivitiEventImpl implements ActivitiEngineEntityEvent, FlowableExceptionEvent {
+public class ActivitiEntityExceptionEventImpl extends ActivitiEventImpl implements FlowableEngineEntityEvent, FlowableExceptionEvent {
 
 	protected Object entity;
 	protected Throwable cause;

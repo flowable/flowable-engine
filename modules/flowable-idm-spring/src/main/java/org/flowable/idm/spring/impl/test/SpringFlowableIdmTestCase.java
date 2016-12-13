@@ -30,7 +30,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
  * @author Josh Long
  */
 @TestExecutionListeners(DependencyInjectionTestExecutionListener.class)
-public abstract class SpringActivitiTestCase extends AbstractFlowableIdmTestCase implements ApplicationContextAware {
+public abstract class SpringFlowableIdmTestCase extends AbstractFlowableIdmTestCase implements ApplicationContextAware {
 
   // we need a data structure to store all the resolved ProcessEngines and map them to something
   protected Map<Object, IdmEngine> cachedIdmEngines = new ConcurrentHashMap<Object, IdmEngine>();
@@ -43,7 +43,7 @@ public abstract class SpringActivitiTestCase extends AbstractFlowableIdmTestCase
   @Autowired
   protected ApplicationContext applicationContext;
 
-  public SpringActivitiTestCase() {
+  public SpringFlowableIdmTestCase() {
     this.testContextManager = new TestContextManager(getClass());
   }
 

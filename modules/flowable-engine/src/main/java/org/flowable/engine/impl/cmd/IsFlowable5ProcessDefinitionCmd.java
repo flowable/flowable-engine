@@ -24,12 +24,12 @@ import org.flowable.engine.repository.ProcessDefinition;
 /**
  * @author Tom Baeyens
  */
-public class IsActiviti5ProcessDefinitionCmd implements Command<Boolean>, Serializable {
+public class IsFlowable5ProcessDefinitionCmd implements Command<Boolean>, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected String processDefinitionId;
 
-  public IsActiviti5ProcessDefinitionCmd(String processDefinitionId) {
+  public IsFlowable5ProcessDefinitionCmd(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
   }
 

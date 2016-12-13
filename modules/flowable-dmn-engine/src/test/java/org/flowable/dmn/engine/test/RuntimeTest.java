@@ -25,7 +25,7 @@ import org.junit.Test;
 /**
  * @author Yvo Swillens
  */
-public class RuntimeTest extends AbstractActivitiDmnTest {
+public class RuntimeTest extends AbstractFlowableDmnTest {
 
     @Test
     @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/deployment/multiple_conclusions.dmn")

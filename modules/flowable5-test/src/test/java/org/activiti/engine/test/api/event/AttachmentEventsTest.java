@@ -17,7 +17,7 @@ import java.io.ByteArrayInputStream;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.impl.delegate.event.ActivitiEngineEntityEvent;
+import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -50,14 +50,14 @@ public class AttachmentEventsTest extends PluggableActivitiTestCase {
 			Attachment attachment = taskService.createAttachment("test", task.getId(), processInstance.getId(), "attachment name", "description", "http://activiti.org");
 			assertNull(attachment.getUserId());
 			assertEquals(2, listener.getEventsReceived().size());
-			ActivitiEngineEntityEvent event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+			FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
 			assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
 			assertEquals(processInstance.getId(), event.getProcessInstanceId());
 			assertEquals(processInstance.getId(), event.getExecutionId());
 			assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
 			org.activiti.engine.task.Attachment attachmentFromEvent = (org.activiti.engine.task.Attachment) event.getEntity();
 			assertEquals(attachment.getId(), attachmentFromEvent.getId());
-			event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
+			event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
 			assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
 			assertEquals(processInstance.getId(), event.getProcessInstanceId());
 			assertEquals(processInstance.getId(), event.getExecutionId());
@@ -72,7 +72,7 @@ public class AttachmentEventsTest extends PluggableActivitiTestCase {
 			assertNotNull(attachment.getUserId());
 			assertEquals("testuser", attachment.getUserId());
 			assertEquals(2, listener.getEventsReceived().size());
-			event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+			event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
 			assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
 			assertEquals(processInstance.getId(), event.getProcessInstanceId());
 			assertEquals(processInstance.getId(), event.getExecutionId());
@@ -80,7 +80,7 @@ public class AttachmentEventsTest extends PluggableActivitiTestCase {
 			attachmentFromEvent = (org.activiti.engine.task.Attachment) event.getEntity();
 			assertEquals(attachment.getId(), attachmentFromEvent.getId());
 			
-			event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
+			event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
 			assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
 			listener.clearEventsReceived();
 			
@@ -90,7 +90,7 @@ public class AttachmentEventsTest extends PluggableActivitiTestCase {
 			taskService.saveAttachment(attachment);
 			
 			assertEquals(1, listener.getEventsReceived().size());
-			event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+			event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
 			assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
 			assertEquals(processInstance.getId(), event.getProcessInstanceId());
 			assertEquals(processInstance.getId(), event.getExecutionId());
@@ -103,7 +103,7 @@ public class AttachmentEventsTest extends PluggableActivitiTestCase {
 			// Finally, delete attachment
 			taskService.deleteAttachment(attachment.getId());
 			assertEquals(1, listener.getEventsReceived().size());
-			event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+			event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
 			assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
 			assertEquals(processInstance.getId(), event.getProcessInstanceId());
 			assertEquals(processInstance.getId(), event.getExecutionId());

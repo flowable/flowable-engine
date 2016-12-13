@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-public class JPAActivitiEngineConfiguration {
+public class JPAFlowableEngineConfiguration {
 
   @Autowired
   protected DataSource dataSource;

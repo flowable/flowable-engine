@@ -24,7 +24,7 @@ import org.flowable.dmn.api.DecisionTable;
 import org.flowable.dmn.api.DmnDeployment;
 import org.junit.Test;
 
-public class DeploymentTest extends AbstractActivitiDmnTest {
+public class DeploymentTest extends AbstractFlowableDmnTest {
 
     @Test
     @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/deployment/multiple_conclusions.dmn")

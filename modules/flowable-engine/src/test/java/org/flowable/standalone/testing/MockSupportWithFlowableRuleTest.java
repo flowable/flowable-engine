@@ -14,7 +14,7 @@ package org.flowable.standalone.testing;
 
 import org.flowable.engine.test.FlowableRule;
 import org.flowable.engine.test.Deployment;
-import org.flowable.engine.test.mock.ActivitiMockSupport;
+import org.flowable.engine.test.mock.FlowableMockSupport;
 import org.flowable.engine.test.mock.MockServiceTask;
 import org.flowable.engine.test.mock.MockServiceTasks;
 import org.flowable.engine.test.mock.NoOpServiceTasks;
@@ -101,7 +101,7 @@ public class MockSupportWithFlowableRuleTest {
   @Deployment(resources = { "org/flowable/standalone/testing/MockSupportWithFlowableRuleTest.testNoOpServiceTasksAnnotation.bpmn20.xml" })
   @NoOpServiceTasks(ids = { "serviceTask1", "serviceTask3", "serviceTask5" }, classNames = { "com.yourcompany.delegate2", "com.yourcompany.delegate4" })
   public void testNoOpServiceTasksWithIdsAnnotation() {
-    ActivitiMockSupport mockSupport = flowableRule.getMockSupport();
+    FlowableMockSupport mockSupport = flowableRule.getMockSupport();
     Assert.assertEquals(0, mockSupport.getNrOfNoOpServiceTaskExecutions());
     flowableRule.getRuntimeService().startProcessInstanceByKey("mockSupportTest");
     Assert.assertEquals(5, mockSupport.getNrOfNoOpServiceTaskExecutions());

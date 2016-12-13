@@ -9,10 +9,10 @@ import org.flowable.engine.impl.interceptor.Command;
  */
 public class TotalExecutionTimeCommandInterceptor extends AbstractCommandInterceptor {
 
-    protected ActivitiProfiler activitiProfiler;
+    protected FlowableProfiler activitiProfiler;
 
     public TotalExecutionTimeCommandInterceptor() {
-        this.activitiProfiler = ActivitiProfiler.getInstance();
+        this.activitiProfiler = FlowableProfiler.getInstance();
     }
 
     public <T> T execute(CommandConfig config, Command<T> command) {
