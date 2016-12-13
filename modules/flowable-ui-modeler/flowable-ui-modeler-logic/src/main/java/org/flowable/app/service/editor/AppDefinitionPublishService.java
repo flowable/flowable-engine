@@ -171,12 +171,7 @@ public class AppDefinitionPublishService {
 
       byte[] deployZipArtifact = createDeployZipArtifact(deployableAssets);
       if (deployZipArtifact != null) {
-        try {
-          deployZipArtifact(deployableZipName, deployZipArtifact);
-        } catch (Exception e) {
-          logger.error("Error while deploying artifact: "+appDefinitionModel.getKey(), e);
-          throw new InternalServerErrorException("Error while deploying artifact: " + appDefinitionModel.getKey());
-        }
+        deployZipArtifact(deployableZipName, deployZipArtifact);
       }
     }
   }
@@ -261,7 +256,7 @@ public class AppDefinitionPublishService {
     return deployZipArtifact;
   }
 
-  protected void deployZipArtifact(String artifactName, byte[] zipArtifact) throws Exception {
+  protected void deployZipArtifact(String artifactName, byte[] zipArtifact) {
     String deployApiUrl = environment.getRequiredProperty("deployment.api.url");
     String basicAuthUser = environment.getRequiredProperty("idm.admin.user");
     String basicAuthPassword = environment.getRequiredProperty("idm.admin.password");
@@ -290,7 +285,8 @@ public class AppDefinitionPublishService {
       sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
       clientBuilder.setSSLSocketFactory(sslsf);
     } catch (Exception e) {
-      throw new Exception("Could not configure SSL for http client", e);
+      logger.error("Could not configure SSL for http client", e);
+      throw new InternalServerErrorException("Could not configure SSL for http client", e);
     }
 
     CloseableHttpClient client = clientBuilder.build();
@@ -300,10 +296,12 @@ public class AppDefinitionPublishService {
       if (response.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
         return;
       } else {
-        throw new Exception("Invalid deploy result code: " + response.getStatusLine().getStatusCode());
+        logger.error("Invalid deploy result code: ", response.getStatusLine());
+        throw new InternalServerErrorException("Invalid deploy result code: " + response.getStatusLine());
       }
     } catch (Exception e) {
-      throw new Exception("Error calling deploy endpoint", e);
+      logger.error("Error calling deploy endpoint", e);
+      throw new InternalServerErrorException("Error calling deploy endpoint: " + e.getMessage());
     } finally {
       if (client != null) {
         try {

@@ -85,7 +85,15 @@ public class AppDefinitionResource {
 
   @RequestMapping(value = "/rest/app-definitions/{modelId}/publish", method = RequestMethod.POST, produces = "application/json")
   public AppDefinitionUpdateResultRepresentation publishAppDefinition(@PathVariable("modelId") String modelId, @RequestBody AppDefinitionPublishRepresentation publishModel) {
-    return appDefinitionImportService.publishAppDefinition(modelId, publishModel);
+    AppDefinitionUpdateResultRepresentation resultRepresentation = null;
+    try {
+      resultRepresentation = appDefinitionImportService.publishAppDefinition(modelId, publishModel);
+    } catch (Exception ex) {
+      resultRepresentation = new AppDefinitionUpdateResultRepresentation();
+      resultRepresentation.setError(true);
+      resultRepresentation.setErrorDescription(ex.getMessage());
+    }
+    return resultRepresentation;
   }
 
   @RequestMapping(value = "/rest/app-definitions/{modelId}/export", method = RequestMethod.GET)
