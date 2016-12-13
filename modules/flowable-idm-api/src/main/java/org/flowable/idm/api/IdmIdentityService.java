@@ -122,27 +122,27 @@ public interface IdmIdentityService {
 
   /**
    * Sets the picture for a given user.
-   * 
-   * @throws ActivitiObjectNotFoundException
-   *           if the user doesn't exist.
+   * @param userId
    * @param picture
    *          can be null to delete the picture.
+   * @throws ActivitiObjectNotFoundException
+   *           if the user doesn't exist.
    */
   void setUserPicture(String userId, Picture picture);
 
   /**
    * Retrieves the picture for a given user.
-   * 
+   * @param userId
+   * @return null if the user doesn't have a picture.
+   *
    * @throws ActivitiObjectNotFoundException
    *           if the user doesn't exist.
-   * @returns null if the user doesn't have a picture.
    */
   Picture getUserPicture(String userId);
   
   /**
    * Creates a new token. The token is transient and must be saved using {@link #saveToken(Token)}.
-   * 
-   * @param tokenId
+   * @param id
    *          id for the new token, cannot be null.
    */
   Token newToken(String id);

@@ -674,7 +674,7 @@ public interface TaskService {
    *
    * @param taskId
    *          id of task, cannot be null.
-   * @param dataObjectName
+   * @param dataObject
    *          name of DataObject, cannot be null.
    * @return the DataObject or null if the variable is undefined.
    * @throws FlowableObjectNotFoundException

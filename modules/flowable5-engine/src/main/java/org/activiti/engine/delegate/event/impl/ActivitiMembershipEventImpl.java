@@ -17,7 +17,7 @@ import org.flowable.idm.api.event.FlowableIdmMembershipEvent;
 import org.flowable.idm.engine.delegate.event.impl.FlowableIdmEventImpl;
 
 /**
- * Implementation of {@link ActivitiMembershipEvent}.
+ * Implementation of {@link ActivitiIdmMembershipEvent}.
  * @author Frederik Heremans
  */
 public class ActivitiMembershipEventImpl extends FlowableIdmEventImpl implements FlowableIdmMembershipEvent {

@@ -39,7 +39,7 @@ public class BitMaskUtil {
   /**
    * Set bit to '1' in the given int.
    * 
-   * @param current
+   * @param value
    *          integer value
    * @param bitNumber
    *          number of the bit to set to '1' (right first bit starting at 1).
@@ -56,7 +56,7 @@ public class BitMaskUtil {
   /**
    * Set bit to '0' in the given int.
    * 
-   * @param current
+   * @param value
    *          integer value
    * @param bitNumber
    *          number of the bit to set to '0' (right first bit starting at 1).
@@ -75,7 +75,7 @@ public class BitMaskUtil {
    * 
    * @param value
    *          integer to check bit
-   * @param number
+   * @param bitNumber
    *          of bit to check (right first bit starting at 1)
    */
   public static boolean isBitOn(int value, int bitNumber) {
@@ -89,7 +89,7 @@ public class BitMaskUtil {
   /**
    * Set bit to '0' or '1' in the given int.
    * 
-   * @param current
+   * @param value
    *          integer value
    * @param bitNumber
    *          number of the bit to set to '0' or '1' (right first bit starting at 1).

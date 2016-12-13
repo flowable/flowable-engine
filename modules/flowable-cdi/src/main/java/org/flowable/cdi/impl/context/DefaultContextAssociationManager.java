@@ -126,7 +126,7 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
   /**
    * Override to add different / additional contexts.
    * 
-   * @returns a list of {@link Scope}-types, which are used in the given order to resolve the broadest active context (@link #getBroadestActiveContext()})
+   * @return a list of {@link Scope}-types, which are used in the given order to resolve the broadest active context (@link #getBroadestActiveContext()})
    */
   protected List<Class<? extends ScopedAssociation>> getAvailableScopedAssociationClasses() {
     ArrayList<Class<? extends ScopedAssociation>> scopeTypes = new ArrayList<Class<? extends ScopedAssociation>>();

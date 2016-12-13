@@ -19,7 +19,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
- * A {@link UserDetails} implementation that exposes the {@link com.activiti.domain.idm.User.User} object
+ * A {@link UserDetails} implementation that exposes the {@link org.activiti.idm.api.User} object
  * the logged in user represents.
  * 
  * @author Frederik Heremans

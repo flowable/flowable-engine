@@ -322,7 +322,6 @@ public class JsonNodeELResolver extends ELResolver {
    * 
    * @param base
    *            The bean to analyze.
-   *            The bean to analyze.
    * @return base != null
    */
   private final boolean isResolvable(Object base) {

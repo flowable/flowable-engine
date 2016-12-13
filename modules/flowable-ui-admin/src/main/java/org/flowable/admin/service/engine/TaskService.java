@@ -90,7 +90,7 @@ public class TaskService {
 	}
 
 	/**
-	 * @return true, if the task was deleted. False, if deleting the task failed.
+     * Delete a task.
 	 */
 	public void deleteTask(ServerConfig serverConfig, String taskId) {
 		if(taskId == null) {

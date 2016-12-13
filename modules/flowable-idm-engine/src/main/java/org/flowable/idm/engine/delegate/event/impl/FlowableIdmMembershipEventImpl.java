@@ -17,7 +17,7 @@ import org.flowable.idm.api.event.FlowableIdmMembershipEvent;
 
 /**
  * Implementation of {@link FlowableMembershipEvent}.
- * 
+ *
  * @author Frederik Heremans
  */
 public class FlowableIdmMembershipEventImpl extends FlowableIdmEventImpl implements FlowableIdmMembershipEvent {
