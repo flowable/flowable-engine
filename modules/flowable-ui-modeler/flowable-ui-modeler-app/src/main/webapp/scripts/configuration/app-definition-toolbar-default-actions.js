@@ -104,7 +104,7 @@ angular.module('activitiModeler').controller('SaveAppDefinitionCtrl',
                 // Regular error
                 if (response.error) {
                     $scope.status.loading = false;
-                    
+                    $scope.saveDialog.errorMessage = response.errorDescription;
                 } else {
                     $scope.$hide();
                     $rootScope.addAlert($translate.instant('APP.POPUP.SAVE-APP-SAVE-SUCCESS', 'info'));
@@ -115,30 +115,8 @@ angular.module('activitiModeler').controller('SaveAppDefinitionCtrl',
 
             }).
             error(function(data, status, headers, config) {
-
-                if (status === 409 && data && data.messageKey === 'app.publish.procdef.key.conflict') {
-                    $scope.conflict = {
-                        type: 'conflictingProcDefKey',
-                        data: data.customData
-                    };
-                    
-                } else if(status === 409 && data && data.messageKey === 'app.publish.procdef.duplicate.keys') {
-                    $scope.conflict = {
-                        type: 'duplicateProcDefKeys',
-                        data: data.customData
-                    };
-                    
-                } else if (status === 409 && data && data.messageKey === 'app.publish.process.model.already.used') {
-                    $scope.conflict = {
-                        type: 'processModelAlreadyUsed',
-                        data: data.customData
-                    };
-                    
-                } else {
-                	$scope.status.loading = false;
-                    $scope.saveDialog.errorMessage = data.message;
-                }
-
+                $scope.status.loading = false;
+                $scope.saveDialog.errorMessage = data.message;
             });
     };
 

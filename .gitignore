@@ -15,3 +15,5 @@ migration.html
 /modules/**/bin
 modules/flowable-ui-task/flowable-ui-task-app/data
 modules/flowable-webapp-rest2/src/main/webapp/docs
+modules/flowable-app-rest/.extract
+modules/flowable-ui-idm/flowable-ui-idm-app/.extract

@@ -1,0 +1,64 @@
+version: '2'
+services:
+    flowable-rest-app:
+        image: flowable/flowable-rest
+        depends_on:
+            - flowable-db
+        environment:
+            - datasource.driver=org.postgresql.Driver
+            - datasource.url=jdbc:postgresql://flowable-db:5432/flowable
+            - datasource.username=flowable
+            - datasource.password=flowable
+        ports:
+            - 9977:9977
+        depends_on:
+            - flowable-db
+        entrypoint: ["./wait-for-postgres.sh", "flowable-db", "java", "-jar", "flowable-rest.jar", "-httpPort=9977", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
+    flowable-admin-app:
+        image: flowable/flowable-admin
+        depends_on:
+            - flowable-db
+            - flowable-idm-app
+            - flowable-rest-app
+        environment:
+            - datasource.driver=org.postgresql.Driver
+            - datasource.url=jdbc:postgresql://flowable-db:5432/flowable
+            - datasource.username=flowable
+            - datasource.password=flowable
+            - idm.app.url=http://flowable-idm-app:8080/flowable-idm
+            - idm.app.redirect.url=http://localhost:8080/flowable-idm
+            - idm.admin.user=admin
+            - idm.admin.password=test
+            - rest.process.app.host=http://flowable-rest-app
+            - rest.process.app.port=9977
+            - rest.process.app.contextroot=flowable-rest
+            - rest.process.app.restroot=service
+            - rest.dmn.app.host=http://flowable-rest-app
+            - rest.dmn.app.port=9977
+            - rest.dmn.app.contextroot=flowable-rest
+            - rest.dmn.app.restroot=dmn-api
+            - rest.form.app.host=http://flowable-rest-app
+            - rest.form.app.port=9977
+            - rest.form.app.contextroot=flowable-rest
+            - rest.form.app.restroot=form-api
+            - rest.content.app.host=http://flowable-rest-app
+            - rest.content.app.port=9977
+            - rest.content.app.contextroot=flowable-rest
+            - rest.content.app.restroot=content-api
+        ports:
+            - 9988:9988
+    flowable-idm-app:
+        image: flowable/flowable-idm
+        depends_on:
+            - flowable-db
+        environment:
+            - datasource.driver=org.postgresql.Driver
+            - datasource.url=jdbc:postgresql://flowable-db:5432/flowable
+            - datasource.username=flowable
+            - datasource.password=flowable
+        ports:
+            - 8080:8080
+    flowable-db:
+        extends:
+            file: postgres.yml
+            service: flowable-postgres

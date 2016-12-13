@@ -1,6 +1,5 @@
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -12,8 +11,8 @@
     <packaging>war</packaging>
 
     <dependencies>
-    
-    	<dependency>
+
+        <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-ui-idm-conf</artifactId>
         </dependency>
@@ -25,22 +24,12 @@
             <groupId>org.flowable</groupId>
             <artifactId>flowable-ui-idm-logic</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-idm-engine</artifactId>
         </dependency>
 
-		<dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        
         <!-- LOGGING -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -54,7 +43,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
-        
+
         <!-- COMMON dependencies -->
         <dependency>
             <groupId>commons-fileupload</groupId>
@@ -73,14 +62,14 @@
             <artifactId>javax.servlet-api</artifactId>
         </dependency>
         <dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-		</dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.mchange</groupId>
             <artifactId>c3p0</artifactId>
         </dependency>
-        
+
         <!-- JSON -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -95,7 +84,7 @@
             <artifactId>jackson-datatype-joda</artifactId>
         </dependency>
 
-		<!-- SPRING -->
+        <!-- SPRING -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
@@ -109,13 +98,13 @@
             <artifactId>spring-jdbc</artifactId>
         </dependency>
         <dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-webmvc</artifactId>
-		</dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
@@ -177,19 +166,6 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.tomcat.maven</groupId>
-                <artifactId>tomcat7-maven-plugin</artifactId>
-                <configuration>
-                    <path>/flowable-idm</path>
-                    <port>8080</port>
-                    <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
-                    <systemProperties>
-                        <com.sun.management.jmxremote.port>4002</com.sun.management.jmxremote.port>
-                    </systemProperties>
-                </configuration>
-            </plugin>
-
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-eclipse-plugin</artifactId>
                 <version>2.9</version>
@@ -198,7 +174,6 @@
                     <downloadJavadocs>true</downloadJavadocs>
                 </configuration>
             </plugin>
-
         </plugins>
 
         <pluginManagement>
@@ -239,5 +214,198 @@
             </plugins>
         </pluginManagement>
     </build>
+    <profiles>
+        <profile>
+            <id>h2mem</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.tomcat.maven</groupId>
+                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <configuration>
+                            <path>/flowable-idm</path>
+                            <port>8080</port>
+                            <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
+                            <systemProperties>
+                                <com.sun.management.jmxremote.port>4002</com.sun.management.jmxremote.port>
+                            </systemProperties>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>mysql</id>
+            <dependencies>
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.tomcat.maven</groupId>
+                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <configuration>
+                            <path>/flowable-idm</path>
+                            <port>8080</port>
+                            <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
+                            <systemProperties>
+                                <datasource.driver>com.mysql.jdbc.Driver</datasource.driver>
+                                <datasource.url>jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8</datasource.url>
+                                <datasource.username>flowable</datasource.username>
+                                <datasource.password>flowable</datasource.password>
+                                <com.sun.management.jmxremote.port>4002</com.sun.management.jmxremote.port>
+                            </systemProperties>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>buildExecutableWar</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.tomcat.maven</groupId>
+                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <version>2.1</version>
+                        <configuration>
+                            <path>/</path>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>tomcat-run</id>
+                                <goals>
+                                    <goal>exec-war-only</goal>
+                                </goals>
+                                <phase>package</phase>
+                                <configuration>
+                                    <path>/flowable-idm</path>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>buildDockerImage</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.tomcat.maven</groupId>
+                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <version>2.1</version>
+                        <configuration>
+                            <path>/</path>
+                            <finalName>${project.build.finalName}.jar</finalName>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>tomcat-run</id>
+                                <goals>
+                                    <goal>exec-war-only</goal>
+                                </goals>
+                                <phase>package</phase>
+                                <configuration>
+                                    <path>/flowable-idm</path>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.spotify</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>0.4.13</version>
+                        <configuration>
+                            <imageName>flowable/${project.build.finalName}</imageName>
+                            <baseImage>flowable/java8_server</baseImage>
+                            <entryPoint>["java", "-jar", "/${project.build.finalName}.jar", "-httpPort=8080", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]</entryPoint>
+                            <forceTags>true</forceTags>
+                            <imageTags>
+                                <imageTag>${project.version}</imageTag>
+                                <imageTag>latest</imageTag>
+                            </imageTags>
+                            <resources>
+                                <resource>
+                                    <targetPath>/</targetPath>
+                                    <directory>${project.build.directory}</directory>
+                                    <include>${project.build.finalName}.jar</include>
+                                </resource>
+                            </resources>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>build-image</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>pushDockerImage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.spotify</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>0.4.13</version>
+                        <executions>
+                            <execution>
+                                <id>tag-image-version</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>tag</goal>
+                                </goals>
+                                <configuration>
+                                    <image>flowable/${project.build.finalName}</image>
+                                    <newName>docker.io/flowable/${project.build.finalName}:${project.version}</newName>
+                                    <serverId>docker-hub</serverId>
+                                    <pushImage>true</pushImage>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>tag-image-latest</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>tag</goal>
+                                </goals>
+                                <configuration>
+                                    <image>flowable/${project.build.finalName}</image>
+                                    <newName>docker.io/flowable/${project.build.finalName}:latest</newName>
+                                    <serverId>docker-hub</serverId>
+                                    <pushImage>true</pushImage>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

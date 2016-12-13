@@ -149,7 +149,6 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
     AppDefinitionRepresentation appDefinition = createAppDefinitionRepresentation(model);
     if (updatedModel.isPublish()) {
       appDefinitionPublishService.publishAppDefinition(null, model, user);
-     
     } else {
       appDefinition.setDefinition(updatedModel.getAppDefinition().getDefinition());
     }

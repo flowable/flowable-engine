@@ -13,6 +13,7 @@
 package org.flowable.app.conf;
 
 import org.flowable.app.service.idm.RemoteIdmServiceImpl;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
@@ -42,5 +43,11 @@ public class ApplicationConfiguration {
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
     }
-	
+
+	@Bean
+	public static PropertyPlaceholderConfigurer propertyPlaceholderConfigurer() {
+		PropertyPlaceholderConfigurer placeholderConfigurer = new PropertyPlaceholderConfigurer();
+		placeholderConfigurer.setSystemPropertiesMode(PropertyPlaceholderConfigurer.SYSTEM_PROPERTIES_MODE_OVERRIDE);
+		return placeholderConfigurer;
+	}
 }

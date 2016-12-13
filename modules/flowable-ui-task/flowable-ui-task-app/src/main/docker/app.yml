@@ -1,0 +1,33 @@
+version: '2'
+services:
+    flowable-task-app:
+        image: flowable/flowable-task
+        external_links:
+            - flowable-task-db:db
+            - flowable-idm-app:idm
+        environment:
+            - datasource.driver=org.postgresql.Driver
+            - datasource.url=jdbc:postgresql://db:5432/flowable
+            - datasource.username=flowable
+            - datasource.password=flowable
+            - idm.app.url=http://idm:8080/flowable-idm
+            - idm.app.redirect.url=http://localhost:8080/flowable-idm
+            - idm.admin.user=admin
+            - idm.admin.password=test
+        ports:
+            - 9999:9999
+    flowable-idm-app:
+        image: flowable/flowable-idm
+        external_links:
+            - flowable-task-db:db
+        environment:
+            - datasource.driver=org.postgresql.Driver
+            - datasource.url=jdbc:postgresql://db:5432/flowable
+            - datasource.username=flowable
+            - datasource.password=flowable
+        ports:
+            - 8080:8080
+    flowable-task-db:
+        extends:
+            file: postgres.yml
+            service: flowable-task-postgres
