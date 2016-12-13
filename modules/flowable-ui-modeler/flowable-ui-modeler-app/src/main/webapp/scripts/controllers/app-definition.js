@@ -205,7 +205,7 @@ angular.module('activitiModeler')
 
                 if (data.error) {
                     $scope.popup.loading = false;
-                    $scope.addAlertPromise($translate('APP.ALERT.PUBLISH-ERROR-MESSAGE', data), 'error');
+                    $scope.addAlert(data.errorDescription, 'error');
                 } else {
                     $scope.popup.loading = false;
                     $route.reload();
