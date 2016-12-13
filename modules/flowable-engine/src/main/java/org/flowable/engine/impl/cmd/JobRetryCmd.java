@@ -70,7 +70,7 @@ public class JobRetryCmd implements Command<Object> {
     AbstractJobEntity newJobEntity = null;
     if (currentFlowElement == null || failedJobRetryTimeCycleValue == null) {
 
-      log.debug("activity or FailedJobRetryTimerCycleValue is null in job {}. only decrementing retries.", jobId);
+      log.debug("activity or FailedJobRetryTimerCycleValue is null in job {}. Only decrementing retries.", jobId);
       
       if (job.getRetries() <= 1) {
         newJobEntity = commandContext.getJobManager().moveJobToDeadLetterJob(job);
