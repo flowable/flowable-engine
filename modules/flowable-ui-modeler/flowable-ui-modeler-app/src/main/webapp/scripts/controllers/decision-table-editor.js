@@ -589,7 +589,7 @@ angular.module('activitiModeler')
                 enableRowHeaderSelection: true,
                 multiSelect: false,
                 modifierKeysToMultiSelect: false,
-                enableHorizontalScrollbar: 0,
+                enableHorizontalScrollbar: 2,
                 enableColumnMenus: true,
                 enableSorting: false,
                 enableCellEditOnFocus: true,
