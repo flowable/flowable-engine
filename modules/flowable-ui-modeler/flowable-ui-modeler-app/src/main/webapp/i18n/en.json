@@ -408,7 +408,8 @@
         "ALERT": {
           "DELETE-CONFIRM": "App definition deleted",
           "PUBLISH-CONFIRM": "The app definition has been published",
-          "PUBLISH-ERROR": "Could not publish app definition. Please check the validity of the referenced process models"
+          "PUBLISH-ERROR": "Could not publish app definition. Please check the validity of the referenced process models",
+          "PUBLISH-ERROR-MESSAGE": "Error while publishing app: {{errorDescription}}"
         }
     },
 

@@ -203,14 +203,9 @@ angular.module('activitiModeler')
             success(function(data, status, headers, config) {
                 $scope.$hide();
 
-                if (data.errorType == 1) {
-                    var error = {modelName: data.errorDescription};
-                    $scope.addAlertPromise($translate('APP.POPUP.HAS-CUSTOM-STENCILITEM', error), 'error');
-
-                } else if (data.errorType == 2) {
-                    var error = { modelName: data.errorDescription};
-                    $scope.addAlertPromise($translate('APP.POPUP.HAS-VALIDATIONERROR', error), 'error');
-
+                if (data.error) {
+                    $scope.popup.loading = false;
+                    $scope.addAlertPromise($translate('APP.ALERT.PUBLISH-ERROR-MESSAGE', data), 'error');
                 } else {
                     $scope.popup.loading = false;
                     $route.reload();
@@ -218,28 +213,9 @@ angular.module('activitiModeler')
                 }
             }).
             error(function(data, status, headers, config) {
-
                 $scope.popup.loading = false;
-
-                if (status === 409 && data && data.messageKey === 'app.publish.procdef.key.conflict') {
-                    $scope.popup.error = {
-                        type: 'conflictingProcDefKey',
-                        data: data.customData
-                    };
-                } else if(status === 409 && data && data.messageKey === 'app.publish.procdef.duplicate.keys') {
-                    $scope.popup.error = {
-                        type: 'duplicateProcDefKeys',
-                        data: data.customData
-                    };
-                } else if (status === 409 && data && data.messageKey === 'app.publish.process.model.already.used') {
-                    $scope.popup.error = {
-                        type: 'processModelAlreadyUsed',
-                        data: data.customData
-                    };
-                } else {
-                    $scope.$hide();
-                    $scope.addAlertPromise($translate('APP.ALERT.PUBLISH-ERROR'), 'error');
-                }
+                $scope.$hide();
+                $scope.addAlertPromise($translate('APP.ALERT.PUBLISH-ERROR'), 'error');
             });
     };
 

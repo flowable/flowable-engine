@@ -299,9 +299,9 @@ public class AppDefinitionPublishService {
         logger.error("Invalid deploy result code: ", response.getStatusLine());
         throw new InternalServerErrorException("Invalid deploy result code: " + response.getStatusLine());
       }
-    } catch (Exception e) {
-      logger.error("Error calling deploy endpoint", e);
-      throw new InternalServerErrorException("Error calling deploy endpoint: " + e.getMessage());
+    } catch (IOException ioe) {
+      logger.error("Error calling deploy endpoint", ioe);
+      throw new InternalServerErrorException("Error calling deploy endpoint: " + ioe.getMessage());
     } finally {
       if (client != null) {
         try {
