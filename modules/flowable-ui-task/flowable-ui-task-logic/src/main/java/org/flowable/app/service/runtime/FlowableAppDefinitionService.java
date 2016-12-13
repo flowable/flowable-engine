@@ -51,7 +51,7 @@ public class FlowableAppDefinitionService {
   public ResultListDataRepresentation getAppDefinitions() {
     List<AppDefinitionRepresentation> resultList = new ArrayList<AppDefinitionRepresentation>();
 
-    // Default app: tasks and IDM (available for all)
+    // Default app: tasks (available for all)
     resultList.add(taskAppDefinitionRepresentation);
     
     // Custom apps

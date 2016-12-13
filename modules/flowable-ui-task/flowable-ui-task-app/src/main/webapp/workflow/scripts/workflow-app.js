@@ -113,8 +113,8 @@ activitiApp
        // turn loading bar spinner off (angular-loading-bar lib)
        cfpLoadingBarProvider.includeSpinner = false;
     }])
-    .run(['$rootScope', '$routeParams', '$timeout', '$translate', '$location', '$http', '$window', 'appResourceRoot', 'AppDefinitionService',
-        function($rootScope, $routeParams, $timeout, $translate, $location, $http, $window, appResourceRoot, AppDefinitionService) {
+    .run(['$rootScope', '$routeParams', '$timeout', '$translate', '$location', '$http', '$window', 'appResourceRoot', 'AppDefinitionService', 'ProcessService',
+        function($rootScope, $routeParams, $timeout, $translate, $location, $http, $window, appResourceRoot, AppDefinitionService, ProcessService) {
 
         $rootScope.restRootUrl = function() {
             return FLOWABLE.CONFIG.contextRoot;
@@ -261,17 +261,9 @@ activitiApp
         $rootScope.root = {};
 
         $rootScope.loadProcessDefinitions = function(deploymentKey) {
-            var url = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-definitions?latest=true';
-            if (deploymentKey) {
-                url += '&deploymentKey=' + deploymentKey;
-            }
-            $http({method: 'GET', url: url}).
-                success(function(response, status, headers, config) {
-                    $rootScope.root.processDefinitions = response.data;
-                }).
-                error(function(response, status, headers, config) {
-                    console.log('Something went wrong: ' + response);
-                });
+        	ProcessService.getProcessDefinitions(deploymentKey).then(function(response) {
+        		$rootScope.root.processDefinitions = response.data;
+        	});
         };
 
         $rootScope.$on("$locationChangeStart",

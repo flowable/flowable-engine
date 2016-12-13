@@ -21,8 +21,8 @@ angular.module('activitiApp')
 
        AppDefinitionService.setActiveDeploymentKey($scope.deploymentKey);
 
-       ProcessService.getProcessDefinitions($scope.deploymentKey).then(function(reponse){
-           $scope.processDefinitions = reponse.data;
+       ProcessService.getProcessDefinitions($scope.deploymentKey).then(function(response){
+           $scope.processDefinitions = response.data;
        });
 
       $scope.processName = '';
