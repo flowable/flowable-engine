@@ -38,8 +38,6 @@ public class DatabaseConfiguration {
   public DataSource dataSource() {
 
     String jdbcUrl = environment.getProperty("datasource.url", "jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000");
-    System.out.println("JDBC.URL: "+ jdbcUrl);
-
     String jdbcDriver = environment.getProperty("datasource.driver", "org.h2.Driver");
     String jdbcUsername = environment.getProperty("datasource.username", "sa");
     String jdbcPassword = environment.getProperty("datasource.password", "");
