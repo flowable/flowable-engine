@@ -1332,19 +1332,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public void initConfigurators() {
 
     allConfigurators = new ArrayList<ProcessEngineConfigurator>();
-
-    // Configurators that are explicitly added to the config
-    if (configurators != null) {
-      for (ProcessEngineConfigurator configurator : configurators) {
-        allConfigurators.add(configurator);
-      }
-    }
-
+    
     if (disableIdmEngine == false) {
       if (idmProcessEngineConfigurator != null) {
         allConfigurators.add(idmProcessEngineConfigurator);
       } else {
         allConfigurators.add(new IdmEngineConfigurator());
+      }
+    }
+
+    // Configurators that are explicitly added to the config
+    if (configurators != null) {
+      for (ProcessEngineConfigurator configurator : configurators) {
+        allConfigurators.add(configurator);
       }
     }
 

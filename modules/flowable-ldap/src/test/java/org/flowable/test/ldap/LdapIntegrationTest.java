@@ -47,12 +47,10 @@ public class LdapIntegrationTest extends LDAPTestCase {
     assertEquals(1, taskService.createTaskQuery().count());
     assertEquals(1, taskService.createTaskQuery().taskCandidateGroup("sales").count());
 
-    // Pepe is a member of the candidate group and should be able to find
-    // the task
+    // Pepe is a member of the candidate group and should be able to find the task
     assertEquals(1, taskService.createTaskQuery().taskCandidateUser("pepe").count());
 
-    // Dr. Bunsen is also a member of the candidate group and should be able
-    // to find the task
+    // Dr. Bunsen is also a member of the candidate group and should be able to find the task
     assertEquals(1, taskService.createTaskQuery().taskCandidateUser("bunsen").count());
 
     // Kermit is a candidate user and should be able to find the task

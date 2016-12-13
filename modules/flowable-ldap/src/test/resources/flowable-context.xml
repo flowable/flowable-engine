@@ -39,7 +39,7 @@
                 <property name="password" value="pass" />
                 
                 <!-- Query params -->
-                <property name="baseDn" value="o=activiti" />
+                <property name="baseDn" value="o=flowable" />
                 <property name="queryUserByUserId" value="(&amp;(objectClass=inetOrgPerson)(uid={0}))" />
                 <property name="queryUserByFullNameLike" value="(&amp;(objectClass=inetOrgPerson)(|({0}=*{1}*)({2}=*{3}*)))" />
                 <property name="queryGroupsForUser" value="(&amp;(objectClass=groupOfUniqueNames)(uniqueMember={0}))" />
@@ -61,15 +61,10 @@
 		<property name="processEngineConfiguration" ref="processEngineConfiguration" />
 	</bean>
 
-	<bean id="repositoryService" factory-bean="processEngine"
-		factory-method="getRepositoryService" />
-	<bean id="runtimeService" factory-bean="processEngine"
-		factory-method="getRuntimeService" />
-	<bean id="taskService" factory-bean="processEngine"
-		factory-method="getTaskService" />
-	<bean id="historyService" factory-bean="processEngine"
-		factory-method="getHistoryService" />
-	<bean id="managementService" factory-bean="processEngine"
-		factory-method="getManagementService" />
+	<bean id="repositoryService" factory-bean="processEngine" factory-method="getRepositoryService" />
+	<bean id="runtimeService" factory-bean="processEngine" factory-method="getRuntimeService" />
+	<bean id="taskService" factory-bean="processEngine" factory-method="getTaskService" />
+	<bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService" />
+	<bean id="managementService" factory-bean="processEngine" factory-method="getManagementService" />
 
 </beans>

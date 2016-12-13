@@ -28,7 +28,6 @@
 		<property name="dataSource" ref="dataSource" />
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="databaseSchemaUpdate" value="true" />
-		<property name="disableIdmEngine" value="true" />
 		<property name="configurators">
 		  <list>
 		      <bean class="org.flowable.ldap.LDAPConfigurator">
