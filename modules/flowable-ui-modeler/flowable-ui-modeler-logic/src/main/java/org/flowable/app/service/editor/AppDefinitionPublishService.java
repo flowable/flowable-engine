@@ -296,7 +296,7 @@ public class AppDefinitionPublishService {
       if (response.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
         return;
       } else {
-        logger.error("Invalid deploy result code: ", response.getStatusLine());
+        logger.error("Invalid deploy result code: {}", response.getStatusLine());
         throw new InternalServerErrorException("Invalid deploy result code: " + response.getStatusLine());
       }
     } catch (IOException ioe) {
