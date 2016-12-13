@@ -69,6 +69,7 @@
         <property name="jdbcPassword" value=""/>
 
         <property name="clock" ref="clock"/>
+        <property name="disableIdmEngine" value="true"/>
 
         <!--
         command context reuse is not possible when there are 2 engines running -> both with different

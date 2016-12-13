@@ -8,7 +8,7 @@
   simulation runs
   -->
   <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
-    <property name="processEngineName" value="simulationManager"/>
+    <property name="engineName" value="simulationManager"/>
     <property name="jdbcUrl" value="jdbc:h2:mem:simulationManager;DB_CLOSE_DELAY=1000"/>
     <property name="jdbcDriver" value="org.h2.Driver"/>
     <property name="jdbcUsername" value="sa"/>
@@ -62,20 +62,21 @@
     <constructor-arg name="processEngineConfiguration">
       <bean class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
 
-        <property name="processEngineName" value="simulation-run-activiti"/>
-        <property name="jdbcUrl" value="jdbc:h2:mem:simulation-run-activiti;DB_CLOSE_DELAY=1000"/>
+        <property name="engineName" value="simulation-run-flowable"/>
+        <property name="jdbcUrl" value="jdbc:h2:mem:simulation-run-flowable;DB_CLOSE_DELAY=1000"/>
         <property name="jdbcDriver" value="org.h2.Driver"/>
         <property name="jdbcUsername" value="sa"/>
         <property name="jdbcPassword" value=""/>
 
         <property name="clock" ref="clock"/>
+        <property name="disableIdmEngine" value="true"/>
 
         <!--
         command context reuse is not possible when there are 2 engines running -> both with different
         process definitions in the repository.
         -->
         <property name="defaultCommandConfig">
-          <bean class="org.flowable.engine.impl.interceptor.CommandConfig">
+          <bean class="org.flowable.engine.common.impl.interceptor.CommandConfig">
             <constructor-arg name="contextReusePossible" value="false"/>
           </bean>
         </property>
