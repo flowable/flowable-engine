@@ -53,7 +53,7 @@ public class OsgiScriptingEngines extends ScriptingEngines {
     try {
       scriptEngine = Extender.resolveScriptEngine(language);
     } catch (InvalidSyntaxException e) {
-      throw new FlowableException("problem resolving scripting engine" + e.getMessage(), e);
+      throw new FlowableException("problem resolving scripting engine: " + e.getMessage(), e);
     }
 
     if (scriptEngine == null) {

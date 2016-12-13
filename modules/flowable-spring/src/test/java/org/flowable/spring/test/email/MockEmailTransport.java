@@ -28,7 +28,7 @@ public class MockEmailTransport extends Transport {
     try {
       logger.info(message.getContent().toString());
     } catch (IOException ex) {
-      logger.error("Error occured while sending email" + ex);
+      logger.error("Error occured while sending email: " + ex);
     }
   }
 

@@ -90,7 +90,7 @@ public class GetFormModelCmd implements Command<FormModel>, Serializable {
       formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyParentDeploymentIdAndTenantId(formDefinitionKey, parentDeploymentId, tenantId);
       if (formDefinitionEntity == null) {
         throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey + 
-            "for parent deployment id '" + parentDeploymentId + "' and for tenant identifier " + tenantId, FormDefinitionEntity.class);
+            " for parent deployment id '" + parentDeploymentId + "' and for tenant identifier " + tenantId, FormDefinitionEntity.class);
       }
 
     } else {
