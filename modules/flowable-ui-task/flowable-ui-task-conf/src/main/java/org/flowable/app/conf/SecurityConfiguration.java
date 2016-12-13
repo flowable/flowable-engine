@@ -12,10 +12,14 @@
  */
 package org.flowable.app.conf;
 
+import java.util.Arrays;
+
 import org.flowable.app.filter.FlowableCookieFilter;
+import org.flowable.app.filter.FlowableCookieFilterCallback;
 import org.flowable.app.security.AjaxLogoutSuccessHandler;
 import org.flowable.app.security.ClearFlowableCookieLogoutHandler;
 import org.flowable.app.security.DefaultPrivileges;
+import org.flowable.app.security.EngineAuthenticationCookieFilterCallback;
 import org.flowable.app.security.RemoteIdmAuthenticationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,8 +56,15 @@ public class SecurityConfiguration {
 	
 	@Bean
   public FlowableCookieFilter flowableCookieFilter() {
-    return new FlowableCookieFilter();
+	  FlowableCookieFilter filter = new FlowableCookieFilter();
+    filter.setRequiredPrivileges(Arrays.asList(DefaultPrivileges.ACCESS_TASK));
+    return filter;
   }
+	
+	@Bean
+	public FlowableCookieFilterCallback flowableCookieFilterCallback() {
+	  return new EngineAuthenticationCookieFilterCallback();
+	}
 	
 	@Autowired
   public void configureGlobal(AuthenticationManagerBuilder auth) {
@@ -74,8 +85,6 @@ public class SecurityConfiguration {
 	@Order(10) // API config first (has Order(1))
   public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
-	  private static final Logger logger = LoggerFactory.getLogger(FormLoginWebSecurityConfigurerAdapter.class);
-	
     @Autowired
     protected Environment env;
     

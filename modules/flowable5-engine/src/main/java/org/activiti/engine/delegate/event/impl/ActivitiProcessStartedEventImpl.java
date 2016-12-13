@@ -19,7 +19,7 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
 
 /**
- * An {@link org.activiti5.engine.delegate.event.FlowableCancelledEvent} implementation.
+ * An {@link org.activiti.engine.delegate.event.FlowableCancelledEvent} implementation.
  *
  * @author martin.grofcik
  */

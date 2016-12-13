@@ -27,41 +27,41 @@
 		<argLine>-Duser.language=en</argLine>
 
 		<!-- OSGi bundles properties -->
-		<activiti.artifact />
-		<activiti.osgi.import.activiti.version>version="[$(version;==;${activiti.osgi.version.clean}),$(version;=+;${activiti.osgi.version.clean}))"</activiti.osgi.import.activiti.version>
-		<activiti.osgi.import.strict.version>version="[$(version;===;${activiti.osgi.version.clean}),$(version;==+;${activiti.osgi.version.clean}))"</activiti.osgi.import.strict.version>
-		<activiti.osgi.import.default.version>[$(version;==;$(@)),$(version;+;$(@)))</activiti.osgi.import.default.version>
-		<activiti.osgi.import.defaults>
-		</activiti.osgi.import.defaults>
-		<activiti.osgi.import.before.defaults />
-		<activiti.osgi.import.additional />
-		<activiti.osgi.export.additional />
-		<activiti.osgi.import.pkg>
-			org.activiti.*;${activiti.osgi.import.activiti.version},
-			${activiti.osgi.import.before.defaults},
-			${activiti.osgi.import.defaults},
-			${activiti.osgi.import.additional},
+		<flowable.artifact />
+		<flowable.osgi.import.flowable.version>version="[$(version;==;${flowable.osgi.version.clean}),$(version;=+;${flowable.osgi.version.clean}))"</flowable.osgi.import.flowable.version>
+		<flowable.osgi.import.strict.version>version="[$(version;===;${flowable.osgi.version.clean}),$(version;==+;${flowable.osgi.version.clean}))"</flowable.osgi.import.strict.version>
+		<flowable.osgi.import.default.version>[$(version;==;$(@)),$(version;+;$(@)))</flowable.osgi.import.default.version>
+		<flowable.osgi.import.defaults>
+		</flowable.osgi.import.defaults>
+		<flowable.osgi.import.before.defaults />
+		<flowable.osgi.import.additional />
+		<flowable.osgi.export.additional />
+		<flowable.osgi.import.pkg>
+			org.flowable.*;${flowable.osgi.import.flowable.version},
+			${flowable.osgi.import.before.defaults},
+			${flowable.osgi.import.defaults},
+			${flowable.osgi.import.additional},
 			*
-		</activiti.osgi.import.pkg>
-		<activiti.osgi.activator />
-		<activiti.osgi.failok>false</activiti.osgi.failok>
-		<activiti.osgi.export>${activiti.osgi.export.pkg};${activiti.osgi.version};-noimport:=true</activiti.osgi.export>
-		<!-- <activiti.osgi.export.pkg>!*.impl;${activiti.artifact}*</activiti.osgi.export.pkg>
-			<activiti.osgi.private.pkg>${activiti.artifact}*.impl</activiti.osgi.private.pkg> -->
-		<activiti.osgi.export.pkg>
-			${activiti.artifact}*,
-			${activiti.osgi.export.additional}
-		</activiti.osgi.export.pkg>
-		<activiti.osgi.private.pkg></activiti.osgi.private.pkg>
-		<activiti.osgi.version>version=${project.version}</activiti.osgi.version>
-		<activiti.osgi.split.pkg>-split-package:=first</activiti.osgi.split.pkg>
-		<activiti.osgi.import>${activiti.osgi.import.pkg}</activiti.osgi.import>
-		<activiti.osgi.dynamic />
-		<activiti.osgi.symbolic.name>${activiti.artifact}</activiti.osgi.symbolic.name>
-		<activiti.osgi.exclude.dependencies>false</activiti.osgi.exclude.dependencies>
-		<activiti.osgi.remove.headers>Ignore-Package,Include-Resource,Private-Package,Bundle-DocURL</activiti.osgi.remove.headers>
-		<activiti.osgi.include.resource>{maven-resources}</activiti.osgi.include.resource>
-		<activiti.osgi.embed></activiti.osgi.embed>
+		</flowable.osgi.import.pkg>
+		<flowable.osgi.activator />
+		<flowable.osgi.failok>false</flowable.osgi.failok>
+		<flowable.osgi.export>${flowable.osgi.export.pkg};${flowable.osgi.version};-noimport:=true</flowable.osgi.export>
+		<!-- <flowable.osgi.export.pkg>!*.impl;${flowable.artifact}*</flowable.osgi.export.pkg>
+			<flowable.osgi.private.pkg>${flowable.artifact}*.impl</flowable.osgi.private.pkg> -->
+		<flowable.osgi.export.pkg>
+			${flowable.artifact}*,
+			${flowable.osgi.export.additional}
+		</flowable.osgi.export.pkg>
+		<flowable.osgi.private.pkg></flowable.osgi.private.pkg>
+		<flowable.osgi.version>version=${project.version}</flowable.osgi.version>
+		<flowable.osgi.split.pkg>-split-package:=first</flowable.osgi.split.pkg>
+		<flowable.osgi.import>${flowable.osgi.import.pkg}</flowable.osgi.import>
+		<flowable.osgi.dynamic />
+		<flowable.osgi.symbolic.name>${flowable.artifact}</flowable.osgi.symbolic.name>
+		<flowable.osgi.exclude.dependencies>false</flowable.osgi.exclude.dependencies>
+		<flowable.osgi.remove.headers>Ignore-Package,Include-Resource,Private-Package,Bundle-DocURL</flowable.osgi.remove.headers>
+		<flowable.osgi.include.resource>{maven-resources}</flowable.osgi.include.resource>
+		<flowable.osgi.embed></flowable.osgi.embed>
 	</properties>
 
 	<dependencyManagement>
@@ -886,28 +886,28 @@
 				<version>2.1.0</version>
 				<extensions>true</extensions>
 				<configuration>
-					<excludeDependencies>${activiti.osgi.exclude.dependencies}</excludeDependencies>
+					<excludeDependencies>${flowable.osgi.exclude.dependencies}</excludeDependencies>
 					<instructions>
 						<Bundle-Name>${project.name}</Bundle-Name>
-						<Bundle-SymbolicName>${activiti.osgi.symbolic.name}</Bundle-SymbolicName>
-						<Bundle-Activator>${activiti.osgi.activator}</Bundle-Activator>
-						<Export-Package>${activiti.osgi.export}</Export-Package>
-						<Import-Package>org.activiti.osgi;resolution:=optional,
-							${activiti.osgi.import}</Import-Package>
-						<DynamicImport-Package>${activiti.osgi.dynamic}</DynamicImport-Package>
-						<Private-Package>${activiti.osgi.private.pkg}</Private-Package>
-						<Implementation-Title>Activiti</Implementation-Title>
+						<Bundle-SymbolicName>${flowable.osgi.symbolic.name}</Bundle-SymbolicName>
+						<Bundle-Activator>${flowable.osgi.activator}</Bundle-Activator>
+						<Export-Package>${flowable.osgi.export}</Export-Package>
+						<Import-Package>org.flowable.osgi;resolution:=optional,
+							${flowable.osgi.import}</Import-Package>
+						<DynamicImport-Package>${flowable.osgi.dynamic}</DynamicImport-Package>
+						<Private-Package>${flowable.osgi.private.pkg}</Private-Package>
+						<Implementation-Title>Flowable</Implementation-Title>
 						<Implementation-Version>${project.version}</Implementation-Version>
-						<Include-Resource>${activiti.osgi.include.resource}</Include-Resource>
-						<_versionpolicy>${activiti.osgi.import.default.version}</_versionpolicy>
-						<_removeheaders>${activiti.osgi.remove.headers}</_removeheaders>
-						<_failok>${activiti.osgi.failok}</_failok>
-						<Export-Service>${activiti.osgi.export.service}</Export-Service>
-						<Import-Service>${activiti.osgi.import.service}</Import-Service>
-						<Embed-Dependency>${activiti.osgi.embed}</Embed-Dependency>
+						<Include-Resource>${flowable.osgi.include.resource}</Include-Resource>
+						<_versionpolicy>${flowable.osgi.import.default.version}</_versionpolicy>
+						<_removeheaders>${flowable.osgi.remove.headers}</_removeheaders>
+						<_failok>${flowable.osgi.failok}</_failok>
+						<Export-Service>${flowable.osgi.export.service}</Export-Service>
+						<Import-Service>${flowable.osgi.import.service}</Import-Service>
+						<Embed-Dependency>${flowable.osgi.embed}</Embed-Dependency>
 					</instructions>
 					<versions>
-						<activiti.osgi.version.clean>${project.version}</activiti.osgi.version.clean>
+						<flowable.osgi.version.clean>${project.version}</flowable.osgi.version.clean>
 					</versions>
 				</configuration>
 			</plugin>

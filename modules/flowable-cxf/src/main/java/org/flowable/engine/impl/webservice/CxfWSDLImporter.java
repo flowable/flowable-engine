@@ -46,8 +46,6 @@ import org.flowable.engine.impl.bpmn.data.SimpleStructureDefinition;
 import org.flowable.engine.impl.bpmn.data.StructureDefinition;
 import org.flowable.engine.impl.bpmn.parser.XMLImporter;
 import org.flowable.engine.impl.util.ReflectUtil;
-import org.flowable.engine.impl.webservice.WSOperation;
-import org.flowable.engine.impl.webservice.WSService;
 
 import com.ibm.wsdl.extensions.schema.SchemaImpl;
 import com.sun.codemodel.JClass;
@@ -208,7 +206,7 @@ public class CxfWSDLImporter implements XMLImporter {
   protected static void _importFields(final JDefinedClass theClass, final AtomicInteger index, final SimpleStructureDefinition structure) {
       
     final JClass parentClass = theClass._extends();
-    if (parentClass != null && parentClass instanceof JDefinedClass) {
+    if (parentClass instanceof JDefinedClass) {
       _importFields((JDefinedClass)parentClass, index, structure);
     }
     for (Entry<String, JFieldVar> entry : theClass.fields().entrySet()) {

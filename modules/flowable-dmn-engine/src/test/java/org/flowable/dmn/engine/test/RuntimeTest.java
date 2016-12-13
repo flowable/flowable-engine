@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.dmn.api.RuleEngineExecutionResult;
-import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;

@@ -28,6 +28,7 @@
 		<property name="dataSource" ref="dataSource" />
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="databaseSchemaUpdate" value="true" />
+		<property name="disableIdmEngine" value="true" />
 		<property name="configurators">
 		  <list>
 		      <bean class="org.flowable.ldap.LDAPConfigurator">
@@ -65,15 +66,10 @@
 		<property name="processEngineConfiguration" ref="processEngineConfiguration" />
 	</bean>
 
-	<bean id="repositoryService" factory-bean="processEngine"
-		factory-method="getRepositoryService" />
-	<bean id="runtimeService" factory-bean="processEngine"
-		factory-method="getRuntimeService" />
-	<bean id="taskService" factory-bean="processEngine"
-		factory-method="getTaskService" />
-	<bean id="historyService" factory-bean="processEngine"
-		factory-method="getHistoryService" />
-	<bean id="managementService" factory-bean="processEngine"
-		factory-method="getManagementService" />
+	<bean id="repositoryService" factory-bean="processEngine" factory-method="getRepositoryService" />
+	<bean id="runtimeService" factory-bean="processEngine" factory-method="getRuntimeService" />
+	<bean id="taskService" factory-bean="processEngine" factory-method="getTaskService" />
+	<bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService" />
+	<bean id="managementService" factory-bean="processEngine" factory-method="getManagementService" />
 
 </beans>

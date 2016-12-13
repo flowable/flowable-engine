@@ -27,24 +27,24 @@ Flowable cdi can be setup in different environments. In this section we briefly 
 
 ==== Looking up a Process Engine
 
-The cdi extension needs to get access to a ProcessEngine. To achieve this, an implementation of the interface +org.activiti.cdi.spi.ProcessEngineLookup+ is looked up at runtime. The cdi module ships with a default implementation named +org.activiti.cdi.impl.LocalProcessEngineLookup+, which uses  the ++ProcessEngines++-Utility class for looking up the ProcessEngine. In the default configuration +$$ProcessEngines#NAME_DEFAULT$$+ is used to lookup the ProcessEngine. This class might be subclassed to set a custom name. NOTE: needs an +activiti.cfg.xml+ configuration on the classpath.		 
+The cdi extension needs to get access to a ProcessEngine. To achieve this, an implementation of the interface +org.flowable.cdi.spi.ProcessEngineLookup+ is looked up at runtime. The cdi module ships with a default implementation named +org.flowable.cdi.impl.LocalProcessEngineLookup+, which uses  the ++ProcessEngines++-Utility class for looking up the ProcessEngine. In the default configuration +$$ProcessEngines#NAME_DEFAULT$$+ is used to lookup the ProcessEngine. This class might be subclassed to set a custom name. NOTE: needs an +flowable.cfg.xml+ configuration on the classpath.		 
     	
-Flowable cdi uses a java.util.ServiceLoader SPI for resolving an instance of +org.activiti.cdi.spi.ProcessEngineLookup+. In order to provide a custom implementation of the interface, we need to add a plain text file named  +META-INF/services/org.activiti.cdi.spi.ProcessEngineLookup+ to our deployment, in which we specify the fully qualified classname of the implementation. 
+Flowable cdi uses a java.util.ServiceLoader SPI for resolving an instance of +org.flowable.cdi.spi.ProcessEngineLookup+. In order to provide a custom implementation of the interface, we need to add a plain text file named  +META-INF/services/org.flowable.cdi.spi.ProcessEngineLookup+ to our deployment, in which we specify the fully qualified classname of the implementation. 
     	
 [NOTE]
 ====
-If you do not provide a custom +org.activiti.cdi.spi.ProcessEngineLookup+ implementation, Flowable will use the default +LocalProcessEngineLookup+ implementation. In that case, all you need to do is providing a activiti.cfg.xml file on the classpath (see next section).
+If you do not provide a custom +org.flowable.cdi.spi.ProcessEngineLookup+ implementation, Flowable will use the default +LocalProcessEngineLookup+ implementation. In that case, all you need to do is providing a flowable.cfg.xml file on the classpath (see next section).
 ====
 
 
 ==== Configuring the Process Engine
 
-Configuration depends on the selected ProcessEngineLookup-Strategy (cf. previous section). Here, we focus on the configuration options available in combination with the LocalProcessEngineLookup, which requires us to provide  a Spring activiti.cfg.xml file on the classpath.
+Configuration depends on the selected ProcessEngineLookup-Strategy (cf. previous section). Here, we focus on the configuration options available in combination with the LocalProcessEngineLookup, which requires us to provide  a Spring flowable.cfg.xml file on the classpath.
 
 Flowable offers different ProcessEngineConfiguration implementations mostly dependent on the underlying transaction management strategy. The flowable-cdi module is not concerned with transactions, which means that potentially any transaction management strategy  can be used (even the Spring transaction abstraction). As a convenience, the cdi-module provides two custom ProcessEngineConfiguration implementations: 
      	
-* ++org.activiti.cdi.CdiJtaProcessEngineConfiguration++: a subclass of the Flowable JtaProcessEngineConfiguration,  can be used if JTA-managed transactions should be used for Flowable
-* ++org.activiti.cdi.CdiStandaloneProcessEngineConfiguration++: a subclass of the Flowable StandaloneProcessEngineConfiguration,  can be used if plain JDBC transactions should be used for Flowable. The following is an example activiti.cfg.xml file for JBoss 7:
+* ++org.flowable.cdi.CdiJtaProcessEngineConfiguration++: a subclass of the Flowable JtaProcessEngineConfiguration,  can be used if JTA-managed transactions should be used for Flowable
+* ++org.flowable.cdi.CdiStandaloneProcessEngineConfiguration++: a subclass of the Flowable StandaloneProcessEngineConfiguration,  can be used if plain JDBC transactions should be used for Flowable. The following is an example flowable.cfg.xml file for JBoss 7:
      
 [source,xml,linenums]
 ----
@@ -61,7 +61,7 @@ Flowable offers different ProcessEngineConfiguration implementations mostly depe
 
 	<!-- process engine configuration -->
 	<bean id="processEngineConfiguration"
-		class="org.activiti.cdi.CdiJtaProcessEngineConfiguration">
+		class="org.flowable.cdi.CdiJtaProcessEngineConfiguration">
 		<!-- lookup the default Jboss datasource -->
 		<property name="dataSourceJndiName" value="java:jboss/datasources/ExampleDS" />
 		<property name="databaseType" value="h2" />
@@ -74,7 +74,7 @@ Flowable offers different ProcessEngineConfiguration implementations mostly depe
      	
 ----
 
-And this is how it would look like for Glassfish 3.1.1 (assuming a datasource named jdbc/activiti is properly configured):
+And this is how it would look like for Glassfish 3.1.1 (assuming a datasource named jdbc/flowable is properly configured):
 
 [source,xml,linenums]     	
 ----
@@ -91,8 +91,8 @@ And this is how it would look like for Glassfish 3.1.1 (assuming a datasource na
 
 	<!-- process engine configuration -->
 	<bean id="processEngineConfiguration"
-		class="org.activiti.cdi.CdiJtaProcessEngineConfiguration">
-		<property name="dataSourceJndiName" value="jdbc/activiti" />
+		class="org.flowable.cdi.CdiJtaProcessEngineConfiguration">
+		<property name="dataSourceJndiName" value="jdbc/flowable" />
 		<property name="transactionManager" ref="transactionManager" />
 		<!-- using externally managed transactions -->
 		<property name="transactionsExternallyManaged" value="true" />
@@ -138,7 +138,7 @@ In the default configuration, process instances are associated with the "broades
 
 ==== Associating a Conversation with a Process Instance 
 	
-When resolving @BusinessProcessScoped beans, or injecting process variables, we rely on an existing association  between an active cdi scope and a process instance. Flowable-cdi provides the +org.activiti.cdi.BusinessProcess+ bean  for controlling the association, most prominently:
+When resolving @BusinessProcessScoped beans, or injecting process variables, we rely on an existing association  between an active cdi scope and a process instance. Flowable-cdi provides the +org.flowable.cdi.BusinessProcess+ bean  for controlling the association, most prominently:
 		
 * the _startProcessBy(...)_ methods, mirroring the respective methods exposed by the Flowable +RuntimeService+ allowing to start and subsequently associating a business process,
 * +resumeProcessById(String processInstanceId)+, allowing to associate the process instance with the provided id,
@@ -158,7 +158,7 @@ Note that the ++BusinessProcess++-bean is a +@Named+ bean, which means that the 
 
 ==== Declaratively controlling the Process
 
-Flowable-cdi allows declaratively starting process instances and completing tasks using annotations. The  +@org.activiti.cdi.annotation.StartProcess+ annotation allows to start a process instance  either by "key" or by "name".  Note that the process instance is started _after_ the annotated method returns. Example:
+Flowable-cdi allows declaratively starting process instances and completing tasks using annotations. The  +@org.flowable.cdi.annotation.StartProcess+ annotation allows to start a process instance  either by "key" or by "name".  Note that the process instance is started _after_ the annotated method returns. Example:
 		
 [source,java,linenums]
 ----
@@ -169,7 +169,7 @@ public String submitRequest(BusinessTripRequest request) {
 }			
 ----
 
-Depending on the configuration of Flowable, the code of the annotated method and the starting of the  process instance will be combined in the same transaction. The ++@org.activiti.cdi.annotation.CompleteTask++-annotation works in the same way:
+Depending on the configuration of Flowable, the code of the annotated method and the starting of the  process instance will be combined in the same transaction. The ++@org.flowable.cdi.annotation.CompleteTask++-annotation works in the same way:
 
 [source,java,linenums]
 ----
@@ -190,7 +190,7 @@ Flowable-cdi exposes CDI beans to Flowable El, using a custom resolver. This mak
 [source,xml,linenums]
 ----
 <userTask id="authorizeBusinessTrip" name="Authorize Business Trip"			 
-			activiti:assignee="#{authorizingManager.account.username}" />
+			flowable:assignee="#{authorizingManager.account.username}" />
 ----
 
 Where "authorizingManager" could be a bean provided by a producer method:
@@ -210,7 +210,7 @@ public Employee authorizingManager() {
 
 ----
 
-We can use the same feature to call a business method of an EJB in a service task, using the ++activiti:expression="myEjb.method()"++-extension. Note that this requires a ++@Named++-annotation on the ++MyEjb++-class.
+We can use the same feature to call a business method of an EJB in a service task, using the ++flowable:expression="myEjb.method()"++-extension. Note that this requires a ++@Named++-annotation on the ++MyEjb++-class.
 
 ==== Working with @BusinessProcessScoped beans
 
@@ -263,14 +263,14 @@ Flowable can be hooked-up to the CDI event-bus. This allows us to be notified of
 ----
 <property name="postBpmnParseHandlers">
 	<list>
-		<bean class="org.activiti.cdi.impl.event.CdiEventSupportBpmnParseHandler" />
+		<bean class="org.flowable.cdi.impl.event.CdiEventSupportBpmnParseHandler" />
 	</list>
 </property>
 ----
 
 
 Now Flowable is configured for publishing events using the CDI event bus. The following gives an overview of how process events can be received in CDI beans. In CDI, we can declaratively specify event observers using the ++@Observes++-annotation. Event notification is type-safe. The type of
-process events is ++org.activiti.cdi.BusinessProcessEvent++.
+process events is ++org.flowable.cdi.BusinessProcessEvent++.
 The following is an example of a simple event observer method:
 
 [source,java,linenums]

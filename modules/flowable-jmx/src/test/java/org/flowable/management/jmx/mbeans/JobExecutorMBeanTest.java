@@ -32,7 +32,6 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.management.jmx.DefaultManagementMBeanAssembler;
 import org.flowable.management.jmx.ManagementMBeanAssembler;
-import org.flowable.management.jmx.mbeans.JobExecutorMBean;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

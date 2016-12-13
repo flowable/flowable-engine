@@ -13,8 +13,7 @@
 
 package org.flowable.rest.service.api.identity;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize.Inclusion;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * @author Frederik Heremans
@@ -32,7 +31,7 @@ public class UserInfoRequest {
     return key;
   }
 
-  @JsonSerialize(include = Inclusion.NON_NULL)
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   public void setValue(String value) {
     this.value = value;
   }

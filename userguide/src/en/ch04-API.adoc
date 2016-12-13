@@ -28,7 +28,7 @@ DynamicBpmnService dynamicBpmnService = processEngine.getDynamicBpmnService();
 +ProcessEngines.getDefaultProcessEngine()+ will initialize and build a process engine the first time it is called and afterwards always return the same process engine. Proper creation and closing of all process engines can be done with +ProcessEngines.init()+  and +ProcessEngines.destroy()+.
 
 
-The ProcessEngines class will scan for all +activiti.cfg.xml+ and +activiti-context.xml+ files. For all +activiti.cfg.xml+ files, the process engine will be built in the typical Flowable way: +ProcessEngineConfiguration.createProcessEngineConfigurationFromInputStream(inputStream).buildProcessEngine()+. For all +activiti-context.xml+ files, the process engine will be built in the Spring way: First the Spring application context is created and then the process engine is obtained from that application context.
+The ProcessEngines class will scan for all +flowable.cfg.xml+ and +flowable-context.xml+ files. For all +flowable.cfg.xml+ files, the process engine will be built in the typical Flowable way: +ProcessEngineConfiguration.createProcessEngineConfigurationFromInputStream(inputStream).buildProcessEngine()+. For all +flowable-context.xml+ files, the process engine will be built in the Spring way: First the Spring application context is created and then the process engine is obtained from that application context.
 
 All services are stateless. This means that you can easily run Flowable on multiple nodes in a cluster, each going to the same database, without having to worry about which machine actually executed previous calls. Any call to any service is idempotent regardless of where it is executed.
 
@@ -66,7 +66,7 @@ For more detailed information on the service operations and the engine API, see 
 
 === Exception strategy
 
-The base exception in Flowable is the +org.activiti.engine.ActivitiException+, an unchecked exception. This exception can be thrown at all times by the API, but 'expected' exceptions that happen in specific methods are documented in the link:$$http://flowable.org/javadocs/index.html$$[ the javadocs]. For example, an extract from ++TaskService++:
+The base exception in Flowable is the +org.flowable.engine.ActivitiException+, an unchecked exception. This exception can be thrown at all times by the API, but 'expected' exceptions that happen in specific methods are documented in the link:$$http://flowable.org/javadocs/index.html$$[ the javadocs]. For example, an extract from ++TaskService++:
 
 [source,java,linenums]
 ----
@@ -318,9 +318,9 @@ For more concrete usage and examples, check out <<springExpressions,Expressions 
 
 Business processes are an integral part of software projects and they should be tested in the same way normal application logic is tested: with unit tests. Since Flowable is an embeddable Java engine, writing unit tests for business processes is as simple as writing regular unit tests.
 
-Flowable supports both JUnit versions 3 and 4 styles of unit testing. In the JUnit 3 style, the +org.activiti.engine.test.ActivitiTestCase+ must be extended. This will make the ProcessEngine and the services available through protected member fields. In the +setup()+ of the test,  the processEngine will be initialized by default with the +activiti.cfg.xml+ resource on the classpath.  To specify a different configuration file, override the _getConfigurationResource()_ method. Process engines are cached statically over multiple unit tests when the configuration resource is the same.
+Flowable supports both JUnit versions 3 and 4 styles of unit testing. In the JUnit 3 style, the +org.flowable.engine.test.ActivitiTestCase+ must be extended. This will make the ProcessEngine and the services available through protected member fields. In the +setup()+ of the test,  the processEngine will be initialized by default with the +flowable.cfg.xml+ resource on the classpath.  To specify a different configuration file, override the _getConfigurationResource()_ method. Process engines are cached statically over multiple unit tests when the configuration resource is the same.
 
-By extending +ActivitiTestCase+, you can annotate test methods with +org.activiti.engine.test.Deployment+. Before the test is run, a resource file of the form +testClassName.testMethod.bpmn20.xml+ in the same package as the test class, will be deployed. At the end of the test, the deployment will be deleted, including all related process instances, tasks, etc. The +Deployment+ annotation also supports setting the resource location explicitly. See the class itself for more information.
+By extending +ActivitiTestCase+, you can annotate test methods with +org.flowable.engine.test.Deployment+. Before the test is run, a resource file of the form +testClassName.testMethod.bpmn20.xml+ in the same package as the test class, will be deployed. At the end of the test, the deployment will be deleted, including all related process instances, tasks, etc. The +Deployment+ annotation also supports setting the resource location explicitly. See the class itself for more information.
 
 Taking all that in account, a JUnit 3 style test looks as follows.
 
@@ -341,24 +341,24 @@ public class MyBusinessProcessTest extends ActivitiTestCase {
 }
 ----
 
-To get the same functionality when using the JUnit 4 style of writing unit tests, the +org.activiti.engine.test.ActivitiRule+ Rule must be used. Through this rule, the process engine and services are available through getters. As with the +ActivitiTestCase+ (see above), including this +Rule+ will enable the use of the +org.activiti.engine.test.Deployment+ annotation (see above for an explanation of its use and configuration) and it will look for the default configuration file on the classpath. Process engines are statically cached over multiple unit tests when using the same configuration resource.
+To get the same functionality when using the JUnit 4 style of writing unit tests, the +org.flowable.engine.test.FlowableRule+ Rule must be used. Through this rule, the process engine and services are available through getters. As with the +ActivitiTestCase+ (see above), including this +Rule+ will enable the use of the +org.flowable.engine.test.Deployment+ annotation (see above for an explanation of its use and configuration) and it will look for the default configuration file on the classpath. Process engines are statically cached over multiple unit tests when using the same configuration resource.
 
-The following code snippet shows an example of using the JUnit 4 style of testing and the usage of the +ActivitiRule+.
+The following code snippet shows an example of using the JUnit 4 style of testing and the usage of the +FlowableRule+.
 
 [source,java,linenums]
 ----
 public class MyBusinessProcessTest {
 
   @Rule
-  public ActivitiRule activitiRule = new ActivitiRule();
+  public FlowableRule FlowableRule = new FlowableRule();
 
   @Test
   @Deployment
   public void ruleUsageExample() {
-    RuntimeService runtimeService = activitiRule.getRuntimeService();
+    RuntimeService runtimeService = FlowableRule.getRuntimeService();
     runtimeService.startProcessInstanceByKey("ruleUsage");
 
-    TaskService taskService = activitiRule.getTaskService();
+    TaskService taskService = FlowableRule.getTaskService();
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("My Task", task.getName());
 
@@ -391,7 +391,7 @@ Select the line you've just typed and right-click on it. Now select 'Display' (o
 
 image::images/api.test.debug.start.h2.server.2.png[align="center"]
 
-Now open up a browser and go to link:$$http://localhost:8082$$[http://localhost:8082], and fill in the JDBC URL to the in-memory database (by default this is ++jdbc:h2:mem:activiti++), and hit the connect button.
+Now open up a browser and go to link:$$http://localhost:8082$$[http://localhost:8082], and fill in the JDBC URL to the in-memory database (by default this is ++jdbc:h2:mem:flowable++), and hit the connect button.
 
 image::images/api.test.debug.h2.login.png[align="center"]
 
@@ -425,7 +425,7 @@ public class ProcessEnginesServletContextListener implements ServletContextListe
 }
 ----
 
-The +contextInitialized+ method will delegate to +ProcessEngines.init()+. That will look for +activiti.cfg.xml+ resource files on the classpath, and create a +ProcessEngine+ for the given configurations (e.g. multiple jars with a configuration file). If you have multiple such resource files on the classpath, make sure they all have different names. When the process engine is needed, it can be fetched using
+The +contextInitialized+ method will delegate to +ProcessEngines.init()+. That will look for +flowable.cfg.xml+ resource files on the classpath, and create a +ProcessEngine+ for the given configurations (e.g. multiple jars with a configuration file). If you have multiple such resource files on the classpath, make sure they all have different names. When the process engine is needed, it can be fetched using
 
 [source,java,linenums]
 ----

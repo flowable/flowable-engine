@@ -35,6 +35,7 @@
         <property name="databaseSchemaUpdate" value="true"/>
 
         <property name="clock" ref="clock"/>
+        <property name="disableIdmEngine" value="true"/>
       </bean>
     </constructor-arg>
   </bean>

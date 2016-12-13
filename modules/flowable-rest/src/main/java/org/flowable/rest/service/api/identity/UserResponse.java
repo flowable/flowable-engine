@@ -13,8 +13,7 @@
 
 package org.flowable.rest.service.api.identity;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize.Inclusion;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * @author Frederik Hermans
@@ -69,7 +68,7 @@ public class UserResponse {
     this.lastName = lastName;
   }
 
-  @JsonSerialize(include = Inclusion.NON_NULL)
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   public String getPassword() {
     return passWord;
   }

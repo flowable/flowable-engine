@@ -17,9 +17,9 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <spring.mule.version>3.2.10.RELEASE</spring.mule.version>
-    <activiti.artifact>
+    <flowable.artifact>
       org.activiti.mule.test
-    </activiti.artifact>
+    </flowable.artifact>
   </properties>
 
   <build>

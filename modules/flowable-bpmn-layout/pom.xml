@@ -14,9 +14,9 @@
   </parent>
 
   <properties>
-    <activiti.artifact>
+    <flowable.artifact>
       org.flowable.bpmn.layout
-    </activiti.artifact>
+    </flowable.artifact>
   </properties>
 
   <build>

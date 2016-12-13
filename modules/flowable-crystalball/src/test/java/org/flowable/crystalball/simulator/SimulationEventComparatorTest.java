@@ -1,8 +1,5 @@
 package org.flowable.crystalball.simulator;
 
-import org.flowable.crystalball.simulator.SimulationEvent;
-import org.flowable.crystalball.simulator.SimulationEventComparator;
-
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at

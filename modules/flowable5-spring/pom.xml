@@ -14,12 +14,12 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <activiti.artifact>
+        <flowable.artifact>
             org.activiti.spring
-        </activiti.artifact>
-        <activiti.osgi.import.additional>
+        </flowable.artifact>
+        <flowable.osgi.import.additional>
           org.springframework.test.context*;resolution:=optional,
-        </activiti.osgi.import.additional>
+        </flowable.osgi.import.additional>
     </properties>
 
     <build>

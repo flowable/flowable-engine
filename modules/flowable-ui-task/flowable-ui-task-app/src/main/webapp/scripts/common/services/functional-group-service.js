@@ -43,7 +43,7 @@ activitiModule.service('FunctionalGroupService', ['$http', '$q',
             return httpAsPromise(
                 {
                     method: 'GET',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/editor-groups',
+                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/workflow-groups',
                     params: params
                 }
             )

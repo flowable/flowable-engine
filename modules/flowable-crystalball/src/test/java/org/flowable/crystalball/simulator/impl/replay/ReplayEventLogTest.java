@@ -6,13 +6,11 @@ import org.flowable.crystalball.simulator.delegate.event.impl.EventLogProcessIns
 import org.flowable.crystalball.simulator.delegate.event.impl.EventLogTransformer;
 import org.flowable.crystalball.simulator.delegate.event.impl.EventLogUserTaskCompleteTransformer;
 import org.flowable.crystalball.simulator.impl.StartReplayLogEventHandler;
-import org.flowable.crystalball.simulator.impl.replay.ReplayUserTaskCompleteEventHandler;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.*;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.impl.ProcessEngineImpl;

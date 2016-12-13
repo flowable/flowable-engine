@@ -12,9 +12,6 @@
  */
 package org.flowable.engine.impl.webservice;
 
-import org.flowable.engine.impl.webservice.SyncWebServiceClient;
-import org.flowable.engine.impl.webservice.SyncWebServiceClientFactory;
-
 /**
  * A CXF factory for {@link SyncWebServiceClient}
  * 

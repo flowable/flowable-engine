@@ -31,6 +31,8 @@ import org.flowable.engine.test.Deployment;
 
 /**
  * @author Tijs Rademakers
+ * @author Roman Smirnov
+ * @author Christian Lipphardt
  */
 public class VariableScopeTest extends PluggableFlowableTestCase {
 
@@ -86,9 +88,6 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
 
   /**
    * A testcase to produce and fix issue ACT-862.
-   * 
-   * @author Roman Smirnov
-   * @author Christian Lipphardt
    */
   @Deployment
   public void testVariableNamesScope() {

@@ -3,7 +3,7 @@
         "SELECT-FOLDER": "Select folder..."
     },
     "GENERAL": {
-        "MAIN-TITLE": "Activiti - My Tasks",
+        "MAIN-TITLE": "Flowable - My Tasks",
         "ERROR": {
             "GENERIC": "Sorry, an error occured...",
             "UNKNOWN": "Sorry, an error occured while performing the requested operation.",
@@ -175,7 +175,7 @@
             "NO-COMMENTS": "This task has no comments yet...",
             "INVOLVE-PEOPLE-PLACEHOLDER": "+ Add person",
             "CONTENT-UPLOADED-BY": "Added by ",
-            "ASSIGNEE": "Assigned to {{firstName}} {{lastName}}",
+            "ASSIGNEE": "Assigned to",
             "NEW-COMMENT-PLACEHOLDER": "Enter a comment to add to this task",
             "COMMENT-HEADER": "Added by {{createdBy | username}}, {{created | dateformat:\"fromNow\"}}",
             "NO-FILTER": "Showing your tasks, no filter applied",
@@ -234,7 +234,7 @@
             "SELECT-DEFINITION": "Select a process to start from the list below",
             "NO-PROCESS-DEFINITIONS": "You cannot start a process since there are no process definitions available",
             "START-PROCESS": "Start Process",
-            "STARTED-BY": "Started by {{firstName}} {{lastName}}",
+            "STARTED-BY": "Started by",
             "NO-PROCESS-DEFINITION-SELECTED-HELP": "Please select a process definition"
         },
         "ACTION" : {
@@ -272,11 +272,8 @@
         }
     },
     "INVOLVE-PEOPLE": {
-        "NO-MATCHING-RESULTS": "Use the search box above to find users or ",
+        "NO-MATCHING-RESULTS": "Use the search box above to find users",
         "SEARCH-PLACEHOLDER": "Search user",
-        "USE-EMAIL": "select someone using an email address",
-        "EMAIL-PLACEHOLDER": "Enter an email address",
-        "EMAIL-HELP": "Press Enter or click the button to continue. This person will be notified by email or invited to sign up",
         "BACK-TO-SEARCH": "Back to search",
         "ACTION-SELECT": "Select"
     },

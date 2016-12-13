@@ -6,21 +6,21 @@ While you can definitely use Flowable without Spring, we've provided some very n
 
 === ProcessEngineFactoryBean
 
-The +ProcessEngine+ can be configured as a regular Spring bean. The starting point of the integration is the class +org.activiti.spring.ProcessEngineFactoryBean+. That bean takes a process engine configuration and creates the process engine.  This means that the creation and configuration of properties for Spring is the same as documented in the <<configuration,configuration section>>. For Spring integration the configuration and engine beans will look like this:
+The +ProcessEngine+ can be configured as a regular Spring bean. The starting point of the integration is the class +org.flowable.spring.ProcessEngineFactoryBean+. That bean takes a process engine configuration and creates the process engine.  This means that the creation and configuration of properties for Spring is the same as documented in the <<configuration,configuration section>>. For Spring integration the configuration and engine beans will look like this:
 
 [source,xml,linenums]
 ----
-<bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
+<bean id="processEngineConfiguration" class="org.flowable.spring.SpringProcessEngineConfiguration">
     ...
 </bean>
 
-<bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
+<bean id="processEngine" class="org.flowable.spring.ProcessEngineFactoryBean">
   <property name="processEngineConfiguration" ref="processEngineConfiguration" />
 </bean>
 
 ----
 
-Note that the +processEngineConfiguration+ bean now uses the +org.activiti.spring.SpringProcessEngineConfiguration+ class.
+Note that the +processEngineConfiguration+ bean now uses the +org.flowable.spring.SpringProcessEngineConfiguration+ class.
 
 
 === Transactions
@@ -44,7 +44,7 @@ When passing the DataSource to the +SpringProcessEngineConfiguration+ (using pro
 
   <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
     <property name="driverClass" value="org.h2.Driver" />
-    <property name="url" value="jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000" />
+    <property name="url" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000" />
     <property name="username" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -53,14 +53,14 @@ When passing the DataSource to the +SpringProcessEngineConfiguration+ (using pro
     <property name="dataSource" ref="dataSource" />
   </bean>
 
-  <bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
+  <bean id="processEngineConfiguration" class="org.flowable.spring.SpringProcessEngineConfiguration">
     <property name="dataSource" ref="dataSource" />
     <property name="transactionManager" ref="transactionManager" />
     <property name="databaseSchemaUpdate" value="true" />
     <property name="asyncExecutorActivate" value="false" />
   </bean>
 
-  <bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
+  <bean id="processEngine" class="org.flowable.spring.ProcessEngineFactoryBean">
     <property name="processEngineConfiguration" ref="processEngineConfiguration" />
   </bean>
 
@@ -82,11 +82,11 @@ The remainder of that Spring configuration file contains the beans and configura
   ...
   <tx:annotation-driven transaction-manager="transactionManager"/>
 
-  <bean id="userBean" class="org.activiti.spring.test.UserBean">
+  <bean id="userBean" class="org.flowable.spring.test.UserBean">
     <property name="runtimeService" ref="runtimeService" />
   </bean>
 
-  <bean id="printer" class="org.activiti.spring.test.Printer" />
+  <bean id="printer" class="org.flowable.spring.test.Printer" />
 
 </beans>
 ----
@@ -96,14 +96,14 @@ First the application context is created with any of the Spring ways to do that.
 [source,java,linenums]
 ----
 ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext(
-	"org/activiti/examples/spring/SpringTransactionIntegrationTest-context.xml");
+	"org/flowable/examples/spring/SpringTransactionIntegrationTest-context.xml");
 ----
 
 or since it is a test:
 
 [source,java,linenums]
 ----
-@ContextConfiguration("classpath:org/activiti/spring/test/transaction/SpringTransactionIntegrationTest-context.xml")
+@ContextConfiguration("classpath:org/flowable/spring/test/transaction/SpringTransactionIntegrationTest-context.xml")
 ----
 
 
@@ -115,7 +115,7 @@ RepositoryService repositoryService =
   (RepositoryService) applicationContext.getBean("repositoryService");
 String deploymentId = repositoryService
   .createDeployment()
-  .addClasspathResource("org/activiti/spring/test/hello.bpmn20.xml")
+  .addClasspathResource("org/flowable/spring/test/hello.bpmn20.xml")
   .deploy()
   .getId();
 
@@ -161,7 +161,7 @@ When using the ProcessEngineFactoryBean, by default, all <<apiExpressions,expres
 
 [source,xml,linenums]
 ----
-<bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
+<bean id="processEngineConfiguration" class="org.flowable.spring.SpringProcessEngineConfiguration">
   ...
   <property name="beans">
     <map>
@@ -170,7 +170,7 @@ When using the ProcessEngineFactoryBean, by default, all <<apiExpressions,expres
   </property>
 </bean>
 
-<bean id="printer" class="org.activiti.examples.spring.Printer" />
+<bean id="printer" class="org.flowable.examples.spring.Printer" />
 ----
 
 Now the exposed beans can be used in expressions: for example, the SpringTransactionIntegrationTest +hello.bpmn20.xml+ shows how a method on a Spring bean can be invoked using a UEL method expression:
@@ -185,7 +185,7 @@ Now the exposed beans can be used in expressions: for example, the SpringTransac
     <startEvent id="start" />
     <sequenceFlow id="flow1" sourceRef="start" targetRef="print" />
 
-    <serviceTask id="print" activiti:expression="#{printer.printMessage()}" />
+    <serviceTask id="print" flowable:expression="#{printer.printMessage()}" />
     <sequenceFlow id="flow2" sourceRef="print" targetRef="end" />
 
     <endEvent id="end" />
@@ -214,7 +214,7 @@ And the Spring bean configuration (also shown above) looks like this:
 <beans>
   ...
 
-  <bean id="printer" class="org.activiti.examples.spring.Printer" />
+  <bean id="printer" class="org.flowable.examples.spring.Printer" />
 
 </beans>
 ----
@@ -229,13 +229,13 @@ Here's an example:
 
 [source,xml,linenums]
 ----
-<bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
+<bean id="processEngineConfiguration" class="org.flowable.spring.SpringProcessEngineConfiguration">
   ...
   <property name="deploymentResources"
-    value="classpath*:/org/activiti/spring/test/autodeployment/autodeploy.*.bpmn20.xml" />
+    value="classpath*:/org/flowable/spring/test/autodeployment/autodeploy.*.bpmn20.xml" />
 </bean>
 
-<bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
+<bean id="processEngine" class="org.flowable.spring.ProcessEngineFactoryBean">
   <property name="processEngineConfiguration" ref="processEngineConfiguration" />
 </bean>
 ----
@@ -253,9 +253,9 @@ To be able to customize the way deployments are determined, you can specify an a
 [source,xml,linenums]
 ----
 <bean id="processEngineConfiguration"
-    class="org.activiti.spring.SpringProcessEngineConfiguration">
+    class="org.flowable.spring.SpringProcessEngineConfiguration">
   ...
-  <property name="deploymentResources" value="classpath*:/activiti/*.bpmn" />
+  <property name="deploymentResources" value="classpath*:/flowable/*.bpmn" />
   <property name="deploymentMode" value="single-resource" />
 </bean>
 ----
@@ -273,7 +273,7 @@ When integrating with Spring, business processes can be tested very easily using
 [source,java,linenums]
 ----
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:org/activiti/spring/test/junit4/springTypicalUsageTest-context.xml")
+@ContextConfiguration("classpath:org/flowable/spring/test/junit4/springTypicalUsageTest-context.xml")
 public class MyBusinessProcessTest {
 
   @Autowired
@@ -300,11 +300,11 @@ public class MyBusinessProcessTest {
 }
 ----
 
-Note that for this to work, you need to define a _org.activiti.engine.test.ActivitiRule_ bean in the Spring configuration (which is injected by auto-wiring in the example above).
+Note that for this to work, you need to define a _org.flowable.engine.test.ActivitiRule_ bean in the Spring configuration (which is injected by auto-wiring in the example above).
 
 [source,xml,linenums]
 ----
-<bean id="activitiRule" class="org.activiti.engine.test.ActivitiRule">
+<bean id="activitiRule" class="org.flowable.engine.test.ActivitiRule">
   <property name="processEngine" ref="processEngine" />
 </bean>
 
@@ -401,11 +401,11 @@ The application can now be started. You will see output like this:
 MyApplication                            : Starting MyApplication on ...
 s.c.a.AnnotationConfigApplicationContext : Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@33cb5951: startup date [Wed Dec 17 15:24:34 CET 2014]; root of context hierarchy
 a.s.b.AbstractProcessEngineConfiguration : No process definitions were found using the specified path (classpath:/processes/**.bpmn20.xml).
-o.activiti.engine.impl.db.DbSqlSession   : performing create on engine with resource org/activiti/db/create/activiti.h2.create.engine.sql
-o.activiti.engine.impl.db.DbSqlSession   : performing create on history with resource org/activiti/db/create/activiti.h2.create.history.sql
-o.activiti.engine.impl.db.DbSqlSession   : performing create on identity with resource org/activiti/db/create/activiti.h2.create.identity.sql
+o.flowable.engine.impl.db.DbSqlSession   : performing create on engine with resource org/flowable/db/create/flowable.h2.create.engine.sql
+o.flowable.engine.impl.db.DbSqlSession   : performing create on history with resource org/flowable/db/create/flowable.h2.create.history.sql
+o.flowable.engine.impl.db.DbSqlSession   : performing create on identity with resource org/flowable/db/create/flowable.h2.create.identity.sql
 o.a.engine.impl.ProcessEngineImpl        : ProcessEngine default created
-o.a.e.i.a.DefaultAsyncJobExecutor        : Starting up the default async job executor [org.activiti.spring.SpringAsyncExecutor].
+o.a.e.i.a.DefaultAsyncJobExecutor        : Starting up the default async job executor [org.flowable.spring.SpringAsyncExecutor].
 o.a.e.i.a.AcquireTimerJobsRunnable       : {} starting to acquire async jobs due
 o.a.e.i.a.AcquireAsyncJobsDueRunnable    : {} starting to acquire async jobs due
 o.s.j.e.a.AnnotationMBeanExporter        : Registering beans for JMX exposure on startup
@@ -426,7 +426,7 @@ Also, any BPMN 2.0 process definition in the _processes_ folder would be automat
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions
         xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-        xmlns:activiti="http://activiti.org/bpmn"
+        xmlns:flowable="http://flowable.org/bpmn"
         targetNamespace="Examples">
 
     <process id="oneTaskProcess" name="The One Task Process">
@@ -521,9 +521,9 @@ Remove H2 from the Maven dependencies and add the MySQL driver and the Tomcat co
 When the app is now booted up, you'll see it uses MySQL as database (and the Tomcat connection pooling framework):
 
 ----
-org.activiti.engine.impl.db.DbSqlSession   : performing create on engine with resource org/activiti/db/create/activiti.mysql.create.engine.sql
-org.activiti.engine.impl.db.DbSqlSession   : performing create on history with resource org/activiti/db/create/activiti.mysql.create.history.sql
-org.activiti.engine.impl.db.DbSqlSession   : performing create on identity with resource org/activiti/db/create/activiti.mysql.create.identity.sql
+org.flowable.engine.impl.db.DbSqlSession   : performing create on engine with resource org/flowable/db/create/flowable.mysql.create.engine.sql
+org.flowable.engine.impl.db.DbSqlSession   : performing create on history with resource org/flowable/db/create/flowable.mysql.create.history.sql
+org.flowable.engine.impl.db.DbSqlSession   : performing create on identity with resource org/flowable/db/create/flowable.mysql.create.identity.sql
 ----
 
 When you reboot the application multiple times, you'll see the number of tasks go up (the H2 in-memory database does not survive a shutdown, the MySQL does).
@@ -831,7 +831,7 @@ And lastly, to try out the Spring-JPA-Flowable integration, we assign the task u
 
 [source,xml,linenums]
 ----
-<userTask id="theTask" name="my task" activiti:assignee="${person.id}"/>
+<userTask id="theTask" name="my task" flowable:assignee="${person.id}"/>
 ----
 
 We can now start a new process instance, providing the user name in the POST body:

@@ -150,20 +150,21 @@ public interface IdentityService {
 
   /**
    * Sets the picture for a given user.
-   * 
-   * @throws FlowableObjectNotFoundException
-   *           if the user doesn't exist.
+   *
+   * @param userId
    * @param picture
    *          can be null to delete the picture.
+   * @throws FlowableObjectNotFoundException
+   *           if the user doesn't exist.
    */
   void setUserPicture(String userId, Picture picture);
 
   /**
    * Retrieves the picture for a given user.
-   * 
+   *
+   * @return null if the user doesn't have a picture.
    * @throws FlowableObjectNotFoundException
    *           if the user doesn't exist.
-   * @returns null if the user doesn't have a picture.
    */
   Picture getUserPicture(String userId);
 

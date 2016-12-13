@@ -15,9 +15,9 @@
 	</parent>
 
 	<properties>
-		<activiti.artifact>
+		<flowable.artifact>
 			org.flowable.validation
-		</activiti.artifact>
+		</flowable.artifact>
 	</properties>
 
 	<build>

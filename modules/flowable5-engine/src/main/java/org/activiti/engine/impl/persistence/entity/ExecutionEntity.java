@@ -251,7 +251,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   /**
    * persisted reference to the super execution of this execution
    * 
-   * @See {@link #getSuperExecution()}
+   * @see {@link #getSuperExecution()}
    * @see #setSuperExecution(ExecutionEntity)
    */
   protected String superExecutionId;

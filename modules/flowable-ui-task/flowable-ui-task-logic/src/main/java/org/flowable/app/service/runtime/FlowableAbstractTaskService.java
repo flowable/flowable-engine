@@ -72,7 +72,7 @@ public abstract class FlowableAbstractTaskService {
         processInstanceStartUserId = historicProcessInstance.getStartUserId();
         BpmnModel bpmnModel = repositoryService.getBpmnModel(task.getProcessDefinitionId());
         FlowElement flowElement = bpmnModel.getFlowElement(task.getTaskDefinitionKey());
-        if (flowElement != null && flowElement instanceof UserTask) {
+        if (flowElement instanceof UserTask) {
           UserTask userTask = (UserTask) flowElement;
           List<ExtensionElement> extensionElements = userTask.getExtensionElements().get("initiator-can-complete");
           if (CollectionUtils.isNotEmpty(extensionElements)) {

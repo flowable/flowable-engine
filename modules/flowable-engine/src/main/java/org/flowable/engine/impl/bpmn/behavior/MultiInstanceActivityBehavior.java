@@ -73,10 +73,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
   protected String collectionElementIndexVariable = "loopCounter";
 
   /**
+   * @param activity
    * @param innerActivityBehavior
    *          The original {@link ActivityBehavior} of the activity that will be wrapped inside this behavior.
-   * @param isSequential
-   *          Indicates whether the multi instance behavior must be sequential or parallel
    */
   public MultiInstanceActivityBehavior(Activity activity, AbstractBpmnActivityBehavior innerActivityBehavior) {
     this.activity = activity;

@@ -16,7 +16,6 @@ import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngineConfiguration;
-import org.flowable.form.engine.test.FlowableFormRule;
 import org.junit.Before;
 import org.junit.Rule;
 

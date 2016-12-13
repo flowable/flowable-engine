@@ -14,12 +14,12 @@
   </parent>
   
   <properties>
-    <activiti.artifact>
+    <flowable.artifact>
       org.flowable.bpmn.converter
-    </activiti.artifact>
-    <activiti.osgi.export.additional>
+    </flowable.artifact>
+    <flowable.osgi.export.additional>
       org.flowable.bpmn.constants,org.flowable.bpmn.util,org.flowable.bpmn.exceptions
-    </activiti.osgi.export.additional>
+    </flowable.osgi.export.additional>
   </properties>
 
   <build>

@@ -48,7 +48,6 @@ import org.flowable.dmn.engine.DmnEngines;
 import org.flowable.dmn.engine.impl.test.AbstractDmnTestCase;
 import org.flowable.dmn.engine.test.DmnTestHelper;
 import org.flowable.rest.dmn.conf.ApplicationConfiguration;
-import org.flowable.rest.dmn.service.api.DmnRestUrlBuilder;
 import org.flowable.rest.dmn.util.TestServerUtil;
 import org.flowable.rest.dmn.util.TestServerUtil.TestServer;
 import org.junit.Assert;

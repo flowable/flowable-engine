@@ -35,7 +35,7 @@ public class SecureScriptContextFactory extends ContextFactory {
     protected SecureScriptThreadMxBeanWrapper threadMxBeanWrapper;
 
     protected Context makeContext() {
-        SecureScriptContext context = new SecureScriptContext();
+        SecureScriptContext context = new SecureScriptContext(this);
 
         // Setting this, as otherwise variables set seem to have the wrong type
         context.getWrapFactory().setJavaPrimitiveWrap(false);

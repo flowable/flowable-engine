@@ -30,7 +30,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
  * {@link #buildUrl(String[], Object...)} can be called several times to build URLs based on the base URL
  * 
  * @author Bassam Al-Sarori
- * @auth Yvo Swillens
+ * @author Yvo Swillens
  */
 public class FormRestUrlBuilder {
 

@@ -15,12 +15,12 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <activiti.artifact>
+    <flowable.artifact>
       org.flowable.json.converter
-    </activiti.artifact>
-    <activiti.osgi.export.additional>
+    </flowable.artifact>
+    <flowable.osgi.export.additional>
       org.flowable.editor*
-    </activiti.osgi.export.additional>
+    </flowable.osgi.export.additional>
   </properties>
 
   <build>

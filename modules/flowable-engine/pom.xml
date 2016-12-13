@@ -201,13 +201,13 @@
 	</dependencies>
 
 	<properties>
-		<activiti.artifact>
+		<flowable.artifact>
 			org.flowable.engine
-		</activiti.artifact>
-		<activiti.osgi.export.additional>
+		</flowable.artifact>
+		<flowable.osgi.export.additional>
 			org.flowable.db.mapping.entity
-		</activiti.osgi.export.additional>
-		<activiti.osgi.import.additional>
+		</flowable.osgi.export.additional>
+		<flowable.osgi.import.additional>
 			junit*;resolution:=optional,
 			org.junit*;resolution:=optional,
 			com.sun*;resolution:=optional,
@@ -222,7 +222,7 @@
 			com.fasterxml*;resolution:=optional,
 			javax.transaction;resolution:=optional,
 			javax.enterprise.concurrent;resolution:=optional,
-		</activiti.osgi.import.additional>
+		</flowable.osgi.import.additional>
 	</properties>
 
 	<build>

@@ -64,9 +64,12 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
   
   protected String idmAppUrl;
   
+  protected Collection<String> requiredPrivileges;
+  
   // Caching the persistent tokens and users to avoid hitting the database too often 
   // (eg when doing multiple requests at the same time)
   protected LoadingCache<String, RemoteToken> tokenCache;
+  
   protected LoadingCache<String, FlowableAppUser> userCache;
   
   @PostConstruct
@@ -139,7 +142,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
           filterCallback.onValidTokenFound(request, response, token);
         }
       } else {
-        redirectToLogin(request, response);
+        redirectToLogin(request, response, null);
         return; // no need to execute any other filters
       }
     }
@@ -189,18 +192,52 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
   protected void onValidTokenFound(HttpServletRequest request, HttpServletResponse response, RemoteToken token) {
     try {
       FlowableAppUser appUser = userCache.get(token.getUserId());
-      
+      validateRequiredPriviliges(request, response, appUser);
       SecurityContextHolder.getContext().setAuthentication(new RememberMeAuthenticationToken(token.getId(), 
           appUser, appUser.getAuthorities()));
       
     } catch (Exception e) {
       logger.trace("Could not set necessary threadlocals for token, e");
-      redirectToLogin(request, response);
+      redirectToLogin(request, response, token.getUserId());
     }
   }
   
-  protected void redirectToLogin(HttpServletRequest request, HttpServletResponse response)  {
+  protected void validateRequiredPriviliges(HttpServletRequest request, HttpServletResponse response, FlowableAppUser user) {
+    
+    if (user == null) {
+      return;
+    }
+    
+    String pathInfo = request.getPathInfo();
+    if (pathInfo == null 
+        || !pathInfo.startsWith("/rest")) { // rest calls handled by Spring Security conf
+    
+      if (requiredPrivileges != null && requiredPrivileges.size() > 0) {
+        
+        if (user.getAuthorities() == null || user.getAuthorities().size() == 0) {
+          redirectToLogin(request, response, user.getUserObject().getId());
+        }
+        
+        int matchingPrivileges = 0;
+        for (GrantedAuthority authority : user.getAuthorities()) {
+          if (requiredPrivileges.contains(authority.getAuthority())) {
+            matchingPrivileges++;
+          }
+        }
+        
+        if (matchingPrivileges != requiredPrivileges.size()) {
+          redirectToLogin(request, response, user.getUserObject().getId());
+        }
+      }
+      
+    }
+  }
+  
+  protected void redirectToLogin(HttpServletRequest request, HttpServletResponse response, String userId)  {
     try {
+      if (userId != null) {
+        userCache.invalidate(userId);
+      }
       response.sendRedirect(idmAppUrl + "#/login?redirectOnAuthSuccess=true&redirectUrl=" + request.getRequestURL());
     } catch (IOException e) {
       logger.warn("Could not redirect to " + idmAppUrl, e);
@@ -243,6 +280,14 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
     }
 
     return tokens;
+  }
+
+  public Collection<String> getRequiredPrivileges() {
+    return requiredPrivileges;
+  }
+
+  public void setRequiredPrivileges(Collection<String> requiredPrivileges) {
+    this.requiredPrivileges = requiredPrivileges;
   }
   
 }

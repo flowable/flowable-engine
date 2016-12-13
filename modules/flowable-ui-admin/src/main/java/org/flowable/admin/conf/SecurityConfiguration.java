@@ -12,13 +12,13 @@
  */
 package org.flowable.admin.conf;
 
+import java.util.Arrays;
+
 import org.flowable.admin.security.AjaxLogoutSuccessHandler;
 import org.flowable.app.filter.FlowableCookieFilter;
 import org.flowable.app.security.ClearFlowableCookieLogoutHandler;
 import org.flowable.app.security.CookieConstants;
 import org.flowable.app.security.DefaultPrivileges;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,11 +31,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-  private static final Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
-
   @Bean
   public FlowableCookieFilter flowableCookieFilter() {
-    return new FlowableCookieFilter();
+    FlowableCookieFilter filter = new FlowableCookieFilter();
+    filter.setRequiredPrivileges(Arrays.asList(DefaultPrivileges.ACCESS_ADMIN));
+    return filter;
   }
   
   @Configuration

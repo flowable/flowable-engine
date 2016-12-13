@@ -113,7 +113,7 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> extends Abs
    * 
    * @param dbQueryName The query name that needs to be executed.
    * @param parameter The parameters for the query.
-   * @param entityMatcher The matcher used to determine which entities from the cache needs to be retained
+   * @param cachedEntityMatcher The matcher used to determine which entities from the cache needs to be retained
    * @param checkCache If false, no cache check will be done, and the returned list will simply be the list from the database.
    */
   @SuppressWarnings("unchecked")

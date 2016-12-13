@@ -15,9 +15,8 @@ package org.flowable.rest.service.api.engine.variable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize.Inclusion;
 
 /**
  * Pojo representing a variable used in REST-service which definies it's name, variable, scope and type.
@@ -44,7 +43,7 @@ public class RestVariable {
     this.name = name;
   }
 
-  @JsonSerialize(include = Inclusion.NON_NULL)
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   public String getType() {
     return type;
   }
@@ -86,7 +85,7 @@ public class RestVariable {
     this.valueUrl = valueUrl;
   }
 
-  @JsonSerialize(include = Inclusion.NON_NULL)
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   public String getValueUrl() {
     return valueUrl;
   }

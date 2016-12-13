@@ -263,7 +263,7 @@ activitiModule
 activitiModule
     .directive('userName', function() {
         var directive = {};
-        directive.template = '{{user.firstName && user.firstName || ""}} {{user.lastName && user.lastName || ""}} {{ (user.email && !user.firstName && !user.lastName) && user.email || ""}}';
+        directive.template = '{{user.firstName && user.firstName != "null" ? user.firstName : ""}} {{user.lastName && user.lastName != "null" ? user.lastName : ""}} {{ (user.email && !user.firstName && !user.lastName) && user.email || ""}}';
         directive.scope = {
             user: "=userName"
         };
@@ -727,15 +727,12 @@ activitiModule.
             }
 
             // Parse callbacks
-            var selectedCallback, cancelledCallback, emailSelectedCallback;
+            var selectedCallback, cancelledCallback;
             if (attrs['onPeopleSelected']) {
                 selectedCallback = $parse(attrs['onPeopleSelected']);
             }
             if (attrs['onCancel']) {
                 cancelledCallback = $parse(attrs['onCancel']);
-            }
-            if (attrs['onEmailSelected']) {
-                emailSelectedCallback = $parse(attrs['onEmailSelected']);
             }
 
             // Parse type
@@ -749,8 +746,6 @@ activitiModule.
             popoverScope.title = attrs['popoverTitle'];
 
             popoverScope.popupModel = {
-                emailMode: false,
-                showRecentResults: false, // Disabled recent for the moment. Put this on true to set it back
                 userResults: [],
                 userField: {},
                 userFieldFilter: ['people']
@@ -759,16 +754,6 @@ activitiModule.
             if ($scope.selectPeopleFormFields) {
                 popoverScope.popupModel.formFields = $scope.selectPeopleFormFields;
             }
-
-            if (attrs['emailModeDisabled']) {
-                var emailModeDisabledValue = attrs['emailModeDisabled'];
-                if (emailModeDisabledValue === 'true') {
-                    popoverScope.popupModel.emailDisabled = true;
-                }
-            }
-
-            popoverScope.popupModel.emailMode = false;
-
 
             popoverScope.setSearchType = function() {
                 popoverScope.popupModel.userSourceType = 'search';
@@ -891,15 +876,6 @@ activitiModule.
                 }
             };
 
-            popoverScope.selectPersonByEmail = function(validEmail) { // Not so nice we have to pass the valid email agrument, but couldnt make it work properly
-                if (validEmail) {
-                    if (emailSelectedCallback) {
-                        emailSelectedCallback($scope.$parent, {email: popoverScope.popupModel.email});
-                        popoverScope.$hide();
-                    }
-                }
-            };
-
             popoverScope.$on('tooltip.hide', function() {
                 // Invalidate recent results
                 if(popoverScope.popupModel.showRecentResults && popoverScope.popupModel.added) {
@@ -907,7 +883,6 @@ activitiModule.
                 }
                 popoverScope.popupModel.userResults = [];
                 popoverScope.popupModel.filter = '';
-                popoverScope.popupModel.emailMode = false;
 
                 if(popoverScope.popupModel.added) {
                     popoverScope.popupModel.added = false;

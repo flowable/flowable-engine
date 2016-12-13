@@ -198,12 +198,14 @@ activitiAdminApp
 
         }])
         
-    .service('NotPermittedInterceptor', [ '$window', function($window) {
+    .service('NotPermittedInterceptor', [ '$rootScope', '$window', function($rootScope, $window) {
 		var service = this;
 		service.responseError = function(response) {
 			if (response.status === 403) {
 				$rootScope.login = null;
 				$rootScope.authenticated = false;
+                $window.location.href = '/';
+                $window.location.reload();
 			}
 			return response;
 		};

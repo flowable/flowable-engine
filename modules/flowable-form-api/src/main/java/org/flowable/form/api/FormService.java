@@ -23,7 +23,7 @@ import org.flowable.form.model.FormModel;
 public interface FormService {
 
     /**
-     * @param definition form definition to use for type-conversion and validation
+     * @param formModel form definition to use for type-conversion and validation
      * @param values values submitted by the user
      * @param outcome outcome selected by the user. If null, no outcome is used and any outcome definitions are ignored.
      * 
@@ -35,10 +35,10 @@ public interface FormService {
     /**
      * Store the submitted form values.
      * 
-       * @param form form instance of the submitted form
+       * @param formModel form instance of the submitted form
        * @param taskId task instance id of the completed task
        * @param processInstanceId process instance id of the completed task
-       * @param valuesNode json node with the values of the 
+       * @param values json node with the values of the
        */
     FormInstance createFormInstance(Map<String, Object> values, FormModel formModel, String taskId, String processInstanceId);
     

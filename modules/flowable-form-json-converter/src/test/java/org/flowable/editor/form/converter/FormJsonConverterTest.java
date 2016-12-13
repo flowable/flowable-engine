@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.flowable.editor.form.converter.FormJsonConverter;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.FormModel;
 import org.junit.Test;

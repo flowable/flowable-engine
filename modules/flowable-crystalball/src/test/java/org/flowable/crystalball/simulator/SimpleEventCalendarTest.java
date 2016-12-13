@@ -1,9 +1,5 @@
 package org.flowable.crystalball.simulator;
 
-import org.flowable.crystalball.simulator.EventCalendar;
-import org.flowable.crystalball.simulator.SimpleEventCalendar;
-import org.flowable.crystalball.simulator.SimulationEvent;
-import org.flowable.crystalball.simulator.SimulationEventComparator;
 import org.flowable.engine.common.impl.util.DefaultClockImpl;
 import org.flowable.engine.common.runtime.Clock;
 import org.junit.Before;
