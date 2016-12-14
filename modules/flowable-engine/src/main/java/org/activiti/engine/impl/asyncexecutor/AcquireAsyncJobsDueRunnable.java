@@ -80,7 +80,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
 
       List<JobEntity> rejectedJobs = offerJobs(acquiredJobs);
 
-      log.info("Jobs acquired: {}, rejected: {}", acquiredJobs.size(), rejectedJobs.size());
+      log.debug("Jobs acquired: {}, rejected: {}", acquiredJobs.size(), rejectedJobs.size());
       if (rejectedJobs.size() > 0) {
         unacquireJobs(commandExecutor, rejectedJobs);
 
