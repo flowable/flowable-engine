@@ -43,7 +43,7 @@ public interface FormDefinitionQuery extends Query<FormDefinitionQuery, FormDefi
   /**
    * Only select deployments that have a different category then the given one.
    * 
-   * @see DeploymentBuilder#category(String)
+   * @see FormDeploymentBuilder#category(String)
    */
   FormDefinitionQuery formCategoryNotEquals(String categoryNotEquals);
 

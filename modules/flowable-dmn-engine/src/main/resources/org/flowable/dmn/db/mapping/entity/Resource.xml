@@ -16,7 +16,7 @@
       <foreach collection="list" item="byteArr" index="index" separator=","> 
         (#{byteArr.id, jdbcType=VARCHAR},
          #{byteArr.name, jdbcType=VARCHAR},
-         #{byteArr.bytes, jdbcType=BLOB},
+         #{byteArr.bytes, jdbcType=${blobType}},
          #{byteArr.deploymentId, jdbcType=VARCHAR},
          #{byteArr.generated, jdbcType=BOOLEAN})
       </foreach>

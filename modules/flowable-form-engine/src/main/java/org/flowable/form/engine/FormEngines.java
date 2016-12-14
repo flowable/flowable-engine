@@ -112,7 +112,7 @@ public abstract class FormEngines {
   }
 
   /**
-   * Registers the given dmn engine. No {@link FormEngineInfo} will be available for this dmn engine. An engine that is registered will be closed when the {@link FormEngines#destroy()} is called.
+   * Registers the given dmn engine. No {@link EngineInfo} will be available for this dmn engine. An engine that is registered will be closed when the {@link FormEngines#destroy()} is called.
    */
   public static void registerFormEngine(FormEngine formEngine) {
     formEngines.put(formEngine.getName(), formEngine);
@@ -184,7 +184,7 @@ public abstract class FormEngines {
   }
 
   /**
-   * Get initialization results. Only info will we available for form engines which were added in the {@link FormEngines#init()}. No {@link FormEngineInfo} is available for engines which were
+   * Get initialization results. Only info will we available for form engines which were added in the {@link FormEngines#init()}. No {@link EngineInfo} is available for engines which were
    * registered programmatically.
    */
   public static EngineInfo getFormEngineInfo(String formEngineName) {
@@ -196,9 +196,9 @@ public abstract class FormEngines {
   }
 
   /**
-   * obtain a form engine by name.
+   * Obtain a form engine by name.
    * 
-   * @param dmnEngineName
+   * @param formEngineName
    *          is the name of the form engine or null for the default form engine.
    */
   public static FormEngine getFormEngine(String formEngineName) {

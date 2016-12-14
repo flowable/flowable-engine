@@ -14,6 +14,8 @@ package org.flowable.app.service.editor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -264,7 +266,8 @@ public class AppDefinitionPublishService {
     if (deployApiUrl.endsWith("/") == false) {
       deployApiUrl = deployApiUrl.concat("/");
     }
-    deployApiUrl = deployApiUrl.concat(String.format("repository/deployments?deploymentKey=%s&deploymentName=%s", deploymentKey, deploymentName));
+    deployApiUrl = deployApiUrl.concat(String.format("repository/deployments?deploymentKey=%s&deploymentName=%s", 
+        encode(deploymentKey), encode(deploymentName)));
 
     HttpPost httpPost = new HttpPost(deployApiUrl);
     httpPost.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
@@ -311,5 +314,16 @@ public class AppDefinitionPublishService {
         }
       }
     }
+  }
+  
+  protected String encode(String string) {
+    if (string != null) {
+      try {
+        return URLEncoder.encode(string, "UTF-8");
+      } catch (UnsupportedEncodingException uee) {
+        throw new IllegalStateException("JVM does not support UTF-8 encoding.", uee);
+      }
+    }
+    return null;
   }
 }

@@ -660,7 +660,7 @@ angular.module('flowableApp')
                             if (field.options !== null && field.options !== undefined && field.options.length > 0) {
 
                                 var emptyValue = field.options[0];
-                                if (emptyValue.name !== field.value.name) {
+                                if (field.value != null && field.value != undefined && emptyValue.name !== field.value.name) {
                                     postData.values[field.id] = field.value;
                                 }
                             }

@@ -19,7 +19,7 @@ import org.flowable.dmn.model.DmnDefinition;
 /**
  * Builder for creating new deployments.
  * 
- * A builder instance can be obtained through {@link org.flowable.dmn.engine.DmnRepositoryService#createDeployment()}.
+ * A builder instance can be obtained through {@link DmnRepositoryService#createDeployment()}.
  * 
  * Multiple resources can be added to one deployment before calling the {@link #deploy()} operation.
  * 

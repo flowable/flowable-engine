@@ -36,7 +36,7 @@ public interface AutoDeploymentStrategy {
   boolean handlesMode(final String mode);
 
   /**
-   * Performs deployment for the provided resources, using the provided name as a hint and the provided {@link RepositoryService} to perform deployment(s).
+   * Performs deployment for the provided resources, using the provided name as a hint and the provided {@link FormRepositoryService} to perform deployment(s).
    * 
    * @param deploymentNameHint
    *          the hint for the name of deployment(s) performed

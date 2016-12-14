@@ -26,7 +26,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 /**
  * A representation class that supports Multi-part form-upload.
  * 
- * Using {@link MultipartRequestEntity} to do the heavy lifting.
+ * Using {@link MultipartEntityBuilder} to do the heavy lifting.
  * 
  * @author Tijs Rademakers
  */

@@ -28,7 +28,6 @@ public interface FormService {
      * @param outcome outcome selected by the user. If null, no outcome is used and any outcome definitions are ignored.
      * 
      * @return raw variables that can be used in the activiti engine, based on the filled in values and selected outcome.
-     * @throws FormValidationException when a submitted value is not valid or a required value is missing.
      */
     Map<String, Object> getVariablesFromFormSubmission(FormModel formModel, Map<String, Object> values, String outcome);
     

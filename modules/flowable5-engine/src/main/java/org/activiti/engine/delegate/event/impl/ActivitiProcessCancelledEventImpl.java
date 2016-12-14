@@ -16,7 +16,7 @@ import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
- * An {@link org.activiti.engine.delegate.event.FlowableCancelledEvent} implementation.
+ * An {@link FlowableCancelledEvent} implementation.
  *
  * @author martin.grofcik
  */

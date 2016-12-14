@@ -26,8 +26,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * Pojo class who can be used to check information between {@link org.activiti.engine.DynamicBpmnService#getProcessDefinitionInfo(String)}
- * and {@link org.activiti.bpmn.model.BpmnModel}. Without exposing the internal behavoir of activiti's logic.
+ * Pojo class who can be used to check information between {@link org.flowable.engine.DynamicBpmnService#getProcessDefinitionInfo(String)}
+ * and {@link org.flowable.bpmn.model.BpmnModel}. Without exposing the internal behavoir of activiti's logic.
  *
  * Created by Pardo David on 5/12/2016.
  */
@@ -57,7 +57,7 @@ public class DynamicProcessDefinitionSummary implements DynamicBpmnConstants {
 	 *     "elementId": (the elements id)
 	 *     "elementType": (the elements type)
 	 *     "elementSummary": {
-	 *         "{@link org.activiti.engine.DynamicBpmnConstants} linked to the elementType": {
+	 *         "{@link org.flowable.engine.DynamicBpmnConstants} linked to the elementType": {
 	 *             bpmnmodel : (array of strings | string | not provided if empty / blank / null)
 	 *             dynamic: (array of strings or string or not provided if blank or empty)
 	 *         }
@@ -66,7 +66,7 @@ public class DynamicProcessDefinitionSummary implements DynamicBpmnConstants {
 	 * </pre>
 	 *
 	 * <p>
-	 *     If no value is found for a given {@link org.activiti.engine.DynamicBpmnConstants} in the {@link BpmnModel} or
+	 *     If no value is found for a given {@link org.flowable.engine.DynamicBpmnConstants} in the {@link BpmnModel} or
 	 *     ProcessDefinitionInfo. we don't store an key in the resulting {@link ObjectNode}. Null values should be avoided
 	 *     in JSON. Depending on the {@link ObjectMapper} configuration keys with a null value could even be removed when writting to json.
 	 * </p>
@@ -79,9 +79,9 @@ public class DynamicProcessDefinitionSummary implements DynamicBpmnConstants {
 	 *     </li>
 	 *     No summary will field will be created for other elements. ElementId, and elementType will be available.
 	 * </p>
-	 * @param elementId the id of the {@link org.activiti.bpmn.model.FlowElement}.
+	 * @param elementId the id of the {@link org.flowable.bpmn.model.FlowElement}.
 	 * @return an {@link ObjectNode} with the provided structure.
-	 * @throws IllegalStateException if no {@link org.activiti.bpmn.model.FlowElement} is found for the provided id.
+	 * @throws IllegalStateException if no {@link org.flowable.bpmn.model.FlowElement} is found for the provided id.
 	 */
 	public ObjectNode getElement(String elementId) throws IllegalStateException{
 
