@@ -16,7 +16,7 @@
 
 /* Controllers */
 
-activitiAdminApp.controller('EngineController', ['$rootScope', '$scope', '$http', '$timeout', '$modal', '$translate',
+flowableAdminApp.controller('EngineController', ['$rootScope', '$scope', '$http', '$timeout', '$modal', '$translate',
     function ($rootScope, $scope, $http, $timeout, $modal, $translate) {
 
         // Set root navigation
@@ -134,7 +134,7 @@ activitiAdminApp.controller('EngineController', ['$rootScope', '$scope', '$http'
     }]);
 
 
-activitiAdminApp.controller('EditEndpointConfigModalInstanceCrtl',
+flowableAdminApp.controller('EditEndpointConfigModalInstanceCrtl',
     ['$scope', '$modalInstance', '$http', 'server', function ($scope, $modalInstance, $http, server) {
 
         $scope.model = {server: server};

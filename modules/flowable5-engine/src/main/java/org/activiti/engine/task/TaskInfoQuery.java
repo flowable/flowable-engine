@@ -19,6 +19,7 @@ import java.util.List;
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.query.Query;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.task.IdentityLink;
 
 /**
@@ -114,6 +115,13 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
    */
   T taskAssigneeLikeIgnoreCase(String assigneeLikeIgnoreCase);
   
+  /**
+   * Only select tasks with an assignee that is in the given list
+   * 
+   * @throws FlowableIllegalArgumentException
+   *           When passed name list is empty or <code>null</code> or contains <code>null String</code>.
+   */
+  T taskAssigneeIds(List<String> assigneeListIds);
   
   /** Only select tasks for which the given user is the owner. */
   T taskOwner(String owner);

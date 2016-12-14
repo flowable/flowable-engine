@@ -14,7 +14,7 @@
  */
 'use strict';
 
-activitiAdminApp.controller('JobController', ['$scope', '$rootScope', '$http', '$timeout','$location','$routeParams', '$modal', '$translate',
+flowableAdminApp.controller('JobController', ['$scope', '$rootScope', '$http', '$timeout','$location','$routeParams', '$modal', '$translate',
     function ($scope, $rootScope, $http, $timeout, $location, $routeParams, $modal, $translate) {
 		$rootScope.navigation = {selection: 'jobs'};
 		
@@ -102,7 +102,7 @@ activitiAdminApp.controller('JobController', ['$scope', '$rootScope', '$http', '
 
 }]);
 
-activitiAdminApp.controller('DeleteModalInstanceCrtl',
+flowableAdminApp.controller('DeleteModalInstanceCrtl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'job', function ($rootScope, $scope, $modalInstance, $http, job) {
 
 	  $scope.job = job;

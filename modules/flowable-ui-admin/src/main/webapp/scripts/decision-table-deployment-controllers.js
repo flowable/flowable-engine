@@ -12,7 +12,7 @@
  */
 'use strict';
 
-activitiAdminApp.controller('DecisionTableDeploymentController', ['$scope', '$rootScope', '$http', '$timeout','$location','$routeParams', '$modal', '$translate', '$q',
+flowableAdminApp.controller('DecisionTableDeploymentController', ['$scope', '$rootScope', '$http', '$timeout','$location','$routeParams', '$modal', '$translate', '$q',
     function ($scope, $rootScope, $http, $timeout, $location, $routeParams, $modal, $translate, $q) {
 
         $rootScope.navigation = {main: 'dmn-engine', sub: 'deployments'};

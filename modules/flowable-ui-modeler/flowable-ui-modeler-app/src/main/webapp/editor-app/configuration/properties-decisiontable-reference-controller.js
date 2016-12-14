@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-angular.module('activitiModeler').controller('ActivitiDecisionTableReferenceCtrl',
+angular.module('flowableModeler').controller('ActivitiDecisionTableReferenceCtrl',
     [ '$scope', '$modal', '$http', function($scope, $modal, $http) {
 	
      // Config for the modal window
@@ -24,7 +24,7 @@ angular.module('activitiModeler').controller('ActivitiDecisionTableReferenceCtrl
      _internalCreateModal(opts, $modal, $scope);
 }]);
  
-angular.module('activitiModeler').controller('ActivitiDecisionTableReferencePopupCtrl', ['$rootScope', '$scope', '$http', '$location',
+angular.module('flowableModeler').controller('ActivitiDecisionTableReferencePopupCtrl', ['$rootScope', '$scope', '$http', '$location',
     function($rootScope, $scope, $http, $location) {
 
         $scope.state = {

@@ -18,23 +18,23 @@
  * Utility objects and methods for the Activiti Administrator app
  *
  */
-ActivitiAdmin.Utils = {};
+FlowableAdmin.Utils = {};
 
-ActivitiAdmin.Utils.resetTimeToMorning = function(date) {
+FlowableAdmin.Utils.resetTimeToMorning = function(date) {
 	date.setUTCHours(0);
 	date.setUTCMinutes(0);
 	date.setUTCSeconds(0);
 	return date;
 };
 
-ActivitiAdmin.Utils.resetTimeToEvening = function(date) {
+FlowableAdmin.Utils.resetTimeToEvening = function(date) {
 	date.setUTCHours(23);
 	date.setUTCMinutes(59);
 	date.setUTCSeconds(59);
 	return date;
 };
 
-ActivitiAdmin.Utils.variableFilterTypes = [
+FlowableAdmin.Utils.variableFilterTypes = [
    {name: "String", id: "string"},
    {name: "Integer", id: "integer"},
    {name: "Double", id: "double"},
@@ -44,7 +44,7 @@ ActivitiAdmin.Utils.variableFilterTypes = [
    {name: "Date", id: "date"}
 ];
 
-ActivitiAdmin.Utils.variableFilterOperators = [
+FlowableAdmin.Utils.variableFilterOperators = [
     {sign: "=", id: "equals", name: "Equals"},
     {sign: "<>", id: "notEquals", name: "Not equals"},
     {sign: "<", id: "lessThan", name: "Less than" },
@@ -60,15 +60,15 @@ ActivitiAdmin.Utils.variableFilterOperators = [
  *
  * Generic list filter implementation.
  */
-ActivitiAdmin.Utils.Filter = function(config, $http, $timeout, $rootScope) {
+FlowableAdmin.Utils.Filter = function(config, $http, $timeout, $rootScope) {
 	this.init(config, $http, $timeout, $rootScope);
 };
 
-ActivitiAdmin.Utils.Filter.prototype = {
+FlowableAdmin.Utils.Filter.prototype = {
 
 	init: function(config, $http, $timeout, $rootScope) {
-		this.order = ActivitiAdmin.Config.filter.defaultOrder;
-		this.resultSize = ActivitiAdmin.Config.filter.defaultResultSize;
+		this.order = FlowableAdmin.Config.filter.defaultOrder;
+		this.resultSize = FlowableAdmin.Config.filter.defaultResultSize;
 		this.$http = $http;
 		this.$timeout = $timeout;
 		this.$rootScope = $rootScope;
@@ -166,7 +166,7 @@ ActivitiAdmin.Utils.Filter.prototype = {
 				// Actually do the refresh-call
 				this.refresh();
 			}
-		}).bind(this), ActivitiAdmin.Config.filter.delay);
+		}).bind(this), FlowableAdmin.Config.filter.delay);
 	},
 
 	_success: function(data, status, headers, config) {
@@ -302,9 +302,9 @@ ActivitiAdmin.Utils.Filter.prototype = {
 					if (this.properties[filter].getMonth) {
 						// Special handling for dates. Use correct format and reset time-component
 						if (filter.indexOf("Before") > 0) {
-							ActivitiAdmin.Utils.resetTimeToEvening(this.properties[filter]);
+							FlowableAdmin.Utils.resetTimeToEvening(this.properties[filter]);
 						} else {
-							ActivitiAdmin.Utils.resetTimeToMorning(this.properties[filter]);
+							FlowableAdmin.Utils.resetTimeToMorning(this.properties[filter]);
 						}
 						params[filter] = moment(this.properties[filter]).format("YYYY-MM-DDTHH:mm:ssZ");
 					} else {

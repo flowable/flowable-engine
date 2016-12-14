@@ -14,7 +14,7 @@
  */
 'use strict';
 
-activitiAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScope', '$http', '$timeout','$location','$routeParams', '$modal', '$translate', '$q', 'gridConstants',
+flowableAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScope', '$http', '$timeout','$location','$routeParams', '$modal', '$translate', '$q', 'gridConstants',
     function ($scope, $rootScope, $http, $timeout, $location, $routeParams, $modal, $translate, $q, gridConstants) {
 
         $rootScope.navigation = {main: 'process-engine', sub: 'definitions'};
@@ -295,7 +295,7 @@ activitiAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
 
 }]);
 
-activitiAdminApp.controller('EditProcessDefinitionCategoryModalCrtl',
+flowableAdminApp.controller('EditProcessDefinitionCategoryModalCrtl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'definition', function ($rootScope, $scope, $modalInstance, $http, definition) {
 
   $scope.model = {
@@ -333,7 +333,7 @@ activitiAdminApp.controller('EditProcessDefinitionCategoryModalCrtl',
   };
 }]);
 
-activitiAdminApp.controller('ShowProcessDefinitionDiagramPopupCrtl',
+flowableAdminApp.controller('ShowProcessDefinitionDiagramPopupCrtl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'definition', '$timeout', function ($rootScope, $scope, $modalInstance, $http, definition, $timeout) {
 
   $scope.model = {

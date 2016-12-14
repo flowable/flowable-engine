@@ -12,7 +12,7 @@
  */
 'use strict';
 
-activitiAdminApp.controller('FormDeploymentController', ['$scope', '$rootScope', '$http', '$timeout','$location','$routeParams', '$modal', '$translate', '$q',
+flowableAdminApp.controller('FormDeploymentController', ['$scope', '$rootScope', '$http', '$timeout','$location','$routeParams', '$modal', '$translate', '$q',
     function ($scope, $rootScope, $http, $timeout, $location, $routeParams, $modal, $translate, $q) {
 
         $rootScope.navigation = {main: 'form-engine', sub: 'deployments'};

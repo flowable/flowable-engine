@@ -14,7 +14,7 @@ package org.flowable.cdi.test.api.annotation;
 
 import org.flowable.cdi.BusinessProcess;
 import org.flowable.cdi.impl.annotation.StartProcessInterceptor;
-import org.flowable.cdi.test.CdiActivitiTestCase;
+import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.cdi.test.impl.beans.DeclarativeProcessController;
 import org.flowable.engine.test.Deployment;
 import org.junit.Test;
@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
  * 
  * @author Daniel Meyer
  */
-public class StartProcessTest extends CdiActivitiTestCase {
+public class StartProcessTest extends CdiFlowableTestCase {
 
   @Test
   @Deployment(resources = "org/activiti/cdi/test/api/annotation/StartProcessTest.bpmn20.xml")

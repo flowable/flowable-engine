@@ -14,7 +14,7 @@
 
 /* Controllers */
 
-activitiAdminApp.controller('FormDeploymentsController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', 'gridConstants',
+flowableAdminApp.controller('FormDeploymentsController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', 'gridConstants',
     function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, $modal, gridConstants) {
 
 		$rootScope.navigation = {main: 'form-engine', sub: 'deployments'};
@@ -57,7 +57,7 @@ activitiAdminApp.controller('FormDeploymentsController', ['$rootScope', '$scope'
 	    	$scope.filter = $rootScope.filters.formDeploymentFilter;
 	    	$scope.filter.config = filterConfig;
 	    } else {
-		    $scope.filter = new ActivitiAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
+		    $scope.filter = new FlowableAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
 		    $rootScope.filters.formDeploymentFilter = $scope.filter;
 	    }
 
@@ -122,7 +122,7 @@ activitiAdminApp.controller('FormDeploymentsController', ['$rootScope', '$scope'
 /**\
  * Controller for the upload a model from the process Modeler.
  */
- activitiAdminApp.controller('UploadDeploymentCrtl',
+ flowableAdminApp.controller('UploadDeploymentCrtl',
     ['$scope', '$modalInstance', '$http', '$upload', function ($scope, $modalInstance, $http, $upload) {
 
     $scope.status = {loading: false};

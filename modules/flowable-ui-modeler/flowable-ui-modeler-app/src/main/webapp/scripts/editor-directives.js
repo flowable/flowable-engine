@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-angular.module('activitiModeler')
+angular.module('flowableModeler')
     .directive('loading', ['$translate', function ($translate) {
         return {
             restrict: 'E',
@@ -18,7 +18,7 @@ angular.module('activitiModeler')
         };
     }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
     .directive('loadingLeftPull', ['$translate', function ($translate) {
         return {
             restrict: 'E',
@@ -29,7 +29,7 @@ angular.module('activitiModeler')
 /**
  * This is a template for the icon of a stencil item.
  */
-angular.module('activitiModeler')
+angular.module('flowableModeler')
     .directive('stencilItemIcon', [function () {
         return {
             scope: {
@@ -43,7 +43,7 @@ angular.module('activitiModeler')
 
 // Workaround for https://github.com/twbs/bootstrap/issues/8379 :
 // prototype.js interferes with regular dropdown behavior
-angular.module('activitiModeler')
+angular.module('flowableModeler')
     .directive('activitiFixDropdownBug', function () {
         return {
             restrict: 'AEC',
@@ -61,7 +61,7 @@ angular.module('activitiModeler')
 
 
 //form builder element renderer
-angular.module('activitiModeler').directive('formBuilderElement', ['$rootScope', '$timeout', '$modal', '$http', '$templateCache', '$translate', 'RecursionHelper', 'FormBuilderService',
+angular.module('flowableModeler').directive('formBuilderElement', ['$rootScope', '$timeout', '$modal', '$http', '$templateCache', '$translate', 'RecursionHelper', 'FormBuilderService',
     function ($rootScope, $timeout, $modal, $http, $templateCache, $translate, RecursionHelper, FormBuilderService) {
     return {
         restrict: 'AE',
@@ -250,7 +250,7 @@ angular.module('activitiModeler').directive('formBuilderElement', ['$rootScope',
 }]);
 
 
-angular.module('activitiModeler').directive('storeCursorPosition', ['$rootScope', '$timeout', '$popover', '$http', '$templateCache', function ($rootScope, $timeout, $popover, $http, $templateCache) {
+angular.module('flowableModeler').directive('storeCursorPosition', ['$rootScope', '$timeout', '$popover', '$http', '$templateCache', function ($rootScope, $timeout, $popover, $http, $templateCache) {
     return {
         restrict: 'A',
         scope: {
@@ -266,7 +266,7 @@ angular.module('activitiModeler').directive('storeCursorPosition', ['$rootScope'
     };
 }]);
 
-angular.module('activitiModeler').
+angular.module('flowableModeler').
     directive('selectGroupPopover', ['$http', '$popover', '$parse', 'GroupService', function ($http, $popover, $parse, GroupService) {
         var directive = {};
         directive.restrict = 'A';
@@ -422,7 +422,7 @@ angular.module('activitiModeler').
         return directive;
     }]);
 
-angular.module('activitiModeler').
+angular.module('flowableModeler').
     directive('assignmentSelect', ['$http', '$templateCache', function ($http, $templateCache) {
 
         var directive = {};
@@ -667,7 +667,7 @@ angular.module('activitiModeler').
         return directive;
     }]);
 
-angular.module('activitiModeler').
+angular.module('flowableModeler').
     directive('fieldsSelect', ['$http', '$templateCache', function ($http, $templateCache) {
 
         var directive = {};
@@ -728,7 +728,7 @@ angular.module('activitiModeler').
         return directive;
     }]);
 
-angular.module('activitiModeler').
+angular.module('flowableModeler').
     directive('recipientSelect', ['$http', '$translate', '$templateCache', function ($http, $translate, $templateCache) {
 
         var directive = {};
@@ -903,7 +903,7 @@ angular.module('activitiModeler').
         return directive;
     }]);
 
-angular.module('activitiModeler').
+angular.module('flowableModeler').
     directive('editorInputCheck', function () {
 
         return {

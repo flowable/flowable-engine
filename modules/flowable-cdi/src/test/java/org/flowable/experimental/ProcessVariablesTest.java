@@ -18,12 +18,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.cdi.BusinessProcess;
-import org.flowable.cdi.test.CdiActivitiTestCase;
+import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class ProcessVariablesTest extends CdiActivitiTestCase {
+public class ProcessVariablesTest extends CdiFlowableTestCase {
 
   @Ignore
   @Test

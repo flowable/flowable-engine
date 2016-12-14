@@ -12,7 +12,7 @@
  */
 'use strict';
 
-angular.module('activitiModeler').service('UserService', ['$http', '$q',
+angular.module('flowableModeler').service('UserService', ['$http', '$q',
     function ($http, $q) {
 
         var httpAsPromise = function(options) {
@@ -48,7 +48,7 @@ angular.module('activitiModeler').service('UserService', ['$http', '$q',
 
     }]);
 
-angular.module('activitiModeler').service('GroupService', ['$http', '$q',
+angular.module('flowableModeler').service('GroupService', ['$http', '$q',
     function ($http, $q) {
 
         var httpAsPromise = function(options) {

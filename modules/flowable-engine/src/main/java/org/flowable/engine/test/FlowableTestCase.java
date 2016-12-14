@@ -26,7 +26,7 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.test.TestHelper;
-import org.flowable.engine.test.mock.ActivitiMockSupport;
+import org.flowable.engine.test.mock.FlowableMockSupport;
 
 import junit.framework.TestCase;
 
@@ -71,7 +71,7 @@ public abstract class FlowableTestCase extends TestCase {
   protected ManagementService managementService;
   protected FormService formService;
 
-  private ActivitiMockSupport mockSupport;
+  private FlowableMockSupport mockSupport;
 
   /** uses 'activiti.cfg.xml' as it's configuration resource */
   public FlowableTestCase() {
@@ -129,8 +129,8 @@ public abstract class FlowableTestCase extends TestCase {
   }
 
   protected void initializeMockSupport() {
-    if (ActivitiMockSupport.isMockSupportPossible(processEngine)) {
-      this.mockSupport = new ActivitiMockSupport(processEngine);
+    if (FlowableMockSupport.isMockSupportPossible(processEngine)) {
+      this.mockSupport = new FlowableMockSupport(processEngine);
     }
   }
 
@@ -164,11 +164,11 @@ public abstract class FlowableTestCase extends TestCase {
     this.configurationResource = configurationResource;
   }
 
-  public ActivitiMockSupport getMockSupport() {
+  public FlowableMockSupport getMockSupport() {
     return mockSupport;
   }
 
-  public ActivitiMockSupport mockSupport() {
+  public FlowableMockSupport mockSupport() {
     return mockSupport;
   }
 

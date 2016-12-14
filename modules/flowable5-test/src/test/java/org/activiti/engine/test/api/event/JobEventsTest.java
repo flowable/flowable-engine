@@ -21,7 +21,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.impl.delegate.event.ActivitiEngineEvent;
+import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -50,11 +50,11 @@ public class JobEventsTest extends PluggableActivitiTestCase {
 		
 		// Check if create-event has been dispatched
 		assertEquals(2, listener.getEventsReceived().size());
-		ActivitiEngineEvent event = (ActivitiEngineEvent) listener.getEventsReceived().get(0);
+		FlowableEngineEvent event = (FlowableEngineEvent) listener.getEventsReceived().get(0);
 		assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
 		checkEventContext(event, theJob, false);
 		
-		event = (ActivitiEngineEvent) listener.getEventsReceived().get(1);
+		event = (FlowableEngineEvent) listener.getEventsReceived().get(1);
 		assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
 		checkEventContext(event, theJob, false);
 		
@@ -63,7 +63,7 @@ public class JobEventsTest extends PluggableActivitiTestCase {
 		// Update the job-entity. Check if update event is dispatched with update job entity
 		managementService.setTimerJobRetries(theJob.getId(), 5);
 		assertEquals(1, listener.getEventsReceived().size());
-		event = (ActivitiEngineEvent) listener.getEventsReceived().get(0);
+		event = (FlowableEngineEvent) listener.getEventsReceived().get(0);
 		assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
 		Job updatedJob = (Job) ((FlowableEntityEvent) event).getEntity();
 		assertEquals(5, updatedJob.getRetries());
@@ -82,26 +82,26 @@ public class JobEventsTest extends PluggableActivitiTestCase {
 		assertEquals(6, listener.getEventsReceived().size());
 		
 		// First, a timer fired event has been dispatched
-		event = (ActivitiEngineEvent) listener.getEventsReceived().get(0);
+		event = (FlowableEngineEvent) listener.getEventsReceived().get(0);
     assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
     checkEventContext(event, theJob, true);
     
-    event = (ActivitiEngineEvent) listener.getEventsReceived().get(1);
+    event = (FlowableEngineEvent) listener.getEventsReceived().get(1);
     assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
     checkEventContext(event, theJob, true);
 
     // First, a timer fired event has been dispatched
-    event = (ActivitiEngineEvent) listener.getEventsReceived().get(3);
+    event = (FlowableEngineEvent) listener.getEventsReceived().get(3);
     assertEquals(FlowableEngineEventType.TIMER_FIRED, event.getType());
     checkEventContext(event, theJob, true);
 
     // Next, a delete event has been dispatched
-    event = (ActivitiEngineEvent) listener.getEventsReceived().get(4);
+    event = (FlowableEngineEvent) listener.getEventsReceived().get(4);
     assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
     checkEventContext(event, theJob, true);
 
     // Finally, a complete event has been dispatched
-    event = (ActivitiEngineEvent) listener.getEventsReceived().get(5);
+    event = (FlowableEngineEvent) listener.getEventsReceived().get(5);
     assertEquals(FlowableEngineEventType.JOB_EXECUTION_SUCCESS, event.getType());
     checkEventContext(event, theJob, true);
 	
@@ -125,11 +125,11 @@ public class JobEventsTest extends PluggableActivitiTestCase {
 
     // Check if create-event has been dispatched
     assertEquals(2, listener.getEventsReceived().size());
-    ActivitiEngineEvent event = (ActivitiEngineEvent) listener.getEventsReceived().get(0);
+    FlowableEngineEvent event = (FlowableEngineEvent) listener.getEventsReceived().get(0);
     assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
     checkEventContext(event, theJob, false);
 
-    event = (ActivitiEngineEvent) listener.getEventsReceived().get(1);
+    event = (FlowableEngineEvent) listener.getEventsReceived().get(1);
     assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
     checkEventContext(event, theJob, false);
 
@@ -340,40 +340,40 @@ public class JobEventsTest extends PluggableActivitiTestCase {
 		assertEquals(8, listener.getEventsReceived().size());
 
     // First, the timer was fired
-		ActivitiEngineEvent event = (ActivitiEngineEvent) listener.getEventsReceived().get(0);
+		FlowableEngineEvent event = (FlowableEngineEvent) listener.getEventsReceived().get(0);
     assertEquals(FlowableEngineEventType.TIMER_FIRED, event.getType());
     checkEventContext(event, theJob, true);
 
     // Second, the job-entity was deleted, as the job was executed
-		event = (ActivitiEngineEvent) listener.getEventsReceived().get(1);
+		event = (FlowableEngineEvent) listener.getEventsReceived().get(1);
 		assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
 		checkEventContext(event, theJob, true);
 		
 	  // Next, a job failed event is dispatched
-		event = (ActivitiEngineEvent) listener.getEventsReceived().get(2);
+		event = (FlowableEngineEvent) listener.getEventsReceived().get(2);
 		assertEquals(FlowableEngineEventType.JOB_EXECUTION_FAILURE, event.getType());
 		checkEventContext(event, theJob, true);
 		
 		// Finally, an timer create event is received and the job count is decremented
-    event = (ActivitiEngineEvent) listener.getEventsReceived().get(3);
+    event = (FlowableEngineEvent) listener.getEventsReceived().get(3);
     assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
     checkEventContext(event, theJob, true);
     
-    event = (ActivitiEngineEvent) listener.getEventsReceived().get(4);
+    event = (FlowableEngineEvent) listener.getEventsReceived().get(4);
     assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
     checkEventContext(event, theJob, true);
     
     // original job is deleted
-    event = (ActivitiEngineEvent) listener.getEventsReceived().get(5);
+    event = (FlowableEngineEvent) listener.getEventsReceived().get(5);
     assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
     checkEventContext(event, theJob, true);
 		
 		// Finally, an update-event is received and the job count is decremented
-		event = (ActivitiEngineEvent) listener.getEventsReceived().get(6);
+		event = (FlowableEngineEvent) listener.getEventsReceived().get(6);
 		assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
 		checkEventContext(event, theJob, true);
 		
-		event = (ActivitiEngineEvent) listener.getEventsReceived().get(7);
+		event = (FlowableEngineEvent) listener.getEventsReceived().get(7);
 		assertEquals(FlowableEngineEventType.JOB_RETRIES_DECREMENTED, event.getType());
 		assertEquals(0, ((Job) ((FlowableEntityEvent) event).getEntity()).getRetries());
 		checkEventContext(event, theJob, true);
@@ -381,7 +381,7 @@ public class JobEventsTest extends PluggableActivitiTestCase {
 		processEngineConfiguration.resetClock();
 	}
 	
-	protected void checkEventContext(ActivitiEngineEvent event, Job entity, boolean scopeExecutionExpected) {
+	protected void checkEventContext(FlowableEngineEvent event, Job entity, boolean scopeExecutionExpected) {
 		assertEquals(entity.getProcessInstanceId(), event.getProcessInstanceId());
 		assertEquals(entity.getProcessDefinitionId(), event.getProcessDefinitionId());
 		if (scopeExecutionExpected) {

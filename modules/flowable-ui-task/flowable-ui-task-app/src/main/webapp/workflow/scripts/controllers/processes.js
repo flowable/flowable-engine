@@ -12,9 +12,9 @@
  */
 'use strict';
 
-angular.module('activitiApp')
-    .controller('ProcessesController', ['$rootScope', '$scope', '$translate', '$http', '$timeout', '$location', '$modal', '$routeParams', '$popover', 'appResourceRoot', 'AppDefinitionService',
-        function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal, $routeParams, $popover, appResourceRoot, AppDefinitionService) {
+angular.module('flowableApp')
+    .controller('ProcessesController', ['$rootScope', '$scope', '$translate', '$http', '$timeout', '$location', '$modal', '$routeParams', '$popover', 'appResourceRoot', 'AppDefinitionService', 'ProcessService',
+        function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal, $routeParams, $popover, appResourceRoot, AppDefinitionService, ProcessService) {
 
         var processId = $routeParams.processId;
 
@@ -221,15 +221,18 @@ angular.module('activitiApp')
 
         $scope.selectDefaultDefinition = function() {
             // Select first non-default definition, if any
-            if ($scope.root.processDefinitions && $scope.root.processDefinitions.length > 0) {
-                for(var i=0; i< $scope.root.processDefinitions.length; i++) {
-                    var def = $scope.root.processDefinitions[i];
-                    if(def.id != 'default') {
-                        $scope.selectProcessDefinition(def);
-                        break;
-                    }
-                }
-            }
+            ProcessService.getProcessDefinitions($scope.deploymentKey).then(function(response) {
+            	$rootScope.root.processDefinitions = response.data;
+	            if ($scope.root.processDefinitions && $scope.root.processDefinitions.length > 0) {
+	                for (var i=0; i< $scope.root.processDefinitions.length; i++) {
+	                    var def = $scope.root.processDefinitions[i];
+	                    if (def.id != 'default') {
+	                        $scope.selectProcessDefinition(def);
+	                        break;
+	                    }
+	                }
+	            }
+	        });
 
         };
 
@@ -302,7 +305,7 @@ angular.module('activitiApp')
         $rootScope.loadProcessDefinitions($scope.deploymentKey);
 
         // If 'createProcessInstance' is set (eg from the task page)
-        if($rootScope.createProcessInstance) {
+        if ($rootScope.createProcessInstance) {
             $rootScope.createProcessInstance = false;
             $scope.createProcessInstance();
         } else {

@@ -14,7 +14,7 @@
  */
 'use strict';
 
-angular.module('activitiAdminApp')
+angular.module('flowableAdminApp')
     .constant('gridConstants', {
         defaultTemplate : '<div><div class="ngCellText" title="{{row.getProperty(col.field)}}">{{row.getProperty(col.field)}}</div></div>',
         dateTemplate : '<div><div class="ngCellText" title="{{row.getProperty(col.field) | dateformat:\'full\'}}">{{row.getProperty(col.field) | dateformat}}</div></div>',

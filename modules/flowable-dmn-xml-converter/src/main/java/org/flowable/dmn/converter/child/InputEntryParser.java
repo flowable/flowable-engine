@@ -64,7 +64,7 @@ public class InputEntryParser extends BaseChildElementParser {
         }
 
         if (inputClause == null) {
-            LOGGER.warn("Error determine output clause for position: " + model.getCurrentDecisionTable().getInputs());
+            LOGGER.warn("Error determine output clause for position: {}", model.getCurrentDecisionTable().getInputs());
         }
 
         RuleInputClauseContainer ruleInputClauseContainer = new RuleInputClauseContainer();

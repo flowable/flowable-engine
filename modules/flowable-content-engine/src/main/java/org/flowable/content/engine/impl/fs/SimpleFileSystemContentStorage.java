@@ -80,7 +80,7 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
     if (!subFolder.exists()) {
       boolean created = subFolder.mkdir();
       if (created) {
-        LOG.info("Created content folder in " + subFolder.getAbsolutePath());
+        LOG.info("Created content folder in {}", subFolder.getAbsolutePath());
       } else {
         LOG.warn("Could not create content folder. This might impact the storage of related content");
       }

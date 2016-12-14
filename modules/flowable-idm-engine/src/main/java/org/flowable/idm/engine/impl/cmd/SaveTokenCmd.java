@@ -20,7 +20,6 @@ import org.flowable.idm.api.Token;
 import org.flowable.idm.engine.impl.interceptor.Command;
 import org.flowable.idm.engine.impl.interceptor.CommandContext;
 import org.flowable.idm.engine.impl.persistence.entity.TokenEntity;
-import org.flowable.idm.engine.impl.persistence.entity.UserEntity;
 
 /**
  * @author Tijs Rademakers
@@ -40,7 +39,7 @@ public class SaveTokenCmd implements Command<Void>, Serializable {
     }
     
     if (commandContext.getTokenEntityManager().isNewToken(token)) {
-      if (token instanceof UserEntity) {
+      if (token instanceof TokenEntity) {
         commandContext.getTokenEntityManager().insert((TokenEntity) token, true);
       } else {
         commandContext.getDbSqlSession().insert((Entity) token);

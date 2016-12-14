@@ -16,10 +16,10 @@ import java.util.Map;
 
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableEntityWithVariablesEvent;
-import org.flowable.engine.impl.delegate.event.ActivitiEngineEntityEvent;
+import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
 
 /**
- * Base class for all {@link ActivitiEngineEntityEvent} implementations, related to entities with variables.
+ * Base class for all {@link FlowableEngineEntityEvent} implementations, related to entities with variables.
  * 
  * @author Tijs Rademakers
  */

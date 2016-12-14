@@ -1,0 +1,88 @@
+version: '2'
+services:
+    flowable-modeler-app:
+          image: flowable/flowable-modeler
+          container_name: flowable-modeler
+          depends_on:
+              - flowable-db
+              - flowable-idm-app
+              - flowable-task-app
+          environment:
+              - datasource.driver=org.postgresql.Driver
+              - datasource.url=jdbc:postgresql://flowable-db:5432/flowable
+              - datasource.username=flowable
+              - datasource.password=flowable
+              - idm.app.url=http://flowable-idm-app:8080/flowable-idm
+              - idm.app.redirect.url=http://localhost:8080/flowable-idm
+              - idm.admin.user=admin
+              - idm.admin.password=test
+              - deployment.api.url=http://flowable-task-app:9999/flowable-task/process-api
+          ports:
+              - 8888:8888
+    flowable-task-app:
+        image: flowable/flowable-task
+        container_name: flowable-task
+        depends_on:
+            - flowable-db
+            - flowable-idm-app
+        environment:
+            - datasource.driver=org.postgresql.Driver
+            - datasource.url=jdbc:postgresql://flowable-db:5432/flowable
+            - datasource.username=flowable
+            - datasource.password=flowable
+            - idm.app.url=http://flowable-idm-app:8080/flowable-idm
+            - idm.app.redirect.url=http://localhost:8080/flowable-idm
+            - idm.admin.user=admin
+            - idm.admin.password=test
+        ports:
+            - 9999:9999
+    flowable-idm-app:
+        image: flowable/flowable-idm
+        container_name: flowable-idm
+        depends_on:
+            - flowable-db
+        environment:
+            - datasource.driver=org.postgresql.Driver
+            - datasource.url=jdbc:postgresql://flowable-db:5432/flowable
+            - datasource.username=flowable
+            - datasource.password=flowable
+        ports:
+            - 8080:8080
+    flowable-admin-app:
+        image: flowable/flowable-admin
+        container_name: flowable-admin
+        depends_on:
+            - flowable-db
+            - flowable-idm-app
+            - flowable-task-app
+        environment:
+            - datasource.driver=org.postgresql.Driver
+            - datasource.url=jdbc:postgresql://flowable-db:5432/flowable
+            - datasource.username=flowable
+            - datasource.password=flowable
+            - idm.app.url=http://flowable-idm-app:8080/flowable-idm
+            - idm.app.redirect.url=http://localhost:8080/flowable-idm
+            - idm.admin.user=admin
+            - idm.admin.password=test
+            - rest.process.app.host=http://flowable-task-app
+            - rest.process.app.port=9999
+            - rest.process.app.contextroot=flowable-task
+            - rest.process.app.restroot=process-api
+            - rest.dmn.app.host=http://flowable-task-app
+            - rest.dmn.app.port=9999
+            - rest.dmn.app.contextroot=flowable-task
+            - rest.dmn.app.restroot=dmn-api
+            - rest.form.app.host=http://flowable-task-app
+            - rest.form.app.port=9999
+            - rest.form.app.contextroot=flowable-task
+            - rest.form.app.restroot=form-api
+            - rest.content.app.host=http://flowable-task-app
+            - rest.content.app.port=9999
+            - rest.content.app.contextroot=flowable-task
+            - rest.content.app.restroot=content-api
+        ports:
+            - 9988:9988
+    flowable-db:
+        extends:
+            file: postgres.yml
+            service: flowable-postgres

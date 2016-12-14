@@ -12,7 +12,7 @@
  */
 'use strict';
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
   .controller('FormsCtrl', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$modal', function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal) {
 
       // Main page (needed for visual indicator of current page)
@@ -140,7 +140,7 @@ angular.module('activitiModeler')
   }]);
 
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 .controller('CreateNewFormCtrl', ['$rootScope', '$scope', '$http',
     function ($rootScope, $scope, $http) {
 
@@ -188,7 +188,7 @@ angular.module('activitiModeler')
     };
 }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 	.controller('DuplicateFormCtrl', ['$rootScope', '$scope', '$http',
 		function ($rootScope, $scope, $http) {
 

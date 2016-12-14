@@ -19,7 +19,7 @@ import java.util.Map;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.junit.Test;
 
-public class JavaDelegateTest extends AbstractActiviti6CompatibilityTest {
+public class JavaDelegateTest extends AbstractFlowable6CompatibilityTest {
 
   @Test
   public void testActiviti5JavaDelegate() {

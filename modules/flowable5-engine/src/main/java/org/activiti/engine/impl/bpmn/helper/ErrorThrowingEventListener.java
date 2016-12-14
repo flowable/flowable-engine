@@ -17,7 +17,7 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.impl.delegate.event.ActivitiEngineEvent;
+import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
 
 /**
  * An {@link FlowableEventListener} that throws a error event when an event is
@@ -32,8 +32,8 @@ public class ErrorThrowingEventListener extends BaseDelegateEventListener {
 
 	@Override
 	public void onEvent(FlowableEvent event) {
-		if (isValidEvent(event) && event instanceof ActivitiEngineEvent) {
-		  ActivitiEngineEvent engineEvent = (ActivitiEngineEvent) event;
+		if (isValidEvent(event) && event instanceof FlowableEngineEvent) {
+		  FlowableEngineEvent engineEvent = (FlowableEngineEvent) event;
 			ExecutionEntity execution = null;
 			
 			if (Context.isExecutionContextActive()) {

@@ -12,7 +12,7 @@
  */
 'use strict';
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
     .controller('HeaderController', ['$rootScope', '$scope', '$http', '$timeout', function ($rootScope, $scope, $http, $timeout) {
     	
     	// Add reference to global header-config

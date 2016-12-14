@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.flowable.cdi.BusinessProcess;
-import org.flowable.cdi.test.CdiActivitiTestCase;
+import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
@@ -28,7 +28,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.junit.Test;
 
-public class SignalEventTest extends CdiActivitiTestCase {
+public class SignalEventTest extends CdiFlowableTestCase {
 
   @Named
   public static class SignalReceivedDelegate implements JavaDelegate {

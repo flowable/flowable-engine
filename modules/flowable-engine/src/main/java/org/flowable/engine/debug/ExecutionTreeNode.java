@@ -71,10 +71,10 @@ public class ExecutionTreeNode implements Iterable<ExecutionTreeNode> {
     StringBuilder strb = new StringBuilder();
     strb.append(getExecutionEntity().getId());
     if (getExecutionEntity().getActivityId() != null) {
-      strb.append(" : " + getExecutionEntity().getActivityId());
+      strb.append(" : ").append(getExecutionEntity().getActivityId());
     }
     if (getExecutionEntity().getParentId() != null) {
-      strb.append(", parent id " + getExecutionEntity().getParentId());
+      strb.append(", parent id ").append(getExecutionEntity().getParentId());
     }
     if (getExecutionEntity().isProcessInstanceType()) {
       strb.append(" (process instance)");
@@ -89,14 +89,14 @@ public class ExecutionTreeNode implements Iterable<ExecutionTreeNode> {
   }
 
   protected void internalToString(StringBuilder strb, String prefix, boolean isTail) {
-    strb.append(prefix + (isTail ? "└── " : "├── ") + getExecutionEntity().getId() + " : " 
-        + getCurrentFlowElementId()
-        + ", parent id " + getExecutionEntity().getParentId() 
-        + (getExecutionEntity().isActive() ? " (active)" : " (not active)")
-        + (getExecutionEntity().isScope() ? " (scope)" : "")
-        + (getExecutionEntity().isMultiInstanceRoot() ? " (multi instance root)" : "")
-        + (getExecutionEntity().isEnded() ? " (ended)" : "")
-        + System.lineSeparator());
+    strb.append(prefix).append(isTail ? "└── " : "├── ").append(getExecutionEntity().getId()).append(" : ")
+            .append(getCurrentFlowElementId()).append(", parent id ")
+            .append(getExecutionEntity().getParentId())
+            .append(getExecutionEntity().isActive() ? " (active)" : " (not active)")
+            .append(getExecutionEntity().isScope() ? " (scope)" : "")
+            .append(getExecutionEntity().isMultiInstanceRoot() ? " (multi instance root)" : "")
+            .append(getExecutionEntity().isEnded() ? " (ended)" : "")
+            .append(System.lineSeparator());
     if (children != null) {
       for (int i = 0; i < children.size() - 1; i++) {
         children.get(i).internalToString(strb, prefix + (isTail ? "    " : "│   "), false);

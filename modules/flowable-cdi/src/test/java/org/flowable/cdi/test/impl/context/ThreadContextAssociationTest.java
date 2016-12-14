@@ -12,7 +12,7 @@
  */
 package org.flowable.cdi.test.impl.context;
 
-import org.flowable.cdi.test.CdiActivitiTestCase;
+import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.cdi.test.impl.beans.ProcessScopedMessageBean;
 import org.flowable.engine.test.Deployment;
 import org.junit.Test;
@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
  * 
  * @author Daniel Meyer
  */
-public class ThreadContextAssociationTest extends CdiActivitiTestCase {
+public class ThreadContextAssociationTest extends CdiFlowableTestCase {
 
   @Test
   @Deployment

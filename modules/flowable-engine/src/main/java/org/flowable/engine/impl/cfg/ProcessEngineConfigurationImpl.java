@@ -32,7 +32,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
@@ -69,9 +68,9 @@ import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.common.impl.transaction.ContextAwareJdbcTransactionFactory;
 import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.compatibility.DefaultFlowable5CompatibilityHandlerFactory;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandlerFactory;
-import org.flowable.engine.compatibility.DefaultFlowable5CompatibilityHandlerFactory;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventDispatcherImpl;
 import org.flowable.engine.form.AbstractFormType;
@@ -718,11 +717,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   */
   protected ExecuteAsyncRunnableFactory asyncExecutorExecuteAsyncRunnableFactory;
 
-  // ID GENERATOR ///////////////////////////////////////////////////////////////
-
-  protected DataSource idGeneratorDataSource;
-  protected String idGeneratorDataSourceJndiName;
-
   // BPMN PARSER //////////////////////////////////////////////////////////////
 
   protected List<BpmnParseHandler> preBpmnParseHandlers;
@@ -1338,19 +1332,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public void initConfigurators() {
 
     allConfigurators = new ArrayList<ProcessEngineConfigurator>();
-
-    // Configurators that are explicitly added to the config
-    if (configurators != null) {
-      for (ProcessEngineConfigurator configurator : configurators) {
-        allConfigurators.add(configurator);
-      }
-    }
-
+    
     if (disableIdmEngine == false) {
       if (idmProcessEngineConfigurator != null) {
         allConfigurators.add(idmProcessEngineConfigurator);
       } else {
         allConfigurators.add(new IdmEngineConfigurator());
+      }
+    }
+
+    // Configurators that are explicitly added to the config
+    if (configurators != null) {
+      for (ProcessEngineConfigurator configurator : configurators) {
+        allConfigurators.add(configurator);
       }
     }
 
@@ -1657,7 +1651,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           Class<?> handledType = defaultBpmnParseHandler.getHandledTypes().iterator().next();
           if (customParseHandlerMap.containsKey(handledType)) {
             BpmnParseHandler newBpmnParseHandler = customParseHandlerMap.get(handledType);
-            log.info("Replacing default BpmnParseHandler " + defaultBpmnParseHandler.getClass().getName() + " with " + newBpmnParseHandler.getClass().getName());
+            log.info("Replacing default BpmnParseHandler {} with {}", defaultBpmnParseHandler.getClass().getName(), newBpmnParseHandler.getClass().getName());
             bpmnParserHandlers.set(i, newBpmnParseHandler);
           }
         }
@@ -1765,23 +1759,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void initIdGenerator() {
     if (idGenerator == null) {
-      CommandExecutor idGeneratorCommandExecutor = null;
-      if (idGeneratorDataSource != null) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneProcessEngineConfiguration();
-        processEngineConfiguration.setDataSource(idGeneratorDataSource);
-        processEngineConfiguration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_FALSE);
-        processEngineConfiguration.init();
-        idGeneratorCommandExecutor = processEngineConfiguration.getCommandExecutor();
-      } else if (idGeneratorDataSourceJndiName != null) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneProcessEngineConfiguration();
-        processEngineConfiguration.setDataSourceJndiName(idGeneratorDataSourceJndiName);
-        processEngineConfiguration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_FALSE);
-        processEngineConfiguration.init();
-        idGeneratorCommandExecutor = processEngineConfiguration.getCommandExecutor();
-      } else {
-        idGeneratorCommandExecutor = getCommandExecutor();
-      }
-
+      CommandExecutor idGeneratorCommandExecutor = getCommandExecutor();
       DbIdGenerator dbIdGenerator = new DbIdGenerator();
       dbIdGenerator.setIdBlockSize(idBlockSize);
       dbIdGenerator.setCommandExecutor(idGeneratorCommandExecutor);
@@ -2055,7 +2033,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       flowable5CompatibilityHandler = flowable5CompatibilityHandlerFactory.createFlowable5CompatibilityHandler();
 
       if (flowable5CompatibilityHandler != null) {
-        log.info("Found compatibility handler instance : " + flowable5CompatibilityHandler.getClass());
+        log.info("Found compatibility handler instance : {}", flowable5CompatibilityHandler.getClass());
       }
     }
 
@@ -2843,24 +2821,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setFailedJobCommandFactory(FailedJobCommandFactory failedJobCommandFactory) {
     this.failedJobCommandFactory = failedJobCommandFactory;
-    return this;
-  }
-
-  public DataSource getIdGeneratorDataSource() {
-    return idGeneratorDataSource;
-  }
-
-  public ProcessEngineConfigurationImpl setIdGeneratorDataSource(DataSource idGeneratorDataSource) {
-    this.idGeneratorDataSource = idGeneratorDataSource;
-    return this;
-  }
-
-  public String getIdGeneratorDataSourceJndiName() {
-    return idGeneratorDataSourceJndiName;
-  }
-
-  public ProcessEngineConfigurationImpl setIdGeneratorDataSourceJndiName(String idGeneratorDataSourceJndiName) {
-    this.idGeneratorDataSourceJndiName = idGeneratorDataSourceJndiName;
     return this;
   }
 
@@ -3851,7 +3811,5 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.asyncExecutorMessageQueueMode = asyncExecutorMessageQueueMode;
     return this;
   }
-
-
 
 }

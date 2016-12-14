@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-angular.module('activitiModeler')
+angular.module('flowableModeler')
   .controller('AppDefinitionCtrl', ['$rootScope', '$scope', '$translate', '$http', '$location', '$routeParams', '$modal', '$popover', '$timeout',
                               function ($rootScope, $scope, $translate, $http, $location, $routeParams, $modal, $popover, $timeout) {
 
@@ -179,7 +179,7 @@ angular.module('activitiModeler')
     $scope.loadApp();
 }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 .controller('PublishAppDefinitionPopupCtrl', ['$rootScope', '$scope', '$http', '$route', '$translate', function ($rootScope, $scope, $http, $route, $translate) {
 
     $scope.popup = {
@@ -203,14 +203,9 @@ angular.module('activitiModeler')
             success(function(data, status, headers, config) {
                 $scope.$hide();
 
-                if (data.errorType == 1) {
-                    var error = {modelName: data.errorDescription};
-                    $scope.addAlertPromise($translate('APP.POPUP.HAS-CUSTOM-STENCILITEM', error), 'error');
-
-                } else if (data.errorType == 2) {
-                    var error = { modelName: data.errorDescription};
-                    $scope.addAlertPromise($translate('APP.POPUP.HAS-VALIDATIONERROR', error), 'error');
-
+                if (data.error) {
+                    $scope.popup.loading = false;
+                    $scope.addAlert(data.errorDescription, 'error');
                 } else {
                     $scope.popup.loading = false;
                     $route.reload();
@@ -218,28 +213,9 @@ angular.module('activitiModeler')
                 }
             }).
             error(function(data, status, headers, config) {
-
                 $scope.popup.loading = false;
-
-                if (status === 409 && data && data.messageKey === 'app.publish.procdef.key.conflict') {
-                    $scope.popup.error = {
-                        type: 'conflictingProcDefKey',
-                        data: data.customData
-                    };
-                } else if(status === 409 && data && data.messageKey === 'app.publish.procdef.duplicate.keys') {
-                    $scope.popup.error = {
-                        type: 'duplicateProcDefKeys',
-                        data: data.customData
-                    };
-                } else if (status === 409 && data && data.messageKey === 'app.publish.process.model.already.used') {
-                    $scope.popup.error = {
-                        type: 'processModelAlreadyUsed',
-                        data: data.customData
-                    };
-                } else {
-                    $scope.$hide();
-                    $scope.addAlertPromise($translate('APP.ALERT.PUBLISH-ERROR'), 'error');
-                }
+                $scope.$hide();
+                $scope.addAlertPromise($translate('APP.ALERT.PUBLISH-ERROR'), 'error');
             });
     };
 
@@ -250,7 +226,7 @@ angular.module('activitiModeler')
     };
 }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 .controller('DeleteAppDefinitionPopupCrtl', ['$rootScope', '$scope', '$http', '$translate', function ($rootScope, $scope, $http, $translate) {
 
     $scope.popup = {
@@ -286,7 +262,7 @@ angular.module('activitiModeler')
     };
 }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 .controller('ImportNewVersionAppDefinitionCtrl', ['$rootScope', '$scope', '$http', 'Upload', '$route', function ($rootScope, $scope, $http, Upload, $route) {
 
   $scope.popup = {

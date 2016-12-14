@@ -41,6 +41,6 @@ public class EditorGroupsResource {
     for (RemoteGroup group : groups) {
       result.add(new GroupRepresentation(group));
     }
-    return new ResultListDataRepresentation(groups);
+    return new ResultListDataRepresentation(result);
   }
 }

@@ -13,7 +13,7 @@
 package org.flowable.engine.delegate.event;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.impl.delegate.event.ActivitiEngineEvent;
+import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
 import org.flowable.engine.impl.variable.VariableType;
 
 /**
@@ -22,7 +22,7 @@ import org.flowable.engine.impl.variable.VariableType;
  * @author Frederik Heremans
  * @author Joram Barrez
  */
-public interface FlowableVariableEvent extends ActivitiEngineEvent {
+public interface FlowableVariableEvent extends FlowableEngineEvent {
 
   /**
    * @return the name of the variable involved.

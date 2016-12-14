@@ -292,7 +292,7 @@ KISBPM.TOOLBAR = {
 };
 
 /** Custom controller for the save dialog */
-angular.module('activitiModeler').controller('SaveModelCtrl', [ '$rootScope', '$scope', '$http', '$route', '$location',
+angular.module('flowableModeler').controller('SaveModelCtrl', [ '$rootScope', '$scope', '$http', '$route', '$location',
     function ($rootScope, $scope, $http, $route, $location) {
 
     var modelMetaData = $scope.editor.getModelMetaData();

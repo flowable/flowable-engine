@@ -21,7 +21,7 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.impl.delegate.event.ActivitiEngineEvent;
+import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
 
 /**
  * An {@link FlowableEventListener} that throws a message event when an event is
@@ -38,8 +38,8 @@ public class MessageThrowingEventListener extends BaseDelegateEventListener {
 	
 	@Override
 	public void onEvent(FlowableEvent event) {
-	  if (isValidEvent(event) && event instanceof ActivitiEngineEvent) {
-      ActivitiEngineEvent engineEvent = (ActivitiEngineEvent) event;
+	  if (isValidEvent(event) && event instanceof FlowableEngineEvent) {
+      FlowableEngineEvent engineEvent = (FlowableEngineEvent) event;
 		
 			if (engineEvent.getProcessInstanceId() == null) {
 				throw new ActivitiIllegalArgumentException(

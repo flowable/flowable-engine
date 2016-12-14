@@ -13,7 +13,7 @@
 /**
  * Controller for profile mgmt
  */
-activitiApp.controller('IdmProfileMgmtController', ['$rootScope', '$scope', '$modal', 'IdmService', '$translate',
+flowableApp.controller('IdmProfileMgmtController', ['$rootScope', '$scope', '$modal', 'IdmService', '$translate',
     function ($rootScope, $scope, $modal, IdmService, $translate) {
 
         $rootScope.setMainPageById('profile');
@@ -106,7 +106,7 @@ activitiApp.controller('IdmProfileMgmtController', ['$rootScope', '$scope', '$mo
 
     }]);
 
-activitiApp.
+flowableApp.
     controller('UploadUserPictureController', ['$rootScope', '$scope', 'Upload', function ($rootScope, $scope, Upload) {
 
         $scope.popup = {
@@ -151,7 +151,7 @@ activitiApp.
 
     }]);
 
-activitiApp.
+flowableApp.
     controller('IdmChangePasswordController', ['$rootScope', '$scope', 'IdmService', function ($rootScope, $scope, IdmService) {
 
         $scope.isConfirmButtonDisabled = function() {

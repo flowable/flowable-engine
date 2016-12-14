@@ -11,7 +11,7 @@ import org.flowable.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.task.Task;
-import org.flowable.engine.test.profiler.ActivitiProfiler;
+import org.flowable.engine.test.profiler.FlowableProfiler;
 import org.flowable.engine.test.profiler.CommandStats;
 import org.flowable.engine.test.profiler.ConsoleLogger;
 import org.flowable.engine.test.profiler.ProfileSession;
@@ -87,7 +87,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
       Assert.assertTrue(historicActivityInstance.getEndTime() != null);
     }
     
-    ActivitiProfiler.getInstance().reset();
+    FlowableProfiler.getInstance().reset();
     
     for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
@@ -252,7 +252,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
   // ---------------------------------
   
   protected void assertExecutedCommands(String...commands) {
-    ProfileSession profileSession = ActivitiProfiler.getInstance().getProfileSessions().get(0);
+    ProfileSession profileSession = FlowableProfiler.getInstance().getProfileSessions().get(0);
     Map<String, CommandStats> allStats = profileSession.calculateSummaryStatistics();
     
     if (commands.length != allStats.size()) {
@@ -293,7 +293,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
       String dbInsert = (String) expectedInserts[i];
       Long count = (Long) expectedInserts[i+1];
       
-      Assert.assertEquals("Insert count for " + dbInsert + "not correct", count, stats.getDbInserts().get("org.flowable.engine.impl.persistence.entity." + dbInsert));
+      Assert.assertEquals("Insert count for " + dbInsert + " not correct", count, stats.getDbInserts().get("org.flowable.engine.impl.persistence.entity." + dbInsert));
     }
   }
   
@@ -308,7 +308,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
       String dbDelete = (String) expectedDeletes[i];
       Long count = (Long) expectedDeletes[i+1];
       
-      Assert.assertEquals("Delete count count for " + dbDelete + "not correct", count, stats.getDbDeletes().get("org.flowable.engine.impl.persistence.entity." + dbDelete));
+      Assert.assertEquals("Delete count count for " + dbDelete + " not correct", count, stats.getDbDeletes().get("org.flowable.engine.impl.persistence.entity." + dbDelete));
     }
   }
   
@@ -333,7 +333,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
   }
   
   protected CommandStats getStats(String commandClass) {
-    ProfileSession profileSession = ActivitiProfiler.getInstance().getProfileSessions().get(0);
+    ProfileSession profileSession = FlowableProfiler.getInstance().getProfileSessions().get(0);
     Map<String, CommandStats> allStats = profileSession.calculateSummaryStatistics();
     CommandStats stats = getStatsForCommand(commandClass, allStats);
     return stats;
@@ -351,13 +351,13 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
   
   // HELPERS
   
-  protected ActivitiProfiler deployStartProcessInstanceAndProfile(String path, String processDefinitionKey) {
+  protected FlowableProfiler deployStartProcessInstanceAndProfile(String path, String processDefinitionKey) {
     return deployStartProcessInstanceAndProfile(path, processDefinitionKey, true);
   }
   
-  protected ActivitiProfiler deployStartProcessInstanceAndProfile(String path, String processDefinitionKey, boolean stopProfilingAfterStart) {
+  protected FlowableProfiler deployStartProcessInstanceAndProfile(String path, String processDefinitionKey, boolean stopProfilingAfterStart) {
     deploy(path);
-    ActivitiProfiler activitiProfiler = startProcessInstanceAndProfile(processDefinitionKey);
+    FlowableProfiler activitiProfiler = startProcessInstanceAndProfile(processDefinitionKey);
     if (stopProfilingAfterStart) {
       stopProfiling();
     }
@@ -368,15 +368,15 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/cfg/executioncount/" + path).deploy();
   }
   
-  protected ActivitiProfiler startProcessInstanceAndProfile(String processDefinitionKey) {
-    ActivitiProfiler activitiProfiler = ActivitiProfiler.getInstance();
+  protected FlowableProfiler startProcessInstanceAndProfile(String processDefinitionKey) {
+    FlowableProfiler activitiProfiler = FlowableProfiler.getInstance();
     activitiProfiler.startProfileSession("Profiling session");
     runtimeService.startProcessInstanceByKey(processDefinitionKey);
     return activitiProfiler;
   }
   
   protected void stopProfiling() {
-    ActivitiProfiler profiler = ActivitiProfiler.getInstance();
+    FlowableProfiler profiler = FlowableProfiler.getInstance();
     profiler.stopCurrentProfileSession();
     new ConsoleLogger(profiler).log();
   }

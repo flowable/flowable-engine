@@ -12,26 +12,24 @@
  */
 package org.flowable.editor.dmn.converter;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Created by yvoswillens on 27/08/15.
  */
 public class DmnJsonConverterUtil {
 
-    protected static final Logger logger = LoggerFactory.getLogger(DmnJsonConverterUtil.class);
+  protected static final Logger logger = LoggerFactory.getLogger(DmnJsonConverterUtil.class);
 
-    private static ObjectMapper objectMapper = new ObjectMapper();
-
-    public static String getValueAsString(String name, JsonNode objectNode) {
-        String propertyValue = null;
-        JsonNode jsonNode = objectNode.get(name);
-        if (jsonNode != null && jsonNode.isNull() == false) {
-            propertyValue = jsonNode.asText();
-        }
-        return propertyValue;
+  public static String getValueAsString(String name, JsonNode objectNode) {
+    String propertyValue = null;
+    JsonNode jsonNode = objectNode.get(name);
+    if (jsonNode != null && jsonNode.isNull() == false) {
+      propertyValue = jsonNode.asText();
     }
+    return propertyValue;
+  }
 }

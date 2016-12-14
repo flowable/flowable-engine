@@ -13,7 +13,7 @@
 'use strict';
 
 
-angular.module('activitiApp')
+angular.module('flowableApp')
     .controller('TaskController', ['$rootScope', '$scope', '$translate', '$timeout','$location', '$modal', '$popover', 'appResourceRoot', 'CommentService', 'TaskService', '$routeParams', 'AppDefinitionService',
         function ($rootScope, $scope, $translate, $timeout, $location, $modal, $popover, appResourceRoot, CommentService, TaskService, $routeParams, AppDefinitionService) {
 
@@ -39,7 +39,7 @@ angular.module('activitiApp')
         }]
 );
 
-angular.module('activitiApp')
+angular.module('flowableApp')
   .controller('TaskDetailController', ['$rootScope', '$scope', '$translate', '$http','$location', '$routeParams', 'appResourceRoot', 'CommentService', 'TaskService', 'FormService', 'RelatedContentService', '$timeout', '$modal', '$popover',
         function ($rootScope, $scope, $translate, $http, $location, $routeParams, appResourceRoot, CommentService, TaskService, FormService, RelatedContentService, $timeout, $modal, $popover) {
 
@@ -639,7 +639,7 @@ angular.module('activitiApp')
  }]);
 
 
-angular.module('activitiApp')
+angular.module('flowableApp')
     .controller('CreateTaskController', ['$rootScope', '$scope', '$translate', '$http', '$location', 'TaskService',
         function ($rootScope, $scope, $translate, $http, $location, TaskService) {
 
@@ -662,7 +662,7 @@ angular.module('activitiApp')
         }
 ]);
 
-angular.module('activitiApp')
+angular.module('flowableApp')
     .controller('ContentDetailsController', ['$rootScope', '$scope', '$translate', '$modal', 'appResourceRoot', 'RelatedContentService',
         function ($rootScope, $scope, $translate, $modal, appResourceRoot, RelatedContentService) {
 

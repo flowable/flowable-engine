@@ -12,7 +12,7 @@
  */
 'use strict';
 
-angular.module('activitiApp')
+angular.module('flowableApp')
     .controller('StartFormController', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$route', '$modal', '$routeParams', '$popover',
         function ($rootScope, $scope, $translate, $http, $timeout, $location, $route, $modal, $routeParams, $popover) {
    

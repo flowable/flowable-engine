@@ -2,12 +2,12 @@ package org.flowable.cdi.test.impl.event;
 
 import static org.junit.Assert.assertEquals;
 
-import org.flowable.cdi.test.CdiActivitiTestCase;
+import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.junit.Test;
 
-public class MultiInstanceTaskCompleteEventTest extends CdiActivitiTestCase {
+public class MultiInstanceTaskCompleteEventTest extends CdiFlowableTestCase {
 
   @Test
   @Deployment(resources = { "org/activiti/cdi/test/impl/event/MultiInstanceTaskCompleteEventTest.process1.bpmn20.xml.bpmn" })

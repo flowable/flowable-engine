@@ -21,7 +21,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.junit.Test;
 
-public class StartProcessInstanceTest extends AbstractActiviti6CompatibilityTest {
+public class StartProcessInstanceTest extends AbstractFlowable6CompatibilityTest {
 
   @Test
   public void testStartProcessInstance() {

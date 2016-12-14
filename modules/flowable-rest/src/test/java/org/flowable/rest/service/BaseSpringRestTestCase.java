@@ -229,8 +229,8 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
       
       int responseStatusCode = response.getStatusLine().getStatusCode();
       if (expectedStatusCode != responseStatusCode) {
-        log.info("Wrong status code : " + responseStatusCode + ", but should be " + expectedStatusCode);
-        log.info("Response body: " + IOUtils.toString(response.getEntity().getContent()));
+        log.info("Wrong status code : {}, but should be {}", responseStatusCode, expectedStatusCode);
+        log.info("Response body: {}", IOUtils.toString(response.getEntity().getContent()));
       }
       
       Assert.assertEquals(expectedStatusCode, responseStatusCode);
@@ -276,7 +276,7 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
       if (!TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.contains(tableNameWithoutPrefix)) {
         Long count = tableCounts.get(tableName);
         if (count != 0L) {
-          outputMessage.append("  " + tableName + ": " + count + " record(s) ");
+          outputMessage.append("  ").append(tableName).append(": ").append(count.toString()).append(" record(s) ");
         }
       }
     }

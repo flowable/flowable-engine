@@ -13,7 +13,7 @@
 
 'use strict';
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
     .controller('ToolbarController', ['$scope', '$http', '$modal', '$q', '$rootScope', '$translate', '$location', function ($scope, $http, $modal, $q, $rootScope, $translate, $location) {
 
     	$scope.editorFactory.promise.then(function () {

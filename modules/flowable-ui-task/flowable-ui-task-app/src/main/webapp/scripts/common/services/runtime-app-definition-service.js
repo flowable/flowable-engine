@@ -13,7 +13,7 @@
 'use strict';
 
 // User service
-activitiApp.service('RuntimeAppDefinitionService', ['$http', '$q', '$location', 'appName',
+flowableApp.service('RuntimeAppDefinitionService', ['$http', '$q', '$location', 'appName',
     function ($http, $q, $location, appName) {
 
         var httpAsPromise = function(options) {

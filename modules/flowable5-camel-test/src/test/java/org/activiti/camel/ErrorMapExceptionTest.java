@@ -25,7 +25,7 @@ import org.springframework.test.context.ContextConfiguration;
 /**
  * @author Saeid Mirzaei
  */
-@ContextConfiguration("classpath:generic-camel-activiti-context.xml")
+@ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class ErrorMapExceptionTest extends SpringActivitiTestCase {
 
   @Autowired

@@ -12,7 +12,7 @@
  */
 'use strict';
 
-angular.module('activitiApp')
+angular.module('flowableApp')
       .controller('StartProcessController', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$route', '$modal', '$routeParams', '$q', 'AppDefinitionService', 'ProcessService', 'FormService', 'RelatedContentService',
    function ($rootScope, $scope, $translate, $http, $timeout, $location, $route, $modal, $routeParams, $q, AppDefinitionService, ProcessService, FormService, RelatedContentService) {
 
@@ -21,8 +21,8 @@ angular.module('activitiApp')
 
        AppDefinitionService.setActiveDeploymentKey($scope.deploymentKey);
 
-       ProcessService.getProcessDefinitions($scope.deploymentKey).then(function(reponse){
-           $scope.processDefinitions = reponse.data;
+       ProcessService.getProcessDefinitions($scope.deploymentKey).then(function(response){
+           $scope.processDefinitions = response.data;
        });
 
       $scope.processName = '';

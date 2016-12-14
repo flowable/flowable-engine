@@ -16,27 +16,27 @@
 
 /* Services */
 
-activitiAdminApp.factory('Account', ['$resource',
+flowableAdminApp.factory('Account', ['$resource',
     function ($resource) {
         return $resource('app/rest/account', {}, {
         });
     }]);
 
-activitiAdminApp.factory('Sessions', ['$resource',
+flowableAdminApp.factory('Sessions', ['$resource',
     function ($resource) {
         return $resource('app/rest/account/sessions/:series', {}, {
             'get': { method: 'GET', isArray: true}
         });
     }]);
 
-activitiAdminApp.factory('Metrics', ['$resource',
+flowableAdminApp.factory('Metrics', ['$resource',
     function ($resource) {
         return $resource('/metrics/metrics', {}, {
             'get': { method: 'GET'}
         });
     }]);
 
-activitiAdminApp.factory('LogsService', ['$resource',
+flowableAdminApp.factory('LogsService', ['$resource',
     function ($resource) {
         return $resource('app/rest/logs', {}, {
             'findAll': { method: 'GET', isArray: true},

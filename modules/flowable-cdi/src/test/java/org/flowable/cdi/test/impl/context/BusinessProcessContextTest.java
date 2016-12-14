@@ -13,7 +13,7 @@
 package org.flowable.cdi.test.impl.context;
 
 import org.flowable.cdi.BusinessProcess;
-import org.flowable.cdi.test.CdiActivitiTestCase;
+import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.cdi.test.impl.beans.CreditCard;
 import org.flowable.cdi.test.impl.beans.ProcessScopedMessageBean;
 import org.flowable.engine.test.Deployment;
@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
  * 
  * @author Daniel Meyer
  */
-public class BusinessProcessContextTest extends CdiActivitiTestCase {
+public class BusinessProcessContextTest extends CdiFlowableTestCase {
 
   @Test
   @Deployment

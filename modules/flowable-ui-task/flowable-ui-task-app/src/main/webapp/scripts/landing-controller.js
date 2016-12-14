@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-activitiApp.controller('LandingController', ['$scope','$window', '$location', '$http', '$translate', '$modal', 'RuntimeAppDefinitionService', '$rootScope',
+flowableApp.controller('LandingController', ['$scope','$window', '$location', '$http', '$translate', '$modal', 'RuntimeAppDefinitionService', '$rootScope',
     function ($scope, $window, $location, $http, $translate, $modal, RuntimeAppDefinitionService, $rootScope) {
 
         $scope.model = {

@@ -36,7 +36,7 @@ import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.TestActivityBehaviorFactory;
-import org.flowable.engine.test.mock.ActivitiMockSupport;
+import org.flowable.engine.test.mock.FlowableMockSupport;
 import org.flowable.engine.test.mock.MockServiceTask;
 import org.flowable.engine.test.mock.MockServiceTasks;
 import org.flowable.engine.test.mock.NoOpServiceTasks;
@@ -111,7 +111,7 @@ public abstract class TestHelper {
     }
   }
 
-  public static void annotationMockSupportSetup(Class<?> testClass, String methodName, ActivitiMockSupport mockSupport) {
+  public static void annotationMockSupportSetup(Class<?> testClass, String methodName, FlowableMockSupport mockSupport) {
 
     // Get method
     Method method = null;
@@ -127,18 +127,18 @@ public abstract class TestHelper {
     handleNoOpServiceTasksAnnotation(mockSupport, method);
   }
 
-  protected static void handleMockServiceTaskAnnotation(ActivitiMockSupport mockSupport, Method method) {
+  protected static void handleMockServiceTaskAnnotation(FlowableMockSupport mockSupport, Method method) {
     MockServiceTask mockedServiceTask = method.getAnnotation(MockServiceTask.class);
     if (mockedServiceTask != null) {
       handleMockServiceTaskAnnotation(mockSupport, mockedServiceTask);
     }
   }
 
-  protected static void handleMockServiceTaskAnnotation(ActivitiMockSupport mockSupport, MockServiceTask mockedServiceTask) {
+  protected static void handleMockServiceTaskAnnotation(FlowableMockSupport mockSupport, MockServiceTask mockedServiceTask) {
     mockSupport.mockServiceTaskWithClassDelegate(mockedServiceTask.originalClassName(), mockedServiceTask.mockedClassName());
   }
 
-  protected static void handleMockServiceTasksAnnotation(ActivitiMockSupport mockSupport, Method method) {
+  protected static void handleMockServiceTasksAnnotation(FlowableMockSupport mockSupport, Method method) {
     MockServiceTasks mockedServiceTasks = method.getAnnotation(MockServiceTasks.class);
     if (mockedServiceTasks != null) {
       for (MockServiceTask mockedServiceTask : mockedServiceTasks.value()) {
@@ -147,7 +147,7 @@ public abstract class TestHelper {
     }
   }
 
-  protected static void handleNoOpServiceTasksAnnotation(ActivitiMockSupport mockSupport, Method method) {
+  protected static void handleNoOpServiceTasksAnnotation(FlowableMockSupport mockSupport, Method method) {
     NoOpServiceTasks noOpServiceTasks = method.getAnnotation(NoOpServiceTasks.class);
     if (noOpServiceTasks != null) {
 
@@ -182,7 +182,7 @@ public abstract class TestHelper {
     }
   }
 
-  public static void annotationMockSupportTeardown(ActivitiMockSupport mockSupport) {
+  public static void annotationMockSupportTeardown(FlowableMockSupport mockSupport) {
     mockSupport.reset();
   }
 

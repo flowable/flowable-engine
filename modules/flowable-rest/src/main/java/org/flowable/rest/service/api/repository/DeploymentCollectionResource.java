@@ -20,8 +20,6 @@ import java.util.zip.ZipInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import io.swagger.annotations.*;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.common.api.FlowableException;
@@ -41,6 +39,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 /**
  * @author Tijs Rademakers
@@ -124,7 +130,9 @@ public class DeploymentCollectionResource {
           @ApiResponse(code = 400, message = "Indicates there was no content present in the request body or the content mime-type is not supported for deployment. The status-description contains additional information.")
   })
   @RequestMapping(value = "/repository/deployments", method = RequestMethod.POST, produces = "application/json")
-  public DeploymentResponse uploadDeployment(@RequestParam(value = "tenantId", required = false) String tenantId, HttpServletRequest request, HttpServletResponse response) {
+  public DeploymentResponse uploadDeployment(@RequestParam(value = "tenantId", required = false) String tenantId,
+      @RequestParam(value = "deploymentKey", required = false) String deploymentKey,
+      HttpServletRequest request, HttpServletResponse response) {
 
     if (request instanceof MultipartHttpServletRequest == false) {
       throw new FlowableIllegalArgumentException("Multipart request is required");
@@ -154,6 +162,10 @@ public class DeploymentCollectionResource {
         throw new FlowableIllegalArgumentException("File must be of type .bpmn20.xml, .bpmn, .bar or .zip");
       }
       deploymentBuilder.name(fileName);
+      
+      if (deploymentKey != null) {
+        deploymentBuilder.key(deploymentKey);
+      }
 
       if (tenantId != null) {
         deploymentBuilder.tenantId(tenantId);

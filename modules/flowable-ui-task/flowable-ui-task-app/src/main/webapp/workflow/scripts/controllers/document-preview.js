@@ -12,7 +12,7 @@
  */
 'use strict';
 
-angular.module('activitiApp')
+angular.module('flowableApp')
     .controller('DocumentPreviewController', ['$rootScope', '$scope', '$modal', 'appResourceRoot', 'RelatedContentService',
         function ($rootScope, $scope, $modal, appResourceRoot, RelatedContentService) {
 

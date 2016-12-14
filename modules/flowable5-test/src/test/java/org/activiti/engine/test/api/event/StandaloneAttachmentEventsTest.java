@@ -17,7 +17,7 @@ import java.io.ByteArrayInputStream;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.impl.delegate.event.ActivitiEngineEntityEvent;
+import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Task;
@@ -45,21 +45,21 @@ public class StandaloneAttachmentEventsTest extends PluggableActivitiTestCase {
 				// Create link-attachment
 				Attachment attachment = taskService.createAttachment("test", task.getId(), null, "attachment name", "description", "http://activiti.org");
 				assertEquals(2, listener.getEventsReceived().size());
-				ActivitiEngineEntityEvent event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+				FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
 				assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
 				assertNull(event.getProcessInstanceId());
 				assertNull(event.getExecutionId());
 				assertNull(event.getProcessDefinitionId());
 				Attachment attachmentFromEvent = (Attachment) event.getEntity();
 				assertEquals(attachment.getId(), attachmentFromEvent.getId());
-				event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
+				event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
 				assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
 				listener.clearEventsReceived();
 				
 				// Create binary attachment
 				attachment = taskService.createAttachment("test", task.getId(), null, "attachment name", "description", new ByteArrayInputStream("test".getBytes()));
 				assertEquals(2, listener.getEventsReceived().size());
-				event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+				event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
 				assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
 				assertNull(event.getProcessInstanceId());
 				assertNull(event.getExecutionId());
@@ -67,7 +67,7 @@ public class StandaloneAttachmentEventsTest extends PluggableActivitiTestCase {
 				attachmentFromEvent = (Attachment) event.getEntity();
 				assertEquals(attachment.getId(), attachmentFromEvent.getId());
 				
-				event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
+				event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
 				assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
 				listener.clearEventsReceived();
 				
@@ -77,7 +77,7 @@ public class StandaloneAttachmentEventsTest extends PluggableActivitiTestCase {
 				taskService.saveAttachment(attachment);
 				
 				assertEquals(1, listener.getEventsReceived().size());
-				event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+				event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
 				assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
 				assertNull(event.getProcessInstanceId());
 				assertNull(event.getExecutionId());
@@ -90,7 +90,7 @@ public class StandaloneAttachmentEventsTest extends PluggableActivitiTestCase {
 				// Finally, delete attachment
 				taskService.deleteAttachment(attachment.getId());
 				assertEquals(1, listener.getEventsReceived().size());
-				event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+				event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
 				assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
 				assertNull(event.getProcessInstanceId());
 				assertNull(event.getExecutionId());
@@ -124,7 +124,7 @@ public class StandaloneAttachmentEventsTest extends PluggableActivitiTestCase {
 				historyService.deleteHistoricTaskInstance(task.getId());
 				
 				assertEquals(1, listener.getEventsReceived().size());
-				ActivitiEngineEntityEvent event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+				FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
 				assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
 				assertNull(event.getProcessInstanceId());
 				assertNull(event.getExecutionId());

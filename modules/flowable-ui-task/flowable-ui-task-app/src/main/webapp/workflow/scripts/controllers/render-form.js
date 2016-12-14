@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-angular.module('activitiApp')
+angular.module('flowableApp')
     .controller('RenderFormController', ['$rootScope', '$scope', '$http', '$translate', '$modal', 'appResourceRoot', 'FormService', 'RelatedContentService', '$sce', '$timeout', 'TaskService', 'hotkeys', 'uiGridConstants',
         function ($rootScope, $scope, $http, $translate, $modal, appResourceRoot, FormService, RelatedContentService, $sce, $timeout, TaskService, hotkeys, uiGridConstants) {
 

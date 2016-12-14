@@ -14,7 +14,7 @@
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
 		<property name="driverClass" value="org.h2.Driver" />
-		<property name="url" value="jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000" />
+		<property name="url" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000" />
 		<property name="username" value="sa" />
 		<property name="password" value="" />
 	</bean>
@@ -28,7 +28,6 @@
 		<property name="dataSource" ref="dataSource" />
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="databaseSchemaUpdate" value="true" />
-		<property name="disableIdmEngine" value="true" />
 		<property name="configurators">
 		  <list>
 		      <bean class="org.flowable.ldap.LDAPConfigurator">

@@ -17,7 +17,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.delegate.event.ActivitiEngineEvent;
+import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.Flowable5Util;
@@ -34,9 +34,9 @@ public class ErrorThrowingEventListener extends BaseDelegateEventListener {
 
   @Override
   public void onEvent(FlowableEvent event) {
-    if (isValidEvent(event) && event instanceof ActivitiEngineEvent) {
+    if (isValidEvent(event) && event instanceof FlowableEngineEvent) {
       
-      ActivitiEngineEvent engineEvent = (ActivitiEngineEvent) event;
+      FlowableEngineEvent engineEvent = (FlowableEngineEvent) event;
       CommandContext commandContext = Context.getCommandContext();
       
       if (engineEvent.getProcessDefinitionId() != null && 

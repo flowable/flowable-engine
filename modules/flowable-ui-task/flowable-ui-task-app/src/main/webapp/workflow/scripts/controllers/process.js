@@ -12,7 +12,7 @@
  */
 'use strict';
 
-angular.module('activitiApp')
+angular.module('flowableApp')
   .controller('ProcessController', ['$rootScope', '$scope', '$translate', '$http', '$timeout', '$location', '$modal', '$routeParams', 'AppDefinitionService',
     function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal, $routeParams, AppDefinitionService) {
 
@@ -36,7 +36,7 @@ angular.module('activitiApp')
         };
 }]);
 
-angular.module('activitiApp')
+angular.module('flowableApp')
     .controller('ProcessDetailController', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$route', '$modal', '$routeParams', '$popover', 'appResourceRoot', 'TaskService', 'CommentService', 'RelatedContentService',
         function ($rootScope, $scope, $translate, $http, $timeout, $location, $route, $modal, $routeParams, $popover, appResourceRoot, TaskService, CommentService, RelatedContentService) {
 
@@ -181,7 +181,7 @@ angular.module('activitiApp')
     };
 }]);
 
-angular.module('activitiApp')
+angular.module('flowableApp')
     .controller('ShowProcessDiagramCtrl', ['$scope', '$timeout', 'ResourceService', 'appResourceRoot',
         function ($scope, $timeout, ResourceService, appResourceRoot) {
 
@@ -212,7 +212,7 @@ angular.module('activitiApp')
     ]
 );
 
-angular.module('activitiApp')
+angular.module('flowableApp')
 .controller('CancelProcessCtrl', ['$scope', '$http', '$route', 'ProcessService', function ($scope, $http, $route, ProcessService) {
 
         $scope.popup = {loading: false};

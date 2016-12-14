@@ -20,7 +20,17 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -480,8 +490,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // ID GENERATOR /////////////////////////////////////////////////////////////
   
   protected IdGenerator idGenerator;
-  protected DataSource idGeneratorDataSource;
-  protected String idGeneratorDataSourceJndiName;
   
   // BPMN PARSER //////////////////////////////////////////////////////////////
   
@@ -1287,7 +1295,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           Class<?> handledType = defaultBpmnParseHandler.getHandledTypes().iterator().next();
           if (customParseHandlerMap.containsKey(handledType)) {
             BpmnParseHandler newBpmnParseHandler = customParseHandlerMap.get(handledType);
-            log.info("Replacing default BpmnParseHandler " + defaultBpmnParseHandler.getClass().getName() + " with " + newBpmnParseHandler.getClass().getName());
+            log.info("Replacing default BpmnParseHandler {} with {}", defaultBpmnParseHandler.getClass().getName(), newBpmnParseHandler.getClass()
+                    .getName());
             bpmnParserHandlers.set(i, newBpmnParseHandler);
           }
         }
@@ -1366,23 +1375,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   
   protected void initIdGenerator() {
     if (idGenerator==null) {
-      CommandExecutor idGeneratorCommandExecutor = null;
-      if (idGeneratorDataSource!=null) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneProcessEngineConfiguration();
-        processEngineConfiguration.setDataSource(idGeneratorDataSource);
-        processEngineConfiguration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_FALSE);
-        processEngineConfiguration.init();
-        idGeneratorCommandExecutor = processEngineConfiguration.getCommandExecutor();
-      } else if (idGeneratorDataSourceJndiName!=null) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneProcessEngineConfiguration();
-        processEngineConfiguration.setDataSourceJndiName(idGeneratorDataSourceJndiName);
-        processEngineConfiguration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_FALSE);
-        processEngineConfiguration.init();
-        idGeneratorCommandExecutor = processEngineConfiguration.getCommandExecutor();
-      } else {
-        idGeneratorCommandExecutor = getCommandExecutor();
-      }
-      
+      CommandExecutor idGeneratorCommandExecutor = getCommandExecutor();
       DbIdGenerator dbIdGenerator = new DbIdGenerator();
       dbIdGenerator.setIdBlockSize(idBlockSize);
       dbIdGenerator.setCommandExecutor(idGeneratorCommandExecutor);
@@ -2182,24 +2175,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   
   public ProcessEngineConfigurationImpl setFailedJobCommandFactory(FailedJobCommandFactory failedJobCommandFactory) {
     this.failedJobCommandFactory = failedJobCommandFactory;
-    return this;
-  }
-
-  public DataSource getIdGeneratorDataSource() {
-    return idGeneratorDataSource;
-  }
-  
-  public ProcessEngineConfigurationImpl setIdGeneratorDataSource(DataSource idGeneratorDataSource) {
-    this.idGeneratorDataSource = idGeneratorDataSource;
-    return this;
-  }
-  
-  public String getIdGeneratorDataSourceJndiName() {
-    return idGeneratorDataSourceJndiName;
-  }
-
-  public ProcessEngineConfigurationImpl setIdGeneratorDataSourceJndiName(String idGeneratorDataSourceJndiName) {
-    this.idGeneratorDataSourceJndiName = idGeneratorDataSourceJndiName;
     return this;
   }
 

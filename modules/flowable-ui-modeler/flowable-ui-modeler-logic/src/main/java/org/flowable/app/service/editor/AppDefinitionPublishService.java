@@ -12,14 +12,33 @@
  */
 package org.flowable.app.service.editor;
 
-import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.flowable.app.domain.editor.AbstractModel;
 import org.flowable.app.domain.editor.AppDefinition;
 import org.flowable.app.domain.editor.AppModelDefinition;
@@ -38,12 +57,11 @@ import org.flowable.bpmn.model.UserTask;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
 import org.flowable.editor.dmn.converter.DmnJsonConverter;
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,15 +82,15 @@ public class AppDefinitionPublishService {
 
   @Autowired
   protected ModelService modelService;
-  
-  @Autowired
-  protected RepositoryService repositoryService;
-  
+
   @Autowired
   protected ModelRepository modelRepository;
   
   @Autowired
   protected ObjectMapper objectMapper;
+
+  @Autowired
+  protected Environment environment;
   
   protected DmnJsonConverter dmnJsonConverter = new DmnJsonConverter();
   protected DmnXMLConverter dmnXMLConverter = new DmnXMLConverter();
@@ -85,11 +103,14 @@ public class AppDefinitionPublishService {
     AppDefinition appDefinition = resolveAppDefinition(appDefinitionModel);
 
     if (CollectionUtils.isNotEmpty(appDefinition.getModels())) {
-      DeploymentBuilder deploymentBuilder = repositoryService.createDeployment()
-          .name(appDefinitionModel.getName())
-          .key(appDefinitionModel.getKey());
-      
-      deploymentBuilder.addString(appDefinitionModel.getKey() + ".app", getAppDefinitionJson(appDefinition));
+
+      String deployableZipName = appDefinitionModel.getKey() + ".zip";
+      Map<String, byte[]> deployableAssets = new HashMap<>();
+
+      String appDefinitionJson = getAppDefinitionJson(appDefinition);
+      byte[] appDefinitionJsonBytes = appDefinitionJson.getBytes(StandardCharsets.UTF_8);
+
+      deployableAssets.put(appDefinitionModel.getKey() + ".app", appDefinitionJsonBytes);
       
       Map<String, Model> formMap = new HashMap<String, Model>();
       Map<String, Model> decisionTableMap = new HashMap<String, Model>();
@@ -98,7 +119,7 @@ public class AppDefinitionPublishService {
 
         AbstractModel processModel = modelService.getModel(appModelDef.getId());
         if (processModel == null) {
-          logger.error("Model " + appModelDef.getId() + " for app definition " + appDefinitionModel.getId() + " could not be found");
+          logger.error("Model {} for app definition {} could not be found", appModelDef.getId(), appDefinitionModel.getId());
           throw new BadRequestException("Model for app definition could not be found");
         }
         
@@ -120,13 +141,15 @@ public class AppDefinitionPublishService {
         }
         
         byte[] modelXML = modelService.getBpmnXML(bpmnModel);
-        deploymentBuilder.addInputStream(processModel.getKey().replaceAll(" ", "") + ".bpmn", new ByteArrayInputStream(modelXML));
+        deployableAssets.put(processModel.getKey().replaceAll(" ", "") + ".bpmn", modelXML);
       }
       
       if (formMap.size() > 0) {
         for (String formId : formMap.keySet()) {
           Model formInfo = formMap.get(formId);
-          deploymentBuilder.addString("form-" + formInfo.getKey() + ".form", formInfo.getModelEditorJson());
+          String formModelEditorJson = formInfo.getModelEditorJson();
+          byte[] formModelEditorJsonBytes = formModelEditorJson.getBytes(StandardCharsets.UTF_8);
+          deployableAssets.put("form-" + formInfo.getKey() + ".form", formModelEditorJsonBytes);
         }
       }
       
@@ -135,11 +158,10 @@ public class AppDefinitionPublishService {
           Model decisionTableInfo = decisionTableMap.get(decisionTableId);
           try {
             JsonNode decisionTableNode = objectMapper.readTree(decisionTableInfo.getModelEditorJson());
-            DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionTableNode, decisionTableInfo.getId(), 
+            DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionTableNode, decisionTableInfo.getId(),
                 decisionTableInfo.getVersion(), decisionTableInfo.getLastUpdated());
             byte[] dmnXMLBytes = dmnXMLConverter.convertToXML(dmnDefinition);
-            deploymentBuilder.addBytes("dmn-" + decisionTableInfo.getKey() + ".dmn", dmnXMLBytes);
-            
+            deployableAssets.put("dmn-" + decisionTableInfo.getKey() + ".dmn", dmnXMLBytes);
           } catch (Exception e) {
             logger.error("Error converting decision table to XML " + decisionTableInfo.getName(), e);
             throw new InternalServerErrorException("Error converting decision table to XML " + decisionTableInfo.getName());
@@ -147,7 +169,10 @@ public class AppDefinitionPublishService {
         }
       }
 
-      deploymentBuilder.deploy();
+      byte[] deployZipArtifact = createDeployZipArtifact(deployableAssets);
+      if (deployZipArtifact != null) {
+        deployZipArtifact(deployableZipName, deployZipArtifact, appDefinitionModel.getKey());
+      }
     }
   }
   
@@ -203,5 +228,88 @@ public class AppDefinitionPublishService {
     appDefinitionNode.put("theme", appDefinition.getTheme());
     appDefinitionNode.put("icon", appDefinition.getIcon());
     return appDefinitionNode.toString();
+  }
+
+  protected byte[] createDeployZipArtifact(Map<String, byte[]> deployableAssets) {
+    ByteArrayOutputStream baos = null;
+    ZipOutputStream zos = null;
+    byte[] deployZipArtifact = null;
+    try {
+      baos = new ByteArrayOutputStream();
+      zos = new ZipOutputStream(baos);
+
+      for (Map.Entry<String, byte[]> entry : deployableAssets.entrySet()) {
+        ZipEntry zipEntry = new ZipEntry(entry.getKey());
+        zipEntry.setSize(entry.getValue().length);
+        zos.putNextEntry(zipEntry);
+        zos.write(entry.getValue());
+        zos.closeEntry();
+      }
+
+      // this is the zip file as byte[]
+      deployZipArtifact = baos.toByteArray();
+    } catch (IOException ioe) {
+      logger.error("Error adding deploy zip entry", ioe);
+      throw new InternalServerErrorException("Could not create deploy zip artifact");
+    }
+
+    return deployZipArtifact;
+  }
+
+  protected void deployZipArtifact(String artifactName, byte[] zipArtifact, String deploymentKey) {
+    String deployApiUrl = environment.getRequiredProperty("deployment.api.url");
+    String basicAuthUser = environment.getRequiredProperty("idm.admin.user");
+    String basicAuthPassword = environment.getRequiredProperty("idm.admin.password");
+
+    if (deployApiUrl.endsWith("/") == false) {
+      deployApiUrl = deployApiUrl.concat("/");
+    }
+    deployApiUrl = deployApiUrl.concat("repository/deployments?deploymentKey=" + deploymentKey);
+
+    HttpPost httpPost = new HttpPost(deployApiUrl);
+    httpPost.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
+        Base64.encodeBase64((basicAuthUser + ":" + basicAuthPassword).getBytes(Charset.forName("UTF-8")))));
+
+    MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+    entityBuilder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+    entityBuilder.addBinaryBody("artifact", zipArtifact, ContentType.DEFAULT_BINARY, artifactName);
+
+    HttpEntity entity = entityBuilder.build();
+    httpPost.setEntity(entity);
+
+    HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+    SSLConnectionSocketFactory sslsf = null;
+    try {
+      SSLContextBuilder builder = new SSLContextBuilder();
+      builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+      sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+      clientBuilder.setSSLSocketFactory(sslsf);
+    } catch (Exception e) {
+      logger.error("Could not configure SSL for http client", e);
+      throw new InternalServerErrorException("Could not configure SSL for http client", e);
+    }
+
+    CloseableHttpClient client = clientBuilder.build();
+
+    try {
+      HttpResponse response = client.execute(httpPost);
+      if (response.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
+        return;
+      } else {
+        logger.error("Invalid deploy result code: {}", response.getStatusLine());
+        throw new InternalServerErrorException("Invalid deploy result code: " + response.getStatusLine());
+      }
+    } catch (IOException ioe) {
+      logger.error("Error calling deploy endpoint", ioe);
+      throw new InternalServerErrorException("Error calling deploy endpoint: " + ioe.getMessage());
+    } finally {
+      if (client != null) {
+        try {
+          client.close();
+        } catch (IOException e) {
+          logger.warn("Exception while closing http client", e);
+        }
+      }
+    }
   }
 }

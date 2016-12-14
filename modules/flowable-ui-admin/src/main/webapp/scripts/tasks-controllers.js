@@ -16,15 +16,15 @@
 
 /* Controllers */
 
-activitiAdminApp.controller('TasksController', ['$scope', '$rootScope', '$http', '$timeout','$location','$translate', '$q', 'gridConstants',
+flowableAdminApp.controller('TasksController', ['$scope', '$rootScope', '$http', '$timeout','$location','$translate', '$q', 'gridConstants',
     function ($scope, $rootScope, $http, $timeout, $location, $translate, $q, gridConstants) {
 		$rootScope.navigation = {main: 'process-engine', sub: 'tasks'};
         
 		$scope.taskData = {};
 		$scope.selectedTasks = [];
 	  
-		$scope.variableFilterTypes = ActivitiAdmin.Utils.variableFilterTypes;
-		$scope.variableFilterOperators = ActivitiAdmin.Utils.variableFilterOperators;
+		$scope.variableFilterTypes = FlowableAdmin.Utils.variableFilterTypes;
+		$scope.variableFilterOperators = FlowableAdmin.Utils.variableFilterOperators;
 
 	    var filterConfig = {
 		    	url: '/app/rest/activiti/tasks',
@@ -79,7 +79,7 @@ activitiAdminApp.controller('TasksController', ['$scope', '$rootScope', '$http',
 
 	    if($rootScope.filters.forced.taskFilter) {
 	    	// Always recreate the filter and add all properties
-	    	$scope.filter = new ActivitiAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
+	    	$scope.filter = new FlowableAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
     		$rootScope.filters.taskFilter = $scope.filter;
     		
     		for(var prop in $rootScope.filters.forced.taskFilter) {
@@ -94,7 +94,7 @@ activitiAdminApp.controller('TasksController', ['$scope', '$rootScope', '$http',
 	    		$scope.filter = $rootScope.filters.taskFilter;
 	    		$scope.filter.config = filterConfig;
 	    	} else {
-	    		$scope.filter = new ActivitiAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
+	    		$scope.filter = new FlowableAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
 	    		$rootScope.filters.taskFilter = $scope.filter;
 	    	}
 	    }

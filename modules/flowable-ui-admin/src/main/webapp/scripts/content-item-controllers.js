@@ -14,7 +14,7 @@
 
 /* Controllers */
 
-activitiAdminApp.controller('ContentItemController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', '$routeParams',
+flowableAdminApp.controller('ContentItemController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', '$routeParams',
     function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, $modal, $routeParams) {
 
         $rootScope.navigation = {main: 'content-engine', sub: 'content-items'};

@@ -63,7 +63,7 @@ public class OutputEntryParser extends BaseChildElementParser {
         }
 
         if (outputClause == null) {
-            LOGGER.warn("Error determine output clause for position: " + model.getCurrentDecisionTable().getOutputs());
+            LOGGER.warn("Error determine output clause for position: {}", model.getCurrentDecisionTable().getOutputs());
         }
 
         RuleOutputClauseContainer outputContainer = new RuleOutputClauseContainer();

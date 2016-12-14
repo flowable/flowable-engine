@@ -14,13 +14,13 @@ package org.flowable.cdi.test.impl.event;
 
 import static org.junit.Assert.assertEquals;
 
-import org.flowable.cdi.test.CdiActivitiTestCase;
+import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.junit.Test;
 
-public class EventNotificationTest extends CdiActivitiTestCase {
+public class EventNotificationTest extends CdiFlowableTestCase {
 
   @Test
   @Deployment(resources = { "org/activiti/cdi/test/impl/event/EventNotificationTest.process1.bpmn20.xml" })

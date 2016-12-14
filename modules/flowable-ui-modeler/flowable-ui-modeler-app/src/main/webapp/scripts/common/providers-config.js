@@ -15,7 +15,7 @@
  * a resource using $http.
  */
 
-activitiModule.service('NotPermittedInterceptor', [ '$window', function($window) {
+flowableModule.service('NotPermittedInterceptor', [ '$window', function($window) {
     var service = this;
 
     service.responseError = function(response) {
@@ -27,7 +27,7 @@ activitiModule.service('NotPermittedInterceptor', [ '$window', function($window)
     };
 }]);
 
-activitiModule.config(['$httpProvider', function($httpProvider) {
+flowableModule.config(['$httpProvider', function($httpProvider) {
 
     if (!$httpProvider.defaults.headers.get) {
         $httpProvider.defaults.headers.get = {};

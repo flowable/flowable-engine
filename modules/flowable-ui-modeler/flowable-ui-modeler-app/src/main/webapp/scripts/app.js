@@ -12,7 +12,7 @@
  */
 'use strict';
 
-var activitiModeler = angular.module('activitiModeler', [
+var flowableModeler = angular.module('flowableModeler', [
   'ngCookies',
   'ngResource',
   'ngSanitize',
@@ -34,10 +34,10 @@ var activitiModeler = angular.module('activitiModeler', [
   'dndLists'
 ]);
 
-var activitiModule = activitiModeler;
-var activitiApp = activitiModeler;
+var flowableModule = flowableModeler;
+var flowableApp = flowableModeler;
 
-activitiModeler
+flowableModeler
   // Initialize routes
   .config(['$provide', '$routeProvider', '$selectProvider', '$translateProvider', function ($provide, $routeProvider, $selectProvider, $translateProvider) {
 

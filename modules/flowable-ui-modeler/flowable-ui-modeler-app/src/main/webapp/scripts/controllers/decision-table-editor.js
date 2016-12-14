@@ -14,7 +14,7 @@
  */
 'use strict';
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
     .controller('DecisionTableEditorController', ['$rootScope', '$scope', '$q', '$translate', '$http', '$timeout', '$location', '$modal', '$route', '$routeParams', 'DecisionTableService',
         'UtilityService', 'uiGridConstants', 'appResourceRoot',
         function ($rootScope, $scope, $q, $translate, $http, $timeout, $location, $modal, $route, $routeParams, DecisionTableService,
@@ -628,7 +628,7 @@ angular.module('activitiModeler')
             };
         }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
     .controller('DecisionTableInputConditionEditorCtlr', ['$rootScope', '$scope', function ($rootScope, $scope) {
         var previousVariableId = $scope.model.selectedExpression.variableId;
 
@@ -693,7 +693,7 @@ angular.module('activitiModeler')
         };
     }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
     .controller('DecisionTableConclusionEditorCtrl', ['$rootScope', '$scope', '$q', '$translate', function ($rootScope, $scope, $q, $translate) {
 
         // condition input options

@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-angular.module('activitiModeler')
+angular.module('flowableModeler')
     .controller('DecisionTableDetailsCtrl', ['$rootScope', '$scope', '$translate', '$http', '$location', '$routeParams','$modal', '$timeout', '$popover', 'DecisionTableService', 'uiGridConstants',
         function ($rootScope, $scope, $translate, $http, $location, $routeParams, $modal, $timeout, $popover, DecisionTableService, uiGridConstants) {
 

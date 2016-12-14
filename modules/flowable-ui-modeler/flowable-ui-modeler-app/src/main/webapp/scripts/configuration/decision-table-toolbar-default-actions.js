@@ -92,7 +92,7 @@ var DECISION_TABLE_TOOLBAR = {
 };
 
 /** Custom controller for the save dialog */
-angular.module('activitiModeler')
+angular.module('flowableModeler')
     .controller('SaveDecisionTableCtrl', [ '$rootScope', '$scope', '$http', '$route', '$location', '$translate', 'DecisionTableService',
         function ($rootScope, $scope, $http, $route, $location, $translate, DecisionTableService) {
 

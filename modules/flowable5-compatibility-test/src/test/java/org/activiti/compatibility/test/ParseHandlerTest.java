@@ -19,7 +19,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class ParseHandlerTest extends AbstractActiviti6CompatibilityTest {
+public class ParseHandlerTest extends AbstractFlowable6CompatibilityTest {
 
   @Test
   public void testActiviti5ParseHandlersApplied() {

@@ -12,7 +12,7 @@
  */
 'use strict';
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
     .controller('FormBuilderController', ['$rootScope', '$scope', '$translate', '$http', '$timeout', '$location', '$modal', '$routeParams', '$popover', 'FormBuilderService',
         function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal, $routeParams, $popover, FormBuilderService) {
 

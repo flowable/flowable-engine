@@ -13,7 +13,7 @@
 'use strict';
 
 // Form service
-angular.module('activitiModeler').service('FormBuilderService', ['$http', '$q', '$rootScope', '$translate',
+angular.module('flowableModeler').service('FormBuilderService', ['$http', '$q', '$rootScope', '$translate',
     function ($http, $q, $rootScope, $translate) {
 
         // Removes all properties starting with '_', used before json serialization

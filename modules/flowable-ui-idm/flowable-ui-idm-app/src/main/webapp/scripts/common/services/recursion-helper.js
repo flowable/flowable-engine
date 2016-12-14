@@ -13,7 +13,7 @@
 'use strict';
 
 // Recursion Helper service, makes it possible to use nested directives of the same type
-activitiModule.factory('RecursionHelper', ['$compile', function($compile){
+flowableModule.factory('RecursionHelper', ['$compile', function($compile){
     return {
         /**
          * Manually compiles the element, fixing the recursion loop.

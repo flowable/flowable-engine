@@ -16,7 +16,7 @@
 
 /* Controllers */
 
-activitiAdminApp.controller('UsersController', ['$scope', '$rootScope', '$http', '$timeout','$location', '$modal', '$translate', '$q',
+flowableAdminApp.controller('UsersController', ['$scope', '$rootScope', '$http', '$timeout','$location', '$modal', '$translate', '$q',
     function ($scope, $rootScope, $http, $timeout, $location, $modal, $translate, $q) {
 		$rootScope.navigation = {selection: 'users'};
 		
@@ -141,7 +141,7 @@ activitiAdminApp.controller('UsersController', ['$scope', '$rootScope', '$http',
 		};
     }]);
 
-activitiAdminApp.controller('DeleteUserModalInstanceCrtl',
+flowableAdminApp.controller('DeleteUserModalInstanceCrtl',
     ['$scope', '$modalInstance', '$http', 'user', function ($scope, $modalInstance, $http, user) {
 
   $scope.user = user;
@@ -167,7 +167,7 @@ activitiAdminApp.controller('DeleteUserModalInstanceCrtl',
   };
 }]);
 
-activitiAdminApp.controller('EditUserModalInstanceCrtl',
+flowableAdminApp.controller('EditUserModalInstanceCrtl',
     ['$scope', '$modalInstance', '$http', 'user', function ($scope, $modalInstance, $http, user) {
 
   $scope.user = user;
@@ -202,7 +202,7 @@ activitiAdminApp.controller('EditUserModalInstanceCrtl',
   };
 }]);
 
-activitiAdminApp.controller('ChangePasswordModalInstanceCrtl',
+flowableAdminApp.controller('ChangePasswordModalInstanceCrtl',
     ['$scope', '$modalInstance', '$http', 'user', function ($scope, $modalInstance, $http, user) {
 
 	  $scope.user = user;
@@ -235,7 +235,7 @@ activitiAdminApp.controller('ChangePasswordModalInstanceCrtl',
 	  };
 	}]);
 
-activitiAdminApp.controller('NewUserModalInstanceCrtl',
+flowableAdminApp.controller('NewUserModalInstanceCrtl',
     ['$scope', '$modalInstance', '$http', function ($scope, $modalInstance, $http) {
 
   $scope.model = {

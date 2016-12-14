@@ -46,7 +46,7 @@ import org.flowable.engine.impl.cmd.GetIdentityLinksForProcessDefinitionCmd;
 import org.flowable.engine.impl.cmd.GetModelCmd;
 import org.flowable.engine.impl.cmd.GetModelEditorSourceCmd;
 import org.flowable.engine.impl.cmd.GetModelEditorSourceExtraCmd;
-import org.flowable.engine.impl.cmd.IsActiviti5ProcessDefinitionCmd;
+import org.flowable.engine.impl.cmd.IsFlowable5ProcessDefinitionCmd;
 import org.flowable.engine.impl.cmd.IsProcessDefinitionSuspendedCmd;
 import org.flowable.engine.impl.cmd.SaveModelCmd;
 import org.flowable.engine.impl.cmd.SetDeploymentCategoryCmd;
@@ -150,7 +150,7 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
   }
   
   public Boolean isFlowable5ProcessDefinition(String processDefinitionId) {
-    return commandExecutor.execute(new IsActiviti5ProcessDefinitionCmd(processDefinitionId));
+    return commandExecutor.execute(new IsFlowable5ProcessDefinitionCmd(processDefinitionId));
   }
 
   public BpmnModel getBpmnModel(String processDefinitionId) {

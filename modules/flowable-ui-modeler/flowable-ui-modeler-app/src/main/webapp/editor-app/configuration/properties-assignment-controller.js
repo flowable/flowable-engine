@@ -16,7 +16,7 @@
  */
 'use strict';
 
-angular.module('activitiModeler').controller('KisBpmAssignmentCtrl', [ '$scope', '$modal', function($scope, $modal) {
+angular.module('flowableModeler').controller('KisBpmAssignmentCtrl', [ '$scope', '$modal', function($scope, $modal) {
 
     // Config for the modal window
     var opts = {
@@ -28,7 +28,7 @@ angular.module('activitiModeler').controller('KisBpmAssignmentCtrl', [ '$scope',
     _internalCreateModal(opts, $modal, $scope);
 }]);
 
-angular.module('activitiModeler').controller('KisBpmAssignmentPopupCtrl',
+angular.module('flowableModeler').controller('KisBpmAssignmentPopupCtrl',
     [ '$rootScope', '$scope', '$translate', '$http', 'UserService', 'GroupService', function($rootScope, $scope, $translate, $http, UserService, GroupService) {
 
     // Put json representing assignment on scope

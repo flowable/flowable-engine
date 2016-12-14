@@ -12,7 +12,7 @@
  */
 'use strict';
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
   .controller('ProcessesCtrl', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$modal', function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal) {
 
       // Main page (needed for visual indicator of current page)
@@ -140,7 +140,7 @@ angular.module('activitiModeler')
 	  $scope.loadProcesses();
   }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 .controller('CreateNewProcessModelCrtl', ['$rootScope', '$scope', '$modal', '$http', '$location',
                                           function ($rootScope, $scope, $modal, $http, $location) {
 
@@ -189,7 +189,7 @@ angular.module('activitiModeler')
     };
 }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 .controller('DuplicateProcessModelCrtl', ['$rootScope', '$scope', '$modal', '$http', '$location',
                                           function ($rootScope, $scope, $modal, $http, $location) {
 
@@ -241,7 +241,7 @@ angular.module('activitiModeler')
     };
 }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 .controller('ImportProcessModelCrtl', ['$rootScope', '$scope', '$http', 'Upload', '$location', function ($rootScope, $scope, $http, Upload, $location) {
 
   $scope.model = {

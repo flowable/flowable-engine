@@ -14,7 +14,7 @@
 
 /* Controllers */
 
-activitiAdminApp.controller('ContentItemsController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', 'gridConstants',
+flowableAdminApp.controller('ContentItemsController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', 'gridConstants',
     function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, $modal, gridConstants) {
 
         $rootScope.navigation = {main: 'content-engine', sub: 'content-items'};
@@ -56,7 +56,7 @@ activitiAdminApp.controller('ContentItemsController', ['$rootScope', '$scope', '
             $scope.filter = $rootScope.filters.contentItemFilter;
             $scope.filter.config = filterConfig;
         } else {
-            $scope.filter = new ActivitiAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
+            $scope.filter = new FlowableAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
             $rootScope.filters.contentItemFilter = $scope.filter;
         }
 

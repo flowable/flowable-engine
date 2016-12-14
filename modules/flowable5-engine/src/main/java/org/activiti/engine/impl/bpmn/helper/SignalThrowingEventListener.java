@@ -20,7 +20,7 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.impl.delegate.event.ActivitiEngineEvent;
+import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
 import org.flowable.engine.repository.ProcessDefinition;
 
 /**
@@ -37,8 +37,8 @@ public class SignalThrowingEventListener extends BaseDelegateEventListener {
 
 	@Override
 	public void onEvent(FlowableEvent event) {
-	  if (isValidEvent(event) && event instanceof ActivitiEngineEvent) {
-      ActivitiEngineEvent engineEvent = (ActivitiEngineEvent) event;
+	  if (isValidEvent(event) && event instanceof FlowableEngineEvent) {
+      FlowableEngineEvent engineEvent = (FlowableEngineEvent) event;
 
 			if (engineEvent.getProcessInstanceId() == null && processInstanceScope) {
 				throw new ActivitiIllegalArgumentException(

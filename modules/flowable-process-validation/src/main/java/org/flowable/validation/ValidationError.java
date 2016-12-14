@@ -120,38 +120,38 @@ public class ValidationError {
   @Override
   public String toString() {
     StringBuilder strb = new StringBuilder();
-    strb.append("[Validation set: '" + validatorSetName + "' | Problem: '" + problem + "'] : ");
+    strb.append("[Validation set: '").append(validatorSetName).append("' | Problem: '").append(problem).append("'] : ");
     strb.append(defaultDescription);
     strb.append(" - [Extra info : ");
     boolean extraInfoAlreadyPresent = false;
     if (processDefinitionId != null) {
-      strb.append("processDefinitionId = " + processDefinitionId);
+      strb.append("processDefinitionId = ").append(processDefinitionId);
       extraInfoAlreadyPresent = true;
     }
     if (processDefinitionName != null) {
       if (extraInfoAlreadyPresent) {
         strb.append(" | ");
       }
-      strb.append("processDefinitionName = " + processDefinitionName + " | ");
+      strb.append("processDefinitionName = ").append(processDefinitionName).append(" | ");
       extraInfoAlreadyPresent = true;
     }
     if (activityId != null) {
       if (extraInfoAlreadyPresent) {
         strb.append(" | ");
       }
-      strb.append("id = " + activityId + " | ");
+      strb.append("id = ").append(activityId).append(" | ");
       extraInfoAlreadyPresent = true;
     }
     if (activityName != null) {
       if (extraInfoAlreadyPresent) {
         strb.append(" | ");
       }
-      strb.append("activityName = " + activityName + " | ");
+      strb.append("activityName = ").append(activityName).append(" | ");
       extraInfoAlreadyPresent = true;
     }
     strb.append("]");
     if (xmlLineNumber > 0 && xmlColumnNumber > 0) {
-      strb.append(" ( line: " + xmlLineNumber + ", column: " + xmlColumnNumber + ")");
+      strb.append(" ( line: ").append(Integer.toString(xmlLineNumber)).append(", column: ").append(Integer.toString(xmlColumnNumber)).append(")");
     }
     return strb.toString();
   }

@@ -15,7 +15,7 @@
 /**
  * General bootstrap of the application.
  */
-angular.module('activitiModeler')
+angular.module('flowableModeler')
     .controller('EditorController', ['$rootScope', '$scope', '$http', '$q', '$routeParams', '$timeout', '$location', '$translate', '$modal', 'FormBuilderService',
         function ($rootScope, $scope, $http, $q, $routeParams, $timeout, $location, $translate, $modal, FormBuilderService) {
 
@@ -348,7 +348,7 @@ angular.module('activitiModeler')
 
 }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
   .controller('EditorUnsavedChangesPopupCrtl', ['$rootScope', '$scope', '$http', '$location', '$window', function ($rootScope, $scope, $http, $location, $window) {
 
     $scope.discard = function () {

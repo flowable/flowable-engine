@@ -327,7 +327,7 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
         
         list = historyService.createHistoricTaskInstanceQuery().taskNameLikeIgnoreCase("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        new ArrayList(2);
+        tasks = new ArrayList(2);
         tasks.add(list.get(0).getId());
         tasks.add(list.get(1).getId());
         assertTrue(tasks.contains(task2.getId()));
@@ -336,7 +336,7 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
         // orQuery
         list = historyService.createHistoricTaskInstanceQuery().or().taskNameLikeIgnoreCase("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        new ArrayList(2);
+        tasks = new ArrayList(2);
         tasks.add(list.get(0).getId());
         tasks.add(list.get(1).getId());
         assertTrue(tasks.contains(task1.getId()));
@@ -344,7 +344,7 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
         
         list = historyService.createHistoricTaskInstanceQuery().or().taskNameLikeIgnoreCase("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
         assertEquals(2, list.size());
-        new ArrayList(2);
+        tasks = new ArrayList(2);
         tasks.add(list.get(0).getId());
         tasks.add(list.get(1).getId());
         assertTrue(tasks.contains(task2.getId()));

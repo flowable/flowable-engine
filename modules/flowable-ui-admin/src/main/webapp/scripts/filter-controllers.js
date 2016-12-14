@@ -16,7 +16,7 @@
 
 /* Controllers */
 
-activitiAdminApp.controller('ProcessDefinitionFilterController', ['$scope', '$rootScope', '$http', '$timeout',
+flowableAdminApp.controller('ProcessDefinitionFilterController', ['$scope', '$rootScope', '$http', '$timeout',
     function ($scope, $rootScope, $http, $timeout) {
 	
 	$scope.setFilterPropertyName = function(filterPropertyName) {

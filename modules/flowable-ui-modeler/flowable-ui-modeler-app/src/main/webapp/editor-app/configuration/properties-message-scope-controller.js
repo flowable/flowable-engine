@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-angular.module('activitiModeler').controller('ActivitiMessageRefCtrl', [ '$scope', function($scope) {
+angular.module('flowableModeler').controller('ActivitiMessageRefCtrl', [ '$scope', function($scope) {
 
     // Find the parent shape on which the message definitions are defined
     var messageDefinitionsProperty = undefined;

@@ -14,7 +14,7 @@
 
 /* Controllers */
 
-activitiAdminApp.controller('FormInstancesController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', 'gridConstants',
+flowableAdminApp.controller('FormInstancesController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', 'gridConstants',
     function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, $modal, gridConstants) {
 
         $rootScope.navigation = {main: 'form-engine', sub: 'instances'};
@@ -56,7 +56,7 @@ activitiAdminApp.controller('FormInstancesController', ['$rootScope', '$scope', 
             $scope.filter = $rootScope.filters.formInstanceFilter;
             $scope.filter.config = filterConfig;
         } else {
-            $scope.filter = new ActivitiAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
+            $scope.filter = new FlowableAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
             $rootScope.filters.formInstanceFilter = $scope.filter;
         }
 

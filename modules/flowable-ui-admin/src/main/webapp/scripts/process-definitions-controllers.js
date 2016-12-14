@@ -17,7 +17,7 @@
 
 /* Controllers */
 
-activitiAdminApp.controller('ProcessDefinitionsController', ['$rootScope', '$scope', '$http', '$timeout', '$location','$translate', '$q', '$modal', 'gridConstants',
+flowableAdminApp.controller('ProcessDefinitionsController', ['$rootScope', '$scope', '$http', '$timeout', '$location','$translate', '$q', '$modal', 'gridConstants',
     function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, $modal, gridConstants) {
 
 		$rootScope.navigation = {main: 'process-engine', sub: 'definitions'};
@@ -61,7 +61,7 @@ activitiAdminApp.controller('ProcessDefinitionsController', ['$rootScope', '$sco
 
 	    if ($rootScope.filters.forced.processDefinitionFilter) {
 	        // Always recreate the filter and add all properties
-	        $scope.filter = new ActivitiAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
+	        $scope.filter = new FlowableAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
 	        $rootScope.filters.processDefinitionFilter = $scope.filter;
 
 	        for (var prop in $rootScope.filters.forced.processDefinitionFilter) {
@@ -78,7 +78,7 @@ activitiAdminApp.controller('ProcessDefinitionsController', ['$rootScope', '$sco
 	    	$scope.filter = $rootScope.filters.processDefinitionFilter;
 	    	$scope.filter.config = filterConfig;
 	    } else {
-		    $scope.filter = new ActivitiAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
+		    $scope.filter = new FlowableAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
 		    $rootScope.filters.processDefinitionFilter = $scope.filter;
 	    }
 

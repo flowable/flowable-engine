@@ -5,7 +5,7 @@
 
     <bean id="idmEngineConfiguration" class="org.flowable.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration">
 
-        <property name="jdbcUrl" value="jdbc:h2:mem:activitiidm;DB_CLOSE_DELAY=1000" />
+        <property name="jdbcUrl" value="jdbc:h2:mem:flowableidm;DB_CLOSE_DELAY=1000" />
         <property name="jdbcDriver" value="org.h2.Driver" />
         <property name="jdbcUsername" value="sa" />
         <property name="jdbcPassword" value="" />

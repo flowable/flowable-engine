@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-angular.module('activitiModeler')
+angular.module('flowableModeler')
     .controller('FormToolbarController', ['$scope', '$http', '$modal', '$q', '$rootScope', '$translate', '$location', 'FormBuilderService', function ($scope, $http, $modal, $q, $rootScope, $translate, $location, FormBuilderService) {
 
     	var toolbarItems = FORM_TOOLBAR_CONFIG.items;

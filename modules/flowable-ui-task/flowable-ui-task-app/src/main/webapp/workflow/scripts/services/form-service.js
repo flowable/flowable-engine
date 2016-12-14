@@ -13,7 +13,7 @@
 'use strict';
 
 // Task service
-angular.module('activitiApp').service('FormService', ['$http', '$q',
+angular.module('flowableApp').service('FormService', ['$http', '$q',
     function ($http, $q) {
 
         var httpAsPromise = function(options) {

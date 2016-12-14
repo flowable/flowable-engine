@@ -13,14 +13,14 @@
 package org.flowable.engine.delegate.event;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.impl.delegate.event.ActivitiEngineEvent;
+import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
 
 /**
  * An {@link FlowableEvent} that indicates a certain sequence flow has been taken.
  * 
  * @author Frederik Heremans
  */
-public interface FlowableSequenceFlowTakenEvent extends ActivitiEngineEvent {
+public interface FlowableSequenceFlowTakenEvent extends FlowableEngineEvent {
 
   String getId();
 

@@ -16,7 +16,7 @@
 
 /* Controllers */
 
-activitiAdminApp.controller('ProcessInstancesController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', 'gridConstants',
+flowableAdminApp.controller('ProcessInstancesController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', 'gridConstants',
     function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, gridConstants) {
 
 		$rootScope.navigation = {main: 'process-engine', sub: 'instances'};
@@ -25,8 +25,8 @@ activitiAdminApp.controller('ProcessInstancesController', ['$rootScope', '$scope
 		$scope.processInstances = {};
 		$scope.definitionCacheLoaded = false;
 
-		$scope.variableFilterTypes = ActivitiAdmin.Utils.variableFilterTypes;
-		$scope.variableFilterOperators = ActivitiAdmin.Utils.variableFilterOperators;
+		$scope.variableFilterTypes = FlowableAdmin.Utils.variableFilterTypes;
+		$scope.variableFilterOperators = FlowableAdmin.Utils.variableFilterOperators;
 
 	    var filterConfig = {
 	    	url: '/app/rest/activiti/process-instances',
@@ -74,7 +74,7 @@ activitiAdminApp.controller('ProcessInstancesController', ['$rootScope', '$scope
 
 	    if ($rootScope.filters.forced.instanceFilter) {
 	    	// Always recreate the filter and add all properties
-	    	$scope.filter = new ActivitiAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
+	    	$scope.filter = new FlowableAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
     		$rootScope.filters.instanceFilter = $scope.filter;
 
     		for(var prop in $rootScope.filters.forced.instanceFilter) {
@@ -89,7 +89,7 @@ activitiAdminApp.controller('ProcessInstancesController', ['$rootScope', '$scope
 	    	 $scope.filter.config = filterConfig;
 
 	    } else {
-		    $scope.filter = new ActivitiAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
+		    $scope.filter = new FlowableAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
 		    $rootScope.filters.instanceFilter = $scope.filter;
 	    }
 

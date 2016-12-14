@@ -28,7 +28,7 @@ import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
-@ContextConfiguration("classpath:generic-camel-activiti-context.xml")
+@ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class SimpleProcessTest extends SpringFlowableTestCase {
 
   @Autowired

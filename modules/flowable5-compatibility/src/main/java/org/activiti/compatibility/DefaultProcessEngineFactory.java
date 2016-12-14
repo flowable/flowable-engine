@@ -71,13 +71,7 @@ public class DefaultProcessEngineFactory {
   }
 
   protected void copyJdbcConfig(ProcessEngineConfigurationImpl flowable6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl flowable5Configuration) {
-    if (flowable6Configuration.getIdGeneratorDataSource() != null) {
-      flowable5Configuration.setIdGeneratorDataSource(flowable6Configuration.getIdGeneratorDataSource());
-    } else if (flowable6Configuration.getIdGeneratorDataSourceJndiName() != null) {
-      flowable5Configuration.setIdGeneratorDataSourceJndiName(flowable6Configuration.getIdGeneratorDataSourceJndiName());
-    } else {
-      flowable5Configuration.setDataSource(flowable6Configuration.getDataSource());
-    }
+    flowable5Configuration.setDataSource(flowable6Configuration.getDataSource());
     
     if (flowable6Configuration.getJdbcDriver() != null) {
       flowable5Configuration.setJdbcDriver(flowable6Configuration.getJdbcDriver());

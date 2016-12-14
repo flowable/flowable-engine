@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-angular.module('activitiModeler')
+angular.module('flowableModeler')
     .controller('DecisionTableToolbarController', ['$scope', '$http', '$modal', '$q', '$rootScope', '$translate', '$location', 'DecisionTableService',
         function ($scope, $http, $modal, $q, $rootScope, $translate, $location, DecisionTableService) {
 

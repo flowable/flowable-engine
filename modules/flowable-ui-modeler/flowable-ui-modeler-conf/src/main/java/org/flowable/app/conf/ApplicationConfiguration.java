@@ -12,6 +12,7 @@
  */
 package org.flowable.app.conf;
 
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -45,5 +46,12 @@ public class ApplicationConfiguration {
 	@Bean
 	public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
 	  return new PropertySourcesPlaceholderConfigurer();
+	}
+
+	@Bean
+	public static PropertyPlaceholderConfigurer propertyPlaceholderConfigurer() {
+		PropertyPlaceholderConfigurer placeholderConfigurer = new PropertyPlaceholderConfigurer();
+		placeholderConfigurer.setSystemPropertiesMode(PropertyPlaceholderConfigurer.SYSTEM_PROPERTIES_MODE_OVERRIDE);
+		return placeholderConfigurer;
 	}
 }

@@ -7,9 +7,9 @@ import java.util.Map;
  */
 public class ConsoleLogger {
 
-    protected ActivitiProfiler profiler;
+    protected FlowableProfiler profiler;
 
-    public ConsoleLogger(ActivitiProfiler profiler) {
+    public ConsoleLogger(FlowableProfiler profiler) {
         this.profiler = profiler;
     }
 

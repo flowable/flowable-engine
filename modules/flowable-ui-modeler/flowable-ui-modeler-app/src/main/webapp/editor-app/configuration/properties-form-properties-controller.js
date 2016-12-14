@@ -15,7 +15,7 @@
  * Form Properties
  */
 
-angular.module('activitiModeler').controller('KisBpmFormPropertiesCtrl',
+angular.module('flowableModeler').controller('KisBpmFormPropertiesCtrl',
     ['$scope', '$modal', '$timeout', '$translate', function ($scope, $modal, $timeout, $translate) {
 
         // Config for the modal window
@@ -28,7 +28,7 @@ angular.module('activitiModeler').controller('KisBpmFormPropertiesCtrl',
         _internalCreateModal(opts, $modal, $scope);
     }]);
 
-angular.module('activitiModeler').controller('KisBpmFormPropertiesPopupCtrl',
+angular.module('flowableModeler').controller('KisBpmFormPropertiesPopupCtrl',
     ['$scope', '$q', '$translate', '$timeout', function ($scope, $q, $translate, $timeout) {
 
         // Put json representing form properties on scope

@@ -12,7 +12,7 @@
  */
 'use strict';
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 .controller('EditModelPopupCrtl', ['$rootScope', '$scope', '$http', '$translate', '$location',
     function ($rootScope, $scope, $http, $translate, $location) {
 
@@ -100,7 +100,7 @@ angular.module('activitiModeler')
     	};
 }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
     .controller('DeleteModelPopupCrtl', ['$rootScope', '$scope', '$http', '$translate', function ($rootScope, $scope, $http, $translate) {
 
         var model;
@@ -166,7 +166,7 @@ angular.module('activitiModeler')
         };
     }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 .controller('UseAsNewVersionPopupCrtl', ['$rootScope', '$scope', '$http', '$translate', '$location', function ($rootScope, $scope, $http, $translate, $location) {
 
 	var model;

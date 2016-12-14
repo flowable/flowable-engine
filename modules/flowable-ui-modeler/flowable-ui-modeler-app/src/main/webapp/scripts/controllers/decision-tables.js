@@ -14,7 +14,7 @@
  */
 'use strict';
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
   .controller('DecisionTablesController', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$modal', function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal) {
 
 	  $rootScope.setMainPageById('decision-tables');
@@ -151,7 +151,7 @@ angular.module('activitiModeler')
   }]);
 
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 .controller('CreateNewDecisionTableCtrl', ['$rootScope', '$scope', '$http', function ($rootScope, $scope, $http) {
 
     $scope.model = {
@@ -198,7 +198,7 @@ angular.module('activitiModeler')
     };
 }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 	.controller('DuplicateDecisionTableCtrl', ['$rootScope', '$scope', '$http', 'EventTrackingService',
 		function ($rootScope, $scope, $http, EventTrackingService) {
 
@@ -254,7 +254,7 @@ angular.module('activitiModeler')
 			};
 		}]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 .controller('ImportDecisionTableModelCrtl', ['$rootScope', '$scope', '$http', 'Upload', '$location', 'EventTrackingService', function ($rootScope, $scope, $http, Upload, $location, EventTrackingService) {
 
   $scope.model = {
