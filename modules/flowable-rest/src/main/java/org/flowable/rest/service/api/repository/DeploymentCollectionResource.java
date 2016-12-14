@@ -130,9 +130,10 @@ public class DeploymentCollectionResource {
           @ApiResponse(code = 400, message = "Indicates there was no content present in the request body or the content mime-type is not supported for deployment. The status-description contains additional information.")
   })
   @RequestMapping(value = "/repository/deployments", method = RequestMethod.POST, produces = "application/json")
-  public DeploymentResponse uploadDeployment(@RequestParam(value = "tenantId", required = false) String tenantId,
-      @RequestParam(value = "deploymentKey", required = false) String deploymentKey,
-      HttpServletRequest request, HttpServletResponse response) {
+  public DeploymentResponse uploadDeployment(@ApiParam(name = "deploymentKey") @RequestParam(value = "deploymentKey", required = false) String deploymentKey,
+                                             @ApiParam(name = "deploymentName") @RequestParam(value = "deploymentName", required = false) String deploymentName,
+                                             @ApiParam(name = "tenantId") @RequestParam(value = "tenantId", required = false) String tenantId,
+                                              HttpServletRequest request, HttpServletResponse response) {
 
     if (request instanceof MultipartHttpServletRequest == false) {
       throw new FlowableIllegalArgumentException("Multipart request is required");
@@ -161,8 +162,19 @@ public class DeploymentCollectionResource {
       } else {
         throw new FlowableIllegalArgumentException("File must be of type .bpmn20.xml, .bpmn, .bar or .zip");
       }
-      deploymentBuilder.name(fileName);
-      
+
+      if (StringUtils.isEmpty(deploymentName)) {
+        String fileNameWithoutExtension = fileName.split("\\.")[0];
+
+        if (StringUtils.isNotEmpty(fileNameWithoutExtension)) {
+          fileName = fileNameWithoutExtension;
+        }
+
+        deploymentBuilder.name(fileName);
+      } else {
+        deploymentBuilder.name(deploymentName);
+      }
+
       if (deploymentKey != null) {
         deploymentBuilder.key(deploymentKey);
       }
