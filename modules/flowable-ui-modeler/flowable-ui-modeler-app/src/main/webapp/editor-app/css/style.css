@@ -750,3 +750,13 @@ li.x-menu-list-item.x-menu-item-active a {
     cursor: pointer;
     z-index: 1;
 }
+
+.decision-table .row {
+	margin-left: -10px;
+	margin-right: -10px;
+}
+
+.ui-grid .ui-grid-render-container-body .ui-grid-viewport {
+	overflow-x: auto !important;
+}
+
