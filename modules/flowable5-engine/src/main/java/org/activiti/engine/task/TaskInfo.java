@@ -39,13 +39,13 @@ public interface TaskInfo {
 	int getPriority();
 
 	/**
-	 * The {@link User.getId() userId} of the person that is responsible for this
+	 * The {@link org.flowable.idm.api.User userId} of the person that is responsible for this
 	 * task.
 	 */
 	String getOwner();
 
 	/**
-	 * The {@link User.getId() userId} of the person to which this task is
+	 * The {@link org.flowable.idm.api.User userId} of the person to which this task is
 	 * delegated.
 	 */
 	String getAssignee();

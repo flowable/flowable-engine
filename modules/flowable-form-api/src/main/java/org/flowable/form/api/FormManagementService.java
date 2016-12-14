@@ -42,7 +42,7 @@ public interface FormManagementService {
   TableMetaData getTableMetaData(String tableName);
 
   /**
-   * Creates a {@link IdmTablePageQuery} that can be used to fetch {@link IdmTablePage} containing specific sections of table row data.
+   * Creates a {@link TablePageQuery} that can be used to fetch {@link org.flowable.engine.common.api.management.TablePage} containing specific sections of table row data.
    */
   TablePageQuery createTablePageQuery();
 

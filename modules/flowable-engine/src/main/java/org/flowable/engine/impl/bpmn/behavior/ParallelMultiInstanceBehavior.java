@@ -99,7 +99,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
   }
 
   /**
-   * Called when the wrapped {@link ActivityBehavior} calls the {@link AbstractBpmnActivityBehavior#leave(ActivityExecution)} method. Handles the completion of one of the parallel instances
+   * Called when the wrapped {@link ActivityBehavior} calls the {@link AbstractBpmnActivityBehavior#leave(DelegateExecution)} method. Handles the completion of one of the parallel instances
    */
   public void leave(DelegateExecution execution) {
 

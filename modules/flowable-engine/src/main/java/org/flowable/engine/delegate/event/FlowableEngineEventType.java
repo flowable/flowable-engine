@@ -81,7 +81,7 @@ public enum FlowableEngineEventType implements FlowableEventType {
   JOB_EXECUTION_SUCCESS,
 
   /**
-   * A job has been executed, but failed. Event should be an instance of a {@link ActivitiExceptionEvent}.
+   * A job has been executed, but failed. Event should be an instance of a {@link ExceptionEvent}.
    */
   JOB_EXECUTION_FAILURE,
 
@@ -142,7 +142,7 @@ public enum FlowableEngineEventType implements FlowableEventType {
 
   /**
    * An activity has received a message event. Dispatched before the actual message has been received by the activity. This event will be either followed by a {@link #ACTIVITY_SIGNALLED} event or
-   * {@link #ACTIVITY_COMPLETE} for the involved activity, if the message was delivered successfully.
+   * {@link #ACTIVITY_COMPLETED} for the involved activity, if the message was delivered successfully.
    */
   ACTIVITY_MESSAGE_RECEIVED,
 
@@ -153,17 +153,17 @@ public enum FlowableEngineEventType implements FlowableEventType {
 
   /**
    * An activity has received an error event. Dispatched before the actual error has been received by the activity. This event will be either followed by a {@link #ACTIVITY_SIGNALLED} event or
-   * {@link #ACTIVITY_COMPLETE} for the involved activity, if the error was delivered successfully.
+   * {@link #ACTIVITY_COMPLETED} for the involved activity, if the error was delivered successfully.
    */
   ACTIVITY_ERROR_RECEIVED,
   
   /**
    * A event dispatched when a {@link HistoricActivityInstance} is created. 
-   * This is a specialized version of the {@link ActivitiEventType#ENTITY_CREATED} and {@link ActivitiEventType#ENTITY_INITIALIZED} event,
-   * with the same use case as the {@link ActivitiEventType#ACTIVITY_STARTED}, but containing
+   * This is a specialized version of the {@link FlowableEngineEventType#ENTITY_CREATED} and {@link FlowableEngineEventType#ENTITY_INITIALIZED} event,
+   * with the same use case as the {@link FlowableEngineEventType#ACTIVITY_STARTED}, but containing
    * slightly different data.
    * 
-   * Note this will be an {@link ActivitiEntityEvent}, where the entity is the {@link HistoricActivityInstance}.
+   * Note this will be an {@link FlowableEngineEventType}, where the entity is the {@link HistoricActivityInstance}.
    *  
    * Note that history (minimum level ACTIVITY) must be enabled to receive this event.  
    */
@@ -171,8 +171,8 @@ public enum FlowableEngineEventType implements FlowableEventType {
   
   /**
    * A event dispatched when a {@link HistoricActivityInstance} is marked as ended. 
-   * his is a specialized version of the {@link ActivitiEventType#ENTITY_UPDATED} event,
-   * with the same use case as the {@link ActivitiEventType#ACTIVITY_COMPLETED}, but containing
+   * his is a specialized version of the {@link FlowableEngineEventType#ENTITY_UPDATED} event,
+   * with the same use case as the {@link FlowableEngineEventType#ACTIVITY_COMPLETED}, but containing
    * slightly different data (e.g. the end time, the duration, etc.). 
    *  
    * Note that history (minimum level ACTIVITY) must be enabled to receive this event.  
@@ -255,11 +255,11 @@ public enum FlowableEngineEventType implements FlowableEventType {
   
   /**
    * A event dispatched when a {@link HistoricProcessInstance} is created. 
-   * This is a specialized version of the {@link ActivitiEventType#ENTITY_CREATED} and {@link ActivitiEventType#ENTITY_INITIALIZED} event,
-   * with the same use case as the {@link ActivitiEventType#PROCESS_STARTED}, but containing
+   * This is a specialized version of the {@link FlowableEngineEventType#ENTITY_CREATED} and {@link FlowableEngineEventType#ENTITY_INITIALIZED} event,
+   * with the same use case as the {@link FlowableEngineEventType#PROCESS_STARTED}, but containing
    * slightly different data (e.g. the start time, the start user id, etc.). 
    * 
-   * Note this will be an {@link ActivitiEntityEvent}, where the entity is the {@link HistoricProcessInstance}.
+   * Note this will be an {@link FlowableEngineEventType}, where the entity is the {@link HistoricProcessInstance}.
    *  
    * Note that history (minimum level ACTIVITY) must be enabled to receive this event.  
    */
@@ -267,8 +267,8 @@ public enum FlowableEngineEventType implements FlowableEventType {
   
   /**
    * A event dispatched when a {@link HistoricProcessInstance} is marked as ended. 
-   * his is a specialized version of the {@link ActivitiEventType#ENTITY_UPDATED} event,
-   * with the same use case as the {@link ActivitiEventType#PROCESS_COMPLETED}, but containing
+   * his is a specialized version of the {@link FlowableEngineEventType#ENTITY_UPDATED} event,
+   * with the same use case as the {@link FlowableEngineEventType#PROCESS_COMPLETED}, but containing
    * slightly different data (e.g. the end time, the duration, etc.). 
    *  
    * Note that history (minimum level ACTIVITY) must be enabled to receive this event.  

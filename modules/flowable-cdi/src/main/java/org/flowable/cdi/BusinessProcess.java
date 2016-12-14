@@ -261,7 +261,7 @@ public class BusinessProcess implements Serializable {
    * 
    * @param executionId
    *          the id of the execution to associate with.
-   * @throws ActivitiCdiException if no such execution exists
+   * @throws FlowableCdiException if no such execution exists
    */
   public void associateExecutionById(String executionId) {
     Execution execution = processEngine.getRuntimeService().createExecutionQuery().executionId(executionId).singleResult();

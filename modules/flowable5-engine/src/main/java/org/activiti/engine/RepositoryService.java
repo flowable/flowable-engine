@@ -57,6 +57,7 @@ public interface RepositoryService {
    * @param deploymentId id of the deployment, cannot be null.
    * @deprecated use {@link #deleteDeployment(String, boolean)}.  This methods may be deleted from 5.3. 
    */
+  @Deprecated
   void deleteDeploymentCascade(String deploymentId);
 
   /**

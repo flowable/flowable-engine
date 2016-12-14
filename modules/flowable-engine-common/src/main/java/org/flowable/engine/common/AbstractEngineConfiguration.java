@@ -129,20 +129,22 @@ public abstract class AbstractEngineConfiguration {
   /**
    * Flag that can be set to configure or nota relational database is used. This is useful for custom implementations that do not use relational databases at all.
    * 
-   * If true (default), the {@link ProcessEngineConfiguration#getDatabaseSchemaUpdate()} value will be used to determine what needs to happen wrt the database schema.
+   * If true (default), the {@link AbstractEngineConfiguration#getDatabaseSchemaUpdate()} value will be used to determine what needs to happen wrt the database schema.
    * 
    * If false, no validation or schema creation will be done. That means that the database schema must have been created 'manually' before but the engine does not validate whether the schema is
-   * correct. The {@link ProcessEngineConfiguration#getDatabaseSchemaUpdate()} value will not be used.
+   * correct. The {@link AbstractEngineConfiguration#getDatabaseSchemaUpdate()} value will not be used.
    */
   protected boolean usingRelationalDatabase = true;
 
   /**
-   * Allows configuring a database table prefix which is used for all runtime operations of the process engine. For example, if you specify a prefix named 'PRE1.', activiti will query for executions
+   * Allows configuring a database table prefix which is used for all runtime operations of the process engine. For example, if you specify a prefix named
+   * 'PRE1.', Flowable will query for executions
    * in a table named 'PRE1.ACT_RU_EXECUTION_'.
    * 
    * <p />
-   * <strong>NOTE: the prefix is not respected by automatic database schema management. If you use {@link ProcessEngineConfiguration#DB_SCHEMA_UPDATE_CREATE_DROP} or
-   * {@link ProcessEngineConfiguration#DB_SCHEMA_UPDATE_TRUE}, activiti will create the database tables using the default names, regardless of the prefix configured here.</strong>
+   * <strong>NOTE: the prefix is not respected by automatic database schema management. If you use {@link AbstractEngineConfiguration#DB_SCHEMA_UPDATE_CREATE_DROP} or
+   * {@link AbstractEngineConfiguration#DB_SCHEMA_UPDATE_TRUE}, Flowable will create the database tables using the default names, regardless of the prefix
+   * configured here.</strong>
    */
   protected String databaseTablePrefix = "";
   
