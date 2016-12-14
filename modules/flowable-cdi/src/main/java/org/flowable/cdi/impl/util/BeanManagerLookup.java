@@ -57,6 +57,6 @@ public class BeanManagerLookup {
       // silently ignore
     }
 
-    throw new FlowableException("Could not lookup beanmanager in jndi. If no jndi is avalable, set the beanmanger to the 'localInstance' property of this class.");
+    throw new FlowableException("Could not lookup beanmanager in jndi. If no jndi is available, set the beanmanger to the 'localInstance' property of this class.");
   }
 }

@@ -162,7 +162,7 @@ public interface DelegateExecution extends VariableScope {
   void setScope(boolean isScope);
   
   /**
-   * Returns whather this execution is the root of a multi instance execution.
+   * Returns whether this execution is the root of a multi instance execution.
    */
   boolean isMultiInstanceRoot();
   

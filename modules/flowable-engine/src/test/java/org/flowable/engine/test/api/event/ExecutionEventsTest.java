@@ -86,7 +86,7 @@ public class ExecutionEventsTest extends PluggableFlowableTestCase {
     
     listener.clearEventsReceived();
 
-    // Check update event when process-definition is supended (should
+    // Check update event when process-definition is suspended (should
     // cascade suspend/activate all process instances)
     repositoryService.suspendProcessDefinitionById(processInstance.getProcessDefinitionId(), true, null);
     repositoryService.activateProcessDefinitionById(processInstance.getProcessDefinitionId(), true, null);

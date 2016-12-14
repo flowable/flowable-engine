@@ -68,7 +68,7 @@ public class DynamicProcessDefinitionSummary implements DynamicBpmnConstants {
 	 * <p>
 	 *     If no value is found for a given {@link org.flowable.engine.DynamicBpmnConstants} in the {@link BpmnModel} or
 	 *     ProcessDefinitionInfo. we don't store an key in the resulting {@link ObjectNode}. Null values should be avoided
-	 *     in JSON. Depending on the {@link ObjectMapper} configuration keys with a null value could even be removed when writting to json.
+	 *     in JSON. Depending on the {@link ObjectMapper} configuration keys with a null value could even be removed when writing to json.
 	 * </p>
 	 *
 	 * <p color="red">

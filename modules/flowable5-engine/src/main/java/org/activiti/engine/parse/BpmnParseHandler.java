@@ -34,7 +34,7 @@ import org.flowable.bpmn.model.BaseElement;
 public interface BpmnParseHandler {
   
   /**
-   * The types for which this handler must be calleding during process parsing.
+   * The types for which this handler must be called during process parsing.
    */
   Collection<Class<? extends BaseElement>> getHandledTypes();
   

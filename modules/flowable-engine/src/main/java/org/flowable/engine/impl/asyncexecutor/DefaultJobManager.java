@@ -236,7 +236,7 @@ public class DefaultJobManager implements JobManager {
       newJobEntity.setLockOwner(null);
       processEngineConfiguration.getJobEntityManager().insert(newJobEntity);
       
-      // We're not calling triggerExecutorIfNeeded here after the inser. The unacquire happened
+      // We're not calling triggerExecutorIfNeeded here after the insert. The unacquire happened
       // for a reason (eg queue full or exclusive lock failure). No need to try it immediately again,
       // as the chance of failure will be high.
       

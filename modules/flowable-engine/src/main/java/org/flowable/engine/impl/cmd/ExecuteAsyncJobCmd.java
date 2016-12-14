@@ -46,7 +46,7 @@ public class ExecuteAsyncJobCmd implements Command<Object>, Serializable {
     }
     
     // We need to refetch the job, as it could have been deleted by another concurrent job
-    // For exampel: an embedded subprocess with a couple of async tasks and a timer on the boundary of the subprocess
+    // For example: an embedded subprocess with a couple of async tasks and a timer on the boundary of the subprocess
     // when the timer fires, all executions and thus also the jobs inside of the embedded subprocess are destroyed.
     // However, the async task jobs could already have been fetched and put in the queue.... while in reality they have been deleted. 
     // A refetch is thus needed here to be sure that it exists for this transaction.

@@ -134,7 +134,7 @@ public class CxfWSDLImporter implements XMLImporter {
     } catch (WSDLException e) {
         e.printStackTrace();
     } catch (IOException e) {
-        throw new FlowableException("Error retrieveing the JAXB binding definitions", e);
+        throw new FlowableException("Error retrieving the JAXB binding definitions", e);
     }
   }
   

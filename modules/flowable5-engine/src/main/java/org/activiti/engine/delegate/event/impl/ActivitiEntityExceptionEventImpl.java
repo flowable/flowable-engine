@@ -19,7 +19,7 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
 
 /**
- * Base class for all {@link FlowableEvent} implementations, represents an exception occured, related 
+ * Base class for all {@link FlowableEvent} implementations, represents an exception occurred, related
  * to an entity.
  * 
  * @author Frederik Heremans

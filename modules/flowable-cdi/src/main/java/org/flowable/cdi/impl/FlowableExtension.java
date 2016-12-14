@@ -96,7 +96,7 @@ public class FlowableExtension implements Extension {
         logger.debug("ProcessEngineLookup service {} returned process engine.", processEngineLookup.getClass());
         break;
       } else {
-        logger.debug("ProcessEngineLookup service {} retuned 'null' value.", processEngineLookup.getClass());
+        logger.debug("ProcessEngineLookup service {} returned 'null' value.", processEngineLookup.getClass());
       }
     }
 

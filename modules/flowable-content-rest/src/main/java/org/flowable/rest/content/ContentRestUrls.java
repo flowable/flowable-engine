@@ -47,7 +47,7 @@ public final class ContentRestUrls {
   public static final String[] URL_QUERY_CONTENT_ITEM = { SEGMENT_QUERY_RESOURCE, SEGMENT_CONTENT_ITEMS_RESOURCE };
 
   /**
-   * Creates an url based on the passed fragments and replaces any placeholders with the given arguments. The placeholders are folowing the {@link MessageFormat} convention (eg. {0} is replaced by
+   * Creates an url based on the passed fragments and replaces any placeholders with the given arguments. The placeholders are following the {@link MessageFormat} convention (eg. {0} is replaced by
    * first argument value).
    */
   public static final String createRelativeResourceUrl(String[] segments, Object... arguments) {

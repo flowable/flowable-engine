@@ -138,7 +138,7 @@ public class DeploymentsJMXClientTest {
     mbsc.invoke(deploymentsBeanName, "suspendProcessDefinitionById", new String[] { pidV2 }, new String[] { String.class.getName() });
     RepositoryService repositoryService = processEngine.getRepositoryService();
 
-    // test if it is realy suspended and not the other one
+    // test if it is really suspended and not the other one
     assertTrue(repositoryService.getProcessDefinition(pidV2).isSuspended());
     assertFalse(repositoryService.getProcessDefinition(pidV1).isSuspended());
 

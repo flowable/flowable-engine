@@ -314,7 +314,7 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
     ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
     BpmnModel bpmnModel = commandExecutor.execute(new GetBpmnModelCmd(processDefinitionId));
 
-    // agressive exception. this  method should not be called if the process definition does not exists.
+    // aggressive exception. this  method should not be called if the process definition does not exists.
     if (bpmnModel == null) {
       throw new ActivitiException("ProcessDefinition " + processDefinitionId + " does not exists");
     }
