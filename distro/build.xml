@@ -2,7 +2,7 @@
 
 <project name="activiti.distro" default="distro">
 
-	<property file="${user.home}/.activiti/build.properties" />
+	<property file="${user.home}/.flowable/build.properties" />
 
 	<property name="flowable.version" value="6.0.0.RC1-SNAPSHOT" />
 	<property name="target.distro.root" value="target/zip/flowable-${flowable.version}" />
