@@ -12,7 +12,7 @@
  */
 'use strict';
 
-var activitiApp = angular.module('activitiApp', [
+var flowableApp = angular.module('flowableApp', [
     'ngCookies',
     'ngResource',
     'ngSanitize',
@@ -30,9 +30,9 @@ var activitiApp = angular.module('activitiApp', [
     'cfp.hotkeys'
 ]);
 
-var activitiModule = activitiApp;
+var flowableModule = flowableApp;
 
-activitiApp
+flowableApp
 
   // Initialize routes
    .config(['$provide', '$routeProvider', '$selectProvider', '$datepickerProvider', '$translateProvider', 'cfpLoadingBarProvider',

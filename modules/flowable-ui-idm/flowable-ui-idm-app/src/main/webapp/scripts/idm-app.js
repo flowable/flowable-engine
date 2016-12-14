@@ -12,7 +12,7 @@
  */
 'use strict';
 
-var activitiApp = angular.module('activitiApp', [
+var flowableApp = angular.module('flowableApp', [
   	'http-auth-interceptor',
   	'ngCookies',
   	'ngResource',
@@ -29,8 +29,8 @@ var activitiApp = angular.module('activitiApp', [
     'ui.grid.cellNav'
 ]);
 
-var activitiModule = activitiApp;
-activitiApp
+var flowableModule = flowableApp;
+flowableApp
   // Initialize routes
   .config(['$provide', '$routeProvider', '$selectProvider', '$datepickerProvider', '$translateProvider', function ($provide, $routeProvider, $selectProvider, $datepickerProvider, $translateProvider) {
 

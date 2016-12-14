@@ -14,7 +14,7 @@
  */
 'use strict';
 
-activitiAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope', '$http', '$timeout', '$location', '$routeParams', '$modal', '$translate', '$q', 'gridConstants',
+flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope', '$http', '$timeout', '$location', '$routeParams', '$modal', '$translate', '$q', 'gridConstants',
     function ($scope, $rootScope, $http, $timeout, $location, $routeParams, $modal, $translate, $q, gridConstants) {
 
         $rootScope.navigation = {main: 'process-engine', sub: 'instances'};
@@ -506,7 +506,7 @@ activitiAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
         };
     }]);
 
-activitiAdminApp.controller('DeleteProcessModalInstanceCrtl',
+flowableAdminApp.controller('DeleteProcessModalInstanceCrtl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'process', 'action', function ($rootScope, $scope, $modalInstance, $http, process, action) {
 
         $scope.process = process;
@@ -540,7 +540,7 @@ activitiAdminApp.controller('DeleteProcessModalInstanceCrtl',
         };
     }]);
 
-activitiAdminApp.controller('ShowProcessInstanceDiagramPopupCrtl',
+flowableAdminApp.controller('ShowProcessInstanceDiagramPopupCrtl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'process', '$timeout', function ($rootScope, $scope, $modalInstance, $http, process, $timeout) {
 
         $scope.model = {
@@ -566,7 +566,7 @@ activitiAdminApp.controller('ShowProcessInstanceDiagramPopupCrtl',
 
     }]);
 
-activitiAdminApp.controller('UpdateVariableCrtl',
+flowableAdminApp.controller('UpdateVariableCrtl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'variable', 'processInstanceId', function ($rootScope, $scope, $modalInstance, $http, variable, processInstanceId) {
 
         $scope.status = {loading: false};
@@ -640,7 +640,7 @@ activitiAdminApp.controller('UpdateVariableCrtl',
 
     }]);
 
-activitiAdminApp.controller('DeleteVariableCrtl',
+flowableAdminApp.controller('DeleteVariableCrtl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'variable', 'processInstanceId',
         function ($rootScope, $scope, $modalInstance, $http, variable, processInstanceId) {
 
@@ -666,7 +666,7 @@ activitiAdminApp.controller('DeleteVariableCrtl',
 
         }]);
 
-activitiAdminApp.controller('AddVariableCrtl',
+flowableAdminApp.controller('AddVariableCrtl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'processInstanceId',
         function ($rootScope, $scope, $modalInstance, $http, processInstanceId) {
 

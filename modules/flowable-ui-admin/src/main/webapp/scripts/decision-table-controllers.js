@@ -12,7 +12,7 @@
  */
 'use strict';
 
-activitiAdminApp.controller('DecisionTableController', ['$scope', '$rootScope', '$http', '$timeout', '$location', '$routeParams', '$modal', '$translate', '$q', 'gridConstants',
+flowableAdminApp.controller('DecisionTableController', ['$scope', '$rootScope', '$http', '$timeout', '$location', '$routeParams', '$modal', '$translate', '$q', 'gridConstants',
     function ($scope, $rootScope, $http, $timeout, $location, $routeParams, $modal, $translate, $q, gridConstants) {
         $rootScope.navigation = {main: 'dmn-engine', sub: 'decision-tables'};
         
@@ -100,7 +100,7 @@ activitiAdminApp.controller('DecisionTableController', ['$scope', '$rootScope', 
 
     }]);
 
-activitiAdminApp.controller('ShowDecisionTablePopupCrtl',
+flowableAdminApp.controller('ShowDecisionTablePopupCrtl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'decisionTable', '$timeout', '$translate', 'uiGridConstants',
         function ($rootScope, $scope, $modalInstance, $http, decisionTable, $timeout, $translate, uiGridConstants) {
 

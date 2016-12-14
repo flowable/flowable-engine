@@ -17,11 +17,11 @@
 
 /* App Module */
 
-var activitiAdminApp = angular.module('activitiAdminApp', ['ngResource', 'ngRoute', 'ngCookies',
+var flowableAdminApp = angular.module('flowableAdminApp', ['ngResource', 'ngRoute', 'ngCookies',
     'pascalprecht.translate', 'ngGrid', 'ui.select2', 'ui.bootstrap', 'angularFileUpload', 'ui.keypress',
     'ui.grid', 'ui.grid.edit', 'ui.grid.selection', 'ui.grid.autoResize', 'ui.grid.moveColumns', 'ui.grid.cellNav']);
 
-activitiAdminApp
+flowableAdminApp
     .config(['$routeProvider', '$httpProvider', '$translateProvider', '$provide',
         function ($routeProvider, $httpProvider, $translateProvider, $provide) {
             $routeProvider
@@ -362,7 +362,7 @@ activitiAdminApp
 	            };
 
 	            // Reference the fixed configuration values on the root scope
-	            $rootScope.config = ActivitiAdmin.Config;
+	            $rootScope.config = FlowableAdmin.Config;
 
 	            // Store empty object for filter-references
 	            $rootScope.filters = { forced: {} };

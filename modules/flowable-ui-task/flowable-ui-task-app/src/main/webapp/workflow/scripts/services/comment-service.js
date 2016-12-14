@@ -13,7 +13,7 @@
 'use strict';
 
 // Comment service
-angular.module('activitiApp').service('CommentService', ['$http', '$q',
+angular.module('flowableApp').service('CommentService', ['$http', '$q',
     function ($http, $q) {
 
         /*

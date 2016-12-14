@@ -13,7 +13,7 @@
 /**
  * Service with small utility methods
  */
-angular.module('activitiModeler').service('UtilityService', [ '$window', '$document', '$timeout', function ($window, $document, $timeout) {
+angular.module('flowableModeler').service('UtilityService', [ '$window', '$document', '$timeout', function ($window, $document, $timeout) {
 
     this.scrollToElement = function(elementId) {
         $timeout(function() {

@@ -16,7 +16,7 @@
 
 /* Controllers */
 
-activitiAdminApp.controller('DecisionTablesController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', 'gridConstants',
+flowableAdminApp.controller('DecisionTablesController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', 'gridConstants',
     function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, $modal, gridConstants) {
 
         $rootScope.navigation = {main: 'dmn-engine', sub: 'decision-tables'};
@@ -60,7 +60,7 @@ activitiAdminApp.controller('DecisionTablesController', ['$rootScope', '$scope',
             $scope.filter = $rootScope.filters.decisionTableFilter;
             $scope.filter.config = filterConfig;
         } else {
-            $scope.filter = new ActivitiAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
+            $scope.filter = new FlowableAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
             $rootScope.filters.decisionTableFilter = $scope.filter;
         }
 

@@ -16,7 +16,7 @@
 
 /* Controllers */
 
-activitiAdminApp.controller('JobsController', ['$scope', '$rootScope', '$http', '$timeout','$location','$translate', '$q', 'gridConstants',
+flowableAdminApp.controller('JobsController', ['$scope', '$rootScope', '$http', '$timeout','$location','$translate', '$q', 'gridConstants',
     function ($scope, $rootScope, $http, $timeout, $location, $translate, $q, gridConstants) {
 		$rootScope.navigation = {main: 'process-engine', sub: 'jobs'};
 		
@@ -68,7 +68,7 @@ activitiAdminApp.controller('JobsController', ['$scope', '$rootScope', '$http', 
     		
 	    if ($rootScope.filters.forced.jobFilter) {
 	    	// Always recreate the filter and add all properties
-	    	$scope.filter = new ActivitiAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
+	    	$scope.filter = new FlowableAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
     		$rootScope.filters.jobFilter = $scope.filter;
     		
     		for (var prop in $rootScope.filters.forced.jobFilter) {
@@ -83,7 +83,7 @@ activitiAdminApp.controller('JobsController', ['$scope', '$rootScope', '$http', 
 	    		$scope.filter = $rootScope.filters.jobFilter;
 	    		$scope.filter.config = filterConfig;
 	    	} else {
-	    		$scope.filter = new ActivitiAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
+	    		$scope.filter = new FlowableAdmin.Utils.Filter(filterConfig, $http, $timeout, $rootScope);
 	    		$rootScope.filters.jobFilter = $scope.filter;
 	    	}
 	    }

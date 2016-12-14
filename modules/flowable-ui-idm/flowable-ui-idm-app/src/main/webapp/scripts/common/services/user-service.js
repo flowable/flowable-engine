@@ -13,7 +13,7 @@
 'use strict';
 
 // User service
-activitiModule.service('UserService', ['$http', '$q',
+flowableModule.service('UserService', ['$http', '$q',
     function ($http, $q) {
 
         var httpAsPromise = function(options) {

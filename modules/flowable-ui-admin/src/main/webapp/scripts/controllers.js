@@ -16,7 +16,7 @@
 
 /* Controllers */
 
-activitiAdminApp.controller('ConfirmPopupCrtl', ['$scope', '$modalInstance', 'model', 
+flowableAdminApp.controller('ConfirmPopupCrtl', ['$scope', '$modalInstance', 'model', 
     function ($scope, $modalInstance, model) {
         $scope.model = model;
         $scope.ok = function () {

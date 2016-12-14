@@ -13,7 +13,7 @@
 'use strict';
 
 // Task service
-angular.module('activitiApp').service('TaskService', ['$http', '$q', '$rootScope', 'RelatedContentService',
+angular.module('flowableApp').service('TaskService', ['$http', '$q', '$rootScope', 'RelatedContentService',
     function ($http, $q, $rootScope, RelatedContentService) {
 
         var httpAsPromise = function(options) {

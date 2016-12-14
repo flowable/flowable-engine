@@ -14,7 +14,7 @@
  */
 'use strict';
 
-activitiAdminApp.controller('TaskController', ['$scope', '$rootScope', '$http', '$timeout','$location','$routeParams', '$modal', '$translate', '$q', 'gridConstants',
+flowableAdminApp.controller('TaskController', ['$scope', '$rootScope', '$http', '$timeout','$location','$routeParams', '$modal', '$translate', '$q', 'gridConstants',
     function ($scope, $rootScope, $http, $timeout, $location, $routeParams, $modal, $translate, $q, gridConstants) {
 
         $rootScope.navigation = {main: 'process-engine', sub: 'tasks'};
@@ -330,7 +330,7 @@ activitiAdminApp.controller('TaskController', ['$scope', '$rootScope', '$http', 
 
 
 // Popup controllers
-activitiAdminApp.controller('CompleteModalInstanceCrtl',
+flowableAdminApp.controller('CompleteModalInstanceCrtl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'task', function ($rootScope, $scope, $modalInstance, $http, task) {
 
   $scope.task = task;
@@ -355,7 +355,7 @@ activitiAdminApp.controller('CompleteModalInstanceCrtl',
   };
 }]);
 
-activitiAdminApp.controller('ResolveTaskModalInstanceCrtl',
+flowableAdminApp.controller('ResolveTaskModalInstanceCrtl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'task', function ($rootScope, $scope, $modalInstance, $http, task) {
 
   $scope.task = task;
@@ -380,7 +380,7 @@ activitiAdminApp.controller('ResolveTaskModalInstanceCrtl',
   };
 }]);
 
-activitiAdminApp.controller('DeleteTaskModalInstanceCrtl',
+flowableAdminApp.controller('DeleteTaskModalInstanceCrtl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'task', function ($rootScope, $scope, $modalInstance, $http, task) {
 
   $scope.task = task;
@@ -408,7 +408,7 @@ activitiAdminApp.controller('DeleteTaskModalInstanceCrtl',
 }]);
 
 
-activitiAdminApp.controller('DelegateModalInstanceCrtl',
+flowableAdminApp.controller('DelegateModalInstanceCrtl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'task', function ($rootScope, $scope, $modalInstance, $http, task) {
 
   $scope.task = task;
@@ -437,7 +437,7 @@ activitiAdminApp.controller('DelegateModalInstanceCrtl',
   };
 }]);
 
-activitiAdminApp.controller('AssignModalInstanceCrtl',
+flowableAdminApp.controller('AssignModalInstanceCrtl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'task', function ($rootScope, $scope, $modalInstance, $http, task) {
 
 	  $scope.task = task;
@@ -470,7 +470,7 @@ activitiAdminApp.controller('AssignModalInstanceCrtl',
 	  };
 	}]);
 
-activitiAdminApp.controller('EditTaskModalInstanceCrtl',
+flowableAdminApp.controller('EditTaskModalInstanceCrtl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'task', function ($rootScope, $scope, $modalInstance, $http, task) {
 
       $scope.task = task;

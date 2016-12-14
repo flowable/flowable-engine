@@ -12,7 +12,7 @@
  */
 'use strict';
 
-angular.module('activitiApp')
+angular.module('flowableApp')
   .controller('TasksController', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$modal', '$popover', 'appResourceRoot', 'CommentService', 'TaskService', '$routeParams', 'AppDefinitionService',
         function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal, $popover, appResourceRoot, CommentService, TaskService, $routeParams, AppDefinitionService) {
 

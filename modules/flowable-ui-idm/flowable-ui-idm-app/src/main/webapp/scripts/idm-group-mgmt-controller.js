@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-activitiApp.controller('GroupMgmtController', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$modal', '$popover', 'IdmService',
+flowableApp.controller('GroupMgmtController', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$modal', '$popover', 'IdmService',
     function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal, $popover, IdmService) {
 
         var validUser = true;

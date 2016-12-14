@@ -13,7 +13,7 @@
 
 'use strict';
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
     .controller('StencilController', ['$rootScope', '$scope', '$http', '$modal', '$timeout', '$window', 
                                       function ($rootScope, $scope, $http, $modal, $timeout, $window) {
 

@@ -16,7 +16,7 @@
 
 /* Controllers */
 
-activitiAdminApp.controller('FormInstanceController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', '$routeParams',
+flowableAdminApp.controller('FormInstanceController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', '$modal', '$routeParams',
     function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, $modal, $routeParams) {
 
         $rootScope.navigation = {main: 'form-engine', sub: 'instances'};
@@ -81,7 +81,7 @@ activitiAdminApp.controller('FormInstanceController', ['$rootScope', '$scope', '
         });
     }]);
 
-activitiAdminApp.controller('ShowFormRenderPopupCrtl',
+flowableAdminApp.controller('ShowFormRenderPopupCrtl',
         ['$rootScope', '$scope', '$modalInstance', '$http', 'form', '$timeout', '$translate', 'uiGridConstants',
             function ($rootScope, $scope, $modalInstance, $http, form, $timeout, $translate, uiGridConstants) {
 

@@ -84,7 +84,7 @@ var FORM_TOOLBAR = {
 };
 
 /** Custom controller for the save dialog */
-angular.module('activitiModeler')
+angular.module('flowableModeler')
     .controller('SaveFormCtrl', [ '$rootScope', '$scope', '$http', '$route', '$location', '$translate', 'FormBuilderService',
                          function ($rootScope, $scope, $http, $route, $location, $translate, FormBuilderService) {
 

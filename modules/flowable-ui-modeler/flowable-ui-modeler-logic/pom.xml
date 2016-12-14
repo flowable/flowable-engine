@@ -20,10 +20,6 @@
         </dependency>
         <dependency>
 			<groupId>org.flowable</groupId>
-			<artifactId>flowable-engine</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.flowable</groupId>
 			<artifactId>flowable-bpmn-model</artifactId>
 		</dependency>
 		<dependency>

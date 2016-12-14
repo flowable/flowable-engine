@@ -13,7 +13,7 @@
 'use strict';
 
 // User service
-activitiModule.service('ResourceService', ['$http', '$q', 'appResourceRoot',
+flowableModule.service('ResourceService', ['$http', '$q', 'appResourceRoot',
     function ($http, $q, appResourceRoot) {
 
         var loadedResources = {};

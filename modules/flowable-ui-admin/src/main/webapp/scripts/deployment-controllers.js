@@ -14,7 +14,7 @@
  */
 'use strict';
 
-activitiAdminApp.controller('DeploymentController', ['$scope', '$rootScope', '$http', '$timeout','$location','$routeParams', '$modal', '$translate', '$q',
+flowableAdminApp.controller('DeploymentController', ['$scope', '$rootScope', '$http', '$timeout','$location','$routeParams', '$modal', '$translate', '$q',
     function ($scope, $rootScope, $http, $timeout, $location, $routeParams, $modal, $translate, $q) {
 
         $rootScope.navigation = {main: 'process-engine', sub: 'deployments'};

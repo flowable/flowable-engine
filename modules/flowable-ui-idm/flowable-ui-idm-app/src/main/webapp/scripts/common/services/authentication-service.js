@@ -150,7 +150,7 @@
 /* Services */
 
 // Add authentication factories
-activitiApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'authService', '$q', '$location', '$window',
+flowableApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'authService', '$q', '$location', '$window',
     function ($rootScope, $http, authService, $q, $location, $window) {
       return {
         authenticate: function() {

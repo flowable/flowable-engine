@@ -15,7 +15,7 @@
  * Execution listeners
  */
 
-angular.module('activitiModeler').controller('ActivitiMessageDefinitionsCtrl', ['$scope', '$modal', function ($scope, $modal) {
+angular.module('flowableModeler').controller('ActivitiMessageDefinitionsCtrl', ['$scope', '$modal', function ($scope, $modal) {
 
     // Config for the modal window
     var opts = {
@@ -29,7 +29,7 @@ angular.module('activitiModeler').controller('ActivitiMessageDefinitionsCtrl', [
 
 //Need a separate controller for the modal window due to https://github.com/angular-ui/bootstrap/issues/259
 // Will be fixed in a newer version of Angular UI
-angular.module('activitiModeler').controller('ActivitiMessageDefinitionsPopupCtrl',
+angular.module('flowableModeler').controller('ActivitiMessageDefinitionsPopupCtrl',
     ['$scope', '$q', '$translate', '$timeout', function ($scope, $q, $translate, $timeout) {
 
         // Put json representing mesage definitions on scope

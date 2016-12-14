@@ -12,7 +12,7 @@
  */
 'use strict';
 
-angular.module('activitiApp').service('IdmService', ['$http', '$q', '$rootScope',
+angular.module('flowableApp').service('IdmService', ['$http', '$q', '$rootScope',
     function ($http, $q, $rootScope) {
 
         var httpAsPromise = function (options) {

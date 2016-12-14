@@ -13,7 +13,7 @@
 'use strict';
 
 // Comment service
-angular.module('activitiApp').service('AppDefinitionService', ['$http', '$q', '$rootScope', '$location', '$translate',
+angular.module('flowableApp').service('AppDefinitionService', ['$http', '$q', '$rootScope', '$location', '$translate',
     function ($http, $q, $rootScope, $location, $translate) {
 
         var httpAsPromise = function(options) {

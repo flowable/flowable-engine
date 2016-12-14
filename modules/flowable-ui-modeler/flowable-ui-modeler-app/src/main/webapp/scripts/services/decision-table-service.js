@@ -15,7 +15,7 @@
 'use strict';
 
 // Decision Table service
-angular.module('activitiModeler').service('DecisionTableService', [ '$rootScope', '$http', '$q', '$timeout', '$translate',
+angular.module('flowableModeler').service('DecisionTableService', [ '$rootScope', '$http', '$q', '$timeout', '$translate',
     function ($rootScope, $http, $q, $timeout, $translate) {
 
         var httpAsPromise = function(options) {

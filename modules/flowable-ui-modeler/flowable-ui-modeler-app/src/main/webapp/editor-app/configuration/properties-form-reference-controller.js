@@ -11,7 +11,7 @@
  * limitations under the License.
  */
  
-angular.module('activitiModeler').controller('KisBpmFormReferenceDisplayCtrl',
+angular.module('flowableModeler').controller('KisBpmFormReferenceDisplayCtrl',
     [ '$scope', '$modal', '$http', function($scope, $modal, $http) {
     
     if ($scope.property && $scope.property.value && $scope.property.value.id) {
@@ -27,7 +27,7 @@ angular.module('activitiModeler').controller('KisBpmFormReferenceDisplayCtrl',
 	
 }]);
 
-angular.module('activitiModeler').controller('KisBpmFormReferenceCrtl',
+angular.module('flowableModeler').controller('KisBpmFormReferenceCrtl',
     [ '$scope', '$modal', '$http', function($scope, $modal, $http) {
 	
      // Config for the modal window
@@ -40,7 +40,7 @@ angular.module('activitiModeler').controller('KisBpmFormReferenceCrtl',
      _internalCreateModal(opts, $modal, $scope);
 }]);
 
-angular.module('activitiModeler').controller('KisBpmFormReferencePopupCrtl',
+angular.module('flowableModeler').controller('KisBpmFormReferencePopupCrtl',
     [ '$rootScope', '$scope', '$http', '$location', function($rootScope, $scope, $http, $location) {
 	 
 	$scope.state = {'loadingForms' : true, 'formError' : false};

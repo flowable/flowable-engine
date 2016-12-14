@@ -14,7 +14,7 @@
  */
 'use strict';
 
-angular.module('activitiAdminApp')
+angular.module('flowableAdminApp')
     .directive('autoFocus', ['$timeout', function($timeout) {
         return {
             restrict: 'AC',

@@ -12,7 +12,7 @@
  */
 'use strict';
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
   .controller('AppDefinitionsCtrl', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$modal', function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal) {
 
       // Main page (needed for visual indicator of current page)
@@ -136,7 +136,7 @@ angular.module('activitiModeler')
   }]);
 
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
     .controller('CreateNewAppCrtl', ['$rootScope', '$scope', '$http', '$location', '$translate', function ($rootScope, $scope, $http, $location, $translate) {
 
         $scope.model = {
@@ -188,7 +188,7 @@ angular.module('activitiModeler')
         };
     }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
     .controller('DuplicateAppCrtl', ['$rootScope', '$scope', '$http', '$location', '$translate', function ($rootScope, $scope, $http, $location, $translate) {
 
         $scope.model = {
@@ -245,7 +245,7 @@ angular.module('activitiModeler')
         };
     }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 .controller('ImportAppDefinitionCtrl', ['$rootScope', '$scope', '$http', 'Upload', '$location', function ($rootScope, $scope, $http, Upload, $location) {
 
   $scope.model = {

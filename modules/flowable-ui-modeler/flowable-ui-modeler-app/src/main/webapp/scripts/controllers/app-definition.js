@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-angular.module('activitiModeler')
+angular.module('flowableModeler')
   .controller('AppDefinitionCtrl', ['$rootScope', '$scope', '$translate', '$http', '$location', '$routeParams', '$modal', '$popover', '$timeout',
                               function ($rootScope, $scope, $translate, $http, $location, $routeParams, $modal, $popover, $timeout) {
 
@@ -179,7 +179,7 @@ angular.module('activitiModeler')
     $scope.loadApp();
 }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 .controller('PublishAppDefinitionPopupCtrl', ['$rootScope', '$scope', '$http', '$route', '$translate', function ($rootScope, $scope, $http, $route, $translate) {
 
     $scope.popup = {
@@ -226,7 +226,7 @@ angular.module('activitiModeler')
     };
 }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 .controller('DeleteAppDefinitionPopupCrtl', ['$rootScope', '$scope', '$http', '$translate', function ($rootScope, $scope, $http, $translate) {
 
     $scope.popup = {
@@ -262,7 +262,7 @@ angular.module('activitiModeler')
     };
 }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 .controller('ImportNewVersionAppDefinitionCtrl', ['$rootScope', '$scope', '$http', 'Upload', '$route', function ($rootScope, $scope, $http, Upload, $route) {
 
   $scope.popup = {

@@ -40,7 +40,7 @@ var APP_DEFINITION_TOOLBAR = {
 };
 
 /** Custom controller for the save dialog */
-angular.module('activitiModeler').controller('SaveAppDefinitionCtrl',
+angular.module('flowableModeler').controller('SaveAppDefinitionCtrl',
     [ '$rootScope', '$scope', '$http', '$route', '$location', '$translate',
     function ($rootScope, $scope, $http, $route, $location, $translate) {
 	

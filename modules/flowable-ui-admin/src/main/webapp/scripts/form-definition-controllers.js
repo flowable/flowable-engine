@@ -14,7 +14,7 @@
  */
 'use strict';
 
-activitiAdminApp.controller('FormDefinitionController', ['$scope', '$rootScope', '$http', '$timeout', '$location', '$routeParams', '$modal', '$translate', '$q', 'gridConstants',
+flowableAdminApp.controller('FormDefinitionController', ['$scope', '$rootScope', '$http', '$timeout', '$location', '$routeParams', '$modal', '$translate', '$q', 'gridConstants',
     function ($scope, $rootScope, $http, $timeout, $location, $routeParams, $modal, $translate, $q, gridConstants) {
         $rootScope.navigation = {main: 'form-engine', sub: 'definitions'};
 
@@ -100,7 +100,7 @@ activitiAdminApp.controller('FormDefinitionController', ['$scope', '$rootScope',
 
     }]);
 
-activitiAdminApp.controller('ShowFormPopupCrtl',
+flowableAdminApp.controller('ShowFormPopupCrtl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'form', '$timeout', '$translate', 'uiGridConstants',
         function ($rootScope, $scope, $modalInstance, $http, form, $timeout, $translate, uiGridConstants) {
 
