@@ -138,10 +138,6 @@ angular.module('flowableModeler').controller('KisBpmFormPropertiesPopupCtrl',
                 readable: true,
                 writable: true
             };
-            
-            $timeout(function(){
-				$scope.gridOptions.selectItem($scope.formProperties.length - 1, true);
-			});
 
             $scope.formProperties.push(newProperty);
 
