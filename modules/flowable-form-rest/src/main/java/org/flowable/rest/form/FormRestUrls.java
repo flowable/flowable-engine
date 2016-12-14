@@ -85,7 +85,7 @@ public final class FormRestUrls {
   public static final String[] URL_FORM_INSTANCE_QUERY = { SEGMENT_QUERY_RESOURCES, SEGMENT_FORM_INSTANCES_RESOURCES };
 
   /**
-   * Creates an url based on the passed fragments and replaces any placeholders with the given arguments. The placeholders are folowing the {@link MessageFormat} convention (eg. {0} is replaced by
+   * Creates an url based on the passed fragments and replaces any placeholders with the given arguments. The placeholders are following the {@link MessageFormat} convention (eg. {0} is replaced by
    * first argument value).
    */
   public static final String createRelativeResourceUrl(String[] segments, Object... arguments) {

@@ -208,7 +208,7 @@ public class DbSqlSession implements Session {
 
   /**
    * A {@link DeleteOperation} that checks for concurrent modifications if the persistent object implements {@link HasRevision}.
-   * That is, it employs optimisting concurrency control. Used when the persistent object has been fetched already.
+   * That is, it employs optimizing concurrency control. Used when the persistent object has been fetched already.
    */
   public class CheckedDeleteOperation implements DeleteOperation {
     protected final PersistentObject persistentObject;

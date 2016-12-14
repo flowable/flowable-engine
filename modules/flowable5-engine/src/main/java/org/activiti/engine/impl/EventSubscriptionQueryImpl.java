@@ -47,7 +47,7 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
 
   public EventSubscriptionQueryImpl eventSubscriptionId(String id) {
     if (eventSubscriptionId == null) {
-      throw new ActivitiIllegalArgumentException("Provided svent subscription id is null");
+      throw new ActivitiIllegalArgumentException("Provided event subscription id is null");
     }
     this.eventSubscriptionId = id;
     return this;

@@ -140,7 +140,7 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> extends Abs
           for (CachedEntity cachedObject : cachedObjects) {
             EntityImpl cachedEntity = (EntityImpl) cachedObject.getEntity();
             if (cachedEntityMatcher.isRetained(result, cachedObjects, cachedEntity, parameter)) {
-              entityMap.put(cachedEntity.getId(), cachedEntity); // will overwite db version with newer version
+              entityMap.put(cachedEntity.getId(), cachedEntity); // will overwrite db version with newer version
             }
           }
         }
@@ -152,7 +152,7 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> extends Abs
               for (CachedEntity subclassCachedObject : subclassCachedObjects) {
                 EntityImpl cachedSubclassEntity = (EntityImpl) subclassCachedObject.getEntity();
                 if (cachedEntityMatcher.isRetained(result, cachedObjects, cachedSubclassEntity, parameter)) {
-                  entityMap.put(cachedSubclassEntity.getId(), cachedSubclassEntity); // will overwite db version with newer version
+                  entityMap.put(cachedSubclassEntity.getId(), cachedSubclassEntity); // will overwrite db version with newer version
                 }
               }
             }

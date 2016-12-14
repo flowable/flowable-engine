@@ -497,7 +497,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
   }
   
   /**
-   * Simple test that checks if all databases have correcly added the process definition tag.
+   * Simple test that checks if all databases have correctly added the process definition tag.
    */
   @Test
   @org.flowable.engine.test.Deployment(resources = "org/flowable/engine/test/api/v6/Flowable6Test.testOneTaskProcess.bpmn20.xml")

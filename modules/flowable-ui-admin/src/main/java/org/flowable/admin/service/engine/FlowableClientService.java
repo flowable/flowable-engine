@@ -133,7 +133,7 @@ public class FlowableClientService {
       try {
         InputStream responseContent = response.getEntity().getContent();
         String strResponse = IOUtils.toString(responseContent);
-        
+
         boolean success = response.getStatusLine() != null && response.getStatusLine().getStatusCode() == expectedStatusCode;
         if (success) {
           JsonNode bodyNode = objectMapper.readTree(strResponse);
@@ -146,7 +146,7 @@ public class FlowableClientService {
           } catch (Exception e) {
             log.debug("Error parsing error message", e);
           }
-          exception = new FlowableServiceException(extractError(bodyNode, "An error occured while calling Activiti: " + response.getStatusLine()));
+          exception = new FlowableServiceException(extractError(bodyNode, "An error occurred while calling Flowable: " + response.getStatusLine()));
         }
       } catch (Exception e) {
         log.warn("Error consuming response from uri " + request.getURI(), e);
@@ -202,7 +202,7 @@ public class FlowableClientService {
           } catch (Exception e) {
             log.debug("Error parsing error message", e);
           }
-          exception = new FlowableServiceException(extractError(bodyNode, "An error occured while calling Activiti: " + response.getStatusLine()));
+          exception = new FlowableServiceException(extractError(bodyNode, "An error occurred while calling Flowable: " + response.getStatusLine()));
         }
       } catch (Exception e) {
         log.warn("Error consuming response from uri " + request.getURI(), e);
@@ -263,7 +263,7 @@ public class FlowableClientService {
           }
 
         } else {
-          exception = new FlowableServiceException(extractError(readJsonContent(response.getEntity().getContent()), "An error occured while calling Activiti: " + response.getStatusLine()));
+          exception = new FlowableServiceException(extractError(readJsonContent(response.getEntity().getContent()), "An error occurred while calling Flowable: " + response.getStatusLine()));
         }
       } catch (Exception e) {
         log.warn("Error consuming response from uri " + request.getURI(), e);
@@ -318,7 +318,7 @@ public class FlowableClientService {
           return new ResponseInfo(statusCode, bodyNode);
 
         } else {
-          exception = new FlowableServiceException(extractError(readJsonContent(response.getEntity().getContent()), "An error occured while calling Activiti: " + response.getStatusLine()));
+          exception = new FlowableServiceException(extractError(readJsonContent(response.getEntity().getContent()), "An error occurred while calling Flowable: " + response.getStatusLine()));
         }
       } catch (Exception e) {
         log.warn("Error consuming response from uri " + request.getURI(), e);
@@ -364,7 +364,7 @@ public class FlowableClientService {
             response.getEntity().writeTo(httpResponse.getOutputStream());
           }
         } else {
-          exception = new FlowableServiceException(extractError(readJsonContent(response.getEntity().getContent()), "An error occured while calling Activiti: " + response.getStatusLine()));
+          exception = new FlowableServiceException(extractError(readJsonContent(response.getEntity().getContent()), "An error occurred while calling Flowable: " + response.getStatusLine()));
         }
       } catch (Exception e) {
         log.warn("Error consuming response from uri " + request.getURI(), e);
@@ -406,7 +406,7 @@ public class FlowableClientService {
           if (response.getEntity().getContentLength() != 0) {
             InputStream responseContent = response.getEntity().getContent();
             JsonNode errorBody = objectMapper.readTree(responseContent);
-            errorMessage = extractError(errorBody, "An error occured while calling Activiti: " + response.getStatusLine());
+            errorMessage = extractError(errorBody, "An error occurred while calling Flowable: " + response.getStatusLine());
           } else {
             errorMessage = "An error was returned when calling the Activiti server";
           }
@@ -471,7 +471,7 @@ public class FlowableClientService {
           if (response.getEntity() != null && response.getEntity().getContentLength() != 0) {
             InputStream responseContent = response.getEntity().getContent();
             JsonNode errorBody = objectMapper.readTree(responseContent);
-            errorMessage = extractError(errorBody, "An error occured while calling Activiti: " + response.getStatusLine());
+            errorMessage = extractError(errorBody, "An error occurred while calling Flowable: " + response.getStatusLine());
 
           } else {
             errorMessage = "An error was returned when calling the Activiti server";

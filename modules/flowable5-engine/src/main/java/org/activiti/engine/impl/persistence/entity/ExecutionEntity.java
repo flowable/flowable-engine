@@ -80,7 +80,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   
   private static Logger log = LoggerFactory.getLogger(ExecutionEntity.class);
   
-  // Persistent refrenced entities state //////////////////////////////////////
+  // Persistent referenced entities state //////////////////////////////////////
   protected static final int EVENT_SUBSCRIPTIONS_STATE_BIT = 1;
   protected static final int TASKS_STATE_BIT = 2;
   protected static final int JOBS_STATE_BIT = 3;
@@ -547,7 +547,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
         
         // Need to call the activity end here. If we would do it later,
         // the executions are removed and the historic activity instances are
-        // never ended as the combination of {activityId,executionId} is not valid anymor
+        // never ended as the combination of {activityId,executionId} is not valid anymore
         Context.getCommandContext().getHistoryManager().recordActivityEnd(prunedExecution);
         
         log.debug("pruning execution {}", prunedExecution);
@@ -742,7 +742,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
 
   
-  // bussiness key ////////////////////////////////////////////////////////////
+  // business key ////////////////////////////////////////////////////////////
   
   public String getBusinessKey() {
     return businessKey;

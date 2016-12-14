@@ -334,7 +334,7 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
       } catch (IllegalArgumentException e) {
         throw new FlowableException("Error while invoking '" + declaration.getName() + "' on class " + target.getClass().getName(), e);
       } catch (IllegalAccessException e) {
-        throw new FlowableException("Illegal acces when calling '" + declaration.getName() + "' on class " + target.getClass().getName(), e);
+        throw new FlowableException("Illegal access when calling '" + declaration.getName() + "' on class " + target.getClass().getName(), e);
       } catch (InvocationTargetException e) {
         throw new FlowableException("Exception while invoking '" + declaration.getName() + "' on class " + target.getClass().getName(), e);
       }

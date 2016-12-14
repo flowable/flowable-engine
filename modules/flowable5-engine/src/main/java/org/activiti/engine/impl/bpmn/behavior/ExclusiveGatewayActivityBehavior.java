@@ -42,7 +42,7 @@ public class ExclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
    * (where the condition evaluates to true), is not valid for an exclusive
    * gateway. 
    * 
-   * Hence, this behaviour is overriden and replaced by the correct behavior:
+   * Hence, this behaviour is overridden and replaced by the correct behavior:
    * selecting the first sequence flow which condition evaluates to true
    * (or which hasn't got a condition) and leaving the activity through that
    * sequence flow. 

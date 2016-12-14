@@ -226,7 +226,7 @@ public class FileSystemContentStorage implements ContentStorage {
 
     File contentFile = new File(leafToUse, indexToUse + "");
     if (contentFile.exists()) {
-      throw new ContentStorageException("Content already stored at that location, shouldn't have happended: " + contentFile);
+      throw new ContentStorageException("Content already stored at that location, shouldn't have happened: " + contentFile);
     }
 
     try {
