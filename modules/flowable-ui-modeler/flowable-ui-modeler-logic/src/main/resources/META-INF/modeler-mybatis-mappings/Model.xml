@@ -48,7 +48,7 @@
             #{version, jdbcType=INTEGER},
             #{modelEditorJson, jdbcType=VARCHAR},
             #{modelType, jdbcType=INTEGER},
-            #{thumbnail, jdbcType=BLOB}
+            #{thumbnail, jdbcType=${blobType}}
           )
     </insert>
     
@@ -66,7 +66,7 @@
             version = #{version, jdbcType=INTEGER},
             model_editor_json = #{modelEditorJson, jdbcType=VARCHAR},
             model_type = #{modelType, jdbcType=INTEGER},
-            thumbnail = #{thumbnail, jdbcType=BLOB}
+            thumbnail = #{thumbnail, jdbcType=${blobType}}
         </set>
         where id = #{id, jdbcType=VARCHAR}
     </update>
