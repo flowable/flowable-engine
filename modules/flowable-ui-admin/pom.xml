@@ -85,6 +85,19 @@
                                 <datasource.username>flowable</datasource.username>
                                 <datasource.password>flowable</datasource.password>
                                 <com.sun.management.jmxremote.port>4002</com.sun.management.jmxremote.port>
+                                <!-- endpoint config for development -->
+                                <rest.process.app.port>9999</rest.process.app.port>
+                                <rest.process.app.contextroot>flowable-task</rest.process.app.contextroot>
+                                <rest.process.app.restroot>process-api</rest.process.app.restroot>
+                                <rest.dmn.app.port>9999</rest.dmn.app.port>
+                                <rest.dmn.app.contextroot>flowable-task</rest.dmn.app.contextroot>
+                                <rest.dmn.app.restroot>dmn-api</rest.dmn.app.restroot>
+                                <rest.form.app.port>9999</rest.form.app.port>
+                                <rest.form.app.contextroot>flowable-task</rest.form.app.contextroot>
+                                <rest.form.app.restroot>form-api</rest.form.app.restroot>
+                                <rest.content.app.port>9999</rest.content.app.port>
+                                <rest.content.app.contextroot>flowable-task</rest.content.app.contextroot>
+                                <rest.content.app.restroot>content-api</rest.content.app.restroot>
                             </systemProperties>
                         </configuration>
                     </plugin>
