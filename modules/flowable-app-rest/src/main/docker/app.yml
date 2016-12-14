@@ -13,7 +13,7 @@ services:
             - 9977:9977
         depends_on:
             - flowable-rest-db
-        entrypoint: ["./wait-for-postgres.sh", "db", "java", "-jar", "flowable-rest.jar", "-httpPort=9977", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
+        entrypoint: ["./wait-for-something.sh", "db", "5432", "PostgreSQL", "java", "-jar", "flowable-rest.jar", "-httpPort=9977", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
     flowable-rest-db:
         extends:
             file: postgres.yml
