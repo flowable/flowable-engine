@@ -141,6 +141,7 @@
 }
 .logo img {
     width: 400px;
+    margin-bottom: 50px;
 }
 .login-error{
     color: #e74c3c;
