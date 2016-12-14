@@ -230,7 +230,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
       for (HistoricVariableInstance historicVariableInstance: historicVariableInstances) {
         if (historicVariableInstance instanceof HistoricVariableInstanceEntity) {
           HistoricVariableInstanceEntity variableEntity = (HistoricVariableInstanceEntity) historicVariableInstance;
-          if(variableEntity != null && variableEntity.getVariableType() != null) {
+          if(variableEntity.getVariableType() != null) {
             variableEntity.getValue();
             
             // make sure JPA entities are cached for later retrieval
