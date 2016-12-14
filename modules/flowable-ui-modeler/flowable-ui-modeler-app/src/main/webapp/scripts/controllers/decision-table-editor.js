@@ -589,7 +589,7 @@ angular.module('flowableModeler')
                 enableRowHeaderSelection: true,
                 multiSelect: false,
                 modifierKeysToMultiSelect: false,
-                enableHorizontalScrollbar: 2,
+                enableHorizontalScrollbar: 0,
                 enableColumnMenus: true,
                 enableSorting: false,
                 enableCellEditOnFocus: true,
@@ -635,7 +635,7 @@ angular.module('flowableModeler')
         // condition input options
         $scope.popup = {
             selectedExpressionLabel: $scope.model.selectedExpression.label ? $scope.model.selectedExpression.label : '',
-            selectedExpressionVariable: previousVariableId ? $scope.getSelectedVariableModel(previousVariableId) : undefined
+            selectedExpressionVariable: {id: previousVariableId}
         };
 
         $scope.save = function () {

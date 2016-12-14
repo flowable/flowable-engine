@@ -171,7 +171,7 @@ public class AppDefinitionPublishService {
 
       byte[] deployZipArtifact = createDeployZipArtifact(deployableAssets);
       if (deployZipArtifact != null) {
-        deployZipArtifact(deployableZipName, deployZipArtifact, appDefinitionModel.getKey());
+        deployZipArtifact(deployableZipName, deployZipArtifact, appDefinitionModel.getKey(), appDefinitionModel.getName());
       }
     }
   }
@@ -256,7 +256,7 @@ public class AppDefinitionPublishService {
     return deployZipArtifact;
   }
 
-  protected void deployZipArtifact(String artifactName, byte[] zipArtifact, String deploymentKey) {
+  protected void deployZipArtifact(String artifactName, byte[] zipArtifact, String deploymentKey, String deploymentName) {
     String deployApiUrl = environment.getRequiredProperty("deployment.api.url");
     String basicAuthUser = environment.getRequiredProperty("idm.admin.user");
     String basicAuthPassword = environment.getRequiredProperty("idm.admin.password");
@@ -264,7 +264,7 @@ public class AppDefinitionPublishService {
     if (deployApiUrl.endsWith("/") == false) {
       deployApiUrl = deployApiUrl.concat("/");
     }
-    deployApiUrl = deployApiUrl.concat("repository/deployments?deploymentKey=" + deploymentKey);
+    deployApiUrl = deployApiUrl.concat(String.format("repository/deployments?deploymentKey=%s&deploymentName=%s", deploymentKey, deploymentName));
 
     HttpPost httpPost = new HttpPost(deployApiUrl);
     httpPost.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(

@@ -13,6 +13,10 @@
     <version>6.0.0.RC1-SNAPSHOT</version>
   </parent>
 
+  <properties>
+    <swagger.host>localhost:8080</swagger.host>
+  </properties>
+
   <build>
     <finalName>flowable-rest</finalName>
     <plugins>
@@ -128,7 +132,7 @@
                     <scheme>http</scheme>
                     <scheme>https</scheme>
                   </schemes>
-                  <host>localhost:9977</host>
+                  <host>${swagger.host}</host>
                   <basePath>/flowable-rest/service</basePath>
                   <info>
                     <title>Flowable REST API</title>
@@ -166,7 +170,7 @@
                     <scheme>http</scheme>
                     <scheme>https</scheme>
                   </schemes>
-                  <host>localhost:9977</host>
+                  <host>${swagger.host}</host>
                   <basePath>/flowable-rest/service</basePath>
                   <info>
                     <title>Flowable REST API</title>
@@ -204,7 +208,7 @@
                     <scheme>http</scheme>
                     <scheme>https</scheme>
                   </schemes>
-                  <host>localhost:9977</host>
+                  <host>${swagger.host}</host>
                   <basePath>/flowable-rest/service</basePath>
                   <info>
                     <title>Flowable REST API</title>
@@ -242,7 +246,7 @@
                     <scheme>http</scheme>
                     <scheme>https</scheme>
                   </schemes>
-                  <host>localhost:9977</host>
+                  <host>${swagger.host}</host>
                   <basePath>/flowable-rest/service</basePath>
                   <info>
                     <title>Flowable REST API</title>
@@ -280,7 +284,7 @@
                     <scheme>http</scheme>
                     <scheme>https</scheme>
                   </schemes>
-                  <host>localhost:9977</host>
+                  <host>${swagger.host}</host>
                   <basePath>/flowable-rest/service</basePath>
                   <info>
                     <title>Flowable REST API</title>
@@ -320,7 +324,7 @@
                     <scheme>http</scheme>
                     <scheme>https</scheme>
                   </schemes>
-                  <host>localhost:9977</host>
+                  <host>${swagger.host}</host>
                   <basePath>/flowable-rest/service</basePath>
                   <info>
                     <title>Flowable Runtime REST API</title>
@@ -358,7 +362,7 @@
                     <scheme>http</scheme>
                     <scheme>https</scheme>
                   </schemes>
-                  <host>localhost:9977</host>
+                  <host>${swagger.host}</host>
                   <basePath>/flowable-rest/service</basePath>
                   <info>
                     <title>Flowable Runtime REST API</title>
@@ -396,7 +400,7 @@
                     <scheme>http</scheme>
                     <scheme>https</scheme>
                   </schemes>
-                  <host>localhost:9977</host>
+                  <host>${swagger.host}</host>
                   <basePath>/flowable-rest/service</basePath>
                   <info>
                     <title>Flowable Runtime REST API</title>
@@ -434,7 +438,7 @@
                     <scheme>http</scheme>
                     <scheme>https</scheme>
                   </schemes>
-                  <host>localhost:9977</host>
+                  <host>${swagger.host}</host>
                   <basePath>/flowable-rest/service</basePath>
                   <info>
                     <title>Flowable REST API</title>
