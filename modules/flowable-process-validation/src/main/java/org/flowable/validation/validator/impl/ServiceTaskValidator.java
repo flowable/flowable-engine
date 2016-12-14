@@ -55,7 +55,7 @@ public class ServiceTaskValidator extends ExternalInvocationTaskValidator {
     if (StringUtils.isNotEmpty(serviceTask.getType())) {
 
       if (!serviceTask.getType().equalsIgnoreCase("mail") && !serviceTask.getType().equalsIgnoreCase("mule") && !serviceTask.getType().equalsIgnoreCase("camel")
-          && !serviceTask.getType().equalsIgnoreCase("shell") && !serviceTask.getType().equalsIgnoreCase("dmn")) {
+          && !serviceTask.getType().equalsIgnoreCase("shell") && !serviceTask.getType().equalsIgnoreCase("dmn") && !serviceTask.getType().equalsIgnoreCase("rescheduleTimer")) {
         
         addError(errors, Problems.SERVICE_TASK_INVALID_TYPE, process, serviceTask, "Invalid or unsupported service task type");
       }

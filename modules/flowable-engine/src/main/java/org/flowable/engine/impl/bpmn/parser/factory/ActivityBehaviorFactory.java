@@ -71,6 +71,7 @@ import org.flowable.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ParallelGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ReceiveTaskActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.RescheduleTimerJobActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ScriptTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ServiceTaskDelegateExpressionActivityBehavior;
@@ -212,4 +213,6 @@ public interface ActivityBehaviorFactory {
   public abstract BoundaryMessageEventActivityBehavior createBoundaryMessageEventActivityBehavior(BoundaryEvent boundaryEvent, MessageEventDefinition messageEventDefinition, boolean interrupting);
   
   public abstract BoundaryCompensateEventActivityBehavior createBoundaryCompensateEventActivityBehavior(BoundaryEvent boundaryEvent, CompensateEventDefinition compensateEventDefinition, boolean interrupting);
+  
+  public abstract RescheduleTimerJobActivityBehavior createRescheduleTimerJobActivityBehavior(ServiceTask serviceTask);
 }

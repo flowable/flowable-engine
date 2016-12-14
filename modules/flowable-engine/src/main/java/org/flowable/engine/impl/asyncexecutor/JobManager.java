@@ -57,6 +57,11 @@ public interface JobManager {
   void scheduleTimerJob(TimerJobEntity timerJob);
 
   /**
+   *  Reschedules a timer by deleting the timer job and creating a new one.
+   */
+  void rescheduleTimerJob(TimerJobEntity timerJob);
+  
+  /**
    * Moves a {@link TimerJobEntity} to become an async {@link JobEntity}. 
    * 
    * This happens for example when the due date of a timer is reached, 
