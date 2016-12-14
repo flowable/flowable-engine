@@ -48,6 +48,7 @@ public class IndentingXMLStreamWriter extends DelegatingXMLStreamWriter {
    * 
    * @deprecated Only return the length of the indent string.
    */
+  @Deprecated
   public int getIndentStep() {
     return indentStep.length();
   }
@@ -61,6 +62,7 @@ public class IndentingXMLStreamWriter extends DelegatingXMLStreamWriter {
    * 
    * @deprecated Should use the version that takes string.
    */
+  @Deprecated
   public void setIndentStep(int indentStep) {
     StringBuilder s = new StringBuilder();
     for (; indentStep > 0; indentStep--)

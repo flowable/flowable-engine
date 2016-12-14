@@ -101,7 +101,7 @@ public class DmnDeploymentHelper  {
 
   /**
    * Gets the persisted version of the already-deployed process definition.  Note that this is
-   * different from {@link #getMostRecentVersionOfProcessDefinition} as it looks specifically for
+   * different from {@link #getMostRecentVersionOfDecisionTable} as it looks specifically for
    * a process definition that is already persisted and attached to a particular deployment,
    * rather than the latest version across all deployments.
    */

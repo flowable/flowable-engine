@@ -123,7 +123,7 @@ public class DeploymentManager {
 
   /**
    * Resolving the decision will fetch the DMN, parse it and store the
-   * {@link DmnDefinition} in memory.
+   * {@link FormDefinition} in memory.
    */
   public FormDefinitionCacheEntry resolveFormDefinition(FormDefinition formDefinition) {
     String formDefinitionId = formDefinition.getId();

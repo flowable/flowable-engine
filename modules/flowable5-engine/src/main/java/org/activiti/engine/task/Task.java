@@ -46,10 +46,10 @@ public interface Task extends TaskInfo {
 	/** Sets the indication of how important/urgent this task is */
 	void setPriority(int priority);
 	
-  /** The {@link User.getId() userId} of the person that is responsible for this task. */
+  /** The {@link org.flowable.idm.api.User userId} of the person that is responsible for this task. */
   void setOwner(String owner);
   
-	/** The {@link User.getId() userId} of the person to which this task is delegated. */
+	/** The {@link org.flowable.idm.api.User userId} of the person to which this task is delegated. */
 	void setAssignee(String assignee);
 	
 	/** The current {@link DelegationState} for this task. */ 
