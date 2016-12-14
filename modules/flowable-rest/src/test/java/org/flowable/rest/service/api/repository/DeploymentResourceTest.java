@@ -56,7 +56,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
       assertEquals(1L, repositoryService.createDeploymentQuery().deploymentId(deploymentId).count());
 
       assertNotNull(name);
-      assertEquals("oneTaskProcess.bpmn20.xml", name);
+      assertEquals("oneTaskProcess", name);
 
       assertNotNull(url);
       assertTrue(url.endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, deploymentId)));
@@ -121,7 +121,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
       assertEquals(1L, repositoryService.createDeploymentQuery().deploymentId(deploymentId).count());
 
       assertNotNull(name);
-      assertEquals("test-deployment.bar", name);
+      assertEquals("test-deployment", name);
 
       assertNotNull(url);
       assertTrue(url.endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, deploymentId)));
