@@ -298,7 +298,7 @@ angular.module('flowableApp')
                         field.isVisible = true;
                     }
                     
-                    if (field.type == 'dropdown' && field.value && field.options) {
+                    if (field.type == 'dropdown' && field.value && field.options && !field.readOnly) {
                         for (var j = 0; j < field.options.length; j++) {
                             if (field.options[j].name == field.value) {
                                 field.value = field.options[j];

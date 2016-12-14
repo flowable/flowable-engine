@@ -168,7 +168,7 @@
             "DUE-ON": "Due",
             "CREATED-ON": "Created",
             "ENDED-ON": "Completed",
-            "COMPLETED-BY": "Completed by {{firstName}} {{lastName}}, ",
+            "COMPLETED-BY": "Completed by",
             "NO-DESCRIPTION": "This task has no description",
             "NO-RELATED-CONTENT": "This task has no related content yet...",
             "NO-PEOPLE-INVOLVED": "This task has no people involved yet...",
