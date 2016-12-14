@@ -17,7 +17,7 @@
 		<result property="version" column="version" jdbcType="INTEGER" />
 		<result property="modelEditorJson" column="model_editor_json" jdbcType="VARCHAR" />
 		<result property="modelType" column="model_type" jdbcType="INTEGER" />
-		<result property="thumbnail" column="thumbnail" jdbcType="BLOB" />
+		<result property="thumbnail" column="thumbnail" jdbcType="${blobType}" />
 	</resultMap>
 
     <insert id="insertModel" parameterType="org.flowable.app.domain.editor.Model">
