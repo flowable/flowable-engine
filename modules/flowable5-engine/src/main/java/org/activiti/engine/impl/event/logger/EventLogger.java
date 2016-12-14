@@ -95,7 +95,7 @@ public class EventLogger implements FlowableEventListener {
 			CommandContext currentCommandContext = Context.getCommandContext();
 			EventFlusher eventFlusher = (EventFlusher) currentCommandContext.getAttribute(EVENT_FLUSHER_KEY);
 			
-			if (eventHandler != null && eventFlusher == null) {
+			if (eventFlusher == null) {
 				
 				eventFlusher = createEventFlusher();
 				if (eventFlusher == null) {
