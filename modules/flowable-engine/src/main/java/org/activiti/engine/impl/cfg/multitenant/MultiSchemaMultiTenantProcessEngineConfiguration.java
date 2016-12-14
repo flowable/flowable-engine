@@ -12,7 +12,6 @@
  */
 package org.activiti.engine.impl.cfg.multitenant;
 
-import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 
 import javax.sql.DataSource;
@@ -31,7 +30,6 @@ import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.activiti.engine.impl.persistence.StrongUuidGenerator;
 import org.activiti.engine.impl.persistence.deploy.MultiSchemaMultiTenantProcessDefinitionCache;
 import org.activiti.engine.repository.DeploymentBuilder;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

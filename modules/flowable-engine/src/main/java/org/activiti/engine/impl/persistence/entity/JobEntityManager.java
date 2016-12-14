@@ -233,6 +233,13 @@ public class JobEntityManager extends AbstractManager {
   	getDbSqlSession().update("unacquireJob", params);
   }
 
+  public void unacquireOwnedJobs(String lockOwner, String tenantId) {
+    Map<String, Object> params = new HashMap<String, Object>(2);
+    params.put("lockOwner", lockOwner);
+    params.put("tenantId", tenantId);
+    getDbSqlSession().update("unacquireOwnedJobs", params);
+  }
+
   public long findJobCountByQueryCriteria(JobQueryImpl jobQuery) {
     return (Long) getDbSqlSession().selectOne("selectJobCountByQueryCriteria", jobQuery);
   }
@@ -251,5 +258,4 @@ public class JobEntityManager extends AbstractManager {
     params.put("dueDate", Context.getProcessEngineConfiguration().getClock().getCurrentTime());
     return getDbSqlSession().update("updateJobLockForAllJobs", params);
   }
-  
 }

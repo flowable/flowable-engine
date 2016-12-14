@@ -15,6 +15,7 @@ package org.activiti.engine.impl.asyncexecutor;
 import java.util.LinkedList;
 import java.util.UUID;
 
+import org.activiti.engine.impl.cmd.UnacquireOwnedJobsCmd;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
@@ -106,6 +107,10 @@ public abstract class AbstractAsyncJobExecutor implements AsyncExecutor {
     commandContext.getJobEntityManager().unacquireJob(job.getId());
   }
   
+  protected void unlockOwnedJobs() {
+    commandExecutor.execute(new UnacquireOwnedJobsCmd(lockOwner, null));
+  }
+
   protected Runnable createRunnableForJob(JobEntity job) {
     return executeAsyncRunnableFactory.createExecuteAsyncRunnable(job, commandExecutor);
   }

@@ -40,6 +40,9 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncJobExecutor {
   
   /** The size of the queue on which jobs to be executed are placed */
   protected int queueSize = 100;
+
+  /** Whether to unlock jobs that are owned by this executor (have the same lockOwner) at startup */
+  protected boolean unlockOwnedJobs = false;
   
   /** The queue used for job execution work */
   protected BlockingQueue<Runnable> threadPoolQueue;
@@ -49,7 +52,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncJobExecutor {
   
   /** The time (in seconds) that is waited to gracefully shut down the threadpool used for job execution */
   protected long secondsToWaitOnShutdown = 60L;
-  
+
   protected boolean executeAsyncJob(Runnable runnable) {
     try {
       executorService.execute(runnable);
@@ -69,7 +72,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncJobExecutor {
   protected void unlockJob(final JobEntity job, CommandContext commandContext) {
     commandContext.getJobEntityManager().unacquireJob(job.getId());
   }
-  
+    
   protected void startExecutingAsyncJobs() {
     if (threadPoolQueue==null) {
       log.info("Creating thread pool queue of size {}", queueSize);
@@ -82,10 +85,14 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncJobExecutor {
       
       executorService = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS, threadPoolQueue);      
     }
+
+    if (unlockOwnedJobs) {
+      unlockOwnedJobs();
+    }
     
     startJobAcquisitionThread();
   }
-    
+  
   protected void stopExecutingAsyncJobs() {
     stopJobAcquisitionThread();
     
@@ -104,6 +111,11 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncJobExecutor {
     }
 
     executorService = null;
+  }
+  
+  @Override
+  public int getRemainingCapacity() {
+    return threadPoolQueue.remainingCapacity();
   }
   
   public int getQueueSize() {
@@ -136,6 +148,14 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncJobExecutor {
 
   public void setSecondsToWaitOnShutdown(long secondsToWaitOnShutdown) {
     this.secondsToWaitOnShutdown = secondsToWaitOnShutdown;
+  }
+  
+  public boolean isUnlockOwnedJobs() {
+    return unlockOwnedJobs;
+  }
+  
+  public void setUnlockOwnedJobs(boolean unlockOwnedJobs) {
+    this.unlockOwnedJobs = unlockOwnedJobs;
   }
 
   public BlockingQueue<Runnable> getThreadPoolQueue() {

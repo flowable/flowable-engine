@@ -657,5 +657,14 @@
     set DUEDATE_ = #{dueDate,jdbcType=TIMESTAMP}, LOCK_OWNER_ = null, LOCK_EXP_TIME_ = null
     where ID_ = #{id,jdbcType=VARCHAR}
   </update>
+  
+  <update id="unacquireOwnedJobs" parameterType="java.util.Map">
+    update ${prefix}ACT_RU_JOB
+    set LOCK_OWNER_ = null, LOCK_EXP_TIME_ = null
+    where LOCK_OWNER_ = #{lockOwner,jdbcType=VARCHAR}
+    <if test="tenantId != null">
+      and RES.TENANT_ID_ = #{tenantId}
+    </if>
+  </update>
 
 </mapper>

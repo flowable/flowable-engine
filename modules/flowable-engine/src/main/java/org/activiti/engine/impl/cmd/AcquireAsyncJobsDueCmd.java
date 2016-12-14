@@ -30,17 +30,25 @@ import org.activiti.engine.impl.persistence.entity.JobEntity;
 public class AcquireAsyncJobsDueCmd implements Command<AcquiredJobEntities> {
 
   private final AsyncExecutor asyncExecutor;
+  private final int remainingCapacity;
 
   public AcquireAsyncJobsDueCmd(AsyncExecutor asyncExecutor) {
+    this(asyncExecutor, Integer.MAX_VALUE);
+  }
+  
+  public AcquireAsyncJobsDueCmd(AsyncExecutor asyncExecutor, int remainingCapacity) {
     this.asyncExecutor = asyncExecutor;
+    this.remainingCapacity = remainingCapacity;
   }
   
   public AcquiredJobEntities execute(CommandContext commandContext) {
-    AcquiredJobEntities acquiredJobs = new AcquiredJobEntities();
+    int maxResults = Math.min(remainingCapacity, asyncExecutor.getMaxAsyncJobsDuePerAcquisition());
+    
     List<JobEntity> jobs = commandContext
       .getJobEntityManager()
-      .findAsyncJobsDueToExecute(new Page(0, asyncExecutor.getMaxAsyncJobsDuePerAcquisition()));
+      .findAsyncJobsDueToExecute(new Page(0, maxResults));
     
+    AcquiredJobEntities acquiredJobs = new AcquiredJobEntities();
     for (JobEntity job: jobs) {
       lockJob(commandContext, job, asyncExecutor.getAsyncJobLockTimeInMillis());
       acquiredJobs.addJob(job);

@@ -58,7 +58,7 @@ public class TenantAwareDataSource implements DataSource {
   }
 
   public Connection getConnection(String username, String password) throws SQLException {
-    return  getCurrentDataSource().getConnection(username, password);
+    return getCurrentDataSource().getConnection(username, password);
   }
   
   protected DataSource getCurrentDataSource() {
