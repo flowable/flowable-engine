@@ -30,7 +30,7 @@
          #{identityInfo.type ,jdbcType=VARCHAR},
          #{identityInfo.key ,jdbcType=VARCHAR},
          #{identityInfo.value ,jdbcType=VARCHAR},
-         #{identityInfo.passwordBytes ,jdbcType=BLOB},
+         #{identityInfo.passwordBytes ,jdbcType=${blobType}},
          #{identityInfo.parentId ,jdbcType=VARCHAR})
       </foreach>
   </insert>

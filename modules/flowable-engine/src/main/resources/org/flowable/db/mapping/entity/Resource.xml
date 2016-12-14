@@ -17,7 +17,7 @@
         (#{byteArr.id, jdbcType=VARCHAR},
          1,
          #{byteArr.name, jdbcType=VARCHAR},
-         #{byteArr.bytes, jdbcType=BLOB},
+         #{byteArr.bytes, jdbcType=${blobType}},
          #{byteArr.deploymentId, jdbcType=VARCHAR},
          #{byteArr.generated, jdbcType=BOOLEAN})
       </foreach>
