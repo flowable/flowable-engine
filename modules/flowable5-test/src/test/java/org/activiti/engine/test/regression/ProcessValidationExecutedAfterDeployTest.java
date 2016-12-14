@@ -3,7 +3,7 @@ package org.activiti.engine.test.regression;
 import java.util.List;
 
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -17,7 +17,7 @@ import org.flowable.validation.ProcessValidator;
  * kicks in the second time, but not originally (don't do this at home, kids. Disabling the validator on deploy is BAD).
  * 
  */
-public class ProcessValidationExecutedAfterDeployTest extends PluggableActivitiTestCase{
+public class ProcessValidationExecutedAfterDeployTest extends PluggableFlowableTestCase{
 	
 	protected ProcessValidator processValidator;
 	

@@ -16,7 +16,7 @@ package org.activiti.engine.test.bpmn.usertask;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
@@ -24,7 +24,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Thilo-Alexander Ginkel
  */
-public class TaskPriorityExtensionsTest extends PluggableActivitiTestCase {
+public class TaskPriorityExtensionsTest extends PluggableFlowableTestCase {
 
   @Deployment
   public void testPriorityExtension() throws Exception {

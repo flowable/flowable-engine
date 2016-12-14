@@ -19,7 +19,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.ResourceActivitiTestCase;
+import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.impl.calendar.BusinessCalendar;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -31,10 +31,10 @@ import org.joda.time.Period;
 /**
  * @author Frederik Heremans
  */
-public class TaskDueDateExtensionsTest extends ResourceActivitiTestCase {
+public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
 
   public TaskDueDateExtensionsTest() {
-    super("org/activiti/engine/test/bpmn/usertask/TaskDueDateExtensionsTest.activiti.cfg.xml");
+    super("org/activiti/engine/test/bpmn/usertask/TaskDueDateExtensionsTest.flowable.cfg.xml");
   }
 
   @Deployment

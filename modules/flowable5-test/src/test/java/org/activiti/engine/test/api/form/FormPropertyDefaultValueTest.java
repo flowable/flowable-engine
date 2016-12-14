@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.form.FormProperty;
 import org.flowable.engine.form.StartFormData;
 import org.flowable.engine.form.TaskFormData;
@@ -12,7 +12,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
-public class FormPropertyDefaultValueTest extends PluggableActivitiTestCase {
+public class FormPropertyDefaultValueTest extends PluggableFlowableTestCase {
 
   @Deployment
   public void testDefaultValue() throws Exception {

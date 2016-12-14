@@ -12,14 +12,14 @@
  */
 package org.activiti.engine.test.jobexecutor;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 
 /**
  * @author Saeid Mirzaei
  */
 
-public class JobExecutorFailRetryTest extends PluggableActivitiTestCase {
+public class JobExecutorFailRetryTest extends PluggableFlowableTestCase {
 	
 	@Deployment
 	public void testFailedServiceTask() {

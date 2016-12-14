@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.test.api.event;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
@@ -23,9 +23,9 @@ import org.flowable.engine.repository.Model;
  * 
  * @author Frederik Heremans
  */
-public class ModelEventsTest extends PluggableActivitiTestCase {
+public class ModelEventsTest extends PluggableFlowableTestCase {
 
-	private TestActiviti6EntityEventListener listener;
+	private TestFlowable6EntityEventListener listener;
 	
 	/**
 	 * Test create, update and delete events of model entities.
@@ -82,7 +82,7 @@ public class ModelEventsTest extends PluggableActivitiTestCase {
 	@Override
 	protected void setUp() throws Exception {
 	  super.setUp();
-	  listener = new TestActiviti6EntityEventListener(Model.class);
+	  listener = new TestFlowable6EntityEventListener(Model.class);
 	  processEngineConfiguration.getEventDispatcher().addEventListener(listener);
 	}
 	

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.management.TablePage;
 import org.flowable.engine.task.Task;
 
@@ -24,7 +24,7 @@ import org.flowable.engine.task.Task;
 /**
  * @author Joram Barrez
  */
-public class TablePageQueryTest extends PluggableActivitiTestCase {
+public class TablePageQueryTest extends PluggableFlowableTestCase {
   
   public void testGetTablePage() {
     String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();

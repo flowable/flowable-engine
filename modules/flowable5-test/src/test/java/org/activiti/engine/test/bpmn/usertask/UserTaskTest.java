@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -28,7 +28,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Joram Barrez
  */
-public class UserTaskTest extends PluggableActivitiTestCase {
+public class UserTaskTest extends PluggableFlowableTestCase {
   
   @Deployment
   public void testTaskPropertiesNotNull() {

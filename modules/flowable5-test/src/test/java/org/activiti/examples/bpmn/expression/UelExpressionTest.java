@@ -13,7 +13,7 @@
 
 package org.activiti.examples.bpmn.expression;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -23,7 +23,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Joram Barrez
  */
-public class UelExpressionTest extends PluggableActivitiTestCase {
+public class UelExpressionTest extends PluggableFlowableTestCase {
 
   @Deployment
   public void testValueAndMethodExpression() {

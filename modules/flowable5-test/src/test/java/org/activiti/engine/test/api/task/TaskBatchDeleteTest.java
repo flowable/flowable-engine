@@ -12,12 +12,12 @@
  */
 package org.activiti.engine.test.api.task;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
-public class TaskBatchDeleteTest extends PluggableActivitiTestCase {
+public class TaskBatchDeleteTest extends PluggableFlowableTestCase {
 
     /**
      * Validating fix for ACT-2070

@@ -16,7 +16,7 @@ package org.activiti.engine.test.api.mgmt;
 import java.util.Date;
 
 import org.activiti.engine.impl.persistence.entity.JobEntity;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.JobNotFoundException;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -37,7 +37,7 @@ import org.flowable.engine.test.Deployment;
  * @author Saeid Mizaei
  * @author Joram Barrez
  */
-public class ManagementServiceTest extends PluggableActivitiTestCase {
+public class ManagementServiceTest extends PluggableFlowableTestCase {
 
   public void testGetMetaDataForUnexistingTable() {
     TableMetaData metaData = managementService.getTableMetaData("unexistingtable");

@@ -35,7 +35,7 @@ import org.flowable.engine.test.Deployment;
 public class TimerCustomCalendarTest extends ResourceFlowableTestCase {
 
   public TimerCustomCalendarTest() {
-    super("org/flowable/engine/test/bpmn/event/timer/TimerCustomCalendarTest.activiti.cfg.xml");
+    super("org/flowable/engine/test/bpmn/event/timer/TimerCustomCalendarTest.flowable.cfg.xml");
   }
 
   @Deployment

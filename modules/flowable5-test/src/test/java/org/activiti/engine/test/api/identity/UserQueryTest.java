@@ -15,7 +15,7 @@ package org.activiti.engine.test.api.identity;
 
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.idm.api.User;
@@ -25,7 +25,7 @@ import org.flowable.idm.api.UserQuery;
 /**
  * @author Joram Barrez
  */
-public class UserQueryTest extends PluggableActivitiTestCase {
+public class UserQueryTest extends PluggableFlowableTestCase {
   
   protected void setUp() throws Exception {
     super.setUp();

@@ -15,7 +15,7 @@ package org.activiti.examples.bpmn.tasklistener;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
@@ -25,7 +25,7 @@ import org.flowable.engine.test.Deployment;
  * @author Falko Menge <falko.menge@camunda.com>
  * @author Frederik Heremans
  */
-public class CustomTaskAssignmentTest extends PluggableActivitiTestCase {
+public class CustomTaskAssignmentTest extends PluggableFlowableTestCase {
   
   @Override
   protected void setUp() throws Exception {

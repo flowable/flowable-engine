@@ -46,7 +46,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class ActivityEventsTest extends PluggableFlowableTestCase {
 
-  private TestActivitiActivityEventListener listener;
+  private TestFlowableActivityEventListener listener;
 
   protected EventLogger databaseEventLogger;
 
@@ -82,7 +82,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
   protected void initializeServices() {
     super.initializeServices();
 
-    listener = new TestActivitiActivityEventListener(true);
+    listener = new TestFlowableActivityEventListener(true);
     processEngineConfiguration.getEventDispatcher().addEventListener(listener);
   }
 

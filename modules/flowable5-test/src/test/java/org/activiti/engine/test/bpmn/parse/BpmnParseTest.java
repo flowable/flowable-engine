@@ -19,7 +19,7 @@ import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.process.TransitionImpl;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.test.TestHelper;
 import org.flowable.bpmn.exceptions.XMLException;
 import org.flowable.bpmn.model.BpmnModel;
@@ -33,7 +33,7 @@ import org.flowable.engine.test.Deployment;
  * 
  * @author Joram Barrez
  */
-public class BpmnParseTest extends PluggableActivitiTestCase {
+public class BpmnParseTest extends PluggableFlowableTestCase {
   
   public void testInvalidProcessDefinition() {
     try {

@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.test.api.event;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
@@ -27,9 +27,9 @@ import org.flowable.engine.test.Deployment;
  * 
  * @author Frederik Heremans
  */
-public class CommentEventsTest extends PluggableActivitiTestCase {
+public class CommentEventsTest extends PluggableFlowableTestCase {
 
-	private TestActivitiEntityEventListener listener;
+	private TestFlowableEntityEventListener listener;
 
 	/**
 	 * Test create, update and delete events of comments on a task/process.
@@ -74,7 +74,7 @@ public class CommentEventsTest extends PluggableActivitiTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		listener = new TestActivitiEntityEventListener(org.activiti.engine.task.Comment.class);
+		listener = new TestFlowableEntityEventListener(org.activiti.engine.task.Comment.class);
 		processEngineConfiguration.getEventDispatcher().addEventListener(listener);
 	}
 

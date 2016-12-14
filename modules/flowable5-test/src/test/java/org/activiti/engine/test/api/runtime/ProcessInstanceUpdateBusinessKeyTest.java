@@ -13,7 +13,7 @@
 package org.activiti.engine.test.api.runtime;
 
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -21,7 +21,7 @@ import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
-public class ProcessInstanceUpdateBusinessKeyTest extends PluggableActivitiTestCase {
+public class ProcessInstanceUpdateBusinessKeyTest extends PluggableFlowableTestCase {
 
   @Deployment
   public void testProcessInstanceUpdateBusinessKey() {

@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -28,7 +28,7 @@ import org.flowable.engine.repository.ProcessDefinition;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class ProcessDefinitionsTest extends PluggableActivitiTestCase {
+public class ProcessDefinitionsTest extends PluggableFlowableTestCase {
 
   private static final String NAMESPACE = "xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL'";
 

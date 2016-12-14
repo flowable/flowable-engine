@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricDetail;
@@ -39,7 +39,7 @@ import org.flowable.engine.test.Deployment;
  * @author Christian Lipphardt (camunda)
  * @author Joram Barrez
  */
-public class HistoricVariableInstanceTest extends PluggableActivitiTestCase {
+public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
 
   @Deployment(resources={
     "org/activiti/examples/bpmn/callactivity/orderProcess.bpmn20.xml",

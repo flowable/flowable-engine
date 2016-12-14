@@ -29,7 +29,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class ProcessDefinitionEventsTest extends PluggableFlowableTestCase {
 
-  private TestMultipleActivitiEventListener listener;
+  private TestMultipleFlowableEventListener listener;
 
   /**
    * Test create, update and delete events of process definitions.
@@ -135,7 +135,7 @@ public class ProcessDefinitionEventsTest extends PluggableFlowableTestCase {
   protected void initializeServices() {
     super.initializeServices();
 
-    listener = new TestMultipleActivitiEventListener();
+    listener = new TestMultipleFlowableEventListener();
     listener.setEventClasses(FlowableEntityEvent.class);
     listener.setEntityClasses(ProcessDefinition.class, TimerJobEntity.class);
 

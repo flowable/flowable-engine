@@ -27,7 +27,7 @@ import org.flowable.engine.test.Deployment;
 public class RulesDeployerTest extends ResourceFlowableTestCase {
 
   public RulesDeployerTest() {
-    super("org/flowable/standalone/rules/rules.activiti.cfg.xml");
+    super("org/flowable/standalone/rules/rules.flowable.cfg.xml");
   }
 
   @SuppressWarnings("unchecked")

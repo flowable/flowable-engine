@@ -13,7 +13,7 @@
 
 package org.activiti.engine.test.bpmn.event.compensate;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.test.bpmn.event.compensate.helper.SetVariablesDelegate;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
@@ -26,7 +26,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Daniel Meyer
  */
-public class CompensateEventTest extends PluggableActivitiTestCase {
+public class CompensateEventTest extends PluggableFlowableTestCase {
   
   @Deployment
   public void testCompensateSubprocess() {

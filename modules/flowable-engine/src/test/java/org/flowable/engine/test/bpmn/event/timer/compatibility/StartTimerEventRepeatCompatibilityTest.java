@@ -10,16 +10,16 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
-import org.flowable.engine.test.api.event.TestActivitiEntityEventListener;
+import org.flowable.engine.test.api.event.TestFlowableEntityEventListener;
 
 public class StartTimerEventRepeatCompatibilityTest extends TimerEventCompatibilityTest {
 
-  private TestActivitiEntityEventListener listener;
+  private TestFlowableEntityEventListener listener;
 
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    listener = new TestActivitiEntityEventListener(Job.class);
+    listener = new TestFlowableEntityEventListener(Job.class);
     processEngineConfiguration.getEventDispatcher().addEventListener(listener);
   }
 

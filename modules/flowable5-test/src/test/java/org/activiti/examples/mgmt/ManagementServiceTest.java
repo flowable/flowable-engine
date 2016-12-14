@@ -15,7 +15,7 @@ package org.activiti.examples.mgmt;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.common.api.management.TableMetaData;
 
@@ -25,7 +25,7 @@ import org.flowable.engine.common.api.management.TableMetaData;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class ManagementServiceTest extends PluggableActivitiTestCase {
+public class ManagementServiceTest extends PluggableFlowableTestCase {
 
   public void testTableCount() {
     Map<String, Long> tableCount = managementService.getTableCount();

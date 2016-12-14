@@ -18,7 +18,7 @@ package org.activiti.engine.test.bpmn.usertask;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.AbstractActivitiTestCase;
+import org.activiti.engine.impl.test.AbstractFlowableTestCase;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -32,14 +32,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Tijs Rademakers
  */
-public class DisabledDefinitionInfoCacheTest extends AbstractActivitiTestCase {
+public class DisabledDefinitionInfoCacheTest extends AbstractFlowableTestCase {
 
   protected static ProcessEngine cachedProcessEngine;
   
   protected void initializeProcessEngine() {
     if (cachedProcessEngine==null) {
       ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-          .createProcessEngineConfigurationFromResource("org/activiti/engine/test/bpmn/usertask/activiti.cfg.xml");
+          .createProcessEngineConfigurationFromResource("org/activiti/engine/test/bpmn/usertask/flowable.cfg.xml");
       
       cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
     }

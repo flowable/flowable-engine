@@ -18,7 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.history.HistoricActivityInstance;
@@ -35,7 +35,7 @@ import org.flowable.engine.test.Deployment;
  * @author Joram Barrez
  * @author Falko Menge
  */
-public class SubProcessTest extends PluggableActivitiTestCase {
+public class SubProcessTest extends PluggableFlowableTestCase {
   
   @Deployment
   public void testSimpleSubProcess() {

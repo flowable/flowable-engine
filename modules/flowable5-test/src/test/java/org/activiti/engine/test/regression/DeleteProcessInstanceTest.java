@@ -3,7 +3,7 @@ package org.activiti.engine.test.regression;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.runtime.Execution;
@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 /**
  * From http://forums.activiti.org/content/inability-completely-delete-process-instance-when
  */
-public class DeleteProcessInstanceTest extends PluggableActivitiTestCase{
+public class DeleteProcessInstanceTest extends PluggableFlowableTestCase{
 	
 	private static Logger log = LoggerFactory.getLogger(DeleteProcessInstanceTest.class);
 	

@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.test.bpmn.exclusive;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.test.Deployment;
@@ -21,7 +21,7 @@ import org.flowable.engine.test.Deployment;
  * 
  * @author Daniel Meyer
  */
-public class ExclusiveTaskTest extends PluggableActivitiTestCase {
+public class ExclusiveTaskTest extends PluggableFlowableTestCase {
   
   @Deployment
   public void testNonExclusiveService() {   

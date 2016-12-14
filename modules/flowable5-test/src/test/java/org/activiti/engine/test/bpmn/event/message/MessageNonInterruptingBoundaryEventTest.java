@@ -13,7 +13,7 @@
 
 package org.activiti.engine.test.bpmn.event.message;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
@@ -22,7 +22,7 @@ import org.flowable.engine.test.Deployment;
  * 
  * @author Kristin Polenz
  */
-public class MessageNonInterruptingBoundaryEventTest extends PluggableActivitiTestCase {
+public class MessageNonInterruptingBoundaryEventTest extends PluggableFlowableTestCase {
   
   @Deployment
   public void testSingleNonInterruptingBoundaryMessageEvent() {

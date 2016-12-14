@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.test.api.identity;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
@@ -21,7 +21,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Joram Barrez
  */
-public class ProcessInstanceIdentityLinkTest extends PluggableActivitiTestCase {
+public class ProcessInstanceIdentityLinkTest extends PluggableFlowableTestCase {
   
   // Test specific for fix introduced by https://activiti.atlassian.net/browse/ACT-1591
   // (Referential integrity constraint violation on PROC_INST and IDENTITY_LINK)

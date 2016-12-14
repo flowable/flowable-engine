@@ -16,7 +16,7 @@ package org.activiti.engine.test.bpmn.servicetask;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Tijs Rademakers
  */
-public class DynamicServiceTaskTest extends PluggableActivitiTestCase {
+public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
   
   @Deployment
   public void testChangeClassName() {

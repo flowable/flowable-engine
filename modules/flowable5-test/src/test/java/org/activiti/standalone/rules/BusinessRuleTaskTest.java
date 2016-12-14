@@ -12,7 +12,7 @@
  */
 package org.activiti.standalone.rules;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
@@ -20,7 +20,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Tijs Rademakers
  */
-public class BusinessRuleTaskTest extends PluggableActivitiTestCase {
+public class BusinessRuleTaskTest extends PluggableFlowableTestCase {
 
   @Deployment
   public void testBusinessRuleTask() {

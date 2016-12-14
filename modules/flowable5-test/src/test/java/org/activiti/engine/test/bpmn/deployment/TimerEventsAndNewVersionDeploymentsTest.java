@@ -13,7 +13,7 @@
 
 package org.activiti.engine.test.bpmn.deployment;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.Job;
 
@@ -23,7 +23,7 @@ import org.flowable.engine.runtime.Job;
  * 
  * @author Joram Barrez
  */
-public class TimerEventsAndNewVersionDeploymentsTest extends PluggableActivitiTestCase {
+public class TimerEventsAndNewVersionDeploymentsTest extends PluggableFlowableTestCase {
   
   private static final String TEST_TIMER_PROCESS = 
       "org/activiti/engine/test/bpmn/deployment/TimerEventsAndNewVersionDeploymentsTest.timerTest.bpmn20.xml";

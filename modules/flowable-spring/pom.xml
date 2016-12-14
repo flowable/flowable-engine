@@ -210,12 +210,12 @@
                                 <phase>generate-sources</phase>
                                 <configuration>
                                     <tasks>
-                                        <delete dir="src/test/java/org/activiti/engine/test" />
-                                        <delete dir="src/test/resources/org/activiti/engine/test" />
-                                        <delete dir="src/test/java/org/activiti/examples" />
-                                        <delete dir="src/test/resources/org/activiti/examples" />
-                                        <delete dir="src/test/java/org/activiti/standalone" />
-                                        <delete dir="src/test/resources/org/activiti/standalone" />
+                                        <delete dir="src/test/java/org/flowable/engine/test" />
+                                        <delete dir="src/test/resources/org/flowable/engine/test" />
+                                        <delete dir="src/test/java/org/flowable/examples" />
+                                        <delete dir="src/test/resources/org/flowable/examples" />
+                                        <delete dir="src/test/java/org/flowable/standalone" />
+                                        <delete dir="src/test/resources/org/flowable/standalone" />
                                     </tasks>
                                 </configuration>
                                 <goals>
@@ -288,8 +288,8 @@
                             <excludes>
                                 <exclude>org/flowable/standalone/**</exclude>
                                 <exclude>**/*TestCase.java</exclude>
-                                <exclude>**/ActivitiRuleJunit4Test.java</exclude><!-- Can't run in
-									Spring since ActivitiRule must be used different in Spring -->
+                                <exclude>**/FlowableRuleJunit4Test.java</exclude><!-- Can't run in
+									Spring since FlowableRule must be used different in Spring -->
                                 <exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-234 -->
                                 <exclude>**/WSDLImporterTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-315 -->
                                 <exclude>**/JobExecutorTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-427 -->

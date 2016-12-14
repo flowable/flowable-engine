@@ -16,7 +16,7 @@ package org.activiti.engine.test.api.identity;
 import java.util.Arrays;
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
@@ -27,7 +27,7 @@ import org.flowable.idm.api.User;
 /**
  * @author Frederik Heremans
  */
-public class IdentityServiceTest extends PluggableActivitiTestCase {
+public class IdentityServiceTest extends PluggableFlowableTestCase {
 
   public void testUserInfo() {
     User user = identityService.newUser("testuser");

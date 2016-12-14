@@ -168,7 +168,7 @@ public class BpmnDeployer implements Deployer {
           }
           
           processDefinition.setDiagramResourceName(diagramResourceName);
-          processDefinition.setEngineVersion(Flowable5CompatibilityHandler.FLOWABLE_5_ENGINE_TAG);
+          processDefinition.setEngineVersion(Flowable5CompatibilityHandler.V5_ENGINE_TAG);
           processDefinitions.add(processDefinition);
           bpmnModelMap.put(processDefinition.getKey(), bpmnParse.getBpmnModel());
         }

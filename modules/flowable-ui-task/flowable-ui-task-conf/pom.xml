@@ -30,7 +30,7 @@
             <artifactId>flowable-content-engine</artifactId>
         </dependency>
 
-		<!-- Activiti -->
+		<!-- Flowable -->
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-engine</artifactId>

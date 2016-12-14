@@ -13,14 +13,14 @@
 
 package org.activiti.engine.test.bpmn.mail;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.subethamail.wiser.Wiser;
 
 
 /**
  * @author Joram Barrez
  */
-public abstract class EmailTestCase extends PluggableActivitiTestCase {
+public abstract class EmailTestCase extends PluggableFlowableTestCase {
   
   protected Wiser wiser;
   

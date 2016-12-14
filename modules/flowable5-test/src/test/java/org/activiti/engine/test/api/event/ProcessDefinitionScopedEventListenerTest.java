@@ -14,7 +14,7 @@ package org.activiti.engine.test.api.event;
 
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.delegate.event.impl.FlowableEventSupport;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -27,9 +27,9 @@ import org.flowable.engine.test.Deployment;
  * 
  * @author Frederik Heremans
  */
-public class ProcessDefinitionScopedEventListenerTest extends PluggableActivitiTestCase {
+public class ProcessDefinitionScopedEventListenerTest extends PluggableFlowableTestCase {
 
-	protected TestActivitiEventListener testListenerAsBean;
+	protected TestFlowableEventListener testListenerAsBean;
 	protected Map<Object, Object> oldBeans;
 
 	/**
@@ -48,7 +48,7 @@ public class ProcessDefinitionScopedEventListenerTest extends PluggableActivitiT
 		assertNotNull(firstDefinition);
 
 		// Fetch a reference to the process definition entity to add the listener
-		TestActivitiEventListener listener = new TestActivitiEventListener();
+		TestFlowableEventListener listener = new TestFlowableEventListener();
 		BpmnModel bpmnModel = repositoryService.getBpmnModel(firstDefinition.getId());
 		assertNotNull(bpmnModel);
 

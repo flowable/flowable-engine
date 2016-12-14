@@ -14,7 +14,7 @@ package org.flowable.standalone.event;
 
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
-import org.flowable.engine.test.api.event.TestActivitiEventListener;
+import org.flowable.engine.test.api.event.TestFlowableEventListener;
 
 /**
  * Test to verify event-listeners, which are configured in the cfg.xml, are notified.
@@ -24,23 +24,21 @@ import org.flowable.engine.test.api.event.TestActivitiEventListener;
 public class EngineEventsTest extends ResourceFlowableTestCase {
 
   public EngineEventsTest() {
-    super("org/flowable/standalone/event/activiti-eventlistener.cfg.xml");
+    super("org/flowable/standalone/event/flowable-eventlistener.cfg.xml");
   }
 
   public void testEngineEventsTest() {
     // Fetch the listener to check received events
-    TestActivitiEventListener listener = (TestActivitiEventListener) processEngineConfiguration.getBeans().get("eventListener");
+    TestFlowableEventListener listener = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("eventListener");
     assertNotNull(listener);
 
     // Check create-event
-    assertEquals(1, listener.getEventsReceived().size());
     assertEquals(FlowableEngineEventType.ENGINE_CREATED, listener.getEventsReceived().get(0).getType());
     listener.clearEventsReceived();
 
     // Check close-event
     processEngine.close();
-    assertEquals(1, listener.getEventsReceived().size());
-    assertEquals(FlowableEngineEventType.ENGINE_CLOSED, listener.getEventsReceived().get(0).getType());
+    assertEquals(FlowableEngineEventType.ENGINE_CLOSED, listener.getEventsReceived().get(listener.getEventsReceived().size() - 1).getType());
 
   }
 

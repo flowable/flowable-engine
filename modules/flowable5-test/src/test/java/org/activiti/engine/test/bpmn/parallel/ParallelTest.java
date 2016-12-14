@@ -13,14 +13,14 @@
 
 package org.activiti.engine.test.bpmn.parallel;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 
 
 /**
  * @author Tom Baeyens
  */
-public class ParallelTest extends PluggableActivitiTestCase {
+public class ParallelTest extends PluggableFlowableTestCase {
 
   @Deployment
   public void testParallel() {

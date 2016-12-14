@@ -15,7 +15,7 @@ package org.activiti.engine.test.bpmn.event.message;
 
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -29,7 +29,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Daniel Meyer
  */
-public class MessageStartEventTest extends PluggableActivitiTestCase {
+public class MessageStartEventTest extends PluggableFlowableTestCase {
   
   public void testDeploymentCreatesSubscriptions() {
     String deploymentId = repositoryService

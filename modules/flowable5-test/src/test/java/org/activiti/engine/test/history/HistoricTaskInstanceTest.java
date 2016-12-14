@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.runtime.Clock;
@@ -36,7 +36,7 @@ import org.flowable.engine.test.Deployment;
  * @author Tom Baeyens
  * @author Frederik Heremans
  */
-public class HistoricTaskInstanceTest extends PluggableActivitiTestCase {
+public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
 
   @Deployment
   public void testHistoricTaskInstance() throws Exception {

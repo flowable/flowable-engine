@@ -3,7 +3,7 @@
  */
 package org.activiti.engine.test.jobexecutor;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.interceptor.CommandExecutor;
@@ -13,7 +13,7 @@ import org.flowable.engine.runtime.Job;
 /**
  * @author Tom Baeyens
  */
-public class JobExecutorCmdExceptionTest extends PluggableActivitiTestCase {
+public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
 
   protected TweetExceptionHandler tweetExceptionHandler = new TweetExceptionHandler();
 

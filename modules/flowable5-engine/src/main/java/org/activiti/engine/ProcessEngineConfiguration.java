@@ -228,7 +228,7 @@ public abstract class ProcessEngineConfiguration {
   public abstract ProcessEngine buildProcessEngine();
   
   public static ProcessEngineConfiguration createProcessEngineConfigurationFromResourceDefault() {
-    return createProcessEngineConfigurationFromResource("activiti.cfg.xml", "processEngineConfiguration");
+    return createProcessEngineConfigurationFromResource("flowable.cfg.xml", "processEngineConfiguration");
   }
 
   public static ProcessEngineConfiguration createProcessEngineConfigurationFromResource(String resource) {

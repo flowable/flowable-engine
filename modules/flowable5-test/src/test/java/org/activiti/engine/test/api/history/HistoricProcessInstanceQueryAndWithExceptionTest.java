@@ -2,14 +2,14 @@ package org.activiti.engine.test.api.history;
 
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.TimerJobQuery;
 
-public class HistoricProcessInstanceQueryAndWithExceptionTest extends PluggableActivitiTestCase {
+public class HistoricProcessInstanceQueryAndWithExceptionTest extends PluggableFlowableTestCase {
 
   private static final String PROCESS_DEFINITION_KEY_NO_EXCEPTION = "oneTaskProcess";
   private static final String PROCESS_DEFINITION_KEY_WITH_EXCEPTION_1 = "JobErrorCheck";

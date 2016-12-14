@@ -22,7 +22,7 @@ import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.ReadOnlyProcessDefinition;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
 
@@ -31,7 +31,7 @@ import org.flowable.engine.repository.ProcessDefinition;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class ProcessDefinitionPersistenceTest extends PluggableActivitiTestCase {
+public class ProcessDefinitionPersistenceTest extends PluggableFlowableTestCase {
 
   public void testProcessDefinitionPersistence() {
     String deploymentId = repositoryService

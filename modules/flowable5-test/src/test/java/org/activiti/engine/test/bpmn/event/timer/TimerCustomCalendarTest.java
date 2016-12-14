@@ -7,7 +7,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.util.Date;
 import java.util.List;
 
-import org.activiti.engine.impl.test.ResourceActivitiTestCase;
+import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.calendar.BusinessCalendar;
 import org.flowable.engine.runtime.Job;
@@ -18,10 +18,10 @@ import org.flowable.engine.test.Deployment;
  * testing custom calendar for timer definitions
  * Created by martin.grofcik
  */
-public class TimerCustomCalendarTest extends ResourceActivitiTestCase {
+public class TimerCustomCalendarTest extends ResourceFlowableTestCase {
 
   public TimerCustomCalendarTest() {
-    super("org/activiti/engine/test/bpmn/event/timer/TimerCustomCalendarTest.activiti.cfg.xml");
+    super("org/activiti/engine/test/bpmn/event/timer/TimerCustomCalendarTest.flowable.cfg.xml");
   }
 
   @Deployment

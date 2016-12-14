@@ -4,7 +4,7 @@
 
 	<process id="testEventListeners">
         <extensionElements>
-          <activiti:eventListener class="org.flowable.engine.test.api.event.StaticTestActivitiEventListener" />
+          <activiti:eventListener class="org.flowable.engine.test.api.event.StaticTestFlowableEventListener" />
           <activiti:eventListener delegateExpression="${testEventListener}" events="ENTITY_CREATED"/>
         </extensionElements>
         

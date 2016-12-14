@@ -12,7 +12,7 @@
  */
 package org.activiti.spring.test.servicetask;
 
-import org.activiti.spring.impl.test.SpringActivitiTestCase;
+import org.activiti.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -22,7 +22,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Joram Barrez
  */
 @ContextConfiguration("classpath:org/activiti/spring/test/servicetask/servicetaskSpringTest-context.xml")
-public class ServiceTaskSpringDelegationTest extends SpringActivitiTestCase {
+public class ServiceTaskSpringDelegationTest extends SpringFlowableTestCase {
 
   @Deployment
   public void testDelegateExpression() {

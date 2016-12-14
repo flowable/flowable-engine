@@ -14,7 +14,7 @@ package org.activiti.engine.test.api.event;
 
 import java.io.ByteArrayInputStream;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
@@ -27,9 +27,9 @@ import org.flowable.engine.task.Task;
  * 
  * @author Frederik Heremans
  */
-public class StandaloneAttachmentEventsTest extends PluggableActivitiTestCase {
+public class StandaloneAttachmentEventsTest extends PluggableFlowableTestCase {
 
-	private TestActiviti6EntityEventListener listener;
+	private TestFlowable6EntityEventListener listener;
 
 	/**
 	 * Test create, update and delete events of users.
@@ -145,7 +145,7 @@ public class StandaloneAttachmentEventsTest extends PluggableActivitiTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		listener = new TestActiviti6EntityEventListener(Attachment.class);
+		listener = new TestFlowable6EntityEventListener(Attachment.class);
 		processEngineConfiguration.getEventDispatcher().addEventListener(listener);
 	}
 

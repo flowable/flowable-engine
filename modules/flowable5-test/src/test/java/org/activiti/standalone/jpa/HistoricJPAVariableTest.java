@@ -7,7 +7,7 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.activiti.engine.impl.test.AbstractActivitiTestCase;
+import org.activiti.engine.impl.test.AbstractFlowableTestCase;
 import org.activiti.engine.impl.variable.EntityManagerSession;
 import org.activiti.engine.impl.variable.EntityManagerSessionFactory;
 import org.flowable.engine.ProcessEngine;
@@ -24,7 +24,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Daisuke Yoshimoto
  */
-public class HistoricJPAVariableTest extends AbstractActivitiTestCase {
+public class HistoricJPAVariableTest extends AbstractFlowableTestCase {
 
   protected static ProcessEngine cachedProcessEngine;
 
@@ -39,7 +39,7 @@ public class HistoricJPAVariableTest extends AbstractActivitiTestCase {
   protected void initializeProcessEngine() {
     if (cachedProcessEngine==null) {
       ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-        .createProcessEngineConfigurationFromResource("org/activiti/standalone/jpa/activiti.cfg.xml");
+        .createProcessEngineConfigurationFromResource("org/activiti/standalone/jpa/flowable.cfg.xml");
       
       cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
       

@@ -26,7 +26,7 @@ import org.flowable.engine.test.Deployment;
 public class WatchDogAgendaTest extends ResourceFlowableTestCase {
 
   public WatchDogAgendaTest() {
-    super("org/flowable/examples/runtime/WatchDogAgendaTest.activiti.cfg.xml");
+    super("org/flowable/examples/runtime/WatchDogAgendaTest.flowable.cfg.xml");
   }
 
   @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")

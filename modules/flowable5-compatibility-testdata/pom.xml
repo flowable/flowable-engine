@@ -105,7 +105,7 @@
 						<transformers>
 							<transformer
 								implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-								<mainClass>org.activiti.compatibility.Main</mainClass>
+								<mainClass>org.flowable.compatibility.Main</mainClass>
 							</transformer>
 						</transformers>
 					</configuration>

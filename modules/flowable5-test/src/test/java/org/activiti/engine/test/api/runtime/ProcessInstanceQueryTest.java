@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.history.HistoryLevel;
@@ -43,7 +43,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Frederik Heremans
  * @author Falko Menge
  */
-public class ProcessInstanceQueryTest extends PluggableActivitiTestCase {
+public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
 
   private static final int PROCESS_DEFINITION_KEY_DEPLOY_COUNT = 4;
   private static final int PROCESS_DEFINITION_KEY_2_DEPLOY_COUNT = 1;

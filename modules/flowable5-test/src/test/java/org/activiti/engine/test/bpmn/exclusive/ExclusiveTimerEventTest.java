@@ -14,14 +14,14 @@ package org.activiti.engine.test.bpmn.exclusive;
 
 import java.util.Date;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.TimerJobQuery;
 import org.flowable.engine.test.Deployment;
 
 
-public class ExclusiveTimerEventTest extends PluggableActivitiTestCase {
+public class ExclusiveTimerEventTest extends PluggableFlowableTestCase {
 
   @Deployment
   public void testCatchingTimerEvent() throws Exception {

@@ -13,7 +13,7 @@
 package org.activiti.engine.test.api.event;
 
 import org.activiti.engine.impl.identity.Authentication;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
@@ -28,9 +28,9 @@ import org.flowable.engine.test.Deployment;
  * 
  * @author Frederik Heremans
  */
-public class IdentityLinkEventsTest extends PluggableActivitiTestCase {
+public class IdentityLinkEventsTest extends PluggableFlowableTestCase {
 
-	private TestActivitiEntityEventListener listener;
+	private TestFlowableEntityEventListener listener;
 
 	/**
 	 * Check identity links on process definitions. 
@@ -220,7 +220,7 @@ public class IdentityLinkEventsTest extends PluggableActivitiTestCase {
 	protected void initializeServices() {
 		super.initializeServices();
 
-		listener = new TestActivitiEntityEventListener(IdentityLink.class);
+		listener = new TestFlowableEntityEventListener(IdentityLink.class);
 		processEngineConfiguration.getEventDispatcher().addEventListener(listener);
 	}
 

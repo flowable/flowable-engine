@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -31,7 +31,7 @@ import org.flowable.engine.test.Deployment;
  * @author Kristin Polenz (camunda)
  * @author Christian Lipphardt (camunda)
  */
-public class MessageBoundaryEventTest extends PluggableActivitiTestCase {
+public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
   
   @Deployment
   public void testSingleBoundaryMessageEvent() {

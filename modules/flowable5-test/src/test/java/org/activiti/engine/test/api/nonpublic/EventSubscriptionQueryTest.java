@@ -22,7 +22,7 @@ import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.activiti.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.activiti.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -31,7 +31,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Daniel Meyer
  */
-public class EventSubscriptionQueryTest extends PluggableActivitiTestCase {
+public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
   
   public void testQueryByEventName() {
     

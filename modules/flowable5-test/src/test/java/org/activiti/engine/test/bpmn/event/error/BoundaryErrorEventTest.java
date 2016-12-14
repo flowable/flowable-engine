@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.activiti.engine.impl.util.JvmUtil;
 import org.flowable.engine.common.api.FlowableException;
@@ -33,7 +33,7 @@ import org.flowable.engine.test.Deployment;
  * @author Joram Barrez
  * @author Falko Menge
  */
-public class BoundaryErrorEventTest extends PluggableActivitiTestCase {
+public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
   
   @Deployment
   public void testCatchErrorOnEmbeddedSubprocess() {

@@ -84,8 +84,7 @@
 							<version>[3.0.0,)</version>
 						</requireMavenVersion>
 						<requireJavaVersion>
-							<message>You are running an older version of Java. The Activiti
-								Modeler Application requires at least JDK 1.6</message>
+							<message>You are running an older version of Java. The Modeler Application requires at least JDK 1.6</message>
 							<version>[1.6.0,)</version>
 						</requireJavaVersion>
 					</rules>

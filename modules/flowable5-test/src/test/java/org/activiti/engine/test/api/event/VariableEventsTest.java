@@ -15,7 +15,7 @@ package org.activiti.engine.test.api.event;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableVariableEvent;
@@ -29,7 +29,7 @@ import org.flowable.engine.test.Deployment;
  * 
  * @author Frederik Heremans
  */
-public class VariableEventsTest extends PluggableActivitiTestCase {
+public class VariableEventsTest extends PluggableFlowableTestCase {
 
 	private TestVariableEventListener listener;
 

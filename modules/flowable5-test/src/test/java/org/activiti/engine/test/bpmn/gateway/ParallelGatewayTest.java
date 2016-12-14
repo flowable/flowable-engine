@@ -15,7 +15,7 @@ package org.activiti.engine.test.bpmn.gateway;
 
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -25,7 +25,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Joram Barrez
  */
-public class ParallelGatewayTest extends PluggableActivitiTestCase {
+public class ParallelGatewayTest extends PluggableFlowableTestCase {
 
   /**
    * Case where there is a parallel gateway that splits into 3 paths of

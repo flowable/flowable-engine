@@ -18,7 +18,7 @@
             <artifactId>flowable-ui-modeler-logic</artifactId>
         </dependency>
 
-		<!-- Activiti -->
+		<!-- Flowable -->
 		<dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-bpmn-model</artifactId>

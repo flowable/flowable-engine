@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -17,7 +17,7 @@ import org.flowable.engine.test.Deployment;
  * @author Saeid Mirzaei
  */
 
-public class TimeExpressionTest extends PluggableActivitiTestCase {
+public class TimeExpressionTest extends PluggableFlowableTestCase {
 	
   @Deployment(resources = { "org/activiti/engine/test/bpmn/event/timer/IntermediateTimerEventTest.testExpression.bpmn20.xml"})	  
   public void testTimeExpressionComplete() throws Exception {

@@ -15,7 +15,7 @@ package org.activiti.engine.test.bpmn.subprocess.transaction;
 
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -29,7 +29,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Daniel Meyer
  */
-public class TransactionSubProcessTest extends PluggableActivitiTestCase {
+public class TransactionSubProcessTest extends PluggableFlowableTestCase {
 
   
   @Deployment(resources={"org/activiti/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testSimpleCase.bpmn20.xml"})

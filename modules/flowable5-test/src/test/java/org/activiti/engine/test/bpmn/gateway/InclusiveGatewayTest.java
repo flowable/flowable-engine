@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.runtime.Execution;
@@ -31,7 +31,7 @@ import org.flowable.engine.test.Deployment;
  * @author Tijs Rademakers
  * @author Saeid Mirzaei
  */
-public class InclusiveGatewayTest extends PluggableActivitiTestCase {
+public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
   private static final String TASK1_NAME = "Task 1";
   private static final String TASK2_NAME = "Task 2";

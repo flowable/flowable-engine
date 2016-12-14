@@ -19,7 +19,7 @@ import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.activiti.camel.util.Routing;
-import org.activiti.spring.impl.test.SpringActivitiTestCase;
+import org.activiti.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -28,8 +28,8 @@ import org.springframework.test.context.ContextConfiguration;
  * @author stefan.schulze@accelsis.biz
  * 
  */
-@ContextConfiguration("classpath:error-camel-activiti-context.xml")
-public class ErrorHandlingTest extends SpringActivitiTestCase {
+@ContextConfiguration("classpath:error-camel-flowable-context.xml")
+public class ErrorHandlingTest extends SpringFlowableTestCase {
 
   private static final int WAIT = 3000;
 

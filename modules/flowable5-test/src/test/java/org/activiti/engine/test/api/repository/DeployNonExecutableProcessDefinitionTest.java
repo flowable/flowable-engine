@@ -12,14 +12,14 @@
  */
 package org.activiti.engine.test.api.repository;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.test.Deployment;
 
 /**
  * @author jbarrez
  */
-public class DeployNonExecutableProcessDefinitionTest extends PluggableActivitiTestCase {
+public class DeployNonExecutableProcessDefinitionTest extends PluggableFlowableTestCase {
 	
 	/*
 	 * Test for https://activiti.atlassian.net/browse/ACT-2071

@@ -4,17 +4,17 @@ import java.util.List;
 
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.impl.test.ResourceActivitiTestCase;
+import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.activiti.engine.task.Attachment;
 import org.flowable.engine.task.Task;
 
 /**
  * @author Bassam Al-Sarori
  */
-public class CustomMybatisXMLMapperTest extends ResourceActivitiTestCase {
+public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
 
   public CustomMybatisXMLMapperTest() {
-    super("org/activiti/standalone/cfg/custom-mybatis-xml-mappers-activiti.cfg.xml");
+    super("org/activiti/standalone/cfg/custom-mybatis-xml-mappers-flowable.cfg.xml");
   }
 
   public void testSelectOneTask() {

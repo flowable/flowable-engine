@@ -16,7 +16,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventImpl;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
-import org.flowable.engine.test.api.event.TestActivitiEventListener;
+import org.flowable.engine.test.api.event.TestFlowableEventListener;
 
 /**
  * Test to verify event-listeners, which are configured in the cfg.xml, are notified.
@@ -26,12 +26,12 @@ import org.flowable.engine.test.api.event.TestActivitiEventListener;
 public class EventListenersConfigurationTest extends ResourceFlowableTestCase {
 
   public EventListenersConfigurationTest() {
-    super("org/flowable/standalone/event/activiti-eventlistener.cfg.xml");
+    super("org/flowable/standalone/event/flowable-eventlistener.cfg.xml");
   }
 
   public void testEventListenerConfiguration() {
     // Fetch the listener to check received events
-    TestActivitiEventListener listener = (TestActivitiEventListener) processEngineConfiguration.getBeans().get("eventListener");
+    TestFlowableEventListener listener = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("eventListener");
     assertNotNull(listener);
 
     // Clear any events received (eg. engine initialisation)

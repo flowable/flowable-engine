@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.test.cmd;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -20,7 +20,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Saeid Mirzaei
  */
-public class FailedJobRetryCmdTest extends PluggableActivitiTestCase{
+public class FailedJobRetryCmdTest extends PluggableFlowableTestCase{
 	
   @Deployment(resources = { "org/activiti/engine/test/cmd/FailedJobRetryCmdTest.testFailedServiceTask.bpmn20.xml" })
 	public void testFailedServiceTask() {

@@ -13,7 +13,7 @@ import org.flowable.engine.repository.Deployment;
 public class ChineseConverterTest extends ResourceFlowableTestCase {
 
   public ChineseConverterTest() {
-    super("org/flowable/standalone/parsing/encoding.activiti.cfg.xml");
+    super("org/flowable/standalone/parsing/encoding.flowable.cfg.xml");
   }
 
   public void testConvertXMLToModel() throws Exception {

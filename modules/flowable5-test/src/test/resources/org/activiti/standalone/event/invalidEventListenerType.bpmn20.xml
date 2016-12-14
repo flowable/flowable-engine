@@ -4,7 +4,7 @@
 
 	<process id="testInvalidEventClass">
         <extensionElements>
-          <activiti:eventListener events="invalid" class="org.activiti.engine.test.api.event.StaticTestActivitiEventListener" />
+          <activiti:eventListener events="invalid" class="org.activiti.engine.test.api.event.StaticTestFlowableEventListener" />
         </extensionElements>
         
 		<startEvent id="theStart" />

@@ -1,6 +1,6 @@
 package org.flowable.crystalball.simulator.impl;
 
-import org.flowable.crystalball.simulator.delegate.event.impl.AbstractRecordActivitiEventListener;
+import org.flowable.crystalball.simulator.delegate.event.impl.AbstractRecordFlowableEventListener;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
@@ -9,7 +9,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
  */
 public class RecordableProcessEngineFactory extends SimulationProcessEngineFactory {
 
-  public RecordableProcessEngineFactory(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractRecordActivitiEventListener listener) {
+  public RecordableProcessEngineFactory(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractRecordFlowableEventListener listener) {
     super(processEngineConfiguration);
     processEngineConfiguration.getEventDispatcher().addEventListener(listener);
   }

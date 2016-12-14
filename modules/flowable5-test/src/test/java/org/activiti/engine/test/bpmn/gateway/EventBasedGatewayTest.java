@@ -15,7 +15,7 @@ package org.activiti.engine.test.bpmn.gateway;
 
 import java.util.Date;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -28,7 +28,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Daniel Meyer
  */
-public class EventBasedGatewayTest extends PluggableActivitiTestCase {
+public class EventBasedGatewayTest extends PluggableFlowableTestCase {
   
   @Deployment(resources={
           "org/activiti/engine/test/bpmn/gateway/EventBasedGatewayTest.testCatchAlertAndTimer.bpmn20.xml",

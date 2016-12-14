@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
@@ -35,7 +35,7 @@ import org.flowable.engine.test.Deployment;
  * @author Nils Preusker
  * @author Bernd Ruecker
  */
-public class CallActivityAdvancedTest extends PluggableActivitiTestCase {
+public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
 
   @Deployment(resources = {
     "org/activiti/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml", 

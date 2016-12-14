@@ -21,7 +21,7 @@ public class AbstractEscapeClauseTestCase extends ResourceFlowableTestCase {
   }
   
   public AbstractEscapeClauseTestCase(String activitiConfigurationResource) {
-    super("org/flowable/standalone/escapeclause/activiti.cfg.xml");
+    super("org/flowable/standalone/escapeclause/flowable.cfg.xml");
   }
   
 }

@@ -32,7 +32,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class AttachmentEventsTest extends PluggableFlowableTestCase {
 
-  private TestActivitiEntityEventListener listener;
+  private TestFlowableEntityEventListener listener;
 
   /**
    * Test create, update and delete events of attachments on a task/process.
@@ -226,7 +226,7 @@ public class AttachmentEventsTest extends PluggableFlowableTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    listener = new TestActivitiEntityEventListener(Attachment.class);
+    listener = new TestFlowableEntityEventListener(Attachment.class);
     processEngineConfiguration.getEventDispatcher().addEventListener(listener);
   }
 

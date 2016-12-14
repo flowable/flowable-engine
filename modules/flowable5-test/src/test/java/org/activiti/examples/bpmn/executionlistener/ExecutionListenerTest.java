@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.examples.bpmn.executionlistener.CurrentActivityExecutionListener.CurrentActivity;
 import org.activiti.examples.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -27,7 +27,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Frederik Heremans
  */
-public class ExecutionListenerTest extends PluggableActivitiTestCase {
+public class ExecutionListenerTest extends PluggableFlowableTestCase {
 
   
   @Deployment(resources = {"org/activiti/examples/bpmn/executionlistener/ExecutionListenersProcess.bpmn20.xml"})

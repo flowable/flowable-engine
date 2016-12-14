@@ -19,7 +19,7 @@ package org.activiti.camel.examples.multiinstance;
 
 import java.util.List;
 
-import org.activiti.spring.impl.test.SpringActivitiTestCase;
+import org.activiti.spring.impl.test.SpringFlowableTestCase;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.flowable.engine.runtime.Job;
@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
-public class MultiInstanceTest extends SpringActivitiTestCase {
+public class MultiInstanceTest extends SpringFlowableTestCase {
 
   @Autowired
   protected CamelContext camelContext;

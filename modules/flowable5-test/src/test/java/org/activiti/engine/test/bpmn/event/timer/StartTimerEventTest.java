@@ -20,7 +20,7 @@ import java.util.concurrent.Callable;
 
 import org.activiti.engine.impl.cmd.CancelJobsCmd;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.IoUtil;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -33,7 +33,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Joram Barrez
  */
-public class StartTimerEventTest extends PluggableActivitiTestCase {
+public class StartTimerEventTest extends PluggableFlowableTestCase {
 
   @Deployment
   public void testDurationStartTimerEvent() throws Exception {

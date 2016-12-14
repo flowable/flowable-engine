@@ -19,7 +19,7 @@ package org.activiti.camel.examples.ping;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.spring.impl.test.SpringActivitiTestCase;
+import org.activiti.spring.impl.test.SpringFlowableTestCase;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.flowable.engine.test.Deployment;
@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
-public class PingPongTest extends SpringActivitiTestCase {
+public class PingPongTest extends SpringFlowableTestCase {
 
   @Autowired
   protected CamelContext camelContext;

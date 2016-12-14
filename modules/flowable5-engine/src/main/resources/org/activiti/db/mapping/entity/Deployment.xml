@@ -8,7 +8,7 @@
   
   <insert id="insertDeployment" parameterType="org.activiti.engine.impl.persistence.entity.DeploymentEntity">
     insert into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, CATEGORY_, TENANT_ID_, DEPLOY_TIME_, ENGINE_VERSION_)
-    values(#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{category, jdbcType=VARCHAR}, #{tenantId, jdbcType=VARCHAR}, #{deploymentTime, jdbcType=TIMESTAMP}, 'activiti-5')
+    values(#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{category, jdbcType=VARCHAR}, #{tenantId, jdbcType=VARCHAR}, #{deploymentTime, jdbcType=TIMESTAMP}, 'v5')
   </insert>
   
   <insert id="bulkInsertDeployment" parameterType="java.util.List">
@@ -20,7 +20,7 @@
          #{deployment.category, jdbcType=VARCHAR},
          #{deployment.tenantId, jdbcType=VARCHAR},
          #{deployment.deploymentTime, jdbcType=TIMESTAMP},
-         'activiti-5')
+         'v5')
       </foreach>
   </insert>
 
@@ -33,7 +33,7 @@
            #{deployment.category, jdbcType=VARCHAR},
            #{deployment.tenantId, jdbcType=VARCHAR},
            #{deployment.deploymentTime, jdbcType=TIMESTAMP},
-           'activiti-5')
+           'v5')
       </foreach>
     SELECT * FROM dual
   </insert>

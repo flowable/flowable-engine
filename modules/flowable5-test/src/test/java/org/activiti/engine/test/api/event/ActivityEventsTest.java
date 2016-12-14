@@ -22,7 +22,7 @@ import org.activiti.engine.impl.event.logger.EventLogger;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
 import org.activiti.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.activiti.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
@@ -43,9 +43,9 @@ import org.flowable.engine.test.Deployment;
  * @author Frederik Heremans
  * @author Joram Barrez
  */
-public class ActivityEventsTest extends PluggableActivitiTestCase {
+public class ActivityEventsTest extends PluggableFlowableTestCase {
 
-	private TestActivitiActivityEventListener listener;
+	private TestFlowableActivityEventListener listener;
 	
 	protected EventLogger databaseEventLogger;
 	
@@ -81,7 +81,7 @@ public class ActivityEventsTest extends PluggableActivitiTestCase {
 	protected void initializeServices() {
 		super.initializeServices();
 
-		listener = new TestActivitiActivityEventListener(true);
+		listener = new TestFlowableActivityEventListener(true);
 		processEngineConfiguration.getEventDispatcher().addEventListener(listener);
 	}
 

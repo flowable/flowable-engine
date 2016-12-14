@@ -13,7 +13,7 @@
 
 package org.activiti.engine.test.history;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -23,7 +23,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Frederik Heremans
  */
-public class HistoricTaskInstanceUpdateTest extends PluggableActivitiTestCase {
+public class HistoricTaskInstanceUpdateTest extends PluggableFlowableTestCase {
 
   
   @Deployment

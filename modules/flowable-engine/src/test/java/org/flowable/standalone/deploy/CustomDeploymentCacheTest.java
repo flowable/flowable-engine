@@ -23,7 +23,7 @@ import org.flowable.engine.repository.Deployment;
 public class CustomDeploymentCacheTest extends ResourceFlowableTestCase {
 
   public CustomDeploymentCacheTest() {
-    super("org/flowable/standalone/deploy/custom.deployment.cache.test.activiti.cfg.xml");
+    super("org/flowable/standalone/deploy/custom.deployment.cache.test.flowable.cfg.xml");
   }
 
   public void testCustomDeploymentCacheUsed() {

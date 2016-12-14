@@ -14,7 +14,7 @@ import org.flowable.engine.task.Task;
 public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
 
   public CustomMybatisXMLMapperTest() {
-    super("org/flowable/standalone/cfg/custom-mybatis-xml-mappers-activiti.cfg.xml");
+    super("org/flowable/standalone/cfg/custom-mybatis-xml-mappers-flowable.cfg.xml");
   }
 
   public void testSelectOneTask() {

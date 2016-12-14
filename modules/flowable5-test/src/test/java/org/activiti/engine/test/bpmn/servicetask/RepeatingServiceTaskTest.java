@@ -13,13 +13,13 @@
 
 package org.activiti.engine.test.bpmn.servicetask;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 
 
 /**
  * @author Joram Barrez
  */
-public class RepeatingServiceTaskTest extends PluggableActivitiTestCase {
+public class RepeatingServiceTaskTest extends PluggableFlowableTestCase {
   
 //  @Deployment
   public void testMultipleInvocationsInSameTransation() {

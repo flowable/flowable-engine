@@ -29,7 +29,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class IdentityLinkEventsTest extends PluggableFlowableTestCase {
 
-  private TestActivitiEntityEventListener listener;
+  private TestFlowableEntityEventListener listener;
 
   /**
    * Check identity links on process definitions.
@@ -216,7 +216,7 @@ public class IdentityLinkEventsTest extends PluggableFlowableTestCase {
   protected void initializeServices() {
     super.initializeServices();
 
-    listener = new TestActivitiEntityEventListener(IdentityLink.class);
+    listener = new TestFlowableEntityEventListener(IdentityLink.class);
     processEngineConfiguration.getEventDispatcher().addEventListener(listener);
   }
 

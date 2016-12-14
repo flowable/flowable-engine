@@ -23,7 +23,7 @@ import org.flowable.engine.test.Deployment;
 public class CustomActivityBehaviorFactoryTest extends ResourceFlowableTestCase {
 
   public CustomActivityBehaviorFactoryTest() {
-    super("org/flowable/standalone/parsing/custom.activitybehaviorfactory.activiti.cfg.xml");
+    super("org/flowable/standalone/parsing/custom.activitybehaviorfactory.flowable.cfg.xml");
   }
 
   // The custom activity factory will change this value

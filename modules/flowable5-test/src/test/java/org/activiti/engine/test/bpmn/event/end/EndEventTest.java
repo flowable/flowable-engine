@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.test.bpmn.event.end;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -21,7 +21,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Joram Barrez
  */
-public class EndEventTest extends PluggableActivitiTestCase {
+public class EndEventTest extends PluggableFlowableTestCase {
 
   // Test case for ACT-1259
   @Deployment

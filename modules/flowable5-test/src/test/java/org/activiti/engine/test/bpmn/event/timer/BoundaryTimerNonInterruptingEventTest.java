@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -29,7 +29,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Joram Barrez
  */
-public class BoundaryTimerNonInterruptingEventTest extends PluggableActivitiTestCase {
+public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTestCase {
     
   @Deployment
   public void testMultipleTimersOnUserTask() {

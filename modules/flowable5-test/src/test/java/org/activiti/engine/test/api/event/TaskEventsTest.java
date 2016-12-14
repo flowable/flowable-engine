@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
@@ -31,9 +31,9 @@ import org.flowable.engine.test.Deployment;
  * 
  * @author Frederik Heremans
  */
-public class TaskEventsTest extends PluggableActivitiTestCase {
+public class TaskEventsTest extends PluggableFlowableTestCase {
 
-	private TestActivitiEntityEventListener listener;
+	private TestFlowableEntityEventListener listener;
 	
 	/**
 	 * Check create, update and delete events for a task. 
@@ -213,7 +213,7 @@ public class TaskEventsTest extends PluggableActivitiTestCase {
     
     // We need to add a special listener that copies the Task values - to record its state when the event fires,
     //otherwise the in-memory task instances is changed after the event fires.
-    TestActivitiEntityEventTaskListener tlistener = new TestActivitiEntityEventTaskListener(org.activiti.engine.task.Task.class);
+    TestFlowableEntityEventTaskListener tlistener = new TestFlowableEntityEventTaskListener(org.activiti.engine.task.Task.class);
     processEngineConfiguration.getEventDispatcher().addEventListener(tlistener);
 
     try {
@@ -259,7 +259,7 @@ public class TaskEventsTest extends PluggableActivitiTestCase {
 	@Override
 	protected void setUp() throws Exception {
 	  super.setUp();
-	  listener = new TestActivitiEntityEventListener(org.activiti.engine.task.Task.class);
+	  listener = new TestFlowableEntityEventListener(org.activiti.engine.task.Task.class);
 	  processEngineConfiguration.getEventDispatcher().addEventListener(listener);
 	}
 	

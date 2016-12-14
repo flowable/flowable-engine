@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -32,7 +32,7 @@ import org.flowable.idm.api.User;
  * @author Tijs Rademakers
  */
 
-public class StartAuthorizationTest extends PluggableActivitiTestCase {
+public class StartAuthorizationTest extends PluggableFlowableTestCase {
 
   IdentityService identityService;
 

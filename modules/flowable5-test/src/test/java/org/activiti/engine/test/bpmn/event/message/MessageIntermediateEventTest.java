@@ -15,7 +15,7 @@ package org.activiti.engine.test.bpmn.event.message;
 
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -26,7 +26,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Daniel Meyer
  */
-public class MessageIntermediateEventTest extends PluggableActivitiTestCase {
+public class MessageIntermediateEventTest extends PluggableFlowableTestCase {
   
   
   @Deployment

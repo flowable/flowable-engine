@@ -18,7 +18,7 @@ import junit.framework.AssertionFailedError;
 
 import org.flowable.crystalball.simulator.*;
 import org.flowable.crystalball.simulator.delegate.event.Function;
-import org.flowable.crystalball.simulator.delegate.event.impl.InMemoryRecordActivitiEventListener;
+import org.flowable.crystalball.simulator.delegate.event.impl.InMemoryRecordFlowableEventListener;
 import org.flowable.crystalball.simulator.delegate.event.impl.ProcessInstanceCreateTransformer;
 import org.flowable.crystalball.simulator.delegate.event.impl.UserTaskCompleteTransformer;
 import org.flowable.crystalball.simulator.impl.EventRecorderTestUtils;
@@ -65,7 +65,7 @@ public abstract class AbstractPlaybackTest extends AbstractFlowableTestCase {
 
   private static Logger log = LoggerFactory.getLogger(AbstractPlaybackTest.class);
 
-  protected InMemoryRecordActivitiEventListener listener = new InMemoryRecordActivitiEventListener(getTransformers());
+  protected InMemoryRecordFlowableEventListener listener = new InMemoryRecordFlowableEventListener(getTransformers());
 
 
   @Override

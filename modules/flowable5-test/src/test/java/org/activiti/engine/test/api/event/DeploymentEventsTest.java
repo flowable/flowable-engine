@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.test.api.event;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
@@ -24,9 +24,9 @@ import org.flowable.engine.repository.DeploymentProperties;
  * 
  * @author Frederik Heremans
  */
-public class DeploymentEventsTest extends PluggableActivitiTestCase {
+public class DeploymentEventsTest extends PluggableFlowableTestCase {
 
-	private TestActivitiEntityEventListener listener;
+	private TestFlowableEntityEventListener listener;
 	
 	/**
 	 * Test create, update and delete events of deployment entities.
@@ -88,7 +88,7 @@ public class DeploymentEventsTest extends PluggableActivitiTestCase {
 	protected void setUp() throws Exception {
 	  super.setUp();
 	  
-	  listener = new TestActivitiEntityEventListener(org.activiti.engine.repository.Deployment.class);
+	  listener = new TestFlowableEntityEventListener(org.activiti.engine.repository.Deployment.class);
 	  processEngineConfiguration.getEventDispatcher().addEventListener(listener);
 	}
 	

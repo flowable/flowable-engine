@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -45,7 +45,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Joram Barrez
  */
-public class MultiInstanceTest extends PluggableActivitiTestCase {
+public class MultiInstanceTest extends PluggableFlowableTestCase {
     
   @Deployment(resources = {"org/activiti/engine/test/bpmn/multiinstance/MultiInstanceTest.sequentialUserTasks.bpmn20.xml"})
   public void testSequentialUserTasks() {

@@ -2,7 +2,7 @@ package org.flowable.crystalball.simulator;
 
 import org.flowable.crystalball.simulator.delegate.event.Function;
 import org.flowable.crystalball.simulator.delegate.event.impl.DeploymentCreateTransformer;
-import org.flowable.crystalball.simulator.delegate.event.impl.InMemoryRecordActivitiEventListener;
+import org.flowable.crystalball.simulator.delegate.event.impl.InMemoryRecordFlowableEventListener;
 import org.flowable.crystalball.simulator.delegate.event.impl.ProcessInstanceCreateTransformer;
 import org.flowable.crystalball.simulator.delegate.event.impl.UserTaskCompleteTransformer;
 import org.flowable.crystalball.simulator.impl.*;
@@ -56,11 +56,11 @@ public class SimpleSimulationRunTest {
 
   private static final String USERTASK_PROCESS = "org/flowable/crystalball/simulator/impl/playback/PlaybackProcessStartTest.testUserTask.bpmn20.xml";
 
-  protected InMemoryRecordActivitiEventListener listener;
+  protected InMemoryRecordFlowableEventListener listener;
 
   @Before
   public void initListener() {
-    listener = new InMemoryRecordActivitiEventListener(getTransformers());
+    listener = new InMemoryRecordFlowableEventListener(getTransformers());
   }
 
   @After

@@ -25,7 +25,7 @@ import org.flowable.engine.repository.Model;
  */
 public class ModelEventsTest extends PluggableFlowableTestCase {
 
-  private TestActivitiEntityEventListener listener;
+  private TestFlowableEntityEventListener listener;
 
   /**
    * Test create, update and delete events of model entities.
@@ -81,7 +81,7 @@ public class ModelEventsTest extends PluggableFlowableTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    listener = new TestActivitiEntityEventListener(Model.class);
+    listener = new TestFlowableEntityEventListener(Model.class);
     processEngineConfiguration.getEventDispatcher().addEventListener(listener);
   }
 

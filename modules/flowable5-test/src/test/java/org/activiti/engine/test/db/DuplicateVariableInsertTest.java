@@ -24,11 +24,11 @@ import org.activiti.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.activiti.engine.impl.cmd.SetTaskVariablesCmd;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 
-public class DuplicateVariableInsertTest extends PluggableActivitiTestCase {
+public class DuplicateVariableInsertTest extends PluggableFlowableTestCase {
 
 	/**
 	 * Test for ACT-1887: Inserting the same new variable at the same time, from 2 different threads, using 2 modified commands that use

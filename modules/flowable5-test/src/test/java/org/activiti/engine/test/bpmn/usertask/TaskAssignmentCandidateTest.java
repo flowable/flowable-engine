@@ -14,7 +14,7 @@ package org.activiti.engine.test.bpmn.usertask;
 
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
@@ -23,7 +23,7 @@ import org.flowable.engine.test.Deployment;
  * 
  * @author Tim Stephenson
  */
-public class TaskAssignmentCandidateTest extends PluggableActivitiTestCase {
+public class TaskAssignmentCandidateTest extends PluggableFlowableTestCase {
 
   public void setUp() throws Exception {
     identityService.saveGroup(identityService.newGroup("accounting"));

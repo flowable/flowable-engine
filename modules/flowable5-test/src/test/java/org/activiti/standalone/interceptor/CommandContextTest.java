@@ -17,13 +17,13 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 
 
 /**
  * @author Tom Baeyens
  */
-public class CommandContextTest extends PluggableActivitiTestCase {
+public class CommandContextTest extends PluggableFlowableTestCase {
 
   public void testCommandContextGetCurrentAfterException() {
     try {

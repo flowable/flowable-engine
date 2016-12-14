@@ -7,7 +7,7 @@ import java.util.List;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Job;
@@ -18,7 +18,7 @@ import org.flowable.engine.test.Deployment;
  * 
  * @author Daniel Meyer
  */
-public class ProcessInstanceSuspensionTest extends PluggableActivitiTestCase {
+public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
   @Deployment(resources={"org/activiti/engine/test/db/oneJobProcess.bpmn20.xml"})
   public void testJobsNotVisisbleToAcquisitionIfInstanceSuspended() {

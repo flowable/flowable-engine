@@ -38,7 +38,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class JobEventsTest extends PluggableFlowableTestCase {
 
-  private TestActivitiEntityEventListener listener;
+  private TestFlowableEntityEventListener listener;
 
   /**
    * Test create, update and delete events of jobs entities.
@@ -406,7 +406,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
   public void testTerminateEndEvent() throws Exception {
     Clock previousClock = processEngineConfiguration.getClock();
 
-    TestActivitiEventListener activitiEventListener = new TestActivitiEventListener();
+    TestFlowableEventListener activitiEventListener = new TestFlowableEventListener();
     processEngineConfiguration.getEventDispatcher().addEventListener(activitiEventListener);
     Clock testClock = new DefaultClockImpl();
 
@@ -468,7 +468,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    listener = new TestActivitiEntityEventListener(Job.class);
+    listener = new TestFlowableEntityEventListener(Job.class);
     processEngineConfiguration.getEventDispatcher().addEventListener(listener);
   }
 

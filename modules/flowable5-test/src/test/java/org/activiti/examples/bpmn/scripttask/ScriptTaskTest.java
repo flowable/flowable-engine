@@ -15,7 +15,7 @@ package org.activiti.examples.bpmn.scripttask;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.repository.DeploymentProperties;
@@ -30,7 +30,7 @@ import groovy.lang.MissingPropertyException;
  * @author Joram Barrez
  * @author Christian Stettler
  */
-public class ScriptTaskTest extends PluggableActivitiTestCase {
+public class ScriptTaskTest extends PluggableFlowableTestCase {
 
   @Deployment
   public void testSetScriptResultToProcessVariable() {

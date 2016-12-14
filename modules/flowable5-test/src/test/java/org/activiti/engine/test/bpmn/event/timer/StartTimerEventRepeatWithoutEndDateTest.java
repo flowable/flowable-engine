@@ -17,8 +17,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
-import org.activiti.engine.test.api.event.TestActivitiEntityEventListener;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
+import org.activiti.engine.test.api.event.TestFlowableEntityEventListener;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
@@ -30,15 +30,15 @@ import org.flowable.engine.task.Task;
 /**
  * @author Vasile Dirla
  */
-public class StartTimerEventRepeatWithoutEndDateTest extends PluggableActivitiTestCase {
+public class StartTimerEventRepeatWithoutEndDateTest extends PluggableFlowableTestCase {
 
-  private TestActivitiEntityEventListener listener;
+  private TestFlowableEntityEventListener listener;
 
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     
-    listener = new TestActivitiEntityEventListener(Job.class);
+    listener = new TestFlowableEntityEventListener(Job.class);
     processEngineConfiguration.getEventDispatcher().addEventListener(listener);
   }
 

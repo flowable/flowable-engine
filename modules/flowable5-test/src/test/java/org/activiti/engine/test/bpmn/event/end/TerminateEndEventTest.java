@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.ExtensionAttribute;
@@ -38,7 +38,7 @@ import org.flowable.engine.test.Deployment;
  * @author Nico Rehwaldt
  * @author Joram Barrez
  */
-public class TerminateEndEventTest extends PluggableActivitiTestCase {
+public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
   public static int serviceTaskInvokedCount = 0;
   

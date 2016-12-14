@@ -14,7 +14,7 @@ package org.activiti.engine.test.bpmn.usertask;
 
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.test.TestHelper;
 import org.flowable.bpmn.exceptions.XMLException;
 import org.flowable.engine.repository.DeploymentProperties;
@@ -27,7 +27,7 @@ import org.flowable.engine.test.Deployment;
  * 
  * @author Joram Barrez
  */
-public class TaskAssignmentExtensionsTest extends PluggableActivitiTestCase {
+public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
 
   public void setUp() throws Exception {
     identityService.saveUser(identityService.newUser("kermit"));

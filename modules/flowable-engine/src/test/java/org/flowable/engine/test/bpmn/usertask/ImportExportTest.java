@@ -16,7 +16,7 @@ import java.io.InputStream;
 public class ImportExportTest extends ResourceFlowableTestCase {
 
   public ImportExportTest() {
-    super("org/flowable/standalone/parsing/encoding.activiti.cfg.xml");
+    super("org/flowable/standalone/parsing/encoding.flowable.cfg.xml");
   }
 
   public void testConvertXMLToModel() throws Exception {

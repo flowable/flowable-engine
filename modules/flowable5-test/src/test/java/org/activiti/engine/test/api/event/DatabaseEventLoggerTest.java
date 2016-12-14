@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.activiti.engine.impl.event.logger.EventLogger;
 import org.activiti.engine.impl.event.logger.handler.Fields;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.event.EventLogEntry;
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author Joram Barrez
  */
-public class DatabaseEventLoggerTest extends PluggableActivitiTestCase {
+public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
 	
 	protected EventLogger databaseEventLogger;
 	

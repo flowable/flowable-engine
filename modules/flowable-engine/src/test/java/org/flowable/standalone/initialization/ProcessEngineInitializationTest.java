@@ -33,7 +33,7 @@ public class ProcessEngineInitializationTest extends AbstractTestCase {
 
   public void testNoTables() {
     try {
-      ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("org/flowable/standalone/initialization/notables.activiti.cfg.xml").buildProcessEngine();
+      ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("org/flowable/standalone/initialization/notables.flowable.cfg.xml").buildProcessEngine();
       fail("expected exception");
     } catch (Exception e) {
       // OK
@@ -43,7 +43,7 @@ public class ProcessEngineInitializationTest extends AbstractTestCase {
 
   public void testVersionMismatch() {
     // first create the schema
-    ProcessEngineImpl processEngine = (ProcessEngineImpl) ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("org/flowable/standalone/initialization/notables.activiti.cfg.xml")
+    ProcessEngineImpl processEngine = (ProcessEngineImpl) ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("org/flowable/standalone/initialization/notables.flowable.cfg.xml")
         .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP).buildProcessEngine();
 
     // then update the version to something that is different to the library
@@ -74,7 +74,7 @@ public class ProcessEngineInitializationTest extends AbstractTestCase {
     try {
       // now we can see what happens if when a process engine is being
       // build with a version mismatch between library and db tables
-      ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("org/flowable/standalone/initialization/notables.activiti.cfg.xml")
+      ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("org/flowable/standalone/initialization/notables.flowable.cfg.xml")
           .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE).buildProcessEngine();
 
       fail("expected exception");

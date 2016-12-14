@@ -3,7 +3,7 @@ package org.activiti.engine.test.api.tenant;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
@@ -23,7 +23,7 @@ import org.junit.Assert;
  * 
  * @author jbarrez
  */
-public class TenancyTest extends PluggableActivitiTestCase {
+public class TenancyTest extends PluggableFlowableTestCase {
 	
 	private static final String TEST_TENANT_ID = "myTenantId";
 	

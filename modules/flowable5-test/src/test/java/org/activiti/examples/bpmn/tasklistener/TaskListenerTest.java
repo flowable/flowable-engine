@@ -14,7 +14,7 @@ package org.activiti.examples.bpmn.tasklistener;
 
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
@@ -22,7 +22,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Joram Barrez
  */
-public class TaskListenerTest extends PluggableActivitiTestCase {
+public class TaskListenerTest extends PluggableFlowableTestCase {
   
   @Deployment(resources = {"org/activiti/examples/bpmn/tasklistener/TaskListenerTest.bpmn20.xml"})
   public void testTaskCreateListener() {

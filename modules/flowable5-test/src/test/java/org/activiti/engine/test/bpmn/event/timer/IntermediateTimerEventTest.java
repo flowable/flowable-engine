@@ -17,14 +17,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.TimerJobQuery;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
-public class IntermediateTimerEventTest extends PluggableActivitiTestCase {
+public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
 
   @Deployment
   public void testCatchingTimerEvent() throws Exception {

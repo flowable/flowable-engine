@@ -26,7 +26,7 @@ import org.flowable.engine.test.Deployment;
 public class ExpressionBeanAccessTest extends ResourceFlowableTestCase {
 
   public ExpressionBeanAccessTest() {
-    super("org/flowable/standalone/el/activiti.cfg.xml");
+    super("org/flowable/standalone/el/flowable.cfg.xml");
   }
 
   @Deployment

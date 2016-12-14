@@ -5,16 +5,16 @@ import java.util.Map;
 
 import org.activiti.engine.impl.cmd.AbstractCustomSqlExecution;
 import org.activiti.engine.impl.cmd.CustomSqlExecution;
-import org.activiti.engine.impl.test.ResourceActivitiTestCase;
+import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.task.Task;
 
 /**
  * @author jbarrez
  */
-public class CustomMybatisMapperTest extends ResourceActivitiTestCase {
+public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
 	
 	public CustomMybatisMapperTest() {
-		super("org/activiti/standalone/cfg/custom-mybatis-mappers-activiti.cfg.xml");
+		super("org/activiti/standalone/cfg/custom-mybatis-mappers-flowable.cfg.xml");
 	}
 	
 	public void testSelectTaskColumns() {

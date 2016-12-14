@@ -44,8 +44,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Tijs Rademakers
  */
 public interface Flowable5CompatibilityHandler {
+  
+  String V5_ENGINE_TAG = "v5";
 
-  public static final String FLOWABLE_5_ENGINE_TAG = "activiti-5";
+  boolean isVersion5Tag(String tag);
   
   ProcessDefinition getProcessDefinition(String processDefinitionId);
   

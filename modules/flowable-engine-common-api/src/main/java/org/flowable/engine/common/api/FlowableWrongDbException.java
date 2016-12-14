@@ -32,7 +32,7 @@ public class FlowableWrongDbException extends FlowableException {
             + libraryVersion
             + "', db version is "
             + dbVersion
-            + " Hint: Set <property name=\"databaseSchemaUpdate\" to value=\"true\" or value=\"create-drop\" (use create-drop for testing only!) in bean processEngineConfiguration in activiti.cfg.xml for automatic schema creation");
+            + " Hint: Set <property name=\"databaseSchemaUpdate\" to value=\"true\" or value=\"create-drop\" (use create-drop for testing only!) in bean processEngineConfiguration in flowable.cfg.xml for automatic schema creation");
     this.libraryVersion = libraryVersion;
     this.dbVersion = dbVersion;
   }

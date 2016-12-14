@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.spring.impl.test.SpringActivitiTestCase;
+import org.activiti.spring.impl.test.SpringFlowableTestCase;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
-public class SimpleSpringProcessTest extends SpringActivitiTestCase {
+public class SimpleSpringProcessTest extends SpringFlowableTestCase {
 
   @Autowired
   protected CamelContext camelContext;

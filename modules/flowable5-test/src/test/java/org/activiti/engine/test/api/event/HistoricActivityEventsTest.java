@@ -15,7 +15,7 @@ package org.activiti.engine.test.api.event;
 import java.util.List;
 
 import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
@@ -29,7 +29,7 @@ import org.flowable.engine.test.Deployment;
  * @author Frederik Heremans
  * @author Joram Barrez
  */
-public class HistoricActivityEventsTest extends PluggableActivitiTestCase {
+public class HistoricActivityEventsTest extends PluggableFlowableTestCase {
 
   private TestHistoricActivityEventListener listener;
 

@@ -15,7 +15,7 @@ package org.activiti.engine.test.api.repository;
 
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.persistence.entity.ModelEntity;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentProperties;
@@ -27,7 +27,7 @@ import org.junit.Assert;
 /**
  * @author Tijs Rademakers
  */
-public class ModelQueryTest extends PluggableActivitiTestCase {
+public class ModelQueryTest extends PluggableFlowableTestCase {
   
   private String modelOneId;
   

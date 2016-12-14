@@ -13,7 +13,7 @@
 
 package org.activiti.spring.test.taskListener;
 
-import org.activiti.spring.impl.test.SpringActivitiTestCase;
+import org.activiti.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
@@ -23,7 +23,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Joram Barrez
  */
 @ContextConfiguration("classpath:org/activiti/spring/test/taskListener/TaskListenerDelegateExpressionTest-context.xml")
-public class TaskListenerSpringTest extends SpringActivitiTestCase {
+public class TaskListenerSpringTest extends SpringFlowableTestCase {
 
   @Deployment
   public void testTaskListenerDelegateExpression() {

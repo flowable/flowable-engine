@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.test.api.event;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
@@ -25,9 +25,9 @@ import org.flowable.engine.task.Task;
  * 
  * @author Frederik Heremans
  */
-public class StandaloneCommentEventsTest extends PluggableActivitiTestCase {
+public class StandaloneCommentEventsTest extends PluggableFlowableTestCase {
 
-	private TestActiviti6EntityEventListener listener;
+	private TestFlowable6EntityEventListener listener;
 	
 	public void testCommentEntityEventsStandaloneTask() throws Exception {
 		if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
@@ -76,7 +76,7 @@ public class StandaloneCommentEventsTest extends PluggableActivitiTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		listener = new TestActiviti6EntityEventListener(Comment.class);
+		listener = new TestFlowable6EntityEventListener(Comment.class);
 		processEngineConfiguration.getEventDispatcher().addEventListener(listener);
 	}
 

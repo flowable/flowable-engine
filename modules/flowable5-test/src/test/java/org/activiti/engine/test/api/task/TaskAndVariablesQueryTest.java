@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.task.TaskQuery;
 import org.flowable.engine.test.Deployment;
@@ -26,7 +26,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Tijs Rademakers
  */
-public class TaskAndVariablesQueryTest extends PluggableActivitiTestCase {
+public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
 
   private List<String> taskIds;
   private List<String> multipleTaskIds;

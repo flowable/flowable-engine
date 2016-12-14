@@ -15,7 +15,7 @@ package org.activiti.spring.test.transaction;
 
 import javax.sql.DataSource;
 
-import org.activiti.spring.impl.test.SpringActivitiTestCase;
+import org.activiti.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.bpmn.exceptions.XMLException;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -27,7 +27,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Tom Baeyens
  */
 @ContextConfiguration("classpath:org/activiti/spring/test/transaction/SpringTransactionIntegrationTest-context.xml")
-public class SpringTransactionIntegrationTest extends SpringActivitiTestCase {
+public class SpringTransactionIntegrationTest extends SpringFlowableTestCase {
 
   @Autowired
   protected UserBean userBean;
@@ -39,7 +39,7 @@ public class SpringTransactionIntegrationTest extends SpringActivitiTestCase {
   protected DataSource dataSource;
 
   @Deployment
-  public void testBasicActivitiSpringIntegration() {
+  public void testBasicFlowableSpringIntegration() {
     userBean.hello();
 
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
@@ -47,7 +47,7 @@ public class SpringTransactionIntegrationTest extends SpringActivitiTestCase {
   }
 
   @Deployment
-  public void testRollbackTransactionOnActivitiException() {
+  public void testRollbackTransactionOnFlowableException() {
 
     // Create a table that the userBean is supposed to fill with some data
     JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);

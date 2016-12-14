@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.test.regression;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.DeploymentProperties;
 
 
@@ -21,7 +21,7 @@ import org.flowable.engine.repository.DeploymentProperties;
  * 
  * @author Joram Barrez
  */
-public class RegressionTest extends PluggableActivitiTestCase {
+public class RegressionTest extends PluggableFlowableTestCase {
   
   // https://activiti.atlassian.net/browse/ACT-1623
   // NPE when eventbased gateway is after referenced event

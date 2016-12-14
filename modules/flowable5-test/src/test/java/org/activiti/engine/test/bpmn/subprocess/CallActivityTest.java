@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.ResourceActivitiTestCase;
+import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.common.api.FlowableException;
@@ -33,7 +33,7 @@ import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 
-public class CallActivityTest extends ResourceActivitiTestCase {
+public class CallActivityTest extends ResourceFlowableTestCase {
 
   private static String MAIN_PROCESS_RESOURCE = "org/activiti/engine/test/bpmn/subprocess/SubProcessTest.testSuspendedProcessCallActivity_mainProcess.bpmn.xml";
   private static String CHILD_PROCESS_RESOURCE = "org/activiti/engine/test/bpmn/subprocess/SubProcessTest.testSuspendedProcessCallActivity_childProcess.bpmn.xml";
@@ -43,7 +43,7 @@ public class CallActivityTest extends ResourceActivitiTestCase {
   private static String NOT_INHERIT_VARIABLES_MAIN_PROCESS_RESOURCE = "org/activiti/engine/test/bpmn/subprocess/SubProcessTest.testNotInheritVariablesCallActivity_mainProcess.bpmn20.xml";
   
   public CallActivityTest() {
-    super("org/activiti/standalone/parsing/encoding.activiti.cfg.xml");
+    super("org/activiti/standalone/parsing/encoding.flowable.cfg.xml");
   }
 
   public void testInstantiateProcessByMessage() throws Exception {

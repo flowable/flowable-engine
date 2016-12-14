@@ -20,7 +20,7 @@ import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Tom Baeyens
  */
-public class MetaDataTest extends PluggableActivitiTestCase {
+public class MetaDataTest extends PluggableFlowableTestCase {
   
   private static Logger log = LoggerFactory.getLogger(MetaDataTest.class);
 

@@ -45,7 +45,7 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
    */
   public void addAndRemoveEventListenerAllEvents() throws Exception {
     // Create a listener that just adds the events to a list
-    TestActivitiEventListener newListener = new TestActivitiEventListener();
+    TestFlowableEventListener newListener = new TestFlowableEventListener();
 
     // Add event-listener to dispatcher
     dispatcher.addEventListener(newListener);
@@ -76,7 +76,7 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
    */
   public void addAndRemoveEventListenerTyped() throws Exception {
     // Create a listener that just adds the events to a list
-    TestActivitiEventListener newListener = new TestActivitiEventListener();
+    TestFlowableEventListener newListener = new TestFlowableEventListener();
 
     // Add event-listener to dispatcher
     dispatcher.addEventListener(newListener, FlowableEngineEventType.ENTITY_CREATED, FlowableEngineEventType.ENTITY_DELETED);
@@ -110,7 +110,7 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
   public void addAndRemoveEventListenerTypedNullType() throws Exception {
 
     // Create a listener that just adds the events to a list
-    TestActivitiEventListener newListener = new TestActivitiEventListener();
+    TestFlowableEventListener newListener = new TestFlowableEventListener();
 
     // Add event-listener to dispatcher
     dispatcher.addEventListener(newListener, (FlowableEngineEventType) null);
@@ -193,8 +193,8 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
    */
   public void exceptionInListener() throws Exception {
     // Create listener that doesn't force the dispatching to fail
-    TestExceptionActivitiEventListener listener = new TestExceptionActivitiEventListener(false);
-    TestActivitiEventListener secondListener = new TestActivitiEventListener();
+    TestExceptionFlowableEventListener listener = new TestExceptionFlowableEventListener(false);
+    TestFlowableEventListener secondListener = new TestFlowableEventListener();
 
     dispatcher.addEventListener(listener);
     dispatcher.addEventListener(secondListener);
@@ -212,8 +212,8 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
     dispatcher.removeEventListener(secondListener);
 
     // Create listener that forces the dispatching to fail
-    listener = new TestExceptionActivitiEventListener(true);
-    secondListener = new TestActivitiEventListener();
+    listener = new TestExceptionFlowableEventListener(true);
+    secondListener = new TestFlowableEventListener();
     dispatcher.addEventListener(listener);
     dispatcher.addEventListener(secondListener);
 

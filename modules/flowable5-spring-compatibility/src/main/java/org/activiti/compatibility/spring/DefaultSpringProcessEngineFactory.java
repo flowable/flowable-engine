@@ -13,8 +13,8 @@
 
 package org.activiti.compatibility.spring;
 
-import org.activiti.compatibility.DefaultProcessEngineFactory;
 import org.activiti.engine.ProcessEngine;
+import org.flowable.compatibility.DefaultProcessEngineFactory;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 

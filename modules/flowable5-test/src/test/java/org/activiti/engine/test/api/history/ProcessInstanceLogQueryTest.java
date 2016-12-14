@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricData;
 import org.flowable.engine.history.HistoricTaskInstance;
@@ -17,7 +17,7 @@ import org.flowable.engine.task.Task;
 /**
  * @author Joram Barrez
  */
-public class ProcessInstanceLogQueryTest extends PluggableActivitiTestCase {
+public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
 	
 	protected String processInstanceId;
 	

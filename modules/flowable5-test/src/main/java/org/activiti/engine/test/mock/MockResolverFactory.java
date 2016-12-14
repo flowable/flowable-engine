@@ -19,7 +19,7 @@ import org.flowable.engine.delegate.VariableScope;
 /**
  * This is a bridge resolver, making available any objects registered through {@link org.flowable.engine.test.mock.Mocks#register} inside scripts supported by Activiti. <br>
  * <br>
- * In order to use it, you need to declare it as ResolverFactory, for example by using activiti.cfg.xml like this: <br>
+ * In order to use it, you need to declare it as ResolverFactory, for example by using flowable.cfg.xml like this: <br>
  * <br>
  * 
  * &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;<br>

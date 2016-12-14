@@ -16,7 +16,7 @@ package org.activiti.engine.test.api.runtime;
 import java.util.List;
 
 import org.activiti.engine.impl.identity.Authentication;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.task.Event;
 import org.flowable.engine.task.IdentityLink;
@@ -29,7 +29,7 @@ import junit.framework.AssertionFailedError;
 /**
  * @author Wendel Kerr
  */
-public class ProcessInstanceIdentityLinksTest extends PluggableActivitiTestCase {
+public class ProcessInstanceIdentityLinksTest extends PluggableFlowableTestCase {
 
   @Deployment(resources="org/activiti/engine/test/api/runtime/IdentityLinksProcess.bpmn20.xml")
   public void testParticipantUserLink() {

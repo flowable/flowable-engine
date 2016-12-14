@@ -16,7 +16,7 @@ package org.activiti.engine.test.el;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -24,7 +24,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Frederik Heremans
  */
-public class ExpressionManagerTest extends PluggableActivitiTestCase {
+public class ExpressionManagerTest extends PluggableFlowableTestCase {
   
   @Override
   protected void setUp() throws Exception {

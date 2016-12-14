@@ -16,7 +16,6 @@ import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.form.StartFormData;
 import org.flowable.engine.impl.form.FormEngine;
 import org.flowable.engine.impl.form.StartFormHandler;
@@ -45,7 +44,7 @@ public class GetRenderedStartFormCmd implements Command<Object>, Serializable {
     ProcessDefinition processDefinition = commandContext.getProcessEngineConfiguration().getDeploymentManager().findDeployedProcessDefinitionById(processDefinitionId);
     
     if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled() && 
-        Flowable5CompatibilityHandler.FLOWABLE_5_ENGINE_TAG.equals(processDefinition.getEngineVersion())) {
+        commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().isVersion5Tag(processDefinition.getEngineVersion())) {
       
       return Flowable5Util.getFlowable5CompatibilityHandler().getRenderedStartForm(processDefinitionId, formEngineName); 
     }

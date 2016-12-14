@@ -1,10 +1,10 @@
 package org.activiti.examples.bpmn.shell;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
-public class ShellTaskTest extends PluggableActivitiTestCase {
+public class ShellTaskTest extends PluggableFlowableTestCase {
 
   enum OsType {
     LINUX, WINDOWS, MAC, SOLARIS, UNKOWN

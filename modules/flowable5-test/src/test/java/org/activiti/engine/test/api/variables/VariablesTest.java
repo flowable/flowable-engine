@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.repository.Deployment;
@@ -20,7 +20,7 @@ import org.flowable.engine.task.Task;
  * 
  * @author Joram Barrez
  */
-public class VariablesTest extends PluggableActivitiTestCase {
+public class VariablesTest extends PluggableFlowableTestCase {
 	
 	protected String processInstanceId;
 	

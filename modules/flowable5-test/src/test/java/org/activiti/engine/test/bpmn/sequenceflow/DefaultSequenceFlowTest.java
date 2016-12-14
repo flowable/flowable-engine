@@ -13,7 +13,7 @@
 
 package org.activiti.engine.test.bpmn.sequenceflow;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.activiti.engine.test.bpmn.gateway.ExclusiveGatewayTest;
 import org.flowable.engine.test.Deployment;
@@ -24,7 +24,7 @@ import org.flowable.engine.test.Deployment;
  * 
  * @author Joram Barrez
  */
-public class DefaultSequenceFlowTest extends PluggableActivitiTestCase {
+public class DefaultSequenceFlowTest extends PluggableFlowableTestCase {
   
   @Deployment
   public void testDefaultSequenceFlowOnTask() {

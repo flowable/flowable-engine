@@ -27,7 +27,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class ExecutionEventsTest extends PluggableFlowableTestCase {
 
-  private TestActivitiEntityEventListener listener;
+  private TestFlowableEntityEventListener listener;
 
   /**
    * Test create, update and delete events of process instances.
@@ -131,7 +131,7 @@ public class ExecutionEventsTest extends PluggableFlowableTestCase {
   protected void initializeServices() {
     super.initializeServices();
 
-    listener = new TestActivitiEntityEventListener(Execution.class);
+    listener = new TestFlowableEntityEventListener(Execution.class);
     processEngineConfiguration.getEventDispatcher().addEventListener(listener);
   }
 

@@ -16,7 +16,6 @@ package org.flowable.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -43,7 +42,7 @@ public class IsFlowable5ProcessDefinitionCmd implements Command<Boolean>, Serial
         .findDeployedProcessDefinitionById(processDefinitionId);
     
     if (processDefinition.getEngineVersion() != null) {
-      if (Flowable5CompatibilityHandler.FLOWABLE_5_ENGINE_TAG.equals(processDefinition.getEngineVersion())) {
+      if (commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().isVersion5Tag(processDefinition.getEngineVersion())) {
         if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled()) {
           return true;
         }

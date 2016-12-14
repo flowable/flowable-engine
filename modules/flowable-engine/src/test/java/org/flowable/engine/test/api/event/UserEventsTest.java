@@ -25,7 +25,7 @@ import org.flowable.idm.api.event.FlowableIdmEventType;
  */
 public class UserEventsTest extends PluggableFlowableTestCase {
 
-  private TestActivitiEntityEventListener listener;
+  private TestFlowableEntityEventListener listener;
 
   /**
    * Test create, update and delete events of users.
@@ -82,7 +82,7 @@ public class UserEventsTest extends PluggableFlowableTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    listener = new TestActivitiEntityEventListener(User.class);
+    listener = new TestFlowableEntityEventListener(User.class);
     processEngineConfiguration.getEventDispatcher().addEventListener(listener);
   }
 

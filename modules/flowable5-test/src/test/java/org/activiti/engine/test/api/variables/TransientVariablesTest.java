@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.DelegateTask;
@@ -19,7 +19,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
-public class TransientVariablesTest extends PluggableActivitiTestCase {
+public class TransientVariablesTest extends PluggableFlowableTestCase {
   
   @Deployment
   public void testSetTransientVariableInServiceTask() {

@@ -23,8 +23,8 @@ import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
-import org.flowable.engine.test.api.event.StaticTestActivitiEventListener;
-import org.flowable.engine.test.api.event.TestActivitiEventListener;
+import org.flowable.engine.test.api.event.StaticTestFlowableEventListener;
+import org.flowable.engine.test.api.event.TestFlowableEventListener;
 
 /**
  * Test for event-listeners that are registered on a process-definition scope, rather than on the global engine-wide scope, declared in the BPMN XML.
@@ -34,10 +34,10 @@ import org.flowable.engine.test.api.event.TestActivitiEventListener;
 public class ProcessDefinitionScopedEventListenerDefinitionTest extends ResourceFlowableTestCase {
 
   public ProcessDefinitionScopedEventListenerDefinitionTest() {
-    super("org/flowable/standalone/event/activiti-eventlistener.cfg.xml");
+    super("org/flowable/standalone/event/flowable-eventlistener.cfg.xml");
   }
 
-  protected TestActivitiEventListener testListenerBean;
+  protected TestFlowableEventListener testListenerBean;
 
   /**
    * Test to verify listeners defined in the BPMN xml are added to the process definition and are active.
@@ -63,7 +63,7 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
     assertEquals(processInstance.getId(), ((ProcessInstance) event.getEntity()).getId());
 
     // Check if listener, defined by classname, received all events
-    List<FlowableEvent> events = StaticTestActivitiEventListener.getEventsReceived();
+    List<FlowableEvent> events = StaticTestFlowableEventListener.getEventsReceived();
     assertFalse(events.isEmpty());
 
     boolean insertFound = false;
@@ -132,7 +132,7 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
     assertNotNull(task);
 
     // Attachment entity
-    TestActivitiEventListener theListener = (TestActivitiEventListener) processEngineConfiguration.getBeans().get("testAttachmentEventListener");
+    TestFlowableEventListener theListener = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("testAttachmentEventListener");
     assertNotNull(theListener);
     assertEquals(0, theListener.getEventsReceived().size());
 
@@ -146,6 +146,6 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    testListenerBean = (TestActivitiEventListener) processEngineConfiguration.getBeans().get("testEventListener");
+    testListenerBean = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("testEventListener");
   }
 }

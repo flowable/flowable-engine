@@ -16,7 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.task.TaskQuery;
 
@@ -25,7 +25,7 @@ import org.flowable.engine.task.TaskQuery;
  * @author Ionut Paduraru
  * @see TaskQueryTest 
  */
-public class SubTaskQueryTest extends PluggableActivitiTestCase {
+public class SubTaskQueryTest extends PluggableFlowableTestCase {
 
   private List<String> taskIds;
 

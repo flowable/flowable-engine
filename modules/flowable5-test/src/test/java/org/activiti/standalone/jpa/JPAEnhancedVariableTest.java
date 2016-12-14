@@ -9,7 +9,7 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.activiti.engine.impl.test.AbstractActivitiTestCase;
+import org.activiti.engine.impl.test.AbstractFlowableTestCase;
 import org.activiti.engine.impl.variable.EntityManagerSession;
 import org.activiti.engine.impl.variable.EntityManagerSessionFactory;
 import org.activiti.engine.task.Task;
@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author <a href="mailto:eugene.khrustalev@gmail.com">Eugene Khrustalev</a>
  */
-public class JPAEnhancedVariableTest extends AbstractActivitiTestCase {
+public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
 
   protected static final Logger logger = LoggerFactory.getLogger(JPAEnhancedVariableTest.class);
   protected static EntityManagerFactory entityManagerFactory;
@@ -41,7 +41,7 @@ public class JPAEnhancedVariableTest extends AbstractActivitiTestCase {
   protected void initializeProcessEngine() {
     if (cachedProcessEngine == null) {
       ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-          .createProcessEngineConfigurationFromResource("org/activiti/standalone/jpa/activiti.cfg.xml");
+          .createProcessEngineConfigurationFromResource("org/activiti/standalone/jpa/flowable.cfg.xml");
 
       cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
       

@@ -14,10 +14,10 @@ package org.activiti.engine.test.bpmn.event.timer.compatibility;
 
 import java.util.Date;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.runtime.Clock;
 
-public abstract class TimerEventCompatibilityTest extends PluggableActivitiTestCase {
+public abstract class TimerEventCompatibilityTest extends PluggableFlowableTestCase {
 
   protected void moveByMinutes(int minutes) throws Exception {
     Clock clock = processEngineConfiguration.getClock();

@@ -15,7 +15,7 @@ package org.activiti.engine.test.history;
 
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
@@ -31,7 +31,7 @@ import org.flowable.engine.test.Deployment;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class HistoricActivityInstanceTest extends PluggableActivitiTestCase {
+public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
   
   @Deployment
   public void testHistoricActivityInstanceNoop() {

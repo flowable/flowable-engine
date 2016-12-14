@@ -27,7 +27,7 @@ import org.flowable.engine.test.Deployment;
 public class UuidGeneratorTest extends ResourceFlowableTestCase {
 
   public UuidGeneratorTest() throws Exception {
-    super("org/flowable/standalone/idgenerator/uuidgenerator.test.activiti.cfg.xml");
+    super("org/flowable/standalone/idgenerator/uuidgenerator.test.flowable.cfg.xml");
   }
 
   @Deployment

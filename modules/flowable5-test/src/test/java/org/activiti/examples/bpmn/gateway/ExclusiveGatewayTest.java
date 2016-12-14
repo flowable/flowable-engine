@@ -15,7 +15,7 @@ package org.activiti.examples.bpmn.gateway;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -26,7 +26,7 @@ import org.flowable.engine.test.Deployment;
  * 
  * @author Joram Barrez
  */
-public class ExclusiveGatewayTest extends PluggableActivitiTestCase {
+public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
 
   /**
    * The test process has an XOR gateway where, the 'input' variable is used to

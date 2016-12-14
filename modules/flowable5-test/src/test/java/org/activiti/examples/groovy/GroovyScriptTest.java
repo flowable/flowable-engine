@@ -13,7 +13,7 @@
 
 package org.activiti.examples.groovy;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -22,7 +22,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Tom Baeyens
  */
-public class GroovyScriptTest extends PluggableActivitiTestCase {
+public class GroovyScriptTest extends PluggableFlowableTestCase {
 
   @Deployment
   public void testScriptExecution() {

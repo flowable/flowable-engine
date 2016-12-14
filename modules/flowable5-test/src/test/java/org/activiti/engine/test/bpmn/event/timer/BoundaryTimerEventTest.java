@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
@@ -33,7 +33,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Joram Barrez
  */
-public class BoundaryTimerEventTest extends PluggableActivitiTestCase {
+public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
   
   private static boolean listenerExecutedStartEvent = false;
   private static boolean listenerExecutedEndEvent = false;

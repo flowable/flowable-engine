@@ -14,7 +14,7 @@ package org.activiti.standalone.deploy;
 
 import java.text.MessageFormat;
 
-import org.activiti.engine.impl.test.ResourceActivitiTestCase;
+import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.repository.Deployment;
@@ -23,10 +23,10 @@ import org.flowable.engine.repository.DeploymentProperties;
 /**
  * @author Joram Barrez
  */
-public class DeploymentCacheLimitTest extends ResourceActivitiTestCase {
+public class DeploymentCacheLimitTest extends ResourceFlowableTestCase {
   
   public DeploymentCacheLimitTest() {
-    super("org/activiti/standalone/deploy/deployment.cache.limit.test.activiti.cfg.xml");
+    super("org/activiti/standalone/deploy/deployment.cache.limit.test.flowable.cfg.xml");
   }
 
   public void testDeploymentCacheLimit() {

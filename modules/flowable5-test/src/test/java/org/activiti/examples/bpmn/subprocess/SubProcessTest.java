@@ -15,7 +15,7 @@ package org.activiti.examples.bpmn.subprocess;
 
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -25,7 +25,7 @@ import org.flowable.engine.task.Task;
 /**
  * @author Joram Barrez
  */
-public class SubProcessTest extends PluggableActivitiTestCase {
+public class SubProcessTest extends PluggableFlowableTestCase {
   
   public void testSimpleSubProcess() {
     

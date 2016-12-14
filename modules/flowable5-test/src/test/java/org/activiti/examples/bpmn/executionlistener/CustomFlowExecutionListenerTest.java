@@ -16,17 +16,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.ResourceActivitiTestCase;
+import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.test.Deployment;
 
 /**
  * @author Tijs Rademakers
  */
-public class CustomFlowExecutionListenerTest extends ResourceActivitiTestCase {
+public class CustomFlowExecutionListenerTest extends ResourceFlowableTestCase {
   
   public CustomFlowExecutionListenerTest() {
-    super("org/activiti/examples/bpmn/executionlistener/custom.flow.parse.handler.activiti.cfg.xml");
+    super("org/activiti/examples/bpmn/executionlistener/custom.flow.parse.handler.flowable.cfg.xml");
   }
 
 	@Deployment(resources = { "org/activiti/examples/bpmn/executionlistener/CustomFlowExecutionListenerTest.bpmn20.xml" })

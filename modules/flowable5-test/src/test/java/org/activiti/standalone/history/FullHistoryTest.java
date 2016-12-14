@@ -25,7 +25,7 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.activiti.engine.impl.test.ResourceActivitiTestCase;
+import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.activiti.engine.impl.variable.EntityManagerSession;
 import org.activiti.engine.impl.variable.EntityManagerSessionFactory;
 import org.activiti.engine.test.api.runtime.DummySerializable;
@@ -54,10 +54,10 @@ import org.flowable.engine.test.Deployment;
  * @author Joram Barrez
  * @author Christian Lipphardt (camunda)
  */
-public class FullHistoryTest extends ResourceActivitiTestCase {
+public class FullHistoryTest extends ResourceFlowableTestCase {
   
   public FullHistoryTest() {
-    super("org/activiti/standalone/history/fullhistory.activiti.cfg.xml");
+    super("org/activiti/standalone/history/fullhistory.flowable.cfg.xml");
   }
 
   @Deployment

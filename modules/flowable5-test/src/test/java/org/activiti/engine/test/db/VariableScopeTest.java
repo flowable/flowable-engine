@@ -24,7 +24,7 @@ import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -34,7 +34,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Tijs Rademakers
  */
-public class VariableScopeTest extends PluggableActivitiTestCase {
+public class VariableScopeTest extends PluggableFlowableTestCase {
   
   @Deployment
   public void testVariableScope() {

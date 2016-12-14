@@ -3,7 +3,7 @@ package org.flowable.crystalball.simulator.impl.playback;
 import org.flowable.crystalball.simulator.*;
 import org.flowable.crystalball.simulator.delegate.event.Function;
 import org.flowable.crystalball.simulator.delegate.event.impl.DeploymentCreateTransformer;
-import org.flowable.crystalball.simulator.delegate.event.impl.InMemoryRecordActivitiEventListener;
+import org.flowable.crystalball.simulator.delegate.event.impl.InMemoryRecordFlowableEventListener;
 import org.flowable.crystalball.simulator.delegate.event.impl.ProcessInstanceCreateTransformer;
 import org.flowable.crystalball.simulator.delegate.event.impl.UserTaskCompleteTransformer;
 import org.flowable.crystalball.simulator.impl.*;
@@ -52,7 +52,7 @@ public class PlaybackRunTest {
   private static final String TEST_VALUE = "TestValue";
   private static final String TEST_VARIABLE = "testVariable";
 
-  protected InMemoryRecordActivitiEventListener listener = new InMemoryRecordActivitiEventListener(getTransformers());
+  protected InMemoryRecordFlowableEventListener listener = new InMemoryRecordFlowableEventListener(getTransformers());
 
   private static final String THE_SIMPLEST_PROCESS = "org/flowable/crystalball/simulator/impl/playback/PlaybackProcessStartTest.testDemo.bpmn20.xml";
 

@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.VariableInstance;
@@ -34,7 +34,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Tom Baeyens
  */
-public class VariablesTest extends PluggableActivitiTestCase {
+public class VariablesTest extends PluggableFlowableTestCase {
   
   @Deployment
   public void testBasicVariableOperations() {

@@ -22,7 +22,6 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
@@ -188,7 +187,7 @@ public class DeploymentManager {
     }
 
     if (processEngineConfiguration.isFlowable5CompatibilityEnabled() && 
-        Flowable5CompatibilityHandler.FLOWABLE_5_ENGINE_TAG.equals(deployment.getEngineVersion())) {
+        processEngineConfiguration.getFlowable5CompatibilityHandler().isVersion5Tag(deployment.getEngineVersion()) ) {
       
       processEngineConfiguration.getFlowable5CompatibilityHandler().deleteDeployment(deploymentId, cascade);
       return;

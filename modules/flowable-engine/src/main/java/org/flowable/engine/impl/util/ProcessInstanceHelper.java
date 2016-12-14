@@ -96,7 +96,7 @@ public class ProcessInstanceHelper {
     
     CommandContext commandContext = Context.getCommandContext();
     if (processDefinition.getEngineVersion() != null) {
-      if (Flowable5CompatibilityHandler.FLOWABLE_5_ENGINE_TAG.equals(processDefinition.getEngineVersion())) {
+      if (commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().isVersion5Tag(processDefinition.getEngineVersion())) {
         Flowable5CompatibilityHandler activiti5CompatibilityHandler = commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler();
 
         if (activiti5CompatibilityHandler == null) {

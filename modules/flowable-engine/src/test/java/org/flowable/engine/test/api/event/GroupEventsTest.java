@@ -27,7 +27,7 @@ import org.flowable.idm.api.event.FlowableIdmMembershipEvent;
  */
 public class GroupEventsTest extends PluggableFlowableTestCase {
 
-  private TestActivitiEntityEventListener listener;
+  private TestFlowableEntityEventListener listener;
 
   /**
    * Test create, update and delete events of Groups.
@@ -85,7 +85,7 @@ public class GroupEventsTest extends PluggableFlowableTestCase {
    * Test create, update and delete events of Groups.
    */
   public void testGroupMembershipEvents() throws Exception {
-    TestActivitiEventListener membershipListener = new TestActivitiEventListener();
+    TestFlowableEventListener membershipListener = new TestFlowableEventListener();
     processEngineConfiguration.getEventDispatcher().addEventListener(membershipListener);
 
     User user = null;
@@ -144,7 +144,7 @@ public class GroupEventsTest extends PluggableFlowableTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    listener = new TestActivitiEntityEventListener(Group.class);
+    listener = new TestFlowableEntityEventListener(Group.class);
     processEngineConfiguration.getEventDispatcher().addEventListener(listener);
   }
 

@@ -15,7 +15,7 @@ package org.activiti.engine.test.api.task;
 import java.util.Date;
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.task.Task;
@@ -23,7 +23,7 @@ import org.flowable.engine.task.Task;
 /**
  * @author Joram Barrez
  */
-public class TaskDueDateTest extends PluggableActivitiTestCase {
+public class TaskDueDateTest extends PluggableFlowableTestCase {
 	
 	@Override
 	protected void tearDown() throws Exception {

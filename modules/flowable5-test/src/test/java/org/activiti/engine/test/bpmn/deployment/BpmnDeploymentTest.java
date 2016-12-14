@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.pvm.ReadOnlyProcessDefinition;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.impl.util.ReflectUtil;
 import org.flowable.engine.common.api.FlowableException;
@@ -36,7 +36,7 @@ import org.flowable.validation.validator.Problems;
  * @author Joram Barrez
  * @author Erik Winlof
  */
-public class BpmnDeploymentTest extends PluggableActivitiTestCase {
+public class BpmnDeploymentTest extends PluggableFlowableTestCase {
   
   @Deployment
   public void testGetBpmnXmlFileThroughService() {

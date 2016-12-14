@@ -22,7 +22,7 @@ import org.flowable.engine.test.Deployment;
 public class BPMNParseHandlerTest extends ResourceFlowableTestCase {
 
   public BPMNParseHandlerTest() {
-    super("org/flowable/standalone/parsing/bpmn.parse.listener.activiti.cfg.xml");
+    super("org/flowable/standalone/parsing/bpmn.parse.listener.flowable.cfg.xml");
   }
 
   @Deployment

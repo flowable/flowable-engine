@@ -28,7 +28,7 @@ public class DefaultFlowable5CompatibilityHandlerFactory implements Flowable5Com
   public Flowable5CompatibilityHandler createFlowable5CompatibilityHandler() {
 
     if (compatibilityHandlerClassName == null) {
-      compatibilityHandlerClassName = "org.activiti.compatibility.DefaultFlowable5CompatibilityHandler";
+      compatibilityHandlerClassName = "org.flowable.compatibility.DefaultFlowable5CompatibilityHandler";
     }
 
     try {

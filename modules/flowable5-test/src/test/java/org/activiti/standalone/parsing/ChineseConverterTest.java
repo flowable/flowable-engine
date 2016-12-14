@@ -3,7 +3,7 @@ package org.activiti.standalone.parsing;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import org.activiti.engine.impl.test.ResourceActivitiTestCase;
+import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.common.impl.util.io.InputStreamSource;
@@ -11,10 +11,10 @@ import org.flowable.engine.common.impl.util.io.StreamSource;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentProperties;
 
-public class ChineseConverterTest extends ResourceActivitiTestCase {
+public class ChineseConverterTest extends ResourceFlowableTestCase {
   
   public ChineseConverterTest() {
-    super("org/activiti/standalone/parsing/encoding.activiti.cfg.xml");
+    super("org/activiti/standalone/parsing/encoding.flowable.cfg.xml");
   }
   
   public void testConvertXMLToModel() throws Exception {

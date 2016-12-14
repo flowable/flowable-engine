@@ -17,13 +17,13 @@ import java.util.Date;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
 import org.activiti.engine.impl.persistence.entity.TimerJobEntity;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Job;
 
 /**
  * @author Tom Baeyens
  */
-public abstract class JobExecutorTestCase extends PluggableActivitiTestCase {
+public abstract class JobExecutorTestCase extends PluggableFlowableTestCase {
 
   protected TweetHandler tweetHandler = new TweetHandler();
 

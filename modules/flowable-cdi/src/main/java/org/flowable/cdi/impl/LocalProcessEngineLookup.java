@@ -22,7 +22,7 @@ import org.flowable.engine.common.api.FlowableException;
  * <p />
  * Use this Strategy if you want to build and manage a {@link ProcessEngine} local to your application.
  * <p />
- * Note: Requires an "activiti.cfg.xml" to be available on the classpath.
+ * Note: Requires an "flowable.cfg.xml" to be available on the classpath.
  * 
  * @author Daniel Meyer
  */

@@ -24,7 +24,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class UncaughtErrorEventTest extends PluggableFlowableTestCase {
 
-  private TestActivitiEventListener listener;
+  private TestFlowableEventListener listener;
 
   /**
    * Test events related to error-events, thrown from within process-execution (eg. service-task).
@@ -43,7 +43,7 @@ public class UncaughtErrorEventTest extends PluggableFlowableTestCase {
   protected void initializeServices() {
     super.initializeServices();
 
-    listener = new TestActivitiEventListener();
+    listener = new TestFlowableEventListener();
     processEngineConfiguration.getEventDispatcher().addEventListener(listener);
   }
 

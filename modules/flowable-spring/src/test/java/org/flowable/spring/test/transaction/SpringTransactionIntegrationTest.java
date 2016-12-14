@@ -39,7 +39,7 @@ public class SpringTransactionIntegrationTest extends SpringFlowableTestCase {
   protected DataSource dataSource;
 
   @Deployment
-  public void testBasicActivitiSpringIntegration() {
+  public void testBasicFlowableSpringIntegration() {
     userBean.hello();
 
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
@@ -47,7 +47,7 @@ public class SpringTransactionIntegrationTest extends SpringFlowableTestCase {
   }
 
   @Deployment
-  public void testRollbackTransactionOnActivitiException() {
+  public void testRollbackTransactionOnFlowableException() {
 
     // Create a table that the userBean is supposed to fill with some data
     JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);

@@ -17,7 +17,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -29,7 +29,7 @@ import org.joda.time.format.ISODateTimeFormat;
 /**
  * @author Vasile Dirla
  */
-public class BoundaryTimerEventRepeatWithEnd extends PluggableActivitiTestCase {
+public class BoundaryTimerEventRepeatWithEnd extends PluggableFlowableTestCase {
 
   @Deployment
   public void testRepeatWithEnd() throws Throwable {

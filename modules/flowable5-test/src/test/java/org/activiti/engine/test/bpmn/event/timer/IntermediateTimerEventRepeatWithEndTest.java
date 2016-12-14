@@ -17,7 +17,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
@@ -31,7 +31,7 @@ import org.joda.time.format.ISODateTimeFormat;
 /**
  * @author Vasile Dirla
  */
-public class IntermediateTimerEventRepeatWithEndTest extends PluggableActivitiTestCase {
+public class IntermediateTimerEventRepeatWithEndTest extends PluggableFlowableTestCase {
 
   @Deployment
   public void testRepeatWithEnd() throws Throwable {

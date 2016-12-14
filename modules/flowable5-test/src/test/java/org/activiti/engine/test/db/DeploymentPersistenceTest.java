@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.IoUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentProperties;
@@ -29,7 +29,7 @@ import org.flowable.engine.repository.DeploymentProperties;
 /**
  * @author Tom Baeyens
  */
-public class DeploymentPersistenceTest extends PluggableActivitiTestCase {
+public class DeploymentPersistenceTest extends PluggableFlowableTestCase {
 
   public void testDeploymentPersistence() {
     Deployment deployment = repositoryService

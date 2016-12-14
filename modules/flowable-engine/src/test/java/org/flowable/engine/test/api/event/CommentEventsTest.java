@@ -29,7 +29,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class CommentEventsTest extends PluggableFlowableTestCase {
 
-  private TestActivitiEntityEventListener listener;
+  private TestFlowableEntityEventListener listener;
 
   /**
    * Test create, update and delete events of comments on a task/process.
@@ -116,7 +116,7 @@ public class CommentEventsTest extends PluggableFlowableTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    listener = new TestActivitiEntityEventListener(Comment.class);
+    listener = new TestFlowableEntityEventListener(Comment.class);
     processEngineConfiguration.getEventDispatcher().addEventListener(listener);
   }
 

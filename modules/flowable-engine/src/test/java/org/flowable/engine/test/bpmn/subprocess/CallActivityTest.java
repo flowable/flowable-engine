@@ -42,7 +42,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
   private static String NOT_INHERIT_VARIABLES_MAIN_PROCESS_RESOURCE = "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testNotInheritVariablesCallActivity_mainProcess.bpmn20.xml";
   
   public CallActivityTest() {
-    super("org/flowable/standalone/parsing/encoding.activiti.cfg.xml");
+    super("org/flowable/standalone/parsing/encoding.flowable.cfg.xml");
   }
 
   public void testInstantiateProcessByMessage() throws Exception {

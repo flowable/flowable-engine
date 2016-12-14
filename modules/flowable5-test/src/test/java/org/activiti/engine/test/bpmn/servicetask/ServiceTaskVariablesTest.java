@@ -15,7 +15,7 @@ package org.activiti.engine.test.bpmn.servicetask;
 
 import java.io.Serializable;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.test.Deployment;
@@ -25,7 +25,7 @@ import org.flowable.engine.test.Deployment;
  *
  * @author Daniel Meyer
  */
-public class ServiceTaskVariablesTest extends PluggableActivitiTestCase {
+public class ServiceTaskVariablesTest extends PluggableFlowableTestCase {
   
   static boolean isNullInDelegate2;
   static boolean isNullInDelegate3;

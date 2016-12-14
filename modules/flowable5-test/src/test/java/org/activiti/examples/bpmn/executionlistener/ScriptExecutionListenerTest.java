@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -25,7 +25,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Tijs Rademakers
  */
-public class ScriptExecutionListenerTest extends PluggableActivitiTestCase {
+public class ScriptExecutionListenerTest extends PluggableFlowableTestCase {
 
 	@Deployment(resources = { "org/activiti/examples/bpmn/executionlistener/ScriptExecutionListenerTest.bpmn20.xml" })
 	public void testScriptExecutionListener() {

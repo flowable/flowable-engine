@@ -1,8 +1,8 @@
 package org.activiti.engine.test.api.runtime;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 
-public class ExecutionAndProcessInstanceQueryVersionTest extends PluggableActivitiTestCase {
+public class ExecutionAndProcessInstanceQueryVersionTest extends PluggableFlowableTestCase {
 
   private static final String PROCESS_DEFINITION_KEY = "oneTaskProcess";
   private static final String DEPLOYMENT_FILE_PATH = "org/activiti/engine/test/api/runtime/oneTaskProcess.bpmn20.xml";

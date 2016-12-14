@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.test.api.event;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
@@ -25,9 +25,9 @@ import org.flowable.engine.task.Task;
  * 
  * @author Frederik Heremans
  */
-public class TaskStandaloneEventsTest extends PluggableActivitiTestCase {
+public class TaskStandaloneEventsTest extends PluggableFlowableTestCase {
 
-	private TestActiviti6EntityEventListener listener;
+	private TestFlowable6EntityEventListener listener;
 	
 	/**
 	 * Check all events for tasks not related to a process-instance 
@@ -138,7 +138,7 @@ public class TaskStandaloneEventsTest extends PluggableActivitiTestCase {
 	@Override
 	protected void setUp() throws Exception {
 	  super.setUp();
-	  listener = new TestActiviti6EntityEventListener(Task.class);
+	  listener = new TestFlowable6EntityEventListener(Task.class);
 	  processEngineConfiguration.getEventDispatcher().addEventListener(listener);
 	}
 	

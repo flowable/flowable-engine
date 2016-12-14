@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
  * on this class.<br>
  * <br>
  * The {@link #init()} method will try to build one {@link ProcessEngine} for 
- * each activiti.cfg.xml file found on the classpath.  If you have more then one,
+ * each flowable.cfg.xml file found on the classpath.  If you have more then one,
  * make sure you specify different process.engine.name values.
  *  
  * @author Tom Baeyens
@@ -71,7 +71,7 @@ public abstract class ProcessEngines {
   protected static List<ProcessEngineInfo> processEngineInfos = new ArrayList<ProcessEngineInfo>();
   
   /** Initializes all process engines that can be found on the classpath for 
-   * resources <code>activiti.cfg.xml</code> (plain Activiti style configuration)
+   * resources <code>flowable.cfg.xml</code> (plain Activiti style configuration)
    * and for resources <code>activiti-context.xml</code> (Spring style configuration). */
   public synchronized static void init() {
     if (!isInitialized()) {
@@ -82,9 +82,9 @@ public abstract class ProcessEngines {
       ClassLoader classLoader = ReflectUtil.getClassLoader();
       Enumeration<URL> resources = null;
       try {
-        resources = classLoader.getResources("activiti.cfg.xml");
+        resources = classLoader.getResources("flowable.cfg.xml");
       } catch (IOException e) {
-        throw new ActivitiIllegalArgumentException("problem retrieving activiti.cfg.xml resources on the classpath: "+System.getProperty("java.class.path"), e);
+        throw new ActivitiIllegalArgumentException("problem retrieving flowable.cfg.xml resources on the classpath: "+System.getProperty("java.class.path"), e);
       }
       
       // Remove duplicated configuration URL's using set. Some classloaders may return identical URL's twice, causing duplicate startups

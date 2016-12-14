@@ -147,7 +147,7 @@
                                 <configuration>
                                     <tasks>
                                         <echo message="updating db configuration to db ${database}" />
-                                        <copy file="${user.home}/.activiti/enterprise/build.flowable-admin.${database}.properties"
+                                        <copy file="${user.home}/.flowable/enterprise/build.flowable-admin.${database}.properties"
                                               tofile="target/test-classes/META-INF/flowable-admin/TEST-db.properties"
                                               overwrite="true" />
                                     </tasks>
@@ -576,8 +576,7 @@
 									<version>[3.0.0,)</version>
 								</requireMavenVersion>
 								<requireJavaVersion>
-									<message>You are running an older version of Java. The Activiti Admin Application
-										requires at least JDK 1.6</message>
+									<message>You are running an older version of Java. The Admin Application requires at least JDK 1.6</message>
 									<version>[1.6.0,)</version>
 								</requireJavaVersion>
 							</rules>

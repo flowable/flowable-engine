@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.test.api.event;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableVariableEvent;
@@ -24,9 +24,9 @@ import org.flowable.engine.task.Task;
  * 
  * @author Frederik Heremans
  */
-public class StandaloneTaskVariableEventsTest extends PluggableActivitiTestCase {
+public class StandaloneTaskVariableEventsTest extends PluggableFlowableTestCase {
 
-	private TestActiviti6VariableEventListener listener;
+	private TestFlowable6VariableEventListener listener;
 
 	/**
 	 * Test to check create, update an delete behavior for variables on a task not related to a process.
@@ -85,7 +85,7 @@ public class StandaloneTaskVariableEventsTest extends PluggableActivitiTestCase 
 	protected void initializeServices() {
 		super.initializeServices();
 
-		listener = new TestActiviti6VariableEventListener();
+		listener = new TestFlowable6VariableEventListener();
 		processEngineConfiguration.getEventDispatcher().addEventListener(listener);
 	}
 

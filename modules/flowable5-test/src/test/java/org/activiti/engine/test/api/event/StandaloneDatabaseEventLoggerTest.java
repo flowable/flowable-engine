@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.event.logger.EventLogger;
 import org.flowable.engine.impl.event.logger.handler.Fields;
@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author Joram Barrez
  */
-public class StandaloneDatabaseEventLoggerTest extends PluggableActivitiTestCase {
+public class StandaloneDatabaseEventLoggerTest extends PluggableFlowableTestCase {
 	
 	protected EventLogger databaseEventLogger;
 	

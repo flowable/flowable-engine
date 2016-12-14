@@ -15,7 +15,7 @@ package org.activiti.examples.bpmn.servicetask;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.engine.common.api.FlowableClassLoadingException;
 import org.flowable.engine.common.api.FlowableException;
@@ -29,7 +29,7 @@ import org.flowable.engine.test.Deployment;
  * @author Joram Barrez
  * @author Frederik Heremans
  */
-public class JavaServiceTaskTest extends PluggableActivitiTestCase {
+public class JavaServiceTaskTest extends PluggableFlowableTestCase {
 
   @Deployment
   public void testJavaServiceDelegation() {

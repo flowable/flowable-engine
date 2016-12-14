@@ -277,7 +277,7 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<echo message="updating activiti dmn configuration to db ${databasewithschemadmn}" />
+										<echo message="updating dmn configuration to db ${databasewithschemadmn}" />
 										<copy file="${basedir}/../../qa/db/schema/flowable.dmn.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset

@@ -15,17 +15,17 @@ package org.activiti.standalone.deploy;
 import java.text.MessageFormat;
 
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.test.ResourceActivitiTestCase;
+import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentProperties;
 
 /**
  * @author Joram Barrez
  */
-public class CustomDeploymentCacheTest extends ResourceActivitiTestCase {
+public class CustomDeploymentCacheTest extends ResourceFlowableTestCase {
   
   public CustomDeploymentCacheTest() {
-    super("org/activiti/standalone/deploy/custom.deployment.cache.test.activiti.cfg.xml");
+    super("org/activiti/standalone/deploy/custom.deployment.cache.test.flowable.cfg.xml");
   }
   
   public void testCustomDeploymentCacheUsed() {

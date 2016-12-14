@@ -33,7 +33,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class TaskEventsTest extends PluggableFlowableTestCase {
 
-  private TestActivitiEntityEventListener listener;
+  private TestFlowableEntityEventListener listener;
 
   /**
    * Check create, update and delete events for a task.
@@ -245,7 +245,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
   public void testEventFiringOrdering() {
     //We need to add a special listener that copies the Task values - to record its state when the event fires,
     //otherwise the in-memory task instances is changed after the event fires.
-    TestActivitiEntityEventTaskListener tlistener = new TestActivitiEntityEventTaskListener(Task.class);
+    TestFlowableEntityEventTaskListener tlistener = new TestFlowableEntityEventTaskListener(Task.class);
     processEngineConfiguration.getEventDispatcher().addEventListener(tlistener);
 
     try {
@@ -396,7 +396,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    listener = new TestActivitiEntityEventListener(Task.class);
+    listener = new TestFlowableEntityEventListener(Task.class);
     processEngineConfiguration.getEventDispatcher().addEventListener(listener);
   }
 

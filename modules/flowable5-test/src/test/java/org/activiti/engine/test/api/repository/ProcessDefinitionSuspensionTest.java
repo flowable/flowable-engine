@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -28,7 +28,7 @@ import org.flowable.engine.test.Deployment;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class ProcessDefinitionSuspensionTest extends PluggableActivitiTestCase {
+public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
 
   @Deployment(resources={"org/activiti/engine/test/db/processOne.bpmn20.xml"})
   public void testProcessDefinitionActiveByDefault() {

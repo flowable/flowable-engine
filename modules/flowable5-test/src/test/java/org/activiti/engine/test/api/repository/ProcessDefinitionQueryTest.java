@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -30,7 +30,7 @@ import org.flowable.engine.repository.ProcessDefinitionQuery;
 /**
  * @author Joram Barrez
  */
-public class ProcessDefinitionQueryTest extends PluggableActivitiTestCase {
+public class ProcessDefinitionQueryTest extends PluggableFlowableTestCase {
   
   private String deploymentOneId;
   private String deploymentTwoId;

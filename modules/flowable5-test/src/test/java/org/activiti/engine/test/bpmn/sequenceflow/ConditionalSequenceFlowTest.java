@@ -16,7 +16,7 @@ package org.activiti.engine.test.bpmn.sequenceflow;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class ConditionalSequenceFlowTest extends PluggableActivitiTestCase {
+public class ConditionalSequenceFlowTest extends PluggableFlowableTestCase {
   
   @Deployment
   public void testUelExpression() {

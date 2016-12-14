@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
 
-public class HistoricProcessInstanceQueryVersionTest extends PluggableActivitiTestCase{
+public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTestCase{
 
   private static final String PROCESS_DEFINITION_KEY = "oneTaskProcess";
   private static final String DEPLOYMENT_FILE_PATH = "org/activiti/engine/test/api/oneTaskProcess.bpmn20.xml";

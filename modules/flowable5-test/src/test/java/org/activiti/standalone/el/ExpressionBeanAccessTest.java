@@ -13,7 +13,7 @@
 
 package org.activiti.standalone.el;
 
-import org.activiti.engine.impl.test.ResourceActivitiTestCase;
+import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -22,10 +22,10 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Frederik Heremans
  */
-public class ExpressionBeanAccessTest extends ResourceActivitiTestCase {
+public class ExpressionBeanAccessTest extends ResourceFlowableTestCase {
 
   public ExpressionBeanAccessTest() {
-    super("org/activiti/standalone/el/activiti.cfg.xml");
+    super("org/activiti/standalone/el/flowable.cfg.xml");
   }
   
   @Deployment

@@ -59,7 +59,7 @@ import org.junit.runners.model.Statement;
  * <p>
  * The ProcessEngine and the services will be made available to the test class
  * through the getters of the activitiRule. The processEngine will be
- * initialized by default with the activiti.cfg.xml resource on the classpath.
+ * initialized by default with the flowable.cfg.xml resource on the classpath.
  * To specify a different configuration file, pass the resource location in
  * {@link #ActivitiRule(String) the appropriate constructor}. Process engines
  * will be cached statically. Right before the first time the setUp is called

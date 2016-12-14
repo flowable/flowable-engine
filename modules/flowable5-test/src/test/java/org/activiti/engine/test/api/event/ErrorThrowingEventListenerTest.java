@@ -13,7 +13,7 @@
 package org.activiti.engine.test.api.event;
 
 import org.activiti.engine.impl.bpmn.helper.ErrorThrowingEventListener;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
@@ -27,7 +27,7 @@ import org.flowable.engine.test.Deployment;
  * 
  * @author Frederik Heremans
  */
-public class ErrorThrowingEventListenerTest extends PluggableActivitiTestCase {
+public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
 
 	@Deployment
 	public void testThrowError() throws Exception {

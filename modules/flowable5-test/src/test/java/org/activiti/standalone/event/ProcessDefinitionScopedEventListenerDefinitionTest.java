@@ -14,9 +14,9 @@ package org.activiti.standalone.event;
 
 import java.util.List;
 
-import org.activiti.engine.impl.test.ResourceActivitiTestCase;
-import org.activiti.engine.test.api.event.StaticTestActivitiEventListener;
-import org.activiti.engine.test.api.event.TestActivitiEventListener;
+import org.activiti.engine.impl.test.ResourceFlowableTestCase;
+import org.activiti.engine.test.api.event.StaticTestFlowableEventListener;
+import org.activiti.engine.test.api.event.TestFlowableEventListener;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
@@ -33,13 +33,13 @@ import org.flowable.engine.test.Deployment;
  * 
  * @author Frederik Heremans
  */
-public class ProcessDefinitionScopedEventListenerDefinitionTest extends ResourceActivitiTestCase {
+public class ProcessDefinitionScopedEventListenerDefinitionTest extends ResourceFlowableTestCase {
 
   public ProcessDefinitionScopedEventListenerDefinitionTest() {
-    super("org/activiti/standalone/event/activiti-eventlistener.cfg.xml");
+    super("org/activiti/standalone/event/flowable-eventlistener.cfg.xml");
   }
 
-	protected TestActivitiEventListener testListenerBean;
+	protected TestFlowableEventListener testListenerBean;
 
 	/**
 	 * Test to verify listeners defined in the BPMN xml are added to the process
@@ -72,7 +72,7 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
 		assertEquals(processInstance.getId(), ((org.activiti.engine.runtime.ProcessInstance) event.getEntity()).getId());
 		
 		// Check if listener, defined by classname, received all events
-		List<FlowableEvent> events = StaticTestActivitiEventListener.getEventsReceived();
+		List<FlowableEvent> events = StaticTestFlowableEventListener.getEventsReceived();
 		assertFalse(events.isEmpty());
 		
 		boolean insertFound = false;
@@ -147,7 +147,7 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
 		assertNotNull(task);
 		
 		// Attachment entity
-		TestActivitiEventListener theListener = (TestActivitiEventListener) processEngineConfiguration.getBeans().get("testAttachmentEventListener");
+		TestFlowableEventListener theListener = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("testAttachmentEventListener");
 		assertNotNull(theListener);
 		assertEquals(0, theListener.getEventsReceived().size());
 		
@@ -161,6 +161,6 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
 	@Override
 	protected void setUp() throws Exception {
 	  super.setUp();
-	  testListenerBean = (TestActivitiEventListener) processEngineConfiguration.getBeans().get("testEventListener");
+	  testListenerBean = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("testEventListener");
 	}
 }

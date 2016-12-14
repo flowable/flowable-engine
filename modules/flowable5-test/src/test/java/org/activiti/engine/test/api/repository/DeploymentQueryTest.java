@@ -15,7 +15,7 @@ package org.activiti.engine.test.api.repository;
 
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
@@ -27,7 +27,7 @@ import org.flowable.engine.repository.DeploymentQuery;
 /**
  * @author Tom Baeyens
  */
-public class DeploymentQueryTest extends PluggableActivitiTestCase {
+public class DeploymentQueryTest extends PluggableFlowableTestCase {
   
   private String deploymentOneId;
   

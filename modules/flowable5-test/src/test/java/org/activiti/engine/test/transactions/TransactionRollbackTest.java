@@ -14,7 +14,7 @@
 package org.activiti.engine.test.transactions;
 
 import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.test.Deployment;
@@ -23,7 +23,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Tom Baeyens
  */
-public class TransactionRollbackTest extends PluggableActivitiTestCase {
+public class TransactionRollbackTest extends PluggableFlowableTestCase {
   
   public static class Buzzz implements ActivityBehavior {
     public void execute(DelegateExecution execution) {

@@ -16,7 +16,7 @@ package org.activiti.engine.test.bpmn.deployment;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.interceptor.Command;
@@ -32,7 +32,7 @@ import org.flowable.engine.task.Task;
  * 
  * @author Joram Barrez
  */
-public class MessageEventsAndNewVersionDeploymentsTest extends PluggableActivitiTestCase {
+public class MessageEventsAndNewVersionDeploymentsTest extends PluggableFlowableTestCase {
   
   private static final String TEST_PROCESS_GLOBAL_BOUNDARY_MESSAGE = 
       "org/activiti/engine/test/bpmn/deployment/MessageEventsAndNewVersionDeploymentsTest.testGlobalMessageBoundaryEvent.bpmn20.xml";

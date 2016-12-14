@@ -1,12 +1,12 @@
 package org.activiti.engine.test.api.history;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.task.Task;
 import org.junit.Test;
 
-public class NonCascadeDeleteTest extends PluggableActivitiTestCase {
+public class NonCascadeDeleteTest extends PluggableFlowableTestCase {
 
   private static String PROCESS_DEFINITION_KEY = "oneTaskProcess";
   

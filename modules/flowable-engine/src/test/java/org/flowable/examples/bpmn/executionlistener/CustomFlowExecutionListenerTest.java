@@ -26,7 +26,7 @@ import org.flowable.engine.test.Deployment;
 public class CustomFlowExecutionListenerTest extends ResourceFlowableTestCase {
 
   public CustomFlowExecutionListenerTest() {
-    super("org/flowable/examples/bpmn/executionlistener/custom.flow.parse.handler.activiti.cfg.xml");
+    super("org/flowable/examples/bpmn/executionlistener/custom.flow.parse.handler.flowable.cfg.xml");
   }
 
   @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/CustomFlowExecutionListenerTest.bpmn20.xml" })

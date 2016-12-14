@@ -13,7 +13,7 @@
 
 package org.activiti.engine.test.bpmn.event.message;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -25,7 +25,7 @@ import org.flowable.engine.test.Deployment;
  * @author Daniel Meyer
  * @author Falko Menge
  */
-public class MessageEventSubprocessTest extends PluggableActivitiTestCase {
+public class MessageEventSubprocessTest extends PluggableFlowableTestCase {
   
   @Deployment
   public void testInterruptingUnderProcessDefinition() {

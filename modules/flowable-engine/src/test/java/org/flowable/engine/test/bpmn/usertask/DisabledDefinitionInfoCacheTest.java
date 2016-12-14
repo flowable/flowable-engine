@@ -39,7 +39,7 @@ public class DisabledDefinitionInfoCacheTest extends AbstractFlowableTestCase {
   protected void initializeProcessEngine() {
     if (cachedProcessEngine==null) {
       ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-          .createProcessEngineConfigurationFromResource("org/flowable/engine/test/bpmn/usertask/activiti.cfg.xml");
+          .createProcessEngineConfigurationFromResource("org/flowable/engine/test/bpmn/usertask/flowable.cfg.xml");
       
       cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
     }

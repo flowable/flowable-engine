@@ -18,7 +18,7 @@ import java.util.List;
 import org.activiti.camel.exception.tools.ExceptionServiceMock;
 import org.activiti.camel.exception.tools.NoExceptionServiceMock;
 import org.activiti.camel.exception.tools.ThrowBpmnExceptionBean;
-import org.activiti.spring.impl.test.SpringActivitiTestCase;
+import org.activiti.spring.impl.test.SpringFlowableTestCase;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
@@ -35,7 +35,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Saeid Mirzaei
  */
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
-public class CamelExceptionTest extends SpringActivitiTestCase {
+public class CamelExceptionTest extends SpringFlowableTestCase {
 
   @Autowired
   protected CamelContext camelContext;

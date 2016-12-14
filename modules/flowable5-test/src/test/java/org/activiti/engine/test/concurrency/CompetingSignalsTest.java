@@ -13,7 +13,7 @@
 
 package org.activiti.engine.test.concurrency;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.RuntimeServiceImpl;
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Tom Baeyens
  */
-public class CompetingSignalsTest extends PluggableActivitiTestCase {
+public class CompetingSignalsTest extends PluggableFlowableTestCase {
 
   private static Logger log = LoggerFactory.getLogger(CompetingSignalsTest.class);
   

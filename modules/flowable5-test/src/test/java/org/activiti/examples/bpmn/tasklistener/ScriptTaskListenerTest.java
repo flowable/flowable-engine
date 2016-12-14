@@ -12,7 +12,7 @@
  */
 package org.activiti.examples.bpmn.tasklistener;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -22,7 +22,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Rich Kroll, Tijs Rademakers
  */
-public class ScriptTaskListenerTest extends PluggableActivitiTestCase {
+public class ScriptTaskListenerTest extends PluggableFlowableTestCase {
 
 	@Deployment(resources = { "org/activiti/examples/bpmn/tasklistener/ScriptTaskListenerTest.bpmn20.xml" })
 	public void testScriptTaskListener() {

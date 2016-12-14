@@ -14,16 +14,16 @@ package org.activiti.standalone.parsing;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.activiti.engine.impl.test.ResourceActivitiTestCase;
+import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 
 /**
  * @author Joram Barrez
  */
-public class CustomActivityBehaviorFactoryTest extends ResourceActivitiTestCase {
+public class CustomActivityBehaviorFactoryTest extends ResourceFlowableTestCase {
   
   public CustomActivityBehaviorFactoryTest() {
-    super("org/activiti/standalone/parsing/custom.activitybehaviorfactory.activiti.cfg.xml");
+    super("org/activiti/standalone/parsing/custom.activitybehaviorfactory.flowable.cfg.xml");
   }
   
   // The custom activity factory will change this value

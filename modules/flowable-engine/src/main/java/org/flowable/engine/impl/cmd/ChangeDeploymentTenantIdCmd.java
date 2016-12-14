@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
@@ -53,7 +52,7 @@ public class ChangeDeploymentTenantIdCmd implements Command<Void>, Serializable 
     }
     
     if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled() && 
-        Flowable5CompatibilityHandler.FLOWABLE_5_ENGINE_TAG.equals(deployment.getEngineVersion())) {
+        commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().isVersion5Tag(deployment.getEngineVersion())) {
       
       commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().changeDeploymentTenantId(deploymentId, newTenantId);
       return null;

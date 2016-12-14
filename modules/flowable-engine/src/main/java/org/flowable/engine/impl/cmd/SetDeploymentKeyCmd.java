@@ -14,7 +14,6 @@ package org.flowable.engine.impl.cmd;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.interceptor.Command;
@@ -48,8 +47,7 @@ public class SetDeploymentKeyCmd implements Command<Void> {
     }
     
     if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled() && 
-        Flowable5CompatibilityHandler.FLOWABLE_5_ENGINE_TAG.equals(deployment.getEngineVersion())) {
-      
+        commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().isVersion5Tag(deployment.getEngineVersion())) {
       return null;
     }
 

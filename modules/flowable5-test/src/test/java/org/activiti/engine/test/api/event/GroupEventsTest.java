@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.test.api.event;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.idm.api.Group;
@@ -25,9 +25,9 @@ import org.flowable.idm.api.event.FlowableIdmMembershipEvent;
  * 
  * @author Frederik Heremans
  */
-public class GroupEventsTest extends PluggableActivitiTestCase {
+public class GroupEventsTest extends PluggableFlowableTestCase {
 
-	private TestActiviti6EntityEventListener listener;
+	private TestFlowable6EntityEventListener listener;
 
 	/**
 	 * Test create, update and delete events of Groups.
@@ -85,7 +85,7 @@ public class GroupEventsTest extends PluggableActivitiTestCase {
 	 * Test create, update and delete events of Groups.
 	 */
 	public void testGroupMembershipEvents() throws Exception {
-	  TestActiviti6EventListener membershipListener = new TestActiviti6EventListener();
+	  TestFlowable6EventListener membershipListener = new TestFlowable6EventListener();
 		processEngineConfiguration.getEventDispatcher().addEventListener(membershipListener);
 		
 		User user = null;
@@ -144,7 +144,7 @@ public class GroupEventsTest extends PluggableActivitiTestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		listener = new TestActiviti6EntityEventListener(Group.class);
+		listener = new TestFlowable6EntityEventListener(Group.class);
 		processEngineConfiguration.getEventDispatcher().addEventListener(listener);
 	}
 

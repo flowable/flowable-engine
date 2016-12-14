@@ -62,7 +62,7 @@ public class Flowable5Util {
     ProcessDefinitionCacheEntry cacheEntry = processEngineConfiguration.getProcessDefinitionCache().get(processDefinitionId);
     if (cacheEntry != null) {
       ProcessDefinition processDefinition = cacheEntry.getProcessDefinition();
-      return Flowable5CompatibilityHandler.FLOWABLE_5_ENGINE_TAG.equals(processDefinition.getEngineVersion());
+      return processEngineConfiguration.getFlowable5CompatibilityHandler().isVersion5Tag(processDefinition.getEngineVersion());
     } else {
       return processEngineConfiguration.getCommandExecutor().execute(new Command<Boolean>() {
         
@@ -84,7 +84,7 @@ public class Flowable5Util {
     }
     
     if (processDefinition.getEngineVersion() != null) {
-      if (Flowable5CompatibilityHandler.FLOWABLE_5_ENGINE_TAG.equals(processDefinition.getEngineVersion())) {
+      if (commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().isVersion5Tag(processDefinition.getEngineVersion())) {
         if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled()) {
           return true;
         }

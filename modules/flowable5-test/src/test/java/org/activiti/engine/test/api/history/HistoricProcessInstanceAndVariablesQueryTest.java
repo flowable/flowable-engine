@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.history.HistoryLevel;
@@ -26,7 +26,7 @@ import org.flowable.engine.task.Task;
 /**
  * @author Tijs Rademakers
  */
-public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableActivitiTestCase {
+public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestCase {
 
   private static String PROCESS_DEFINITION_KEY = "oneTaskProcess";
   private static String PROCESS_DEFINITION_KEY_2 = "oneTaskProcess2";

@@ -10,7 +10,7 @@ import javax.mail.Provider.Type;
 import javax.mail.Session;
 import javax.naming.NamingException;
 
-import org.activiti.spring.impl.test.SpringActivitiTestCase;
+import org.activiti.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.junit.BeforeClass;
@@ -20,7 +20,7 @@ import org.springframework.mock.jndi.SimpleNamingContextBuilder;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration("classpath:org/activiti/spring/test/email/jndiEmailConfiguaration-context.xml")
-public class JndiEmailTest extends SpringActivitiTestCase {
+public class JndiEmailTest extends SpringFlowableTestCase {
 
   private static Logger logger = LoggerFactory.getLogger(JndiEmailTest.class);
 

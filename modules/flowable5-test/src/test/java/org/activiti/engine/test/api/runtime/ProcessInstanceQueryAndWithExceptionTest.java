@@ -2,7 +2,7 @@ package org.activiti.engine.test.api.runtime;
 
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.repository.DeploymentProperties;
@@ -11,7 +11,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.runtime.TimerJobQuery;
 
-public class ProcessInstanceQueryAndWithExceptionTest extends PluggableActivitiTestCase {
+public class ProcessInstanceQueryAndWithExceptionTest extends PluggableFlowableTestCase {
 
   private static final String PROCESS_DEFINITION_KEY_NO_EXCEPTION = "oneTaskProcess";
   private static final String PROCESS_DEFINITION_KEY_WITH_EXCEPTION_1 = "JobErrorCheck";

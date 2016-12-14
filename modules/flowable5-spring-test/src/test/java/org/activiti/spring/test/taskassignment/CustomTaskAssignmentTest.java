@@ -12,7 +12,7 @@
  */
 package org.activiti.spring.test.taskassignment;
 
-import org.activiti.spring.impl.test.SpringActivitiTestCase;
+import org.activiti.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.test.Deployment;
 import org.springframework.test.context.ContextConfiguration;
@@ -21,7 +21,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Joram Barrez
  */
 @ContextConfiguration("classpath:org/activiti/spring/test/taskassignment/taskassignment-context.xml")
-public class CustomTaskAssignmentTest extends SpringActivitiTestCase {
+public class CustomTaskAssignmentTest extends SpringFlowableTestCase {
 
   @Deployment
   public void testSetAssigneeThroughSpringService() {

@@ -14,7 +14,7 @@ package org.activiti.engine.test.api.event;
 
 import java.io.ByteArrayInputStream;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
@@ -30,9 +30,9 @@ import org.flowable.engine.test.Deployment;
  * 
  * @author Frederik Heremans
  */
-public class AttachmentEventsTest extends PluggableActivitiTestCase {
+public class AttachmentEventsTest extends PluggableFlowableTestCase {
 
-	private TestActivitiEntityEventListener listener;
+	private TestFlowableEntityEventListener listener;
 
 	/**
 	 * Test create, update and delete events of attachments on a task/process.
@@ -117,7 +117,7 @@ public class AttachmentEventsTest extends PluggableActivitiTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		listener = new TestActivitiEntityEventListener(org.activiti.engine.task.Attachment.class);
+		listener = new TestFlowableEntityEventListener(org.activiti.engine.task.Attachment.class);
 		processEngineConfiguration.getEventDispatcher().addEventListener(listener);
 	}
 

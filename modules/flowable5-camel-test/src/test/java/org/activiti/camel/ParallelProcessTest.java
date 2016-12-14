@@ -15,7 +15,7 @@ package org.activiti.camel;
 
 import java.util.List;
 
-import org.activiti.spring.impl.test.SpringActivitiTestCase;
+import org.activiti.spring.impl.test.SpringFlowableTestCase;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
-public class ParallelProcessTest extends SpringActivitiTestCase {
+public class ParallelProcessTest extends SpringFlowableTestCase {
 
   @Autowired
   protected CamelContext camelContext;

@@ -16,7 +16,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.runtime.Clock;
@@ -33,9 +33,9 @@ import org.flowable.engine.test.Deployment;
  * 
  * @author Frederik Heremans
  */
-public class JobEventsTest extends PluggableActivitiTestCase {
+public class JobEventsTest extends PluggableFlowableTestCase {
 
-	private TestActivitiEntityEventListener listener;
+	private TestFlowableEntityEventListener listener;
 	
 	/**
 	 * Test create, update and delete events of jobs entities.
@@ -399,7 +399,7 @@ public class JobEventsTest extends PluggableActivitiTestCase {
 	@Override
 	protected void setUp() throws Exception {
 	  super.setUp();
-	  listener = new TestActivitiEntityEventListener(Job.class);
+	  listener = new TestFlowableEntityEventListener(Job.class);
 	  processEngineConfiguration.getEventDispatcher().addEventListener(listener);
 	}
 	

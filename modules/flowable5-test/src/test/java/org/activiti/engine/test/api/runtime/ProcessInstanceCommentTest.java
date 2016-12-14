@@ -14,7 +14,7 @@ package org.activiti.engine.test.api.runtime;
 
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -25,7 +25,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Joram Barrez
  */
-public class ProcessInstanceCommentTest extends PluggableActivitiTestCase {
+public class ProcessInstanceCommentTest extends PluggableFlowableTestCase {
   
   @Deployment
   public void testAddCommentToProcessInstance() {

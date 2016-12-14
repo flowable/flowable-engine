@@ -17,14 +17,14 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.standalone.testing.helpers.ServiceTaskTestMock;
 import org.flowable.engine.test.Deployment;
 
 /**
  * @author Saeid Mirzaei
  */
-public class BoundaryErrorMapTest extends PluggableActivitiTestCase{
+public class BoundaryErrorMapTest extends PluggableFlowableTestCase{
   
   
   // exception matches the only mapping, directly

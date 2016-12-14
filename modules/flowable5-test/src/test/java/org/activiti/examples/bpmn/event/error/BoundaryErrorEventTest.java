@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
@@ -25,7 +25,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Joram Barrez
  */
-public class BoundaryErrorEventTest extends PluggableActivitiTestCase {
+public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
   
   @Override
   protected void setUp() throws Exception {

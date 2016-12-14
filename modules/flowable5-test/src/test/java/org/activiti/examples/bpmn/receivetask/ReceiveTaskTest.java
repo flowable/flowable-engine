@@ -13,7 +13,7 @@
 
 package org.activiti.examples.bpmn.receivetask;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -22,7 +22,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Joram Barrez
  */
-public class ReceiveTaskTest extends PluggableActivitiTestCase {
+public class ReceiveTaskTest extends PluggableFlowableTestCase {
 
   @Deployment
   public void testWaitStateBehavior() {

@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.impl.identity.Authentication;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.history.HistoricIdentityLink;
@@ -40,7 +40,7 @@ import org.flowable.engine.test.Deployment;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class HistoricProcessInstanceTest extends PluggableActivitiTestCase {
+public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
   
   @Deployment(resources = {"org/activiti/engine/test/history/oneTaskProcess.bpmn20.xml"})
   public void testHistoricDataCreatedForProcessExecution() {

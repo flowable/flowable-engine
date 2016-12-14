@@ -20,7 +20,7 @@ import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.impl.cmd.SetProcessDefinitionVersionCmd;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricTaskInstance;
@@ -37,7 +37,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Falko Menge
  */
-public class ProcessInstanceMigrationTest extends PluggableActivitiTestCase {
+public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
   
   private static final String TEST_PROCESS_WITH_PARALLEL_GATEWAY = "org/activiti/examples/bpmn/gateway/ParallelGatewayTest.testForkJoin.bpmn20.xml";
   private static final String TEST_PROCESS = "org/activiti/engine/test/db/ProcessInstanceMigrationTest.testSetProcessDefinitionVersion.bpmn20.xml";

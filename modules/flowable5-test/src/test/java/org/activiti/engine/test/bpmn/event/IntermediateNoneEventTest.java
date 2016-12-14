@@ -12,13 +12,13 @@
  */
 package org.activiti.engine.test.bpmn.event;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
-public class IntermediateNoneEventTest extends PluggableActivitiTestCase {
+public class IntermediateNoneEventTest extends PluggableFlowableTestCase {
   
   private static boolean listenerExcecuted = false;
   

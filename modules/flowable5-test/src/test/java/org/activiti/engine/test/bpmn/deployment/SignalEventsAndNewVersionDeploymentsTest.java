@@ -15,7 +15,7 @@ package org.activiti.engine.test.bpmn.deployment;
 
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.interceptor.Command;
@@ -32,7 +32,7 @@ import org.flowable.engine.test.Deployment;
  * 
  * @author Joram Barrez
  */
-public class SignalEventsAndNewVersionDeploymentsTest extends PluggableActivitiTestCase {
+public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableTestCase {
   
   private static final String TEST_PROCESS_GLOBAL_BOUNDARY_SIGNAL = 
       "org/activiti/engine/test/bpmn/deployment/SignalEventsAndNewVersionDeploymentsTest.testGlobalSignalBoundaryEvent.bpmn20.xml";

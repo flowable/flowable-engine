@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.flowable.engine.test.Deployment;
 
-public class MDCLoggingTest extends PluggableActivitiTestCase {
+public class MDCLoggingTest extends PluggableFlowableTestCase {
 
 	MemoryLogAppender console = new MemoryLogAppender();
 	List<Appender> appenders = null;

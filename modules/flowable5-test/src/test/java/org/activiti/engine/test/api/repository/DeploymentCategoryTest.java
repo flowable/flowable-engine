@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.DeploymentQuery;
@@ -26,7 +26,7 @@ import org.flowable.engine.repository.DeploymentQuery;
 /**
  * @author Tom Baeyens
  */
-public class DeploymentCategoryTest extends PluggableActivitiTestCase {
+public class DeploymentCategoryTest extends PluggableFlowableTestCase {
   
   public void testDeploymentCategory() {
     String noCategoryDeploymentId = null;

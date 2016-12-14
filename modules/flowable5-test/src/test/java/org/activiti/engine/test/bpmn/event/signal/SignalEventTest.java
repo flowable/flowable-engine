@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.runtime.Clock;
@@ -35,7 +35,7 @@ import org.flowable.validation.validator.Problems;
 /**
  * @author Daniel Meyer
  */
-public class SignalEventTest extends PluggableActivitiTestCase {
+public class SignalEventTest extends PluggableFlowableTestCase {
   
   @Deployment(resources={
           "org/activiti/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignal.bpmn20.xml",

@@ -15,18 +15,18 @@ package org.activiti.standalone.history;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.ResourceActivitiTestCase;
+import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 
-public class BulkDeleteNoHistoryTest extends ResourceActivitiTestCase {
+public class BulkDeleteNoHistoryTest extends ResourceFlowableTestCase {
 
     public BulkDeleteNoHistoryTest() {
         // History needs to be disabled to prevent any historic entities come in between the variable deletes
         // to make sure a single batch is used for all entities
-        super("org/activiti/standalone/history/nohistory.activiti.cfg.xml");
+        super("org/activiti/standalone/history/nohistory.flowable.cfg.xml");
     }
     
     @Deployment(resources={"org/activiti/engine/test/api/oneTaskProcess.bpmn20.xml"})

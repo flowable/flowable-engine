@@ -15,7 +15,7 @@ package org.activiti.engine.test.bpmn.java;
 
 import java.io.ByteArrayInputStream;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BpmnModel;
@@ -34,7 +34,7 @@ import org.flowable.engine.repository.DeploymentProperties;
 /**
  * @author Tijs Rademakers
  */
-public class EventJavaTest extends PluggableActivitiTestCase {
+public class EventJavaTest extends PluggableFlowableTestCase {
   
   public void testStartEventWithExecutionListener() throws Exception {
     BpmnModel bpmnModel = new BpmnModel();

@@ -3,7 +3,7 @@ package org.activiti.engine.test.bpmn.usertask;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import org.activiti.engine.impl.test.ResourceActivitiTestCase;
+import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.common.impl.util.io.InputStreamSource;
@@ -14,10 +14,10 @@ import org.flowable.engine.runtime.Execution;
 /**
  * Created by p3700487 on 23/02/15.
  */
-public class ImportExportTest extends ResourceActivitiTestCase {
+public class ImportExportTest extends ResourceFlowableTestCase {
 
     public ImportExportTest() {
-        super("org/activiti/standalone/parsing/encoding.activiti.cfg.xml");
+        super("org/activiti/standalone/parsing/encoding.flowable.cfg.xml");
     }
 
     public void testConvertXMLToModel() throws Exception {

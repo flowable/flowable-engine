@@ -40,7 +40,7 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
   protected void initializeProcessEngine() {
     if (cachedProcessEngine == null) {
       ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-          .createProcessEngineConfigurationFromResource("org/flowable/standalone/jpa/activiti.cfg.xml");
+          .createProcessEngineConfigurationFromResource("org/flowable/standalone/jpa/flowable.cfg.xml");
 
       cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
 

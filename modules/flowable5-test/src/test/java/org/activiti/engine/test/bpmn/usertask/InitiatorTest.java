@@ -13,14 +13,14 @@
 
 package org.activiti.engine.test.bpmn.usertask;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 
 
 /**
  * @author Tom Baeyens
  */
-public class InitiatorTest extends PluggableActivitiTestCase {
+public class InitiatorTest extends PluggableFlowableTestCase {
 
   @Deployment
   public void testInitiator() {

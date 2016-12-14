@@ -6,7 +6,7 @@ import org.flowable.crystalball.simulator.SimulationEvent;
 import org.flowable.crystalball.simulator.SimulationEventHandler;
 import org.flowable.crystalball.simulator.delegate.UserTaskExecutionListener;
 import org.flowable.crystalball.simulator.delegate.event.Function;
-import org.flowable.crystalball.simulator.delegate.event.impl.InMemoryRecordActivitiEventListener;
+import org.flowable.crystalball.simulator.delegate.event.impl.InMemoryRecordFlowableEventListener;
 import org.flowable.crystalball.simulator.delegate.event.impl.ProcessInstanceCreateTransformer;
 import org.flowable.crystalball.simulator.delegate.event.impl.UserTaskCompleteTransformer;
 import org.flowable.crystalball.simulator.impl.StartReplayProcessEventHandler;
@@ -48,7 +48,7 @@ public class ReplayRunTest {
   private static final String TEST_VALUE = "TestValue";
   private static final String TEST_VARIABLE = "testVariable";
 
-  protected static InMemoryRecordActivitiEventListener listener = new InMemoryRecordActivitiEventListener(getTransformers());
+  protected static InMemoryRecordFlowableEventListener listener = new InMemoryRecordFlowableEventListener(getTransformers());
 
   private static final String THE_USERTASK_PROCESS = "org/flowable/crystalball/simulator/impl/playback/PlaybackProcessStartTest.testUserTask.bpmn20.xml";
 

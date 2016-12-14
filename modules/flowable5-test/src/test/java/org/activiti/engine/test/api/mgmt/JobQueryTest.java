@@ -27,7 +27,7 @@ import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
 import org.activiti.engine.impl.persistence.entity.JobEntityManager;
 import org.activiti.engine.impl.persistence.entity.TimerJobEntity;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.runtime.Clock;
@@ -42,7 +42,7 @@ import org.flowable.engine.test.Deployment;
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class JobQueryTest extends PluggableActivitiTestCase {
+public class JobQueryTest extends PluggableFlowableTestCase {
   
   private String deploymentId;
   private String messageId;

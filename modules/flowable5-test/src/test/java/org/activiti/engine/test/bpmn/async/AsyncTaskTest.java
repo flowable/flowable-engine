@@ -15,7 +15,7 @@ package org.activiti.engine.test.bpmn.async;
 import java.util.Date;
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.history.HistoryLevel;
@@ -30,7 +30,7 @@ import org.junit.Assert;
  * 
  * @author Daniel Meyer
  */
-public class AsyncTaskTest extends PluggableActivitiTestCase {
+public class AsyncTaskTest extends PluggableFlowableTestCase {
   
   public static boolean INVOCATION;
   

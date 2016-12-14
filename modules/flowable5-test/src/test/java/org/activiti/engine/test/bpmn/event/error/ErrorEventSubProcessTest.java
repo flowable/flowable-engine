@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.test.bpmn.event.error;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
@@ -20,7 +20,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Falko Menge
  */
-public class ErrorEventSubProcessTest extends PluggableActivitiTestCase {
+public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
   
   @Deployment
   // an event subprocesses takes precedence over a boundary event

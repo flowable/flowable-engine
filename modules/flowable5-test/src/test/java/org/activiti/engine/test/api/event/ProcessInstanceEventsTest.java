@@ -24,7 +24,7 @@ import org.activiti.engine.delegate.event.impl.ActivitiActivityCancelledEventImp
 import org.activiti.engine.delegate.event.impl.ActivitiProcessCancelledEventImpl;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
@@ -42,7 +42,7 @@ import org.flowable.engine.test.Deployment;
  * 
  * @author Frederik Heremans
  */
-public class ProcessInstanceEventsTest extends PluggableActivitiTestCase {
+public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
 	private TestInitializedEntityEventListener listener;
 	

@@ -13,8 +13,8 @@
 package org.activiti.standalone.event;
 
 import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.impl.test.ResourceActivitiTestCase;
-import org.activiti.engine.test.api.event.TestActivitiEventListener;
+import org.activiti.engine.impl.test.ResourceFlowableTestCase;
+import org.activiti.engine.test.api.event.TestFlowableEventListener;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
@@ -22,15 +22,15 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
  * 
  * @author Frederik Heremans
  */
-public class EngineEventsTest extends ResourceActivitiTestCase {
+public class EngineEventsTest extends ResourceFlowableTestCase {
 
   public EngineEventsTest() {
-    super("org/activiti/standalone/event/activiti-eventlistener.cfg.xml");
+    super("org/activiti/standalone/event/flowable-eventlistener.cfg.xml");
   }
   
   public void testEngineEventsTest() {
   	// Fetch the listener to check received events
-  	TestActivitiEventListener listener = (TestActivitiEventListener) processEngineConfiguration.getBeans().get("eventListener");
+  	TestFlowableEventListener listener = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("eventListener");
   	assertNotNull(listener);
   	
   	// Check create-event

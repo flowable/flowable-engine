@@ -960,7 +960,7 @@
 											<property name="database" value="${metadatabase}" />
 										</ant>
 										<echo message="updating flowable cfg to ${metadatabase}" />
-										<ant antfile="${basedir}/../../qa/db/build.xml" target="create.activiti.cfg">
+										<ant antfile="${basedir}/../../qa/db/build.xml" target="create.cfg">
 											<property name="database" value="${metadatabase}" />
 										</ant>
 									</tasks>

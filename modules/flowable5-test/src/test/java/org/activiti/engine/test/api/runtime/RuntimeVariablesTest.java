@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.persistence.entity.VariableInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -28,7 +28,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Daisuke Yoshimoto
  */
-public class RuntimeVariablesTest extends PluggableActivitiTestCase {
+public class RuntimeVariablesTest extends PluggableFlowableTestCase {
 
   @Deployment
   public void testGetVariablesByExecutionIds(){

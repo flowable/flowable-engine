@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.test.api.event;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.test.Deployment;
@@ -23,9 +23,9 @@ import org.flowable.engine.test.Deployment;
  * 
  * @author Frederik Heremans
  */
-public class UncaughtErrorEventTest extends PluggableActivitiTestCase {
+public class UncaughtErrorEventTest extends PluggableFlowableTestCase {
 
-	private TestActivitiEventListener listener;
+	private TestFlowableEventListener listener;
 
 	/**
 	 * Test events related to error-events, thrown from within process-execution (eg. service-task).
@@ -44,7 +44,7 @@ public class UncaughtErrorEventTest extends PluggableActivitiTestCase {
 	protected void initializeServices() {
 		super.initializeServices();
 
-		listener = new TestActivitiEventListener();
+		listener = new TestFlowableEventListener();
 		processEngineConfiguration.getEventDispatcher().addEventListener(listener);
 	}
 

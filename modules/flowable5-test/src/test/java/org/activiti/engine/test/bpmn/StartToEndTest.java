@@ -16,9 +16,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.compatibility.wrapper.Flowable5ProcessInstanceWrapper;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.compatibility.wrapper.Flowable5ProcessInstanceWrapper;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -27,7 +27,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Joram Barrez
  */
-public class StartToEndTest extends PluggableActivitiTestCase {
+public class StartToEndTest extends PluggableFlowableTestCase {
 
   @Deployment
   public void testStartToEnd() {

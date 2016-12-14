@@ -17,14 +17,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 
 /**
  * @author Tom Baeyens
  */
-public class IdentityTest extends PluggableActivitiTestCase {
+public class IdentityTest extends PluggableFlowableTestCase {
 
   public void testAuthentication() {
     User user = identityService.newUser("johndoe");

@@ -952,7 +952,7 @@ public class DbSqlSession implements Session {
 
     } catch (Exception e) {
       if (isMissingTablesException(e)) {
-        throw new ActivitiException("no activiti tables in db. set <property name=\"databaseSchemaUpdate\" to value=\"true\" or value=\"create-drop\" (use create-drop for testing only!) in bean processEngineConfiguration in activiti.cfg.xml for automatic schema creation", e);
+        throw new ActivitiException("no activiti tables in db. set <property name=\"databaseSchemaUpdate\" to value=\"true\" or value=\"create-drop\" (use create-drop for testing only!) in bean processEngineConfiguration in flowable.cfg.xml for automatic schema creation", e);
       } else {
         if (e instanceof RuntimeException) {
           throw (RuntimeException) e;

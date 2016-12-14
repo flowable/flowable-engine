@@ -27,7 +27,7 @@ public class ConnectionPoolTest extends AbstractTestCase {
 
   public void testMyBatisConnectionPoolProperlyConfigured() {
     ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-        .createProcessEngineConfigurationFromResource("org/flowable/engine/test/db/connection-pool.activiti.cfg.xml");
+        .createProcessEngineConfigurationFromResource("org/flowable/engine/test/db/connection-pool.flowable.cfg.xml");
 
     config.buildProcessEngine();
 

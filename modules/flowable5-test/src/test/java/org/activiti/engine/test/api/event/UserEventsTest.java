@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.test.api.event;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.idm.api.User;
@@ -23,9 +23,9 @@ import org.flowable.idm.api.event.FlowableIdmEventType;
  * 
  * @author Frederik Heremans
  */
-public class UserEventsTest extends PluggableActivitiTestCase {
+public class UserEventsTest extends PluggableFlowableTestCase {
 
-	private TestActiviti6EntityEventListener listener;
+	private TestFlowable6EntityEventListener listener;
 
 	/**
 	 * Test create, update and delete events of users.
@@ -83,7 +83,7 @@ public class UserEventsTest extends PluggableActivitiTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		listener = new TestActiviti6EntityEventListener(User.class);
+		listener = new TestFlowable6EntityEventListener(User.class);
 		processEngineConfiguration.getEventDispatcher().addEventListener(listener);
 	}
 

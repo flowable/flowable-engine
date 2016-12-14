@@ -17,7 +17,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.ResourceActivitiTestCase;
+import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
@@ -25,10 +25,10 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Tijs Rademakers
  */
-public class RulesDeployerTest extends ResourceActivitiTestCase {
+public class RulesDeployerTest extends ResourceFlowableTestCase {
 
   public RulesDeployerTest() {
-    super("org/activiti/standalone/rules/rules.activiti.cfg.xml");
+    super("org/activiti/standalone/rules/rules.flowable.cfg.xml");
   }
 
   @SuppressWarnings("unchecked")

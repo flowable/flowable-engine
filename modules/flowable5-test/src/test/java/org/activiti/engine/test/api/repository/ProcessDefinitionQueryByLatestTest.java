@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
 
-public class ProcessDefinitionQueryByLatestTest extends PluggableActivitiTestCase {
+public class ProcessDefinitionQueryByLatestTest extends PluggableFlowableTestCase {
 
 	private static String XML_FILE_PATH = "org/activiti/engine/test/repository/latest/";
 	

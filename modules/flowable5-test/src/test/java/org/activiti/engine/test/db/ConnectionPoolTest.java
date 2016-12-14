@@ -28,7 +28,7 @@ public class ConnectionPoolTest extends PvmTestCase {
   
   public void testMyBatisConnectionPoolProperlyConfigured() {
     ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/activiti/engine/test/db/connection-pool.activiti.cfg.xml");
+      .createProcessEngineConfigurationFromResource("org/activiti/engine/test/db/connection-pool.flowable.cfg.xml");
     
     config.buildProcessEngine();
     

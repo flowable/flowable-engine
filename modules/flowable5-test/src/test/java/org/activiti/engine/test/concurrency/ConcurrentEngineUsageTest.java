@@ -19,7 +19,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.identity.Authentication;
@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Frederik Heremans
  */
-public class ConcurrentEngineUsageTest extends PluggableActivitiTestCase {
+public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
 
   private static Logger log = LoggerFactory.getLogger(ConcurrentEngineUsageTest.class);
   private static final int MAX_RETRIES = 5;

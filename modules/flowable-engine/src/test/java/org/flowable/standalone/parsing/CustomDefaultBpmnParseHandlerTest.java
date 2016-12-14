@@ -22,7 +22,7 @@ import org.flowable.engine.test.Deployment;
 public class CustomDefaultBpmnParseHandlerTest extends ResourceFlowableTestCase {
 
   public CustomDefaultBpmnParseHandlerTest() {
-    super("org/flowable/standalone/parsing/custom.default.parse.handler.activiti.cfg.xml");
+    super("org/flowable/standalone/parsing/custom.default.parse.handler.flowable.cfg.xml");
   }
 
   @Deployment

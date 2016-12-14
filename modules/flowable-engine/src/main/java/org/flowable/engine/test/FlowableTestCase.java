@@ -38,7 +38,7 @@ import junit.framework.TestCase;
  * </p>
  * 
  * <p>
- * The ProcessEngine and the services available to subclasses through protected member fields. The processEngine will be initialized by default with the activiti.cfg.xml resource on the classpath. To
+ * The ProcessEngine and the services available to subclasses through protected member fields. The processEngine will be initialized by default with the flowable.cfg.xml resource on the classpath. To
  * specify a different configuration file, override the {@link #getConfigurationResource()} method. Process engines will be cached statically. The first time the setUp is called for a given
  * configuration resource, the process engine will be constructed.
  * </p>
@@ -73,7 +73,7 @@ public abstract class FlowableTestCase extends TestCase {
 
   private FlowableMockSupport mockSupport;
 
-  /** uses 'activiti.cfg.xml' as it's configuration resource */
+  /** uses 'flowable.cfg.xml' as it's configuration resource */
   public FlowableTestCase() {
   }
 

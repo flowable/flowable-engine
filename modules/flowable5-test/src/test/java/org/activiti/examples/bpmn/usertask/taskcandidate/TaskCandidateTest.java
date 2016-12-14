@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
@@ -27,7 +27,7 @@ import org.flowable.idm.api.User;
 /**
  * @author Joram Barrez, Saeid Mirzaei
  */
-public class TaskCandidateTest extends PluggableActivitiTestCase {
+public class TaskCandidateTest extends PluggableFlowableTestCase {
 
   private static final String KERMIT = "kermit";
 

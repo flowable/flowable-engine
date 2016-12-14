@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.engine.FlowableTaskAlreadyClaimedException;
 import org.flowable.engine.common.api.FlowableException;
@@ -54,7 +54,7 @@ import org.flowable.idm.api.User;
  * @author Joram Barrez
  * @author Falko Menge
  */
-public class TaskServiceTest extends PluggableActivitiTestCase {
+public class TaskServiceTest extends PluggableFlowableTestCase {
 
   public void testSaveTaskUpdate() throws Exception{
     

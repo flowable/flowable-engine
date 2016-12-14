@@ -23,7 +23,7 @@ import org.flowable.engine.test.Deployment;
 public class CustomListenerFactoryTest extends ResourceFlowableTestCase {
 
   public CustomListenerFactoryTest() {
-    super("org/flowable/standalone/parsing/custom.listenerfactory.activiti.cfg.xml");
+    super("org/flowable/standalone/parsing/custom.listenerfactory.flowable.cfg.xml");
   }
 
   // The custom activity factory will change this value

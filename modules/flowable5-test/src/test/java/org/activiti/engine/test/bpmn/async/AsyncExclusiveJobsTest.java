@@ -12,12 +12,12 @@
  */
 package org.activiti.engine.test.bpmn.async;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.test.Deployment;
 
-public class AsyncExclusiveJobsTest extends PluggableActivitiTestCase {
+public class AsyncExclusiveJobsTest extends PluggableFlowableTestCase {
 	
 	/** 
 	 * Test for https://activiti.atlassian.net/browse/ACT-4035.

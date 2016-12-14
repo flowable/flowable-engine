@@ -1,6 +1,6 @@
 package org.activiti.engine.test.api.repository;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.bpmn.exceptions.XMLException;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.DeploymentProperties;
@@ -22,7 +22,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 /**
  * @author Joram Barrez
  */
-public class DeployInvalidXmlTest extends PluggableActivitiTestCase {
+public class DeployInvalidXmlTest extends PluggableFlowableTestCase {
   
   @Override
   protected void setUp() throws Exception {

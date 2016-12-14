@@ -23,7 +23,7 @@ import org.flowable.engine.test.Deployment;
 public class ScriptBeanAccessTest extends ResourceFlowableTestCase {
 
   public ScriptBeanAccessTest() {
-    super("org/flowable/standalone/scripting/activiti.cfg.xml");
+    super("org/flowable/standalone/scripting/flowable.cfg.xml");
   }
 
   @Deployment

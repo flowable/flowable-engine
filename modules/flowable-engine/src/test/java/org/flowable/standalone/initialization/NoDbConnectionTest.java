@@ -24,7 +24,7 @@ public class NoDbConnectionTest extends AbstractTestCase {
 
   public void testNoDbConnection() {
     try {
-      ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("org/flowable/standalone/initialization/nodbconnection.activiti.cfg.xml").buildProcessEngine();
+      ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("org/flowable/standalone/initialization/nodbconnection.flowable.cfg.xml").buildProcessEngine();
       fail("expected exception");
     } catch (RuntimeException e) {
       assertTrue(containsSqlException(e));

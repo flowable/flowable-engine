@@ -13,10 +13,10 @@
 
 package org.activiti.compatibility.spring;
 
-import org.activiti.compatibility.DefaultFlowable5CompatibilityHandler;
-import org.activiti.compatibility.DefaultProcessEngineFactory;
 import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.compatibility.DefaultFlowable5CompatibilityHandler;
+import org.flowable.compatibility.DefaultProcessEngineFactory;
 
 
 /**

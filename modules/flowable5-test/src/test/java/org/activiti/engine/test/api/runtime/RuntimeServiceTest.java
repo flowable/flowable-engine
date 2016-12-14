@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -44,7 +44,7 @@ import org.flowable.engine.test.Deployment;
  * @author Frederik Heremans
  * @author Joram Barrez
  */
-public class RuntimeServiceTest extends PluggableActivitiTestCase {
+public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
   @Deployment(resources={"org/activiti/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testStartProcessInstanceWithVariables() {

@@ -25,7 +25,7 @@ import org.flowable.engine.repository.Deployment;
 public class DeploymentCacheLimitTest extends ResourceFlowableTestCase {
 
   public DeploymentCacheLimitTest() {
-    super("org/flowable/standalone/deploy/deployment.cache.limit.test.activiti.cfg.xml");
+    super("org/flowable/standalone/deploy/deployment.cache.limit.test.flowable.cfg.xml");
   }
 
   public void testDeploymentCacheLimit() {

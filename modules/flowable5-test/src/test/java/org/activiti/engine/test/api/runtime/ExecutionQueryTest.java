@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -54,7 +54,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Joram Barrez
  * @author Frederik Heremans
  */
-public class ExecutionQueryTest extends PluggableActivitiTestCase {
+public class ExecutionQueryTest extends PluggableFlowableTestCase {
   
   private static String CONCURRENT_PROCESS_KEY = "concurrent";
   private static String SEQUENTIAL_PROCESS_KEY = "oneTaskProcess";

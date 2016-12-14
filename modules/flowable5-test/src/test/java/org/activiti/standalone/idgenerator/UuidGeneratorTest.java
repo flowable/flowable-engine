@@ -17,17 +17,17 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.activiti.engine.impl.test.ResourceActivitiTestCase;
+import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
  * @author Joram Barrez
  */
-public class UuidGeneratorTest extends ResourceActivitiTestCase {
+public class UuidGeneratorTest extends ResourceFlowableTestCase {
   
   public UuidGeneratorTest() throws Exception {
-    super("org/activiti/standalone/idgenerator/uuidgenerator.test.activiti.cfg.xml");
+    super("org/activiti/standalone/idgenerator/uuidgenerator.test.flowable.cfg.xml");
   }
   
   @Deployment

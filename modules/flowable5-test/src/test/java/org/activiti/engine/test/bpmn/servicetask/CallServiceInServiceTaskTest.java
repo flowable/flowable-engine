@@ -14,7 +14,7 @@ package org.activiti.engine.test.bpmn.servicetask;
 
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -24,7 +24,7 @@ import org.flowable.idm.api.User;
 /**
  * @author Joram Barrez
  */
-public class CallServiceInServiceTaskTest extends PluggableActivitiTestCase {
+public class CallServiceInServiceTaskTest extends PluggableFlowableTestCase {
 	
   @Deployment
 	public void testStartProcessFromDelegate() {

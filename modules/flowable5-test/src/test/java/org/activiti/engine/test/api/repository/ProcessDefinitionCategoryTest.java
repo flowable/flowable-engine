@@ -15,7 +15,7 @@ package org.activiti.engine.test.api.repository;
 import java.util.HashSet;
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -23,7 +23,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 /**
  * @author Joram Barrez
  */
-public class ProcessDefinitionCategoryTest extends PluggableActivitiTestCase {
+public class ProcessDefinitionCategoryTest extends PluggableFlowableTestCase {
 
   
   public void testQueryByCategoryNotEquals() {

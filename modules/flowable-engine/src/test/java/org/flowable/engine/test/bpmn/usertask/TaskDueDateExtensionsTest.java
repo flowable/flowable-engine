@@ -33,7 +33,7 @@ import org.joda.time.Period;
 public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
   
   public TaskDueDateExtensionsTest() {
-    super("org/flowable/engine/test/bpmn/usertask/TaskDueDateExtensionsTest.activiti.cfg.xml");
+    super("org/flowable/engine/test/bpmn/usertask/TaskDueDateExtensionsTest.flowable.cfg.xml");
   }
 
   @Deployment

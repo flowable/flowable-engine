@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipInputStream;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.ParallelGateway;
@@ -39,7 +39,7 @@ import org.flowable.engine.test.Deployment;
  * @author Frederik Heremans
  * @author Joram Barrez
  */
-public class RepositoryServiceTest extends PluggableActivitiTestCase {
+public class RepositoryServiceTest extends PluggableFlowableTestCase {
 
   @Deployment(resources = {
   "org/activiti/engine/test/api/oneTaskProcess.bpmn20.xml"})

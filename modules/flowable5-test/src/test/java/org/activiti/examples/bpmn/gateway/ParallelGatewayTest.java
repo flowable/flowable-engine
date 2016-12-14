@@ -15,7 +15,7 @@ package org.activiti.examples.bpmn.gateway;
 
 import java.util.List;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.task.TaskQuery;
@@ -24,7 +24,7 @@ import org.flowable.engine.test.Deployment;
 /**
  * @author Joram Barrez
  */
-public class ParallelGatewayTest extends PluggableActivitiTestCase {
+public class ParallelGatewayTest extends PluggableFlowableTestCase {
   
   @Deployment
   public void testForkJoin() {

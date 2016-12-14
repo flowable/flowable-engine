@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -40,7 +40,7 @@ import org.flowable.engine.test.Deployment;
  * @author Tom Baeyens
  * @author Falko Menge (camunda)
  */
-public class FormServiceTest extends PluggableActivitiTestCase {
+public class FormServiceTest extends PluggableFlowableTestCase {
 
   @Deployment(resources = { "org/activiti/examples/taskforms/VacationRequest_deprecated_forms.bpmn20.xml", 
       "org/activiti/examples/taskforms/approve.form",
