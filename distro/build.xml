@@ -288,14 +288,14 @@
 				<include name="flowable-admin.war" />
 			</fileset>
 			<fileset dir="../modules/flowable-app-rest/target">
-				<include name="flowable-app-rest*.war" />
+				<include name="flowable-rest*.war" />
 			</fileset>
 		</copy>
 		<move file="${target.distro.root}/wars/flowable-idm.war" tofile="${target.distro.root}/wars/flowable-idm.war"/>
 		<move file="${target.distro.root}/wars/flowable-modeler.war" tofile="${target.distro.root}/wars/flowable-modeler.war"/>
 		<move file="${target.distro.root}/wars/flowable-task.war" tofile="${target.distro.root}/wars/flowable-task.war"/>
 		<move file="${target.distro.root}/wars/flowable-admin.war" tofile="${target.distro.root}/wars/flowable-admin.war"/>
-		<move file="${target.distro.root}/wars/flowable-app-rest-${flowable.version}.war" tofile="${target.distro.root}/wars/flowable-rest.war"/>
+		<move file="${target.distro.root}/wars/flowable-rest.war" tofile="${target.distro.root}/wars/flowable-rest.war"/>
 	</target>
 
 	<target name="build.docs" unless="nodocs">
