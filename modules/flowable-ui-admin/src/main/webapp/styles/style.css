@@ -9,8 +9,22 @@
 	   - Selection blue: #aad1ec
 */
 
+@font-face {
+	font-family: 'Titillium Web';
+	font-style: normal;
+	font-weight: normal;
+	url('../fonts/TitilliumWeb-Regular.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Titillium Web';
+	font-style: normal;
+	font-weight: bold;
+	url('../fonts/TitilliumWeb-Bold.ttf') format('truetype');
+}
+
 body {
-	font-family: 'Ubuntu', sans-serif;
+	font-family: 'Titillium Web', sans-serif;
 	background-color: #eef1f1;
 	padding-top: 90px;
 	padding-bottom: 20px;
@@ -72,6 +86,10 @@ body {
 
 /* Navigation */
 
+.nav>li>a {
+	padding: 10px 25px;
+}
+
 .navbar {
 	background-color: #384042;
 	border: none;
@@ -99,9 +117,8 @@ body {
     line-height: 40px;
     height: 40px;
     padding-top: 0;
-    font-weight: bold;
     color: #eef1f1;
-	font-size: 12px;
+	font-size: 16px;
 }
 
 .navbar-inverse .navbar-nav > .active-process > a, .navbar-inverse .navbar-nav > .active-process > a:hover, .navbar-inverse .navbar-nav > .active-process > a:focus {
@@ -193,6 +210,7 @@ body {
 }
 
 .sub-navbar .nav.navbar-nav li a {
+	font-size: 14px;
     color: #384042;
     background-color: unset;
 }
