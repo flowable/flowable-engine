@@ -947,7 +947,7 @@ public class DbSqlSession implements Session {
   }
 
   /**
-   * Returns the index in the list of {@link #ACTIVITI_VERSIONS} matching the provided string version.
+   * Returns the index in the list of {@link #FLOWABLE_VERSIONS} matching the provided string version.
    * Returns -1 if no match can be found.  
    */
   protected int findMatchingVersionIndex(String dbVersion) {

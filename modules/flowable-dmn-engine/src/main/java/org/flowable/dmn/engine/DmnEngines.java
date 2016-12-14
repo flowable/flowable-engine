@@ -113,7 +113,7 @@ public abstract class DmnEngines {
   }
 
   /**
-   * Registers the given dmn engine. No {@link DmnEngineInfo} will be available
+   * Registers the given dmn engine. No {@link EngineInfo} will be available
    * for this dmn engine. An engine that is registered will be closed when the
    * {@link DmnEngines#destroy()} is called.
    */
@@ -188,7 +188,7 @@ public abstract class DmnEngines {
 
   /**
    * Get initialization results. Only info will we available for dmn engines
-   * which were added in the {@link DmnEngines#init()}. No {@link DmnEngineInfo}
+   * which were added in the {@link DmnEngines#init()}. No {@link EngineInfo}
    * is available for engines which were registered programmatically.
    */
   public static EngineInfo getDmnEngineInfo(String dmnEngineName) {

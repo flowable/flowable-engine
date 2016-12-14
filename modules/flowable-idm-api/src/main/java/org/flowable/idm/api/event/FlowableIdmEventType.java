@@ -18,7 +18,7 @@ import java.util.List;
 import org.flowable.engine.common.api.delegate.event.FlowableEventType;
 
 /**
- * Enumeration containing all possible types of {@link ActivitiIdmEvent}s.
+ * Enumeration containing all possible types of {@link FlowableIdmEvent}s.
  * 
  * @author Frederik Heremans
  * 

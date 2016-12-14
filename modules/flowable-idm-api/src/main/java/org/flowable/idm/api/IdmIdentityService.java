@@ -125,7 +125,7 @@ public interface IdmIdentityService {
    * @param userId
    * @param picture
    *          can be null to delete the picture.
-   * @throws ActivitiObjectNotFoundException
+   * @throws org.flowable.engine.common.api.FlowableObjectNotFoundException
    *           if the user doesn't exist.
    */
   void setUserPicture(String userId, Picture picture);
@@ -135,7 +135,7 @@ public interface IdmIdentityService {
    * @param userId
    * @return null if the user doesn't have a picture.
    *
-   * @throws ActivitiObjectNotFoundException
+   * @throws org.flowable.engine.common.api.FlowableObjectNotFoundException
    *           if the user doesn't exist.
    */
   Picture getUserPicture(String userId);
@@ -167,7 +167,7 @@ public interface IdmIdentityService {
   TokenQuery createTokenQuery();
 
   /**
-   * Returns a new {@link org.flowable.idm.engine.query.NativeQuery} for tokens.
+   * Returns a new {@link org.flowable.engine.common.api.query.NativeQuery} for tokens.
    */
   NativeTokenQuery createNativeTokenQuery();
 

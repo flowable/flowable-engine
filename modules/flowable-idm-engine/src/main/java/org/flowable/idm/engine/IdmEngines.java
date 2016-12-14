@@ -113,7 +113,7 @@ public abstract class IdmEngines {
   }
 
   /**
-   * Registers the given idm engine. No {@link IdmEngineInfo} will be available for this idm engine. An engine that is registered will be closed when the
+   * Registers the given idm engine. No {@link EngineInfo} will be available for this idm engine. An engine that is registered will be closed when the
    * {@link IdmEngines#destroy()} is called.
    */
   public static void registerIdmEngine(IdmEngine idmEngine) {
@@ -186,7 +186,7 @@ public abstract class IdmEngines {
   }
 
   /**
-   * Get initialization results. Only info will we available for form engines which were added in the {@link IdmEngines#init()}. No {@link IdmEngineInfo} is available for engines which were
+   * Get initialization results. Only info will we available for form engines which were added in the {@link IdmEngines#init()}. No {@link EngineInfo} is available for engines which were
    * registered programmatically.
    */
   public static EngineInfo getIdmEngineInfo(String idmEngineName) {

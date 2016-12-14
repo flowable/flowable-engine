@@ -22,7 +22,7 @@ import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntityMana
 import org.flowable.form.model.FormModel;
 
 /**
- * A utility class that hides the complexity of {@link FormDefinitionEntity} and {@link Decision} lookup. 
+ * A utility class that hides the complexity of {@link FormDefinitionEntity} and {@link FormModel} lookup.
  * Use this class rather than accessing the decision table cache or {@link DeploymentManager} directly.
  * 
  * @author Joram Barrez

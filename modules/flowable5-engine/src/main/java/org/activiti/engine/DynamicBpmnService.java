@@ -158,7 +158,7 @@ public interface DynamicBpmnService {
   
   /**
    * <p>
-   *  Clears the field from the infoNode. So the engine uses the {@link org.activiti.bpmn.model.BpmnModel} value
+   *  Clears the field from the infoNode. So the engine uses the {@link org.flowable.bpmn.model.BpmnModel} value
    *  On next instance.
    * </p>
    *
@@ -173,7 +173,7 @@ public interface DynamicBpmnService {
   void resetProperty(String elementId, String property, ObjectNode infoNode);
 
   /**
-   * Gives a summary between the {@link org.activiti.bpmn.model.BpmnModel} and {@link DynamicBpmnService#getProcessDefinitionInfo(String)}
+   * Gives a summary between the {@link org.flowable.bpmn.model.BpmnModel} and {@link DynamicBpmnService#getProcessDefinitionInfo(String)}
    *
    * @param processDefinitionId the process definition id (key:version:sequence)
    * @return DynamicProcessDefinitionSummary if the processdefinition exists

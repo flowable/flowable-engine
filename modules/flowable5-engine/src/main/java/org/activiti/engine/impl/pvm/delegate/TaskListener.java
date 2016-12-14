@@ -22,6 +22,7 @@ import org.flowable.engine.delegate.DelegateTask;
  * 
  * @author Tom Baeyens
  */
+@Deprecated
 public interface TaskListener {
 
   String EVENTNAME_CREATE = "create";

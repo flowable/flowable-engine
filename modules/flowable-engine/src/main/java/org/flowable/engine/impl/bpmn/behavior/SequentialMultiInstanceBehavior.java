@@ -73,7 +73,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
   }
 
   /**
-   * Called when the wrapped {@link ActivityBehavior} calls the {@link AbstractBpmnActivityBehavior#leave(ActivityExecution)} method. Handles the completion of one instance, and executes the logic for
+   * Called when the wrapped {@link ActivityBehavior} calls the {@link AbstractBpmnActivityBehavior#leave(DelegateExecution)} method. Handles the completion of one instance, and executes the logic for
    * the sequential behavior.
    */
   public void leave(DelegateExecution execution) {

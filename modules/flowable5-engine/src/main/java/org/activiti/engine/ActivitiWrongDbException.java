@@ -17,7 +17,7 @@ package org.activiti.engine;
  * Exception that is thrown when the Activiti engine discovers a mismatch between the 
  * database schema version and the engine version.
  * 
- * The check is done when the engine is created in {@link ProcessEngineBuilder#buildProcessEngine()}.
+ * The check is done when the engine is created in {@link org.activiti.engine.impl.db.DbSqlSession#dbSchemaCheckVersion()}.
  * 
  * @author Tom Baeyens
  */
