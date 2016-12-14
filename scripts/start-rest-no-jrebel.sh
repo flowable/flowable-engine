@@ -6,7 +6,7 @@ STATUS=$?
 if [ $STATUS -eq 0 ]
 then
     cd modules/flowable-app-rest
-    mvn -Dfile.encoding=UTF-8 -Pmysql clean package tomcat7:run
+    mvn -Dfile.encoding=UTF-8 -Dswagger.host=localhost:9977 -Pmysql clean package tomcat7:run
 else
     echo "Build failure in dependent project. Cannot boot Flowable Rest."
 fi
