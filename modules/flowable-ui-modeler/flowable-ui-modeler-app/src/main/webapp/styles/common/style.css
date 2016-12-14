@@ -43,6 +43,20 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'Titillium Web';
+    font-style: normal;
+    font-weight: normal;
+    url('../../fonts/TitilliumWeb-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Titillium Web';
+    font-style: normal;
+    font-weight: bold;
+    url('../../fonts/TitilliumWeb-Bold.ttf') format('truetype');
+}
+
 .form-control {
     -webkit-border-radius: 0;
     -moz-border-radius: 0;
@@ -52,7 +66,7 @@
 
 body,
 body pre {
-    font-family: 'Lato', sans-serif;
+    font-family: 'Titillium Web', sans-serif;
 }
 
 body pre {
@@ -593,7 +607,7 @@ a.dropdown-toggle {
 }
 
 .subheader h2 {
-    font-family: 'Lato', sans-serif;
+    font-family: 'Titillium Web', sans-serif;
     color: #1a1a1a;
     font-size: 20px;
     font-weight: normal;
@@ -2683,7 +2697,8 @@ h3+div > .dropzone {
 }
 
 .landing-logo img {
-    max-height: 26px;
+    max-height: 35px;
+    margin-top: -3px;
     margin-left: 10px;
 }
 
