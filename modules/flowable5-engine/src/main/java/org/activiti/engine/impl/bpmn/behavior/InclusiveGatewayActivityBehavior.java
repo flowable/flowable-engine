@@ -167,7 +167,7 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
     }
 
     // To avoid infinite looping, we must capture every node we visit
-    // and check before going further in the graph if we have already visitied
+    // and check before going further in the graph if we have already visited
     // the node.
     visitedActivities.add(srcActivity);
 

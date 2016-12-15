@@ -38,7 +38,7 @@ public interface TimerJobEntityManager extends EntityManager<TimerJobEntity> {
   boolean insertTimerJobEntity(TimerJobEntity timerJobEntity);
   
   /**
-   * Returns the {@link TimerJobEntity} instances that are elegible to execute,
+   * Returns the {@link TimerJobEntity} instances that are eligible to execute,
    * meaning the due date of the timer has been passed.
    */
   List<TimerJobEntity> findTimerJobsToExecute(Page page);

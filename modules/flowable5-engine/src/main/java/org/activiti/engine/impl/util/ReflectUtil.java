@@ -194,7 +194,7 @@ public abstract class ReflectUtil {
     String setterName = "set" + Character.toTitleCase(fieldName.charAt(0)) +
       fieldName.substring(1, fieldName.length());
     try {
-      // Using getMathods(), getMathod(...) expects exact parameter type
+      // Using getMethods(), getMethod(...) expects exact parameter type
       // matching and ignores inheritance-tree.
       Method[] methods = clazz.getMethods();
       for(Method method : methods) {

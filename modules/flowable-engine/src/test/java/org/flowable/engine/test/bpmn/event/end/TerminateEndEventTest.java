@@ -156,7 +156,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
   public void testTerminateWithSubProcessTerminateAll() throws Exception {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
 
-    // Completing the task -> terminal end event -> all ends (termninate all)
+    // Completing the task -> terminal end event -> all ends (terminate all)
     Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
     taskService.complete(task.getId());
     
@@ -712,7 +712,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 		ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestTerminateNestedSubprocesses");
 		Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("E").singleResult();
 	
-		// Completing E leads to a terminate end event with termninate all set to true
+		// Completing E leads to a terminate end event with terminate all set to true
 		taskService.complete(task.getId());
 		assertProcessEnded(processInstance.getId());
 		assertHistoricProcessInstanceDetails(processInstance);
@@ -723,7 +723,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 		ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestTerminateNestedSubprocesses");
 		Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("A").singleResult();
 	
-		// Completing A and C leads to a terminate end event with termninate all set to true
+		// Completing A and C leads to a terminate end event with terminate all set to true
 		taskService.complete(task.getId());
 		task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("C").singleResult();
 		taskService.complete(task.getId());

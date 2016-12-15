@@ -105,7 +105,7 @@ public class TaskRepresentation extends AbstractRepresentation {
   }
 
   public TaskRepresentation(TaskInfo taskInfo, ProcessDefinition processDefinition, String processInstanceName) {
-    // todo Once a ProcessInstanceInfo class is implemented, lets send inthat as the 3rd parameter istead
+    // todo Once a ProcessInstanceInfo class is implemented, lets send in that as the 3rd parameter instead
     this(taskInfo, processDefinition);
     this.processInstanceName = processInstanceName;
   }

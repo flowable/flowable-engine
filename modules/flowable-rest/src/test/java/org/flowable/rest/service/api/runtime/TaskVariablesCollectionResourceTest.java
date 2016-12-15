@@ -440,7 +440,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
   }
 
   /**
-   * Test creating a multipe task variable in a single call. POST runtime/tasks/{taskId}/variables
+   * Test creating a multiple task variable in a single call. POST runtime/tasks/{taskId}/variables
    */
   public void testCreateMultipleTaskVariables() throws Exception {
     try {

@@ -68,7 +68,7 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
 
   /**
    * Only select historic process instances with a certain process definition version.
-   * Particulary useful when used in combination with {@link #processDefinitionKey(String)}
+   * Particularly useful when used in combination with {@link #processDefinitionKey(String)}
    */
   HistoricProcessInstanceQuery processDefinitionVersion(Integer processDefinitionVersion);
 

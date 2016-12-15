@@ -496,7 +496,7 @@ public class JSONArray {
   }
 
   /**
-   * Get the optional string value associated with an index. It returns an empty string if there is no value at that index. If the value is not a string and is not null, then it is coverted to a
+   * Get the optional string value associated with an index. It returns an empty string if there is no value at that index. If the value is not a string and is not null, then it is converted to a
    * string.
    * 
    * @param index

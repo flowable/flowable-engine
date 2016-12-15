@@ -114,7 +114,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
     closeResponse(response);
     assertTrue(responseNode.get("suspended").booleanValue());
 
-    // Check if process-definitoin is suspended
+    // Check if process-definition is suspended
     processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
     assertTrue(processDefinition.isSuspended());
   }
@@ -205,7 +205,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
     closeResponse(response);
     assertFalse(responseNode.get("suspended").booleanValue());
 
-    // Check if process-definitoin is suspended
+    // Check if process-definition is suspended
     processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
     assertFalse(processDefinition.isSuspended());
   }

@@ -204,7 +204,7 @@ public abstract class ProcessEngines {
 
   /**
    * Get initialization results. Only info will we available for process engines which were added in the {@link ProcessEngines#init()}. No {@link EngineInfo} is available for engines which were
-   * registered programatically.
+   * registered programmatically.
    */
   public static EngineInfo getProcessEngineInfo(String processEngineName) {
     return processEngineInfosByName.get(processEngineName);

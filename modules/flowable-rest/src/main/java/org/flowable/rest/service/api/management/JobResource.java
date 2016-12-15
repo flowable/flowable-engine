@@ -122,7 +122,7 @@ public class JobResource {
     try {
       managementService.deleteJob(jobId);
     } catch (FlowableObjectNotFoundException aonfe) {
-      // Re-throw to have consistent error-messaging acrosse REST-api
+      // Re-throw to have consistent error-messaging across REST-api
       throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
     }
     response.setStatus(HttpStatus.NO_CONTENT.value());
@@ -138,7 +138,7 @@ public class JobResource {
     try {
       managementService.deleteTimerJob(jobId);
     } catch (FlowableObjectNotFoundException aonfe) {
-      // Re-throw to have consistent error-messaging acrosse REST-api
+      // Re-throw to have consistent error-messaging across REST-api
       throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
     }
     response.setStatus(HttpStatus.NO_CONTENT.value());
@@ -154,7 +154,7 @@ public class JobResource {
     try {
       managementService.deleteDeadLetterJob(jobId);
     } catch (FlowableObjectNotFoundException aonfe) {
-      // Re-throw to have consistent error-messaging acrosse REST-api
+      // Re-throw to have consistent error-messaging across REST-api
       throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
     }
     response.setStatus(HttpStatus.NO_CONTENT.value());
@@ -175,7 +175,7 @@ public class JobResource {
     try {
       managementService.executeJob(jobId);
     } catch (FlowableObjectNotFoundException aonfe) {
-      // Re-throw to have consistent error-messaging acrosse REST-api
+      // Re-throw to have consistent error-messaging across REST-api
       throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
     }
 

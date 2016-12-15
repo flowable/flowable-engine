@@ -154,7 +154,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
     List<Task> bTasks = taskService.createTaskQuery().taskName("B").list();
     assertEquals(4, bTasks.size());
     
-    // Compelting 3 B tasks, giving 3 C's and D's
+    // Completing 3 B tasks, giving 3 C's and D's
     for (int i=0; i<3; i++) {
       taskService.complete(bTasks.get(i).getId());
     }
@@ -227,7 +227,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
     managementService.moveTimerToExecutableJob(timers.get(0).getId());
     managementService.executeJob(timers.get(0).getId());
     
-    // We only comnpleted 3 B's. 3 other ones should be destroyed too (as one inner multi instance are 6 instances of B)
+    // We only completed 3 B's. 3 other ones should be destroyed too (as one inner multi instance are 6 instances of B)
     bTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("B").list();
     assertEquals(66, bTasks.size());
    

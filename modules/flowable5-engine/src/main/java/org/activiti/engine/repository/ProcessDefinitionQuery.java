@@ -29,7 +29,7 @@ import org.flowable.engine.repository.ProcessDefinition;
  */
 public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, ProcessDefinition> {
   
-  /** Only select process definiton with the given id.  */
+  /** Only select process definition with the given id.  */
   ProcessDefinitionQuery processDefinitionId(String processDefinitionId);
   
   /** Only select process definitions with the given ids. */
@@ -79,7 +79,7 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   
   /**
    * Only select process definition with a certain version.
-   * Particulary useful when used in combination with {@link #processDefinitionKey(String)}
+   * Particularly useful when used in combination with {@link #processDefinitionKey(String)}
    */
   ProcessDefinitionQuery processDefinitionVersion(Integer processDefinitionVersion);
   
@@ -122,7 +122,7 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   ProcessDefinitionQuery processDefinitionResourceNameLike(String resourceNameLike);
   
   /**
-   * Only selects process definitions which given userId is authoriezed to start
+   * Only selects process definitions which given userId is authorized to start
    */
   ProcessDefinitionQuery startableByUser(String userId);
 

@@ -72,7 +72,7 @@ public class MultiSchemaMultiTenantProcessEngineConfiguration extends ProcessEng
     this.tenantInfoHolder = tenantInfoHolder;
     
     // Using the UUID generator, as otherwise the ids are pulled from a global pool of ids, backed by
-    // a database table. Which is impossible with a mult-database-schema setup.
+    // a database table. Which is impossible with a multi-database-schema setup.
     
     // Also: it avoids the need for having a process definition cache for each tenant
     

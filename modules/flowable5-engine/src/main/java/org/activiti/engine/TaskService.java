@@ -204,7 +204,7 @@ public interface TaskService {
   
   /**
    * Called when the task is successfully executed, 
-   * and the required task paramaters are given by the end-user.
+   * and the required task parameters are given by the end-user.
    * @param taskId the id of the task to complete, cannot be null.
    * @param variables task parameters. May be null or empty.
    * @param localScope If true, the provided variables will be stored task-local, 
@@ -464,7 +464,7 @@ public interface TaskService {
   /** Add a new attachment to a task and/or a process instance and use an url as the content */
   Attachment createAttachment(String attachmentType, String taskId, String processInstanceId, String attachmentName, String attachmentDescription, String url);
   
-  /** Update the name and decription of an attachment */
+  /** Update the name and description of an attachment */
   void saveAttachment(Attachment attachment);
   
   /** Retrieve a particular attachment */

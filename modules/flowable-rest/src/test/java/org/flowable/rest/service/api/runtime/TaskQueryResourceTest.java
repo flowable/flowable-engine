@@ -213,7 +213,7 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
       requestNode.put("processDefinitionNameLike", "The One %");
       assertResultsPresentInPostDataResponse(url, requestNode, processTask.getId());
 
-      // CeatedOn filtering
+      // CreatedOn filtering
       requestNode.removeAll();
       requestNode.put("createdOn", getISODateString(adhocTaskCreate.getTime()));
       assertResultsPresentInPostDataResponse(url, requestNode, adhocTask.getId());
@@ -258,10 +258,10 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
       requestNode.put("dueBefore", getISODateString(inBetweenTaskCreation.getTime()));
       assertResultsPresentInPostDataResponse(url, requestNode, adhocTask.getId());
 
-      // Suspend process-instance to have a supended task
+      // Suspend process-instance to have a suspended task
       runtimeService.suspendProcessInstanceById(processInstance.getId());
 
-      // Suspended filering
+      // Suspended filtering
       requestNode.removeAll();
       requestNode.put("active", false);
       assertResultsPresentInPostDataResponse(url, requestNode, processTask.getId());

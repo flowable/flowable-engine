@@ -79,7 +79,7 @@ public class SignalsResourceTest extends BaseSpringRestTestCase {
       httpPost.setEntity(new StringEntity(requestNode.toString()));
       closeResponse(executeRequest(httpPost, HttpStatus.SC_NO_CONTENT));
 
-      // Check if process is started as a result of the signal, witout
+      // Check if process is started as a result of the signal, without
       // tenant and with var set
       assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceWithoutTenantId().processDefinitionKey("processWithSignalStart1").variableValueEquals("testVar", "test").count());
 

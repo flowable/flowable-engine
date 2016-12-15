@@ -59,7 +59,7 @@ public class DeployResourcesEventHandler implements SimulationEventHandler {
       DeploymentBuilder deploymentBuilder = SimulationRunContext.getRepositoryService().createDeployment();
 
       for (ResourceEntity resource : resources.values()) {
-        log.debug("adding resource [{}] to deploymnet", resource.getName());
+        log.debug("adding resource [{}] to deployment", resource.getName());
         InputStream is = new ByteArrayInputStream(resource.getBytes());
         deploymentBuilder.addInputStream(resource.getName(), is);
         inputStreams.add(is);

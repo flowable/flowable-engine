@@ -39,7 +39,7 @@ public class StringStreamSource implements StreamSource {
     try {
       return new ByteArrayInputStream(byteArrayEncoding == null ? string.getBytes() : string.getBytes(byteArrayEncoding));
     } catch (UnsupportedEncodingException e) {
-      throw new FlowableException("Unsupported enconding for string", e);
+      throw new FlowableException("Unsupported encoding for string", e);
     }
   }
 

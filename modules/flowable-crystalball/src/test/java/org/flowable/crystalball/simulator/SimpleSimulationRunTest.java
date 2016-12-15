@@ -81,11 +81,11 @@ public class SimpleSimulationRunTest {
     TaskService taskService = SimulationRunContext.getTaskService();
     HistoryService historyService = SimulationRunContext.getHistoryService();
 
-    // debuger step - deploy processDefinition
+    // debugger step - deploy processDefinition
     simDebugger.step();
     step0Check(SimulationRunContext.getRepositoryService());
 
-    // debuger step - start process and stay on the userTask
+    // debugger step - start process and stay on the userTask
     simDebugger.step();
     step1Check(runtimeService, taskService);
 
@@ -122,11 +122,11 @@ public class SimpleSimulationRunTest {
     ProcessInstance procInstance = runtimeService.createProcessInstanceQuery().active().processInstanceBusinessKey("oneTaskProcessBusinessKey").singleResult();
     assertNull(procInstance);
 
-    // debuger step - deploy process
+    // debugger step - deploy process
     simDebugger.runTo(1);
     step0Check(SimulationRunContext.getRepositoryService());
 
-    // debuger step - start process and stay on the userTask
+    // debugger step - start process and stay on the userTask
     simDebugger.runTo(1001);
     step1Check(runtimeService, taskService);
 

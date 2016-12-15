@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
- * Pojo representing a variable used in REST-service which definies it's name,
+ * Pojo representing a variable used in REST-service which defines it's name,
  * variable, scope and type.
  * 
  * @author Frederik Heremans

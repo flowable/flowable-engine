@@ -42,7 +42,7 @@ public class JpaTest extends SpringFlowableTestCase {
     assertNotNull(task);
     taskService.complete(task.getId(), variables);
 
-    // If approved, the processsInstance should be finished, gateway based
+    // If approved, the processInstance should be finished, gateway based
     // on loanRequest.approved value
     assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
 

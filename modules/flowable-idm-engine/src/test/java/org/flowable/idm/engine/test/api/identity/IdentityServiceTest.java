@@ -101,7 +101,7 @@ public class IdentityServiceTest extends PluggableFlowableIdmTestCase {
     assertTrue("byte arrays differ", Arrays.equals("niceface".getBytes(), picture.getBytes()));
     assertEquals("image/string", picture.getMimeType());
     
-    //interface defintion states that setting picture to null should delete it
+    //interface definition states that setting picture to null should delete it
     idmIdentityService.setUserPicture(userId, null);
     assertNull("it should be possible to nullify user picture",idmIdentityService.getUserPicture(userId));    
     user = idmIdentityService.createUserQuery().userId("johndoe").singleResult();

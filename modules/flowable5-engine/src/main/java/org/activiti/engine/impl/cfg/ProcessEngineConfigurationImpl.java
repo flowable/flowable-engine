@@ -799,7 +799,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       }
       
       if (dataSource instanceof PooledDataSource) {
-        // ACT-233: connection pool of Ibatis is not properely initialized if this is not called!
+        // ACT-233: connection pool of Ibatis is not properly initialized if this is not called!
         ((PooledDataSource)dataSource).forceCloseAll();
       }
     }
@@ -1058,7 +1058,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   	
   	allConfigurators = new ArrayList<ProcessEngineConfigurator>();
   	
-  	// Configurators that are explicitely added to the config
+  	// Configurators that are explicitly added to the config
     if (configurators != null) {
       for (ProcessEngineConfigurator configurator : configurators) {
         allConfigurators.add(configurator);
@@ -1086,7 +1086,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     	
     	if (!allConfigurators.isEmpty()) {
     		
-    		// Order them according to the priorities (usefule for dependent configurator)
+    		// Order them according to the priorities (useful for dependent configurator)
 	    	Collections.sort(allConfigurators, new Comparator<ProcessEngineConfigurator>() {
 	    		@Override
 	    		public int compare(ProcessEngineConfigurator configurator1, ProcessEngineConfigurator configurator2) {

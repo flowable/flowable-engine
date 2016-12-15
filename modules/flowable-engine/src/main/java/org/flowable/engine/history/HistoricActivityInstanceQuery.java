@@ -65,10 +65,10 @@ public interface HistoricActivityInstanceQuery extends Query<HistoricActivityIns
   /** Only select historic activity instances that are not finished yet. */
   HistoricActivityInstanceQuery unfinished();
   
-  /** Obly select historic activity instances with a specific delete reason. */
+  /** Only select historic activity instances with a specific delete reason. */
   HistoricActivityInstanceQuery deleteReason(String deleteReason);
   
-  /** Obly select historic activity instances with a delete reason that matches the provided parameter. */
+  /** Only select historic activity instances with a delete reason that matches the provided parameter. */
   HistoricActivityInstanceQuery deleteReasonLike(String deleteReasonLike);
 
   /** Only select historic activity instances that have the given tenant id. */

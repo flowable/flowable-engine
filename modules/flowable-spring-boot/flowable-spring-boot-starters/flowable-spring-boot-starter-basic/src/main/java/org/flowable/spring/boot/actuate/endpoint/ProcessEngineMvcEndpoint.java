@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 /**
  * Renders a valid running BPMN process definition as a BPMN diagram.
  *
- * This is duplicative of the functionality in the full REST API implementation.
+ * This is duplicated functionality in the full REST API implementation.
  *
  * @author Joram Barrez
  * @author Josh Long

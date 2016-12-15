@@ -114,7 +114,7 @@ public class JobRetryCmd implements Command<Object> {
         newJobEntity.setRetries(jobRetries - 1);
 
       } catch (Exception e) {
-        throw new FlowableException("failedJobRetryTimeCylcle has wrong format:" + failedJobRetryTimeCycleValue, exception);
+        throw new FlowableException("failedJobRetryTimeCycle has wrong format:" + failedJobRetryTimeCycleValue, exception);
       }
     }
     

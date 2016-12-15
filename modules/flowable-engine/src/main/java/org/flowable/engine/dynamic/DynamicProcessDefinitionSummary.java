@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Pojo class who can be used to check information between {@link org.flowable.engine.DynamicBpmnService#getProcessDefinitionInfo(String)}
- * and {@link org.flowable.bpmn.model.BpmnModel}. Without exposing the internal behavoir of the process engine's logic.
+ * and {@link org.flowable.bpmn.model.BpmnModel}. Without exposing the internal behavior of the process engine's logic.
  *
  * Created by Pardo David on 5/12/2016.
  */

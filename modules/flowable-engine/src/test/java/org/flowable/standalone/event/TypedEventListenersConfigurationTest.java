@@ -37,7 +37,7 @@ public class TypedEventListenersConfigurationTest extends ResourceFlowableTestCa
     // Clear any events received (eg. engine initialisation)
     listener.clearEventsReceived();
 
-    // Dispath a custom event
+    // Dispacth a custom event
     FlowableEvent event = new FlowableEventImpl(FlowableEngineEventType.CUSTOM);
     processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
 

@@ -64,7 +64,7 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
 
   /**
    * Only select process instances with a certain process definition version.
-   * Particulary useful when used in combination with {@link #processDefinitionKey(String)}
+   * Particularly useful when used in combination with {@link #processDefinitionKey(String)}
    */
   ProcessInstanceQuery processDefinitionVersion(Integer processDefinitionVersion);
 

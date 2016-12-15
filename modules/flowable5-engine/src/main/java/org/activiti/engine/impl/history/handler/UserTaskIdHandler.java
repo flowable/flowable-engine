@@ -7,7 +7,7 @@ import org.flowable.engine.delegate.TaskListener;
 
 
 /**
- * Called when a task is created for a user-task activity. Allows recoring task-id in
+ * Called when a task is created for a user-task activity. Allows recording task-id in
  * historic activity.
  * 
  * @author Frederik Heremans

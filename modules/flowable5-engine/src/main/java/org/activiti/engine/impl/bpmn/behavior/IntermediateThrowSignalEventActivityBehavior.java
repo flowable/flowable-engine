@@ -60,7 +60,7 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
     }
     
     ActivityExecution activityExecution = (ActivityExecution) execution;
-    if (activityExecution.getActivity() != null) { // dont continue if process has already finished
+    if (activityExecution.getActivity() != null) { // don't continue if process has already finished
       leave(activityExecution);
     }
   }

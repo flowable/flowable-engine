@@ -87,7 +87,7 @@ public class CamelExceptionTest extends SpringFlowableTestCase {
       runtimeService.startProcessInstanceByKey("exceptionInRouteSynchron");
     } catch (FlowableException e) {
       assertEquals(Exception.class, e.getCause().getCause().getClass());
-      assertEquals("arbitary non bpmn exception", e.getCause().getCause().getMessage());
+      assertEquals("arbitrary non bpmn exception", e.getCause().getCause().getMessage());
 
       assertFalse(ExceptionServiceMock.isCalled());
       assertFalse(NoExceptionServiceMock.isCalled());

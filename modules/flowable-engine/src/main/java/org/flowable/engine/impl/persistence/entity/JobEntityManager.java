@@ -36,7 +36,7 @@ public interface JobEntityManager extends EntityManager<JobEntity> {
   boolean insertJobEntity(JobEntity timerJobEntity);
   
   /**
-   * Returns {@link JobEntity} that are eligble to be executed.
+   * Returns {@link JobEntity} that are eligible to be executed.
    * 
    * For example used by the default {@link AcquireJobsCmd} command used by 
    * the default {@link AcquireTimerJobsRunnable} implementation to get async jobs 
