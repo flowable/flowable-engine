@@ -160,7 +160,7 @@ assertEquals("updatedValue", ((FieldAccessJPAEntity)updatedEntity).getValue());
 
 ==== Query JPA process variables
 
-You can query for ++ProcessInstance++s and ++Execution++s that have a certain JPA-entity as variable value. *Note that only +variableValueEquals(name, entity)+ is supported for JPA-Entities on +ProcessInstanceQuery+ and +ExecutionQuery+*. Methods +variableValueNotEquals+, +variableValueGreaterThan+, +variableValueGreaterThanOrEqual+, +variableValueLessThan+ and +variableValueLessThanOrEqual+ are unsupported and will throw an +ActivitiException+ when a JPA-Entity is passed as value.
+You can query for ++ProcessInstance++s and ++Execution++s that have a certain JPA-entity as variable value. *Note that only +variableValueEquals(name, entity)+ is supported for JPA-Entities on +ProcessInstanceQuery+ and +ExecutionQuery+*. Methods +variableValueNotEquals+, +variableValueGreaterThan+, +variableValueGreaterThanOrEqual+, +variableValueLessThan+ and +variableValueLessThanOrEqual+ are unsupported and will throw an +FlowableException+ when a JPA-Entity is passed as value.
 
 [source,java,linenums]
 ----

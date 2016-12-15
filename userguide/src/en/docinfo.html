@@ -28,7 +28,6 @@
 <script type="text/javascript">
 
   var generateToc = function() {
-    console.log(new Date() + 'Generate toc ' + document.readyState);
     var readyState = document.readyState;
     if (readyState === 'interactive' || readyState == 'complete') {
 
@@ -63,7 +62,6 @@
       });
 
     } else {
-      console.log('Timeout');
       window.setTimeout(function(){
         generateToc();
       }, 50);

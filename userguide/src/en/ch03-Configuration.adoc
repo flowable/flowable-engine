@@ -183,7 +183,7 @@ If using Tomcat, the JNDI resource is configured within $CATALINA_BASE/conf/[eng
 <?xml version="1.0" encoding="UTF-8"?>
     <Context antiJARLocking="true" path="/flowable-app">
         <Resource auth="Container"
-            name="jdbc/activitiDB"
+            name="jdbc/flowableDB"
             type="javax.sql.DataSource"
             description="JDBC DataSource"
             url="jdbc:mysql://localhost:3306/flowable"
@@ -537,7 +537,7 @@ The property +eventListeners+ expects a list of +org.flowable.engine.delegate.ev
 </bean>
 ----
 
-To get notified when certain types of events get dispatched, use the +typedEventListeners+ property, which expects a map. The key of a map-entry is a comma-separated list of event-names (or a single event-name). The value of a map-entry is a list of +org.flowable.engine.delegate.event.ActivitiEventListener+ instances. The snippet below adds an event-listener to the configuration, that is notified when a job execution was successful or failed:
+To get notified when certain types of events get dispatched, use the +typedEventListeners+ property, which expects a map. The key of a map-entry is a comma-separated list of event-names (or a single event-name). The value of a map-entry is a list of +org.flowable.engine.delegate.event.FlowableEventListener+ instances. The snippet below adds an event-listener to the configuration, that is notified when a job execution was successful or failed:
 
 [source,xml,linenums]
 ----
@@ -572,21 +572,21 @@ It's possible to add and remove additional event-listeners to the engine by usin
  * Adds an event-listener which will be notified of ALL events by the dispatcher.
  * @param listenerToAdd the listener to add
  */
-void addEventListener(ActivitiEventListener listenerToAdd);
+void addEventListener(FlowableEventListener listenerToAdd);
 
 /**
  * Adds an event-listener which will only be notified when an event occurs, which type is in the given types.
  * @param listenerToAdd the listener to add
  * @param types types of events the listener should be notified for
  */
-void addEventListener(ActivitiEventListener listenerToAdd, ActivitiEventType... types);
+void addEventListener(FlowableEventListener listenerToAdd, FlowableEventType... types);
 
 /**
  * Removes the given listener from this dispatcher. The listener will no longer be notified,
  * regardless of the type(s) it was registered for in the first place.
  * @param listenerToRemove listener to remove
  */
- void removeEventListener(ActivitiEventListener listenerToRemove);
+ void removeEventListener(FlowableEventListener listenerToRemove);
 ----
 
 Please note that the listeners added at runtime *are not retained when the engine is rebooted.*
@@ -680,7 +680,7 @@ Another way of handling events being dispatched is to throw a BPMN event. Please
 </process>
 ----
 
-If additional logic is needed to decide whether or not to throw the BPMN-event, it's possible to extend the listener-classes provided by Flowable. By overriding the +isValidEvent(ActivitiEvent event) in your subclass, the BPMN-event throwing can be prevented. The classes involved are +org.flowable.engine.test.api.event.SignalThrowingEventListenerTest+, +org.flowable.engine.impl.bpmn.helper.MessageThrowingEventListener+ and +org.flowable.engine.impl.bpmn.helper.ErrorThrowingEventListener+.
+If additional logic is needed to decide whether or not to throw the BPMN-event, it's possible to extend the listener-classes provided by Flowable. By overriding the +isValidEvent(FlowableEvent event) in your subclass, the BPMN-event throwing can be prevented. The classes involved are +org.flowable.engine.test.api.event.SignalThrowingEventListenerTest+, +org.flowable.engine.impl.bpmn.helper.MessageThrowingEventListener+ and +org.flowable.engine.impl.bpmn.helper.ErrorThrowingEventListener+.
 
 
 ===== Notes on listeners on a process-definition
@@ -695,7 +695,7 @@ If additional logic is needed to decide whether or not to throw the BPMN-event, 
 
 ==== Dispatching events through API
 
-We opened up the event-dispatching mechanism through the API, to allow you to dispatch custom events to any listeners that are registered in the engine. It's recommended (although not enforced) to only dispatch +ActivitiEvents+ with type +CUSTOM+. Dispatching the event can be done using the ++RuntimeService++:
+We opened up the event-dispatching mechanism through the API, to allow you to dispatch custom events to any listeners that are registered in the engine. It's recommended (although not enforced) to only dispatch +FlowableEvents+ with type +CUSTOM+. Dispatching the event can be done using the ++RuntimeService++:
 
 [source,java,linenums]
 ----
@@ -704,11 +704,11 @@ We opened up the event-dispatching mechanism through the API, to allow you to di
  * Dispatches the given event to any listeners that are registered.
  * @param event event to dispatch.
  *
- * @throws ActivitiException if an exception occurs when dispatching the event or when the {@link ActivitiEventDispatcher}
+ * @throws FlowableException if an exception occurs when dispatching the event or when the {@link FlowableEventDispatcher}
  * is disabled.
- * @throws ActivitiIllegalArgumentException when the given event is not suitable for dispatching.
+ * @throws FlowableIllegalArgumentException when the given event is not suitable for dispatching.
  */
- void dispatchEvent(ActivitiEvent event);
+ void dispatchEvent(FlowableEvent event);
 ----
 
 [[eventDispatcherEventTypes]]
@@ -716,7 +716,7 @@ We opened up the event-dispatching mechanism through the API, to allow you to di
 
 ==== Supported event types
 
-Listed below are all event types that can occur in the engine. Each type corresponds to an enum value in the +org.flowable.engine.common.api.delegate.event.ActivitiEventType+.
+Listed below are all event types that can occur in the engine. Each type corresponds to an enum value in the +org.flowable.engine.common.api.delegate.event.FlowableEventType+.
 
 [[eventTypes]]
 .Supported events
@@ -732,20 +732,20 @@ Listed below are all event types that can occur in the engine. Each type corresp
 |ENTITY_SUSPENDED|An existing entity is suspended. The suspended entity is contained in the event. Will be dispatched for ProcessDefinitions, ProcessInstances and Tasks.|+org.flowable...FlowableEntityEvent+
 |ENTITY_ACTIVATED|An existing entity is activated. The activated entity is contained in the event. Will be dispatched for ProcessDefinitions, ProcessInstances and Tasks.|+org.flowable...FlowableEntityEvent+
 |JOB_EXECUTION_SUCCESS|A job has been executed successfully. The event contains the job that was executed.|+org.flowable...FlowableEntityEvent+
-|JOB_EXECUTION_FAILURE|The execution of a job has failed. The event contains the job that was executed and the exception.|+org.flowable...FlowableEntityEvent+ and +org.flowable...ActivitiExceptionEvent+
+|JOB_EXECUTION_FAILURE|The execution of a job has failed. The event contains the job that was executed and the exception.|+org.flowable...FlowableEntityEvent+ and +org.flowable...FlowableExceptionEvent+
 |JOB_RETRIES_DECREMENTED|The number of job retries have been decremented due to a failed job. The event contains the job that was updated.|+org.flowable...FlowableEntityEvent+
 |TIMER_SCHEDULED|A timer job has been created and is scheduled for being executed at a future point in time.|+org.flowable...FlowableEntityEvent+
 |TIMER_FIRED|A timer has been fired. The event contains the job that was executed?|+org.flowable...FlowableEntityEvent+
 |JOB_CANCELED|A job has been canceled. The event contains the job that was canceled. Job can be canceled by API call, task was completed and associated boundary timer was canceled, on the new process definition deployment.|+org.flowable...FlowableEntityEvent+
-|ACTIVITY_STARTED|An activity is starting to execute|+org.flowable...ActivitiActivityEvent+
-|ACTIVITY_COMPLETED|An activity is completed successfully|+org.flowable...ActivitiActivityEvent+
+|ACTIVITY_STARTED|An activity is starting to execute|+org.flowable...FlowableActivityEvent+
+|ACTIVITY_COMPLETED|An activity is completed successfully|+org.flowable...FlowableActivityEvent+
 |ACTIVITY_CANCELLED|An activity is going to be cancelled. There can be three reasons for activity cancellation (MessageEventSubscriptionEntity, SignalEventSubscriptionEntity, TimerEntity).|+org.flowable...FlowableActivityCancelledEvent+
-|ACTIVITY_SIGNALED|An activity received a signal|+org.flowable...ActivitiSignalEvent+
-|ACTIVITY_MESSAGE_RECEIVED|An activity received a message. Dispatched before the activity receives the message. When received, a +$$ACTIVITY_SIGNAL$$+ or +$$ACTIVITY_STARTED$$+ will be dispatched for this activity, depending on the type (boundary-event or event-subprocess start-event)|+org.flowable...ActivitiMessageEvent+
-|ACTIVITY_MESSAGE_WAITING|An activity has created a message event subscription and is waiting for its receival.|+org.flowable...ActivitiMessageEvent+
+|ACTIVITY_SIGNALED|An activity received a signal|+org.flowable...FlowableSignalEvent+
+|ACTIVITY_MESSAGE_RECEIVED|An activity received a message. Dispatched before the activity receives the message. When received, a +$$ACTIVITY_SIGNAL$$+ or +$$ACTIVITY_STARTED$$+ will be dispatched for this activity, depending on the type (boundary-event or event-subprocess start-event)|+org.flowable...FlowableMessageEvent+
+|ACTIVITY_MESSAGE_WAITING|An activity has created a message event subscription and is waiting for its receival.|+org.flowable...FlowableMessageEvent+
 |ACTIVITY_MESSAGE_CANCELLED|An activity for which a message event subscription has been created is cancelled and thus receiving the message will not trigger this particular message anymore.|+org.flowable...FlowableMessageEvent+
 |ACTIVITY_ERROR_RECEIVED|An activity has received an error event. Dispatched before the actual error has been handled by the activity. The event's +activityId+ contains a reference to the error-handling activity. This event will be either followed by a +$$ACTIVITY_SIGNALLED$$+ event or +$$ACTIVITY_COMPLETE$$+ for the involved activity, if the error was delivered successfully.|+org.flowable...FlowableErrorEvent+
-|UNCAUGHT_BPMN_ERROR|An uncaught BPMN error has been thrown. The process did not have any handlers for that specific error. The event's +activityId+ will be empty.|+org.flowable...ActivitiErrorEvent+
+|UNCAUGHT_BPMN_ERROR|An uncaught BPMN error has been thrown. The process did not have any handlers for that specific error. The event's +activityId+ will be empty.|+org.flowable...FlowableErrorEvent+
 |ACTIVITY_COMPENSATE|An activity is about to be compensated. The event contains the id of the activity that is will be executed for compensation.|+org.flowable...FlowableActivityEvent+
 |VARIABLE_CREATED|A variable has been created. The event contains the variable name, value and related execution and task (if any).|+org.flowable...FlowableVariableEvent+
 |VARIABLE_UPDATED|An existing variable has been updated. The event contains the variable name, updated value and related execution and task (if any).|+org.flowable...FlowableVariableEvent+

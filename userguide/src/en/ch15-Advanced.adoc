@@ -13,7 +13,7 @@ In Flowable 6 (and later), the async executor is the only one available. For ver
 
 ==== Async Executor design
 
-Two types of jobs exist: timers (like those belonging to a boundary event on a user task) and async continuations (belonging to a service task with the _activiti:async="true"_ attribute).
+Two types of jobs exist: timers (like those belonging to a boundary event on a user task) and async continuations (belonging to a service task with the _flowable:async="true"_ attribute).
 
 *Timers* are the easiest to explain: they are persisted in the ACT_RU_TIMER_JOB table with a certain due date. There is a thread in the async executor that periodically checks if there are new timers that fire (i.e. the due date is 'before' the current time). When that happens, the timer is removed and an async job is created and inserted.
 

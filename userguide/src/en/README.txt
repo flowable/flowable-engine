@@ -20,5 +20,5 @@ The html is generated using the 'index-html.adoc' file. The pdf generation uses 
 
 When building the html doc, following files get included automatically:
 
-* activiti.css : this is the stylesheet for the docs. The css will be included inline in the html docs.
+* flowable.css : this is the stylesheet for the docs. The css will be included inline in the html docs.
 * docinfo.html : this file gets included at the top of the html file. It contains the tocbot library and a little script to initialize the dynamic table of contents.

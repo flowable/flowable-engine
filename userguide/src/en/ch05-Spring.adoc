@@ -284,7 +284,7 @@ public class MyBusinessProcessTest {
 
   @Autowired
   @Rule
-  public ActivitiRule activitiSpringRule;
+  public FlowableRule flowableSpringRule;
 
   @Test
   @Deployment
@@ -300,11 +300,11 @@ public class MyBusinessProcessTest {
 }
 ----
 
-Note that for this to work, you need to define a _org.flowable.engine.test.ActivitiRule_ bean in the Spring configuration (which is injected by auto-wiring in the example above).
+Note that for this to work, you need to define a _org.flowable.engine.test.Flowable_ bean in the Spring configuration (which is injected by auto-wiring in the example above).
 
 [source,xml,linenums]
 ----
-<bean id="activitiRule" class="org.flowable.engine.test.ActivitiRule">
+<bean id="flowableRule" class="org.flowable.engine.test.Flowable">
   <property name="processEngine" ref="processEngine" />
 </bean>
 

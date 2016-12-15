@@ -2775,7 +2775,7 @@ public class ToUppercase implements JavaDelegate {
 
 Note: there will be *only one instance of that Java class created for the serviceTask it is defined on*. All process-instances share the same class instance that will be used to call _execute(DelegateExecution)_. This means that the class must not use any member variables and must be thread-safe, since it can be executed simultaneously from different threads. This also influences the way <<serviceTaskFieldInjection,Field injection>> is handled.
 
-The classes that are referenced in the process definition (i.e. by using ++flowable:class++) are *NOT instantiated during deployment*. Only when a process execution arrives for the first time at the point in the process where the class is used, an instance of that class will be created. If the class cannot be found, an +ActivitiException+ will be thrown. The reasoning for this is that the environment (and more specifically the __classpath__) when you are deploying is often different from the actual runtime environment. For example when using _ant_ or the business archive upload in the Flowable app to deploy processes, the classpath does not contain the referenced classes.
+The classes that are referenced in the process definition (i.e. by using ++flowable:class++) are *NOT instantiated during deployment*. Only when a process execution arrives for the first time at the point in the process where the class is used, an instance of that class will be created. If the class cannot be found, an +FlowableException+ will be thrown. The reasoning for this is that the environment (and more specifically the __classpath__) when you are deploying is often different from the actual runtime environment. For example when using _ant_ or the business archive upload in the Flowable app to deploy processes, the classpath does not contain the referenced classes.
 
 <<internal,[INTERNAL: non-public implementation classes]>> It is also possible to provide a class that implements the _org.flowable.engine.impl.pvm.delegate.ActivityBehavior_ interface. Implementations have then access to the more powerful _ActivityExecution_ that for example also allows to influence the control flow of the process. Note however that this is not a very good practice, and should be avoided as much as possible. So, it is advised to use the _ActivityBehavior_ interface only for advanced use cases and if you know exactly what you're doing.
 
@@ -2794,7 +2794,7 @@ If available, the value is injected through a public setter method on your deleg
 
 *Regardless of the type of value declared in the process-definition, the type of the setter/private field on the injection target should always be +org.flowable.engine.delegate.Expression+. When the expression is resolved it can be cast to the appropriate type.*
 
-Field injection is supported when using the _'actviiti:class'_ attribute. Field injection is also possible when using the _activiti:delegateExpression_ attribute, however special rules with regards to thread-safety apply (see next section).
+Field injection is supported when using the _'flowable:class'_ attribute. Field injection is also possible when using the _flowable:delegateExpression_ attribute, however special rules with regards to thread-safety apply (see next section).
 
 The following code snippet shows how to inject a constant value into a field declared on the class. Note that we need to *declare a 'extensionElements' XML element before the actual field injection declarations*, which is a requirement of the BPMN 2.0 XML Schema.
 
@@ -2841,7 +2841,7 @@ Alternatively, for longs texts (e.g. an inline e-mail) the _'flowable:string'_ s
 </serviceTask>
 ----
 
-To inject values that are dynamically resolved at runtime, expressions can be used. Those expressions can use process variables, or Spring defined beans (if Spring is used). As noted in <<bpmnJavaServiceTaskImplementation,Service Task Implementation>>, an instance of the Java class is shared among all process-instances in a service task when using the _activiti:class_ attribute. To have dynamic injection of values in fields, you can inject value and method expressions in a +org.flowable.engine.delegate.Expression+ which can be evaluated/invoked using the +DelegateExecution+ passed in the +execute+ method.
+To inject values that are dynamically resolved at runtime, expressions can be used. Those expressions can use process variables, or Spring defined beans (if Spring is used). As noted in <<bpmnJavaServiceTaskImplementation,Service Task Implementation>>, an instance of the Java class is shared among all process-instances in a service task when using the _flowable:class_ attribute. To have dynamic injection of values in fields, you can inject value and method expressions in a +org.flowable.engine.delegate.Expression+ which can be evaluated/invoked using the +DelegateExecution+ passed in the +execute+ method.
 
 The example class below uses the injected expressions and resolves them using the current +DelegateExecution+. A _generBean_ method call is used while passing the _gender_ variable. Full code and test can be found in +org.flowable.examples.bpmn.servicetask.JavaServiceTaskTest.testExpressionFieldInjection+
 
@@ -2893,11 +2893,11 @@ Alternatively, you can also set the expressions as an attribute instead of a chi
 
 In general, using service tasks with Java delegates and field injections are thread-safe. However, there are a few situations where thread-safety is not guaranteed, depending on the setup or environment Flowable is running in.
 
-When using the _activiti:class_ attribute, using field injection is always thread safe. For each service task that references a certain class, a new instance will be instantiated and fields will be injected once when the instance is created. Reusing the same class in multiple times in different tasks or process definitions is no problem.
+When using the _flowable:class_ attribute, using field injection is always thread safe. For each service task that references a certain class, a new instance will be instantiated and fields will be injected once when the instance is created. Reusing the same class in multiple times in different tasks or process definitions is no problem.
 
-When using the _activiti:expression_ attribute, using field injection is not possible. Parameters are passed via method calls and these are always thread-safe.
+When using the _flowable:expression_ attribute, using field injection is not possible. Parameters are passed via method calls and these are always thread-safe.
 
-When using the _activiti:delegateExpression_ attribute, the thread-safety of the delegate instance will depend on how the expression is resolved. If the delegate expression is reused in various tasks and/or process definitions and the expression always returns the same instance, using field injection *is not thread-safe*. Let's look at a few examples to clarify.
+When using the _flowable:delegateExpression_ attribute, the thread-safety of the delegate instance will depend on how the expression is resolved. If the delegate expression is reused in various tasks and/or process definitions and the expression always returns the same instance, using field injection *is not thread-safe*. Let's look at a few examples to clarify.
 
 Suppose the expression is _${factory.createDelegate(someVariable)}_, where factory is a Java bean known to the engine (for example a Spring bean when using the Spring integration) that creates a new instance each time the expression is resolved. When using field injection in this case, there is no problem with regards to thread-safety: each time the expression is resolved, the fields are injected on this new instance.
 
@@ -3128,7 +3128,7 @@ When custom logic is executed, it is often required to catch certain business ex
 ====== Throwing BPMN Errors
 
 
-It is possible to throw BPMN Errors from user code inside Service Tasks or Script Tasks. In order to do this, a special ActivitiException called _BpmnError_ can be thrown in JavaDelegates, scripts, expressions and delegate expressions. The engine will catch this exception and forward it to an appropriate error handler, e.g., a Boundary Error Event or an Error Event Sub-Process.
+It is possible to throw BPMN Errors from user code inside Service Tasks or Script Tasks. In order to do this, a special FlowableException called _BpmnError_ can be thrown in JavaDelegates, scripts, expressions and delegate expressions. The engine will catch this exception and forward it to an appropriate error handler, e.g., a Boundary Error Event or an Error Event Sub-Process.
 
 [source,java,linenums]
 ----
@@ -3593,7 +3593,7 @@ The Email task is configured by <<serviceTaskFieldInjection,field injection>>. A
 
 |htmlVar|no|The name of a process variable that holds the HTML that is the content of the e-mail. The key difference between this and html is that this content will have expressions replaced before being sent by the mail task.
 |textVar|no|The name of a process variable that holds the plain text content of the e-mail. The key difference between this and html is that this content will have expressions replaced before being sent by the mail task.
-|ignoreException|no|Whether an failure when handling the e-mail throws an ActivitiException. By default this is set to false.
+|ignoreException|no|Whether an failure when handling the e-mail throws an FlowableException. By default this is set to false.
 |exceptionVariableName|no|When email handling does not throw an exception since _ignoreException = true_ a variable with the given name is used to hold a failure message
 
 |===============
@@ -3778,7 +3778,7 @@ The route just logs the message body and nothing more. Notice the format of the 
 [options="header"]
 |===============
 |Endpoint Url Part|Description
-|activiti|refers to Activiti endpoint
+|activiti|refers to the engine endpoint
 |SimpleCamelCallProcess|name of the process
 |simpleCall|name of the Camel service in the process
 
@@ -4298,7 +4298,7 @@ Note that the same rules with regards to thread-safety apply as for service task
 
 A _task listener_ is used to execute custom Java logic or an expression upon the occurrence of a certain task-related event.
 
-A task listener can only be added in the process definition as a child element of a <<bpmnUserTask,user task>>. Note that this also must happen as a child of the _BPMN 2.0 extensionElements_ and in the _activiti_ namespace, since a task listener is a Flowable-specific construct.
+A task listener can only be added in the process definition as a child element of a <<bpmnUserTask,user task>>. Note that this also must happen as a child of the _BPMN 2.0 extensionElements_ and in the _flowable_ namespace, since a task listener is a Flowable-specific construct.
 
 
 [source,xml,linenums]
@@ -4995,7 +4995,7 @@ image::images/activiti.async.example.async.PNG[align="center"]
 
 This time we are completing the user task, generating an invoice and then send that invoice to the customer. This time the generation of the invoice is not part of the same unit of work so we do not want to rollback the completion of the usertask if generating an invoice fails. So what we want Flowable to do is complete the user task (1), commit the transaction and return the control to the calling application. Then we want to generate the invoice asynchronously, in a background thread. This background thread is the Flowable job executor (actually a thread pool) which periodically polls the database for jobs. So behind the scenes, when we reach the "generate invoice" task, we are creating a job "message" for Flowable to continue the process later and persisting it into the database. This job is then picked up by the job executor and executed. We are also giving the local job executor a little hint that there is a new job, to improve performance.
 
-In order to use this feature, we can use the _activiti:async="true"_ extension. So for example, the service task would look like this:
+In order to use this feature, we can use the _flowable:async="true"_ extension. So for example, the service task would look like this:
 
 [source,xml,linenums]
 ----
@@ -5003,7 +5003,7 @@ In order to use this feature, we can use the _activiti:async="true"_ extension. 
 ----
 
 
-_activiti:async_ can be specified on the following BPMN task types: task, serviceTask, scriptTask, businessRuleTask, sendTask, receiveTask, userTask, subProcess, callActivity
+_flowable:async_ can be specified on the following BPMN task types: task, serviceTask, scriptTask, businessRuleTask, sendTask, receiveTask, userTask, subProcess, callActivity
 
 
 On a userTask, receiveTask or other wait states, the async continuation allows us to execute the start execution listeners in a separate  thread/transaction.

@@ -62,7 +62,7 @@ The +process+ element has two attributes:
 ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProcess");
 ----
 
-* Important to note here is that this is not the same as calling the  +startProcessInstanceById+ method. This method expects the String id  that was generated at deploy time by the Flowable engine, and can be retrieved by calling the +processDefinition.getId()+ method. The format of the generated id is *'key:version'*, and the length is *constrained to 64 characters*. If you get an +ActivitiException+ stating that the generated id is too long, limit the text in the _key_ field of the process.
+* Important to note here is that this is not the same as calling the  +startProcessInstanceById+ method. This method expects the String id  that was generated at deploy time by the Flowable engine, and can be retrieved by calling the +processDefinition.getId()+ method. The format of the generated id is *'key:version'*, and the length is *constrained to 64 characters*. If you get an +FlowableException+ stating that the generated id is too long, limit the text in the _key_ field of the process.
 * *name*: this attribute is *optional* and maps to the _name_ property of a +ProcessDefinition+. The engine itself doesn't use this property, so it can be used for displaying a more human-friendly name in a user interface, for example.
 
 
