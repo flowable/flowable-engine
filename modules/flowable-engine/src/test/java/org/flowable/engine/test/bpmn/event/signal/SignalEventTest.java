@@ -557,6 +557,105 @@ public class SignalEventTest extends PluggableFlowableTestCase {
 
     assertEquals("usertask2", task.getTaskDefinitionKey());
   }
+  
+  @Deployment(resources = { "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignal.bpmn20.xml",
+    "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml" })
+  public void testSignalCatchSuspendedDefinition() {
+    runtimeService.startProcessInstanceByKey("catchSignal");
+    
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+    
+    repositoryService.suspendProcessDefinitionByKey("catchSignal");
+    
+    runtimeService.startProcessInstanceByKey("throwSignal");
+    
+    assertEquals(0, createEventSubscriptionQuery().count());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+  }
+  
+  @Deployment(resources = { "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignal.bpmn20.xml",
+    "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml" })
+  public void testSignalCatchSuspendedDefinitionAndInstances() {
+    runtimeService.startProcessInstanceByKey("catchSignal");
+    
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+    
+    repositoryService.suspendProcessDefinitionByKey("catchSignal", true, null);
+    
+    runtimeService.startProcessInstanceByKey("throwSignal");
+    
+    // signal catch event is still there
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+    
+    repositoryService.activateProcessDefinitionByKey("catchSignal", true, null);
+    
+    runtimeService.startProcessInstanceByKey("throwSignal");
+    
+    // now the signal catch event is gone
+    assertEquals(0, createEventSubscriptionQuery().count());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+  }
+  
+  @Deployment(resources = { "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignal.bpmn20.xml",
+    "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml" })
+  public void testSignalCatchSuspendedInstance() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("catchSignal");
+    
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+    
+    runtimeService.suspendProcessInstanceById(processInstance.getId());
+    
+    runtimeService.startProcessInstanceByKey("throwSignal");
+    
+    // signal catch event is still there
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+    
+    runtimeService.activateProcessInstanceById(processInstance.getId());
+    
+    runtimeService.startProcessInstanceByKey("throwSignal");
+    
+    // now the signal catch event is gone
+    assertEquals(0, createEventSubscriptionQuery().count());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+  }
+  
+  public void testSignalStartEventWithSuspendedDefinition() {
+
+    repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/signal/SignalEventTest.testSignalStartEvent.bpmn20.xml").deploy();
+
+    repositoryService.suspendProcessDefinitionByKey("processWithSignalStart1");
+    
+    try {
+      runtimeService.startProcessInstanceByKey("processWithSignalThrow");
+      fail("Suspended process definition should fail");
+    } catch (FlowableException e) {
+      // expected
+    }
+
+    // Verify
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+    
+    repositoryService.activateProcessDefinitionByKey("processWithSignalStart1");
+    
+    // Starting the process that fires the signal should start three process
+    // instances that are listening on that signal
+    runtimeService.startProcessInstanceByKey("processWithSignalThrow");
+    
+    // Verify
+    assertEquals(3, runtimeService.createProcessInstanceQuery().count());
+    assertEquals(3, taskService.createTaskQuery().count());
+
+    // Cleanup
+    for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+      repositoryService.deleteDeployment(deployment.getId(), true);
+    }
+
+  }
 
   /**
    * Test case for https://activiti.atlassian.net/browse/ACT-1978
