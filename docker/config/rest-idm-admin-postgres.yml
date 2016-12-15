@@ -13,7 +13,7 @@ services:
             - 9977:9977
         depends_on:
             - flowable-db
-        entrypoint: ["./wait-for-postgres.sh", "flowable-db", "java", "-jar", "flowable-rest.jar", "-httpPort=9977", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
+        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-rest.jar", "-httpPort=9977", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
     flowable-admin-app:
         image: flowable/flowable-admin
         depends_on:
@@ -47,6 +47,7 @@ services:
             - rest.content.app.restroot=content-api
         ports:
             - 9988:9988
+        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-admin.jar", "-httpPort=9988", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
     flowable-idm-app:
         image: flowable/flowable-idm
         depends_on:
@@ -58,6 +59,7 @@ services:
             - datasource.password=flowable
         ports:
             - 8080:8080
+        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-idm.jar", "-httpPort=8080", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
     flowable-db:
         extends:
             file: postgres.yml

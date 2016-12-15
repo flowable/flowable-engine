@@ -11,7 +11,7 @@
     <packaging>war</packaging>
 
     <dependencies>
-    
+
     	<dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-ui-task-conf</artifactId>
@@ -100,7 +100,7 @@
             <groupId>org.flowable</groupId>
             <artifactId>flowable-rest</artifactId>
         </dependency>
-        
+
         <!-- DATABASE -->
         <dependency>
             <groupId>org.mybatis</groupId>
@@ -118,7 +118,7 @@
             <groupId>com.mchange</groupId>
             <artifactId>c3p0</artifactId>
         </dependency>
-        
+
         <!-- LOGGING -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -132,7 +132,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
-        
+
         <!-- COMMON dependencies -->
 		<dependency>
 			<groupId>commons-fileupload</groupId>
@@ -169,7 +169,7 @@
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
 		</dependency>
-        
+
         <!-- JSON -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -229,7 +229,7 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
         </dependency>
-        
+
         <!-- EMAIL -->
         <dependency>
             <groupId>org.freemarker</groupId>
@@ -298,7 +298,7 @@
         <pluginManagement>
             <plugins>
 
-                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven 
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven
                     build itself. -->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
@@ -441,6 +441,11 @@
                                     <targetPath>/</targetPath>
                                     <directory>${project.build.directory}</directory>
                                     <include>${project.build.finalName}.jar</include>
+                                </resource>
+                                <resource>
+                                  <targetPath>/</targetPath>
+                                  <directory>${project.basedir}/src/main/docker</directory>
+                                  <include>wait-for-something.sh</include>
                                 </resource>
                             </resources>
                         </configuration>

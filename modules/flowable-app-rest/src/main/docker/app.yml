@@ -2,18 +2,18 @@ version: '2'
 services:
     flowable-rest-app:
         image: flowable/flowable-rest
-        external_links:
-            - flowable-rest-db:db
+        depends_on:
+            - flowable-rest-db
         environment:
             - datasource.driver=org.postgresql.Driver
-            - datasource.url=jdbc:postgresql://db:5432/flowable
+            - datasource.url=jdbc:postgresql://flowable-rest-db:5432/flowable
             - datasource.username=flowable
             - datasource.password=flowable
         ports:
             - 9977:9977
         depends_on:
             - flowable-rest-db
-        entrypoint: ["./wait-for-postgres.sh", "db", "java", "-jar", "flowable-rest.jar", "-httpPort=9977", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
+        entrypoint: ["./wait-for-something.sh", "flowable-rest-db", "5432", "PostgreSQL", "java", "-jar", "flowable-rest.jar", "-httpPort=9977", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
     flowable-rest-db:
         extends:
             file: postgres.yml

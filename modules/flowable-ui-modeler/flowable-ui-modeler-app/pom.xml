@@ -11,7 +11,7 @@
     <packaging>war</packaging>
 
     <dependencies>
-    
+
     	<dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-ui-modeler-conf</artifactId>
@@ -24,7 +24,7 @@
             <groupId>org.flowable</groupId>
             <artifactId>flowable-ui-modeler-logic</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-bpmn-model</artifactId>
@@ -61,7 +61,7 @@
        	 	<groupId>org.flowable</groupId>
         	<artifactId>flowable-dmn-json-converter</artifactId>
       	</dependency>
-        
+
         <!-- DATABASE -->
         <dependency>
             <groupId>org.mybatis</groupId>
@@ -79,7 +79,7 @@
             <groupId>com.mchange</groupId>
             <artifactId>c3p0</artifactId>
         </dependency>
-        
+
         <!-- LOGGING -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -93,7 +93,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
-        
+
         <!-- COMMON dependencies -->
 		<dependency>
 			<groupId>commons-fileupload</groupId>
@@ -127,7 +127,7 @@
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
 		</dependency>
-        
+
         <!-- JSON -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -371,6 +371,11 @@
                                     <targetPath>/</targetPath>
                                     <directory>${project.build.directory}</directory>
                                     <include>${project.build.finalName}.jar</include>
+                                </resource>
+                                <resource>
+                                  <targetPath>/</targetPath>
+                                  <directory>${project.basedir}/src/main/docker</directory>
+                                  <include>wait-for-something.sh</include>
                                 </resource>
                             </resources>
                         </configuration>
