@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.form.api.FormInstance;
+import org.flowable.form.model.FormField;
+import org.flowable.form.model.FormInstanceModel;
 import org.flowable.form.model.FormModel;
 import org.joda.time.LocalDate;
 import org.junit.Test;
@@ -41,6 +43,13 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
     JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
     assertEquals("test", formNode.get("values").get("input1").asText());
     assertEquals("default", formNode.get("flowable_form_outcome").asText());
+    
+    FormInstanceModel formInstanceModel = formService.getFormInstanceModelById(formInstance.getId(), null);
+    assertEquals("form1", formInstanceModel.getKey());
+    assertEquals(1, formInstanceModel.getFields().size());
+    FormField formField = formInstanceModel.getFields().get(0);
+    assertEquals("input1", formField.getId());
+    assertEquals("test", formField.getValue());
   }
   
   @Test

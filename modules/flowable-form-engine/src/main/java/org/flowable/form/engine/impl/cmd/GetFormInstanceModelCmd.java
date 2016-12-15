@@ -242,7 +242,10 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
     }
     
     FormInstance formInstance = null;
-    if (taskId != null) {
+    if (formInstanceId != null) {
+      formInstance = formInstances.get(0);
+      
+    } else if (taskId != null) {
       if (formInstances.size() > 1) {
         throw new FlowableException("Multiple form instances are found for the same task");
       }
