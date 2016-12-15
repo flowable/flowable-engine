@@ -110,9 +110,9 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
     String userEmail = successfulAuthentication.getName();
 
     log.debug("Creating new persistent login for user {}", userEmail);
-    FlowableAppUser activitiAppUser = (FlowableAppUser) successfulAuthentication.getPrincipal();
+    FlowableAppUser appUser = (FlowableAppUser) successfulAuthentication.getPrincipal();
 
-    Token token = createAndInsertPersistentToken(activitiAppUser.getUserObject(), request.getRemoteAddr(), request.getHeader("User-Agent"));
+    Token token = createAndInsertPersistentToken(appUser.getUserObject(), request.getRemoteAddr(), request.getHeader("User-Agent"));
     addCookie(token, request, response);
   }
 

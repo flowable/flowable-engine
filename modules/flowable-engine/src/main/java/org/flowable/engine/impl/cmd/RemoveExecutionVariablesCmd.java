@@ -26,8 +26,8 @@ public class RemoveExecutionVariablesCmd extends NeedsActiveExecutionCmd<Void> {
 
   protected Void execute(CommandContext commandContext, ExecutionEntity execution) {
     if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      activiti5CompatibilityHandler.removeExecutionVariables(executionId, variableNames, isLocal);
+      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+      compatibilityHandler.removeExecutionVariables(executionId, variableNames, isLocal);
       return null;
     }
     

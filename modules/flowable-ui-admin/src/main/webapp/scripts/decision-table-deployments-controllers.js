@@ -26,7 +26,7 @@ flowableAdminApp.controller('DecisionTableDeploymentsController', ['$rootScope',
 	    $scope.selectedDefinitions = [];
 
 	    var filterConfig = {
-	    	url: '/app/rest/activiti/decision-table-deployments',
+	    	url: '/app/rest/admin/decision-table-deployments',
 	    	method: 'GET',
 	    	success: function(data, status, headers, config) {
 	    		$scope.deploymentsData = data;
@@ -113,7 +113,7 @@ flowableAdminApp.controller('DecisionTableDeploymentsController', ['$rootScope',
         for (var i = 0; i < $files.length; i++) {
             var file = $files[i];
             $upload.upload({
-                url: '/app/rest/activiti/deployments',
+                url: '/app/rest/admin/deployments',
                 method: 'POST',
                 file: file
             }).progress(function(evt) {

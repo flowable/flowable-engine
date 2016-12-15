@@ -44,7 +44,7 @@ public class FlowableEndpoint extends DefaultEndpoint {
   
   protected RepositoryService repositoryService;
 
-  protected FlowableConsumer activitiConsumer;
+  protected FlowableConsumer flowableConsumer;
 
   protected boolean copyVariablesToProperties;
 
@@ -73,10 +73,10 @@ public class FlowableEndpoint extends DefaultEndpoint {
   }
 
   public void process(Exchange ex) throws Exception {
-    if (activitiConsumer == null) {
-      throw new FlowableException("Activiti consumer not defined for " + getEndpointUri());
+    if (flowableConsumer == null) {
+      throw new FlowableException("Consumer not defined for " + getEndpointUri());
     }
-    activitiConsumer.getProcessor().process(ex);
+    flowableConsumer.getProcessor().process(ex);
   }
 
   public Producer createProducer() throws Exception {
@@ -92,14 +92,14 @@ public class FlowableEndpoint extends DefaultEndpoint {
   }
   
   protected void addConsumer(FlowableConsumer consumer) {
-    if (activitiConsumer != null) {
-      throw new FlowableException("Activiti consumer already defined for " + getEndpointUri() + "!");
+    if (flowableConsumer != null) {
+      throw new FlowableException("Consumer already defined for " + getEndpointUri() + "!");
     }
-    activitiConsumer = consumer;
+    flowableConsumer = consumer;
   }
   
   protected void removeConsumer() {
-    activitiConsumer = null;
+    flowableConsumer = null;
   }
 
   public boolean isSingleton() {

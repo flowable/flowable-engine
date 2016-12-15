@@ -462,7 +462,7 @@ public class DbSqlSession implements Session {
     int engineMinorVersion = Integer.valueOf(cleanEngineVersionSplitted[1]);
 
     if ((dbMajorVersion > engineMajorVersion) || ((dbMajorVersion <= engineMajorVersion) && (dbMinorVersion > engineMinorVersion))) {
-      throw new FlowableException("Version of activiti idm database (" + versionInDatabase + ") is more recent than the engine (" + IdmEngine.VERSION + ")");
+      throw new FlowableException("Version of idm database (" + versionInDatabase + ") is more recent than the engine (" + IdmEngine.VERSION + ")");
     } else if (cleanDbVersion.compareTo(cleanEngineVersion) == 0) {
       // Versions don't match exactly, possibly snapshot is being used
       log.warn("IDM Engine-version is the same, but not an exact match: {} vs. {}. Not performing database-upgrade.", versionInDatabase, IdmEngine.VERSION);
@@ -494,7 +494,7 @@ public class DbSqlSession implements Session {
   protected void dbSchemaUpgrade(final String component, final int currentDatabaseVersionsIndex) {
     FlowableIdmVersion flowableVersion = FLOWABLE_IDM_VERSIONS.get(currentDatabaseVersionsIndex);
     String dbVersion = flowableVersion.getMainVersion();
-    log.info("upgrading activiti {} schema from {} to {}", component, dbVersion, IdmEngine.VERSION);
+    log.info("upgrading {} schema from {} to {}", component, dbVersion, IdmEngine.VERSION);
 
     // Actual execution of schema DDL SQL
     for (int i = currentDatabaseVersionsIndex + 1; i < FLOWABLE_IDM_VERSIONS.size(); i++) {

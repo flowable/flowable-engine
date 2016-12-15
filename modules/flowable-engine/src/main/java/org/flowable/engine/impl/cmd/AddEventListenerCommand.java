@@ -19,7 +19,7 @@ import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 
 /**
- * Command that adds an event-listener to the Activiti engine.
+ * Command that adds an event-listener to the process engine.
  * 
  * @author Frederik Heremans
  */

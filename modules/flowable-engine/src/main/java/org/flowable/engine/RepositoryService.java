@@ -306,7 +306,7 @@ public interface RepositoryService {
   ProcessDefinition getProcessDefinition(String processDefinitionId);
   
   /**
-   * Checks if the process definition should be executed by the Activiti 5 engine.
+   * Checks if the process definition should be executed by the V5 engine.
    */
   Boolean isFlowable5ProcessDefinition(String processDefinitionId);
   
@@ -468,7 +468,7 @@ public interface RepositoryService {
   List<IdentityLink> getIdentityLinksForProcessDefinition(String processDefinitionId);
 
   /**
-   * Validates the given process definition against the rules for executing a process definition on the Activiti engine.
+   * Validates the given process definition against the rules for executing a process definition on the process engine.
    * 
    * To create such a {@link BpmnModel} from a String, following code may be used:
    * 

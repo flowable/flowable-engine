@@ -21,7 +21,7 @@ import org.flowable.engine.task.Task;
 /**
  * Represents a means for associating an execution with a context.
  * <p />
- * This enables activiti-cdi to provide contextual business process management services, without relying on a specific context like i.e. the conversation context.
+ * This enables the cdi logic to provide contextual business process management services, without relying on a specific context like i.e. the conversation context.
  * 
  * @author Daniel Meyer
  */

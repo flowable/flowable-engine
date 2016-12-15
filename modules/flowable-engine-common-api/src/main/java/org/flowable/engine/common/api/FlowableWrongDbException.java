@@ -28,7 +28,7 @@ public class FlowableWrongDbException extends FlowableException {
 
   public FlowableWrongDbException(String libraryVersion, String dbVersion) {
     super(
-        "version mismatch: activiti library version is '"
+        "version mismatch: library version is '"
             + libraryVersion
             + "', db version is "
             + dbVersion

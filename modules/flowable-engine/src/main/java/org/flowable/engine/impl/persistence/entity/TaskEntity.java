@@ -47,7 +47,7 @@ public interface TaskEntity extends VariableScope, Task, DelegateTask, Entity, H
 
   void setEventName(String eventName);
   
-  void setCurrentActivitiListener(FlowableListener currentActivitiListener);
+  void setCurrentFlowableListener(FlowableListener currentListener);
   
   ExecutionEntity getProcessInstance();
 

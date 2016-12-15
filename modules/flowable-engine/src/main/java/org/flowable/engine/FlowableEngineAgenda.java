@@ -15,7 +15,7 @@ package org.flowable.engine;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
- * This interface exposes methods needed to manipulate activiti agenda.
+ * This interface exposes methods needed to manipulate the agenda implementation.
  */
 public interface FlowableEngineAgenda extends Agenda {
 

@@ -95,7 +95,7 @@ public interface DeploymentBuilder {
   DeploymentBuilder deploymentProperty(String propertyKey, Object propertyValue);
 
   /**
-   * Deploys all provided sources to the Activiti engine.
+   * Deploys all provided sources to the process engine.
    */
   Deployment deploy();
 

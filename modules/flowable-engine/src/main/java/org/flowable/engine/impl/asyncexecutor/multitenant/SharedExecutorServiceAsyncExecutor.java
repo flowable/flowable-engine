@@ -22,6 +22,7 @@ import org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.engine.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.multitenant.TenantInfoHolder;
+import org.flowable.engine.impl.cmd.UnacquireOwnedJobsCmd;
 import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,6 +101,15 @@ public class SharedExecutorServiceAsyncExecutor extends DefaultAsyncJobExecutor 
   @Override
   public void removeTenantAsyncExecutor(String tenantId) {
     stopThreadsForTenant(tenantId);
+  }
+  
+  @Override
+  protected void unlockOwnedJobs() {
+    for (String tenantId : timerJobAcquisitionThreads.keySet()) {
+      tenantInfoHolder.setCurrentTenantId(tenantId);
+      processEngineConfiguration.getCommandExecutor().execute(new UnacquireOwnedJobsCmd(lockOwner, tenantId));
+      tenantInfoHolder.clearCurrentTenantId();
+    }
   }
   
   @Override

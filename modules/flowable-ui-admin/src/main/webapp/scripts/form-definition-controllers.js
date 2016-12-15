@@ -74,14 +74,14 @@ flowableAdminApp.controller('FormDefinitionController', ['$scope', '$rootScope',
 
         $scope.executeWhenReady(function () {
             // Load form
-            $http({method: 'GET', url: '/app/rest/activiti/form-definitions/' + $routeParams.formId}).
+            $http({method: 'GET', url: '/app/rest/admin/form-definitions/' + $routeParams.formId}).
             success(function (data, status, headers, config) {
                 $scope.form = data;
 
                 // Load form submitted forms
                 $http({
                     method: 'GET',
-                    url: '/app/rest/activiti/form-definition-form-instances/' + $routeParams.formId
+                    url: '/app/rest/admin/form-definition-form-instances/' + $routeParams.formId
                 }).
                 success(function (formInstancesData, status, headers, config) {
                     $scope.formInstances = formInstancesData;
@@ -122,7 +122,7 @@ flowableAdminApp.controller('ShowFormPopupCrtl',
                 // Load form definition
                 $http({
                     method: 'GET',
-                    url: '/app/rest/activiti/form-definitions/' + form.id + '/editorJson'
+                    url: '/app/rest/admin/form-definitions/' + form.id + '/editorJson'
                 }).
                 success(function (data, status, headers, config) {
                     $scope.popup.currentForm = data;

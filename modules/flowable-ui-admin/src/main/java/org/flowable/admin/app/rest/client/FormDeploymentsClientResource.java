@@ -38,7 +38,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * @author Yvo Swillens
  */
 @RestController
-@RequestMapping("/rest/activiti/form-deployments")
+@RequestMapping("/rest/admin/form-deployments")
 public class FormDeploymentsClientResource extends AbstractClientResource {
 
   private final Logger log = LoggerFactory.getLogger(FormDeploymentsClientResource.class);
@@ -47,7 +47,7 @@ public class FormDeploymentsClientResource extends AbstractClientResource {
   protected FormDeploymentService clientService;
 
   /**
-   * GET /rest/activiti/form-deployments -> get a list of form deployments.
+   * GET /rest/admin/form-deployments -> get a list of form deployments.
    */
   @RequestMapping(method = RequestMethod.GET, produces = "application/json")
   public JsonNode listDeployments(HttpServletRequest request) {
@@ -68,7 +68,7 @@ public class FormDeploymentsClientResource extends AbstractClientResource {
   }
 
   /**
-   * POST /rest/activiti/form-deployments: upload a form deployment
+   * POST /rest/admin/form-deployments: upload a form deployment
    */
   @RequestMapping(method = RequestMethod.POST, produces = "application/json")
   public JsonNode handleFileUpload(HttpServletRequest request, @RequestParam("file") MultipartFile file) {

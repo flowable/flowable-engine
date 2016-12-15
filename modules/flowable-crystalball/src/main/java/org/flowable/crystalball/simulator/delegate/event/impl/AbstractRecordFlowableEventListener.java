@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * This class provides abstract base to records Activiti events
+ * This class provides abstract base to records engine events
  * 
  * @author martin.grofcik
  */

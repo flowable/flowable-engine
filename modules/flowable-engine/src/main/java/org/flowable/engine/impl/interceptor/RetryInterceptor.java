@@ -54,7 +54,7 @@ public class RetryInterceptor extends AbstractCommandInterceptor {
       failedAttempts++;
     } while (failedAttempts <= numOfRetries);
 
-    throw new FlowableException(numOfRetries + " retries failed with ActivitiOptimisticLockingException. Giving up.");
+    throw new FlowableException(numOfRetries + " retries failed with FlowableOptimisticLockingException. Giving up.");
   }
 
   protected void waitBeforeRetry(long waitTime) {

@@ -25,7 +25,7 @@ import org.flowable.cdi.impl.util.BeanManagerLookup;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
 
 /**
- * Resolver wrapping an instance of javax.el.ELResolver obtained from the {@link BeanManager}. Allows activiti-engine to resolve Cdi-Beans.
+ * Resolver wrapping an instance of javax.el.ELResolver obtained from the {@link BeanManager}. Allows flowable-engine to resolve Cdi-Beans.
  * 
  * @author Daniel Meyer
  */

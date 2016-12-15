@@ -32,8 +32,8 @@ public class ContentManagementServiceImpl extends ServiceImpl implements Content
     return commandExecutor.execute(new GetTableCountCmd());
   }
 
-  public String getTableName(Class<?> activitiEntityClass) {
-    return commandExecutor.execute(new GetTableNameCmd(activitiEntityClass));
+  public String getTableName(Class<?> entityClass) {
+    return commandExecutor.execute(new GetTableNameCmd(entityClass));
   }
 
   public TableMetaData getTableMetaData(String tableName) {

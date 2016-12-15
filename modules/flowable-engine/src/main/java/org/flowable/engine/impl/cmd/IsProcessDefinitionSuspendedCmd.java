@@ -36,8 +36,8 @@ public class IsProcessDefinitionSuspendedCmd implements Command<Boolean>, Serial
   public Boolean execute(CommandContext commandContext) {
     // Backwards compatibility
     if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processDefinitionId)) {
-      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      return activiti5CompatibilityHandler.isProcessDefinitionSuspended(processDefinitionId);
+      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+      return compatibilityHandler.isProcessDefinitionSuspended(processDefinitionId);
     }
     
     return ProcessDefinitionUtil.isProcessDefinitionSuspended(processDefinitionId);

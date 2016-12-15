@@ -54,7 +54,7 @@ flowableAdminApp.controller('TaskController', ['$scope', '$rootScope', '$http', 
 		$scope.loadTask = function() {
 			$scope.task = undefined;
 			// Load task
-			$http({method: 'GET', url: '/app/rest/activiti/tasks/' + $routeParams.taskId}).
+			$http({method: 'GET', url: '/app/rest/admin/tasks/' + $routeParams.taskId}).
 			success(function(data, status, headers, config) {
 				$scope.task = data;
 
@@ -85,7 +85,7 @@ flowableAdminApp.controller('TaskController', ['$scope', '$rootScope', '$http', 
 		$scope.loadRuntimeTask = function() {
 			if($scope.task && !$scope.taskCompleted) {
 				// Load runtime task, if available to fetch delegation state
-				$http({method: 'GET', url: '/app/rest/activiti/tasks/' + $routeParams.taskId,
+				$http({method: 'GET', url: '/app/rest/admin/tasks/' + $routeParams.taskId,
 					params: {runtime: 'true'}}).
 				success(function(data, status, headers, config) {
 					// Workaround for pre 5.15 installs, historic assignee is not updated when set to null
@@ -183,7 +183,7 @@ flowableAdminApp.controller('TaskController', ['$scope', '$rootScope', '$http', 
 
 		$scope.loadSubTasks = function() {
 			$scope.subTasks = undefined;
-			$http({method: 'GET', url: '/app/rest/activiti/tasks/' + $scope.task.id +'/subtasks'}).
+			$http({method: 'GET', url: '/app/rest/admin/tasks/' + $scope.task.id +'/subtasks'}).
 			success(function(data, status, headers, config) {
 				$scope.subTasks = data;
 				$scope.tabData.tabs[0].info = data.total;
@@ -192,7 +192,7 @@ flowableAdminApp.controller('TaskController', ['$scope', '$rootScope', '$http', 
 
 		$scope.loadVariables = function() {
 			$scope.variables = undefined;
-			$http({method: 'GET', url: '/app/rest/activiti/tasks/' + $scope.task.id +'/variables'}).
+			$http({method: 'GET', url: '/app/rest/admin/tasks/' + $scope.task.id +'/variables'}).
 			success(function(data, status, headers, config) {
 				$scope.variables = data;
 				$scope.tabData.tabs[1].info = data.total;
@@ -201,7 +201,7 @@ flowableAdminApp.controller('TaskController', ['$scope', '$rootScope', '$http', 
 
 		$scope.loadIdentityLinks = function() {
 			$scope.identityLinks = undefined;
-			$http({method: 'GET', url: '/app/rest/activiti/tasks/' + $scope.task.id +'/identitylinks'}).
+			$http({method: 'GET', url: '/app/rest/admin/tasks/' + $scope.task.id +'/identitylinks'}).
 			success(function(data, status, headers, config) {
 				$scope.identityLinks = {data: data, size: data.length};
 				$scope.tabData.tabs[2].info = data.length;
@@ -210,7 +210,7 @@ flowableAdminApp.controller('TaskController', ['$scope', '$rootScope', '$http', 
 		
 		$scope.showTaskForm = function() {
 		    if($scope.task.endTime) {
-		        $http({method: 'GET', url: '/app/rest/activiti/task-form-instance/' + $scope.task.id}).
+		        $http({method: 'GET', url: '/app/rest/admin/task-form-instance/' + $scope.task.id}).
 	            success(function(data, status, headers, config) {
 	                $rootScope.submittedForm = data.data[0]; // saving fetched submitted form in root scope to avoid another fetch in submitted form controller
 	                $location.path("/form-instance/" + data.data[0].id);
@@ -338,7 +338,7 @@ flowableAdminApp.controller('CompleteModalInstanceCrtl',
 
   $scope.ok = function () {
 	  $scope.status.loading = true;
-	  $http({method: 'POST', url: '/app/rest/activiti/tasks/' + $scope.task.id, data: {action: 'complete'}}).
+	  $http({method: 'POST', url: '/app/rest/admin/tasks/' + $scope.task.id, data: {action: 'complete'}}).
   	  success(function(data, status, headers, config) {
   		$modalInstance.close(true);
   		$scope.status.loading = false;
@@ -363,7 +363,7 @@ flowableAdminApp.controller('ResolveTaskModalInstanceCrtl',
 
   $scope.ok = function () {
 	  $scope.status.loading = true;
-	  $http({method: 'POST', url: '/app/rest/activiti/tasks/' + $scope.task.id, data: {action: 'resolve'}}).
+	  $http({method: 'POST', url: '/app/rest/admin/tasks/' + $scope.task.id, data: {action: 'resolve'}}).
   	  success(function(data, status, headers, config) {
   		$modalInstance.close(true);
   		$scope.status.loading = false;
@@ -389,7 +389,7 @@ flowableAdminApp.controller('DeleteTaskModalInstanceCrtl',
 
   $scope.ok = function () {
 	  $scope.status.loading = true;
-	  $http({method: 'DELETE', url: '/app/rest/activiti/tasks/' + $scope.task.id}).
+	  $http({method: 'DELETE', url: '/app/rest/admin/tasks/' + $scope.task.id}).
     	success(function(data, status, headers, config) {
     		$modalInstance.close(true);
 	  		$scope.status.loading = false;
@@ -416,7 +416,7 @@ flowableAdminApp.controller('DelegateModalInstanceCrtl',
 
   $scope.ok = function () {
 	  $scope.status.loading = true;
-	  $http({method: 'POST', url: '/app/rest/activiti/tasks/' + $scope.task.id, data: {action: 'delegate', assignee: $scope.status.user}}).
+	  $http({method: 'POST', url: '/app/rest/admin/tasks/' + $scope.task.id, data: {action: 'delegate', assignee: $scope.status.user}}).
   	  success(function(data, status, headers, config) {
   	    if ($scope.newAssignee && $scope.newAssignee.name) {
   	      $modalInstance.close($scope.newAssignee.name);
@@ -453,7 +453,7 @@ flowableAdminApp.controller('AssignModalInstanceCrtl',
 		  } else if ($scope.newAssignee && $scope.newAssignee.name) {
 		      resultUserValue = $scope.newAssignee.name;
 		  }
-		  $http({method: 'PUT', url: '/app/rest/activiti/tasks/' + $scope.task.id, data: {assignee: rawUserValue}}).
+		  $http({method: 'PUT', url: '/app/rest/admin/tasks/' + $scope.task.id, data: {assignee: rawUserValue}}).
 	  	  success(function(data, status, headers, config) {
 	  		$modalInstance.close(resultUserValue);
 	  		$scope.status.loading = false;
@@ -488,7 +488,7 @@ flowableAdminApp.controller('EditTaskModalInstanceCrtl',
 
 	  $scope.ok = function () {
 		  $scope.status.loading = true;
-		  $http({method: 'PUT', url: '/app/rest/activiti/tasks/' + $scope.task.id, data: $scope.model}).
+		  $http({method: 'PUT', url: '/app/rest/admin/tasks/' + $scope.task.id, data: $scope.model}).
 	  	  success(function(data, status, headers, config) {
 	  		$modalInstance.close(true);
 	  		$scope.status.loading = false;

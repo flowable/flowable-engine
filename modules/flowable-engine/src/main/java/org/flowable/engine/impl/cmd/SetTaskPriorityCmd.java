@@ -33,8 +33,8 @@ public class SetTaskPriorityCmd extends NeedsActiveTaskCmd<Void> {
 
   protected Void execute(CommandContext commandContext, TaskEntity task) {
     if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      activiti5CompatibilityHandler.setTaskPriority(taskId, priority);
+      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+      compatibilityHandler.setTaskPriority(taskId, priority);
       return null;
     }
     

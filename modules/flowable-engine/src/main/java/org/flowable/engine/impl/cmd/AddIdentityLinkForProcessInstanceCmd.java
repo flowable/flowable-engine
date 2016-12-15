@@ -75,8 +75,8 @@ public class AddIdentityLinkForProcessInstanceCmd implements Command<Void>, Seri
     }
     
     if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processInstance.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      activiti5CompatibilityHandler.addIdentityLinkForProcessInstance(processInstanceId, userId, groupId, type);
+      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+      compatibilityHandler.addIdentityLinkForProcessInstance(processInstanceId, userId, groupId, type);
       return null;
     }
 

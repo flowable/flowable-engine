@@ -55,8 +55,8 @@ import org.junit.runners.model.Statement;
  * </pre>
  * 
  * <p>
- * The ProcessEngine and the services will be made available to the test class through the getters of the activitiRule. The processEngine will be initialized by default with the flowable.cfg.xml
- * resource on the classpath. To specify a different configuration file, pass the resource location in {@link #ActivitiRule(String) the appropriate constructor}. Process engines will be cached
+ * The ProcessEngine and the services will be made available to the test class through the getters of the FlowableRule. The processEngine will be initialized by default with the flowable.cfg.xml
+ * resource on the classpath. To specify a different configuration file, pass the resource location in {@link #FlowableRule(String) the appropriate constructor}. Process engines will be cached
  * statically. Right before the first time the setUp is called for a given configuration resource, the process engine will be constructed.
  * </p>
  * 
@@ -66,7 +66,7 @@ import org.junit.runners.model.Statement;
  * </p>
  * 
  * <p>
- * The activitiRule also lets you {@link FlowableRule#setCurrentTime(Date) set the current time used by the process engine}. This can be handy to control the exact time that is used by the engine in
+ * The FlowableRule also lets you {@link FlowableRule#setCurrentTime(Date) set the current time used by the process engine}. This can be handy to control the exact time that is used by the engine in
  * order to verify e.g. e.g. due dates of timers. Or start, end and duration times in the history service. In the tearDown, the internal clock will automatically be reset to use the current system
  * time rather then the time that was set during a test method.
  * </p>

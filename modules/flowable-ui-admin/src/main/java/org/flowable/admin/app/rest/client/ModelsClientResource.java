@@ -32,14 +32,14 @@ import com.fasterxml.jackson.databind.JsonNode;
  * @author Bassam Al-Sarori
  */
 @RestController
-@RequestMapping("/rest/activiti/models")
+@RequestMapping("/rest/admin/models")
 public class ModelsClientResource extends AbstractClientResource {
 
     @Autowired
     protected ModelService clientService;
 
     /**
-     * GET  /rest/activiti/models -> get a list of apps.
+     * GET  /rest/admin/models -> get a list of apps.
      */
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
     public JsonNode listModels(HttpServletRequest request) {

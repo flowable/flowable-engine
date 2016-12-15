@@ -55,8 +55,8 @@ public class GetExecutionVariableCmd implements Command<Object>, Serializable {
     }
     
     if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      return activiti5CompatibilityHandler.getExecutionVariable(executionId, variableName, isLocal);
+      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+      return compatibilityHandler.getExecutionVariable(executionId, variableName, isLocal);
     }
 
     Object value;

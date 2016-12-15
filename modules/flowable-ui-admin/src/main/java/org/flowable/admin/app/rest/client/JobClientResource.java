@@ -38,9 +38,9 @@ public class JobClientResource extends AbstractClientResource {
 	protected JobService clientService;
 
 	/**
-	 * GET /rest/activiti/jobs/{jobId} -> return job data
+	 * GET /rest/admin/jobs/{jobId} -> return job data
 	 */
-	@RequestMapping(value = "/rest/activiti/jobs/{jobId}", method = RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value = "/rest/admin/jobs/{jobId}", method = RequestMethod.GET, produces = "application/json")
 	public JsonNode getJob(@PathVariable String jobId) throws BadRequestException {
 
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
@@ -52,9 +52,9 @@ public class JobClientResource extends AbstractClientResource {
 	}
 
 	/**
-	 * DELETE /rest/activiti/jobs/{jobId} -> delete job
+	 * DELETE /rest/admin/jobs/{jobId} -> delete job
 	 */
-	@RequestMapping(value = "/rest/activiti/jobs/{jobId}", method = RequestMethod.DELETE, produces = "application/json")
+	@RequestMapping(value = "/rest/admin/jobs/{jobId}", method = RequestMethod.DELETE, produces = "application/json")
 	@ResponseStatus(value = HttpStatus.OK)
 	public void deleteJob(@PathVariable String jobId) throws BadRequestException {
 
@@ -67,9 +67,9 @@ public class JobClientResource extends AbstractClientResource {
 	}
 
 	/**
-	 * POST /rest/activiti/jobs/{jobId} -> execute job
+	 * POST /rest/admin/jobs/{jobId} -> execute job
 	 */
-	@RequestMapping(value = "/rest/activiti/jobs/{jobId}", method = RequestMethod.POST, produces = "application/json")
+	@RequestMapping(value = "/rest/admin/jobs/{jobId}", method = RequestMethod.POST, produces = "application/json")
 	@ResponseStatus(value = HttpStatus.OK)
 	public void executeJob(@PathVariable String jobId) throws BadRequestException {
 
@@ -82,9 +82,9 @@ public class JobClientResource extends AbstractClientResource {
 	}
 
 	/**
-	 * GET /rest/activiti/jobs/{jobId}/exception-stracktrace -> return job stacktrace
+	 * GET /rest/admin/jobs/{jobId}/exception-stracktrace -> return job stacktrace
 	 */
-	@RequestMapping(value = "/rest/activiti/jobs/{jobId}/stacktrace", method = RequestMethod.GET, produces = "text/plain")
+	@RequestMapping(value = "/rest/admin/jobs/{jobId}/stacktrace", method = RequestMethod.GET, produces = "text/plain")
 	public String getJobStacktrace(@PathVariable String jobId) throws BadRequestException {
 
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);

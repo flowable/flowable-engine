@@ -15,7 +15,7 @@ package org.flowable.cdi;
 import org.flowable.engine.common.api.FlowableException;
 
 /**
- * Represents an exception in activiti cdi.
+ * Represents an exception in cdi.
  * 
  * @author Daniel Meyer
  */

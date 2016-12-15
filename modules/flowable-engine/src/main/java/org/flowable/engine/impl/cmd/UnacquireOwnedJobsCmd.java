@@ -12,34 +12,32 @@
  */
 package org.flowable.engine.impl.cmd;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import java.util.List;
+
+import org.flowable.engine.impl.JobQueryImpl;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.runtime.Job;
 
-/**
- * Command that removes an event-listener from the process engine.
- * 
- * @author Frederik Heremans
- */
-public class RemoveEventListenerCommand implements Command<Void> {
+public class UnacquireOwnedJobsCmd implements Command<Void> {
 
-  protected FlowableEventListener listener;
-
-  public RemoveEventListenerCommand(FlowableEventListener listener) {
-    super();
-    this.listener = listener;
+  private final String lockOwner;
+  private final String tenantId;
+  
+  public UnacquireOwnedJobsCmd(String lockOwner, String tenantId) {
+    this.lockOwner = lockOwner;
+    this.tenantId = tenantId;
   }
 
   @Override
   public Void execute(CommandContext commandContext) {
-    if (listener == null) {
-      throw new FlowableIllegalArgumentException("listener is null.");
+    JobQueryImpl jobQuery = new JobQueryImpl(commandContext);
+    jobQuery.lockOwner(lockOwner);
+    jobQuery.jobTenantId(tenantId);
+    List<Job> jobs = commandContext.getJobEntityManager().findJobsByQueryCriteria(jobQuery, null);
+    for (Job job : jobs) {
+      commandContext.getJobManager().unacquire(job);
     }
-
-    commandContext.getProcessEngineConfiguration().getEventDispatcher().removeEventListener(listener);
-
     return null;
   }
-
 }

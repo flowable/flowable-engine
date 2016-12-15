@@ -65,7 +65,7 @@ public class ExecuteAsyncRunnable implements Runnable {
       });
     }
     
-    if (isHandledByActiviti5Engine()) {
+    if (isHandledByV5Engine()) {
       return;
     }
     
@@ -78,7 +78,7 @@ public class ExecuteAsyncRunnable implements Runnable {
 
   }
 
-  protected boolean isHandledByActiviti5Engine() {
+  protected boolean isHandledByV5Engine() {
     boolean isFlowable5ProcessDefinition = Flowable5Util.isFlowable5ProcessDefinitionId(processEngineConfiguration, job.getProcessDefinitionId());
     if (isFlowable5ProcessDefinition) {
       return processEngineConfiguration.getCommandExecutor().execute(new Command<Boolean>() {
@@ -179,8 +179,8 @@ public class ExecuteAsyncRunnable implements Runnable {
       @Override
       public Void execute(CommandContext commandContext) {
         if (job.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, job.getProcessDefinitionId())) {
-          Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-          activiti5CompatibilityHandler.handleFailedJob(job, exception);
+          Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+          compatibilityHandler.handleFailedJob(job, exception);
           return null;
         }
         

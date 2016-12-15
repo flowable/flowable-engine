@@ -30,7 +30,7 @@ public interface ModelQuery extends Query<ModelQuery, Model> {
   ModelQuery modelCategory(String modelCategory);
 
   /**
-   * Only select models where the category matches the given parameter. The syntax that should be used is the same as in SQL, eg. %activiti%
+   * Only select models where the category matches the given parameter. The syntax that should be used is the same as in SQL, eg. %test%
    */
   ModelQuery modelCategoryLike(String modelCategoryLike);
 
@@ -41,7 +41,7 @@ public interface ModelQuery extends Query<ModelQuery, Model> {
   ModelQuery modelName(String modelName);
 
   /**
-   * Only select models where the name matches the given parameter. The syntax that should be used is the same as in SQL, eg. %activiti%
+   * Only select models where the name matches the given parameter. The syntax that should be used is the same as in SQL, eg. %test%
    */
   ModelQuery modelNameLike(String modelNameLike);
 

@@ -38,7 +38,7 @@ public class ProcessEngineInfoClientResource extends AbstractClientResource {
     @Autowired
     protected Environment env;
 
-    @RequestMapping(value = "/rest/activiti/engine-info/{endpointTypeCode}", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/admin/engine-info/{endpointTypeCode}", method = RequestMethod.GET)
     public JsonNode getEngineInfo(@PathVariable Integer endpointTypeCode) throws BadRequestException {
         EndpointType endpointType = EndpointType.valueOf(endpointTypeCode);
 

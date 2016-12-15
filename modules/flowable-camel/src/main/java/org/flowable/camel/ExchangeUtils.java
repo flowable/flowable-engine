@@ -23,7 +23,7 @@ import org.flowable.engine.common.api.FlowableException;
 
 
 /**
- * This class contains one method - prepareVariables - that is used to copy variables from Camel into Activiti.
+ * This class contains one method - prepareVariables - that is used to copy variables from Camel into the process engine.
  * 
  * @author Ryan Johnston (@rjfsu), Tijs Rademakers, Arnold Schrijver
  * @author Saeid Mirzaei
@@ -35,20 +35,17 @@ public class ExchangeUtils {
   static Map<String, Pattern> patternsCache = new HashMap<String, Pattern >();
 	
   /**
-   * Copies variables from Camel into Activiti.
+   * Copies variables from Camel into the process engine.
    * 
-   * This method will copy the Camel body to the "camelBody" variable. It will copy the Camel body to individual variables within Activiti if it is of type 
+   * This method will copy the Camel body to the "camelBody" variable. It will copy the Camel body to individual variables within Flowable if it is of type 
    * Map&lt;String, Object&gt; or it will copy the Object as it comes.
    * <ul>
    * <li>If the copyVariablesFromProperties parameter is set on the endpoint, the properties are copied instead</li>
    * <li>If the copyCamelBodyToBodyAsString parameter is set on the endpoint, the camelBody is converted to java.lang.String and added as a camelBody variable,
    * unless it is a Map&lt;String, Object&gt;</li>
-   * <li>If the copyVariablesFromHeader parameter is set on the endpoint, each Camel Header will be copied to an individual variable within Activiti.</li>
+   * <li>If the copyVariablesFromHeader parameter is set on the endpoint, each Camel Header will be copied to an individual process variable.</li>
    * </ul>
    * 
-   * @param exchange The Camel Exchange object
-   * @param activitiEndpoint The ActivitiEndpoint implementation
-   * @return A Map&lt;String, Object&gt; containing all of the variables to be used in Activiti
    */
 
   private static Pattern createPattern(String propertyString, boolean asBoolean) {
@@ -73,10 +70,10 @@ public class ExchangeUtils {
 	    return lower.equals("true") || lower.equals("false");
 	  }
 
-  public static Map<String, Object> prepareVariables(Exchange exchange, FlowableEndpoint activitiEndpoint) {
+  public static Map<String, Object> prepareVariables(Exchange exchange, FlowableEndpoint endpoint) {
     Map<String, Object> camelVarMap =  new HashMap<String, Object>();
 
-    String copyProperties = activitiEndpoint.getCopyVariablesFromProperties();
+    String copyProperties = endpoint.getCopyVariablesFromProperties();
     // don't other if the property is null, or is a false
     if (StringUtils.isNotEmpty(copyProperties) 
             && (!isBoolean(copyProperties) || Boolean.parseBoolean(copyProperties))) {
@@ -94,17 +91,17 @@ public class ExchangeUtils {
       }
     }
 
-    String copyHeader = activitiEndpoint.getCopyVariablesFromHeader();
+    String copyHeader = endpoint.getCopyVariablesFromHeader();
     if (!StringUtils.isEmpty(copyHeader) && 
              (!isBoolean(copyHeader) || Boolean.parseBoolean(copyHeader))) {
 
       Pattern pattern = createPattern(copyHeader, Boolean.parseBoolean(copyHeader));
       
-      boolean isSetProcessInitiator = activitiEndpoint.isSetProcessInitiator();
+      boolean isSetProcessInitiator = endpoint.isSetProcessInitiator();
       for (Map.Entry<String, Object> header : exchange.getIn().getHeaders().entrySet()) {
         // Don't pass the process initiator header as a variable.
         
-        if ((!isSetProcessInitiator || activitiEndpoint.getProcessInitiatorHeaderName().equals(header.getKey()))
+        if ((!isSetProcessInitiator || endpoint.getProcessInitiatorHeaderName().equals(header.getKey()))
                 && (pattern == null || pattern.matcher(header.getKey()).matches())) {
           camelVarMap.put(header.getKey(), header.getValue());
         }
@@ -126,7 +123,7 @@ public class ExchangeUtils {
         }
       }
     } else {
-      if (activitiEndpoint.isCopyCamelBodyToBodyAsString() && !(camelBody instanceof String)) {
+      if (endpoint.isCopyCamelBodyToBodyAsString() && !(camelBody instanceof String)) {
         camelBody = exchange.getContext().getTypeConverter().convertTo(String.class, exchange, camelBody);
       }
       if (camelBody != null) {
@@ -144,24 +141,24 @@ public class ExchangeUtils {
    * Returns null if no header name was specified on the Camel route.
    * 
    * @param exchange The Camel Exchange object
-   * @param activitiEndpoint The ActivitiEndpoint implementation
+   * @param endPoint The endPoint implementation
    * @return The userId of the user to be set as the process initiator
    */
-  public static String prepareInitiator(Exchange exchange, FlowableEndpoint activitiEndpoint) {
+  public static String prepareInitiator(Exchange exchange, FlowableEndpoint endpoint) {
      
       String initiator = null;
-      if (activitiEndpoint.isSetProcessInitiator()) {
+      if (endpoint.isSetProcessInitiator()) {
           try {
-              initiator = exchange.getIn().getHeader(activitiEndpoint.getProcessInitiatorHeaderName(), String.class);
+              initiator = exchange.getIn().getHeader(endpoint.getProcessInitiatorHeaderName(), String.class);
           }
           catch (TypeConversionException e) {
               throw new FlowableException("Initiator header '" + 
-                      activitiEndpoint.getProcessInitiatorHeaderName() + "': Value must be of type String.", e);
+                      endpoint.getProcessInitiatorHeaderName() + "': Value must be of type String.", e);
           }
           
           if (StringUtils.isEmpty(initiator)) {
               throw new FlowableException("Initiator header '" + 
-                      activitiEndpoint.getProcessInitiatorHeaderName() + "': Value must be provided");
+                      endpoint.getProcessInitiatorHeaderName() + "': Value must be provided");
           }
       }
       return initiator;

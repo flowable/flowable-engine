@@ -47,8 +47,8 @@ public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Void> {
     // Backwards compatibility
     if (task.getProcessDefinitionId() != null) {
       if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
-        Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-        activiti5CompatibilityHandler.submitTaskFormData(taskId, properties, completeTask);
+        Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+        compatibilityHandler.submitTaskFormData(taskId, properties, completeTask);
         return null;
       }
     }

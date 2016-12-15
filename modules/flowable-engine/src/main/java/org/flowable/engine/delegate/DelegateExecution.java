@@ -95,12 +95,12 @@ public interface DelegateExecution extends VariableScope {
    * if currently an execution listener is being execution. 
    * Returns null otherwise.
    */
-  FlowableListener getCurrentActivitiListener();
+  FlowableListener getCurrentFlowableListener();
 
   /**
    * Called when an {@link ExecutionListener} is being executed. 
    */
-  void setCurrentActivitiListener(FlowableListener currentActivitiListener);
+  void setCurrentFlowableListener(FlowableListener currentListener);
 
   /* Execution management */
 

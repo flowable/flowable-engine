@@ -9,14 +9,14 @@ import org.flowable.engine.impl.interceptor.Command;
  */
 public class TotalExecutionTimeCommandInterceptor extends AbstractCommandInterceptor {
 
-    protected FlowableProfiler activitiProfiler;
+    protected FlowableProfiler profiler;
 
     public TotalExecutionTimeCommandInterceptor() {
-        this.activitiProfiler = FlowableProfiler.getInstance();
+        this.profiler = FlowableProfiler.getInstance();
     }
 
     public <T> T execute(CommandConfig config, Command<T> command) {
-        ProfileSession currentProfileSession = activitiProfiler.getCurrentProfileSession();
+        ProfileSession currentProfileSession = profiler.getCurrentProfileSession();
 
         if (currentProfileSession != null) {
 

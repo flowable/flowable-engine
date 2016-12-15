@@ -51,7 +51,7 @@ final class SimulatorParserUtils {
 //        activity.setActivityBehavior(constructor.newInstance(scope, activity));
 //      } catch (Throwable t) {
 //        LOG.error("unable to set simulation behavior class[" + behaviorClassName + "]", t);
-//        throw new ActivitiException("unable to set simulation behavior class[" + behaviorClassName + "]");
+//        throw new FlowableException("unable to set simulation behavior class[" + behaviorClassName + "]");
 //      }
 //    }
 //  }

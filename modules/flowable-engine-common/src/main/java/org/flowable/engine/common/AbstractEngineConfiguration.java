@@ -78,7 +78,7 @@ public abstract class AbstractEngineConfiguration {
 
   protected String databaseType;
   protected String jdbcDriver = "org.h2.Driver";
-  protected String jdbcUrl = "jdbc:h2:tcp://localhost/~/activiti";
+  protected String jdbcUrl = "jdbc:h2:tcp://localhost/~/flowable";
   protected String jdbcUsername = "sa";
   protected String jdbcPassword = "";
   protected String dataSourceJndiName;

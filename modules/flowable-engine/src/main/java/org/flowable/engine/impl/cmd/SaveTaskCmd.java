@@ -49,8 +49,8 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
     }
 
     if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
-      activiti5CompatibilityHandler.saveTask(task);
+      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+      compatibilityHandler.saveTask(task);
       return null;
     }
 

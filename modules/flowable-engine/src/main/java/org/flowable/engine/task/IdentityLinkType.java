@@ -24,8 +24,6 @@ import org.flowable.engine.TaskService;
  */
 public class IdentityLinkType {
 
-  /* Activiti native roles */
-
   public static final String ASSIGNEE = "assignee";
 
   public static final String CANDIDATE = "candidate";

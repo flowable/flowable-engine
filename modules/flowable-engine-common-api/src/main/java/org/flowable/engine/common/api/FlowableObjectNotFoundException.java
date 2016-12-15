@@ -42,7 +42,7 @@ public class FlowableObjectNotFoundException extends FlowableException {
   }
 
   /**
-   * The class of the object that was not found. Contains the interface-class of the activiti-object that was not found.
+   * The class of the object that was not found. Contains the interface-class of the object that was not found.
    */
   public Class<?> getObjectClass() {
     return objectClass;

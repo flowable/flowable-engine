@@ -896,7 +896,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
     this.eventName = eventName;
   }
   @Override
-  public FlowableListener getCurrentActivitiListener() {
+  public FlowableListener getCurrentFlowableListener() {
     throw new UnsupportedOperationException();
   }
   public void setExecutionId(String executionId) {

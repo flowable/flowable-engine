@@ -114,7 +114,7 @@ public class DmnXMLUtil implements DmnXMLConstants {
 
     public static void writeQualifiedAttribute(String attributeName, String value, XMLStreamWriter xtw) throws Exception {
         if (StringUtils.isNotEmpty(value)) {
-            xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, attributeName, value);
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, attributeName, value);
         }
     }
     

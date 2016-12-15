@@ -31,7 +31,7 @@ public class MessageEventHandler extends AbstractEventHandler {
 
   @Override
   public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
-    // As stated in the ActivitiEventType java-doc, the message-event is
+    // As stated in the FlowableEventType java-doc, the message-event is
     // thrown before the actual message has been sent
     if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       commandContext

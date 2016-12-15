@@ -241,7 +241,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
    * The same operation as {@link VariableScopeImpl#getVariable(String)}, 
    * but with an extra parameter to indicate whether or not all variables need to be fetched.
    * 
-   * Note that the default Activiti way (because of backwards compatibility) is to fetch all the variables 
+   * Note that the default way (because of backwards compatibility) is to fetch all the variables 
    * when doing a get/set of variables. So this means 'true' is the default value for this method,
    * and in fact it will simply delegate to {@link #getVariable(String)}. 
    * This can also be the most performant, if you're doing a lot of variable gets in the same transaction (eg in service tasks).

@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Base class for the activiti test cases.
+ * Base class for the test cases.
  * 
  * The main reason not to use our own test support classes is that we need to run our test suite with various configurations, e.g. with and without spring, standalone or on a server etc. Those
  * requirements create some complications so we think it's best to use a separate base class. That way it is much easier for us to maintain our own codebase and at the same time provide stability on
@@ -36,14 +36,14 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class PluggableFlowableIdmTestCase extends AbstractFlowableIdmTestCase {
 
-  private static Logger pluggableActivitiIdmTestCaseLogger = LoggerFactory.getLogger(PluggableFlowableIdmTestCase.class);
+  private static Logger pluggabledImTestCaseLogger = LoggerFactory.getLogger(PluggableFlowableIdmTestCase.class);
 
   protected static IdmEngine cachedIdmEngine;
   
   protected void initializeIdmEngine() {
     if (cachedIdmEngine == null) {
 
-      pluggableActivitiIdmTestCaseLogger.info("No cached idm engine found for test. Retrieving the default engine.");
+      pluggabledImTestCaseLogger.info("No cached idm engine found for test. Retrieving the default engine.");
       IdmEngines.destroy(); // Just to be sure we're not getting any previously cached version
 
       cachedIdmEngine = IdmEngines.getDefaultIdmEngine();

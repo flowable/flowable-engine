@@ -48,7 +48,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
   public Deployment execute(CommandContext commandContext) {
 
-    // Backwards compatibility with Activiti v5
+    // Backwards compatibility with v5
     if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled()
         && deploymentBuilder.getDeploymentProperties() != null 
         && deploymentBuilder.getDeploymentProperties().containsKey(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION)

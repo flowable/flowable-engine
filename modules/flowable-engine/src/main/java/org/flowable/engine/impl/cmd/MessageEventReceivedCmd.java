@@ -65,8 +65,8 @@ public class MessageEventReceivedCmd extends NeedsActiveExecutionCmd<Void> {
     }
     
     if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      activiti5CompatibilityHandler.messageEventReceived(messageName, executionId, payload, async);
+      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+      compatibilityHandler.messageEventReceived(messageName, executionId, payload, async);
       return null;
     }
 

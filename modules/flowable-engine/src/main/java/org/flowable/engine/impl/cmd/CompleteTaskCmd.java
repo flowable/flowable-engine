@@ -49,12 +49,12 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
     // Backwards compatibility
     if (task.getProcessDefinitionId() != null) {
       if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
-        Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+        Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
         
         if (transientVariables == null) {
-            activiti5CompatibilityHandler.completeTask(task, variables, localScope);
+          compatibilityHandler.completeTask(task, variables, localScope);
         } else {
-            activiti5CompatibilityHandler.completeTask(task, variables, transientVariables);
+          compatibilityHandler.completeTask(task, variables, transientVariables);
         }
         return null;
       }

@@ -37,7 +37,7 @@ public class DatabaseConfiguration {
   @Bean
   public DataSource dataSource() {
 
-    String jdbcUrl = environment.getProperty("datasource.url", "jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000");
+    String jdbcUrl = environment.getProperty("datasource.url", "jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000");
     String jdbcDriver = environment.getProperty("datasource.driver", "org.h2.Driver");
     String jdbcUsername = environment.getProperty("datasource.username", "sa");
     String jdbcPassword = environment.getProperty("datasource.password", "");

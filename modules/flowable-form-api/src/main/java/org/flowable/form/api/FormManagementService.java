@@ -34,7 +34,7 @@ public interface FormManagementService {
   /**
    * Gets the table name (including any configured prefix) for an Flowable entity like Task, Execution or the like.
    */
-  String getTableName(Class<?> activitiIdmEntityClass);
+  String getTableName(Class<?> idmEntityClass);
 
   /**
    * Gets the metadata (column names, column types, etc.) of a certain table. Returns null when no table exists with the given name.

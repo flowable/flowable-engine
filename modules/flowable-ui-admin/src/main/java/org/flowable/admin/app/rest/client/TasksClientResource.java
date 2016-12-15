@@ -39,7 +39,7 @@ public class TasksClientResource extends AbstractClientResource {
 	 * GET /rest/authenticate -> check if the user is authenticated, and return
 	 * its login.
 	 */
-	@RequestMapping(value = "/rest/activiti/tasks", method = RequestMethod.POST, produces = "application/json")
+	@RequestMapping(value = "/rest/admin/tasks", method = RequestMethod.POST, produces = "application/json")
 	public JsonNode listTasks(@RequestBody ObjectNode requestNode) {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		JsonNode resultNode;

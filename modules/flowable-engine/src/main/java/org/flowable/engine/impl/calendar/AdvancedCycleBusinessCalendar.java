@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An Activiti BusinessCalendar for cycle based schedules that takes into account a different daylight savings time zone than the one that the server is configured for.
+ * An BusinessCalendar implementation for cycle based schedules that takes into account a different daylight savings time zone than the one that the server is configured for.
  * <p>
  * For CRON strings DSTZONE is used as the time zone that the CRON schedule refers to. Leave it out to use the server time zone.
  * <p>
@@ -28,9 +28,9 @@ import org.slf4j.LoggerFactory;
  *      0 30 20 ? * MON,TUE,WED,THU,FRI * DSTZONE:US/Arizona
  * </pre>
  * 
- * Removing the DSTZONE key will cause Activiti to use the server's time zone. This is the original behavior.
+ * Removing the DSTZONE key will cause to use the server's time zone. This is the original behavior.
  * <p>
- * Schedule strings are versioned. Version 1 strings will use the original Activiti CycleBusinessCalendar. All new properties are ignored. Version 2 strings will use the new daylight saving time
+ * Schedule strings are versioned. Version 1 strings will use the original CycleBusinessCalendar implementation. All new properties are ignored. Version 2 strings will use the new daylight saving time
  * logic.
  * 
  * <pre>

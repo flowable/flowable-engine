@@ -28,7 +28,7 @@ flowableAdminApp.controller('FormDefinitionsController', ['$rootScope', '$scope'
         $scope.selectedForms = [];
 
         var filterConfig = {
-            url: '/app/rest/activiti/form-definitions',
+            url: '/app/rest/admin/form-definitions',
             method: 'GET',
             success: function (data, status, headers, config) {
                 $scope.formsData = data;

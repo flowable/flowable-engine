@@ -77,14 +77,14 @@ public class FlowableProducer extends DefaultProducer {
   protected void copyResultToCamel(Exchange exchange, ProcessInstance pi) {
     exchange.setProperty(PROCESS_ID_PROPERTY, pi.getProcessInstanceId());
 
-    Map<String, Object> returnVars = getActivitiEndpoint().getReturnVarMap();
+    Map<String, Object> returnVars = getFlowableEndpoint().getReturnVarMap();
 
     if (returnVars != null && returnVars.size() > 0) {
 
       Map<String, Object> processVariables = null;
       if (repositoryService.isFlowable5ProcessDefinition(pi.getProcessDefinitionId())) {
-        Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-        processVariables = activiti5CompatibilityHandler.getVariables(pi);
+        Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+        processVariables = compatibilityHandler.getVariables(pi);
       } else {
         processVariables = ((ExecutionEntity) pi).getVariables();
       }
@@ -115,7 +115,7 @@ public class FlowableProducer extends DefaultProducer {
       try {
         Thread.sleep(timeResolution);
       } catch (InterruptedException e) {
-        throw new FlowableException("error occurred while waiting for activiti=" + activity + " for processInstanceId=" + processInstanceId);
+        throw new FlowableException("error occurred while waiting for activity=" + activity + " for processInstanceId=" + processInstanceId);
       }
       firstTime = false;
       
@@ -141,7 +141,7 @@ public class FlowableProducer extends DefaultProducer {
       throw new FlowableException("Couldn't find activity "+activity+" for processId " + processInstanceId + " in defined timeout.");
     }
 
-    runtimeService.setVariables(execution.getId(), ExchangeUtils.prepareVariables(exchange, getActivitiEndpoint()));
+    runtimeService.setVariables(execution.getId(), ExchangeUtils.prepareVariables(exchange, getFlowableEndpoint()));
     runtimeService.trigger(execution.getId());
   }
 
@@ -150,17 +150,17 @@ public class FlowableProducer extends DefaultProducer {
     if (processInstanceId != null) {
       return processInstanceId;
     }
-    String processInstanceKey = exchange.getProperty(PROCESS_KEY_PROPERTY, String.class);
-    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(processInstanceKey).singleResult();
+    String key = exchange.getProperty(PROCESS_KEY_PROPERTY, String.class);
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(key).singleResult();
 
     if (processInstance == null) {
-      throw new FlowableException("Could not find activiti with key " + processInstanceKey);
+      throw new FlowableException("Could not start process instance with business key " + key);
     }
     return processInstance.getId();
   }
 
   protected ProcessInstance startProcess(Exchange exchange) {
-    FlowableEndpoint endpoint = getActivitiEndpoint();
+    FlowableEndpoint endpoint = getFlowableEndpoint();
     String key = exchange.getProperty(PROCESS_KEY_PROPERTY, String.class);
     try {
       if (endpoint.isSetProcessInitiator()) {
@@ -187,7 +187,7 @@ public class FlowableProducer extends DefaultProducer {
     identityService.setAuthenticatedUserId(processInitiator);
   }
 
-  protected FlowableEndpoint getActivitiEndpoint() {
+  protected FlowableEndpoint getFlowableEndpoint() {
     return (FlowableEndpoint) getEndpoint();
   }
   

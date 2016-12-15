@@ -1308,13 +1308,14 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
   }
   
   @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
-  public void testGetVariableByHistoricActivityInstance() {
+  public void testGetVariableByHistoricActivityInstance() throws Exception {
     if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
       assertNotNull(processInstance);
       Task task = taskService.createTaskQuery().singleResult();
   
       taskService.setVariable(task.getId(), "variable1", "value1");
+      Thread.sleep(50L); // to make sure the times for ordering below are different. 
       taskService.setVariable(task.getId(), "variable1", "value2");
   
       HistoricActivityInstance historicActivitiInstance = historyService.createHistoricActivityInstanceQuery()

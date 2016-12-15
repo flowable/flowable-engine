@@ -83,7 +83,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Ser
   protected boolean isCanceled;
 
   protected String eventName;
-  protected FlowableListener currentActivitiListener;
+  protected FlowableListener currentListener;
 
   protected String tenantId = ProcessEngineConfiguration.NO_TENANT_ID;
 
@@ -458,12 +458,12 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Ser
     this.eventName = eventName;
   }
   
-  public FlowableListener getCurrentActivitiListener() {
-    return currentActivitiListener;
+  public FlowableListener getCurrentFlowableListener() {
+    return currentListener;
   }
 
-  public void setCurrentActivitiListener(FlowableListener currentActivitiListener) {
-    this.currentActivitiListener = currentActivitiListener;
+  public void setCurrentFlowableListener(FlowableListener currentListener) {
+    this.currentListener = currentListener;
   }
 
   public void setExecutionId(String executionId) {

@@ -28,7 +28,7 @@ flowableAdminApp.controller('DecisionTablesController', ['$rootScope', '$scope',
         $scope.selectedDecisionTables = [];
 
         var filterConfig = {
-            url: '/app/rest/activiti/decision-tables',
+            url: '/app/rest/admin/decision-tables',
             method: 'GET',
             success: function (data, status, headers, config) {
                 $scope.decisionTablesData = data;

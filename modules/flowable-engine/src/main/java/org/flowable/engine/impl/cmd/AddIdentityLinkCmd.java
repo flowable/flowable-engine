@@ -67,8 +67,8 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
   protected Void execute(CommandContext commandContext, TaskEntity task) {
 
     if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      activiti5CompatibilityHandler.addIdentityLink(taskId, identityId, identityIdType, identityType);
+      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+      compatibilityHandler.addIdentityLink(taskId, identityId, identityIdType, identityType);
       return null;
     }
     

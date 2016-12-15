@@ -129,6 +129,9 @@
 			<if test="exceptionMessage">
 				and RES.EXCEPTION_MSG_ = #{exceptionMessage}
 			</if>
+			<if test="lockOwner != null">
+			  and RES.LOCK_OWNER_ = #{lockOwner}
+			</if>
 			<if test="onlyLocked">
 			  and RES.LOCK_EXP_TIME_ is not null
 			</if>

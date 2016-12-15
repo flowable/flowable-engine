@@ -96,7 +96,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     }
 
     if (name == null) {
-      log.info("default activiti ProcessEngine created");
+      log.info("default ProcessEngine created");
     } else {
       log.info("ProcessEngine {} created", name);
     }

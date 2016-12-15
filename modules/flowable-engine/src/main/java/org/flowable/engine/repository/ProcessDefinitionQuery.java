@@ -38,7 +38,7 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   ProcessDefinitionQuery processDefinitionCategory(String processDefinitionCategory);
 
   /**
-   * Only select process definitions where the category matches the given parameter. The syntax that should be used is the same as in SQL, eg. %activiti%
+   * Only select process definitions where the category matches the given parameter. The syntax that should be used is the same as in SQL, eg. %test%
    */
   ProcessDefinitionQuery processDefinitionCategoryLike(String processDefinitionCategoryLike);
 
@@ -53,7 +53,7 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   ProcessDefinitionQuery processDefinitionName(String processDefinitionName);
 
   /**
-   * Only select process definitions where the name matches the given parameter. The syntax that should be used is the same as in SQL, eg. %activiti%
+   * Only select process definitions where the name matches the given parameter. The syntax that should be used is the same as in SQL, eg. %test%
    */
   ProcessDefinitionQuery processDefinitionNameLike(String processDefinitionNameLike);
 
@@ -73,7 +73,7 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   ProcessDefinitionQuery processDefinitionKey(String processDefinitionKey);
 
   /**
-   * Only select process definitions where the key matches the given parameter. The syntax that should be used is the same as in SQL, eg. %activiti%
+   * Only select process definitions where the key matches the given parameter. The syntax that should be used is the same as in SQL, eg. %test%
    */
   ProcessDefinitionQuery processDefinitionKeyLike(String processDefinitionKeyLike);
 

@@ -72,7 +72,7 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
     	  Context.removeProcessEngineConfiguration();
     	  Context.removeBpmnOverrideContext();
     	  // don't remove the fallback because it's needed in Activiti 6 code like the Camel module
-    	  //org.activiti.engine.impl.context.Context.removeFallbackActiviti5CompatibilityHandler();
+    	  //org.activiti.engine.impl.context.Context.removeFallbackcompatibilityHandler();
       }
     }
     

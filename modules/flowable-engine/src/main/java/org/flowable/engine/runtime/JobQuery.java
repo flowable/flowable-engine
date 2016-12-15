@@ -75,6 +75,11 @@ public interface JobQuery extends Query<JobQuery, Job> {
   JobQuery jobWithoutTenantId();
   
   /**
+   * Only return jobs with the given lock owner.
+   */
+  JobQuery lockOwner(String lockOwner);
+  
+  /**
    * Only return jobs that are locked (i.e. they are acquired by an executor).
    */
   JobQuery locked();

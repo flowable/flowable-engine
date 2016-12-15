@@ -1314,12 +1314,12 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
   
   @Override
-  public FlowableListener getCurrentActivitiListener() {
+  public FlowableListener getCurrentFlowableListener() {
     throw new UnsupportedOperationException();
   }
   
   @Override
-  public void setCurrentActivitiListener(FlowableListener currentActivitiListener) {
+  public void setCurrentFlowableListener(FlowableListener currentListener) {
     throw new UnsupportedOperationException();
   }
   

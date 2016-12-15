@@ -84,7 +84,7 @@ public class DisplayJsonClientResource extends AbstractClientResource {
 		propertyMappers.put("UserTask", new UserTaskInfoMapper());
 	}
 
-	@RequestMapping(value = "/rest/activiti/process-definitions/{processDefinitionId}/model-json", method = RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value = "/rest/admin/process-definitions/{processDefinitionId}/model-json", method = RequestMethod.GET, produces = "application/json")
 	public JsonNode getProcessDefinitionModelJSON(@PathVariable String processDefinitionId) {
 
 		ServerConfig config = retrieveServerConfig(EndpointType.PROCESS);
@@ -110,7 +110,7 @@ public class DisplayJsonClientResource extends AbstractClientResource {
 		return displayNode;
 	}
 
-	@RequestMapping(value = "/rest/activiti/process-instances/{processInstanceId}/model-json", method = RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/model-json", method = RequestMethod.GET, produces = "application/json")
 	public JsonNode getProcessInstanceModelJSON(@PathVariable String processInstanceId, @RequestParam(required=true) String processDefinitionId) {
 		ObjectNode displayNode = objectMapper.createObjectNode();
 

@@ -70,7 +70,7 @@ public interface DmnDeploymentBuilder {
   DmnDeploymentBuilder enableDuplicateFiltering();
 
   /**
-   * Deploys all provided sources to the Activiti engine.
+   * Deploys all provided sources to the DMN engine.
    */
   DmnDeployment deploy();
 

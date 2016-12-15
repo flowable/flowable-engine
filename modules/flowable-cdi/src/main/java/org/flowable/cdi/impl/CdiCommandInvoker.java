@@ -20,7 +20,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 /**
  * A customized version of the default {@link CommandInvoker} for use with CDI.
  * 
- * The Activiti-CDI integration builds upon the availability of the current execution
+ * The Flowable-CDI integration builds upon the availability of the current execution
  * in a thread local 'execution context'. As this has a (very minimal) impact on 
  * performance, this thread local is not set by the default {@link CommandInvoker}
  * and thus this customized version is needed. 

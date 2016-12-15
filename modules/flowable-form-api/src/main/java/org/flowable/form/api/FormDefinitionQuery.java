@@ -36,7 +36,7 @@ public interface FormDefinitionQuery extends Query<FormDefinitionQuery, FormDefi
   FormDefinitionQuery formCategory(String formCategory);
 
   /**
-   * Only select forms where the category matches the given parameter. The syntax that should be used is the same as in SQL, eg. %activiti%
+   * Only select forms where the category matches the given parameter. The syntax that should be used is the same as in SQL, eg. %test%
    */
   FormDefinitionQuery formCategoryLike(String formCategoryLike);
 
@@ -51,7 +51,7 @@ public interface FormDefinitionQuery extends Query<FormDefinitionQuery, FormDefi
   FormDefinitionQuery formName(String formName);
 
   /**
-   * Only select forms where the name matches the given parameter. The syntax that should be used is the same as in SQL, eg. %activiti%
+   * Only select forms where the name matches the given parameter. The syntax that should be used is the same as in SQL, eg. %test%
    */
   FormDefinitionQuery formNameLike(String formNameLike);
 
@@ -81,7 +81,7 @@ public interface FormDefinitionQuery extends Query<FormDefinitionQuery, FormDefi
   FormDefinitionQuery formDefinitionKey(String formDefinitionKey);
 
   /**
-   * Only select forms where the key matches the given parameter. The syntax that should be used is the same as in SQL, eg. %activiti%
+   * Only select forms where the key matches the given parameter. The syntax that should be used is the same as in SQL, eg. %test%
    */
   FormDefinitionQuery formDefinitionKeyLike(String formDefinitionKeyLike);
 

@@ -51,6 +51,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   protected String tenantIdLike;
   protected boolean withoutTenantId;
   protected boolean noRetriesLeft;
+  protected String lockOwner;
   protected boolean onlyLocked;
   protected boolean onlyUnlocked;
 
@@ -202,6 +203,11 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     return this;
   }
   
+  public JobQuery lockOwner(String lockOwner) {
+    this.lockOwner = lockOwner;
+    return this;
+  }
+  
   public JobQuery locked() {
     this.onlyLocked = true;
     return this;
@@ -330,6 +336,10 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
 
   public boolean isNoRetriesLeft() {
     return noRetriesLeft;
+  }
+  
+  public String getLockOwner() {
+    return lockOwner;
   }
   
   public boolean isOnlyLocked() {

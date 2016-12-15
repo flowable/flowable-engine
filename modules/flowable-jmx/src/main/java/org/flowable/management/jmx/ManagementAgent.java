@@ -17,7 +17,7 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 /**
- * Activiti JMX service agent
+ * Flowable JMX service agent
  */
 
 /**

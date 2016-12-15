@@ -342,7 +342,7 @@ flowableAdminApp
 	        	$rootScope.loadProcessDefinitionsCache = function() {
                     var promise = $http({
                         method: 'GET',
-                        url: '/app/rest/activiti/process-definitions?size=100000000'
+                        url: '/app/rest/admin/process-definitions?size=100000000'
                     }).success(function (data, status, headers, config) {
                         return data;
                     }).error(function (data, status, headers, config) {

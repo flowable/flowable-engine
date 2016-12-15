@@ -41,7 +41,7 @@ public class ProcessInstancesClientResource extends AbstractClientResource {
     /**
      * GET  /rest/authenticate -> check if the user is authenticated, and return its login.
      */
-    @RequestMapping(value = "/rest/activiti/process-instances",
+    @RequestMapping(value = "/rest/admin/process-instances",
             method = RequestMethod.POST,
             consumes = "application/json",
             produces = "application/json")

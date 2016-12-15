@@ -29,7 +29,7 @@ public interface HistoricTaskInstanceQuery extends TaskInfoQuery<HistoricTaskIns
   HistoricTaskInstanceQuery taskDeleteReason(String taskDeleteReason);
 
   /**
-   * Only select historic task instances with a task description like the given value. The syntax that should be used is the same as in SQL, eg. %activiti%.
+   * Only select historic task instances with a task description like the given value. The syntax that should be used is the same as in SQL, eg. %test%.
    */
   HistoricTaskInstanceQuery taskDeleteReasonLike(String taskDeleteReasonLike);
 

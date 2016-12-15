@@ -44,7 +44,7 @@ import org.junit.runners.model.Statement;
  * </pre>
  * 
  * <p>
- * The IdmEngine and the services will be made available to the test class through the getters of the activitiRule. The idmEngine will be initialized by
+ * The IdmEngine and the services will be made available to the test class through the getters of the FlowableRule. The idmEngine will be initialized by
  * default with the flowable.idm.cfg.xml resource
  * on the classpath. To specify a different configuration file, pass the resource location in {@link #FlowableIdmRule(String) the appropriate constructor}. Process engines will be cached statically.
  * Right before the first time the setUp is called for a given configuration resource, the process engine will be constructed.
@@ -56,7 +56,7 @@ import org.junit.runners.model.Statement;
  * </p>
  * 
  * <p>
- * The activitiRule also lets you {@link FlowableIdmRule#setCurrentTime(Date) set the current time used by the process engine}. This can be handy to control the exact time that is used by the engine
+ * The Flowable also lets you {@link FlowableIdmRule#setCurrentTime(Date) set the current time used by the process engine}. This can be handy to control the exact time that is used by the engine
  * in order to verify e.g. e.g. due dates of timers. Or start, end and duration times in the history service. In the tearDown, the internal clock will automatically be reset to use the current system
  * time rather then the time that was set during a test method.
  * </p>

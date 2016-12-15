@@ -17,7 +17,7 @@ import org.flowable.crystalball.simulator.delegate.event.Function;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 
 /**
- * This class provides abstract base for ActivitiEvent -> SimulationEvent transformation
+ * This class provides abstract base for engine event -> SimulationEvent transformation
  * 
  * @author martin.grofcik
  */

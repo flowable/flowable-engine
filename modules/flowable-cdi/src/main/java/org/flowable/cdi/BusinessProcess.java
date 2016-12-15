@@ -69,7 +69,7 @@ import org.flowable.engine.task.Task;
  * <strong>NOTE:</strong> in the absence of a conversation, (non faces request, i.e. when processing a JAX-RS, JAX-WS, JMS, remote EJB or plain Servlet requests), the {@link BusinessProcess} bean
  * associates with the current Request (see {@link RequestScoped @RequestScoped}).
  * <p />
- * <strong>NOTE:</strong> in the absence of a request, ie. when the activiti JobExecutor accesses {@link BusinessProcessScoped @BusinessProcessScoped} beans, the execution is associated with the
+ * <strong>NOTE:</strong> in the absence of a request, ie. when the JobExecutor accesses {@link BusinessProcessScoped @BusinessProcessScoped} beans, the execution is associated with the
  * current thread.
  * 
  * @author Daniel Meyer
@@ -91,7 +91,7 @@ public class BusinessProcess implements Serializable {
 
   protected void validateValidUsage() {
     if (Context.getCommandContext() != null) {
-      throw new FlowableCdiException("Cannot use this method of the BusinessProcess bean within an activiti command.");
+      throw new FlowableCdiException("Cannot use this method of the BusinessProcess bean within an active command.");
     }
   }
 
@@ -222,7 +222,7 @@ public class BusinessProcess implements Serializable {
   public ProcessInstance startProcessByName(String string) {
 
     if (Context.getCommandContext() != null) {
-      throw new FlowableCdiException("Cannot use startProcessByName in an activiti command.");
+      throw new FlowableCdiException("Cannot use startProcessByName in an active command.");
     }
 
     ProcessDefinition definition = processEngine.getRepositoryService().createProcessDefinitionQuery().processDefinitionName(string).singleResult();
@@ -240,7 +240,7 @@ public class BusinessProcess implements Serializable {
   public ProcessInstance startProcessByName(String string, Map<String, Object> variables) {
 
     if (Context.getCommandContext() != null) {
-      throw new FlowableCdiException("Cannot use startProcessByName in an activiti command.");
+      throw new FlowableCdiException("Cannot use startProcessByName in an active command.");
     }
 
     ProcessDefinition definition = processEngine.getRepositoryService().createProcessDefinitionQuery().processDefinitionName(string).singleResult();
@@ -288,7 +288,7 @@ public class BusinessProcess implements Serializable {
    * @throws FlowableCdiException
    *           if no execution is currently associated
    * @throws FlowableException
-   *           if the activiti command fails
+   *           if the command fails
    */
   public void triggerExecution() {
     assertAssociated();
@@ -359,7 +359,7 @@ public class BusinessProcess implements Serializable {
    * @throws FlowableCdiException
    *           if no task is currently associated
    * @throws FlowableException
-   *           if the activiti command fails
+   *           if the command fails
    */
   public void completeTask() {
     assertTaskAssociated();

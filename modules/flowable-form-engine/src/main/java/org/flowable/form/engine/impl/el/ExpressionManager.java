@@ -58,8 +58,6 @@ public class ExpressionManager {
   }
 
   public ExpressionManager(Map<Object, Object> beans, boolean initFactory) {
-    // Use the ExpressionFactoryImpl in activiti build in version of juel,
-    // with parametrised method expressions enabled
     expressionFactory = new ExpressionFactoryImpl();
     this.beans = beans;
   }

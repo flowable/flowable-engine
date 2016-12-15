@@ -41,7 +41,7 @@ public class ProcessDefinitionsClientResource extends AbstractClientResource {
     /**
      * GET  /rest/authenticate -> check if the user is authenticated, and return its login.
      */
-    @RequestMapping(value = "/rest/activiti/process-definitions",
+    @RequestMapping(value = "/rest/admin/process-definitions",
             method = RequestMethod.GET,
             produces = "application/json")
     public JsonNode listProcessDefinitions(HttpServletRequest request) {

@@ -34,7 +34,7 @@ public class ContentItemClientResource extends AbstractClientResource {
     @Autowired
     protected ContentItemService clientService;
 
-    @RequestMapping(value = "/rest/activiti/content-items/{contentItemId}", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/rest/admin/content-items/{contentItemId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getContentItem(@PathVariable String contentItemId) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CONTENT);

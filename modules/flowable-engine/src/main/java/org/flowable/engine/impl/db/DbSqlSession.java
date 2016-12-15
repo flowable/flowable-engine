@@ -1070,8 +1070,8 @@ public class DbSqlSession implements Session {
   }
 
   protected void dbSchemaUpgrade(final String component, final int currentDatabaseVersionsIndex) {
-    FlowableVersion activitiVersion = FLOWABLE_VERSIONS.get(currentDatabaseVersionsIndex);
-    String dbVersion = activitiVersion.getMainVersion();
+    FlowableVersion version = FLOWABLE_VERSIONS.get(currentDatabaseVersionsIndex);
+    String dbVersion = version.getMainVersion();
     log.info("upgrading flowable {} schema from {} to {}", component, dbVersion, ProcessEngine.VERSION);
 
     // Actual execution of schema DDL SQL

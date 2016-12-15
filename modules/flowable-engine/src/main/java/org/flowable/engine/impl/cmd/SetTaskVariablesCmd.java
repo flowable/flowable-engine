@@ -41,8 +41,8 @@ public class SetTaskVariablesCmd extends NeedsActiveTaskCmd<Object> {
   protected Object execute(CommandContext commandContext, TaskEntity task) {
     
     if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      activiti5CompatibilityHandler.setTaskVariables(taskId, variables, isLocal);
+      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+      compatibilityHandler.setTaskVariables(taskId, variables, isLocal);
       return null;
     }
 

@@ -36,7 +36,7 @@ public interface DecisionTableQuery extends Query<DecisionTableQuery, DecisionTa
   DecisionTableQuery decisionTableCategory(String decisionTableCategory);
 
   /**
-   * Only select decision tables where the category matches the given parameter. The syntax that should be used is the same as in SQL, eg. %activiti%
+   * Only select decision tables where the category matches the given parameter. The syntax that should be used is the same as in SQL, eg. %test%
    */
   DecisionTableQuery decisionTableCategoryLike(String decisionTableCategoryLike);
 
@@ -51,7 +51,7 @@ public interface DecisionTableQuery extends Query<DecisionTableQuery, DecisionTa
   DecisionTableQuery decisionTableName(String decisionTableName);
 
   /**
-   * Only select decision tables where the name matches the given parameter. The syntax that should be used is the same as in SQL, eg. %activiti%
+   * Only select decision tables where the name matches the given parameter. The syntax that should be used is the same as in SQL, eg. %test%
    */
   DecisionTableQuery decisionTableNameLike(String decisionTableNameLike);
 
@@ -81,7 +81,7 @@ public interface DecisionTableQuery extends Query<DecisionTableQuery, DecisionTa
   DecisionTableQuery decisionTableKey(String decisionTableKey);
 
   /**
-   * Only select decision tables where the key matches the given parameter. The syntax that should be used is the same as in SQL, eg. %activiti%
+   * Only select decision tables where the key matches the given parameter. The syntax that should be used is the same as in SQL, eg. %test%
    */
   DecisionTableQuery decisionTableKeyLike(String decisionTableKeyLike);
 

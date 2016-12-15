@@ -30,7 +30,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Used to deploy processes. When the activiti-cdi extension is initialized, the classpath is scanned for a file named {@value #PROCESSES_FILE_NAME}. All processes listed in that file are
+ * Used to deploy processes. When the flowable-cdi extension is initialized, the classpath is scanned for a file named {@value #PROCESSES_FILE_NAME}. All processes listed in that file are
  * automatically deployed to the engine.
  * 
  * @author Daniel Meyer

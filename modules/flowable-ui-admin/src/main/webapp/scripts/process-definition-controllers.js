@@ -124,7 +124,7 @@ flowableAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
 
     $scope.loadProcessInstances = function() {
       $scope.processInstances = undefined;
-      $http({method: 'GET', url: '/app/rest/activiti/process-definitions/' + $scope.definition.id +'/process-instances'}).
+      $http({method: 'GET', url: '/app/rest/admin/process-definitions/' + $scope.definition.id +'/process-instances'}).
       success(function(data, status, headers, config) {
         $scope.processInstances = data;
         $scope.tabData.tabs[0].info = data.total;
@@ -133,7 +133,7 @@ flowableAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
 
         $scope.loadJobs = function() {
             $scope.jobs = undefined;
-            $http({method: 'GET', url: '/app/rest/activiti/process-definitions/' + $scope.definition.id +'/jobs'}).
+            $http({method: 'GET', url: '/app/rest/admin/process-definitions/' + $scope.definition.id +'/jobs'}).
             success(function(data, status, headers, config) {
                 $scope.jobs = data;
                 $scope.tabData.tabs[1].info = data.total;
@@ -142,7 +142,7 @@ flowableAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
         
         function loadStartForm () {
             $scope.jobs = undefined;
-            $http({method: 'GET', url: '/app/rest/activiti/process-definition-start-form-definition/' + $scope.definition.id}).
+            $http({method: 'GET', url: '/app/rest/admin/process-definition-start-form-definition/' + $scope.definition.id}).
             success(function(data, status, headers, config) {
                 $scope.startForm = data;
             });
@@ -150,7 +150,7 @@ flowableAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
         
         $scope.loadDecisionTables = function() {
             // Load decision tables
-            $http({method: 'GET', url: '/app/rest/activiti/process-definition-decision-tables/' + $scope.definition.id}).
+            $http({method: 'GET', url: '/app/rest/admin/process-definition-decision-tables/' + $scope.definition.id}).
             success(function(data, status, headers, config) {
                 $scope.decisionTables = data;
                 $scope.tabData.tabs[2].info = data.length;
@@ -161,7 +161,7 @@ flowableAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
         
         $scope.loadFormDefinitions = function() {
             // Load forms
-            $http({method: 'GET', url: '/app/rest/activiti/process-definition-form-definitions/' + $scope.definition.id}).
+            $http({method: 'GET', url: '/app/rest/admin/process-definition-form-definitions/' + $scope.definition.id}).
             success(function(data, status, headers, config) {
                 $scope.formDefinitions = data;
                 $scope.tabData.tabs[3].info = data.length;
@@ -172,7 +172,7 @@ flowableAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
 
 		$scope.executeWhenReady(function() {
 		    // Load definition
-		    $http({method: 'GET', url: '/app/rest/activiti/process-definitions/' + $routeParams.definitionId}).
+		    $http({method: 'GET', url: '/app/rest/admin/process-definitions/' + $routeParams.definitionId}).
 		    success(function(data, status, headers, config) {
 		        $scope.definition = data;
 		        $scope.loadProcessInstances();
@@ -315,7 +315,7 @@ flowableAdminApp.controller('EditProcessDefinitionCategoryModalCrtl',
         category: $scope.model.category
     };
 
-    $http({method: 'PUT', url: '/app/rest/activiti/process-definitions/' + $scope.model.id, data: data}).
+    $http({method: 'PUT', url: '/app/rest/admin/process-definitions/' + $scope.model.id, data: data}).
       success(function(data, status, headers, config) {
         $modalInstance.close(data);
         $scope.status.loading = false;

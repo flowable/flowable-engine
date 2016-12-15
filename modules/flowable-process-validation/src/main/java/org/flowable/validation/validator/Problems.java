@@ -17,111 +17,111 @@ package org.flowable.validation.validator;
  */
 public interface Problems {
 
-  String ALL_PROCESS_DEFINITIONS_NOT_EXECUTABLE = "activiti-process-definition-not-executable";
-  String PROCESS_DEFINITION_NOT_EXECUTABLE = "activiti-specific-process-definition-not-executable";
+  String ALL_PROCESS_DEFINITIONS_NOT_EXECUTABLE = "flowable-process-definition-not-executable";
+  String PROCESS_DEFINITION_NOT_EXECUTABLE = "flowable-specific-process-definition-not-executable";
 
-  String ASSOCIATION_INVALID_SOURCE_REFERENCE = "activiti-asscociation-invalid-source-reference";
+  String ASSOCIATION_INVALID_SOURCE_REFERENCE = "flowable-asscociation-invalid-source-reference";
 
-  String ASSOCIATION_INVALID_TARGET_REFERENCE = "activiti-asscociation-invalid-target-reference";
+  String ASSOCIATION_INVALID_TARGET_REFERENCE = "flowable-asscociation-invalid-target-reference";
 
-  String EXECUTION_LISTENER_IMPLEMENTATION_MISSING = "activiti-execution-listener-implementation-missing";
-  String EXECUTION_LISTENER_INVALID_IMPLEMENTATION_TYPE = "activiti-execution-listener-invalid-implementation-type";
+  String EXECUTION_LISTENER_IMPLEMENTATION_MISSING = "flowable-execution-listener-implementation-missing";
+  String EXECUTION_LISTENER_INVALID_IMPLEMENTATION_TYPE = "flowable-execution-listener-invalid-implementation-type";
 
-  String EVENT_LISTENER_IMPLEMENTATION_MISSING = "activiti-event-listener-implementation-missing";
-  String EVENT_LISTENER_INVALID_IMPLEMENTATION = "activiti-event-listener-invalid-implementation";
-  String EVENT_LISTENER_INVALID_THROW_EVENT_TYPE = "activiti-event-listener-invalid-throw-event-type";
+  String EVENT_LISTENER_IMPLEMENTATION_MISSING = "flowable-event-listener-implementation-missing";
+  String EVENT_LISTENER_INVALID_IMPLEMENTATION = "flowable-event-listener-invalid-implementation";
+  String EVENT_LISTENER_INVALID_THROW_EVENT_TYPE = "flowable-event-listener-invalid-throw-event-type";
 
-  String START_EVENT_MULTIPLE_FOUND = "activiti-start-event-multiple-found";
-  String START_EVENT_INVALID_EVENT_DEFINITION = "activiti-start-event-invalid-event-definition";
+  String START_EVENT_MULTIPLE_FOUND = "flowable-start-event-multiple-found";
+  String START_EVENT_INVALID_EVENT_DEFINITION = "flowable-start-event-invalid-event-definition";
 
-  String SEQ_FLOW_INVALID_SRC = "activiti-seq-flow-invalid-src";
-  String SEQ_FLOW_INVALID_TARGET = "activiti-seq-flow-invalid-target";
+  String SEQ_FLOW_INVALID_SRC = "flowable-seq-flow-invalid-src";
+  String SEQ_FLOW_INVALID_TARGET = "flowable-seq-flow-invalid-target";
 
-  String USER_TASK_LISTENER_IMPLEMENTATION_MISSING = "activiti-usertask-listener-implementation-missing";
+  String USER_TASK_LISTENER_IMPLEMENTATION_MISSING = "flowable-usertask-listener-implementation-missing";
 
-  String SERVICE_TASK_INVALID_TYPE = "activiti-servicetask-invalid-type";
-  String SERVICE_TASK_RESULT_VAR_NAME_WITH_DELEGATE = "activiti-servicetask-result-var-name-with-delegate";
-  String SERVICE_TASK_MISSING_IMPLEMENTATION = "activiti-servicetask-missing-implementation";
-  String SERVICE_TASK_WEBSERVICE_INVALID_OPERATION_REF = "activiti-servicetask-webservice-invalid-operation-ref";
+  String SERVICE_TASK_INVALID_TYPE = "flowable-servicetask-invalid-type";
+  String SERVICE_TASK_RESULT_VAR_NAME_WITH_DELEGATE = "flowable-servicetask-result-var-name-with-delegate";
+  String SERVICE_TASK_MISSING_IMPLEMENTATION = "flowable-servicetask-missing-implementation";
+  String SERVICE_TASK_WEBSERVICE_INVALID_OPERATION_REF = "flowable-servicetask-webservice-invalid-operation-ref";
 
-  String SEND_TASK_INVALID_IMPLEMENTATION = "activiti-sendtask-invalid-implementation";
-  String SEND_TASK_INVALID_TYPE = "activiti-sendtask-invalid-type";
-  String SEND_TASK_WEBSERVICE_INVALID_OPERATION_REF = "activiti-send-webservice-invalid-operation-ref";
+  String SEND_TASK_INVALID_IMPLEMENTATION = "flowable-sendtask-invalid-implementation";
+  String SEND_TASK_INVALID_TYPE = "flowable-sendtask-invalid-type";
+  String SEND_TASK_WEBSERVICE_INVALID_OPERATION_REF = "flowable-send-webservice-invalid-operation-ref";
 
-  String SCRIPT_TASK_MISSING_SCRIPT = "activiti-scripttask-missing-script";
+  String SCRIPT_TASK_MISSING_SCRIPT = "flowable-scripttask-missing-script";
 
-  String MAIL_TASK_NO_RECIPIENT = "activiti-mailtask-no-recipient";
-  String MAIL_TASK_NO_CONTENT = "activiti-mailtask-no-content";
+  String MAIL_TASK_NO_RECIPIENT = "flowable-mailtask-no-recipient";
+  String MAIL_TASK_NO_CONTENT = "flowable-mailtask-no-content";
 
-  String SHELL_TASK_NO_COMMAND = "activiti-shelltask-no-command";
-  String SHELL_TASK_INVALID_PARAM = "activiti-shelltask-invalid-param";
+  String SHELL_TASK_NO_COMMAND = "flowable-shelltask-no-command";
+  String SHELL_TASK_INVALID_PARAM = "flowable-shelltask-invalid-param";
   
-  String DMN_TASK_NO_KEY = "activiti-dmntask-no-decision-table-key";
+  String DMN_TASK_NO_KEY = "flowable-dmntask-no-decision-table-key";
 
-  String EXCLUSIVE_GATEWAY_NO_OUTGOING_SEQ_FLOW = "activiti-exclusive-gateway-no-outgoing-seq-flow";
-  String EXCLUSIVE_GATEWAY_CONDITION_NOT_ALLOWED_ON_SINGLE_SEQ_FLOW = "activiti-exclusive-gateway-condition-not-allowed-on-single-seq-flow";
-  String EXCLUSIVE_GATEWAY_CONDITION_ON_DEFAULT_SEQ_FLOW = "activiti-exclusive-gateway-condition-on-seq-flow";
-  String EXCLUSIVE_GATEWAY_SEQ_FLOW_WITHOUT_CONDITIONS = "activiti-exclusive-gateway-seq-flow-without-conditions";
+  String EXCLUSIVE_GATEWAY_NO_OUTGOING_SEQ_FLOW = "flowable-exclusive-gateway-no-outgoing-seq-flow";
+  String EXCLUSIVE_GATEWAY_CONDITION_NOT_ALLOWED_ON_SINGLE_SEQ_FLOW = "flowable-exclusive-gateway-condition-not-allowed-on-single-seq-flow";
+  String EXCLUSIVE_GATEWAY_CONDITION_ON_DEFAULT_SEQ_FLOW = "flowable-exclusive-gateway-condition-on-seq-flow";
+  String EXCLUSIVE_GATEWAY_SEQ_FLOW_WITHOUT_CONDITIONS = "flowable-exclusive-gateway-seq-flow-without-conditions";
 
-  String EVENT_GATEWAY_ONLY_CONNECTED_TO_INTERMEDIATE_EVENTS = "activiti-event-gateway-only-connected-to-intermediate-events";
+  String EVENT_GATEWAY_ONLY_CONNECTED_TO_INTERMEDIATE_EVENTS = "flowable-event-gateway-only-connected-to-intermediate-events";
   
-  String BPMN_MODEL_TARGET_NAMESPACE_TOO_LONG = "activiti-bpmn-model-target-namespace-too-long";
+  String BPMN_MODEL_TARGET_NAMESPACE_TOO_LONG = "flowable-bpmn-model-target-namespace-too-long";
   
-  String PROCESS_DEFINITION_ID_TOO_LONG = "activiti-process-definition-id-too-long";
-  String PROCESS_DEFINITION_NAME_TOO_LONG = "activiti-process-definition-name-too-long";
-  String PROCESS_DEFINITION_DOCUMENTATION_TOO_LONG = "activiti-process-definition-documentation-too-long";
+  String PROCESS_DEFINITION_ID_TOO_LONG = "flowable-process-definition-id-too-long";
+  String PROCESS_DEFINITION_NAME_TOO_LONG = "flowable-process-definition-name-too-long";
+  String PROCESS_DEFINITION_DOCUMENTATION_TOO_LONG = "flowable-process-definition-documentation-too-long";
   
-  String FLOW_ELEMENT_ID_TOO_LONG = "activiti-flow-element-id-too-long";
+  String FLOW_ELEMENT_ID_TOO_LONG = "flowable-flow-element-id-too-long";
 
-  String SUBPROCESS_MULTIPLE_START_EVENTS = "activiti-subprocess-multiple-start-event";
+  String SUBPROCESS_MULTIPLE_START_EVENTS = "flowable-subprocess-multiple-start-event";
     
-  String SUBPROCESS_START_EVENT_EVENT_DEFINITION_NOT_ALLOWED = "activiti-subprocess-start-event-event-definition-not-allowed";
+  String SUBPROCESS_START_EVENT_EVENT_DEFINITION_NOT_ALLOWED = "flowable-subprocess-start-event-event-definition-not-allowed";
 
-  String EVENT_SUBPROCESS_INVALID_START_EVENT_DEFINITION = "activiti-event-subprocess-invalid-start-event-definition";
+  String EVENT_SUBPROCESS_INVALID_START_EVENT_DEFINITION = "flowable-event-subprocess-invalid-start-event-definition";
 
-  String BOUNDARY_EVENT_NO_EVENT_DEFINITION = "activiti-boundary-event-no-event-definition";
-  String BOUNDARY_EVENT_INVALID_EVENT_DEFINITION = "activiti-boundary-event-invalid-event-definition";
-  String BOUNDARY_EVENT_CANCEL_ONLY_ON_TRANSACTION = "activiti-boundary-event-cancel-only-on-transaction";
-  String BOUNDARY_EVENT_MULTIPLE_CANCEL_ON_TRANSACTION = "activiti-boundary-event-multiple-cancel-on-transaction";
+  String BOUNDARY_EVENT_NO_EVENT_DEFINITION = "flowable-boundary-event-no-event-definition";
+  String BOUNDARY_EVENT_INVALID_EVENT_DEFINITION = "flowable-boundary-event-invalid-event-definition";
+  String BOUNDARY_EVENT_CANCEL_ONLY_ON_TRANSACTION = "flowable-boundary-event-cancel-only-on-transaction";
+  String BOUNDARY_EVENT_MULTIPLE_CANCEL_ON_TRANSACTION = "flowable-boundary-event-multiple-cancel-on-transaction";
 
-  String INTERMEDIATE_CATCH_EVENT_NO_EVENTDEFINITION = "activiti-intermediate-catch-event-no-eventdefinition";
-  String INTERMEDIATE_CATCH_EVENT_INVALID_EVENTDEFINITION = "activiti-intermediate-catch-event-invalid-eventdefinition";
+  String INTERMEDIATE_CATCH_EVENT_NO_EVENTDEFINITION = "flowable-intermediate-catch-event-no-eventdefinition";
+  String INTERMEDIATE_CATCH_EVENT_INVALID_EVENTDEFINITION = "flowable-intermediate-catch-event-invalid-eventdefinition";
 
-  String ERROR_MISSING_ERROR_CODE = "activiti-error-missing-error-code";
-  String EVENT_MISSING_ERROR_CODE = "activiti-event-missing-error-code";
-  String EVENT_TIMER_MISSING_CONFIGURATION = "activiti-event-timer-missing-configuration";
+  String ERROR_MISSING_ERROR_CODE = "flowable-error-missing-error-code";
+  String EVENT_MISSING_ERROR_CODE = "flowable-event-missing-error-code";
+  String EVENT_TIMER_MISSING_CONFIGURATION = "flowable-event-timer-missing-configuration";
 
-  String THROW_EVENT_INVALID_EVENTDEFINITION = "activiti-throw-event-invalid-eventdefinition";
+  String THROW_EVENT_INVALID_EVENTDEFINITION = "flowable-throw-event-invalid-eventdefinition";
 
-  String MULTI_INSTANCE_MISSING_COLLECTION = "activiti-multi-instance-missing-collection";
+  String MULTI_INSTANCE_MISSING_COLLECTION = "flowable-multi-instance-missing-collection";
 
-  String MESSAGE_MISSING_NAME = "activiti-message-missing-name";
-  String MESSAGE_INVALID_ITEM_REF = "activiti-message-invalid-item-ref";
-  String MESSAGE_EVENT_MISSING_MESSAGE_REF = "activiti-message-event-missing-message-ref";
-  String MESSAGE_EVENT_INVALID_MESSAGE_REF = "activiti-message-event-invalid-message-ref";
-  String MESSAGE_EVENT_MULTIPLE_ON_BOUNDARY_SAME_MESSAGE_ID = "activiti-message-event-multiple-on-boundary-same-message-id";
+  String MESSAGE_MISSING_NAME = "flowable-message-missing-name";
+  String MESSAGE_INVALID_ITEM_REF = "flowable-message-invalid-item-ref";
+  String MESSAGE_EVENT_MISSING_MESSAGE_REF = "flowable-message-event-missing-message-ref";
+  String MESSAGE_EVENT_INVALID_MESSAGE_REF = "flowable-message-event-invalid-message-ref";
+  String MESSAGE_EVENT_MULTIPLE_ON_BOUNDARY_SAME_MESSAGE_ID = "flowable-message-event-multiple-on-boundary-same-message-id";
 
-  String OPERATION_INVALID_IN_MESSAGE_REFERENCE = "activiti-operation-invalid-in-message-reference";
+  String OPERATION_INVALID_IN_MESSAGE_REFERENCE = "flowable-operation-invalid-in-message-reference";
 
-  String SIGNAL_EVENT_MISSING_SIGNAL_REF = "activiti-signal-event-missing-signal-ref";
-  String SIGNAL_EVENT_INVALID_SIGNAL_REF = "activiti-signal-event-invalid-signal-ref";
+  String SIGNAL_EVENT_MISSING_SIGNAL_REF = "flowable-signal-event-missing-signal-ref";
+  String SIGNAL_EVENT_INVALID_SIGNAL_REF = "flowable-signal-event-invalid-signal-ref";
 
-  String COMPENSATE_EVENT_INVALID_ACTIVITY_REF = "activiti-compensate-event-invalid-activity-ref";
-  String COMPENSATE_EVENT_MULTIPLE_ON_BOUNDARY = "activiti-compensate-event-multiple-on-boundary";
+  String COMPENSATE_EVENT_INVALID_ACTIVITY_REF = "flowable-compensate-event-invalid-activity-ref";
+  String COMPENSATE_EVENT_MULTIPLE_ON_BOUNDARY = "flowable-compensate-event-multiple-on-boundary";
 
-  String SIGNAL_MISSING_ID = "activiti-signal-missing-id";
-  String SIGNAL_MISSING_NAME = "activiti-signal-missing-name";
-  String SIGNAL_DUPLICATE_NAME = "activiti-signal-duplicate-name";
-  String SIGNAL_INVALID_SCOPE = "activiti-signal-invalid-scope";
+  String SIGNAL_MISSING_ID = "flowable-signal-missing-id";
+  String SIGNAL_MISSING_NAME = "flowable-signal-missing-name";
+  String SIGNAL_DUPLICATE_NAME = "flowable-signal-duplicate-name";
+  String SIGNAL_INVALID_SCOPE = "flowable-signal-invalid-scope";
 
-  String DATA_ASSOCIATION_MISSING_TARGETREF = "activiti-data-association-missing-targetref";
+  String DATA_ASSOCIATION_MISSING_TARGETREF = "flowable-data-association-missing-targetref";
 
-  String DATA_OBJECT_MISSING_NAME = "activiti-data-object-missing-name";
+  String DATA_OBJECT_MISSING_NAME = "flowable-data-object-missing-name";
 
-  String END_EVENT_CANCEL_ONLY_INSIDE_TRANSACTION = "activiti-end-event-cancel-only-inside-transaction";
+  String END_EVENT_CANCEL_ONLY_INSIDE_TRANSACTION = "flowable-end-event-cancel-only-inside-transaction";
 
-  String DI_INVALID_REFERENCE = "activiti-di-invalid-reference";
-  String DI_DOES_NOT_REFERENCE_FLOWNODE = "activiti-di-does-not-reference-flownode";
-  String DI_DOES_NOT_REFERENCE_SEQ_FLOW = "activiti-di-does-not-reference-seq-flow";
+  String DI_INVALID_REFERENCE = "flowable-di-invalid-reference";
+  String DI_DOES_NOT_REFERENCE_FLOWNODE = "flowable-di-does-not-reference-flownode";
+  String DI_DOES_NOT_REFERENCE_SEQ_FLOW = "flowable-di-does-not-reference-seq-flow";
 
 }

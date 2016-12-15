@@ -88,8 +88,8 @@ public class AddCommentCmd implements Command<Comment> {
     }
     
     if (processDefinitionId != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processDefinitionId)) {
-      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      return activiti5CompatibilityHandler.addComment(taskId, processInstanceId, type, message);
+      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+      return compatibilityHandler.addComment(taskId, processInstanceId, type, message);
     }
 
     String userId = Authentication.getAuthenticatedUserId();

@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * We cannot perform a retry if we are called in an existing transaction. In that case, the transaction will be marked "rollback-only" after the first ActivitiOptimisticLockingException.
+ * We cannot perform a retry if we are called in an existing transaction. In that case, the transaction will be marked "rollback-only" after the first FlowableOptimisticLockingException.
  * 
  * @author Daniel Meyer
  */

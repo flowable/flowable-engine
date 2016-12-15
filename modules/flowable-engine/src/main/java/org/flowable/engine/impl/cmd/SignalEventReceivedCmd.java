@@ -84,8 +84,8 @@ public class SignalEventReceivedCmd implements Command<Void> {
       }
       
       if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
-        Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-        activiti5CompatibilityHandler.signalEventReceived(eventName, executionId, payload, async, tenantId);
+        Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+        compatibilityHandler.signalEventReceived(eventName, executionId, payload, async, tenantId);
         return null;
       }
 
@@ -102,8 +102,8 @@ public class SignalEventReceivedCmd implements Command<Void> {
       if (signalEventSubscriptionEntity.isGlobalScoped()) {
         
         if (executionId == null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, signalEventSubscriptionEntity.getProcessDefinitionId())) {
-          Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-          activiti5CompatibilityHandler.signalEventReceived(signalEventSubscriptionEntity, payload, async);
+          Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+          compatibilityHandler.signalEventReceived(signalEventSubscriptionEntity, payload, async);
           
         } else {
           Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(

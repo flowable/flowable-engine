@@ -61,15 +61,15 @@ public abstract class AbstractBpmnParseHandler<T extends BaseElement> implements
 
   protected abstract void executeParse(BpmnParse bpmnParse, T element);
 
-  protected ExecutionListener createExecutionListener(BpmnParse bpmnParse, FlowableListener activitiListener) {
+  protected ExecutionListener createExecutionListener(BpmnParse bpmnParse, FlowableListener listener) {
     ExecutionListener executionListener = null;
 
-    if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(activitiListener.getImplementationType())) {
-      executionListener = bpmnParse.getListenerFactory().createClassDelegateExecutionListener(activitiListener);
-    } else if (ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equalsIgnoreCase(activitiListener.getImplementationType())) {
-      executionListener = bpmnParse.getListenerFactory().createExpressionExecutionListener(activitiListener);
-    } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(activitiListener.getImplementationType())) {
-      executionListener = bpmnParse.getListenerFactory().createDelegateExpressionExecutionListener(activitiListener);
+    if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(listener.getImplementationType())) {
+      executionListener = bpmnParse.getListenerFactory().createClassDelegateExecutionListener(listener);
+    } else if (ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equalsIgnoreCase(listener.getImplementationType())) {
+      executionListener = bpmnParse.getListenerFactory().createExpressionExecutionListener(listener);
+    } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(listener.getImplementationType())) {
+      executionListener = bpmnParse.getListenerFactory().createDelegateExpressionExecutionListener(listener);
     }
     return executionListener;
   }

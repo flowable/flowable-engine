@@ -66,8 +66,8 @@ public class ProcessInstanceHelper {
     
     CommandContext commandContext = Context.getCommandContext(); // Todo: ideally, context should be passed here
     if (Flowable5Util.isFlowable5ProcessDefinition(commandContext, processDefinition)) {
-      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      return activiti5CompatibilityHandler.startProcessInstance(processDefinition.getKey(), processDefinition.getId(), 
+      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+      return compatibilityHandler.startProcessInstance(processDefinition.getKey(), processDefinition.getId(), 
           variables, transientVariables, businessKey, processDefinition.getTenantId(), processInstanceName);
     }
 
@@ -97,13 +97,13 @@ public class ProcessInstanceHelper {
     CommandContext commandContext = Context.getCommandContext();
     if (processDefinition.getEngineVersion() != null) {
       if (commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().isVersion5Tag(processDefinition.getEngineVersion())) {
-        Flowable5CompatibilityHandler activiti5CompatibilityHandler = commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler();
+        Flowable5CompatibilityHandler compatibilityHandler = commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler();
 
-        if (activiti5CompatibilityHandler == null) {
-          throw new FlowableException("Found Activiti 5 process definition, but no compatibility handler on the classpath");
+        if (compatibilityHandler == null) {
+          throw new FlowableException("Found V5 process definition, but no compatibility handler on the classpath");
         }
 
-        return activiti5CompatibilityHandler.startProcessInstanceByMessage(messageName, variables, transientVariables, null, processDefinition.getTenantId());
+        return compatibilityHandler.startProcessInstanceByMessage(messageName, variables, transientVariables, null, processDefinition.getTenantId());
       
       } else {
         throw new FlowableException("Invalid 'engine' for process definition " + processDefinition.getId() + " : " + processDefinition.getEngineVersion());

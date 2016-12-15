@@ -39,9 +39,9 @@ public class JobsClientResource extends AbstractClientResource {
     protected JobService jobService;
 
     /**
-     * GET  /rest/activiti/jobs -> Get a list of jobs.
+     * GET  /rest/admin/jobs -> Get a list of jobs.
      */
-    @RequestMapping(value = "/rest/activiti/jobs",
+    @RequestMapping(value = "/rest/admin/jobs",
             method = RequestMethod.GET,
             produces = "application/json")
     public JsonNode listJobs(HttpServletRequest request) {

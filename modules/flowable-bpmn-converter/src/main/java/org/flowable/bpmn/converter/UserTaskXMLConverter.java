@@ -42,7 +42,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
   
   protected Map<String, BaseChildElementParser> childParserMap = new HashMap<String, BaseChildElementParser>();
 
-  /** default attributes taken from bpmn spec and from activiti extension */
+  /** default attributes taken from bpmn spec and from extension namespace */
   protected static final List<ExtensionAttribute> defaultUserTaskAttributes = Arrays.asList(
       new ExtensionAttribute(ATTRIBUTE_FORM_FORMKEY), 
       new ExtensionAttribute(ATTRIBUTE_TASK_USER_DUEDATE), 

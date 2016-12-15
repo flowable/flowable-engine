@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * @author Yvo Swillens
  */
 @RestController
-@RequestMapping("/rest/activiti/decision-table-deployments")
+@RequestMapping("/rest/admin/decision-table-deployments")
 public class DecisionTableDeploymentsClientResource extends AbstractClientResource {
 
   private final Logger log = LoggerFactory.getLogger(DecisionTableDeploymentsClientResource.class);
@@ -43,7 +43,7 @@ public class DecisionTableDeploymentsClientResource extends AbstractClientResour
   protected DecisionTableDeploymentService clientService;
 
   /**
-   * GET /rest/activiti/decision-table-deployments -> get a list of deployments.
+   * GET /rest/admin/decision-table-deployments -> get a list of deployments.
    */
   @RequestMapping(method = RequestMethod.GET, produces = "application/json")
   public JsonNode listDeployments(HttpServletRequest request) {

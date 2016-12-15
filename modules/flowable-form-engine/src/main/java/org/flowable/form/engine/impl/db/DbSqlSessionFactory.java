@@ -119,13 +119,13 @@ public class DbSqlSessionFactory implements SessionFactory {
   // db specific mappings
   // /////////////////////////////////////////////////////
 
-  protected static void addDatabaseSpecificStatement(String databaseType, String activitiStatement, String ibatisStatement) {
+  protected static void addDatabaseSpecificStatement(String databaseType, String statement, String ibatisStatement) {
     Map<String, String> specificStatements = databaseSpecificStatements.get(databaseType);
     if (specificStatements == null) {
       specificStatements = new HashMap<String, String>();
       databaseSpecificStatements.put(databaseType, specificStatements);
     }
-    specificStatements.put(activitiStatement, ibatisStatement);
+    specificStatements.put(statement, ibatisStatement);
   }
 
   public String mapStatement(String statement) {

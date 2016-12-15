@@ -41,19 +41,19 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
 
 /**
  * This abstract class takes the place of the now-deprecated CamelBehaviour class (which can still be used for legacy compatibility) and significantly improves on its flexibility. Additional
- * implementations can be created that change the way in which Activiti interacts with Camel per your specific needs.
+ * implementations can be created that change the way in which Flowable interacts with Camel per your specific needs.
  * 
  * Three out-of-the-box implementations of CamelBehavior are provided: (1) CamelBehaviorDefaultImpl: Works just like CamelBehaviour does; copies variables into and out of Camel as or from properties.
  * (2) CamelBehaviorBodyAsMapImpl: Works by copying variables into and out of Camel using a Map<String,Object> object in the body. (3) CamelBehaviorCamelBodyImpl: Works by copying a single variable
- * value into Camel as a String body and copying the Camel body into that same Activiti variable. The variable in Activiti must be named "camelBody".
+ * value into Camel as a String body and copying the Camel body into that same variable. The process variable in must be named "camelBody".
  * 
  * The chosen implementation should be set within your ProcessEngineConfiguration. To specify the implementation using Spring, include the following line in your configuration file as part of the
  * properties for "org.flowable.spring.SpringProcessEngineConfiguration":
  * 
  * <property name="camelBehaviorClass" value="org.flowable.camel.impl.CamelBehaviorCamelBodyImpl"/>
  * 
- * Note also that the manner in which variables are copied to Activiti from Camel has changed. It will always copy Camel properties to the Activiti variable set; they can safely be ignored, of course,
- * if not required. It will conditionally copy the Camel body to the "camelBody" variable if it is of type java.lang.String, OR it will copy the Camel body to individual variables within Activiti if
+ * Note also that the manner in which variables are copied to the process engine from Camel has changed. It will always copy Camel properties to the process variables set; they can safely be ignored, of course,
+ * if not required. It will conditionally copy the Camel body to the "camelBody" variable if it is of type java.lang.String, OR it will copy the Camel body to individual variables within the process engine if
  * it is of type Map<String,Object>.
  * 
  * @author Ryan Johnston (@rjfsu), Tijs Rademakers, Saeid Mirzaei
@@ -115,17 +115,17 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
     }
     execution.setVariables(ExchangeUtils.prepareVariables(exchange, endpoint));
     
-    boolean isActiviti5Execution = false;
+    boolean isV5Execution = false;
     if ((Context.getCommandContext() != null && Flowable5Util.isFlowable5ProcessDefinitionId(Context.getCommandContext(), execution.getProcessDefinitionId())) ||
         (Context.getCommandContext() == null && Flowable5Util.getFlowable5CompatibilityHandler() != null)) {
       
-      isActiviti5Execution = true;
+      isV5Execution = true;
     }
     
-    if (!handleCamelException(exchange, execution, isActiviti5Execution)) {
-      if (isActiviti5Execution) {
-        Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-        activiti5CompatibilityHandler.leaveExecution(execution);
+    if (!handleCamelException(exchange, execution, isV5Execution)) {
+      if (isV5Execution) {
+        Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+        compatibilityHandler.leaveExecution(execution);
         return;
       }
       leave(execution);
@@ -143,7 +143,7 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
         return (FlowableEndpoint) e;
       }
     }
-    throw new FlowableException("Activiti endpoint not defined for " + key);    
+    throw new FlowableException("Endpoint not defined for " + key);    
   }
 
   protected Exchange createExchange(DelegateExecution activityExecution, FlowableEndpoint endpoint) {
@@ -156,22 +156,22 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
     return ex;
   }
 
-  protected boolean handleCamelException(Exchange exchange, DelegateExecution execution, boolean isActiviti5Execution) {
+  protected boolean handleCamelException(Exchange exchange, DelegateExecution execution, boolean isV5Execution) {
     Exception camelException = exchange.getException();
     boolean notHandledByCamel = exchange.isFailed() && camelException != null;
     if (notHandledByCamel) {
       if (camelException instanceof BpmnError) {
-        if (isActiviti5Execution) {
-          Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-          activiti5CompatibilityHandler.propagateError((BpmnError) camelException, execution);
+        if (isV5Execution) {
+          Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+          compatibilityHandler.propagateError((BpmnError) camelException, execution);
           return true;
         }
         ErrorPropagation.propagateError((BpmnError) camelException, execution);
         return true;
       } else {
-        if (isActiviti5Execution) {
-          Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-          if (activiti5CompatibilityHandler.mapException(camelException, execution, mapExceptions)) {
+        if (isV5Execution) {
+          Flowable5CompatibilityHandler ompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+          if (ompatibilityHandler.mapException(camelException, execution, mapExceptions)) {
             return true;
           } else {
             throw new FlowableException("Unhandled exception on camel route", camelException);
@@ -233,11 +233,11 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
       if ((Context.getCommandContext() != null && Flowable5Util.isFlowable5ProcessDefinitionId(Context.getCommandContext(), execution.getProcessDefinitionId())) ||
             (Context.getCommandContext() == null && Flowable5Util.getFlowable5CompatibilityHandler() != null)) {
         
-        Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-        camelContextObj = (CamelContext) activiti5CompatibilityHandler.getCamelContextObject(camelContextValue);
+        Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+        camelContextObj = (CamelContext) compatibilityHandler.getCamelContextObject(camelContextValue);
         
       } else {
-        // Convert it to a SpringProcessEngineConfiguration. If this doesn't work, throw a RuntimeException. (ActivitiException extends RuntimeException.)
+        // Convert it to a SpringProcessEngineConfiguration. If this doesn't work, throw a RuntimeException.
         try {
           SpringProcessEngineConfiguration springConfiguration = (SpringProcessEngineConfiguration) engineConfiguration;
           if (StringUtils.isEmpty(camelContextValue) && camelContextObj == null) {
@@ -252,7 +252,7 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
           camelContextObj = (CamelContext) ctx;
           
         } catch (Exception e) {
-          throw new FlowableException("Expecting a SpringProcessEngineConfiguration for the Activiti Camel module.", e);
+          throw new FlowableException("Expecting a SpringProcessEngineConfiguration for the Camel module.", e);
         }
       }
     }

@@ -92,7 +92,7 @@ public class DelegateHelper {
    * Returns whether or not the provided execution is being use for executing an {@link ExecutionListener}. 
    */
   public static boolean isExecutingExecutionListener(DelegateExecution execution) {
-    return execution.getCurrentActivitiListener() != null;
+    return execution.getCurrentFlowableListener() != null;
   }
   
   /**
@@ -121,7 +121,7 @@ public class DelegateHelper {
   }
   
   public static Map<String, List<ExtensionElement>> getListenerExtensionElements(DelegateExecution execution) {
-    return execution.getCurrentActivitiListener().getExtensionElements();
+    return execution.getCurrentFlowableListener().getExtensionElements();
   }
   
   /**
@@ -152,7 +152,7 @@ public class DelegateHelper {
   }
   
   public static List<FieldExtension> getListenerFields(DelegateExecution execution) {
-    return execution.getCurrentActivitiListener().getFieldExtensions();
+    return execution.getCurrentFlowableListener().getFieldExtensions();
   }
   
   /**
@@ -239,8 +239,8 @@ public class DelegateHelper {
    * Similar to {@link #getFieldExpression(DelegateExecution, String)}, but for use within a {@link TaskListener}. 
    */
   public static Expression getFieldExpression(DelegateTask task, String fieldName) {
-    if (task.getCurrentActivitiListener() != null) {
-      List<FieldExtension> fieldExtensions = task.getCurrentActivitiListener().getFieldExtensions();
+    if (task.getCurrentFlowableListener() != null) {
+      List<FieldExtension> fieldExtensions = task.getCurrentFlowableListener().getFieldExtensions();
       if (fieldExtensions != null && fieldExtensions.size() > 0) {
         for (FieldExtension fieldExtension : fieldExtensions) {
           if (fieldName.equals(fieldExtension.getFieldName())) {

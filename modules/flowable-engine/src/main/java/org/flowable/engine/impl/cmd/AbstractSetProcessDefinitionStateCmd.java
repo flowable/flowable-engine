@@ -69,20 +69,20 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
   public Void execute(CommandContext commandContext) {
 
     List<ProcessDefinitionEntity> processDefinitions = findProcessDefinition(commandContext);
-    boolean hasActiviti5ProcessDefinitions = false;
+    boolean hasV5ProcessDefinitions = false;
     for (ProcessDefinitionEntity processDefinitionEntity : processDefinitions) {
       if (Flowable5Util.isFlowable5ProcessDefinition(commandContext, processDefinitionEntity)) {
-        hasActiviti5ProcessDefinitions = true;
+        hasV5ProcessDefinitions = true;
         break;
       }
     }
     
-    if (hasActiviti5ProcessDefinitions) {
-      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+    if (hasV5ProcessDefinitions) {
+      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
       if (getProcessDefinitionSuspensionState() == SuspensionState.ACTIVE) {
-        activiti5CompatibilityHandler.activateProcessDefinition(processDefinitionId, processDefinitionKey, includeProcessInstances, executionDate, tenantId);
+        compatibilityHandler.activateProcessDefinition(processDefinitionId, processDefinitionKey, includeProcessInstances, executionDate, tenantId);
       } else if (getProcessDefinitionSuspensionState() == SuspensionState.SUSPENDED) {
-        activiti5CompatibilityHandler.suspendProcessDefinition(processDefinitionId, processDefinitionKey, includeProcessInstances, executionDate, tenantId);
+        compatibilityHandler.suspendProcessDefinition(processDefinitionId, processDefinitionKey, includeProcessInstances, executionDate, tenantId);
       }
       return null;
     }

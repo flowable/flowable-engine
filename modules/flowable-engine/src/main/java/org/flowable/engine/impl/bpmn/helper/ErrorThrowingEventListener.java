@@ -42,8 +42,8 @@ public class ErrorThrowingEventListener extends BaseDelegateEventListener {
       if (engineEvent.getProcessDefinitionId() != null && 
           Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, engineEvent.getProcessDefinitionId())) {
         
-        Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-        activiti5CompatibilityHandler.throwErrorEvent(event);
+        Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+        compatibilityHandler.throwErrorEvent(event);
         return;
       }
       

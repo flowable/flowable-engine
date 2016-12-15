@@ -34,8 +34,15 @@ public class SkipExpressionUtil {
   }
 
   private static boolean checkSkipExpressionVariable(DelegateExecution execution) {
-    final String skipExpressionEnabledVariable = "_ACTIVITI_SKIP_EXPRESSION_ENABLED";
+    String skipExpressionEnabledVariable = "_ACTIVITI_SKIP_EXPRESSION_ENABLED";
     Object isSkipExpressionEnabled = execution.getVariable(skipExpressionEnabledVariable);
+    
+    if (isSkipExpressionEnabled != null && isSkipExpressionEnabled instanceof Boolean) {
+      return ((Boolean) isSkipExpressionEnabled).booleanValue();
+    }
+    
+    skipExpressionEnabledVariable = "_FLOWABLE_SKIP_EXPRESSION_ENABLED";
+    isSkipExpressionEnabled = execution.getVariable(skipExpressionEnabledVariable);
 
     if (isSkipExpressionEnabled == null) {
       return false;
@@ -44,7 +51,7 @@ public class SkipExpressionUtil {
       return ((Boolean) isSkipExpressionEnabled).booleanValue();
 
     } else {
-      throw new FlowableIllegalArgumentException(skipExpressionEnabledVariable + " variable does not resolve to a boolean. " + isSkipExpressionEnabled);
+      throw new FlowableIllegalArgumentException("Skip expression variable does not resolve to a boolean. " + isSkipExpressionEnabled);
     }
   }
 

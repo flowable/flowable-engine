@@ -39,8 +39,8 @@ public class SetExecutionVariablesCmd extends NeedsActiveExecutionCmd<Object> {
   protected Object execute(CommandContext commandContext, ExecutionEntity execution) {
     
     if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      activiti5CompatibilityHandler.setExecutionVariables(executionId, variables, isLocal);
+      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+      compatibilityHandler.setExecutionVariables(executionId, variables, isLocal);
       return null;
     }
     

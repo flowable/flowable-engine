@@ -40,7 +40,7 @@ public class FormDefinitionsClientResource extends AbstractClientResource {
     /**
      * GET a list of deployed form definitions.
      */
-    @RequestMapping(value = "/rest/activiti/form-definitions", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/rest/admin/form-definitions", method = RequestMethod.GET, produces = "application/json")
     public JsonNode listFormDefinitions(HttpServletRequest request) {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
         Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
@@ -50,7 +50,7 @@ public class FormDefinitionsClientResource extends AbstractClientResource {
     /**
      * GET process definition's list of deployed form definitions.
      */
-    @RequestMapping(value = "/rest/activiti/process-definition-form-definitions/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/rest/admin/process-definition-form-definitions/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getProcessDefinitionForms(@PathVariable String processDefinitionId, HttpServletRequest request) {
         return clientService.getProcessDefinitionForms(retrieveServerConfig(EndpointType.PROCESS), processDefinitionId);
     }

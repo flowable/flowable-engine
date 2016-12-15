@@ -38,7 +38,7 @@ public class DecisionTableClientResource extends AbstractClientResource {
     @Autowired
     protected DecisionTableService clientService;
 
-    @RequestMapping(value = "/rest/activiti/decision-tables/{decisionTableId}", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/rest/admin/decision-tables/{decisionTableId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getDecisionTable(@PathVariable String decisionTableId) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
@@ -49,7 +49,7 @@ public class DecisionTableClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/activiti/decision-tables/{decisionTableId}/editorJson", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/rest/admin/decision-tables/{decisionTableId}/editorJson", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getEditorJsonForDecisionTable(@PathVariable String decisionTableId) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);

@@ -109,7 +109,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
             // Load definition
             $http({
                 method: 'GET',
-                url: '/app/rest/activiti/process-definitions/' + $scope.process.processDefinitionId
+                url: '/app/rest/admin/process-definitions/' + $scope.process.processDefinitionId
             }).success(function (data, status, headers, config) {
                 $scope.definition = data;
             }).error(function (data, status, headers, config) {
@@ -121,7 +121,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
             // Load process
             $http({
                 method: 'GET',
-                url: '/app/rest/activiti/process-instances/' + $routeParams.processInstanceId
+                url: '/app/rest/admin/process-instances/' + $routeParams.processInstanceId
             }).success(function (data, status, headers, config) {
                 $scope.process = data;
 
@@ -320,7 +320,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
             $scope.tasks = undefined;
             $http({
                 method: 'GET',
-                url: '/app/rest/activiti/process-instances/' + $scope.process.id + '/tasks'
+                url: '/app/rest/admin/process-instances/' + $scope.process.id + '/tasks'
             }).success(function (data, status, headers, config) {
                 $scope.tasks = data;
                 $scope.tabData.tabs[0].info = data.total;
@@ -331,7 +331,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
             $scope.variables = undefined;
             $http({
                 method: 'GET',
-                url: '/app/rest/activiti/process-instances/' + $scope.process.id + '/variables'
+                url: '/app/rest/admin/process-instances/' + $scope.process.id + '/variables'
             }).success(function (data, status, headers, config) {
                 $scope.variables = data;
                 $scope.tabData.tabs[1].info = data.total;
@@ -342,7 +342,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
             $scope.subprocesses = undefined;
             $http({
                 method: 'GET',
-                url: '/app/rest/activiti/process-instances/' + $scope.process.id + '/subprocesses'
+                url: '/app/rest/admin/process-instances/' + $scope.process.id + '/subprocesses'
             }).success(function (data, status, headers, config) {
                 $scope.subprocesses = data;
                 $scope.tabData.tabs[2].info = data.total;
@@ -353,7 +353,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
             $scope.jobs = undefined;
             $http({
                 method: 'GET',
-                url: '/app/rest/activiti/process-instances/' + $scope.process.id + '/jobs'
+                url: '/app/rest/admin/process-instances/' + $scope.process.id + '/jobs'
             }).success(function (data, status, headers, config) {
                 $scope.jobs = data;
                 $scope.tabData.tabs[3].info = data.total;
@@ -364,7 +364,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
             // Load definition
             $http({
                 method: 'GET',
-                url: '/app/rest/activiti/process-definitions/' + $scope.process.processDefinitionId
+                url: '/app/rest/admin/process-definitions/' + $scope.process.processDefinitionId
             }).success(function (data, status, headers, config) {
                 $scope.definition = data;
             }).error(function (data, status, headers, config) {
@@ -375,7 +375,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
             // Load decision tables
             $http({
                 method: 'GET',
-                url: '/app/rest/activiti/process-instances/' + $scope.process.id + '/decision-tasks'
+                url: '/app/rest/admin/process-instances/' + $scope.process.id + '/decision-tasks'
             }).success(function (data, status, headers, config) {
                 $scope.decisionTables = data;
                 $scope.tabData.tabs[4].info = data.total;
@@ -387,7 +387,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
             // Load form instances
             $http({
                 method: 'GET',
-                url: '/app/rest/activiti/process-form-instances/' + $scope.process.id
+                url: '/app/rest/admin/process-form-instances/' + $scope.process.id
             }).success(function (data, status, headers, config) {
                 $scope.formInstances = data;
                 $scope.tabData.tabs[5].info = data.total;
@@ -522,7 +522,7 @@ flowableAdminApp.controller('DeleteProcessModalInstanceCrtl',
             }
 
             $http({
-                method: 'POST', url: '/app/rest/activiti/process-instances/' + $scope.process.id,
+                method: 'POST', url: '/app/rest/admin/process-instances/' + $scope.process.id,
                 data: dataForPost
             }).success(function (data, status, headers, config) {
                 $modalInstance.close(true);
@@ -622,7 +622,7 @@ flowableAdminApp.controller('UpdateVariableCrtl',
 
             $http({
                 method: 'PUT',
-                url: '/app/rest/activiti/process-instances/' + processInstanceId + '/variables/' + $scope.updateVariable.name,
+                url: '/app/rest/admin/process-instances/' + processInstanceId + '/variables/' + $scope.updateVariable.name,
                 data: dataForPut
             }).success(function (data, status, headers, config) {
                 $modalInstance.close(true);
@@ -650,7 +650,7 @@ flowableAdminApp.controller('DeleteVariableCrtl',
             $scope.deleteVariable = function () {
                 $http({
                     method: 'DELETE',
-                    url: '/app/rest/activiti/process-instances/' + processInstanceId + '/variables/' + $scope.variable.name
+                    url: '/app/rest/admin/process-instances/' + processInstanceId + '/variables/' + $scope.variable.name
                 }).success(function (data, status, headers, config) {
                     $modalInstance.close(true);
                     $scope.status.loading = false;
@@ -718,7 +718,7 @@ flowableAdminApp.controller('AddVariableCrtl',
 
                 $http({
                     method: 'POST',
-                    url: '/app/rest/activiti/process-instances/' + processInstanceId + '/variables',
+                    url: '/app/rest/admin/process-instances/' + processInstanceId + '/variables',
                     data: data
                 }).success(function (data, status, headers, config) {
                     $modalInstance.close(true);

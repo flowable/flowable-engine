@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * Used for {@link FlowElement} currently not supported by the {@link org.activiti.engine.DynamicBpmnService}
+ * Used for {@link FlowElement} currently not supported by the {@link org.flowable.engine.DynamicBpmnService}
  * and elements who are not parsed.
  *
  * Created by Pardo David on 5/12/2016.

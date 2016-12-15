@@ -47,8 +47,8 @@ import org.junit.runners.model.Statement;
  * 
  * <p>
  * The DmnEngine and the services will be made available to the test class
- * through the getters of the activitiRule. The dmnEngine will be initialized by
- * default with the activiti.dmn.cfg.xml resource on the classpath. To specify a
+ * through the getters of the FlowableRule. The dmnEngine will be initialized by
+ * default with the flowable.dmn.cfg.xml resource on the classpath. To specify a
  * different configuration file, pass the resource location in
  * {@link #FlowableDmnRule(String) the appropriate constructor}. Process engines
  * will be cached statically. Right before the first time the setUp is called
@@ -64,7 +64,7 @@ import org.junit.runners.model.Statement;
  * </p>
  * 
  * <p>
- * The activitiRule also lets you {@link FlowableDmnRule#setCurrentTime(Date)
+ * The FlowableRule also lets you {@link FlowableDmnRule#setCurrentTime(Date)
  * set the current time used by the process engine}. This can be handy to
  * control the exact time that is used by the engine in order to verify e.g.
  * e.g. due dates of timers. Or start, end and duration times in the history

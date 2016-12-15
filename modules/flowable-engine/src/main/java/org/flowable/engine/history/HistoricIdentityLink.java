@@ -26,7 +26,7 @@ import org.flowable.idm.api.UserQuery;
 public interface HistoricIdentityLink {
 
   /**
-   * Returns the type of link. See {@link IdentityLinkType} for the native supported types by Activiti.
+   * Returns the type of link. See {@link IdentityLinkType} for the native supported types by the process engine.
    */
   String getType();
 

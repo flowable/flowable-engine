@@ -43,7 +43,7 @@ public class TaskClientResource extends AbstractClientResource {
 	 * GET /rest/authenticate -> check if the user is authenticated, and return
 	 * its login.
 	 */
-	@RequestMapping(value = "/rest/activiti/tasks/{taskId}", method = RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value = "/rest/admin/tasks/{taskId}", method = RequestMethod.GET, produces = "application/json")
 	public JsonNode getTask(@PathVariable String taskId, @RequestParam(required=false, defaultValue="false") boolean runtime) throws BadRequestException {
 		
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
@@ -54,7 +54,7 @@ public class TaskClientResource extends AbstractClientResource {
 		}
 	}
 	
-	@RequestMapping(value = "/rest/activiti/tasks/{taskId}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/rest/admin/tasks/{taskId}", method = RequestMethod.DELETE)
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	public void deleteTask(@PathVariable String taskId) throws BadRequestException {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
@@ -65,7 +65,7 @@ public class TaskClientResource extends AbstractClientResource {
 		}
 	}
 	
-	@RequestMapping(value = "/rest/activiti/tasks/{taskId}", method = RequestMethod.POST)
+	@RequestMapping(value = "/rest/admin/tasks/{taskId}", method = RequestMethod.POST)
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	public void executeTaskAction(@PathVariable String taskId, @RequestBody ObjectNode actionBody) throws BadRequestException {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
@@ -76,7 +76,7 @@ public class TaskClientResource extends AbstractClientResource {
 		}
 	}
 	
-	@RequestMapping(value = "/rest/activiti/tasks/{taskId}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/rest/admin/tasks/{taskId}", method = RequestMethod.PUT)
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	public void updateTask(@PathVariable String taskId, @RequestBody ObjectNode actionBody) throws BadRequestException {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
@@ -87,7 +87,7 @@ public class TaskClientResource extends AbstractClientResource {
 		}
 	}
 	
-	@RequestMapping(value = "/rest/activiti/tasks/{taskId}/subtasks", method = RequestMethod.GET)
+	@RequestMapping(value = "/rest/admin/tasks/{taskId}/subtasks", method = RequestMethod.GET)
 	public JsonNode getSubtasks(@PathVariable String taskId) throws BadRequestException {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
@@ -97,7 +97,7 @@ public class TaskClientResource extends AbstractClientResource {
 		}
 	}
 	
-	@RequestMapping(value = "/rest/activiti/tasks/{taskId}/variables", method = RequestMethod.GET)
+	@RequestMapping(value = "/rest/admin/tasks/{taskId}/variables", method = RequestMethod.GET)
 	public JsonNode getVariables(@PathVariable String taskId) throws BadRequestException {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {
@@ -107,7 +107,7 @@ public class TaskClientResource extends AbstractClientResource {
 		}
 	}
 	
-	@RequestMapping(value = "/rest/activiti/tasks/{taskId}/identitylinks", method = RequestMethod.GET)
+	@RequestMapping(value = "/rest/admin/tasks/{taskId}/identitylinks", method = RequestMethod.GET)
 	public JsonNode getIdentityLinks(@PathVariable String taskId) throws BadRequestException {
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
 		try {

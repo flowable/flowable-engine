@@ -285,8 +285,8 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
       }
       
       if (Flowable5Util.isFlowable5ProcessDefinitionId(getCommandContext(), task.getProcessDefinitionId())) {
-        Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-        activiti5CompatibilityHandler.deleteTask(taskId, deleteReason, cascade);
+        Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+        compatibilityHandler.deleteTask(taskId, deleteReason, cascade);
         return;
       }
 

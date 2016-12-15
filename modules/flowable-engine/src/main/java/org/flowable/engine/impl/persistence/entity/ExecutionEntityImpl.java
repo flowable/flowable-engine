@@ -46,7 +46,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
   // current position /////////////////////////////////////////////////////////
 
   protected FlowElement currentFlowElement; 
-  protected FlowableListener currentActivitiListener; // Only set when executing an execution listener
+  protected FlowableListener currentListener; // Only set when executing an execution listener
 
   /**
    * the process instance. this is the root of the execution tree. the processInstance of a process instance is a self reference.
@@ -276,12 +276,12 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
     }
   }
   
-  public FlowableListener getCurrentActivitiListener() {
-    return currentActivitiListener;
+  public FlowableListener getCurrentFlowableListener() {
+    return currentListener;
   }
 
-  public void setCurrentActivitiListener(FlowableListener currentActivitiListener) {
-    this.currentActivitiListener = currentActivitiListener;
+  public void setCurrentFlowableListener(FlowableListener currentListener) {
+    this.currentListener = currentListener;
   }
 
   // executions ///////////////////////////////////////////////////////////////

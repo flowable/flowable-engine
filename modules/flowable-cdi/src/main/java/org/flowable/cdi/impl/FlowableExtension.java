@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 /**
  * CDI-Extension registering a custom context for {@link BusinessProcessScoped} beans.
  * 
- * Also starts / stops the activiti {@link ProcessEngine} and deploys all processes listed in the 'processes.xml'-file.
+ * Also starts / stops the {@link ProcessEngine} and deploys all processes listed in the 'processes.xml'-file.
  * 
  * @author Daniel Meyer
  */
@@ -104,8 +104,8 @@ public class FlowableExtension implements Extension {
       throw new FlowableException("Could not find an implementation of the org.flowable.cdi.spi.ProcessEngineLookup service " + "returning a non-null processEngine. Giving up.");
     }
 
-    FlowableServices activitiServices = ProgrammaticBeanLookup.lookup(FlowableServices.class, beanManager);
-    activitiServices.setProcessEngine(processEngine);
+    FlowableServices services = ProgrammaticBeanLookup.lookup(FlowableServices.class, beanManager);
+    services.setProcessEngine(processEngine);
 
     return processEngine;
   }

@@ -47,8 +47,8 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
       if (process != null) {
         processDefinitionId = process.getProcessDefinitionId();
         if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, process.getProcessDefinitionId())) {
-          Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-          activiti5CompatibilityHandler.deleteAttachment(attachmentId);
+          Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+          compatibilityHandler.deleteAttachment(attachmentId);
           return null;
         }
       }

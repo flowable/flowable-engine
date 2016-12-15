@@ -76,7 +76,7 @@ flowableAdminApp.controller('FormDeploymentController', ['$scope', '$rootScope',
             
             modalInstance.result.then(function (result) {
                 if (result === true) {
-                    $http({method: 'DELETE', url: '/app/rest/activiti/form-deployments/' + $routeParams.deploymentId}).
+                    $http({method: 'DELETE', url: '/app/rest/admin/form-deployments/' + $routeParams.deploymentId}).
                     success(function(data, status, headers, config) {
                         $scope.addAlert($translate.instant('ALERT.FORM-DEPLOYMENT.DELETED-DEPLOYMENT', $scope.formDeployment), 'info');
                         $scope.returnToList();
@@ -91,7 +91,7 @@ flowableAdminApp.controller('FormDeploymentController', ['$scope', '$rootScope',
         
 		$scope.executeWhenReady(function() {
 		    // Load deployment
-		    $http({method: 'GET', url: '/app/rest/activiti/form-deployments/' + $routeParams.formDeploymentId}).
+		    $http({method: 'GET', url: '/app/rest/admin/form-deployments/' + $routeParams.formDeploymentId}).
   	    	    success(function(data, status, headers, config) {
   	    	        $scope.formDeployment = data;
   	    	    }).
@@ -106,7 +106,7 @@ flowableAdminApp.controller('FormDeploymentController', ['$scope', '$rootScope',
   	    	    });
   		
 		    // Load process definitions
-		    $http({method: 'GET', url: '/app/rest/activiti/form-definitions?deploymentId=' + $routeParams.formDeploymentId}).
+		    $http({method: 'GET', url: '/app/rest/admin/form-definitions?deploymentId=' + $routeParams.formDeploymentId}).
   	    	    success(function(data, status, headers, config) {
   	    	        $scope.formDefinitions = data;
   	    	    });

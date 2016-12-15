@@ -93,8 +93,8 @@ public class HistoricTaskInstanceEntityManagerImpl extends AbstractEntityManager
         
         if (historicTaskInstance.getProcessDefinitionId() != null 
             && Flowable5Util.isFlowable5ProcessDefinitionId(getCommandContext(), historicTaskInstance.getProcessDefinitionId())) {
-          Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-          activiti5CompatibilityHandler.deleteHistoricTask(id);
+          Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+          compatibilityHandler.deleteHistoricTask(id);
           return;
         }
         

@@ -123,7 +123,7 @@ flowableAdminApp.controller('EngineController', ['$rootScope', '$scope', '$http'
         var checkEndpointConfig = function (endpointType) {
             $http({
                 method: 'GET',
-                url: '/app/rest/activiti/engine-info/'+endpointType,
+                url: '/app/rest/admin/engine-info/'+endpointType,
                 ignoreErrors: true
             }).success(function (data) {
                 $scope.addAlert($translate.instant('ALERT.ENGINE.ENDPOINT-VALID', data), 'info');

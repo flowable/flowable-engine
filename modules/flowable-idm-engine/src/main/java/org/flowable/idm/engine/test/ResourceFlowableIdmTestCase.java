@@ -26,15 +26,15 @@ public abstract class ResourceFlowableIdmTestCase extends AbstractFlowableIdmTes
   
   private static final Logger logger = LoggerFactory.getLogger(ResourceFlowableIdmTestCase.class);
 
-  protected String activitiIdmConfigurationResource;
+  protected String idmConfigurationResource;
   protected String idmEngineName;
 
-  public ResourceFlowableIdmTestCase(String activitiIdmConfigurationResource) {
-    this(activitiIdmConfigurationResource, null);
+  public ResourceFlowableIdmTestCase(String idmConfigurationResource) {
+    this(idmConfigurationResource, null);
   }
   
-  public ResourceFlowableIdmTestCase(String activitiIdmConfigurationResource, String idmEngineName) {
-    this.activitiIdmConfigurationResource = activitiIdmConfigurationResource;
+  public ResourceFlowableIdmTestCase(String idmConfigurationResource, String idmEngineName) {
+    this.idmConfigurationResource = idmConfigurationResource;
     this.idmEngineName = idmEngineName;
   }
 
@@ -47,7 +47,7 @@ public abstract class ResourceFlowableIdmTestCase extends AbstractFlowableIdmTes
 
   @Override
   protected void initializeIdmEngine() {
-    IdmEngineConfiguration config = IdmEngineConfiguration.createIdmEngineConfigurationFromResource(activitiIdmConfigurationResource);
+    IdmEngineConfiguration config = IdmEngineConfiguration.createIdmEngineConfigurationFromResource(idmConfigurationResource);
     if (idmEngineName != null) {
       logger.info("Initializing idm engine with name '{}'", idmEngineName);
       config.setEngineName(idmEngineName);

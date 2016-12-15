@@ -1,7 +1,7 @@
 package org.flowable.engine.delegate.event;
 
 /**
- * An {@link org.flowable.engine.common.api.delegate.event.FlowableEvent} related to start event being sent when activiti process
+ * An {@link org.flowable.engine.common.api.delegate.event.FlowableEvent} related to start event being sent when a process
  * instance is started.
  *
  * @author Christophe DENEUX - Linagora

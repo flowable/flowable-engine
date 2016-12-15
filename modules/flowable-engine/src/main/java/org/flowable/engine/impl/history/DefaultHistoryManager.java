@@ -106,9 +106,9 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
         historicProcessInstance.setEndActivityId(activityId);
         
         // Fire event
-        FlowableEventDispatcher activitiEventDispatcher = getEventDispatcher();
-        if (activitiEventDispatcher != null && activitiEventDispatcher.isEnabled()) {
-          activitiEventDispatcher.dispatchEvent(
+        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+          eventDispatcher.dispatchEvent(
               FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
         }
         
@@ -142,9 +142,9 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
       getHistoricProcessInstanceEntityManager().insert(historicProcessInstance, false);
       
       // Fire event
-      FlowableEventDispatcher activitiEventDispatcher = getEventDispatcher();
-      if (activitiEventDispatcher != null && activitiEventDispatcher.isEnabled()) {
-        activitiEventDispatcher.dispatchEvent(
+      FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+      if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+        eventDispatcher.dispatchEvent(
             FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
       }
 
@@ -170,15 +170,15 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
       getHistoricProcessInstanceEntityManager().insert(historicProcessInstance, false);
       
       // Fire event
-      FlowableEventDispatcher activitiEventDispatcher = getEventDispatcher();
-      if (activitiEventDispatcher != null && activitiEventDispatcher.isEnabled()) {
-        activitiEventDispatcher.dispatchEvent(
+      FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+      if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+        eventDispatcher.dispatchEvent(
             FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
       }
 
-      HistoricActivityInstanceEntity activitiyInstance = findActivityInstance(parentExecution, false, true);
-      if (activitiyInstance != null) {
-        activitiyInstance.setCalledProcessInstanceId(subProcessInstance.getProcessInstanceId());
+      HistoricActivityInstanceEntity activityInstance = findActivityInstance(parentExecution, false, true);
+      if (activityInstance != null) {
+        activityInstance.setCalledProcessInstanceId(subProcessInstance.getProcessInstanceId());
       }
 
     }
@@ -209,9 +209,9 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
         }
         
         // Fire event
-        FlowableEventDispatcher activitiEventDispatcher = getEventDispatcher();
-        if (activitiEventDispatcher != null && activitiEventDispatcher.isEnabled()) {
-          activitiEventDispatcher.dispatchEvent(
+        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+          eventDispatcher.dispatchEvent(
               FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstanceEntity));
         }
         
@@ -232,9 +232,9 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
         historicActivityInstance.markEnded(deleteReason);
         
         // Fire event
-        FlowableEventDispatcher activitiEventDispatcher = getEventDispatcher();
-        if (activitiEventDispatcher != null && activitiEventDispatcher.isEnabled()) {
-          activitiEventDispatcher.dispatchEvent(
+        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+          eventDispatcher.dispatchEvent(
               FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
         }
       }
@@ -247,7 +247,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
     if (execution.getCurrentFlowElement() instanceof FlowNode) {
       activityId = execution.getCurrentFlowElement().getId();
     } else if (execution.getCurrentFlowElement() instanceof SequenceFlow
-        && execution.getCurrentActivitiListener() == null) { // while executing sequence flow listeners, we don't want historic activities
+        && execution.getCurrentFlowableListener() == null) { // while executing sequence flow listeners, we don't want historic activities
       activityId = ( (SequenceFlow) (execution.getCurrentFlowElement())).getSourceFlowElement().getId();
     } 
     

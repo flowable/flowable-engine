@@ -19,7 +19,7 @@ import java.util.Date;
  * 
  * A deployment is a container for resources such as process definitions, images, forms, etc.
  * 
- * When a deployment is 'deployed' through the {@link org.flowable.engine.RuntimeService}, the Activiti engine will recognize certain of such resource types and act upon them (eg process definitions
+ * When a deployment is 'deployed' through the {@link org.flowable.engine.RuntimeService}, the process engine will recognize certain of such resource types and act upon them (eg process definitions
  * will be parsed to an executable Java artifact).
  * 
  * To create a Deployment, use the {@link org.flowable.engine.repository.DeploymentBuilder}. A Deployment on itself is a <b>read-only</b> object and its content cannot be changed after deployment

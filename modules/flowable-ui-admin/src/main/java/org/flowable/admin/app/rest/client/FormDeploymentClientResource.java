@@ -36,7 +36,7 @@ public class FormDeploymentClientResource extends AbstractClientResource {
 	@Autowired
 	protected FormDeploymentService clientService;
 
-	@RequestMapping(value = "/rest/activiti/form-deployments/{deploymentId}", method = RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value = "/rest/admin/form-deployments/{deploymentId}", method = RequestMethod.GET, produces = "application/json")
 	public JsonNode getDeployment(@PathVariable String deploymentId) throws BadRequestException {
 		
 		ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
@@ -47,7 +47,7 @@ public class FormDeploymentClientResource extends AbstractClientResource {
 		}
 	}
 	
-	@RequestMapping(value = "/rest/activiti/form-deployments/{deploymentId}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/rest/admin/form-deployments/{deploymentId}", method = RequestMethod.DELETE)
 	public void deleteDeployment(@PathVariable String deploymentId, HttpServletResponse httpResponse) {
 	    clientService.deleteDeployment(retrieveServerConfig(EndpointType.FORM), httpResponse, deploymentId);
 	}

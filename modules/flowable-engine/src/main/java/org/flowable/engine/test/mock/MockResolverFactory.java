@@ -18,7 +18,7 @@ import org.flowable.engine.impl.scripting.Resolver;
 import org.flowable.engine.impl.scripting.ResolverFactory;
 
 /**
- * This is a bridge resolver, making available any objects registered through {@link org.flowable.engine.test.mock.Mocks#register} inside scripts supported by Activiti. <br>
+ * This is a bridge resolver, making available any objects registered through {@link org.flowable.engine.test.mock.Mocks#register} inside scripts supported by process execution. <br>
  * <br>
  * In order to use it, you need to declare it as ResolverFactory, for example by using flowable.cfg.xml like this: <br>
  * <br>

@@ -62,8 +62,8 @@ public class DeleteIdentityLinkForProcessDefinitionCmd implements Command<Object
     }
     
     if (Flowable5Util.isFlowable5ProcessDefinition(commandContext, processDefinition)) {
-      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      activiti5CompatibilityHandler.deleteCandidateStarter(processDefinitionId, userId, groupId);
+      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+      compatibilityHandler.deleteCandidateStarter(processDefinitionId, userId, groupId);
       return null;
     }
 

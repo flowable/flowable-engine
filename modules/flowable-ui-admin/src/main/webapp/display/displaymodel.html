@@ -171,12 +171,12 @@
         	if(instanceId != null) {
 				request = $.ajax({
 				    type: 'get',
-				    url: './app/rest/activiti/process-instances/' + instanceId + '/model-json?processDefinitionId=' + definitionId + '&nocaching=' + new Date().getTime()
+				    url: './app/rest/admin/process-instances/' + instanceId + '/model-json?processDefinitionId=' + definitionId + '&nocaching=' + new Date().getTime()
 				});
         	} else {
 				request = $.ajax({
 				    type: 'get',
-				    url: './app/rest/activiti/process-definitions/' + definitionId + '/model-json?nocaching=' + new Date().getTime()
+				    url: './app/rest/admin/process-definitions/' + definitionId + '/model-json?nocaching=' + new Date().getTime()
 				});
         	}
 

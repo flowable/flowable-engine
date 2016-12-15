@@ -40,7 +40,7 @@ public class DecisionTablesClientResource extends AbstractClientResource {
     /**
      * GET list of deployed decision tables.
      */
-    @RequestMapping(value="/rest/activiti/decision-tables", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value="/rest/admin/decision-tables", method = RequestMethod.GET, produces = "application/json")
     public JsonNode listDecisionTables(HttpServletRequest request) {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
         Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
@@ -50,7 +50,7 @@ public class DecisionTablesClientResource extends AbstractClientResource {
     /**
      * GET process definition's list of deployed decision tables.
      */
-    @RequestMapping(value = "/rest/activiti/process-definition-decision-tables/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/rest/admin/process-definition-decision-tables/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getProcessDefinitionDecisionTables(@PathVariable String processDefinitionId, HttpServletRequest request) {
         return clientService.getProcessDefinitionDecisionTables(retrieveServerConfig(EndpointType.PROCESS), processDefinitionId);
     }

@@ -6,7 +6,7 @@ import java.util.TimeZone;
 import org.flowable.engine.common.runtime.ClockReader;
 
 /**
- * Resolves a due date using the original Activiti due date resolver. This does not take into account the passed time zone.
+ * Resolves a due date using the original due date resolver. This does not take into account the passed time zone.
  * 
  * @author mseiden
  */

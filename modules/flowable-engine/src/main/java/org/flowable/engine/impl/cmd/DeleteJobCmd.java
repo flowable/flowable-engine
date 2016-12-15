@@ -37,8 +37,8 @@ public class DeleteJobCmd implements Command<Object>, Serializable {
     JobEntity jobToDelete = getJobToDelete(commandContext);
     
     if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, jobToDelete.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      activiti5CompatibilityHandler.deleteJob(jobToDelete.getId());
+      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+      compatibilityHandler.deleteJob(jobToDelete.getId());
       return null;
     }
 

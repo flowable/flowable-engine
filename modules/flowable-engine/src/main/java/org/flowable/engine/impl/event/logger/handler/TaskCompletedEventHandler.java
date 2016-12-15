@@ -17,9 +17,9 @@ public class TaskCompletedEventHandler extends AbstractTaskEventHandler {
   @Override
   public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
     
-    FlowableEntityEvent activitiEntityEvent = (FlowableEntityEvent) event;
+    FlowableEntityEvent entityEvent = (FlowableEntityEvent) event;
 
-    TaskEntity task = (TaskEntity) activitiEntityEvent.getEntity();
+    TaskEntity task = (TaskEntity) entityEvent.getEntity();
     Map<String, Object> data = handleCommonTaskFields(task);
 
     long duration = timeStamp.getTime() - task.getCreateTime().getTime();

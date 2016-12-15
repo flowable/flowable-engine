@@ -230,14 +230,14 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
 
   public Task getTask() {
     if (Context.getCommandContext() != null) {
-      throw new FlowableCdiException("Cannot work with tasks in an activiti command.");
+      throw new FlowableCdiException("Cannot work with tasks in an active command.");
     }
     return getScopedAssociation().getTask();
   }
 
   public void setTask(Task task) {
     if (Context.getCommandContext() != null) {
-      throw new FlowableCdiException("Cannot work with tasks in an activiti command.");
+      throw new FlowableCdiException("Cannot work with tasks in an active command.");
     }
     getScopedAssociation().setTask(task);
   }
@@ -245,7 +245,7 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
   @Override
   public Map<String, Object> getCachedVariables() {
     if (Context.getCommandContext() != null) {
-      throw new FlowableCdiException("Cannot work with cached variables in an activiti command.");
+      throw new FlowableCdiException("Cannot work with cached variables in an active command.");
     }
     return getScopedAssociation().getCachedVariables();
   }

@@ -48,7 +48,7 @@ public abstract class FormEngines {
   protected static List<EngineInfo> formEngineInfos = new ArrayList<EngineInfo>();
 
   /**
-   * Initializes all form engines that can be found on the classpath for resources <code>flowable.form.cfg.xml</code> and for resources <code>activiti-dmn-context.xml</code> (Spring style
+   * Initializes all form engines that can be found on the classpath for resources <code>flowable.form.cfg.xml</code> and for resources <code>flowable-dmn-context.xml</code> (Spring style
    * configuration).
    */
   public synchronized static void init() {

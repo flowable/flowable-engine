@@ -97,7 +97,7 @@ public interface DelegateTask extends VariableScope {
    */
   String getEventName();
 
-  FlowableListener getCurrentActivitiListener();
+  FlowableListener getCurrentFlowableListener();
 
   /**
    * The current {@link org.flowable.engine.task.DelegationState} for this task.

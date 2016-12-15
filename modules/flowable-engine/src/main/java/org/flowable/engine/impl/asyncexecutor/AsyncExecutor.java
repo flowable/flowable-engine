@@ -39,6 +39,8 @@ public interface AsyncExecutor {
    */
   boolean executeAsyncJob(Job job);
   
+  int getRemainingCapacity();
+  
   
   /* Getters and Setters */
   

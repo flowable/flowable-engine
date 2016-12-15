@@ -43,7 +43,7 @@ public class ContentItemsClientResource extends AbstractClientResource {
     /**
      * GET a list of content items.
      */
-    @RequestMapping(value = "/rest/activiti/content-items", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/rest/admin/content-items", method = RequestMethod.GET, produces = "application/json")
     public JsonNode listFormDefinitions(HttpServletRequest request) {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CONTENT);
         Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
@@ -53,7 +53,7 @@ public class ContentItemsClientResource extends AbstractClientResource {
     /**
      * GET process instance's list of content items.
      */
-    @RequestMapping(value = "/rest/activiti/process-instance-content-items/{processInstanceId}", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/rest/admin/process-instance-content-items/{processInstanceId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getProcessDefinitionForms(@PathVariable String processInstanceId, HttpServletRequest request) {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CONTENT);
 

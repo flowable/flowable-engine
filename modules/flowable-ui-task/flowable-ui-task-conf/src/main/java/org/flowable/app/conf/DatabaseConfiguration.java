@@ -59,7 +59,7 @@ public class DatabaseConfiguration {
     } else {
 
       String dataSourceDriver = env.getProperty("datasource.driver", "org.h2.Driver");
-      String dataSourceUrl = env.getProperty("datasource.url", "jdbc:h2:mem:activiti;DB_CLOSE_DELAY=-1");
+      String dataSourceUrl = env.getProperty("datasource.url", "jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1");
 
       String dataSourceUsername = env.getProperty("datasource.username", "sa");
       String dataSourcePassword = env.getProperty("datasource.password", "");

@@ -48,7 +48,7 @@ public abstract class ContentEngines {
   protected static List<EngineInfo> contentEngineInfos = new ArrayList<EngineInfo>();
 
   /**
-   * Initializes all dmn engines that can be found on the classpath for resources <code>flowable.content.cfg.xml</code> and for resources <code>activiti-dmn-context.xml</code> (Spring style
+   * Initializes all dmn engines that can be found on the classpath for resources <code>flowable.content.cfg.xml</code> and for resources <code>flowable-dmn-context.xml</code> (Spring style
    * configuration).
    */
   public synchronized static void init() {

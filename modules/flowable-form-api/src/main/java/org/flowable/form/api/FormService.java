@@ -27,7 +27,7 @@ public interface FormService {
      * @param values values submitted by the user
      * @param outcome outcome selected by the user. If null, no outcome is used and any outcome definitions are ignored.
      * 
-     * @return raw variables that can be used in the activiti engine, based on the filled in values and selected outcome.
+     * @return raw variables that can be used in the process engine, based on the filled in values and selected outcome.
      */
     Map<String, Object> getVariablesFromFormSubmission(FormModel formModel, Map<String, Object> values, String outcome);
     

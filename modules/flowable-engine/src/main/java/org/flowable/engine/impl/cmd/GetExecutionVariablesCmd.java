@@ -56,8 +56,8 @@ public class GetExecutionVariablesCmd implements Command<Map<String, Object>>, S
     }
     
     if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      return activiti5CompatibilityHandler.getExecutionVariables(executionId, variableNames, isLocal);
+      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+      return compatibilityHandler.getExecutionVariables(executionId, variableNames, isLocal);
     }
 
     if (variableNames == null || variableNames.isEmpty()) {

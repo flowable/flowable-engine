@@ -15,7 +15,7 @@ package org.flowable.engine.repository;
 import java.util.Date;
 
 /**
- * Represents a model that is stored in the model repository. In addition, a model can be deployed to the Activiti Engine in a separate deployment step.
+ * Represents a model that is stored in the model repository. In addition, a model can be deployed to the process Engine in a separate deployment step.
  * 
  * A model is a container for the meta data and sources of a process model that typically can be edited in a modeling environment.
  * 

@@ -35,7 +35,7 @@ public class FormDefinitionClientResource extends AbstractClientResource {
     @Autowired
     protected FormDefinitionService clientService;
 
-    @RequestMapping(value = "/rest/activiti/form-definitions/{formDefinitionId}", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/rest/admin/form-definitions/{formDefinitionId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getForm(@PathVariable String formDefinitionId) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);

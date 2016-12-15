@@ -16,7 +16,7 @@ public interface AdvancedSchedulerResolver {
    * Resolves a due date using the specified time zone (if supported)
    * 
    * @param duedateDescription
-   *          An original Activiti schedule string in either ISO or CRON format
+   *          An original schedule string in either ISO or CRON format
    * @param clockReader
    *          The time provider
    * @param timeZone

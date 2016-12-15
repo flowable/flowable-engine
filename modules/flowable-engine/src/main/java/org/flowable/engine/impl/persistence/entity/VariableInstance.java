@@ -19,7 +19,7 @@ import org.flowable.engine.impl.variable.ValueFields;
 /**
  * @author Tijs Rademakers
  * 
- * Generic variable class that can be reused for Activiti 6 and 5 engine
+ * Generic variable class that can be reused for V6 and V5 engine
  */
 public interface VariableInstance extends ValueFields, Entity, HasRevision {
   

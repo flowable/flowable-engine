@@ -48,7 +48,7 @@ import org.flowable.image.ProcessDiagramGenerator;
  * ProcessEngine processEngine = ProcessEngineConfiguration.createStandaloneProcessEngineConfiguration().buildProcessEngine();
  * </pre>
  * 
- * This creates a new process engine with all the defaults to connect to a remote h2 database (jdbc:h2:tcp://localhost/flowable) in standalone mode. Standalone mode means that Activiti will manage the
+ * This creates a new process engine with all the defaults to connect to a remote h2 database (jdbc:h2:tcp://localhost/flowable) in standalone mode. Standalone mode means that the process engine will manage the
  * transactions on the JDBC connections that it creates. One transaction per service method. For a description of how to write the configuration files, see the userguide.
  * </p>
  * 

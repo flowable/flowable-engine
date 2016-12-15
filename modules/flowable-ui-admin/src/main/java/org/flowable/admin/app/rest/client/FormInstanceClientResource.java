@@ -41,13 +41,13 @@ public class FormInstanceClientResource extends AbstractClientResource {
   @Autowired
   protected ObjectMapper objectMapper;
 
-  @RequestMapping(value = "/rest/activiti/form-instances/{formInstanceId}", method = RequestMethod.GET, produces = "application/json")
+  @RequestMapping(value = "/rest/admin/form-instances/{formInstanceId}", method = RequestMethod.GET, produces = "application/json")
   public JsonNode getFormInstance(HttpServletRequest request, @PathVariable String formInstanceId) {
     ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
     return clientService.getFormInstance(serverConfig, formInstanceId);
   }
 
-  @RequestMapping(value = "/rest/activiti/task-form-instance/{taskId}", method = RequestMethod.GET, produces = "application/json")
+  @RequestMapping(value = "/rest/admin/task-form-instance/{taskId}", method = RequestMethod.GET, produces = "application/json")
   public JsonNode getTaskSubmittedForm(@PathVariable String taskId) {
     ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 
@@ -62,7 +62,7 @@ public class FormInstanceClientResource extends AbstractClientResource {
     }
   }
 
-  @RequestMapping(value = "/rest/activiti/form-instances/{formInstanceId}/form-field-values", method = RequestMethod.GET, produces = "application/json")
+  @RequestMapping(value = "/rest/admin/form-instances/{formInstanceId}/form-field-values", method = RequestMethod.GET, produces = "application/json")
   public JsonNode getFormInstanceFormFieldValues(HttpServletRequest request, @PathVariable String formInstanceId) {
     ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
     return clientService.getFormInstanceFormFieldValues(serverConfig, formInstanceId);

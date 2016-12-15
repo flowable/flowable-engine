@@ -53,8 +53,8 @@ public class GetExecutionVariableInstanceCmd implements Command<VariableInstance
     
     VariableInstance variableEntity = null;
     if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler activiti5CompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      variableEntity = activiti5CompatibilityHandler.getExecutionVariableInstance(executionId, variableName, isLocal);
+      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
+      variableEntity = compatibilityHandler.getExecutionVariableInstance(executionId, variableName, isLocal);
       
     } else {  
       if (isLocal) {

@@ -32,7 +32,7 @@ public class JMXConfigurator extends AbstractProcessEngineConfigurator {
   // jmx domain name
   protected String domain = "org.flowable.jmx.Mbeans";
 
-  // the domain name for the activiti mbeans
+  // the domain name for the mbeans
   protected String mbeanDomain = DEFAUL_JMX_DOMAIN;
 
   // JMX service URL path

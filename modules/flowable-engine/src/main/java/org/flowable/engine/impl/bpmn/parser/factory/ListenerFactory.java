@@ -38,19 +38,19 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
  */
 public interface ListenerFactory {
 
-  public abstract TaskListener createClassDelegateTaskListener(FlowableListener activitiListener);
+  public abstract TaskListener createClassDelegateTaskListener(FlowableListener listener);
 
-  public abstract TaskListener createExpressionTaskListener(FlowableListener activitiListener);
+  public abstract TaskListener createExpressionTaskListener(FlowableListener listener);
 
-  public abstract TaskListener createDelegateExpressionTaskListener(FlowableListener activitiListener);
+  public abstract TaskListener createDelegateExpressionTaskListener(FlowableListener listener);
 
-  public abstract ExecutionListener createClassDelegateExecutionListener(FlowableListener activitiListener);
+  public abstract ExecutionListener createClassDelegateExecutionListener(FlowableListener listener);
 
-  public abstract ExecutionListener createExpressionExecutionListener(FlowableListener activitiListener);
+  public abstract ExecutionListener createExpressionExecutionListener(FlowableListener listener);
 
-  public abstract ExecutionListener createDelegateExpressionExecutionListener(FlowableListener activitiListener);
+  public abstract ExecutionListener createDelegateExpressionExecutionListener(FlowableListener listener);
 
-  public abstract TransactionDependentExecutionListener createTransactionDependentDelegateExpressionExecutionListener(FlowableListener activitiListener);
+  public abstract TransactionDependentExecutionListener createTransactionDependentDelegateExpressionExecutionListener(FlowableListener listener);
 
   public abstract FlowableEventListener createClassDelegateEventListener(EventListener eventListener);
 
@@ -58,11 +58,11 @@ public interface ListenerFactory {
 
   public abstract FlowableEventListener createEventThrowingEventListener(EventListener eventListener);
 
-  public abstract CustomPropertiesResolver createClassDelegateCustomPropertiesResolver(FlowableListener activitiListener);
+  public abstract CustomPropertiesResolver createClassDelegateCustomPropertiesResolver(FlowableListener listener);
 
-  public abstract CustomPropertiesResolver createExpressionCustomPropertiesResolver(FlowableListener activitiListener);
+  public abstract CustomPropertiesResolver createExpressionCustomPropertiesResolver(FlowableListener listener);
 
-  public abstract CustomPropertiesResolver createDelegateExpressionCustomPropertiesResolver(FlowableListener activitiListener);
+  public abstract CustomPropertiesResolver createDelegateExpressionCustomPropertiesResolver(FlowableListener listener);
 
-  public abstract TransactionDependentTaskListener createTransactionDependentDelegateExpressionTaskListener(FlowableListener activitiListener);
+  public abstract TransactionDependentTaskListener createTransactionDependentDelegateExpressionTaskListener(FlowableListener listener);
 }

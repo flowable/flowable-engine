@@ -33,7 +33,7 @@ public class AbstractFlowableContentTest {
   public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowablecontent;DB_CLOSE_DELAY=1000";
 
   @Rule
-  public FlowableContentRule activitiRule = new FlowableContentRule();
+  public FlowableContentRule rule = new FlowableContentRule();
 
   protected static ContentEngine cachedContentEngine;
   protected ContentEngineConfiguration contentEngineConfiguration;
@@ -42,7 +42,7 @@ public class AbstractFlowableContentTest {
   @Before
   public void initFormEngine() {
     if (cachedContentEngine == null) {
-      cachedContentEngine = activitiRule.getContentEngine();
+      cachedContentEngine = rule.getContentEngine();
     }
 
     this.contentEngineConfiguration = cachedContentEngine.getContentEngineConfiguration();

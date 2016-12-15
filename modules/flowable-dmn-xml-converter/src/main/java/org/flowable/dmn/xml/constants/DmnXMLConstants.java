@@ -23,8 +23,8 @@ public interface DmnXMLConstants {
   public static final String SCHEMA_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
   public static final String MODEL_NAMESPACE = "http://www.activiti.org/dmn";
   public static final String TARGET_NAMESPACE_ATTRIBUTE = "targetNamespace";
-  public static final String ACTIVITI_EXTENSIONS_NAMESPACE = "http://activiti.org/dmn";
-  public static final String ACTIVITI_EXTENSIONS_PREFIX = "activiti";
+  public static final String FLOWABLE_EXTENSIONS_NAMESPACE = "http://flowable.org/dmn";
+  public static final String FLOWABLE_EXTENSIONS_PREFIX = "flowable";
 
   public static final String ATTRIBUTE_ID = "id";
   public static final String ATTRIBUTE_NAME = "name";
