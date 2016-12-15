@@ -23,7 +23,7 @@ public class XmlUtil {
 	 * 'safe' is here reflecting:
 	 * http://www.jorambarrez.be/blog/2013/02/19/uploading
 	 * -a-funny-xml-can-bring-down-your-server/ and
-	 * http://activiti.org/userguide/index.html#advanced.safe.bpmn.xml
+	 * http://www.flowable.org/docs/userguide/index.html#advanced.safe.bpmn.xml
 	 */
 	public static XMLInputFactory createSafeXmlInputFactory() {
 		XMLInputFactory xif = XMLInputFactory.newInstance();
