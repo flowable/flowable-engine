@@ -119,15 +119,25 @@ public class PersistentTokenServiceImpl implements PersistentTokenService {
   }
 
   private String generateSeriesData() {
-    byte[] newSeries = new byte[DEFAULT_SERIES_LENGTH];
-    random.nextBytes(newSeries);
-    return new String(Base64.encode(newSeries));
+    return generateRandomWithoutSlash(DEFAULT_SERIES_LENGTH);
   }
 
   private String generateTokenData() {
-    byte[] newToken = new byte[DEFAULT_TOKEN_LENGTH];
-    random.nextBytes(newToken);
-    return new String(Base64.encode(newToken));
+    return generateRandomWithoutSlash(DEFAULT_TOKEN_LENGTH);
+  }
+  
+  private String generateRandomWithoutSlash(int size) {
+    String data = generateRandom(size);
+    while (data.contains("/")) {
+      data = generateRandom(size);
+    }
+    return data;
+  }
+  
+  private String generateRandom(int size) {
+    byte[] s = new byte[size];
+    random.nextBytes(s);
+    return new String(Base64.encode(s));
   }
 
   @Override

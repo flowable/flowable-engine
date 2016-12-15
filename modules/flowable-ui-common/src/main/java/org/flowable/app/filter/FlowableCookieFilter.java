@@ -142,7 +142,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
           filterCallback.onValidTokenFound(request, response, token);
         }
       } else {
-        redirectToLogin(request, response, null);
+        redirectOrSendNotPermitted(request, response, null);
         return; // no need to execute any other filters
       }
     }
@@ -198,7 +198,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
       
     } catch (Exception e) {
       logger.trace("Could not set necessary threadlocals for token, e");
-      redirectToLogin(request, response, token.getUserId());
+      redirectOrSendNotPermitted(request, response, token.getUserId());
     }
   }
   
@@ -209,13 +209,13 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
     }
     
     String pathInfo = request.getPathInfo();
-    if (pathInfo == null 
+    if (isRootPath(request) 
         || !pathInfo.startsWith("/rest")) { // rest calls handled by Spring Security conf
     
       if (requiredPrivileges != null && requiredPrivileges.size() > 0) {
         
         if (user.getAuthorities() == null || user.getAuthorities().size() == 0) {
-          redirectToLogin(request, response, user.getUserObject().getId());
+          redirectOrSendNotPermitted(request, response, user.getUserObject().getId());
         }
         
         int matchingPrivileges = 0;
@@ -226,10 +226,18 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
         }
         
         if (matchingPrivileges != requiredPrivileges.size()) {
-          redirectToLogin(request, response, user.getUserObject().getId());
+          redirectOrSendNotPermitted(request, response, user.getUserObject().getId());
         }
       }
       
+    }
+  }
+  
+  protected void redirectOrSendNotPermitted(HttpServletRequest request, HttpServletResponse response, String userId)  {
+    if (isRootPath(request)) {
+      redirectToLogin(request, response, userId);
+    } else {
+      sendNotPermitted(request, response);
     }
   }
   
@@ -242,6 +250,15 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
     } catch (IOException e) {
       logger.warn("Could not redirect to " + idmAppUrl, e);
     }
+  }
+  
+  protected void sendNotPermitted(HttpServletRequest request, HttpServletResponse response) {
+    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+  }
+  
+  protected boolean isRootPath(HttpServletRequest request) {
+    String pathInfo = request.getPathInfo();
+    return pathInfo == null || "".equals(pathInfo) || "/".equals(pathInfo);
   }
   
   protected boolean skipAuthenticationCheck(HttpServletRequest request) {

@@ -24,11 +24,38 @@
 
 <h1>Flowable Release Notes</h1>
 
-<h3>Release Notes - Flowable - 6.0.0.Beta4</h3>
+<h3>Release Notes - Flowable - 6.0.0.RC1</h3>
 
 <h4>Highlights</h4>
+
 <ul>
-    <li></li>
+	<li>Package renaming to org.flowable, and renaming of config files to flowable.cfg.xml and flowable-context.xml.
+	It was not an easy decision to go this route, but for the clear distinction and separation of the Flowable project this is the best way forward.
+	The discussion for this choice can be found in this forum post <a href="http://forum.flowable.org/t/opinions-on-package-renaming-for-flowable-6-to-org-flowable/118/13">http://forum.flowable.org/t/opinions-on-package-renaming-for-flowable-6-to-org-flowable/118/13</a></li>
+	<li>Class name renaming to use Flowable instead of Activiti where needed.</li>
+	<li>The identity functionality is separated in the IDM engine, and the identity database tables are managed by this engine. 
+	By default the IDM engine is enabled when starting the Flowable engine, but it can be disabled with the disableIdmEngine property.</li>
+	<li>Introduction of a content engine, which provides a simple file store for attaching files/documents to a task or process instance.</li>
+	<li>Support for non interrupting event sub processes. Until this version only interrupting event sub processes were supported, 
+	but now it's possible to handle events and let the main process execution continue as well.</li>
+	<li>The task app has been refactored into 3 separate web applications. There's a Flowable Modeler app that contains the modeling repository functionality + the BPMN, form and DMN editor.
+	The second app is the Flowable IDM app that manages the users and groups and handles authentication for each app. 
+	For example the Flowable Modeler will redirect to the Flowable IDM app when no valid cookie is found. 
+	After logging in to the Flowable IDM app, a redirect to the Flowable Modeler is executed and you can access the Modeler repository.
+	This is done to allow for single sign-on between the different apps. The third app is the Flowable task app, that allows you to start process instances and work with tasks and fill-in forms.</li>
+	<li>Introduction of the Flowable Admin application that allows for querying the BPM, DMN, Form and Content engines.</li>
+	<li>Introduction of Docker images to make it easy to start all apps in a convenient way. In the docker folder several docker start scripts can be found that use a Docker compose file.
+	In an upcoming blog post we will share more information on how this can be used.</li>
+	<li>Persistency logic that was written in Hibernate has all been rewritten to MyBatis to have a common framework for all persistency logic.</li>
+	<li>Various and many small bugfixes all around.</li>
+</ul>
+
+<h4>Release remarks</h4>
+
+<ul>
+	<li>This a major milestone to get to the final Flowable 6.0.0 release. All parts of the release are now considered feature complete, so the remaining work will be bug fixing and smaller features.</li>
+	<li>We will continue to improve the docs for the 6.0.0 release.</li>
+	<li>At this point all community testing is extremely important for the quality of the 6.0.0 release. So every contribution is this area is very welcome.</li>
 </ul>
 
 </body>
