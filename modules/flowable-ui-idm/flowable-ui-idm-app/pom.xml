@@ -351,6 +351,11 @@
                                     <directory>${project.build.directory}</directory>
                                     <include>${project.build.finalName}.jar</include>
                                 </resource>
+                                <resource>
+                                    <targetPath>/</targetPath>
+                                    <directory>${project.basedir}/src/main/docker</directory>
+                                    <include>wait-for-something.sh</include>
+                                </resource>
                             </resources>
                         </configuration>
                         <executions>
