@@ -69,6 +69,10 @@
             <groupId>com.mchange</groupId>
             <artifactId>c3p0</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
 
         <!-- JSON -->
         <dependency>
