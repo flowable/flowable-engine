@@ -161,7 +161,7 @@ public class DemoDataConfiguration {
   }
 
   protected void initDemoModelData() {
-    createModelData("Demo model", "This is a demo model", "org/activiti/rest/demo/model/test.model.json");
+    createModelData("Demo model", "This is a demo model", "org/flowable/rest/demo/model/test.model.json");
   }
 
   protected void createModelData(String name, String description, String jsonFile) {
@@ -180,7 +180,7 @@ public class DemoDataConfiguration {
       repositoryService.saveModel(model);
 
       try {
-        InputStream svgStream = this.getClass().getClassLoader().getResourceAsStream("org/activiti/rest/demo/model/test.svg");
+        InputStream svgStream = this.getClass().getClassLoader().getResourceAsStream("org/flowable/rest/demo/model/test.svg");
         repositoryService.addModelEditorSourceExtra(model.getId(), IOUtils.toByteArray(svgStream));
       } catch (Exception e) {
         LOGGER.warn("Failed to read SVG", e);
