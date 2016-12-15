@@ -49,7 +49,7 @@ public class ActivitiEventBuilder {
 	/**
 	 * @param type type of event
 	 * @return an {@link FlowableEvent} that doesn't have it's execution context-fields filled,
-	 * as the event is a global event, independant of any running execution.
+	 * as the event is a global event, independent of any running execution.
 	 */
 	public static FlowableEvent createGlobalEvent(FlowableEngineEventType type) {
 		ActivitiEventImpl newEvent = new ActivitiEventImpl(type);
@@ -68,7 +68,7 @@ public class ActivitiEventBuilder {
 	 * @param type type of event
 	 * @param entity the entity this event targets
 	 * @return an {@link FlowableEntityEvent}. In case an {@link ExecutionContext} is active, the execution related
-	 * event fields will be populated. If not, execution details will be reteived from the {@link Object} if possible.
+	 * event fields will be populated. If not, execution details will be retrieved from the {@link Object} if possible.
 	 */
 	public static FlowableEntityEvent createEntityEvent(FlowableEngineEventType type, Object entity) {
 		ActivitiEntityEventImpl newEvent = new ActivitiEntityEventImpl(entity, type);
@@ -84,7 +84,7 @@ public class ActivitiEventBuilder {
    * @param variables
    *            the variables associated with this entity
    * @return an {@link FlowableEntityEvent}. In case an {@link ExecutionContext} is active, the execution related
-   *         event fields will be populated. If not, execution details will be reteived from the {@link Object} if
+   *         event fields will be populated. If not, execution details will be retrieved from the {@link Object} if
    *         possible.
    */
   @SuppressWarnings("rawtypes")
@@ -101,7 +101,7 @@ public class ActivitiEventBuilder {
    * @param entity the entity this event targets
    * @param variables the variables associated with this entity
    * @return an {@link FlowableEntityEvent}. In case an {@link ExecutionContext} is active, the execution related
-   * event fields will be populated. If not, execution details will be reteived from the {@link Object} if possible.
+   * event fields will be populated. If not, execution details will be retrieved from the {@link Object} if possible.
    */
   @SuppressWarnings("rawtypes")
   public static FlowableEntityWithVariablesEvent createEntityWithVariablesEvent(FlowableEngineEventType type, Object entity, Map variables, boolean localScope) {

@@ -41,7 +41,7 @@ public interface BaseCommandContextCloseListener<C extends AbstractCommandContex
   void closed(C commandContext);
   
   /**
-   * Called when the {@link CommandContext} has not been successully closed due to an exception that happened.
+   * Called when the {@link CommandContext} has not been successfully closed due to an exception that happened.
    * 
    * Note that throwing an exception here does *not* affect the transaction. 
    * The {@link CommandContext} will log the exception though.

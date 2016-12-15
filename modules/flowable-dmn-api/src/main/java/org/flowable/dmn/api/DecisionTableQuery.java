@@ -86,7 +86,7 @@ public interface DecisionTableQuery extends Query<DecisionTableQuery, DecisionTa
   DecisionTableQuery decisionTableKeyLike(String decisionTableKeyLike);
 
   /**
-   * Only select process definition with a certain version. Particulary useful when used in combination with {@link #processDefinitionKey(String)}
+   * Only select process definition with a certain version. Particularly useful when used in combination with {@link #processDefinitionKey(String)}
    */
   DecisionTableQuery decisionTableVersion(Integer decisionTableVersion);
   

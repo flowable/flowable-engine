@@ -33,7 +33,7 @@ public class FlowableListenerExport implements BpmnXMLConstants {
     if (element instanceof HasExecutionListeners) {
       didWriteExtensionStartElement = writeListeners(ELEMENT_EXECUTION_LISTENER, ((HasExecutionListeners) element).getExecutionListeners(), didWriteExtensionStartElement, xtw);
     }
-    // In case of a usertaks, also add task-listeners
+    // In case of a usertask, also add task-listeners
     if (element instanceof UserTask) {
       didWriteExtensionStartElement = writeListeners(ELEMENT_TASK_LISTENER, ((UserTask) element).getTaskListeners(), didWriteExtensionStartElement, xtw);
     }

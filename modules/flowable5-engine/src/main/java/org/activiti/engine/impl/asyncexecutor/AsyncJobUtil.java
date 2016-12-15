@@ -28,7 +28,7 @@ public class AsyncJobUtil {
       
     } catch (Throwable lockException) { 
       if (log.isDebugEnabled()) {
-        log.debug("Could not lock exclusive job. Unlocking job so it can be acquired again. Catched exception: {}", lockException.getMessage());
+        log.debug("Could not lock exclusive job. Unlocking job so it can be acquired again. Caught exception: {}", lockException.getMessage());
       }
       
       unacquireJob(commandExecutor, job);
@@ -114,7 +114,7 @@ public class AsyncJobUtil {
             commandContext.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityExceptionEvent(
                 FlowableEngineEventType.JOB_EXECUTION_FAILURE, job, exception));
           } catch(Throwable ignore) {
-            log.warn("Exception occured while dispatching job failure event, ignoring.", ignore);
+            log.warn("Exception occurred while dispatching job failure event, ignoring.", ignore);
           }
         }
         

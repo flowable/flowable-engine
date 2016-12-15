@@ -30,7 +30,7 @@ public class ExecutionVariableFactory {
     public static Object getExecutionVariable(String type, Object expressionResult) {
 
         if (type == null || expressionResult == null) {
-            logger.error("could not create result variable: type {} expresion result {}", type, expressionResult);
+            logger.error("could not create result variable: type {} expression result {}", type, expressionResult);
             throw new FlowableException("could not create result variable");
         }
 

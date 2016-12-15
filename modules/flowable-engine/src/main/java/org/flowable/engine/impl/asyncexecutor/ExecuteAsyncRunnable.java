@@ -137,7 +137,7 @@ public class ExecuteAsyncRunnable implements Runnable {
 
   /**
    * Returns true if lock succeeded, or no lock was needed.
-   * Returns false if locking was unsuccessfull. 
+   * Returns false if locking was unsuccessful.
    */
   protected boolean lockJobIfNeeded() {
     try {
@@ -147,7 +147,7 @@ public class ExecuteAsyncRunnable implements Runnable {
 
     } catch (Throwable lockException) {
       if (log.isDebugEnabled()) {
-        log.debug("Could not lock exclusive job. Unlocking job so it can be acquired again. Catched exception: {}", lockException.getMessage());
+        log.debug("Could not lock exclusive job. Unlocking job so it can be acquired again. Caught exception: {}", lockException.getMessage());
       }
 
       // Release the job again so it can be acquired later or by another node

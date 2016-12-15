@@ -280,7 +280,7 @@ public class BaseExecutionVariableResource {
   }
 
   /**
-   * Get valid execution from request. Throws exception if execution doen't exist or if execution id is not provided.
+   * Get valid execution from request. Throws exception if execution doesn't exist or if execution id is not provided.
    */
   protected Execution getExecutionFromRequest(String executionId) {
     Execution execution = runtimeService.createExecutionQuery().executionId(executionId).singleResult();

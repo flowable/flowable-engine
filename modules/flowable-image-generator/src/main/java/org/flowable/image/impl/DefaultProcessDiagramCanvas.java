@@ -297,7 +297,7 @@ public class DefaultProcessDiagramCanvas {
   }
 
   /**
-   * Closes the canvas which dissallows further drawing and releases graphical
+   * Closes the canvas which disallows further drawing and releases graphical
    * resources.
    */
   public void close() {

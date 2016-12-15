@@ -61,7 +61,7 @@ public class CdiTaskListener implements TaskListener, Serializable {
 
   @Override
   public void notify(DelegateTask task) {
-    // test whether cdi is setup correclty. (if not, just do not deliver the
+    // test whether cdi is setup correctly. (if not, just do not deliver the
     // event)
     try {
       ProgrammaticBeanLookup.lookup(ProcessEngine.class);
@@ -83,7 +83,7 @@ public class CdiTaskListener implements TaskListener, Serializable {
   protected BeanManager getBeanManager() {
     BeanManager bm = BeanManagerLookup.getBeanManager();
     if (bm == null) {
-      throw new FlowableException("No cdi bean manager avaiable, cannot publish event.");
+      throw new FlowableException("No cdi bean manager available, cannot publish event.");
     }
     return bm;
   }

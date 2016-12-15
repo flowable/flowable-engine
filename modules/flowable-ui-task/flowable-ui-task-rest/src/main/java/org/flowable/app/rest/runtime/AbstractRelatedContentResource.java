@@ -234,7 +234,7 @@ public abstract class AbstractRelatedContentResource {
   protected ContentItemRepresentation addContentItem(ContentItemRepresentation contentItemBody, String taskId, String processInstanceId, boolean isRelatedContent) {
 
     if (contentItemBody.getContentStoreId() == null || contentItemBody.getContentStoreName() == null || contentItemBody.getName() == null) {
-      throw new BadRequestException("Name, source and sourceId are required paremeters");
+      throw new BadRequestException("Name, source and sourceId are required parameters");
     }
 
     User user = SecurityUtils.getCurrentUserObject();

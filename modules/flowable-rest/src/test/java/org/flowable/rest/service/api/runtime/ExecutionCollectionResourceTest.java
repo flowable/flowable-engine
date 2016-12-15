@@ -165,7 +165,7 @@ public class ExecutionCollectionResourceTest extends BaseSpringRestTestCase {
     ObjectNode varNode = objectMapper.createObjectNode();
     variables.add(varNode);
     varNode.put("name", "myVar");
-    varNode.put("value", "Variable set when signal event is receieved");
+    varNode.put("value", "Variable set when signal event is received");
 
     Execution waitingExecution = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
     assertNotNull(waitingExecution);
@@ -183,6 +183,6 @@ public class ExecutionCollectionResourceTest extends BaseSpringRestTestCase {
     Map<String, Object> vars = runtimeService.getVariables(waitingExecution.getId());
     assertEquals(1, vars.size());
 
-    assertEquals("Variable set when signal event is receieved", vars.get("myVar"));
+    assertEquals("Variable set when signal event is received", vars.get("myVar"));
   }
 }

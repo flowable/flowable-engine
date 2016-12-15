@@ -42,7 +42,7 @@ public class EventLogEntryEntity implements PersistentObject, EventLogEntry {
   
   @Override
   public String getId() {
-    return "event-log-" + logNumber; // To avoid clashed, prefixing it (it shouldnt be used)
+    return "event-log-" + logNumber; // To avoid clashed, prefixing it (it shouldn't be used)
   }
   
   @Override
