@@ -33,7 +33,7 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
   @Deployment
   public void testResetExpiredJobs() {
     
-    // This first tets 'mimics' the async executor:
+    // This first test 'mimics' the async executor:
     // first the job will be acquired via the lowlevel API instead of using threads
     // and then they will be reset, using the lowlevel API again.
     

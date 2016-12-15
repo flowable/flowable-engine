@@ -327,7 +327,7 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
     assertTrue(variableValue instanceof byte[]);
     assertEquals("This is binary content global", new String((byte[]) variableValue));
 
-    // local value should remain unchainged
+    // local value should remain unchanged
     variableValue = runtimeService.getVariableLocal(childExecution.getId(), "binaryVariable");
     assertNotNull(variableValue);
     assertTrue(variableValue instanceof byte[]);

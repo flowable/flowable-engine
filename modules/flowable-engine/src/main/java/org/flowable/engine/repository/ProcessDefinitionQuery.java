@@ -78,7 +78,7 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   ProcessDefinitionQuery processDefinitionKeyLike(String processDefinitionKeyLike);
 
   /**
-   * Only select process definition with a certain version. Particulary useful when used in combination with {@link #processDefinitionKey(String)}
+   * Only select process definition with a certain version. Particularly useful when used in combination with {@link #processDefinitionKey(String)}
    */
   ProcessDefinitionQuery processDefinitionVersion(Integer processDefinitionVersion);
   
@@ -120,7 +120,7 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   ProcessDefinitionQuery processDefinitionResourceNameLike(String resourceNameLike);
 
   /**
-   * Only selects process definitions which given userId is authoriezed to start
+   * Only selects process definitions which given userId is authorized to start
    */
   ProcessDefinitionQuery startableByUser(String userId);
 

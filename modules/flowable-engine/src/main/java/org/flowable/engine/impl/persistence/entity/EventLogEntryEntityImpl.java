@@ -41,7 +41,7 @@ public class EventLogEntryEntityImpl extends AbstractEntityNoRevision implements
 
   @Override
   public Object getPersistentState() {
-    return null; // Not updateable
+    return null; // Not updatable
   }
 
   public long getLogNumber() {

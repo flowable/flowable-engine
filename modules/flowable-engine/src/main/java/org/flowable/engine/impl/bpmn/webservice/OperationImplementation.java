@@ -41,9 +41,9 @@ public interface OperationImplementation {
    *          the message to be sent
    * @param operation
    *          the operation that is interested on sending the message
-   * @param overridenEndpointAddresses 
-   *          a not null map of overriden enpoint addresses. The key is the endpoint qualified name.
+   * @param overriddenEndpointAddresses
+   *          a not null map of overriden endpoint addresses. The key is the endpoint qualified name.
    * @return the resulting message
    */
-  MessageInstance sendFor(MessageInstance message, Operation operation, ConcurrentMap<QName, URL> overridenEndpointAddresses) throws Exception;
+  MessageInstance sendFor(MessageInstance message, Operation operation, ConcurrentMap<QName, URL> overriddenEndpointAddresses) throws Exception;
 }

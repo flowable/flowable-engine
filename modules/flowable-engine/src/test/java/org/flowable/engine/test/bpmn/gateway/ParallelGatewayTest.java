@@ -67,7 +67,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
   public void testNestedForkJoin() {
     runtimeService.startProcessInstanceByKey("nestedForkJoin");
 
-    // After process startm, only task 0 should be active
+    // After process starts, only task 0 should be active
     TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
     List<Task> tasks = query.list();
     assertEquals(1, tasks.size());
@@ -118,7 +118,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
     assertEquals("Some Task", tasks.get(1).getName());
 
     // we complete the task from the parent process, the root execution is
-    // receycled, the task in the sub process is still there
+    // recycled, the task in the sub process is still there
     taskService.complete(tasks.get(1).getId());
     tasks = query.list();
     assertEquals(1, tasks.size());

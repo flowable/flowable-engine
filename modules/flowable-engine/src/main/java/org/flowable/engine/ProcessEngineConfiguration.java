@@ -114,7 +114,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
   protected int asyncFailedJobWaitTime = 10;
 
   /**
-   * process diagram generator. Default value is DefaulProcessDiagramGenerator
+   * Process diagram generator. Default value is DefaultProcessDiagramGenerator
    */
   protected ProcessDiagramGenerator processDiagramGenerator;
 

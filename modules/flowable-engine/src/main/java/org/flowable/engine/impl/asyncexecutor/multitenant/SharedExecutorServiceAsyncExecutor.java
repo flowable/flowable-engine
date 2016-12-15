@@ -62,7 +62,7 @@ public class SharedExecutorServiceAsyncExecutor extends DefaultAsyncJobExecutor 
       public Runnable createExecuteAsyncRunnable(Job job, ProcessEngineConfigurationImpl processEngineConfiguration) {
         
         // Here, the runnable will be created by for example the acquire thread, which has already set the current id.
-        // But it will be executed later on, by the executorService and thus we need to set it explicitely again then
+        // But it will be executed later on, by the executorService and thus we need to set it explicitly again then
         
         return new TenantAwareExecuteAsyncRunnable(job, processEngineConfiguration, 
             SharedExecutorServiceAsyncExecutor.this.tenantInfoHolder, 

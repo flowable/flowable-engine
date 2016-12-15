@@ -40,7 +40,7 @@ public class MessageThrowingEventListenerTest extends PluggableFlowableTestCase 
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testMessage");
       assertNotNull(processInstance);
 
-      // Fetch the task and re-assig it to trigger the event-listener
+      // Fetch the task and reassign it to trigger the event-listener
       Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
       assertNotNull(task);
       taskService.setAssignee(task.getId(), "kermit");
@@ -92,7 +92,7 @@ public class MessageThrowingEventListenerTest extends PluggableFlowableTestCase 
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testMessage");
       assertNotNull(processInstance);
 
-      // Fetch the task and re-assig it to trigger the event-listener
+      // Fetch the task and reassign it to trigger the event-listener
       Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
       assertNotNull(task);
       taskService.setAssignee(task.getId(), "kermit");

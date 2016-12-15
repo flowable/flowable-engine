@@ -41,7 +41,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
     
     // Process has two service task: first sets transient vars,
     // second then processes transient var and puts data in real vars.
-    // (mimicing a service + processing call)
+    // (mimicking a service + processing call)
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transientVarsTest");
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
     String message = (String) taskService.getVariable(task.getId(), "message");

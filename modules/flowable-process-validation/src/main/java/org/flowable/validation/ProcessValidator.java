@@ -25,7 +25,7 @@ import org.flowable.validation.validator.ValidatorSet;
 public interface ProcessValidator {
 
   /**
-   * Validates the provided {@link BpmnModel} and returns a list of all {@link ValidationError} occurences found.
+   * Validates the provided {@link BpmnModel} and returns a list of all {@link ValidationError} occurrences found.
    */
   List<ValidationError> validate(BpmnModel bpmnModel);
 

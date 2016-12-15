@@ -455,7 +455,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
       String taskId = task.getId();
 
       task.setAssignee("fred");
-      // Claiming without assignee should set asisgnee to null
+      // Claiming without assignee should set assignee to null
       ObjectNode requestNode = objectMapper.createObjectNode();
       requestNode.put("action", "claim");
 

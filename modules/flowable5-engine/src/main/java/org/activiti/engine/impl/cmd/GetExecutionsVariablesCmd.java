@@ -37,7 +37,7 @@ public class GetExecutionsVariablesCmd implements Command<List<VariableInstance>
   
   @Override
   public List<VariableInstance> execute(CommandContext commandContext) {
-    // Verify existance of executions
+    // Verify existence of executions
     if(executionIds == null) {
       throw new ActivitiIllegalArgumentException("executionIds is null");
     }

@@ -202,7 +202,7 @@ private static final long serialVersionUID = 1L;
       historicActivityInstancMap.put(historicActivityInstance.getId(), (HistoricActivityInstanceEntity) historicActivityInstance);
     }
     
-    // Cached version overwites entity
+    // Cached version overwrites entity
     List<HistoricActivityInstanceEntity> cachedHistoricActivityInstances = Context.getCommandContext().getDbSqlSession()
         .findInCache(HistoricActivityInstanceEntity.class);
     for (HistoricActivityInstanceEntity cachedHistoricActivityInstance : cachedHistoricActivityInstances) {

@@ -19,7 +19,7 @@ import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEngineConfiguration;
 
 /**
- * Interface for {@link AsyncExecutor} implementations used in conjucntion with the 
+ * Interface for {@link AsyncExecutor} implementations used in conjunction with the
  * {@link MultiSchemaMultiTenantProcessEngineConfiguration}. Allows to dynamically
  * add tenant executors to the engine.
  * 

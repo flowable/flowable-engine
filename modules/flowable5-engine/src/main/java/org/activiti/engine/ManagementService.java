@@ -75,7 +75,7 @@ public interface ManagementService {
   TimerJobQuery createTimerJobQuery();
   
   /** 
-   * Forced synchronous execution of a job (eg. for administation or testing)
+   * Forced synchronous execution of a job (eg. for administration or testing)
    * The job will be executed, even if the process definition and/or the process instance
    * is in suspended state.
    * 

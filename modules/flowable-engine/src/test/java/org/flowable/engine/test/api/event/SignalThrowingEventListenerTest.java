@@ -116,7 +116,7 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
   }
 
   /**
-   * Test signal throwing when a job failed and the retries are decremented, affectively starting a new transaction.
+   * Test signal throwing when a job failed and the retries are decremented, effectively starting a new transaction.
    */
   @Deployment
   public void testThrowSignalInNewTransaction() throws Exception {

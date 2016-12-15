@@ -44,7 +44,7 @@ public class GetExecutionVariablesCmd implements Command<Map<String, Object>>, S
 
   public Map<String, Object> execute(CommandContext commandContext) {
 
-    // Verify existance of execution
+    // Verify existence of execution
     if (executionId == null) {
       throw new FlowableIllegalArgumentException("executionId is null");
     }

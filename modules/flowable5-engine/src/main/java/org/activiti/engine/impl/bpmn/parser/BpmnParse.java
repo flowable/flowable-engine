@@ -429,7 +429,7 @@ public class BpmnParse implements BpmnXMLConstants {
     // Activities are parsed first
     for (FlowElement flowElement : flowElements) {
 
-      // Sequence flow are also flow elements, but are only parsed once everyactivity is found
+      // Sequence flow are also flow elements, but are only parsed once every activity is found
       if (flowElement instanceof SequenceFlow) {
         sequenceFlowToParse.add((SequenceFlow) flowElement);
       } else if (flowElement instanceof BoundaryEvent) {

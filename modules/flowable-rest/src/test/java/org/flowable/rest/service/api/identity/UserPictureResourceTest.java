@@ -76,7 +76,7 @@ public class UserPictureResourceTest extends BaseSpringRestTestCase {
   }
 
   /**
-   * Test getting the picture for a user who doesn't have a îcture set
+   * Test getting the picture for a user who doesn't have a pîcture set
    */
   public void testGetPictureForUserWithoutPicture() throws Exception {
     User savedUser = null;

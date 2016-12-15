@@ -64,7 +64,7 @@ public class GetDataObjectsCmd implements Command<Map<String, DataObject>>, Seri
 
   public Map<String, DataObject> execute(CommandContext commandContext) {
 
-    // Verify existance of execution
+    // Verify existence of execution
     if (executionId == null) {
       throw new FlowableIllegalArgumentException("executionId is null");
     }

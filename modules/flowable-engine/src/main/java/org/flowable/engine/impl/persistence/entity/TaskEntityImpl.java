@@ -501,7 +501,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Ser
     this.delegationState = delegationState;
   }
 
-  public String getDelegationStateString() { //Needed for Activiti 5 compatibility, not exposed in terface
+  public String getDelegationStateString() { //Needed for Activiti 5 compatibility, not exposed in interface
     return (delegationState != null ? delegationState.toString() : null);
   }
 

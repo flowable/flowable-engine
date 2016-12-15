@@ -70,7 +70,7 @@ public class ResetExpiredJobsRunnable implements Runnable {
         
       } catch (Throwable e) {
         if (e instanceof FlowableOptimisticLockingException) {
-          log.debug("Optmistic lock exception while resetting locked jobs", e);
+          log.debug("Optimistic lock exception while resetting locked jobs", e);
         } else {
           log.error("exception during resetting expired jobs", e.getMessage(), e);
         }

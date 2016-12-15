@@ -45,7 +45,7 @@ public class ValidateExecutionRelatedEntityCountCfgCmd implements Command<Void> 
      *  F) false | false : all good
      *  
      * In case A and D (not there), the property needs to be written to the db
-     * Only in case E something needs to be done explicitely, the others are okay.
+     * Only in case E something needs to be done explicitly, the others are okay.
      */
     
     PropertyEntityManager propertyEntityManager = commandContext.getPropertyEntityManager();

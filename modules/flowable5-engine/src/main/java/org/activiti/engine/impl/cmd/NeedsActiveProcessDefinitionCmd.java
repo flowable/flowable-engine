@@ -39,7 +39,7 @@ public abstract class NeedsActiveProcessDefinitionCmd<T> implements Command<T>, 
 
     if (deploymentManager.isProcessDefinitionSuspended(processDefinitionId)) {
       throw new ActivitiException("Cannot execute operation because process definition '" 
-              + processDefinition.getName() + "' (id=" + processDefinition.getId() + ") is supended");
+              + processDefinition.getName() + "' (id=" + processDefinition.getId() + ") is suspended");
     }
     
     return execute(commandContext, processDefinition);

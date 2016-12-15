@@ -101,7 +101,7 @@ public interface JobManager {
   JobEntity moveDeadLetterJobToExecutableJob(DeadLetterJobEntity deadLetterJobEntity, int retries);
   
   /**
-   * The ProcessEngineCongiguration instance will be passed when the {@link ProcessEngine} is built.
+   * The ProcessEngineConfiguration instance will be passed when the {@link ProcessEngine} is built.
    */
   void setProcessEngineConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration);
 

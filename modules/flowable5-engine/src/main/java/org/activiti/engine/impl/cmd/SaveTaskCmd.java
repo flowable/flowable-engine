@@ -53,7 +53,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
         
         if (task.getAssignee() != null) {
 	        // The assignment event is normally fired when calling setAssignee. However, this
-	        // doesn't work for standalone tasks as the commandcontext is not availble.
+	        // doesn't work for standalone tasks as the commandcontext is not available.
 	        Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
 	            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, task));
         }

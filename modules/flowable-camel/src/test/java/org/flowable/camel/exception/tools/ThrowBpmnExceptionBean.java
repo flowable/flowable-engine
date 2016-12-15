@@ -31,7 +31,7 @@ public class ThrowBpmnExceptionBean {
     case NO_EXCEPTION:
       break;
     case NON_BPMN_EXCEPTION:
-      throw new Exception("arbitary non bpmn exception");
+      throw new Exception("arbitrary non bpmn exception");
     case BPMN_EXCEPTION:
       throw new BpmnError("testError");
     }

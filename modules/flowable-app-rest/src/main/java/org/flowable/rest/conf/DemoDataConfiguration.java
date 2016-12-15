@@ -103,7 +103,7 @@ public class DemoDataConfiguration {
 
   protected void initDemoUsers() {
     createUser("kermit", "Kermit", "The Frog", "kermit", "kermit@flowable.org", null, Arrays.asList("management", "sales", "marketing", "engineering", "user", "admin"),
-        Arrays.asList("birthDate", "10-10-1955", "jobTitle", "Muppet", "location", "Hollywoord", "phone", "+123456789", "twitterName", "alfresco", "skype", "flowable_kermit_frog"));
+        Arrays.asList("birthDate", "10-10-1955", "jobTitle", "Muppet", "location", "Hollywood", "phone", "+123456789", "twitterName", "alfresco", "skype", "flowable_kermit_frog"));
 
     createUser("gonzo", "Gonzo", "The Great", "gonzo", "gonzo@flowable.org", null, Arrays.asList("management", "sales", "marketing", "user"), null);
     createUser("fozzie", "Fozzie", "Bear", "fozzie", "fozzie@flowable.org", null, Arrays.asList("marketing", "engineering", "user"), null);

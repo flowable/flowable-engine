@@ -496,7 +496,7 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
     // Starting process instance with an invalid type of ID
     // Under normal circumstances, JPA will throw an exception for this of
     // the class is
-    // present in the PU when creating EntityanagerFactory, but we test it
+    // present in the PU when creating EntityManagerFactory, but we test it
     // *just in case*
     variables = new HashMap<String, Object>();
     IllegalIdClassJPAEntity illegalIdTypeEntity = new IllegalIdClassJPAEntity();

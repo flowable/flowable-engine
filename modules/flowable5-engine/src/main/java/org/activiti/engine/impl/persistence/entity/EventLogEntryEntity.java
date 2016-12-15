@@ -52,7 +52,7 @@ public class EventLogEntryEntity implements PersistentObject, EventLogEntry {
   
   @Override
   public Object getPersistentState() {
-    return null; // Not updateable
+    return null; // Not updatable
   }
   
 	public long getLogNumber() {

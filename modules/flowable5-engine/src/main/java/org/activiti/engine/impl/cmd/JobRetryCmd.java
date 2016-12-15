@@ -71,7 +71,7 @@ public class JobRetryCmd implements Command<Object> {
    
     AbstractJobEntity newJobEntity = null;
     if (activity == null || activity.getFailedJobRetryTimeCycleValue() == null) {
-      log.debug("activitiy or FailedJobRetryTimerCycleValue is null in job '{}'. Only decrementing retries.", jobId);
+      log.debug("activity or FailedJobRetryTimerCycleValue is null in job '{}'. Only decrementing retries.", jobId);
       
       if (job.getRetries() <= 1) {
         DeadLetterJobEntity deadLetterJob = new DeadLetterJobEntity(job);
@@ -123,7 +123,7 @@ public class JobRetryCmd implements Command<Object> {
         newJobEntity.setRetries(jobRetries - 1);
          
       } catch (Exception e) {
-        throw new ActivitiException("failedJobRetryTimeCylcle has wrong format:" + failedJobRetryTimeCycle, exception);
+        throw new ActivitiException("failedJobRetryTimeCycle has wrong format:" + failedJobRetryTimeCycle, exception);
       }  
     }
     

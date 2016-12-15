@@ -31,7 +31,7 @@ import org.activiti.engine.impl.el.ExpressionManager;
 public class BpmnParser {
   
   /**
-   * The namepace of the BPMN 2.0 diagram interchange elements.
+   * The namespace of the BPMN 2.0 diagram interchange elements.
    */
   public static final String BPMN_DI_NS = "http://www.omg.org/spec/BPMN/20100524/DI";
   

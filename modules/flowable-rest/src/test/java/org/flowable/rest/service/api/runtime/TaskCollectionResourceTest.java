@@ -246,7 +246,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
       url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?processInstanceBusinessKey=myBusinessKey";
       assertResultsPresentInDataResponse(url, processTask.getId());
 
-      // CeatedOn filtering
+      // CreatedOn filtering
       url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?createdOn=" + getISODateString(adhocTaskCreate.getTime());
       assertResultsPresentInDataResponse(url, adhocTask.getId());
 
@@ -313,10 +313,10 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
       url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?category=" + encode("some-category");
       assertResultsPresentInDataResponse(url, adhocTask.getId());
 
-      // Suspend process-instance to have a supended task
+      // Suspend process-instance to have a suspended task
       runtimeService.suspendProcessInstanceById(processInstance.getId());
 
-      // Suspended filering
+      // Suspended filtering
       url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?active=false";
       assertResultsPresentInDataResponse(url, processTask.getId());
 
