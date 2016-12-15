@@ -225,8 +225,12 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
   protected FormInstance resolveFormInstance(CommandContext commandContext) {
     FormEngineConfiguration formEngineConfiguration = commandContext.getFormEngineConfiguration();
     FormInstanceQuery formInstanceQuery = formEngineConfiguration.getFormService().createFormInstanceQuery().formDefinitionId(formDefinitionId);
-    if (taskId != null) {
+    if (formInstanceId != null) {
+      formInstanceQuery.id(formInstanceId);
+      
+    } else if (taskId != null) {
       formInstanceQuery.taskId(taskId);
+      
     } else {
       formInstanceQuery.processInstanceId(processInstanceId);
     }
