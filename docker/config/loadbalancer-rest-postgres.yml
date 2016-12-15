@@ -23,6 +23,8 @@ services:
       - flowable-rest-app
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - STATS_AUTH=flowable:flowable
     ports:
       - 8080:80
       - 8081:1936
