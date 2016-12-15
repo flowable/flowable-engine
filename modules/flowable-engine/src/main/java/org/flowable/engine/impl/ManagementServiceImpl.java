@@ -40,6 +40,7 @@ import org.flowable.engine.impl.cmd.JobType;
 import org.flowable.engine.impl.cmd.MoveDeadLetterJobToExecutableJobCmd;
 import org.flowable.engine.impl.cmd.MoveJobToDeadLetterJobCmd;
 import org.flowable.engine.impl.cmd.MoveTimerToExecutableJobCmd;
+import org.flowable.engine.impl.cmd.RescheduleTimerJobCmd;
 import org.flowable.engine.impl.cmd.SetJobRetriesCmd;
 import org.flowable.engine.impl.cmd.SetTimerJobRetriesCmd;
 import org.flowable.engine.impl.db.DbSqlSession;
@@ -120,6 +121,11 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   
   public void setTimerJobRetries(String jobId, int retries) {
     commandExecutor.execute(new SetTimerJobRetriesCmd(jobId, retries));
+  }
+  
+  @Override
+  public void rescheduleTimerJob(String jobId, String timeDate, String timeDuration, String timeCycle, String endDate, String calendarName) {
+    commandExecutor.execute(new RescheduleTimerJobCmd(jobId, timeDate, timeDuration, timeCycle, endDate, calendarName));
   }
 
   public TablePageQuery createTablePageQuery() {
