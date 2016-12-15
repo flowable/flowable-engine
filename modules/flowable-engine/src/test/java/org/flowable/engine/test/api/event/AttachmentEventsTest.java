@@ -47,7 +47,7 @@ public class AttachmentEventsTest extends PluggableFlowableTestCase {
       assertNotNull(task);
 
       // Create link-attachment
-      Attachment attachment = taskService.createAttachment("test", task.getId(), processInstance.getId(), "attachment name", "description", "http://activiti.org");
+      Attachment attachment = taskService.createAttachment("test", task.getId(), processInstance.getId(), "attachment name", "description", "http://flowable.org");
       assertNull(attachment.getUserId());
       assertEquals(2, listener.getEventsReceived().size());
       FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
@@ -125,7 +125,7 @@ public class AttachmentEventsTest extends PluggableFlowableTestCase {
         assertNotNull(task);
 
         // Create link-attachment
-        Attachment attachment = taskService.createAttachment("test", task.getId(), null, "attachment name", "description", "http://activiti.org");
+        Attachment attachment = taskService.createAttachment("test", task.getId(), null, "attachment name", "description", "http://flowable.org");
         assertEquals(2, listener.getEventsReceived().size());
         FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
         assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
@@ -198,7 +198,7 @@ public class AttachmentEventsTest extends PluggableFlowableTestCase {
         assertNotNull(task);
 
         // Create link-attachment
-        Attachment attachment = taskService.createAttachment("test", task.getId(), null, "attachment name", "description", "http://activiti.org");
+        Attachment attachment = taskService.createAttachment("test", task.getId(), null, "attachment name", "description", "http://flowable.org");
         listener.clearEventsReceived();
 
         // Delete task and historic task

@@ -50,10 +50,10 @@ public class EmailServiceTaskTest extends PluggableFlowableTestCase {
   @Deployment
   public void testSendEmail() throws Exception {
 
-    String from = "ordershipping@activiti.org";
+    String from = "ordershipping@flowable.org";
     boolean male = true;
     String recipientName = "John Doe";
-    String recipient = "johndoe@alfresco.com";
+    String recipient = "johndoe@flowable.com";
     Date now = new Date();
     String orderId = "123456";
 
