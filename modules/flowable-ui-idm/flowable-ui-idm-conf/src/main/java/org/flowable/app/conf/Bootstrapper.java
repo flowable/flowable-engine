@@ -60,10 +60,12 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
 
   protected User initializeSuperUser() {
     String adminPassword = env.getRequiredProperty("admin.password");
+    String adminFirstname = env.getRequiredProperty("admin.firstname");
     String adminLastname = env.getRequiredProperty("admin.lastname");
     String adminEmail = env.getRequiredProperty("admin.email");
 
     User admin = identityService.newUser(adminEmail);
+    admin.setFirstName(adminFirstname);
     admin.setLastName(adminLastname);
     admin.setEmail(adminEmail);
     admin.setPassword(adminPassword);
