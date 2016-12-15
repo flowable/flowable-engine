@@ -78,7 +78,7 @@ flowableModule.service('UserService', ['$http', '$q',
             return httpAsPromise(
                 {
                     method: 'GET',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin//users',
+                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/users',
                     params: params
                 }
             )

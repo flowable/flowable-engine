@@ -43,7 +43,7 @@ flowableModule.service('GroupService', ['$http', '$q',
             return httpAsPromise(
                 {
                     method: 'GET',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin//groups',
+                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/groups',
                     params: params
                 }
             )

@@ -50,7 +50,7 @@ flowableApp.controller('IdmUserMgmtController', ['$rootScope', '$scope', '$trans
                 start: $scope.model.start
             };
 
-            $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin//users', params: params}).
+            $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/users', params: params}).
                 success(function(data, status, headers, config) {
                     data.moreUsers = data.start + data.size < data.total;
                     $scope.model.users = data;
@@ -175,7 +175,7 @@ flowableApp.controller('IdmUserMgmtController', ['$rootScope', '$scope', '$trans
         $scope.deleteUsers = function() {
             $scope.model.loading = true;
             $scope.getSelectedUsers().forEach(function(selectedUser) {
-                $http({method: 'DELETE', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin//users/' + selectedUser.id}).
+                $http({method: 'DELETE', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/users/' + selectedUser.id}).
                     success(function (data, status, headers, config) {
 
                         $rootScope.addAlert('User deleted', 'info');
@@ -243,7 +243,7 @@ flowableApp.controller('IdmCreateUserPopupController', ['$rootScope', '$scope', 
                 password: model.user.password,
             };
 
-            $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin//users', data: data}).
+            $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/users', data: data}).
                 success(function (data, status, headers, config) {
 
                     $rootScope.addAlert('New user created', 'info');
@@ -285,7 +285,7 @@ flowableApp.controller('IdmCreateUserPopupController', ['$rootScope', '$scope', 
                 lastName: model.user.lastName,
             };
 
-            $http({method: 'PUT', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin//users/' + $scope.model.user.id, data: data}).
+            $http({method: 'PUT', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/users/' + $scope.model.user.id, data: data}).
                 success(function (data, status, headers, config) {
 
                     $scope.loadUsers();
@@ -350,7 +350,7 @@ flowableApp.controller('IdmUserBulkUpdatePopupController', ['$rootScope', '$scop
          data.password = $scope.model.updateUsers.password;
        }
 
-       $http({method: 'PUT', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin//users', data: data})
+       $http({method: 'PUT', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/users', data: data})
            .success(function(data, status, headers, config) {
                 $scope.$hide();
                 $scope.model.loading = false;
