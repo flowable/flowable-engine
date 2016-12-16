@@ -288,8 +288,6 @@ public abstract class AbstractRelatedContentResource {
       contentType = "image/bmp";
     } else if (fileName.endsWith("tif") || fileName.endsWith(".tiff")) {
       contentType = "image/tiff";
-    } else if (fileName.endsWith("png")) {
-      contentType = "image/png";
     } else if (fileName.endsWith("doc")) {
       contentType = "application/msword";
     } else if (fileName.endsWith("docx")) {
