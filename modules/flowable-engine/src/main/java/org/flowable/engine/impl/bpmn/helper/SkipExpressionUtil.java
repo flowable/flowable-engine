@@ -37,7 +37,7 @@ public class SkipExpressionUtil {
     String skipExpressionEnabledVariable = "_ACTIVITI_SKIP_EXPRESSION_ENABLED";
     Object isSkipExpressionEnabled = execution.getVariable(skipExpressionEnabledVariable);
     
-    if (isSkipExpressionEnabled != null && isSkipExpressionEnabled instanceof Boolean) {
+    if (isSkipExpressionEnabled instanceof Boolean) {
       return ((Boolean) isSkipExpressionEnabled).booleanValue();
     }
     
