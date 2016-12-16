@@ -40,7 +40,7 @@ public class DecisionTableCacheEntry implements Serializable {
     }
 
     public void setDecisionTableEntity(DecisionTableEntity decisionTable) {
-        this.decisionTableEntity = decisionTableEntity;
+        this.decisionTableEntity = decisionTable;
     }
 
     public DmnDefinition getDmnDefinition() {
