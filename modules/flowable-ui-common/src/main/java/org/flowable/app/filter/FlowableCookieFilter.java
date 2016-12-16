@@ -266,8 +266,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
         request.getRequestURI().endsWith(".js") ||
         request.getRequestURI().endsWith(".html") || 
         request.getRequestURI().endsWith(".map") ||
-        request.getRequestURI().endsWith(".woff") || 
-        request.getRequestURI().endsWith(".map") ||
+        request.getRequestURI().endsWith(".woff") ||
         request.getRequestURI().endsWith(".png") || 
         request.getRequestURI().endsWith(".jpg")) {
       return true;
