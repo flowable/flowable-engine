@@ -924,7 +924,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }
     
     if (superExecution != null) {
-      this.superExecutionId = ((ExecutionEntity)superExecution).getId();
+      this.superExecutionId = superExecution.getId();
     } else {
       this.superExecutionId = null;
     }

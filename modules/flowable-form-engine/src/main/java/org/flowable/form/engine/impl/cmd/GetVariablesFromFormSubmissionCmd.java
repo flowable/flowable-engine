@@ -111,7 +111,7 @@ public class GetVariablesFromFormSubmissionCmd implements Command<Map<String, Ob
         result = Long.valueOf(strFieldValue);
         
       } else {
-        result = (Long) null;
+        result = null;
       }
 
     } else if (formField.getType().equals(FormFieldTypes.AMOUNT) && formFieldValue instanceof String) {

@@ -656,7 +656,7 @@ public class BpmnDeployer implements Deployer {
     if (exprSet != null) {
       Iterator<Expression> iterator = exprSet.iterator();
       while (iterator.hasNext()) {
-        Expression expr = (Expression) iterator.next();
+        Expression expr = iterator.next();
         IdentityLinkEntity identityLink = new IdentityLinkEntity();
         identityLink.setProcessDef(processDefinition);
         if (exprType.equals(ExprType.USER)) {

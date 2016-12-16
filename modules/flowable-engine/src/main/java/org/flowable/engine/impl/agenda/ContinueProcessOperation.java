@@ -207,11 +207,11 @@ public class ContinueProcessOperation extends AbstractOperation {
       FlowElement targetFlowElement = sequenceFlow.getTargetFlowElement();
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
         FlowableEventBuilder.createSequenceFlowTakenEvent(
-            (ExecutionEntity) execution,
+            execution,
             FlowableEngineEventType.SEQUENCEFLOW_TAKEN, 
             sequenceFlow.getId(),
             sourceFlowElement != null ? sourceFlowElement.getId() : null, 
-            sourceFlowElement != null ? (String) sourceFlowElement.getName() : null, 
+            sourceFlowElement != null ? sourceFlowElement.getName() : null,
             sourceFlowElement != null ? sourceFlowElement.getClass().getName() : null,
             sourceFlowElement != null ? ((FlowNode) sourceFlowElement).getBehavior(): null,
             targetFlowElement != null ? targetFlowElement.getId() : null, 
@@ -238,7 +238,7 @@ public class ContinueProcessOperation extends AbstractOperation {
       }
 
       // A Child execution of the current execution is created to represent the boundary event being active 
-      ExecutionEntity childExecutionEntity = commandContext.getExecutionEntityManager().createChildExecution((ExecutionEntity) execution); 
+      ExecutionEntity childExecutionEntity = commandContext.getExecutionEntityManager().createChildExecution(execution);
       childExecutionEntity.setParentId(execution.getId());
       childExecutionEntity.setCurrentFlowElement(boundaryEvent);
       childExecutionEntity.setScope(false);

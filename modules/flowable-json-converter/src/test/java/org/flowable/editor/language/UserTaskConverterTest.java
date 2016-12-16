@@ -74,18 +74,18 @@ public class UserTaskConverterTest extends AbstractConverterTest {
 
     List<FlowableListener> listeners = userTask.getTaskListeners();
     assertEquals(3, listeners.size());
-    FlowableListener listener = (FlowableListener) listeners.get(0);
+    FlowableListener listener = listeners.get(0);
     assertTrue(ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(listener.getImplementationType()));
     assertEquals("org.test.TestClass", listener.getImplementation());
     assertEquals("create", listener.getEvent());
     assertEquals(2, listener.getFieldExtensions().size());
     assertEquals("testField", listener.getFieldExtensions().get(0).getFieldName());
     assertEquals("test", listener.getFieldExtensions().get(0).getStringValue());
-    listener = (FlowableListener) listeners.get(1);
+    listener = listeners.get(1);
     assertTrue(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equals(listener.getImplementationType()));
     assertEquals("${someExpression}", listener.getImplementation());
     assertEquals("assignment", listener.getEvent());
-    listener = (FlowableListener) listeners.get(2);
+    listener = listeners.get(2);
     assertTrue(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(listener.getImplementationType()));
     assertEquals("${someDelegateExpression}", listener.getImplementation());
     assertEquals("complete", listener.getEvent());

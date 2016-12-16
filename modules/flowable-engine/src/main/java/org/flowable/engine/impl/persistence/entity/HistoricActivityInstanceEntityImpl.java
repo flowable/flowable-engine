@@ -42,7 +42,7 @@ public class HistoricActivityInstanceEntityImpl extends HistoricScopeInstanceEnt
   }
 
   public Object getPersistentState() {
-    Map<String, Object> persistentState = (Map<String, Object>) new HashMap<String, Object>();
+    Map<String, Object> persistentState = new HashMap<String, Object>();
     persistentState.put("endTime", endTime);
     persistentState.put("durationInMillis", durationInMillis);
     persistentState.put("deleteReason", deleteReason);

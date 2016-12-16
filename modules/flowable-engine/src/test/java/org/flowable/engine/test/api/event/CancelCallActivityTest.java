@@ -105,7 +105,7 @@ public class CancelCallActivityTest extends PluggableFlowableTestCase {
     assertNotNull(executionEntity.getParentId());
     assertEquals(processExecutionId, executionEntity.getParentId());
 
-    FlowableEvent activitiEvent = (FlowableEvent) mylistener.getEventsReceived().get(2);
+    FlowableEvent activitiEvent = mylistener.getEventsReceived().get(2);
     assertEquals(FlowableEngineEventType.PROCESS_STARTED, activitiEvent.getType());
 
     
@@ -144,7 +144,7 @@ public class CancelCallActivityTest extends PluggableFlowableTestCase {
 
     
     // start event in external subprocess
-    activitiEvent = (FlowableEvent) mylistener.getEventsReceived().get(9);
+    activitiEvent = mylistener.getEventsReceived().get(9);
     assertEquals(FlowableEngineEventType.PROCESS_STARTED, activitiEvent.getType());   
     
     
