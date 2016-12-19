@@ -153,9 +153,8 @@ public abstract class AbstractBpmnParseHandler<T extends BaseElement> implements
           if(eventDefinition.getEventType().equals("message")
             && eventDefinition.getEventName().equals(subscription.getEventName()) 
             && eventDefinition.isStartEvent() == subscription.isStartEvent()) {
-            
-            logger.warn("Cannot have more than one message event subscription with name '" + subscription.getEventName() +
-                "' for scope '"+scope.getId()+"'");
+
+            logger.warn("Cannot have more than one message event subscription with name '{}' for scope '{}'", subscription.getEventName(), scope.getId());
           }
         }
       }

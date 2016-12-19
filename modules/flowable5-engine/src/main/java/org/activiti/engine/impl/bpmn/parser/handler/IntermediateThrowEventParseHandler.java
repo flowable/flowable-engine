@@ -52,8 +52,8 @@ public class IntermediateThrowEventParseHandler extends AbstractActivityBpmnPars
       bpmnParse.getBpmnParserHandlers().parseElement(bpmnParse, eventDefinition);
     } else if (eventDefinition == null) {
       nestedActivityImpl.setActivityBehavior(bpmnParse.getActivityBehaviorFactory().createIntermediateThrowNoneEventActivityBehavior(intermediateEvent)); 
-    } else { 
-      logger.warn("Unsupported intermediate throw event type for throw event " + intermediateEvent.getId());
+    } else {
+        logger.warn("Unsupported intermediate throw event type for throw event {}", intermediateEvent.getId());
     }
   }
   

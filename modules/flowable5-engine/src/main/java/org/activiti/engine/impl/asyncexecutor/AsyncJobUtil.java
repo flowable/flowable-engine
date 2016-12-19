@@ -76,7 +76,7 @@ public class AsyncJobUtil {
       return;
     
     } catch (Throwable t) {
-      log.error("Error while unlocking exclusive job " + job.getId(), t);
+      log.error("Error while unlocking exclusive job {}", job.getId(), t);
       return;
     }
   }

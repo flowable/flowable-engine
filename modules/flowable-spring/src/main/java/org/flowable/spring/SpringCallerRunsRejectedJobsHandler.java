@@ -34,7 +34,7 @@ public class SpringCallerRunsRejectedJobsHandler implements SpringRejectedJobsHa
       // acquisition)
       new ExecuteAsyncRunnable((JobEntity) job, asyncExecutor.getProcessEngineConfiguration()).run();
     } catch (Exception e) {
-      log.error("Failed to execute rejected job " + job.getId(), e);
+        log.error("Failed to execute rejected job {}", job.getId(), e);
     }
   }
 

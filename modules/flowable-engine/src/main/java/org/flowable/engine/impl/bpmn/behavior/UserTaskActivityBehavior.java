@@ -115,7 +115,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
         name = (String) expressionManager.createExpression(activeTaskName).getValue(execution);
       } catch (FlowableException e) {
         name = activeTaskName;
-        LOGGER.warn("property not found in task name expression " + e.getMessage());
+          LOGGER.warn("property not found in task name expression {}", e.getMessage());
       }
       task.setName(name);
     }
@@ -126,7 +126,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
         description = (String) expressionManager.createExpression(activeTaskDescription).getValue(execution);
       } catch (FlowableException e) {
         description = activeTaskDescription;
-        LOGGER.warn("property not found in task description expression " + e.getMessage());
+          LOGGER.warn("property not found in task description expression {}", e.getMessage());
       }
       task.setDescription(description);
     }

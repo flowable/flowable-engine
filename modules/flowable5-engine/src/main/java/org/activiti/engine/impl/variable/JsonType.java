@@ -51,7 +51,7 @@ public class JsonType implements VariableType {
       try {
         jsonValue = objectMapper.readTree(valueFields.getTextValue());
       } catch (Exception e) {
-        logger.error("Error reading json variable " + valueFields.getName(), e);
+          logger.error("Error reading json variable {}", valueFields.getName(), e);
       }
     }
     return jsonValue;

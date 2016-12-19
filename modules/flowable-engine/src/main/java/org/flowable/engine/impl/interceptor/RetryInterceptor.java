@@ -48,7 +48,7 @@ public class RetryInterceptor extends AbstractCommandInterceptor {
         return next.execute(config, command);
 
       } catch (FlowableOptimisticLockingException e) {
-        log.info("Caught optimistic locking exception: " + e);
+          log.info("Caught optimistic locking exception: {}", e);
       }
 
       failedAttempts++;

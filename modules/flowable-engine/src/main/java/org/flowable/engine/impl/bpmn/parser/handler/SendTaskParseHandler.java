@@ -52,7 +52,7 @@ public class SendTaskParseHandler extends AbstractActivityBpmnParseHandler<SendT
       sendTask.setBehavior(webServiceActivityBehavior);
        
     } else {
-      logger.warn("One of the attributes 'type' or 'operation' is mandatory on sendTask " + sendTask.getId());
+        logger.warn("One of the attributes 'type' or 'operation' is mandatory on sendTask {}", sendTask.getId());
     }
   }
 

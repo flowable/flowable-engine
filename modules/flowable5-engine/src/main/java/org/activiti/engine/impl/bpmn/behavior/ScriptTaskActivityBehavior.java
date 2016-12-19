@@ -82,8 +82,8 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
       }
 
     } catch (ActivitiException e) {
-      
-      LOGGER.warn("Exception while executing " + activityExecution.getActivity().getId() + " : " + e.getMessage());
+
+        LOGGER.warn("Exception while executing {} : {}", activityExecution.getActivity().getId(), e.getMessage());
       
       noErrors = false;
       Throwable rootCause = ExceptionUtils.getRootCause(e);

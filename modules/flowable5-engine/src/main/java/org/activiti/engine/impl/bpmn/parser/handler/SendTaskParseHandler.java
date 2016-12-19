@@ -60,7 +60,7 @@ public class SendTaskParseHandler extends AbstractExternalInvocationBpmnParseHan
         StringUtils.isNotEmpty(sendTask.getOperationRef())) {
       
       if (!bpmnParse.getOperations().containsKey(sendTask.getOperationRef())) {
-        logger.warn(sendTask.getOperationRef() + " does not exist for sendTask " + sendTask.getId());
+          logger.warn("{} does not exist for sendTask {}", sendTask.getOperationRef(), sendTask.getId());
       } else {
         WebServiceActivityBehavior webServiceActivityBehavior = bpmnParse.getActivityBehaviorFactory().createWebServiceActivityBehavior(sendTask);
         Operation operation = bpmnParse.getOperations().get(sendTask.getOperationRef());
@@ -84,7 +84,7 @@ public class SendTaskParseHandler extends AbstractExternalInvocationBpmnParseHan
         activity.setActivityBehavior(webServiceActivityBehavior);
       }
     } else {
-      logger.warn("One of the attributes 'type' or 'operation' is mandatory on sendTask " + sendTask.getId());
+        logger.warn("One of the attributes 'type' or 'operation' is mandatory on sendTask {}", sendTask.getId());
     }
   }
 

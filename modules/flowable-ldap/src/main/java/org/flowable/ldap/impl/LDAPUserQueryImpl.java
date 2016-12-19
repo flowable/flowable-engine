@@ -86,7 +86,7 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
             namingEnum.close();
 
           } catch (NamingException ne) {
-            logger.debug("Could not execute LDAP query: " + ne.getMessage(), ne);
+              logger.debug("Could not execute LDAP query: {}", ne.getMessage(), ne);
             return null;
           }
           return result;
@@ -120,7 +120,7 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
           return user;
 
         } catch (NamingException ne) {
-          logger.debug("Could not find user " + userId + " : " + ne.getMessage(), ne);
+            logger.debug("Could not find user {} : {}", userId, ne.getMessage(), ne);
           return null;
         }
       }

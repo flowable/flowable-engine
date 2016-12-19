@@ -248,7 +248,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
       }
       response.sendRedirect(idmAppUrl + "#/login?redirectOnAuthSuccess=true&redirectUrl=" + request.getRequestURL());
     } catch (IOException e) {
-      logger.warn("Could not redirect to " + idmAppUrl, e);
+        logger.warn("Could not redirect to {}", idmAppUrl, e);
     }
   }
   

@@ -227,7 +227,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration {
       }
       
       if (contentRootFile != null && contentRootFile.exists()) {
-        logger.info("Content file system root : " + contentRootFile.getAbsolutePath());
+          logger.info("Content file system root : {}", contentRootFile.getAbsolutePath());
      }
       
       contentStorage = new SimpleFileSystemContentStorage(contentRootFile);

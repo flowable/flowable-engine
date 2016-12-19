@@ -102,8 +102,7 @@ public abstract class PluggableFlowableTestCase extends AbstractFlowableTestCase
       }
 
     } else {
-      pluggableActivitiTestCaseLogger.warn("Not using " + CommandExecutorImpl.class + ", ignoring the "
-          + EnableVerboseExecutionTreeLogging.class + " annotation");
+        pluggableActivitiTestCaseLogger.warn("Not using {}, ignoring the {} annotation", CommandExecutorImpl.class, EnableVerboseExecutionTreeLogging.class);
     }
   }
 

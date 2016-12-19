@@ -142,7 +142,7 @@ public class TimerEventDefinitionParseHandler extends AbstractBpmnParseHandler<T
 
     // neither date, cycle or duration configured!
     if (expression == null) {
-      logger.warn("Timer needs configuration (either timeDate, timeCycle or timeDuration is needed) (" + timerActivity.getId() + ")");
+        logger.warn("Timer needs configuration (either timeDate, timeCycle or timeDuration is needed) ({})", timerActivity.getId());
     }
 
 

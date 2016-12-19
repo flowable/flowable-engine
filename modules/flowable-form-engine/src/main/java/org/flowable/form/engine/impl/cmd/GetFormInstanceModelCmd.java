@@ -131,7 +131,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
           try {
             field.setValue(formExpression.getValue(variables));
           } catch (Exception e) {
-            logger.error("Error getting value for expression " + expressionField.getExpression() + " " + e.getMessage());
+              logger.error("Error getting value for expression {} {}", expressionField.getExpression(), e.getMessage());
           }
           
         } else if (FormFieldTypes.UPLOAD.equals(field.getType())) {
@@ -359,7 +359,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
             variables.put(field.getId(), dateValue.toString("d-M-yyyy"));
           }
         } catch (Exception e) {
-          logger.error("Error parsing form date value for process instance " + processInstanceId + " and task " + taskId + " with value " + fieldValue, e);
+            logger.error("Error parsing form date value for process instance {} and task {} with value {}", processInstanceId, taskId, fieldValue, e);
         }
   
       } else {
