@@ -64,7 +64,7 @@ public class ValidateExecutionRelatedEntityCountCfgCmd implements Command<Void> 
       
     } else {
       
-      boolean propertyValue = Boolean.valueOf(propertyEntity.getValue().toString().toLowerCase());
+      boolean propertyValue = Boolean.valueOf(propertyEntity.getValue().toLowerCase());
       if (!configProperty && propertyValue) {
         if (logger.isInfoEnabled()) {
           logger.info("Configuration change: execution related entity counting feature was enabled before, but now disabled. "

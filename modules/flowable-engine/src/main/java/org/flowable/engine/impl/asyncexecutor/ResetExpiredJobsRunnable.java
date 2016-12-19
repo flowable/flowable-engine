@@ -48,7 +48,7 @@ public class ResetExpiredJobsRunnable implements Runnable {
   }
 
   public synchronized void run() {
-    log.info("{} starting to reset expired jobs");
+    log.info("starting to reset expired jobs");
     Thread.currentThread().setName("flowable-reset-expired-jobs");
 
     while (!isInterrupted) {
@@ -72,7 +72,7 @@ public class ResetExpiredJobsRunnable implements Runnable {
         if (e instanceof FlowableOptimisticLockingException) {
           log.debug("Optimistic lock exception while resetting locked jobs", e);
         } else {
-          log.error("exception during resetting expired jobs", e.getMessage(), e);
+          log.error("exception during resetting expired jobs: {}", e.getMessage(), e);
         }
       }
 
@@ -96,7 +96,7 @@ public class ResetExpiredJobsRunnable implements Runnable {
       
     }
 
-    log.info("{} stopped resetting expired jobs");
+    log.info("stopped resetting expired jobs");
   }
 
   public void stop() {

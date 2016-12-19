@@ -283,7 +283,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     createdExecution.setActivity(getActivity());
     
     if (log.isDebugEnabled()) {
-      log.debug("Child execution {} created with parent ", createdExecution, this);
+      log.debug("Child execution {} created with parent {}", createdExecution, this);
     }
 
     if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {

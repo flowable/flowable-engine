@@ -42,7 +42,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
   }
 
   public synchronized void run() {
-    log.info("{} starting to acquire async jobs due");
+    log.info("starting to acquire async jobs due");
     Thread.currentThread().setName("flowable-acquire-async-jobs");
 
     CommandExecutor commandExecutor = asyncExecutor.getProcessEngineConfiguration().getCommandExecutor();

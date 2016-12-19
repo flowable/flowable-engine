@@ -90,7 +90,7 @@ public class ValuedDataObjectXMLConverter extends BaseBpmnXMLConverter {
             try {
               dataObject.setValue(sdf.parse(valueElement.getElementText()));
             } catch (Exception e) {
-              LOGGER.error("Error converting {}", dataObject.getName(), e.getMessage());
+              LOGGER.error("Error converting {}; message={}", dataObject.getName(), e.getMessage());
             }
           } else {
             dataObject.setValue(valueElement.getElementText());

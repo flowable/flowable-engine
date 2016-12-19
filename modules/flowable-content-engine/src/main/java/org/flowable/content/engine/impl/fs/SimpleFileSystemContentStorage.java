@@ -173,7 +173,7 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
       }
     }
 
-    return new FileSystemContentObject(contentFile, id.toString(), length);
+    return new FileSystemContentObject(contentFile, id, length);
   }
 
   @Override

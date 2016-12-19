@@ -587,7 +587,7 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
         } else {
           value = new String(dObjValue.toString());
         }
-        propertyItemNode.put(PROPERTY_DATA_VALUE, value.toString());
+        propertyItemNode.put(PROPERTY_DATA_VALUE, value);
       }
 
       itemsNode.add(propertyItemNode);
