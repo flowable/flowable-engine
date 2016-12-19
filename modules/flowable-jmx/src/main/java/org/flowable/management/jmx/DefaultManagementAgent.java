@@ -72,7 +72,7 @@ public class DefaultManagementAgent implements ManagementAgent {
         registerMBeanWithServer(obj, name, forceRegistration);
 
     } catch (NotCompliantMBeanException e) {
-      LOG.error("Mbean " + name + " is not compliant MBean.", e);
+        LOG.error("Mbean {} is not compliant MBean.", name, e);
       registerMBeanWithServer(obj, name, forceRegistration);
 
     }
@@ -227,9 +227,9 @@ public class DefaultManagementAgent implements ManagementAgent {
           LOG.info("JMX Connector thread started and listening at: {}", url);
         } catch (IOException ioe) {
           if (ioe.getCause() instanceof javax.naming.NameAlreadyBoundException) {
-            LOG.warn("JMX connection:" + url + " already exists.");
+              LOG.warn("JMX connection:{} already exists.", url);
           } else {
-            LOG.warn("Could not start JMXConnector thread at: " + url + ". JMX Connector not in use.", ioe);
+              LOG.warn("Could not start JMXConnector thread at: {}. JMX Connector not in use.", url, ioe);
           }
         }
       }

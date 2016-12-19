@@ -690,7 +690,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         Activity activity = retrieveAttachedRefObject(boundaryEvent.getAttachedToRefId(), parentContainer.getFlowElements());
 
         if (activity == null) {
-          LOGGER.warn("Boundary event " + boundaryEvent.getId() + " is not attached to any activity");
+            LOGGER.warn("Boundary event {} is not attached to any activity", boundaryEvent.getId());
         } else {
           boundaryEvent.setAttachedToRef(activity);
           activity.getBoundaryEvents().add(boundaryEvent);

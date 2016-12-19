@@ -73,7 +73,7 @@ public class BpmnParseHandlers {
     List<BpmnParseHandler> handlers = parseHandlers.get(element.getClass());
     
     if (handlers == null) {
-      LOGGER.warn("Could not find matching parse handler for + " + element.getId() + " this is likely a bug.");
+        LOGGER.warn("Could not find matching parse handler for + {} this is likely a bug.", element.getId());
     } else {
       for (BpmnParseHandler handler : handlers) {
         handler.parse(bpmnParse, element);

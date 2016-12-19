@@ -65,7 +65,7 @@ public class LDAPQueryBuilder {
             }
             namingEnum.close();
           } catch (NamingException e) {
-            LOGGER.debug("Could not find user dn : " + e.getMessage(), e);
+              LOGGER.debug("Could not find user dn : {}", e.getMessage(), e);
           }
           return null;
         }

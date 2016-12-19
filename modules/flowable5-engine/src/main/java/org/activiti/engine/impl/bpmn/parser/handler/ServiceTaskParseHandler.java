@@ -60,7 +60,7 @@ public class ServiceTaskParseHandler extends AbstractExternalInvocationBpmnParse
           activity.setActivityBehavior(bpmnParse.getActivityBehaviorFactory().createShellActivityBehavior(serviceTask));
           
         } else {
-        	logger.warn("Invalid service task type: '" + serviceTask.getType() + "' " + " for service task " + serviceTask.getId());
+            logger.warn("Invalid service task type: '{}'  for service task {}", serviceTask.getType(), serviceTask.getId());
         }
 
       // activiti:class
@@ -80,7 +80,7 @@ public class ServiceTaskParseHandler extends AbstractExternalInvocationBpmnParse
           StringUtils.isNotEmpty(serviceTask.getOperationRef())) {
         
         if (!bpmnParse.getOperations().containsKey(serviceTask.getOperationRef())) {
-        	logger.warn(serviceTask.getOperationRef() + " does not exist for service task " + serviceTask.getId());
+            logger.warn("{} does not exist for service task {}", serviceTask.getOperationRef(), serviceTask.getId());
         } else {
           
           WebServiceActivityBehavior webServiceActivityBehavior = bpmnParse.getActivityBehaviorFactory().createWebServiceActivityBehavior(serviceTask);
@@ -104,7 +104,7 @@ public class ServiceTaskParseHandler extends AbstractExternalInvocationBpmnParse
           activity.setActivityBehavior(webServiceActivityBehavior);
         }
       } else {
-        logger.warn("One of the attributes 'class', 'delegateExpression', 'type', 'operation', or 'expression' is mandatory on serviceTask " + serviceTask.getId());
+          logger.warn("One of the attributes 'class', 'delegateExpression', 'type', 'operation', or 'expression' is mandatory on serviceTask {}", serviceTask.getId());
       }
 
     }

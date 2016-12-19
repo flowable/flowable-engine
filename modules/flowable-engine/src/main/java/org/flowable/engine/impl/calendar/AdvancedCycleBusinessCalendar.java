@@ -98,7 +98,7 @@ public class AdvancedCycleBusinessCalendar extends CycleBusinessCalendar {
       Date date = resolvers.get(version == null ? getDefaultScheduleVersion() : Integer.valueOf(version)).resolve(duedateDescription, clockReader,
           timeZone == null ? clockReader.getCurrentTimeZone() : TimeZone.getTimeZone(timeZone));
 
-      logger.info("Calculated Date: " + (date == null ? "Will Not Run Again" : date));
+      logger.info("Calculated Date: {}", date == null ? "Will Not Run Again" : date);
 
       return date;
 

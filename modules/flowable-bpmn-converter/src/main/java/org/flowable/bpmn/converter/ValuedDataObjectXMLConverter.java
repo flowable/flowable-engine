@@ -62,7 +62,7 @@ public class ValuedDataObjectXMLConverter extends BaseBpmnXMLConverter {
       } else if (dataType.equals("datetime")) {
         dataObject = new DateDataObject();
       } else {
-        LOGGER.error("Error converting {}, invalid data type: " + dataType, xtr.getAttributeValue(null, ATTRIBUTE_DATA_NAME));
+        LOGGER.error("Error converting {}, invalid data type: {}", xtr.getAttributeValue(null, ATTRIBUTE_DATA_NAME), dataType);
       }
 
     } else {

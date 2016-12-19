@@ -184,8 +184,8 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
 
       int responseStatusCode = response.getStatusLine().getStatusCode();
       if (expectedStatusCode != responseStatusCode) {
-        log.info("Wrong status code : " + responseStatusCode + ", but should be " + expectedStatusCode);
-        log.info("Response body: " + IOUtils.toString(response.getEntity().getContent()));
+        log.info("Wrong status code : {}, but should be {}", responseStatusCode, expectedStatusCode);
+        log.info("Response body: {}", IOUtils.toString(response.getEntity().getContent()));
       }
 
       Assert.assertEquals(expectedStatusCode, responseStatusCode);

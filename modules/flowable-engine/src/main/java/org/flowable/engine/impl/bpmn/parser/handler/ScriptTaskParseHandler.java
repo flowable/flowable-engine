@@ -33,7 +33,7 @@ public class ScriptTaskParseHandler extends AbstractActivityBpmnParseHandler<Scr
   protected void executeParse(BpmnParse bpmnParse, ScriptTask scriptTask) {
 
     if (StringUtils.isEmpty(scriptTask.getScript())) {
-      logger.warn("No script provided for scriptTask " + scriptTask.getId());
+        logger.warn("No script provided for scriptTask {}", scriptTask.getId());
     }
 
     scriptTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createScriptTaskActivityBehavior(scriptTask));

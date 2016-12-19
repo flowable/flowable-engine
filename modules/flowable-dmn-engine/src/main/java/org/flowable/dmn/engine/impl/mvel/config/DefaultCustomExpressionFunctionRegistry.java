@@ -52,7 +52,7 @@ public class DefaultCustomExpressionFunctionRegistry implements CustomExpression
             logger.debug("adding method to MVEL: {} {} with {} parameters", classRef.getName(), methodName, methodParam.length);
             return classRef.getMethod(methodName, methodParam);
         } catch (NoSuchMethodException nsme) {
-            logger.error("Could not find method for name: "+methodName, nsme);
+            logger.error("Could not find method for name: {}", methodName, nsme);
         }
 
         return null;

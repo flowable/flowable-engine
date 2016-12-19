@@ -40,7 +40,7 @@ public class SecureJavascriptTaskParseHandler extends ScriptTaskParseHandler {
 
   protected void createSecureJavascriptTaskBehavior(BpmnParse bpmnParse, ScriptTask scriptTask, String language) {
     if (StringUtils.isEmpty(scriptTask.getScript())) {
-      logger.warn("No script provided for scriptTask " + scriptTask.getId());
+        logger.warn("No script provided for scriptTask {}", scriptTask.getId());
     }
     
     scriptTask.setBehavior(new SecureJavascriptTaskActivityBehavior(scriptTask.getId(), 

@@ -53,8 +53,7 @@ public class ScriptEventHandler implements SimulationEventHandler {
       scriptingEngines.evaluate((String) event.getProperty(this.scriptPropertyName), language, execution, false);
 
     } catch (FlowableException e) {
-      log.warn("Exception while executing simulation event " + event + " scriptPropertyName :" + this.scriptPropertyName + "\n script: " + event.getProperty(this.scriptPropertyName)
-          + "\n exception is:" + e.getMessage());
+        log.warn("Exception while executing simulation event {} scriptPropertyName :{}\n script: {}\n exception is:{}", event, this.scriptPropertyName, event.getProperty(this.scriptPropertyName), e.getMessage());
       throw e;
     }
   }

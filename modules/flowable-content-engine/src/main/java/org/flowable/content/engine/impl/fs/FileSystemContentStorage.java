@@ -273,7 +273,7 @@ public class FileSystemContentStorage implements ContentStorage {
       int lastIndex = indexes[converter.getIterationDepth() - 2];
       if (lastIndex >= converter.getBlockSize() - 1) {
 
-        logger.debug("Block size reached, moving up one level: " + currentMaxFolder.getAbsolutePath());
+          logger.debug("Block size reached, moving up one level: {}", currentMaxFolder.getAbsolutePath());
 
         // Need to flip to a higher folder
         boolean needsMove = false;
@@ -292,7 +292,7 @@ public class FileSystemContentStorage implements ContentStorage {
         }
 
         if (needsMove) {
-          logger.error("Maximum number of content items reached, cannot store any more content: " + currentMaxFolder.getAbsolutePath());
+            logger.error("Maximum number of content items reached, cannot store any more content: {}", currentMaxFolder.getAbsolutePath());
           throw new ContentStorageException("Maximum number of content items reached, cannot store any more content");
         }
 
@@ -339,7 +339,7 @@ public class FileSystemContentStorage implements ContentStorage {
         }
       } catch (NumberFormatException nfe) {
         // Ignore bad named folders
-        logger.warn("Content store contains bad folder: " + s);
+          logger.warn("Content store contains bad folder: {}", s);
       }
     }
 

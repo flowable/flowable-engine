@@ -49,7 +49,7 @@ public class IntermediateCatchEventParseHandler extends AbstractFlowNodeBpmnPars
         bpmnParse.getBpmnParserHandlers().parseElement(bpmnParse, eventDefinition);
 
       } else {
-        logger.warn("Unsupported intermediate catch event type for event " + event.getId());
+          logger.warn("Unsupported intermediate catch event type for event {}", event.getId());
       }
     }
   }

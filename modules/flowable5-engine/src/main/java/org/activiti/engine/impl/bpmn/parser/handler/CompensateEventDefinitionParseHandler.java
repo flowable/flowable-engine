@@ -39,8 +39,7 @@ public class CompensateEventDefinitionParseHandler extends AbstractBpmnParseHand
     ScopeImpl scope = bpmnParse.getCurrentScope();
     if(StringUtils.isNotEmpty(eventDefinition.getActivityRef())) {
       if(scope.findActivity(eventDefinition.getActivityRef()) == null) {
-        logger.warn("Invalid attribute value for 'activityRef': no activity with id '" + eventDefinition.getActivityRef() +
-            "' in current scope " + scope.getId());
+          logger.warn("Invalid attribute value for 'activityRef': no activity with id '{}' in current scope {}", eventDefinition.getActivityRef(), scope.getId());
       }
     }
     

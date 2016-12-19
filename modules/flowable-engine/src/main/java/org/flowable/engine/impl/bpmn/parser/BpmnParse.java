@@ -179,7 +179,7 @@ public class BpmnParse implements BpmnXMLConstants {
 
             // Write out warnings (if any)
             if (warningBuilder.length() > 0) {
-              LOGGER.warn("Following warnings encountered during process validation: " + warningBuilder.toString());
+                LOGGER.warn("Following warnings encountered during process validation: {}", warningBuilder.toString());
             }
 
           }
@@ -348,11 +348,11 @@ public class BpmnParse implements BpmnXMLConstants {
           if (bpmnModel.getArtifact(bpmnReference) == null) {
             // Check if it's a Pool or Lane, then DI is ok
             if (bpmnModel.getPool(bpmnReference) == null && bpmnModel.getLane(bpmnReference) == null) {
-              LOGGER.warn("Invalid reference in diagram interchange definition: could not find " + bpmnReference);
+                LOGGER.warn("Invalid reference in diagram interchange definition: could not find {}", bpmnReference);
             }
           }
         } else if (!(bpmnModel.getFlowElement(bpmnReference) instanceof FlowNode)) {
-          LOGGER.warn("Invalid reference in diagram interchange definition: " + bpmnReference + " does not reference a flow node");
+            LOGGER.warn("Invalid reference in diagram interchange definition: {} does not reference a flow node", bpmnReference);
         }
       }
       
@@ -360,10 +360,10 @@ public class BpmnParse implements BpmnXMLConstants {
         if (bpmnModel.getFlowElement(bpmnReference) == null) {
           // ACT-1625: don't warn when artifacts are referenced from DI
           if (bpmnModel.getArtifact(bpmnReference) == null) {
-            LOGGER.warn("Invalid reference in diagram interchange definition: could not find " + bpmnReference);
+              LOGGER.warn("Invalid reference in diagram interchange definition: could not find {}", bpmnReference);
           }
         } else if (!(bpmnModel.getFlowElement(bpmnReference) instanceof SequenceFlow)) {
-          LOGGER.warn("Invalid reference in diagram interchange definition: " + bpmnReference + " does not reference a sequence flow");
+            LOGGER.warn("Invalid reference in diagram interchange definition: {} does not reference a sequence flow", bpmnReference);
         }
       }
 
@@ -401,7 +401,7 @@ public class BpmnParse implements BpmnXMLConstants {
     } else if (bpmnModel.getArtifact(key) != null) {
       // it's an association, so nothing to do
     } else {
-      LOGGER.warn("Invalid reference in 'bpmnElement' attribute, sequenceFlow " + key + " not found");
+        LOGGER.warn("Invalid reference in 'bpmnElement' attribute, sequenceFlow {} not found", key);
     }
   }
 

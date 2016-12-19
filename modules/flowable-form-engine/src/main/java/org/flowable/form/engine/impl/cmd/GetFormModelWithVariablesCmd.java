@@ -108,7 +108,7 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
           try {
             field.setValue(formExpression.getValue(variables));
           } catch (Exception e) {
-            logger.error("Error getting value for expression " + expressionField.getExpression() + " " + e.getMessage(), e);
+              logger.error("Error getting value for expression {} {}", expressionField.getExpression(), e.getMessage(), e);
           }
           
         } else {
@@ -224,7 +224,7 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
             variables.put(field.getId(), dateValue);
           }
         } catch (Exception e) {
-          logger.error("Error parsing form date value for process instance " + processInstanceId + " with value " + fieldValue, e);
+            logger.error("Error parsing form date value for process instance {} with value {}", processInstanceId, fieldValue, e);
         }
   
       } else {

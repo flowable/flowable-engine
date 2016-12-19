@@ -175,7 +175,7 @@ public class EventLogger implements FlowableEventListener {
 			eventHandler.setObjectMapper(objectMapper);
 			return eventHandler;
 		} catch (Exception e) {
-			logger.warn("Could not instantiate " + eventHandlerClass + ", this is most likely a programmatic error");
+            logger.warn("Could not instantiate {}, this is most likely a programmatic error", eventHandlerClass);
 		}
 		return null;
   }

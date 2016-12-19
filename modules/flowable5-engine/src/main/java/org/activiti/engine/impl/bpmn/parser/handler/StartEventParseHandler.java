@@ -136,7 +136,7 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
     } else { // "regular" subprocess
       
       if(!startEvent.getEventDefinitions().isEmpty()) {
-        logger.warn("event definitions only allowed on start event if subprocess is an event subprocess " + bpmnParse.getCurrentSubProcess().getId());
+          logger.warn("event definitions only allowed on start event if subprocess is an event subprocess {}", bpmnParse.getCurrentSubProcess().getId());
       }
       if (scope.getProperty(PROPERTYNAME_INITIAL) == null) {
         scope.setProperty(PROPERTYNAME_INITIAL, startEventActivity);

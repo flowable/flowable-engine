@@ -152,7 +152,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
       // Waits for 1 minute to finish all currently executing jobs
       try {
         if (!executorService.awaitTermination(secondsToWaitOnShutdown, TimeUnit.SECONDS)) {
-          log.warn("Timeout during shutdown of async job executor. " + "The current running jobs could not end within " + secondsToWaitOnShutdown + " seconds after shutdown operation.");
+            log.warn("Timeout during shutdown of async job executor. The current running jobs could not end within {} seconds after shutdown operation.", secondsToWaitOnShutdown);
         }
       } catch (InterruptedException e) {
         log.warn("Interrupted while shutting down the async job executor. ", e);

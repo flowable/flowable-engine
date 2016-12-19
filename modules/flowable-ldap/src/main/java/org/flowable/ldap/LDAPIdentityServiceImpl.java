@@ -134,7 +134,7 @@ public class LDAPIdentityServiceImpl extends IdmIdentityServiceImpl {
             namingEnum.close();
 
           } catch (NamingException ne) {
-            logger.info("Could not authenticate user " + userId + " : " + ne.getMessage(), ne);
+              logger.info("Could not authenticate user {} : {}", userId, ne.getMessage(), ne);
             return false;
           }
 
@@ -159,7 +159,7 @@ public class LDAPIdentityServiceImpl extends IdmIdentityServiceImpl {
       });
 
     } catch (FlowableException e) {
-      logger.info("Could not authenticate user : " + e);
+        logger.info("Could not authenticate user : {}", e);
       return false;
     }
   }

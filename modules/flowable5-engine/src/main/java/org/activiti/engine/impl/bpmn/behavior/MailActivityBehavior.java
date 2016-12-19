@@ -400,7 +400,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
 
   protected void handleException(DelegateExecution execution, String msg, Exception e, boolean doIgnoreException, String exceptionVariable) {
     if (doIgnoreException) {
-      LOG.info("Ignoring email send error: " + msg, e);
+        LOG.info("Ignoring email send error: {}", msg, e);
       if (exceptionVariable != null && exceptionVariable.length() > 0) {
         execution.setVariable(exceptionVariable, msg);
       }

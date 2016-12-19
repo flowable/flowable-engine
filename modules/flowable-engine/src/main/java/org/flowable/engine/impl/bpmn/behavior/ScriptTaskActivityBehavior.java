@@ -81,7 +81,7 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
 
     } catch (FlowableException e) {
 
-      LOGGER.warn("Exception while executing " + execution.getCurrentFlowElement().getId() + " : " + e.getMessage());
+        LOGGER.warn("Exception while executing {} : {}", execution.getCurrentFlowElement().getId(), e.getMessage());
 
       noErrors = false;
       Throwable rootCause = ExceptionUtils.getRootCause(e);
