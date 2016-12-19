@@ -46,7 +46,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
   }
 
   public synchronized void run() {
-    log.info("{} starting to acquire async jobs due");
+    log.info("starting to acquire async jobs due");
     Thread.currentThread().setName("flowable-acquire-timer-jobs");
 
     final CommandExecutor commandExecutor = asyncExecutor.getProcessEngineConfiguration().getCommandExecutor();
@@ -112,7 +112,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
       }
     }
 
-    log.info("{} stopped async job due acquisition");
+    log.info("stopped async job due acquisition");
   }
 
   public void stop() {
