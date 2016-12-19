@@ -85,7 +85,7 @@ public abstract class AbstractProcessEngineConfiguration {
     	}
     	
     	if (result.isEmpty()) {
-      	logger.info(String.format("No process definitions were found for autodeployment"));
+      	logger.info("No process definitions were found for autodeployment");
     	}
     	
       return result;

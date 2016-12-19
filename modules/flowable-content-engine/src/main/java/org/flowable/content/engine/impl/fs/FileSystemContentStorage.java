@@ -160,7 +160,7 @@ public class FileSystemContentStorage implements ContentStorage {
       }
     }
 
-    return new FileSystemContentObject(contentFile, id.toString(), length);
+    return new FileSystemContentObject(contentFile, id, length);
   }
 
   public void deleteContentObject(String id) {

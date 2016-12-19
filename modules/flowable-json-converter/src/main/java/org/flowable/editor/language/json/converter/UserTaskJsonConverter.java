@@ -249,7 +249,7 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
     }
 
     if (userTask.getPriority() != null) {
-      setPropertyValue(PROPERTY_USERTASK_PRIORITY, userTask.getPriority().toString(), propertiesNode);
+      setPropertyValue(PROPERTY_USERTASK_PRIORITY, userTask.getPriority(), propertiesNode);
     }
 
     if (StringUtils.isNotEmpty(userTask.getFormKey())) {
