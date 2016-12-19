@@ -116,12 +116,16 @@ public class DefaultJobManager implements JobManager {
   public void rescheduleTimerJob(String timerJobId, TimerEventDefinition timerEventDefinition) {
     TimerJobEntityManager jobManager = processEngineConfiguration.getTimerJobEntityManager();
     TimerJobEntity timerJob = jobManager.findById(timerJobId);
-    if(timerJob != null) {
+    if (timerJob != null) {
       processEngineConfiguration.getTimerJobEntityManager().delete(timerJob);
       
       BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(timerJob.getProcessDefinitionId());
       Event eventElement = (Event) bpmnModel.getFlowElement(TimerEventHandler.getActivityIdFromConfiguration(timerJob.getJobHandlerConfiguration()));
-      boolean isInterruptingTimer = (eventElement instanceof BoundaryEvent) ? ((BoundaryEvent)eventElement).isCancelActivity() : false;
+      boolean isInterruptingTimer = false;
+      if (eventElement instanceof BoundaryEvent) {
+        isInterruptingTimer = ((BoundaryEvent) eventElement).isCancelActivity();
+      }
+      
       ExecutionEntity execution = processEngineConfiguration.getExecutionEntityManager().findById(timerJob.getExecutionId());
       TimerJobEntity rescheduledTimerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, isInterruptingTimer, execution, 
               timerJob.getJobHandlerType(), timerJob.getJobHandlerConfiguration());

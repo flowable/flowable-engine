@@ -365,6 +365,8 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
     // startDate variable set to one hour from now
     Calendar calendar = Calendar.getInstance();
     calendar.add(Calendar.HOUR, 1);
+    long startTimeInMillis = calendar.getTime().getTime();
+    
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("startDate", calendar.getTime());
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("rescheduleTimer", variables);
@@ -372,18 +374,24 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
     List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
     assertEquals(1, tasks.size());
     assertEquals("Task 1", tasks.get(0).getName());
-    Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId())
-            .singleResult();
+    Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
     assertNotNull(timerJob);
+    long diffInMilliseconds = Math.abs(startTimeInMillis - timerJob.getDuedate().getTime());
+    assertTrue(diffInMilliseconds < 100);
 
     // reschedule timer for two hours from now
     calendar = Calendar.getInstance();
     calendar.add(Calendar.HOUR, 2);
-    managementService.rescheduleTimerJob(timerJob.getId(), sdf.format(calendar.getTime()), null, null, null, null);
+    managementService.rescheduleTimeDateJob(timerJob.getId(), sdf.format(calendar.getTime()));
+    
+    timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+    diffInMilliseconds = Math.abs(startTimeInMillis - timerJob.getDuedate().getTime());
+    assertTrue(diffInMilliseconds > (59 * 60 * 1000));
     
     // Move clock forward 1 hour from now
     calendar = Calendar.getInstance();
     calendar.add(Calendar.HOUR, 1);
+    calendar.add(Calendar.MINUTE, 5);
     processEngineConfiguration.getClock().setCurrentTime(calendar.getTime());
     JobTestHelper.executeJobExecutorForTime(processEngineConfiguration, 1000, 100);
     
@@ -391,8 +399,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
     tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
     assertEquals(1, tasks.size());
     assertEquals("Task 1", tasks.get(0).getName());
-    timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId())
-            .singleResult();
+    timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
     assertNotNull(timerJob);
     
     // Move clock forward 2 hours from now
@@ -414,6 +421,8 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
     // startDate variable set to one hour from now
     Calendar calendar = Calendar.getInstance();
     calendar.add(Calendar.HOUR, 1);
+    long startTimeInMillis = calendar.getTime().getTime();
+    
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("startDate", calendar.getTime());
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("rescheduleTimer", variables);
@@ -421,19 +430,25 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
     List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
     assertEquals(1, tasks.size());
     assertEquals("Task 1", tasks.get(0).getName());
-    Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId())
-            .singleResult();
+    Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
     assertNotNull(timerJob);
+    long diffInMilliseconds = Math.abs(startTimeInMillis - timerJob.getDuedate().getTime());
+    assertTrue(diffInMilliseconds < 100);
 
     // reschedule timer for two hours from now
     calendar = Calendar.getInstance();
     calendar.add(Calendar.HOUR, 2);
     
-    managementService.rescheduleTimerJob(timerJob.getId(), sdf.format(calendar.getTime()), null, null, null, null);
+    managementService.rescheduleTimeDateJob(timerJob.getId(), sdf.format(calendar.getTime()));
+    
+    timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+    diffInMilliseconds = Math.abs(startTimeInMillis - timerJob.getDuedate().getTime());
+    assertTrue(diffInMilliseconds > (59 * 60 * 1000));
     
     // Move clock forward 1 hour from now
     calendar = Calendar.getInstance();
     calendar.add(Calendar.HOUR, 1);
+    calendar.add(Calendar.MINUTE, 5);
     processEngineConfiguration.getClock().setCurrentTime(calendar.getTime());
     JobTestHelper.executeJobExecutorForTime(processEngineConfiguration, 1000, 100);
     
@@ -441,8 +456,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
     tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
     assertEquals(1, tasks.size());
     assertEquals("Task 1", tasks.get(0).getName());
-    timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId())
-            .singleResult();
+    timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
     assertNotNull(timerJob);
     
     // Move clock forward 2 hours from now
