@@ -103,7 +103,7 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
       		|| eventDefinition instanceof SignalEventDefinition) {
         bpmnParse.getBpmnParserHandlers().parseElement(bpmnParse, eventDefinition);
       } else {
-        logger.warn("Unsupported event definition on start event", eventDefinition);
+        logger.warn("Unsupported event definition on start event {}", eventDefinition);
       }
     }
   }
@@ -142,7 +142,7 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
         scope.setProperty(PROPERTYNAME_INITIAL, startEventActivity);
         startEventActivity.setActivityBehavior(bpmnParse.getActivityBehaviorFactory().createNoneStartEventActivityBehavior(startEvent));
       } else {
-        logger.warn("multiple start events not supported for subprocess", bpmnParse.getCurrentSubProcess().getId());
+        logger.warn("multiple start events not supported for subprocess {}", bpmnParse.getCurrentSubProcess().getId());
       }
     }
 

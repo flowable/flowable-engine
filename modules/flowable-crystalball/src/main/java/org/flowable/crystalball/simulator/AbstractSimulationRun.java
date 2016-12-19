@@ -71,7 +71,7 @@ public abstract class AbstractSimulationRun implements SimulationRun, Simulation
     if (!simulationEnd(event)) {
       log.debug("executing simulation event {}", event);
       executeEvent(event);
-      log.debug("simulation event {event} execution done", event);
+      log.debug("simulation event {} execution done", event);
     } else {
       log.info("Simulation run has ended.");
     }
