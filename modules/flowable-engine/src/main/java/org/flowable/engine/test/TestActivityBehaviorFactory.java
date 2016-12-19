@@ -79,6 +79,7 @@ import org.flowable.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ParallelGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ReceiveTaskActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.RescheduleTimerJobActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ScriptTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ServiceTaskDelegateExpressionActivityBehavior;
@@ -405,7 +406,11 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     return wrappedActivityBehaviorFactory.createBoundaryCompensateEventActivityBehavior(boundaryEvent, compensateEventDefinition, interrupting);
   }
   
-
+  @Override
+  public RescheduleTimerJobActivityBehavior createRescheduleTimerJobActivityBehavior(ServiceTask serviceTask) {
+    return wrappedActivityBehaviorFactory.createRescheduleTimerJobActivityBehavior(serviceTask);
+  }
+  
   // Mock support //////////////////////////////////////////////////////
 
   public void addClassDelegateMock(String originalClassFqn, Class<?> mockClass) {

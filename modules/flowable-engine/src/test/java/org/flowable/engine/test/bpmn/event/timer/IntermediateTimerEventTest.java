@@ -18,8 +18,11 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.TimerJobQuery;
@@ -154,4 +157,55 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
     assertProcessEnded(processInstance.getId());
   }
 
+  @Deployment
+  public void testRescheduleTimer() {
+    // startDate variable set to one hour from now
+    Calendar calendar = Calendar.getInstance();
+    calendar.add(Calendar.HOUR, 1);
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("startDate", calendar.getTime());
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("rescheduleTimer", variables);
+
+    List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+    assertEquals(0, tasks.size());
+    Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId())
+            .singleResult();
+    assertNotNull(timerJob);
+
+    // reschedule timer for two hours from now
+    calendar = Calendar.getInstance();
+    calendar.add(Calendar.HOUR, 2);
+    runtimeService.setVariable(processInstance.getId(), "startDate", calendar.getTime());
+    
+    Execution executionWithMessage = runtimeService.createExecutionQuery()
+            .messageEventSubscriptionName("rescheduleTimerMsg").singleResult();
+    assertNotNull(executionWithMessage);
+    
+    runtimeService.messageEventReceived("rescheduleTimerMsg", executionWithMessage.getId());
+    
+    // Move clock forward 1 hour from now
+    calendar = Calendar.getInstance();
+    calendar.add(Calendar.HOUR, 1);
+    processEngineConfiguration.getClock().setCurrentTime(calendar.getTime());
+    JobTestHelper.executeJobExecutorForTime(processEngineConfiguration, 1000, 100);
+    
+    // Confirm timer has not run
+    tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+    assertEquals(0, tasks.size());
+    timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId())
+            .singleResult();
+    assertNotNull(timerJob);
+    
+    // Move clock forward 2 hours from now
+    calendar = Calendar.getInstance();
+    calendar.add(Calendar.HOUR, 2);
+    processEngineConfiguration.getClock().setCurrentTime(calendar.getTime());
+    waitForJobExecutorToProcessAllJobs(2000, 100);
+    
+    // Confirm timer has run
+    tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+    assertEquals(1, tasks.size());
+    timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertNull(timerJob);
+  }
 }
