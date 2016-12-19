@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.FlowElement;
@@ -107,6 +109,24 @@ public class DefaultJobManager implements JobManager {
     FlowableEventDispatcher eventDispatcher = commandContext.getEventDispatcher();
     if (eventDispatcher.isEnabled()) {
       eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_SCHEDULED, timerJob));
+    }
+  }
+
+  @Override
+  public void rescheduleTimerJob(String timerJobId, TimerEventDefinition timerEventDefinition) {
+    TimerJobEntityManager jobManager = processEngineConfiguration.getTimerJobEntityManager();
+    TimerJobEntity timerJob = jobManager.findById(timerJobId);
+    if(timerJob != null) {
+      processEngineConfiguration.getTimerJobEntityManager().delete(timerJob);
+      
+      BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(timerJob.getProcessDefinitionId());
+      Event eventElement = (Event) bpmnModel.getFlowElement(TimerEventHandler.getActivityIdFromConfiguration(timerJob.getJobHandlerConfiguration()));
+      boolean isInterruptingTimer = (eventElement instanceof BoundaryEvent) ? ((BoundaryEvent)eventElement).isCancelActivity() : false;
+      ExecutionEntity execution = processEngineConfiguration.getExecutionEntityManager().findById(timerJob.getExecutionId());
+      TimerJobEntity rescheduledTimerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, isInterruptingTimer, execution, 
+              timerJob.getJobHandlerType(), timerJob.getJobHandlerConfiguration());
+      
+      scheduleTimerJob(rescheduledTimerJob);
     }
   }
   
