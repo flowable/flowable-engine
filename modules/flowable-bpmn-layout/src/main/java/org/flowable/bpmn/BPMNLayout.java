@@ -94,7 +94,7 @@ public class BPMNLayout extends mxGraphLayout {
   }
 
   public mxGraph getGraph() {
-    return (mxGraph) graph;
+    return graph;
   }
 
   /**

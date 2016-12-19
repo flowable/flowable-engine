@@ -183,7 +183,7 @@ public void recordProcessInstanceStart(ExecutionEntity processInstance) {
 public void recordSubProcessInstanceStart(ExecutionEntity parentExecution, ExecutionEntity subProcessInstance) {
     if(isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
       
-      HistoricProcessInstanceEntity historicProcessInstance = new HistoricProcessInstanceEntity((ExecutionEntity) subProcessInstance);
+      HistoricProcessInstanceEntity historicProcessInstance = new HistoricProcessInstanceEntity(subProcessInstance);
      
       ActivityImpl initialActivity = subProcessInstance.getActivity();
       // Fix for ACT-1728: startActivityId not initialized with subprocess-instance
@@ -363,7 +363,7 @@ public void recordActivityStart(ExecutionEntity executionEntity) {
     }
 
     if (execution.getParentId() != null) {
-      return findActivityInstance((ExecutionEntity) execution.getParent(), activityId, checkPersistentStore);
+      return findActivityInstance(execution.getParent(), activityId, checkPersistentStore);
     }
 
     return null;

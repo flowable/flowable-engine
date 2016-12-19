@@ -71,10 +71,10 @@ public class CustomExtensionsConverterTest extends AbstractConverterTest {
 
     List<FieldExtension> fields = serviceTask.getFieldExtensions();
     assertEquals(2, fields.size());
-    FieldExtension field = (FieldExtension) fields.get(0);
+    FieldExtension field = fields.get(0);
     assertEquals("testField", field.getFieldName());
     assertEquals("test", field.getStringValue());
-    field = (FieldExtension) fields.get(1);
+    field = fields.get(1);
     assertEquals("testField2", field.getFieldName());
     assertEquals("${test}", field.getExpression());
 
@@ -95,19 +95,19 @@ public class CustomExtensionsConverterTest extends AbstractConverterTest {
 
   protected void validateExecutionListeners(List<FlowableListener> listeners) {
     assertEquals(3, listeners.size());
-    FlowableListener listener = (FlowableListener) listeners.get(0);
+    FlowableListener listener = listeners.get(0);
     assertTrue(ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(listener.getImplementationType()));
     assertEquals("org.test.TestClass", listener.getImplementation());
     assertEquals("start", listener.getEvent());
     assertEquals("before-commit", listener.getOnTransaction());
     assertEquals("org.test.TestResolverClass", listener.getCustomPropertiesResolverImplementation());
-    listener = (FlowableListener) listeners.get(1);
+    listener = listeners.get(1);
     assertTrue(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equals(listener.getImplementationType()));
     assertEquals("${testExpression}", listener.getImplementation());
     assertEquals("end", listener.getEvent());
     assertEquals("committed", listener.getOnTransaction());
     assertEquals("${testResolverExpression}", listener.getCustomPropertiesResolverImplementation());
-    listener = (FlowableListener) listeners.get(2);
+    listener = listeners.get(2);
     assertTrue(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(listener.getImplementationType()));
     assertEquals("${delegateExpression}", listener.getImplementation());
     assertEquals("start", listener.getEvent());

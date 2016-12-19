@@ -117,7 +117,7 @@ public class EventSubscriptionEntityManager extends AbstractManager {
     // add events created in this command (not visible yet in query)
     for (SignalEventSubscriptionEntity entity : createdSignalSubscriptions) {
       if(executionId.equals(entity.getExecutionId())) {
-        selectList.add((SignalEventSubscriptionEntity) entity);        
+        selectList.add(entity);
       }
     }
     
@@ -136,7 +136,7 @@ public class EventSubscriptionEntityManager extends AbstractManager {
     for (SignalEventSubscriptionEntity entity : createdSignalSubscriptions) {
       if(executionId.equals(entity.getExecutionId())
          && name.equals(entity.getEventName())) {
-        selectList.add((SignalEventSubscriptionEntity) entity);        
+        selectList.add(entity);
       }
     }
     

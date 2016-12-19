@@ -174,7 +174,7 @@ public class ScopeUtil {
       eventScopeExecution.setActive(false);      
       eventScopeExecution.setConcurrent(false);
       eventScopeExecution.setEventScope(true);      
-      eventScopeExecution.setActivity((ActivityImpl) execution.getActivity());
+      eventScopeExecution.setActivity(execution.getActivity());
       
       execution.setConcurrent(false);
       

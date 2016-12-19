@@ -119,7 +119,7 @@ public class HistoricVariableInstanceEntityManagerImpl extends AbstractEntityMan
     if (getHistoryManager().isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
       List<HistoricVariableInstanceEntity> historicProcessVariables = historicVariableInstanceDataManager.findHistoricVariableInstancesByTaskId(taskId);
       for (HistoricVariableInstanceEntity historicProcessVariable : historicProcessVariables) {
-        delete((HistoricVariableInstanceEntity) historicProcessVariable);
+        delete(historicProcessVariable);
       }
     }
   }

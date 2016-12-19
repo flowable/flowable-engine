@@ -77,7 +77,7 @@ public class FlowableExtension implements Extension {
     Iterator<ProcessEngineLookup> serviceIterator = processEngineServiceLoader.iterator();
     List<ProcessEngineLookup> discoveredLookups = new ArrayList<ProcessEngineLookup>();
     while (serviceIterator.hasNext()) {
-      ProcessEngineLookup serviceInstance = (ProcessEngineLookup) serviceIterator.next();
+      ProcessEngineLookup serviceInstance = serviceIterator.next();
       discoveredLookups.add(serviceInstance);
     }
 

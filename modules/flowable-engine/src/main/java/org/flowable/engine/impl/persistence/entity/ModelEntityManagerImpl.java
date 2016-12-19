@@ -48,8 +48,8 @@ public class ModelEntityManagerImpl extends AbstractEntityManager<ModelEntity> i
 
   @Override
   public void insert(ModelEntity model) {
-    ((ModelEntity) model).setCreateTime(getClock().getCurrentTime());
-    ((ModelEntity) model).setLastUpdateTime(getClock().getCurrentTime());
+    model.setCreateTime(getClock().getCurrentTime());
+    model.setLastUpdateTime(getClock().getCurrentTime());
     
     super.insert(model);
   }

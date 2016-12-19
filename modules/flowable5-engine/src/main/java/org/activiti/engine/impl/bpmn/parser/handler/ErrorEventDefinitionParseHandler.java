@@ -39,7 +39,7 @@ public class ErrorEventDefinitionParseHandler extends AbstractBpmnParseHandler<E
   
   protected void executeParse(BpmnParse bpmnParse, ErrorEventDefinition eventDefinition) {
 
-    ErrorEventDefinition modelErrorEvent = (ErrorEventDefinition) eventDefinition;
+    ErrorEventDefinition modelErrorEvent = eventDefinition;
     if (bpmnParse.getBpmnModel().containsErrorRef(modelErrorEvent.getErrorCode())) {
       String errorCode = bpmnParse.getBpmnModel().getErrors().get(modelErrorEvent.getErrorCode());
       modelErrorEvent.setErrorCode(errorCode);
