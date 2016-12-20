@@ -44,15 +44,25 @@ import java.lang.annotation.RetentionPolicy;
  *     // a deployment will be available in the engine repository
  *     // containing the three resources
  *   }
+ *
+ *   &#64;Deployment(resources = { "org/example/processOne.bpmn20.xml" },
+ *     tenantId = "example")
+ *   public void testForATenantDeploymentWithASingleResource() {
+ *     // a deployment will be available in the engine repository
+ *     // containing the single resource for the specified tenant
+ *   }
  * </pre>
  * 
  * @author Dave Syer
  * @author Tom Baeyens
+ * @author Tim Stephenson
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Deployment {
 
   /** Specify resources that make up the process definition. */
   public String[] resources() default {};
-
+  
+  /** Specify tenantId to deploy for */
+  public String tenantId() default "";
 }
