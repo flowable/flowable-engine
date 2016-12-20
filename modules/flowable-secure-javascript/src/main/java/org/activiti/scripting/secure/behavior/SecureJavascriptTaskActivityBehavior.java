@@ -12,9 +12,13 @@
  */
 package org.activiti.scripting.secure.behavior;
 
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.impl.bpmn.behavior.ScriptTaskActivityBehavior;
+import org.activiti.engine.impl.bpmn.helper.ErrorPropagation;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti.scripting.secure.impl.SecureJavascriptUtil;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
  * @author Joram Barrez
@@ -28,7 +32,26 @@ public class SecureJavascriptTaskActivityBehavior extends ScriptTaskActivityBeha
 
     @Override
     public void execute(ActivityExecution execution) throws Exception {
-      SecureJavascriptUtil.evaluateScript(execution, script);
+      boolean noErrors = true;
+      try {
+        Object result = SecureJavascriptUtil.evaluateScript(execution, script);
+
+        if (resultVariable != null) {
+          execution.setVariable(resultVariable, result);
+        }
+
+      } catch (ActivitiException e) {
+        noErrors = false;
+        Throwable rootCause = ExceptionUtils.getRootCause(e);
+        if (rootCause instanceof BpmnError) {
+          ErrorPropagation.propagateError((BpmnError) rootCause, execution);
+        } else {
+          throw e;
+        }
+      }
+      if (noErrors) {
+        leave(execution);
+      }
     }
 
 }

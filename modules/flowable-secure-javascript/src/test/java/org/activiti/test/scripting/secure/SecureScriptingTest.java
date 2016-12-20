@@ -12,13 +12,14 @@
  */
 package org.activiti.test.scripting.secure;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -96,6 +97,9 @@ public class SecureScriptingTest extends SecureScriptingBaseTest {
     Assert.assertTrue(c instanceof Number);
     Number cNumber = (Number) c;
     Assert.assertEquals(579, cNumber.intValue());
+    
+    List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+    Assert.assertEquals(1, tasks.size());
   }
 
   @Test
