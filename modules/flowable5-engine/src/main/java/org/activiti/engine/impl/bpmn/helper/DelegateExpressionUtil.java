@@ -39,9 +39,9 @@ public class DelegateExpressionUtil {
     if (fieldDeclarations != null && fieldDeclarations.size() > 0) {
       
       DelegateExpressionFieldInjectionMode injectionMode = Context.getProcessEngineConfiguration().getDelegateExpressionFieldInjectionMode();
-      if (injectionMode.equals(DelegateExpressionFieldInjectionMode.COMPATIBILITY)) {
+      if (injectionMode == DelegateExpressionFieldInjectionMode.COMPATIBILITY) {
         ClassDelegate.applyFieldDeclaration(fieldDeclarations, delegate, true);
-      } else if (injectionMode.equals(DelegateExpressionFieldInjectionMode.MIXED)) {
+      } else if (injectionMode == DelegateExpressionFieldInjectionMode.MIXED) {
         ClassDelegate.applyFieldDeclaration(fieldDeclarations, delegate, false);
       }
       

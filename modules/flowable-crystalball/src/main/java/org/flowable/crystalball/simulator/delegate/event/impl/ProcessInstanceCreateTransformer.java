@@ -42,7 +42,7 @@ public class ProcessInstanceCreateTransformer extends Flowable2SimulationEventFu
 
   @Override
   public SimulationEvent apply(FlowableEvent event) {
-    if (FlowableEngineEventType.ENTITY_INITIALIZED.equals(event.getType()) && (event instanceof FlowableEntityEvent) && ((FlowableEntityEvent) event).getEntity() instanceof ProcessInstance
+    if (FlowableEngineEventType.ENTITY_INITIALIZED == event.getType() && (event instanceof FlowableEntityEvent) && ((FlowableEntityEvent) event).getEntity() instanceof ProcessInstance
         && ((ExecutionEntity) ((FlowableEntityEvent) event).getEntity()).isProcessInstanceType()) {
 
       ProcessInstance processInstance = (ProcessInstance) ((FlowableEntityEvent) event).getEntity();

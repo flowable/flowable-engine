@@ -611,7 +611,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         // adding to the list.
         assertNotNull(((ExecutionEntity) ((FlowableEntityEvent) event).getEntity()).getId());
         eventsReceived.add(event);
-      } else if (FlowableEngineEventType.PROCESS_CANCELLED.equals(event.getType()) || FlowableEngineEventType.ACTIVITY_CANCELLED.equals(event.getType())) {
+      } else if (FlowableEngineEventType.PROCESS_CANCELLED == event.getType() || FlowableEngineEventType.ACTIVITY_CANCELLED == event.getType()) {
         eventsReceived.add(event);
       }
     }
@@ -628,7 +628,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
       List<FlowableEvent> filteredEvents = new ArrayList<FlowableEvent>();
       List<FlowableEvent> eventsReceived = listener.getEventsReceived();
       for (FlowableEvent eventReceived : eventsReceived) {
-        if (eventType.equals(eventReceived.getType())) {
+        if (eventType == eventReceived.getType()) {
           filteredEvents.add(eventReceived);
         }
       }

@@ -263,7 +263,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
     int timerCancelledCount = 0;
     List<FlowableEvent> eventsReceived = listener.getEventsReceived();
     for (FlowableEvent eventReceived : eventsReceived) {
-      if (eventType.equals(eventReceived.getType())) {
+      if (eventType == eventReceived.getType()) {
         timerCancelledCount++;
       }
     }
@@ -274,7 +274,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
     List<FlowableEvent> eventsReceived = listener.getEventsReceived();
     List<FlowableEngineEvent> filteredEvents = new ArrayList<>();
     for (FlowableEvent eventReceived : eventsReceived) {
-      if (eventType.equals(eventReceived.getType())) {
+      if (eventType == eventReceived.getType()) {
         filteredEvents.add((FlowableEngineEvent) eventReceived);
       }
     }
@@ -428,14 +428,14 @@ public class JobEventsTest extends PluggableFlowableTestCase {
     // Process Cancelled event should not be sent for the subprocess
     List<FlowableEvent> eventsReceived = activitiEventListener.getEventsReceived();
     for (FlowableEvent eventReceived : eventsReceived) {
-      if (FlowableEngineEventType.PROCESS_CANCELLED.equals(eventReceived.getType())) {
+      if (FlowableEngineEventType.PROCESS_CANCELLED == eventReceived.getType()) {
         fail("Should not have received PROCESS_CANCELLED event");
       }
     }
 
     // validate the activityType string
     for (FlowableEvent eventReceived : eventsReceived) {
-      if (FlowableEngineEventType.ACTIVITY_CANCELLED.equals(eventReceived.getType())) {
+      if (FlowableEngineEventType.ACTIVITY_CANCELLED == eventReceived.getType()) {
         FlowableActivityEvent event = (FlowableActivityEvent) eventReceived;
         String activityType = event.getActivityType();
         if (!"userTask".equals(activityType) && (!"subProcess".equals(activityType)) && (!"endEvent".equals(activityType))) {
