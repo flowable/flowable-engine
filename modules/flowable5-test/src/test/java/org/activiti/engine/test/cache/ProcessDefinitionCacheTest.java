@@ -64,7 +64,7 @@ public class ProcessDefinitionCacheTest extends PvmTestCase {
     standaloneProcessEngineConfiguration.setJdbcUrl("jdbc:h2:mem:activiti-reboot-test;DB_CLOSE_DELAY=1000");
     standaloneProcessEngineConfiguration.setAsyncExecutorActivate(false);
     standaloneProcessEngineConfiguration.setFlowable5CompatibilityEnabled(true);
-    ProcessEngine processEngine = standaloneProcessEngineConfiguration.buildProcessEngine();;
+    ProcessEngine processEngine = standaloneProcessEngineConfiguration.buildProcessEngine();
      
     processEngine.getRepositoryService()
         .createDeployment()
