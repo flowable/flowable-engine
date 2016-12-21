@@ -185,9 +185,9 @@ public class BpmnDeploymentHelper  {
         String expression = iterator.next();
         IdentityLinkEntity identityLink = commandContext.getIdentityLinkEntityManager().create();
         identityLink.setProcessDef(processDefinition);
-        if (expressionType.equals(ExpressionType.USER)) {
+        if (expressionType == ExpressionType.USER) {
           identityLink.setUserId(expression);
-        } else if (expressionType.equals(ExpressionType.GROUP)) {
+        } else if (expressionType == ExpressionType.GROUP) {
           identityLink.setGroupId(expression);
         }
         identityLink.setType(IdentityLinkType.CANDIDATE);

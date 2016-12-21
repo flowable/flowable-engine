@@ -178,7 +178,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
   @SuppressWarnings("rawtypes")
   public void complete(Map variablesMap, boolean localScope) {
   	
-  	if (getDelegationState() != null && getDelegationState().equals(DelegationState.PENDING)) {
+  	if (getDelegationState() != null && getDelegationState() == DelegationState.PENDING) {
   		throw new ActivitiException("A delegated task cannot be completed, but should be resolved instead.");
   	}
   	

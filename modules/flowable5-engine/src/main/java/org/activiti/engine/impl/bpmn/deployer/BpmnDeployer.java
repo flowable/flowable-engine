@@ -659,9 +659,9 @@ public class BpmnDeployer implements Deployer {
         Expression expr = iterator.next();
         IdentityLinkEntity identityLink = new IdentityLinkEntity();
         identityLink.setProcessDef(processDefinition);
-        if (exprType.equals(ExprType.USER)) {
+        if (exprType == ExprType.USER) {
            identityLink.setUserId(expr.toString());
-        } else if (exprType.equals(ExprType.GROUP)) {
+        } else if (exprType == ExprType.GROUP) {
           identityLink.setGroupId(expr.toString());
         }
         identityLink.setType(IdentityLinkType.CANDIDATE);

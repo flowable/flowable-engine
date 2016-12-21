@@ -37,7 +37,7 @@ public class TaskHelper {
     Map<String, Object> transientVariables, boolean localScope, CommandContext commandContext) {
     // Task complete logic
     
-    if (taskEntity.getDelegationState() != null && taskEntity.getDelegationState().equals(DelegationState.PENDING)) {
+    if (taskEntity.getDelegationState() != null && taskEntity.getDelegationState() == DelegationState.PENDING) {
       throw new FlowableException("A delegated task cannot be completed, but should be resolved instead.");
     }
 

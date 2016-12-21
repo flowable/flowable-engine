@@ -201,7 +201,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     
   	if (nullHandlingOnOrder != null) {
   		
-  		if (nullHandlingOnOrder.equals(NullHandlingOnOrder.NULLS_FIRST)) {
+  		if (nullHandlingOnOrder == NullHandlingOnOrder.NULLS_FIRST) {
   			
   			if (ProcessEngineConfigurationImpl.DATABASE_TYPE_H2.equals(databaseType)
             || ProcessEngineConfigurationImpl.DATABASE_TYPE_HSQL.equals(databaseType)
@@ -218,7 +218,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     		}
     		
   			
-      } else if (nullHandlingOnOrder.equals(NullHandlingOnOrder.NULLS_LAST)) {
+      } else if (nullHandlingOnOrder == NullHandlingOnOrder.NULLS_LAST) {
       	
   			if (ProcessEngineConfigurationImpl.DATABASE_TYPE_H2.equals(databaseType)
   			    || ProcessEngineConfigurationImpl.DATABASE_TYPE_HSQL.equals(databaseType)

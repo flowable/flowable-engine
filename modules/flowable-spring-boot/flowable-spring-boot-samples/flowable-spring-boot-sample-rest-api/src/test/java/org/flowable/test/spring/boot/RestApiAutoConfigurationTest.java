@@ -103,7 +103,7 @@ public class RestApiAutoConfigurationTest {
 
         @Override
         public void handleError(ClientHttpResponse clientHttpResponse) throws IOException {
-          if (clientHttpResponse.getStatusCode().equals(HttpStatus.UNAUTHORIZED))
+          if (clientHttpResponse.getStatusCode() == HttpStatus.UNAUTHORIZED)
             received401.set(true);
         }
     });

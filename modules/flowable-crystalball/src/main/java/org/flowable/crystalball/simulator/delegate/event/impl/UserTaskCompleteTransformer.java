@@ -37,7 +37,7 @@ public class UserTaskCompleteTransformer extends Flowable2SimulationEventFunctio
 
   @Override
   public SimulationEvent apply(FlowableEvent event) {
-    if (FlowableEngineEventType.TASK_COMPLETED.equals(event.getType())) {
+    if (FlowableEngineEventType.TASK_COMPLETED == event.getType()) {
       Task task = (Task) ((FlowableEntityEvent) event).getEntity();
 
       Map<String, Object> properties = new HashMap<String, Object>();

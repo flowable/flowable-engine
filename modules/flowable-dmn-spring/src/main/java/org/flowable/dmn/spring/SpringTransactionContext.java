@@ -59,7 +59,7 @@ public class SpringTransactionContext implements TransactionContext {
   }
 
   public void addTransactionListener(final TransactionState transactionState, final TransactionListener transactionListener) {
-    if (transactionState.equals(TransactionState.COMMITTING)) {
+    if (transactionState == TransactionState.COMMITTING) {
 
       TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
         @Override
@@ -68,7 +68,7 @@ public class SpringTransactionContext implements TransactionContext {
         }
       });
 
-    } else if (transactionState.equals(TransactionState.COMMITTED)) {
+    } else if (transactionState == TransactionState.COMMITTED) {
 
       TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
         @Override
@@ -77,7 +77,7 @@ public class SpringTransactionContext implements TransactionContext {
         }
       });
 
-    } else if (transactionState.equals(TransactionState.ROLLINGBACK)) {
+    } else if (transactionState == TransactionState.ROLLINGBACK) {
 
       TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
         @Override
@@ -86,7 +86,7 @@ public class SpringTransactionContext implements TransactionContext {
         }
       });
 
-    } else if (transactionState.equals(TransactionState.ROLLED_BACK)) {
+    } else if (transactionState == TransactionState.ROLLED_BACK) {
 
       TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
         @Override

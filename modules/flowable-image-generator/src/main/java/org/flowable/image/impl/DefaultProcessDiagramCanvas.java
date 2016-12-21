@@ -544,11 +544,11 @@ public class DefaultProcessDiagramCanvas {
       drawConditionalSequenceFlowIndicator(line, scaleFactor);
     }
   
-    if (associationDirection.equals(AssociationDirection.ONE) || associationDirection.equals(AssociationDirection.BOTH)) {
+    if (associationDirection == AssociationDirection.ONE || associationDirection == AssociationDirection.BOTH) {
       Line2D.Double line = new Line2D.Double(xPoints[xPoints.length-2], yPoints[xPoints.length-2], xPoints[xPoints.length-1], yPoints[xPoints.length-1]);
       drawArrowHead(line, scaleFactor);
     }
-    if (associationDirection.equals(AssociationDirection.BOTH)) {
+    if (associationDirection == AssociationDirection.BOTH) {
       Line2D.Double line = new Line2D.Double(xPoints[1], yPoints[1], xPoints[0], yPoints[0]);
       drawArrowHead(line, scaleFactor);
     }
@@ -1221,10 +1221,10 @@ public class DefaultProcessDiagramCanvas {
    * @return Shape
    */
   private static Shape createShape(SHAPE_TYPE shapeType, GraphicInfo graphicInfo) {
-    if (SHAPE_TYPE.Rectangle.equals(shapeType)) {
+    if (SHAPE_TYPE.Rectangle == shapeType) {
       // source is rectangle
       return new Rectangle2D.Double(graphicInfo.getX(), graphicInfo.getY(), graphicInfo.getWidth(), graphicInfo.getHeight());       
-    } else if (SHAPE_TYPE.Rhombus.equals(shapeType)) {
+    } else if (SHAPE_TYPE.Rhombus == shapeType) {
       // source is rhombus
       Path2D.Double rhombus = new Path2D.Double();
       rhombus.moveTo(graphicInfo.getX(), graphicInfo.getY() + graphicInfo.getHeight() / 2);
@@ -1234,7 +1234,7 @@ public class DefaultProcessDiagramCanvas {
       rhombus.lineTo(graphicInfo.getX(), graphicInfo.getY() + graphicInfo.getHeight() / 2);
       rhombus.closePath();
       return rhombus;
-    } else if (SHAPE_TYPE.Ellipse.equals(shapeType)) {
+    } else if (SHAPE_TYPE.Ellipse == shapeType) {
       // source is ellipse
       return new Ellipse2D.Double(graphicInfo.getX(), graphicInfo.getY(), graphicInfo.getWidth(), graphicInfo.getHeight());
     } else {

@@ -37,7 +37,7 @@ public class DeploymentCreateTransformer extends Flowable2SimulationEventFunctio
 
   @Override
   public SimulationEvent apply(FlowableEvent event) {
-    if (FlowableEngineEventType.ENTITY_CREATED.equals(event.getType()) && (event instanceof FlowableEntityEvent) && ((FlowableEntityEvent) event).getEntity() instanceof DeploymentEntity) {
+    if (FlowableEngineEventType.ENTITY_CREATED == event.getType() && (event instanceof FlowableEntityEvent) && ((FlowableEntityEvent) event).getEntity() instanceof DeploymentEntity) {
 
       DeploymentEntity deploymentEntity = (DeploymentEntity) ((FlowableEntityEvent) event).getEntity();
 

@@ -92,16 +92,16 @@ public class JtaTransactionContext implements TransactionContext {
     }
 
     public void beforeCompletion() {
-      if(TransactionState.COMMITTING.equals(transactionState) 
-         || TransactionState.ROLLINGBACK.equals(transactionState)) {
+      if(TransactionState.COMMITTING == transactionState
+         || TransactionState.ROLLINGBACK == transactionState) {
         transactionListener.execute(commandContext);
       }
     }
 
     public void afterCompletion(int status) {
-      if(Status.STATUS_ROLLEDBACK == status && TransactionState.ROLLED_BACK.equals(transactionState)) {
+      if(Status.STATUS_ROLLEDBACK == status && TransactionState.ROLLED_BACK == transactionState) {
         transactionListener.execute(commandContext);
-      } else if(Status.STATUS_COMMITTED == status && TransactionState.COMMITTED.equals(transactionState)) {
+      } else if(Status.STATUS_COMMITTED == status && TransactionState.COMMITTED == transactionState) {
         transactionListener.execute(commandContext);
       }
     }
