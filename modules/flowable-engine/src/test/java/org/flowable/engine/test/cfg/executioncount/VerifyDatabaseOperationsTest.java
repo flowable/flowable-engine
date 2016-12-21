@@ -76,8 +76,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     processEngineConfiguration.setEnableProcessDefinitionInfoCache(oldenableProcessDefinitionInfoCacheValue);
     ((DefaultHistoryManager) processEngineConfiguration.getHistoryManager()).setHistoryLevel(oldHistoryLevel);
     
-    ((CommandExecutorImpl) processEngineConfiguration.getCommandExecutor()).setFirst(oldFirstCommandInterceptor);;
-    
+    ((CommandExecutorImpl) processEngineConfiguration.getCommandExecutor()).setFirst(oldFirstCommandInterceptor);
+
     processEngineConfiguration.addSessionFactory(oldDbSqlSessionFactory);
     
     // Validate (cause this tended to be screwed up)

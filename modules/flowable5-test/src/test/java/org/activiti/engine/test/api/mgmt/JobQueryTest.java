@@ -170,7 +170,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
   
   public void testQueryByExecutable() {
     processEngineConfiguration.getClock().setCurrentTime(new Date(timerThreeFireTime.getTime() + ONE_SECOND)); // all jobs should be executable at t3 + 1hour.1second
-    TimerJobQuery query = managementService.createTimerJobQuery().executable();;
+    TimerJobQuery query = managementService.createTimerJobQuery().executable();
     verifyQueryResults(query, 3);
     
     // Setting retries of one job to 0, makes it non-executable
