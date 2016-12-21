@@ -52,7 +52,7 @@ public abstract class IdmEngines {
    * <code>flowable-idm-context.xml</code> (Spring style
    * configuration).
    */
-  public synchronized static void init() {
+  public static synchronized void init() {
     if (!isInitialized()) {
       if (idmEngines == null) {
         // Create new map to store idm engines if current map is null
@@ -232,7 +232,7 @@ public abstract class IdmEngines {
   /**
    * closes all idm engines. This method should be called when the server shuts down.
    */
-  public synchronized static void destroy() {
+  public static synchronized void destroy() {
     if (isInitialized()) {
       Map<String, IdmEngine> engines = new HashMap<String, IdmEngine>(idmEngines);
       idmEngines = new HashMap<String, IdmEngine>();

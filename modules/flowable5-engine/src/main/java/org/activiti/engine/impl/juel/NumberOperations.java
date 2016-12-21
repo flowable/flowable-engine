@@ -26,9 +26,9 @@ import org.activiti.engine.impl.javax.el.ELException;
  * @author Christoph Beck
  */
 public class NumberOperations {
-	private final static Long LONG_ZERO = Long.valueOf(0L);
+	private static final Long LONG_ZERO = Long.valueOf(0L);
 
-	private final static boolean isDotEe(String value) {
+	private static final boolean isDotEe(String value) {
 		int length = value.length();
 		for (int i = 0; i < length; i++) {
 			switch (value.charAt(i)) {
@@ -40,7 +40,7 @@ public class NumberOperations {
 		return false;
 	}
 
-	private final static boolean isDotEe(Object value) {
+	private static final boolean isDotEe(Object value) {
 		return value instanceof String && isDotEe((String)value);
 	}
 

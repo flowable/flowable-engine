@@ -25,7 +25,7 @@ import org.flowable.engine.impl.persistence.entity.JobEntity;
  */
 public class ProcessEventJobHandler implements JobHandler {
 
-  public final static String TYPE = "event";
+  public static final String TYPE = "event";
 
   public String getType() {
     return TYPE;

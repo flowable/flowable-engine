@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("serial")
 public class DefaultContextAssociationManager implements ContextAssociationManager, Serializable {
 
-  private final static Logger log = LoggerFactory.getLogger(DefaultContextAssociationManager.class);
+  private static final Logger log = LoggerFactory.getLogger(DefaultContextAssociationManager.class);
 
   protected static class ScopedAssociation {
 

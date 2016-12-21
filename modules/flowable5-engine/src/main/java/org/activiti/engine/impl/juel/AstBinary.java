@@ -22,7 +22,7 @@ public class AstBinary extends AstRightValue {
 	public interface Operator {
 		public Object eval(Bindings bindings, ELContext context, AstNode left, AstNode right);		
 	}
-	public static abstract class SimpleOperator implements Operator {
+	public abstract static class SimpleOperator implements Operator {
 		public Object eval(Bindings bindings, ELContext context, AstNode left, AstNode right) {
 			return apply(bindings, left.eval(bindings, context), right.eval(bindings, context));
 		}

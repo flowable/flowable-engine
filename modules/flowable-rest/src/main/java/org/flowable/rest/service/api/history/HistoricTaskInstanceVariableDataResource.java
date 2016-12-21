@@ -53,13 +53,14 @@ public class HistoricTaskInstanceVariableDataResource {
   @Autowired
   protected HistoryService historyService;
 
-  @ApiOperation(value = "Get the binary data for a historic task instance variable", tags = { "History" }, nickname = "getHistoricTaskInstanceVariableData",
-          notes = "The response body contains the binary value of the variable. When the variable is of type binary, the content-type of the response is set to application/octet-stream, regardless of the content of the variable or the request accept-type header. In case of serializable, application/x-java-serialized-object is used as content-type.")
+  @ResponseBody
+  @RequestMapping(value = "/history/historic-task-instances/{taskId}/variables/{variableName}/data", method = RequestMethod.GET)
   @ApiResponses(value = {
           @ApiResponse(code = 200, message = "Indicates the task instance was found and the requested variable data is returned."),
-          @ApiResponse(code = 404, message = "Indicates the requested task instance was not found or the process instance doesn’t have a variable with the given name or the variable doesn’t have a binary stream available. Status message provides additional information.") })
-  @RequestMapping(value = "/history/historic-task-instances/{taskId}/variables/{variableName}/data", method = RequestMethod.GET)
-  public @ResponseBody
+          @ApiResponse(code = 404, message = "Indicates the requested task instance was not found or the process instance doesn’t have a variable with the given name or the variable doesn’t have a binary stream available. Status message provides additional information.")})
+  @ApiOperation(value = "Get the binary data for a historic task instance variable", tags = {"History"}, nickname = "getHistoricTaskInstanceVariableData",
+          notes = "The response body contains the binary value of the variable. When the variable is of type binary, the content-type of the response is set to application/octet-stream, regardless of the content of the variable or the request accept-type header. In case of serializable, application/x-java-serialized-object is used as content-type.")
+  public
   byte[] getVariableData(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName, @RequestParam(value = "scope", required = false) String scope,
       HttpServletRequest request, HttpServletResponse response) {
 

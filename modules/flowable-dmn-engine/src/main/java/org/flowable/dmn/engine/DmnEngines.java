@@ -52,7 +52,7 @@ public abstract class DmnEngines {
    * resources <code>flowable.dmn.cfg.xml</code> and for resources
    * <code>flowable-dmn-context.xml</code> (Spring style configuration).
    */
-  public synchronized static void init() {
+  public static synchronized void init() {
     if (!isInitialized()) {
       if (dmnEngines == null) {
         // Create new map to store dmn engines if current map is null
@@ -236,7 +236,7 @@ public abstract class DmnEngines {
    * closes all dmn engines. This method should be called when the server shuts
    * down.
    */
-  public synchronized static void destroy() {
+  public static synchronized void destroy() {
     if (isInitialized()) {
       Map<String, DmnEngine> engines = new HashMap<String, DmnEngine>(dmnEngines);
       dmnEngines = new HashMap<String, DmnEngine>();

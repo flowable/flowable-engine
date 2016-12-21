@@ -25,8 +25,8 @@ import java.util.Set;
 import org.activiti.engine.impl.javax.el.ELException;
 
 public class BooleanOperations {
-	private final static Set<Class<? extends Number>> SIMPLE_INTEGER_TYPES = new HashSet<Class<? extends Number>>();
-	private final static Set<Class<? extends Number>> SIMPLE_FLOAT_TYPES = new HashSet<Class<? extends Number>>();
+	private static final Set<Class<? extends Number>> SIMPLE_INTEGER_TYPES = new HashSet<Class<? extends Number>>();
+	private static final Set<Class<? extends Number>> SIMPLE_FLOAT_TYPES = new HashSet<Class<? extends Number>>();
 	
 	static {
 		SIMPLE_INTEGER_TYPES.add(Byte.class);

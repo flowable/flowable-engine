@@ -47,8 +47,9 @@ public class ServerConfigsResource {
   @Autowired
   protected Environment env;
 
+  @ResponseBody
   @RequestMapping(value = "/rest/server-configs", method = RequestMethod.GET, produces = "application/json")
-  public @ResponseBody List<ServerConfigRepresentation> getServers() {
+  public List<ServerConfigRepresentation> getServers() {
     return serverConfigService.findAll();
   }
 

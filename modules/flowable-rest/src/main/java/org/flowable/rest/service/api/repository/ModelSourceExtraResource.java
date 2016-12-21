@@ -38,15 +38,16 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 @Api(tags = { "Models" }, description = "Manage Models")
 public class ModelSourceExtraResource extends BaseModelSourceResource {
 
-  @ApiOperation(value = "Get the extra editor source for a model", tags = {"Models"},
-          notes = "Response body contains the model’s raw editor source. The response’s content-type is set to application/octet-stream, regardless of the content of the source."
-  )
+  @ResponseBody
+  @RequestMapping(value = "/repository/models/{modelId}/source-extra", method = RequestMethod.GET)
   @ApiResponses(value = {
           @ApiResponse(code = 200, message = "Indicates the model was found and source is returned."),
           @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
   })
-  @RequestMapping(value = "/repository/models/{modelId}/source-extra", method = RequestMethod.GET)
-  protected @ResponseBody
+  @ApiOperation(value = "Get the extra editor source for a model", tags = {"Models"},
+          notes = "Response body contains the model’s raw editor source. The response’s content-type is set to application/octet-stream, regardless of the content of the source."
+  )
+  protected
   byte[] getModelBytes(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletResponse response) {
     byte[] editorSource = repositoryService.getModelEditorSourceExtra(modelId);
     if (editorSource == null) {
