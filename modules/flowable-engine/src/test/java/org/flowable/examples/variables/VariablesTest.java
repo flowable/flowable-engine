@@ -1216,9 +1216,7 @@ class CustomType {
       return false;
 
     CustomType other = (CustomType) obj;
-    if (!Arrays.equals(value, other.value))
-      return false;
-    return true;
+    return Arrays.equals(value, other.value);
   }
 
 }

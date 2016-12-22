@@ -262,19 +262,16 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
   }
   
   protected boolean skipAuthenticationCheck(HttpServletRequest request) {
-    if (request.getRequestURI().endsWith(".css") || 
-        request.getRequestURI().endsWith(".js") ||
-        request.getRequestURI().endsWith(".html") || 
-        request.getRequestURI().endsWith(".map") ||
-        request.getRequestURI().endsWith(".woff") ||
-        request.getRequestURI().endsWith(".png") || 
-        request.getRequestURI().endsWith(".jpg") ||
-        request.getRequestURI().endsWith(".jpeg") ||
-        request.getRequestURI().endsWith(".tif") ||
-        request.getRequestURI().endsWith(".tiff")) {
-      return true;
-    }
-    return false;
+    return request.getRequestURI().endsWith(".css") ||
+           request.getRequestURI().endsWith(".js") ||
+           request.getRequestURI().endsWith(".html") ||
+           request.getRequestURI().endsWith(".map") ||
+           request.getRequestURI().endsWith(".woff") ||
+           request.getRequestURI().endsWith(".png") ||
+           request.getRequestURI().endsWith(".jpg") ||
+           request.getRequestURI().endsWith(".jpeg") ||
+           request.getRequestURI().endsWith(".tif") ||
+           request.getRequestURI().endsWith(".tiff");
   }
   
   protected String[] decodeCookie(String cookieValue) throws InvalidCookieException {
