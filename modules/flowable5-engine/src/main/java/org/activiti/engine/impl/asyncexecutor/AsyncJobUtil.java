@@ -72,12 +72,8 @@ public class AsyncJobUtil {
             "You can ignore this message if you indeed have multiple job executor acquisition threads running against the same database. " +
             "Exception message: {}", optimisticLockingException.getMessage());
       }
-      
-      return;
-    
     } catch (Throwable t) {
       log.error("Error while unlocking exclusive job {}", job.getId(), t);
-      return;
     }
   }
   
