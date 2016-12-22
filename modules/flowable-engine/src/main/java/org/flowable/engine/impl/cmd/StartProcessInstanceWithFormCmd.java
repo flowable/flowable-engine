@@ -15,6 +15,7 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -144,9 +145,7 @@ public class StartProcessInstanceWithFormCmd implements Command<ProcessInstance>
             if (StringUtils.isNotEmpty(variableValue)) {
               String[] contentItemIds = StringUtils.split(variableValue, ",");
               Set<String> contentItemIdSet = new HashSet<>();
-              for (String contentItemId : contentItemIds) {
-                contentItemIdSet.add(contentItemId);
-              }
+              Collections.addAll(contentItemIdSet, contentItemIds);
                 
               ContentService contentService = processEngineConfiguration.getContentService();
               List<ContentItem> contentItems = contentService.createContentItemQuery().ids(contentItemIdSet).list();

@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.cmd;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -111,9 +112,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
             if (StringUtils.isNotEmpty(variableValue)) {
               String[] contentItemIds = StringUtils.split(variableValue, ",");
               Set<String> contentItemIdSet = new HashSet<>();
-              for (String contentItemId : contentItemIds) {
-                contentItemIdSet.add(contentItemId);
-              }
+              Collections.addAll(contentItemIdSet, contentItemIds);
                 
               ContentService contentService = processEngineConfiguration.getContentService();
               List<ContentItem> contentItems = contentService.createContentItemQuery().ids(contentItemIdSet).list();

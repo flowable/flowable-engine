@@ -14,6 +14,7 @@
 package org.flowable.rest.service.api.runtime.task;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -163,9 +164,7 @@ public class TaskCollectionResource extends TaskBaseResource {
     if (requestParams.containsKey("candidateGroups")) {
       String[] candidateGroups = requestParams.get("candidateGroups").split(",");
       List<String> groups = new ArrayList<String>(candidateGroups.length);
-      for (String candidateGroup : candidateGroups) {
-        groups.add(candidateGroup);
-      }
+      Collections.addAll(groups, candidateGroups);
       request.setCandidateGroupIn(groups);
     }
     

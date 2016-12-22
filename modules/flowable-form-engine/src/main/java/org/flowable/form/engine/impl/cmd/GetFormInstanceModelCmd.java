@@ -14,6 +14,7 @@ package org.flowable.form.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -142,9 +143,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
             String uploadValue = (String) variables.get(field.getId());
             if (uploadValue != null) {
               List<String> contentIds = new ArrayList<>();
-              for (String s : uploadValue.split(",")) {
-                contentIds.add(s);
-              }
+              Collections.addAll(contentIds, uploadValue.split(","));
               field.setValue(contentIds);
             }
           }
