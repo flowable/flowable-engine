@@ -119,7 +119,7 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
   }
 
   // Start event
-  public final static String EXCEPTION_MAP_FIELD = "mapExceptions";
+  public static final String EXCEPTION_MAP_FIELD = "mapExceptions";
 
   public NoneStartEventActivityBehavior createNoneStartEventActivityBehavior(StartEvent startEvent) {
     return new NoneStartEventActivityBehavior();

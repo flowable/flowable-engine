@@ -37,9 +37,9 @@ import org.w3c.dom.NodeList;
  */
 public class ProcessDeployer {
 
-  public final static String PROCESSES_FILE_NAME = "processes.xml";
-  public final static String PROCESS_ELEMENT_NAME = "process";
-  public final static String PROCESS_ATTR_RESOURCE = "resource";
+  public static final String PROCESSES_FILE_NAME = "processes.xml";
+  public static final String PROCESS_ELEMENT_NAME = "process";
+  public static final String PROCESS_ATTR_RESOURCE = "resource";
 
   private static Logger logger = LoggerFactory.getLogger(ProcessDeployer.class);
 

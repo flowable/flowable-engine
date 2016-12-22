@@ -58,7 +58,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Service
 public class FlowableClientService {
 
-  private final static Logger log = LoggerFactory.getLogger(FlowableClientService.class);
+  private static final Logger log = LoggerFactory.getLogger(FlowableClientService.class);
 
   protected static final String[] PAGING_AND_SORTING_PARAMETER_NAMES = new String[] { "sort", "order", "size" };
 

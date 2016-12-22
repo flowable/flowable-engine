@@ -24,7 +24,7 @@ public class EventSubscriptionQueryProperty implements QueryProperty {
 
   // properties used in event subscription queries:
 
-  public final static EventSubscriptionQueryProperty CREATED = new EventSubscriptionQueryProperty("RES.CREATED_");
+  public static final EventSubscriptionQueryProperty CREATED = new EventSubscriptionQueryProperty("RES.CREATED_");
 
   // ///////////////////////////////////////////////
 

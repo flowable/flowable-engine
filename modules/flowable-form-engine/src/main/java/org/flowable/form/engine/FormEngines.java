@@ -51,7 +51,7 @@ public abstract class FormEngines {
    * Initializes all form engines that can be found on the classpath for resources <code>flowable.form.cfg.xml</code> and for resources <code>flowable-dmn-context.xml</code> (Spring style
    * configuration).
    */
-  public synchronized static void init() {
+  public static synchronized void init() {
     if (!isInitialized()) {
       if (formEngines == null) {
         // Create new map to store dmn engines if current map is null
@@ -230,7 +230,7 @@ public abstract class FormEngines {
   /**
    * closes all form engines. This method should be called when the server shuts down.
    */
-  public synchronized static void destroy() {
+  public static synchronized void destroy() {
     if (isInitialized()) {
       Map<String, FormEngine> engines = new HashMap<String, FormEngine>(formEngines);
       formEngines = new HashMap<String, FormEngine>();

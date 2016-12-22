@@ -23,7 +23,7 @@ import org.flowable.engine.runtime.Job;
  */
 public class AsyncContinuationJobHandler implements JobHandler {
   
-  public final static String TYPE = "async-continuation";
+  public static final String TYPE = "async-continuation";
 
   public String getType() {
     return TYPE;

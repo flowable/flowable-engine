@@ -25,8 +25,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 public class ProcessExceptionHandlerAdvice extends BaseExceptionHandlerAdvice {
 
-    @ResponseStatus(HttpStatus.CONFLICT)
-    // 409
+    @ResponseStatus(HttpStatus.CONFLICT) // 409
     @ExceptionHandler(FlowableTaskAlreadyClaimedException.class)
     @ResponseBody
     public ErrorInfo handleTaskAlreadyClaimed(FlowableTaskAlreadyClaimedException e) {

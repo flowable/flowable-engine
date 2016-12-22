@@ -24,7 +24,7 @@ import org.flowable.engine.runtime.Job;
  */
 public class ProcessEventJobHandler implements JobHandler {
   
-  public final static String TYPE = "event"; 
+  public static final String TYPE = "event";
 
   public String getType() {
     return TYPE;

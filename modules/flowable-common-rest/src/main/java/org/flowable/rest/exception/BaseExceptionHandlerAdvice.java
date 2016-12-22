@@ -27,32 +27,28 @@ public class BaseExceptionHandlerAdvice {
     return new ErrorInfo("Content is not supported", e);
   }
 
-  @ResponseStatus(HttpStatus.CONFLICT)
-  // 409
+  @ResponseStatus(HttpStatus.CONFLICT) // 409
   @ExceptionHandler(FlowableConflictException.class)
   @ResponseBody
   public ErrorInfo handleConflict(FlowableConflictException e) {
     return new ErrorInfo("Conflict", e);
   }
 
-  @ResponseStatus(HttpStatus.NOT_FOUND)
-  // 404
+  @ResponseStatus(HttpStatus.NOT_FOUND) // 404
   @ExceptionHandler(FlowableObjectNotFoundException.class)
   @ResponseBody
   public ErrorInfo handleNotFound(FlowableObjectNotFoundException e) {
     return new ErrorInfo("Not found", e);
   }
 
-  @ResponseStatus(HttpStatus.FORBIDDEN)
-  // 403
+  @ResponseStatus(HttpStatus.FORBIDDEN) // 403
   @ExceptionHandler(FlowableForbiddenException.class)
   @ResponseBody
   public ErrorInfo handleForbidden(FlowableForbiddenException e) {
     return new ErrorInfo("Forbidden", e);
   }
 
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  // 400
+  @ResponseStatus(HttpStatus.BAD_REQUEST) // 400
   @ExceptionHandler(FlowableIllegalArgumentException.class)
   @ResponseBody
   public ErrorInfo handleIllegal(FlowableIllegalArgumentException e) {

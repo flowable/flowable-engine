@@ -68,7 +68,7 @@ public abstract class ProcessEngines {
    * Initializes all process engines that can be found on the classpath for resources <code>flowable.cfg.xml</code> (plain Flowable style configuration) and for resources
    * <code>flowable-context.xml</code> (Spring style configuration).
    */
-  public synchronized static void init() {
+  public static synchronized void init() {
     if (!isInitialized()) {
       if (processEngines == null) {
         // Create new map to store process-engines if current map is
@@ -249,7 +249,7 @@ public abstract class ProcessEngines {
   /**
    * closes all process engines. This method should be called when the server shuts down.
    */
-  public synchronized static void destroy() {
+  public static synchronized void destroy() {
     if (isInitialized()) {
       Map<String, ProcessEngine> engines = new HashMap<String, ProcessEngine>(processEngines);
       processEngines = new HashMap<String, ProcessEngine>();

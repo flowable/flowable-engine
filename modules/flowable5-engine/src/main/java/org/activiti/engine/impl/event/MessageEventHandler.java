@@ -25,7 +25,7 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
  */
 public class MessageEventHandler extends AbstractEventHandler {
   
-  public final static String EVENT_HANDLER_TYPE = "message";
+  public static final String EVENT_HANDLER_TYPE = "message";
 
   public String getEventHandlerType() {
     return EVENT_HANDLER_TYPE;

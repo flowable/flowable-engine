@@ -373,7 +373,7 @@ public class JSONObject {
      * @param  d A double.
      * @return A String.
      */
-    static public String doubleToString(double d) {
+    public static String doubleToString(double d) {
         if (Double.isInfinite(d) || Double.isNaN(d)) {
             return "null";
         }
@@ -681,7 +681,7 @@ public class JSONObject {
      * @return A String.
      * @throws JSONException If n is a non-finite number.
      */
-    static public String numberToString(Number n)
+    public static String numberToString(Number n)
             throws JSONException {
         if (n == null) {
             throw new JSONException("Null pointer");
@@ -1184,7 +1184,7 @@ public class JSONObject {
      * @param s A String.
      * @return A simple JSON value.
      */
-    static public Object stringToValue(String s) {
+    public static Object stringToValue(String s) {
         if (s.equals("")) {
             return s;
         }

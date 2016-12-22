@@ -4,7 +4,7 @@ import org.flowable.engine.ProcessEngines;
 
 public class ProcessEnginesRest extends ProcessEngines {
 
-  public synchronized static void init() {
+  public static synchronized void init() {
     isInitialized = true;
   }
 }

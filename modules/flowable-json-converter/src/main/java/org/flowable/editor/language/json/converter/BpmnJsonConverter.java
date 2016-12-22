@@ -77,9 +77,9 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
   protected static Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap = new HashMap<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>>();
   protected static Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap = new HashMap<String, Class<? extends BaseBpmnJsonConverter>>();
 
-  public final static String MODELER_NAMESPACE = "http://activiti.com/modeler";
-  protected final static DateFormat defaultFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-  protected final static DateFormat entFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+  public static final String MODELER_NAMESPACE = "http://activiti.com/modeler";
+  protected static final DateFormat defaultFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+  protected static final DateFormat entFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 
   static {
 

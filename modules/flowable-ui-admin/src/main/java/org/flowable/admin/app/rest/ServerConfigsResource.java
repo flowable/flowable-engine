@@ -48,12 +48,13 @@ public class ServerConfigsResource {
   protected Environment env;
 
   @RequestMapping(value = "/rest/server-configs", method = RequestMethod.GET, produces = "application/json")
-  public @ResponseBody List<ServerConfigRepresentation> getServers() {
+  public List<ServerConfigRepresentation> getServers() {
     return serverConfigService.findAll();
   }
 
   @RequestMapping(value = "/rest/server-configs/default/{endpointTypeCode}", method = RequestMethod.GET, produces = "application/json")
   @ResponseStatus(value = HttpStatus.OK)
+  @ResponseBody
   public ServerConfigRepresentation getDefaultServerConfig(@PathVariable Integer endpointTypeCode) {
     EndpointType endpointType = EndpointType.valueOf(endpointTypeCode);
 
