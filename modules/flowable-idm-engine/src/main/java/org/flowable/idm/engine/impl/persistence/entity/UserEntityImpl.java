@@ -39,6 +39,7 @@ public class UserEntityImpl extends AbstractEntity implements UserEntity, Serial
   public UserEntityImpl() {
   }
 
+  @Override
   public Object getPersistentState() {
     Map<String, Object> persistentState = new HashMap<String, Object>();
     persistentState.put("firstName", firstName);
@@ -53,10 +54,7 @@ public class UserEntityImpl extends AbstractEntity implements UserEntity, Serial
     return persistentState;
   }
 
-  public int getRevisionNext() {
-    return revision + 1;
-  }
-
+  @Override
   public Picture getPicture() {
     if (pictureByteArrayRef != null && pictureByteArrayRef.getId() != null) {
       return new Picture(pictureByteArrayRef.getBytes(), pictureByteArrayRef.getName());
@@ -64,6 +62,7 @@ public class UserEntityImpl extends AbstractEntity implements UserEntity, Serial
     return null;
   }
 
+  @Override
   public void setPicture(Picture picture) {
     if(picture != null) {
       savePicture(picture);
@@ -85,42 +84,52 @@ public class UserEntityImpl extends AbstractEntity implements UserEntity, Serial
     }
   }
   
+  @Override
   public String getFirstName() {
     return firstName;
   }
 
+  @Override
   public void setFirstName(String firstName) {
     this.firstName = firstName;
   }
 
+  @Override
   public String getLastName() {
     return lastName;
   }
 
+  @Override
   public void setLastName(String lastName) {
     this.lastName = lastName;
   }
 
+  @Override
   public String getEmail() {
     return email;
   }
 
+  @Override
   public void setEmail(String email) {
     this.email = email;
   }
 
+  @Override
   public String getPassword() {
     return password;
   }
 
+  @Override
   public void setPassword(String password) {
     this.password = password;
   }
 
+  @Override
   public boolean isPictureSet() {
     return pictureByteArrayRef != null && pictureByteArrayRef.getId() != null;
   }
 
+  @Override
   public ByteArrayRef getPictureByteArrayRef() {
     return pictureByteArrayRef;
   }

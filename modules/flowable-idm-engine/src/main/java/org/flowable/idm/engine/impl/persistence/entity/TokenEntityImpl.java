@@ -34,54 +34,67 @@ public class TokenEntityImpl extends AbstractEntity implements TokenEntity, Seri
   protected String userId;
   protected String tokenData;
 
+  @Override
   public String getTokenValue() {
     return tokenValue;
   }
 
+  @Override
   public void setTokenValue(String tokenValue) {
     this.tokenValue = tokenValue;
   }
 
+  @Override
   public Date getTokenDate() {
     return tokenDate;
   }
 
+  @Override
   public void setTokenDate(Date tokenDate) {
     this.tokenDate = tokenDate;
   }
 
+  @Override
   public String getIpAddress() {
     return ipAddress;
   }
 
+  @Override
   public void setIpAddress(String ipAddress) {
     this.ipAddress = ipAddress;
   }
 
+  @Override
   public String getUserAgent() {
     return userAgent;
   }
 
+  @Override
   public void setUserAgent(String userAgent) {
     this.userAgent = userAgent;
   }
 
+  @Override
   public String getUserId() {
     return userId;
   }
 
+  @Override
   public void setUserId(String userId) {
     this.userId = userId;
   }
 
+  @Override
   public String getTokenData() {
     return tokenData;
   }
 
+  @Override
   public void setTokenData(String tokenData) {
     this.tokenData = tokenData;
   }
 
+  @Override
   public Object getPersistentState() {
     Map<String, Object> persistentState = new HashMap<String, Object>();
     persistentState.put("tokenValue", tokenValue);
@@ -92,10 +105,6 @@ public class TokenEntityImpl extends AbstractEntity implements TokenEntity, Seri
     persistentState.put("tokenData", tokenData);
     
     return persistentState;
-  }
-  
-  public int getRevisionNext() {
-    return revision + 1;
   }
 
   // common methods //////////////////////////////////////////////////////////

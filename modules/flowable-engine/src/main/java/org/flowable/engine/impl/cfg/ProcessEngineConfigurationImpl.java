@@ -1050,6 +1050,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
 
 
+  @Override
   public void initDatabaseType() {
     super.initDatabaseType();
     // Special care for MSSQL, as it has a hard limit of 2000 params per statement (incl bulk statement).
@@ -1059,6 +1060,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
 
+  @Override
   public String pathToEngineDbProperties() {
     return "org/flowable/db/properties/" + databaseType + ".properties";
   }
@@ -1085,15 +1087,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler());
   }
 
+  @Override
   public InputStream getMyBatisXmlConfigurationStream() {
     return getResourceAsStream(DEFAULT_MYBATIS_MAPPING_FILE);
   }
 
+  @Override
   public ProcessEngineConfigurationImpl setCustomMybatisMappers(Set<Class<?>> customMybatisMappers) {
     this.customMybatisMappers = customMybatisMappers;
     return this;
   }
 
+  @Override
   public ProcessEngineConfigurationImpl setCustomMybatisXMLMappers(Set<String> customMybatisXMLMappers) {
     this.customMybatisXMLMappers = customMybatisXMLMappers;
     return this;
@@ -1757,6 +1762,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // id generator
   // /////////////////////////////////////////////////////////////
 
+  @Override
   public void initIdGenerator() {
     if (idGenerator == null) {
       CommandExecutor idGeneratorCommandExecutor = getCommandExecutor();
@@ -1784,6 +1790,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
 
+  @Override
   public void initTransactionFactory() {
     if (transactionFactory == null) {
       if (transactionsExternallyManaged) {
@@ -1972,12 +1979,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
 
-  public void initBeans() {
-    if (beans == null) {
-      beans = new HashMap<Object, Object>();
-    }
-  }
-
   public void initEventDispatcher() {
     if (this.eventDispatcher == null) {
       this.eventDispatcher = new FlowableEventDispatcherImpl();
@@ -2050,6 +2051,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public Runnable getProcessEngineCloseRunnable() {
     return new Runnable() {
+      @Override
       public void run() {
         commandExecutor.execute(getSchemaCommandConfig(), new SchemaOperationProcessEngineClose());
       }
@@ -2060,11 +2062,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // getters and setters
   // //////////////////////////////////////////////////////
 
+  @Override
   public ProcessEngineConfigurationImpl setDefaultCommandConfig(CommandConfig defaultCommandConfig) {
     this.defaultCommandConfig = defaultCommandConfig;
     return this;
   }
 
+  @Override
   public ProcessEngineConfigurationImpl setSchemaCommandConfig(CommandConfig schemaCommandConfig) {
     this.schemaCommandConfig = schemaCommandConfig;
     return this;
@@ -2115,6 +2119,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  @Override
   public RepositoryService getRepositoryService() {
     return repositoryService;
   }
@@ -2124,6 +2129,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  @Override
   public RuntimeService getRuntimeService() {
     return runtimeService;
   }
@@ -2133,6 +2139,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  @Override
   public HistoryService getHistoryService() {
     return historyService;
   }
@@ -2142,6 +2149,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  @Override
   public IdentityService getIdentityService() {
     return identityService;
   }
@@ -2151,6 +2159,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  @Override
   public TaskService getTaskService() {
     return taskService;
   }
@@ -2160,6 +2169,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  @Override
   public FormService getFormService() {
     return formService;
   }
@@ -2169,6 +2179,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  @Override
   public ManagementService getManagementService() {
     return managementService;
   }
@@ -2187,6 +2198,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  @Override
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
     return this;
   }
@@ -2290,10 +2302,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public Map<Class<?>, SessionFactory> getSessionFactories() {
-    return sessionFactories;
-  }
-
+  @Override
   public ProcessEngineConfigurationImpl setSessionFactories(Map<Class<?>, SessionFactory> sessionFactories) {
     this.sessionFactories = sessionFactories;
     return this;
@@ -2411,6 +2420,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  @Override
   public ProcessEngineConfigurationImpl setIdGenerator(IdGenerator idGenerator) {
     this.idGenerator = idGenerator;
     return this;
@@ -2625,6 +2635,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  @Override
   public ProcessEngineConfigurationImpl setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
     this.sqlSessionFactory = sqlSessionFactory;
     return this;
@@ -2639,11 +2650,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  @Override
   public ProcessEngineConfigurationImpl setTransactionFactory(TransactionFactory transactionFactory) {
     this.transactionFactory = transactionFactory;
     return this;
   }
 
+  @Override
   public ProcessEngineConfigurationImpl setCustomSessionFactories(List<SessionFactory> customSessionFactories) {
     this.customSessionFactories = customSessionFactories;
     return this;
@@ -2757,10 +2770,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public Map<Object, Object> getBeans() {
-    return beans;
-  }
-
+  @Override
   public ProcessEngineConfigurationImpl setBeans(Map<Object, Object> beans) {
     this.beans = beans;
     return this;
@@ -2914,21 +2924,25 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  @Override
   public ProcessEngineConfigurationImpl setEventDispatcher(FlowableEventDispatcher eventDispatcher) {
     this.eventDispatcher = eventDispatcher;
     return this;
   }
 
+  @Override
   public ProcessEngineConfigurationImpl setEnableEventDispatcher(boolean enableEventDispatcher) {
     this.enableEventDispatcher = enableEventDispatcher;
     return this;
   }
 
+  @Override
   public ProcessEngineConfigurationImpl setTypedEventListeners(Map<String, List<FlowableEventListener>> typedListeners) {
     this.typedEventListeners = typedListeners;
     return this;
   }
 
+  @Override
   public ProcessEngineConfigurationImpl setEventListeners(List<FlowableEventListener> eventListeners) {
     this.eventListeners = eventListeners;
     return this;
@@ -2979,10 +2993,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public boolean isUsingRelationalDatabase() {
-    return usingRelationalDatabase;
-  }
-
+  @Override
   public ProcessEngineConfigurationImpl setUsingRelationalDatabase(boolean usingRelationalDatabase) {
     this.usingRelationalDatabase = usingRelationalDatabase;
     return this;
@@ -3509,6 +3520,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  @Override
   public ProcessEngineConfigurationImpl setClock(Clock clock) {
     if (this.clock == null) {
       this.clock = clock;

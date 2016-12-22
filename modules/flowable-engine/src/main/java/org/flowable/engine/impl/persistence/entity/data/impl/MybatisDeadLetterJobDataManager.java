@@ -46,11 +46,6 @@ public class MybatisDeadLetterJobDataManager extends AbstractDataManager<DeadLet
   public DeadLetterJobEntity create() {
     return new DeadLetterJobEntityImpl();
   }
-  
-  @Override
-  public void delete(DeadLetterJobEntity entity) {
-    getDbSqlSession().delete(entity);
-  }
 
   @Override
   @SuppressWarnings("unchecked")
