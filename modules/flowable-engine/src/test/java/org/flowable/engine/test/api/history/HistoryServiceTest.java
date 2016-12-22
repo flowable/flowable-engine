@@ -48,21 +48,21 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
   @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testHistoricProcessInstanceQuery() {
     // With a clean ProcessEngine, no instances should be available
-    assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 0);
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().count());
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 1);
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().count());
 
     // Complete the task and check if the size is count 1
     List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
     assertEquals(1, tasks.size());
     taskService.complete(tasks.get(0).getId());
-    assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 1);
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().count());
   }
 
   @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testHistoricProcessInstanceQueryOrderBy() {
     // With a clean ProcessEngine, no instances should be available
-    assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 0);
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().count());
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
@@ -145,7 +145,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     runtimeService.startProcessInstanceByKey("orderProcess");
     HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processDefinitionKey(processDefinitionKey).singleResult();
     assertNotNull(historicProcessInstance);
-    assertTrue(historicProcessInstance.getProcessDefinitionKey().equals(processDefinitionKey));
+    assertEquals(historicProcessInstance.getProcessDefinitionKey(), processDefinitionKey);
     assertEquals("theStart", historicProcessInstance.getStartActivityId());
 
     // now complete the task to end the process instance

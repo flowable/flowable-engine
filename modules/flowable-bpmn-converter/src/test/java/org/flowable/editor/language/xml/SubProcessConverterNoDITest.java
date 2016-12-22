@@ -46,9 +46,9 @@ public class SubProcessConverterNoDITest extends AbstractConverterTest {
     assertTrue(flowElement instanceof UserTask);
     assertEquals("userTask1", flowElement.getId());
     UserTask userTask = (UserTask) flowElement;
-    assertTrue(userTask.getCandidateUsers().size() == 1);
-    assertTrue(userTask.getCandidateGroups().size() == 1);
-    assertTrue(userTask.getFormProperties().size() == 2);
+    assertEquals(1, userTask.getCandidateUsers().size());
+    assertEquals(1, userTask.getCandidateGroups().size());
+    assertEquals(2, userTask.getFormProperties().size());
 
     flowElement = model.getMainProcess().getFlowElement("subprocess1");
     assertNotNull(flowElement);
@@ -58,7 +58,7 @@ public class SubProcessConverterNoDITest extends AbstractConverterTest {
     assertTrue(subProcess.getLoopCharacteristics().isSequential());
     assertEquals("10", subProcess.getLoopCharacteristics().getLoopCardinality());
     assertEquals("${assignee == \"\"}", subProcess.getLoopCharacteristics().getCompletionCondition());
-    assertTrue(subProcess.getFlowElements().size() == 5);
+    assertEquals(5, subProcess.getFlowElements().size());
 
     assertEquals(1, subProcess.getExecutionListeners().size());
     FlowableListener listenerSubProcess = subProcess.getExecutionListeners().get(0);

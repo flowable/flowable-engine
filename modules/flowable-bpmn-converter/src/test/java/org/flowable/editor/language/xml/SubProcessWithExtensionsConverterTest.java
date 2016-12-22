@@ -131,7 +131,7 @@ public class SubProcessWithExtensionsConverterTest extends AbstractConverterTest
     assertTrue(subProcess.getLoopCharacteristics().isSequential());
     assertEquals("10", subProcess.getLoopCharacteristics().getLoopCardinality());
     assertEquals("${assignee == \"\"}", subProcess.getLoopCharacteristics().getCompletionCondition());
-    assertTrue(subProcess.getFlowElements().size() == 5);
+    assertEquals(5, subProcess.getFlowElements().size());
 
     /*
      * Verify Subprocess attributes extension
@@ -140,9 +140,9 @@ public class SubProcessWithExtensionsConverterTest extends AbstractConverterTest
     assertEquals(2, attributes.size());
     for (String key : attributes.keySet()) {
       if (key.equals("Attr3")) {
-        assertTrue("3".equals(attributes.get(key)));
+        assertEquals("3", attributes.get(key));
       } else if (key.equals("Attr4")) {
-        assertTrue("4".equals(attributes.get(key)));
+        assertEquals("4", attributes.get(key));
       } else {
         fail("Unknown key value");
       }

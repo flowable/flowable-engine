@@ -74,9 +74,9 @@ public class ExtensionElementConverterTest extends AbstractConverterTest {
         assertEquals(2, attributes.size());
         for (String key : attributes.keySet()) {
           if (key.equals("Attr3")) {
-            assertTrue("3".equals(attributes.get(key)));
+            assertEquals("3", attributes.get(key));
           } else if (key.equals("Attr4")) {
-            assertTrue("4".equals(attributes.get(key)));
+            assertEquals("4", attributes.get(key));
           } else {
             fail("Unknown key value");
           }
@@ -112,9 +112,9 @@ public class ExtensionElementConverterTest extends AbstractConverterTest {
         assertEquals(2, attributes.size());
         for (String key : attributes.keySet()) {
           if (key.equals("Attr5")) {
-            assertTrue("5".equals(attributes.get(key)));
+            assertEquals("5", attributes.get(key));
           } else if (key.equals("Attr6")) {
-            assertTrue("6".equals(attributes.get(key)));
+            assertEquals("6", attributes.get(key));
           } else {
             fail("Unknown key value");
           }

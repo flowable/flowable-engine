@@ -118,9 +118,8 @@ public class IntegrationAutoConfigurationTest {
         vars.put("customerId", 232);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(integrationGatewayProcess, vars);
         Assert.assertNotNull("the processInstance should not be null", processInstance);
-        org.junit.Assert.assertTrue(
-                applicationContext.getBean(InboundGatewayConfiguration.AnalysingService.class)
-                        .getStringAtomicReference().get().equals(projectId));
+        Assert.assertEquals(applicationContext.getBean(InboundGatewayConfiguration.AnalysingService.class)
+                .getStringAtomicReference().get(), projectId);
     }
 
     @Configuration

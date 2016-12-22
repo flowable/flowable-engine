@@ -41,7 +41,7 @@ public class FormPropertiesConverterTest extends AbstractConverterTest {
   private void validateModel(BpmnModel model) {
     assertEquals("formPropertiesProcess", model.getMainProcess().getId());
     assertEquals("User registration", model.getMainProcess().getName());
-    assertEquals(true, model.getMainProcess().isExecutable());
+    assertTrue(model.getMainProcess().isExecutable());
     
     FlowElement startFlowElement = model.getMainProcess().getFlowElement("startNode", true);
     assertNotNull(startFlowElement);

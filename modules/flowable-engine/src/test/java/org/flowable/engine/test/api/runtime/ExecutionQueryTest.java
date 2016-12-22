@@ -1638,7 +1638,7 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
     assertEquals(2, executions.size());
     for (Execution execution : executions) {
       if (execution.getParentId() == null) {
-        assertTrue(processInstance.getId() != execution.getProcessInstanceId());
+        assertNotSame(processInstance.getId(), execution.getProcessInstanceId());
       } else if (execution.getParentId().equals(execution.getProcessInstanceId())) {
         assertEquals("embeddedSubprocess" , execution.getActivityId());
       } else {

@@ -49,8 +49,8 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
       
       } else {
         childExecution = execution;
-        
-        assertTrue(execution.getId().equals(execution.getProcessInstanceId()) == false);
+
+        assertEquals(false, execution.getId().equals(execution.getProcessInstanceId()));
         assertEquals("theTask", execution.getActivityId());
       }
     }
@@ -102,8 +102,8 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
       
       } else {
         childExecution = execution;
-        
-        assertTrue(execution.getId().equals(execution.getProcessInstanceId()) == false);
+
+        assertEquals(false, execution.getId().equals(execution.getProcessInstanceId()));
         assertEquals("theTask1", execution.getActivityId());
       }
     }
@@ -134,7 +134,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
     assertEquals(2, executionList.size());
     
     task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertTrue(childExecution.getId().equals(task.getExecutionId()) == false);
+    assertEquals(false, childExecution.getId().equals(task.getExecutionId()));
     
     Execution finalTaskExecution = runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult();
     assertEquals("theTask2", finalTaskExecution.getActivityId());
@@ -209,8 +209,8 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
       
       } else {
         childExecution = execution;
-        
-        assertTrue(execution.getId().equals(execution.getProcessInstanceId()) == false);
+
+        assertEquals(false, execution.getId().equals(execution.getProcessInstanceId()));
         assertEquals("theTask1", execution.getActivityId());
       }
     }
@@ -241,7 +241,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
     assertEquals(2, executionList.size());
     
     task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertTrue(childExecution.getId().equals(task.getExecutionId()) == false);
+    assertEquals(false, childExecution.getId().equals(task.getExecutionId()));
     
     Execution finalTaskExecution = runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult();
     assertEquals("theTask2", finalTaskExecution.getActivityId());
