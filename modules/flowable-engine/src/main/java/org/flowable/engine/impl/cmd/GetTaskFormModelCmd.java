@@ -14,6 +14,7 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -115,9 +116,7 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
           } else if (formField.getValue() instanceof String) {
             String[] splittedString = ((String) formField.getValue()).split(",");
             contentItemIds = new ArrayList<String>();
-            for (String contentItemId : splittedString) {
-              contentItemIds.add(contentItemId);
-            }
+            Collections.addAll(contentItemIds, splittedString);
           }
           
           if (contentItemIds != null) {

@@ -14,6 +14,7 @@ package org.flowable.spring.boot;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -78,9 +79,7 @@ public abstract class AbstractProcessEngineConfiguration {
     		String path = prefix + suffix;
     		Resource[] resources = applicationContext.getResources(path);
     		if (resources != null && resources.length > 0) {
-    			for (Resource resource : resources) {
-    				result.add(resource);
-    			}
+                Collections.addAll(result, resources);
     		}
     	}
     	
