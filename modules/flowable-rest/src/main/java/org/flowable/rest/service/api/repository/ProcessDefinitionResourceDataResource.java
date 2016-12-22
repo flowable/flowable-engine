@@ -32,15 +32,14 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = { "Process Definitions" }, description = "Manage Process Definitions")
 public class ProcessDefinitionResourceDataResource extends BaseDeploymentResourceDataResource {
 
-  @ResponseBody
   @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/resourcedata", method = RequestMethod.GET)
   @ApiResponses(value = {
           @ApiResponse(code = 200, message = "Indicates both process definition and resource have been found and the resource data has been returned."),
           @ApiResponse(code = 404, message = "Indicates the requested process definition was not found or there is no resource with the given id present in the process definition. The status-description contains additional information.")
   })
   @ApiOperation(value = "Get a process definition resource content", tags = {"Process Definitions"})
-  public
-  byte[] getProcessDefinitionResource(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId, HttpServletResponse response) {
+  @ResponseBody
+  public byte[] getProcessDefinitionResource(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId, HttpServletResponse response) {
     ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
     return getDeploymentResourceData(processDefinition.getDeploymentId(), processDefinition.getResourceName(), response);
   }

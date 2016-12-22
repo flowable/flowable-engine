@@ -40,7 +40,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = { "Tasks" }, description = "Manage Tasks")
 public class TaskVariableDataResource extends TaskVariableBaseResource {
 
-  @ResponseBody
   @RequestMapping(value = "/runtime/tasks/{taskId}/variables/{variableName}/data", method = RequestMethod.GET, produces = "application/json")
   @ApiImplicitParams(
           @ApiImplicitParam(name = "scope", dataType = "string", value = "Scope of variable to be returned. When local, only task-local variable value is returned. When global, only variable value from the task’s parent execution-hierarchy are returned. When the parameter is omitted, a local variable will be returned if it exists, otherwise a global variable.", paramType = "query")
@@ -51,12 +50,11 @@ public class TaskVariableDataResource extends TaskVariableBaseResource {
   })
   @ApiOperation(value = "Get the binary data for a variable", tags = {"Tasks"}, nickname = "geTaskVariableData",
           notes = "The response body contains the binary value of the variable. When the variable is of type binary, the content-type of the response is set to application/octet-stream, regardless of the content of the variable or the request accept-type header. In case of serializable, application/x-java-serialized-object is used as content-type.")
-  public
-  byte[] getVariableData(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId,
+  @ResponseBody
+  public byte[] getVariableData(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId,
           @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
           @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scope,
       HttpServletRequest request, HttpServletResponse response) {
-
     try {
       byte[] result = null;
 
