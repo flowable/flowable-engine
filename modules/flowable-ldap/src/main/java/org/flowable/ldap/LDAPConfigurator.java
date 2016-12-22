@@ -80,10 +80,12 @@ public class LDAPConfigurator extends AbstractProcessEngineConfigurator {
   // Cache listener (experimental)
   protected LDAPGroupCacheListener groupCacheListener;
 
+  @Override
   public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
     // Nothing to do
   }
 
+  @Override
   public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
     
     LDAPGroupCache ldapGroupCache = null;

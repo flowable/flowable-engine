@@ -36,6 +36,7 @@ public class IntermediateCatchTimerEventActivityBehavior extends IntermediateCat
     this.timerEventDefinition = timerEventDefinition;
   }
 
+  @Override
   public void execute(DelegateExecution execution) {
     JobManager jobManager = Context.getCommandContext().getJobManager();
     
@@ -61,8 +62,4 @@ public class IntermediateCatchTimerEventActivityBehavior extends IntermediateCat
         DeleteReason.EVENT_BASED_GATEWAY_CANCEL, false);
   }
 
-  @Override
-  public void trigger(DelegateExecution execution, String triggerName, Object triggerData) {
-    leaveIntermediateCatchEvent(execution);
-  }
 }

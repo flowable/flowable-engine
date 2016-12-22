@@ -29,11 +29,6 @@ public class IntegrationActivityBehavior extends ReceiveTaskActivityBehavior {
     }
 
     @Override
-    public void leave(DelegateExecution execution) {
-        super.leave(execution);
-    }
-
-    @Override
     public void trigger(DelegateExecution execution, String signalName, Object data) {
         gateway.signal(this, execution, signalName, data);
     }
