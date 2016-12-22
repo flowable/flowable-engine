@@ -33,7 +33,7 @@ public class FormPropertyDefaultValueTest extends PluggableFlowableTestCase {
       } else if ("longExpressionProperty".equals(prop.getId())) {
         assertEquals("23", prop.getValue());
       } else {
-        assertTrue("Invalid form property: " + prop.getId(), false);
+        fail("Invalid form property: " + prop.getId());
       }
     }
 
@@ -67,7 +67,7 @@ public class FormPropertyDefaultValueTest extends PluggableFlowableTestCase {
       } else if ("longExpressionProperty".equals(prop.getId())) {
         assertEquals("23", prop.getValue());
       } else {
-        assertTrue("Invalid form property: " + prop.getId(), false);
+        fail("Invalid form property: " + prop.getId());
       }
     }
 

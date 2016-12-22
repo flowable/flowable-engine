@@ -45,7 +45,7 @@ public class AsyncEndEventConverterTest extends AbstractConverterTest {
     List<FlowableListener> listeners = endEvent.getExecutionListeners();
     assertEquals(1, listeners.size());
     FlowableListener listener = listeners.get(0);
-    assertTrue(ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(listener.getImplementationType()));
+    assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, listener.getImplementationType());
     assertEquals("org.test.TestClass", listener.getImplementation());
     assertEquals("start", listener.getEvent());
   }

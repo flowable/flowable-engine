@@ -166,7 +166,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
     // a new timer should be created with the repeat
     assertEquals(1, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
     Job secondTimerInstance = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertTrue(firstTimerInstance.getId() != secondTimerInstance.getId());
+    assertNotSame(firstTimerInstance.getId(), secondTimerInstance.getId());
 
     checkEventCount(1, FlowableEngineEventType.TIMER_FIRED);
     checkEventContext(filterEvents(FlowableEngineEventType.TIMER_FIRED).get(0), firstTimerInstance);

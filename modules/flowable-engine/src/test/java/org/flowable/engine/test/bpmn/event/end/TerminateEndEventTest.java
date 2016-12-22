@@ -274,7 +274,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
     variables.put("input", 1);
     taskService.complete(task.getId(), variables);
 
-    assertTrue(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).count() == 0);
+    assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).count());
     assertHistoricProcessInstanceDetails(pi);
   }
 

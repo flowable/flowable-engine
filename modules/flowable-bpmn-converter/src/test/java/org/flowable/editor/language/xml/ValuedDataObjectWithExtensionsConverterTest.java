@@ -146,9 +146,9 @@ public class ValuedDataObjectWithExtensionsConverterTest extends AbstractConvert
     assertEquals(2, attributes.size());
     for (String key : attributes.keySet()) {
       if (key.equals("Attr1")) {
-        assertTrue("1".equals(attributes.get(key)));
+        assertEquals("1", attributes.get(key));
       } else if (key.equals("Attr2")) {
-        assertTrue("2".equals(attributes.get(key)));
+        assertEquals("2", attributes.get(key));
       } else {
         fail("Unknown key value");
       }
@@ -193,9 +193,9 @@ public class ValuedDataObjectWithExtensionsConverterTest extends AbstractConvert
     assertEquals(2, attributes.size());
     for (String key : attributes.keySet()) {
       if (key.equals("Attr3")) {
-        assertTrue("3".equals(attributes.get(key)));
+        assertEquals("3", attributes.get(key));
       } else if (key.equals("Attr4")) {
-        assertTrue("4".equals(attributes.get(key)));
+        assertEquals("4", attributes.get(key));
       } else {
         fail("Unknown key value");
       }

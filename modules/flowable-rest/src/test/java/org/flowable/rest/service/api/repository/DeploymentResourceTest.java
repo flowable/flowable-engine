@@ -116,7 +116,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
       String url = responseNode.get("url").textValue();
       String tenantId = responseNode.get("tenantId").textValue();
 
-      assertTrue(tenantId.equals(""));
+      assertEquals("", tenantId);
       assertNotNull(deploymentId);
       assertEquals(1L, repositoryService.createDeploymentQuery().deploymentId(deploymentId).count());
 

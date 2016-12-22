@@ -355,7 +355,7 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
 
     JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
     closeResponse(response);
-    assertEquals(false, responseNode.get("ended").asBoolean());
+    assertFalse(responseNode.get("ended").asBoolean());
     JsonNode variablesArrayNode = responseNode.get("variables");
     assertEquals(0, variablesArrayNode.size());
 
@@ -405,7 +405,7 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
     CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
     JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
     closeResponse(response);
-    assertEquals(false, responseNode.get("ended").asBoolean());
+    assertFalse(responseNode.get("ended").asBoolean());
     JsonNode variablesArrayNode = responseNode.get("variables");
     assertEquals(2, variablesArrayNode.size());
     for (JsonNode variableNode : variablesArrayNode) {

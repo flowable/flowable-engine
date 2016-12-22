@@ -51,18 +51,18 @@ public class SubProcessConverterAutoLayoutTest extends AbstractConverterTest {
     assertTrue(flowElement instanceof UserTask);
     assertEquals("userTask1", flowElement.getId());
     UserTask userTask = (UserTask) flowElement;
-    assertTrue(userTask.getCandidateUsers().size() == 1);
-    assertTrue(userTask.getCandidateGroups().size() == 1);
+    assertEquals(1, userTask.getCandidateUsers().size());
+    assertEquals(1, userTask.getCandidateGroups().size());
 
     flowElement = model.getMainProcess().getFlowElement("subprocess1");
     assertNotNull(flowElement);
     assertTrue(flowElement instanceof SubProcess);
     assertEquals("subprocess1", flowElement.getId());
     SubProcess subProcess = (SubProcess) flowElement;
-    assertTrue(subProcess.getFlowElements().size() == 6);
+    assertEquals(6, subProcess.getFlowElements().size());
 
     List<ValuedDataObject> dataObjects = ((SubProcess) flowElement).getDataObjects();
-    assertTrue(dataObjects.size() == 1);
+    assertEquals(1, dataObjects.size());
 
     ValuedDataObject dataObj = dataObjects.get(0);
     assertEquals("SubTest", dataObj.getName());

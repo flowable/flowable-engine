@@ -70,7 +70,7 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
     assertTrue(propNode.get("value").isNull());
     assertTrue(propNode.get("readable").asBoolean());
     assertTrue(propNode.get("writable").asBoolean());
-    assertTrue(propNode.get("required").asBoolean() == false);
+    assertEquals(false, propNode.get("required").asBoolean());
 
     propNode = mappedProperties.get("duration");
     assertNotNull(propNode);
@@ -80,7 +80,7 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
     assertTrue(propNode.get("value").isNull());
     assertTrue(propNode.get("readable").asBoolean());
     assertTrue(propNode.get("writable").asBoolean());
-    assertTrue(propNode.get("required").asBoolean() == false);
+    assertEquals(false, propNode.get("required").asBoolean());
 
     propNode = mappedProperties.get("speaker");
     assertNotNull(propNode);
@@ -89,8 +89,8 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
     assertTrue(propNode.get("type").isNull());
     assertEquals("John Doe", propNode.get("value").asText());
     assertTrue(propNode.get("readable").asBoolean());
-    assertTrue(propNode.get("writable").asBoolean() == false);
-    assertTrue(propNode.get("required").asBoolean() == false);
+    assertEquals(false, propNode.get("writable").asBoolean());
+    assertEquals(false, propNode.get("required").asBoolean());
 
     propNode = mappedProperties.get("street");
     assertNotNull(propNode);
@@ -111,7 +111,7 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
     assertEquals("dd-MMM-yyyy", propNode.get("datePattern").asText());
     assertTrue(propNode.get("readable").asBoolean());
     assertTrue(propNode.get("writable").asBoolean());
-    assertTrue(propNode.get("required").asBoolean() == false);
+    assertEquals(false, propNode.get("required").asBoolean());
 
     propNode = mappedProperties.get("end");
     assertNotNull(propNode);
@@ -122,7 +122,7 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
     assertEquals("dd/MM/yyyy", propNode.get("datePattern").asText());
     assertTrue(propNode.get("readable").asBoolean());
     assertTrue(propNode.get("writable").asBoolean());
-    assertTrue(propNode.get("required").asBoolean() == false);
+    assertEquals(false, propNode.get("required").asBoolean());
 
     propNode = mappedProperties.get("direction");
     assertNotNull(propNode);
@@ -133,7 +133,7 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
     assertTrue(propNode.get("datePattern").isNull());
     assertTrue(propNode.get("readable").asBoolean());
     assertTrue(propNode.get("writable").asBoolean());
-    assertTrue(propNode.get("required").asBoolean() == false);
+    assertEquals(false, propNode.get("required").asBoolean());
     JsonNode enumValues = propNode.get("enumValues");
     assertEquals(4, enumValues.size());
     Map<String, String> mappedEnums = new HashMap<String, String>();
@@ -165,7 +165,7 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
     assertTrue(propNode.get("value").isNull());
     assertTrue(propNode.get("readable").asBoolean());
     assertTrue(propNode.get("writable").asBoolean());
-    assertTrue(propNode.get("required").asBoolean() == false);
+    assertEquals(false, propNode.get("required").asBoolean());
 
     propNode = mappedProperties.get("description");
     assertNotNull(propNode);
@@ -175,7 +175,7 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
     assertTrue(propNode.get("value").isNull());
     assertTrue(propNode.get("readable").asBoolean());
     assertTrue(propNode.get("writable").asBoolean());
-    assertTrue(propNode.get("required").asBoolean() == false);
+    assertEquals(false, propNode.get("required").asBoolean());
 
     closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_FORM_DATA) + "?processDefinitionId=123"), HttpStatus.SC_NOT_FOUND));
 

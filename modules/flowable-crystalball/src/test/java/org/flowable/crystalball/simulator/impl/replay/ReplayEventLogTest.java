@@ -95,7 +95,7 @@ public class ReplayEventLogTest {
         .processDefinitionKey(USERTASK_PROCESS)
         .singleResult();
     assertNotNull(replayProcessInstance);
-    assertTrue(replayProcessInstance.getId().equals(processInstance.getId()) == false);
+    assertEquals(false, replayProcessInstance.getId().equals(processInstance.getId()));
     assertEquals(TEST_VALUE, runtimeService.getVariable(replayProcessInstance.getId(), TEST_VARIABLE));
     // there should be one task
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("userTask").count());

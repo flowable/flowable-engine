@@ -1,5 +1,6 @@
 package org.flowable.editor.language;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -30,11 +31,11 @@ public class FlowNodeInSubProcessConverterTest extends AbstractConverterTest {
     ParallelGateway gateway = (ParallelGateway) subProcess.getFlowElement("sid-A0E0B174-36DF-4C4F-A952-311CC3C031FC");
     assertNotNull(gateway);
     List<SequenceFlow> sequenceFlows = gateway.getOutgoingFlows();
-    assertTrue(sequenceFlows.size() == 2);
+    assertEquals(2, sequenceFlows.size());
     assertTrue(sequenceFlows.get(0).getId().equals("sid-9C669980-C274-4A48-BF7F-B9C5CA577DD2") || sequenceFlows.get(0).getId().equals("sid-A299B987-396F-46CA-8D63-85991FBFCE6E"));
     assertTrue(sequenceFlows.get(1).getId().equals("sid-9C669980-C274-4A48-BF7F-B9C5CA577DD2") || sequenceFlows.get(1).getId().equals("sid-A299B987-396F-46CA-8D63-85991FBFCE6E"));
-    assertTrue(sequenceFlows.get(0).getSourceRef().equals("sid-A0E0B174-36DF-4C4F-A952-311CC3C031FC"));
-    assertTrue(sequenceFlows.get(1).getSourceRef().equals("sid-A0E0B174-36DF-4C4F-A952-311CC3C031FC"));
+    assertEquals("sid-A0E0B174-36DF-4C4F-A952-311CC3C031FC", sequenceFlows.get(0).getSourceRef());
+    assertEquals("sid-A0E0B174-36DF-4C4F-A952-311CC3C031FC", sequenceFlows.get(1).getSourceRef());
   }
 
   protected String getResource() {
