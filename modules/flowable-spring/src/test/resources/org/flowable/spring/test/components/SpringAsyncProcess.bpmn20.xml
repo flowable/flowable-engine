@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://www.flowable.org/test">
+    <process id="asyncProcess" name="async process">
+        <startEvent id="startevent1" name="Start"></startEvent>
+        <manualTask id="task" name="Manual Task" flowable:async="true"></manualTask>
+        <endEvent id="endevent1" name="End"></endEvent>
+        <sequenceFlow id="flow1" name="" sourceRef="startevent1" targetRef="task"></sequenceFlow>
+        <sequenceFlow id="flow2" name="" sourceRef="task" targetRef="endevent1"></sequenceFlow>
+    </process>
+</definitions>
