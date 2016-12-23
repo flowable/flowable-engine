@@ -65,7 +65,7 @@ public class ProcessDefinitionCategoryTest extends PluggableFlowableTestCase {
     long count = runtimeService.createProcessInstanceQuery().count();
     runtimeService.startProcessInstanceById(processDefinition.getId());
     long newCount = runtimeService.createProcessInstanceQuery().count();
-    assertTrue(newCount == count + 1);
+    assertEquals(newCount, count + 1);
 
     // Update category
     repositoryService.setProcessDefinitionCategory(processDefinition.getId(), "UpdatedCategory");
@@ -77,7 +77,7 @@ public class ProcessDefinitionCategoryTest extends PluggableFlowableTestCase {
     // Start a process instance
     runtimeService.startProcessInstanceById(processDefinition.getId());
     newCount = runtimeService.createProcessInstanceQuery().count();
-    assertTrue(newCount == count + 2);
+    assertEquals(newCount, count + 2);
 
     // Set category to null
     repositoryService.setProcessDefinitionCategory(processDefinition.getId(), null);

@@ -79,10 +79,10 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     assertTrue(responseNode.get("delegationState").isNull());
     assertEquals("", responseNode.get("tenantId").textValue());
 
-    assertTrue(responseNode.get("executionUrl").asText().equals(buildUrl(RestUrls.URL_EXECUTION, task.getExecutionId())));
-    assertTrue(responseNode.get("processInstanceUrl").asText().equals(buildUrl(RestUrls.URL_PROCESS_INSTANCE, task.getProcessInstanceId())));
-    assertTrue(responseNode.get("processDefinitionUrl").asText().equals(buildUrl(RestUrls.URL_PROCESS_DEFINITION, task.getProcessDefinitionId())));
-    assertTrue(responseNode.get("url").asText().equals(url));
+    assertEquals(responseNode.get("executionUrl").asText(), buildUrl(RestUrls.URL_EXECUTION, task.getExecutionId()));
+    assertEquals(responseNode.get("processInstanceUrl").asText(), buildUrl(RestUrls.URL_PROCESS_INSTANCE, task.getProcessInstanceId()));
+    assertEquals(responseNode.get("processDefinitionUrl").asText(), buildUrl(RestUrls.URL_PROCESS_DEFINITION, task.getProcessDefinitionId()));
+    assertEquals(responseNode.get("url").asText(), url);
 
     // Set tenant on deployment
     managementService.executeCommand(new ChangeDeploymentTenantIdCmd(deploymentId, "myTenant"));
@@ -138,8 +138,8 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
       assertTrue(responseNode.get("processDefinitionId").isNull());
       assertEquals("", responseNode.get("tenantId").textValue());
 
-      assertTrue(responseNode.get("parentTaskUrl").asText().equals(buildUrl(RestUrls.URL_TASK, parentTask.getId())));
-      assertTrue(responseNode.get("url").asText().equals(url));
+      assertEquals(responseNode.get("parentTaskUrl").asText(), buildUrl(RestUrls.URL_TASK, parentTask.getId()));
+      assertEquals(responseNode.get("url").asText(), url);
 
     } finally {
 

@@ -81,7 +81,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
     assertNull(event.getTaskId());
     assertEquals("testVariable", event.getVariableName());
     // deleted variable value is always null
-    assertEquals(null, event.getVariableValue());
+    assertNull(event.getVariableValue());
     listener.clearEventsReceived();
 
     // Create, update and delete multiple variables
@@ -251,7 +251,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
     assertEquals(task.getId(), event.getTaskId());
     assertEquals("testVariable", event.getVariableName());
     // deleted values are always null
-    assertEquals(null, event.getVariableValue());
+    assertNull(event.getVariableValue());
     listener.clearEventsReceived();
   }
 
@@ -295,7 +295,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
     assertEquals(task.getId(), event.getTaskId());
     assertEquals("variable", event.getVariableName());
     // deleted variable value is always null
-    assertEquals(null, event.getVariableValue());
+    assertNull(event.getVariableValue());
   }
 
   /**
@@ -337,7 +337,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
       assertEquals(newTask.getId(), event.getTaskId());
       assertEquals("testVariable", event.getVariableName());
       // deleted variable value is always null
-      assertEquals(null, event.getVariableValue());
+      assertNull(event.getVariableValue());
     } finally {
 
       // Cleanup task and history to ensure a clean DB after test

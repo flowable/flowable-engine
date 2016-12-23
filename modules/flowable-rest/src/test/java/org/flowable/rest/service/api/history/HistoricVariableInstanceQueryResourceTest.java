@@ -151,9 +151,9 @@ public class HistoricVariableInstanceQueryResourceTest extends BaseSpringRestTes
           if (variableValue instanceof Boolean) {
             assertTrue("Variable value is not equal", variableNode.get("value").asBoolean() == (Boolean) variableValue);
           } else if (variableValue instanceof Integer) {
-            assertTrue("Variable value is not equal", variableNode.get("value").asInt() == (Integer) variableValue);
+            assertEquals("Variable value is not equal", variableNode.get("value").asInt(), (int) (Integer) variableValue);
           } else {
-            assertTrue("Variable value is not equal", variableNode.get("value").asText().equals((String) variableValue));
+            assertEquals("Variable value is not equal", variableNode.get("value").asText(), (String) variableValue);
           }
         }
       }

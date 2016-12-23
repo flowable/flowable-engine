@@ -83,8 +83,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     // Validate (cause this tended to be screwed up)
     List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().list();
     for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
-      Assert.assertTrue(historicActivityInstance.getStartTime() != null);
-      Assert.assertTrue(historicActivityInstance.getEndTime() != null);
+      Assert.assertNotNull(historicActivityInstance.getStartTime());
+      Assert.assertNotNull(historicActivityInstance.getEndTime());
     }
     
     FlowableProfiler.getInstance().reset();

@@ -110,8 +110,8 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
       assertNotNull(latestProcessDef);
       links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
       assertEquals(2, links.size());
-      assertEquals(true, containsUserOrGroup("user1", null, links));
-      assertEquals(true, containsUserOrGroup("user2", null, links));
+      assertTrue(containsUserOrGroup("user1", null, links));
+      assertTrue(containsUserOrGroup("user2", null, links));
 
       latestProcessDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process3").singleResult();
       assertNotNull(latestProcessDef);
@@ -123,10 +123,10 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
       assertNotNull(latestProcessDef);
       links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
       assertEquals(4, links.size());
-      assertEquals(true, containsUserOrGroup("userInGroup2", null, links));
-      assertEquals(true, containsUserOrGroup(null, "group1", links));
-      assertEquals(true, containsUserOrGroup(null, "group2", links));
-      assertEquals(true, containsUserOrGroup(null, "group3", links));
+      assertTrue(containsUserOrGroup("userInGroup2", null, links));
+      assertTrue(containsUserOrGroup(null, "group1", links));
+      assertTrue(containsUserOrGroup(null, "group2", links));
+      assertTrue(containsUserOrGroup(null, "group3", links));
 
     } finally {
       tearDownUsersAndGroups();
@@ -152,8 +152,8 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
       repositoryService.addCandidateStarterUser(latestProcessDef.getId(), "user1");
       links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
       assertEquals(2, links.size());
-      assertEquals(true, containsUserOrGroup(null, "group1", links));
-      assertEquals(true, containsUserOrGroup("user1", null, links));
+      assertTrue(containsUserOrGroup(null, "group1", links));
+      assertTrue(containsUserOrGroup("user1", null, links));
 
       repositoryService.deleteCandidateStarterGroup(latestProcessDef.getId(), "nonexisting");
       links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());

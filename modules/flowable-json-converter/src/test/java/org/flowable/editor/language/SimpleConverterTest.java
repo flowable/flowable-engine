@@ -34,7 +34,7 @@ public class SimpleConverterTest extends AbstractConverterTest {
   private void validateModel(BpmnModel model) {
     assertEquals("simpleProcess", model.getMainProcess().getId());
     assertEquals("Simple process", model.getMainProcess().getName());
-    assertEquals(true, model.getMainProcess().isExecutable());
+    assertTrue(model.getMainProcess().isExecutable());
 
     FlowElement flowElement = model.getMainProcess().getFlowElement("flow1", true);
     assertNotNull(flowElement);
@@ -46,7 +46,7 @@ public class SimpleConverterTest extends AbstractConverterTest {
     assertTrue(flowElement instanceof IntermediateCatchEvent);
     assertEquals("catchEvent", flowElement.getId());
     IntermediateCatchEvent catchEvent = (IntermediateCatchEvent) flowElement;
-    assertTrue(catchEvent.getEventDefinitions().size() == 1);
+    assertEquals(1, catchEvent.getEventDefinitions().size());
     EventDefinition eventDefinition = catchEvent.getEventDefinitions().get(0);
     assertTrue(eventDefinition instanceof TimerEventDefinition);
     TimerEventDefinition timerDefinition = (TimerEventDefinition) eventDefinition;

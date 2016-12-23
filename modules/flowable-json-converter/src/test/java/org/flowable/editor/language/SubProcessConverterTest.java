@@ -43,16 +43,16 @@ public class SubProcessConverterTest extends AbstractConverterTest {
     assertTrue(flowElement instanceof UserTask);
     assertEquals("userTask1", flowElement.getId());
     UserTask userTask = (UserTask) flowElement;
-    assertTrue(userTask.getCandidateUsers().size() == 1);
-    assertTrue(userTask.getCandidateGroups().size() == 1);
-    assertTrue(userTask.getFormProperties().size() == 2);
+    assertEquals(1, userTask.getCandidateUsers().size());
+    assertEquals(1, userTask.getCandidateGroups().size());
+    assertEquals(2, userTask.getFormProperties().size());
 
     flowElement = model.getMainProcess().getFlowElement("subprocess1", true);
     assertNotNull(flowElement);
     assertTrue(flowElement instanceof SubProcess);
     assertEquals("subprocess1", flowElement.getId());
     SubProcess subProcess = (SubProcess) flowElement;
-    assertTrue(subProcess.getFlowElements().size() == 5);
+    assertEquals(5, subProcess.getFlowElements().size());
 
     flowElement = model.getMainProcess().getFlowElement("boundaryEvent1", true);
     assertNotNull(flowElement);

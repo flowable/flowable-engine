@@ -70,7 +70,7 @@ public class ContentItemCollectionResourceTest extends BaseSpringContentRestTest
       assertEquals("123456", responseNode.get("processInstanceId").asText());
       assertEquals("id", responseNode.get("contentStoreId").asText());
       assertEquals("testStore", responseNode.get("contentStoreName").asText());
-      assertEquals(false, responseNode.get("contentAvailable").asBoolean());
+      assertFalse(responseNode.get("contentAvailable").asBoolean());
       assertEquals("testa", responseNode.get("createdBy").asText());
       assertEquals("testb", responseNode.get("lastModifiedBy").asText());
       assertEquals(urlContentItem.getCreated(), getDateFromISOString(responseNode.get("created").asText()));
@@ -121,7 +121,7 @@ public class ContentItemCollectionResourceTest extends BaseSpringContentRestTest
       assertEquals("123456", responseNode.get("processInstanceId").asText());
       assertEquals(urlContentItem.getContentStoreId(), responseNode.get("contentStoreId").asText());
       assertEquals("file", responseNode.get("contentStoreName").asText());
-      assertEquals(true, responseNode.get("contentAvailable").asBoolean());
+      assertTrue(responseNode.get("contentAvailable").asBoolean());
       assertEquals("testa", responseNode.get("createdBy").asText());
       assertEquals("testb", responseNode.get("lastModifiedBy").asText());
       assertEquals(urlContentItem.getCreated(), getDateFromISOString(responseNode.get("created").asText()));
