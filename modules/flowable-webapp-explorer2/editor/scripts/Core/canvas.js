@@ -125,20 +125,7 @@ ORYX.Core.Canvas = ORYX.Core.AbstractShape.extend({
 	},
 	
 	focus: function(){
-		
-		try {
-			// Get a href
-			if (!this.focusEl) 
-			{
-				this.focusEl = jQuery('body').append(jQuery('<a href="#" class="x-grid3-focus x-grid3-focus-canvas"/>'));
-				this.focusEl.swallowEvent("click", true);
-			}
-			
-			// Focus it
-			this.focusEl.focus.defer(1, this.focusEl);
-			this.focusEl.blur.defer(3, this.focusEl);
-			
-		} catch(e){}
+		//removed old code that tried to focus an ExtJs widget... very strange logic...
 	},
 	
 	setHightlightState: function(state) {

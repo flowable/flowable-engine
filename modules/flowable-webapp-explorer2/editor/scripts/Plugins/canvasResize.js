@@ -41,9 +41,18 @@ ORYX.Plugins.CanvasResize = Clazz.extend({
     			// Move all children
     			canvas.getChildNodes(false, function(shape){ shape.bounds.moveBy(move) })
     			// Move all dockers, when the edge has at least one docked shape
-    			var edges = canvas.getChildEdges().findAll(function(edge){ return edge.getAllDockedShapes().length > 0})
-    			var dockers = edges.collect(function(edge){ return edge.dockers.findAll(function(docker){ return !docker.getDockedShape() })}).flatten();
-    			dockers.each(function(docker){ docker.bounds.moveBy(move)})
+    			var edges = canvas.getChildEdges().findAll(function(edge){
+    				return edge.getAllDockedShapes().length > 0
+    			});
+    			var dockers = edges.collect(function(edge){
+						return edge.dockers.findAll(function(docker){
+							return !docker.getDockedShape();
+						});
+    			}).flatten();
+
+    			dockers.each(function(docker){
+    				docker.bounds.moveBy(move);
+    			});
     		} else if( position == "S" ){
     			scrollNode.scrollTop += extentionSize;
     		} else if( position == "E" ){
@@ -93,8 +102,8 @@ ORYX.Plugins.CanvasResizeButton = Clazz.extend({
 			
 		var actualScrollNode = jQuery('#canvasSection')[0];
 		var scrollNode 	= actualScrollNode;
-		var canvasNode = jQuery('#canvasSection').find(".ORYX_Editor")[0];
-		var svgRootNode = canvasNode.children[0];
+		var canvasNode = $$("#canvasSection .ORYX_Editor")[0];
+        var svgRootNode = canvasNode.children[0];
 		
 		var iconClass = 'glyphicon glyphicon-chevron-';
 		var iconClassShrink = 'glyphicon glyphicon-chevron-';

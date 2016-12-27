@@ -776,7 +776,7 @@ ORYX.Core.Node = {
             });
             label.x -= offsetX;
             label.y -= offsetY;
-            this._labels[label.id] = label;
+            this._labels.set(label.id,label);
 			
 			label.registerOnChange(this.layout.bind(this));
 			

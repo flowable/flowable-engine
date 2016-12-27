@@ -43,16 +43,6 @@ ORYX.Utils = {
 		}
 	}
 }
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
 XMLNS = {
 	ATOM:	"http://www.w3.org/2005/Atom",
 	XHTML:	"http://www.w3.org/1999/xhtml",
@@ -65,7 +55,7 @@ XMLNS = {
 };
 
 //TODO kann kickstart sich vielleicht auch um die erzeugung von paketen/
-// namespaces k???mmern? z.b. requireNamespace("ORYX.Core.SVG");
+// namespaces k�mmern? z.b. requireNamespace("ORYX.Core.SVG");
 var Kickstart = {
  	started: false,
 	callbacks: [],
@@ -129,17 +119,7 @@ var Kickstart = {
 
 // register kickstart as the new onload event listener on current window.
 // previous listener(s) are triggered to launch with kickstart.
-Event.observe(window, 'load', Kickstart.load);/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-var ERDF = {
+Event.observe(window, 'load', Kickstart.load);var ERDF = {
 
 	LITERAL: 0x01,
 	RESOURCE: 0x02,
@@ -523,16 +503,6 @@ ERDF.Literal = function(literal) {
 		return '"' + this.value + '"';
 	}
 };/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-/*
  * Save and triple generation behaviour. Use this area to configure
  * data management to your needs.
  */
@@ -1112,7 +1082,7 @@ var DataManager = {
 	 * need to graft elements in a certain xmlns and wish to assign attributes
 	 * in both that and another xmlns, you will need to do stepwise grafting,
 	 * adding non-default attributes yourself or you'll have to enhance this
-	 * function. Latter, I would appreciate: martin???apfelfabrik.de
+	 * function. Latter, I would appreciate: martin�apfelfabrik.de
 	 * @param {Object} namespace The namespace in which
 	 * 					elements should be grafted.
 	 * @param {Object} parent The element that should contain the grafted
@@ -1698,17 +1668,7 @@ ResourceManager = {
 			"wrong with either the server, the transport protocol or your " +
 			"online status. Sure you're online?";
 	}
-}/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-/**
+}/**
  * The super class for all classes in ORYX. Adds some OOP feeling to javascript.
  * See article "Object Oriented Super Class Method Calling with JavaScript" on
  * http://truecode.blogspot.com/2006/08/object-oriented-super-class-method.html
@@ -1761,17 +1721,7 @@ Clazz.extend = function(def) {
     //Give this new class the same static extend method    
     classDef.extend = this.extend;        
     return classDef;
-};/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-if(!ORYX) var ORYX = {};
+};if(!ORYX) var ORYX = {};
 
 if(!ORYX.CONFIG) ORYX.CONFIG = {};
 
@@ -1815,17 +1765,7 @@ ORYX.CONFIG.ORYX_NEW_URL =					"/new";
 ORYX.CONFIG.BPMN_LAYOUTER =					ORYX.CONFIG.ROOT_PATH + "bpmnlayouter";
 
 ORYX.CONFIG.EXPRESSION_METADATA_URL = 			ORYX.CONFIG.SERVER_HANDLER_ROOT + "/expression-metadata";
-ORYX.CONFIG.DATASOURCE_METADATA_URL = 			ORYX.CONFIG.SERVER_HANDLER_ROOT + "/datasource-metadata";/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-if(!ORYX) var ORYX = {};
+ORYX.CONFIG.DATASOURCE_METADATA_URL = 			ORYX.CONFIG.SERVER_HANDLER_ROOT + "/datasource-metadata";if(!ORYX) var ORYX = {};
 
 if(!ORYX.CONFIG) ORYX.CONFIG = {};
 
@@ -2067,17 +2007,7 @@ ORYX.CONFIG.FORM_ELEMENT_TYPE_GROUP = 				'http://b3mn.org/stencilset/xforms#Gro
 ORYX.CONFIG.FORM_ELEMENT_TYPE_REPEATING_GROUP =		'http://b3mn.org/stencilset/xforms#RepeatingGroup';
 ORYX.CONFIG.FORM_ELEMENT_TYPE_LABEL_FIELD = 		'http://b3mn.org/stencilset/xforms#LabelField';
 	
-	/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-function printf() {
+	function printf() {
 	
 	var result = arguments[0];
 	for (var i=1; i<arguments.length; i++)
@@ -2194,52 +2124,6 @@ ORYX = Object.extend(ORYX, {
 	 * the server. Once everything is loaded, the third layer is being invoked.
 	 */
 	_load: function() {
-	/*
-		// if configuration not there already,
-		if(!(ORYX.CONFIG)) {
-			
-			// if this is the first attempt...
-			if(ORYX.configrationRetries == 0) {
-				
-				// get the path and filename.
-				var configuration = ORYX.PATH + ORYX.CONFIGURATION;
-	
-				ORYX.Log.debug("Configuration not found, loading from '%0'.",
-					configuration);
-				
-				// require configuration file.
-				Kickstart.require(configuration);
-				
-			// else if attempts exceeded ...
-			} else if(ORYX.configrationRetries >= ORYX_CONFIGURATION_WAIT_ATTEMPTS) {
-				
-				throw "Tried to get configuration" +
-					ORYX_CONFIGURATION_WAIT_ATTEMPTS +
-					" times from '" + configuration + "'. Giving up."
-					
-			} else if(ORYX.configrationRetries > 0){
-				
-				// point out how many attempts are left...
-				ORYX.Log.debug("Waiting once more (%0 attempts left)",
-					(ORYX_CONFIGURATION_WAIT_ATTEMPTS -
-						ORYX.configrationRetries));
-
-			}
-			
-			// any case: continue in a moment with increased retry count.
-			ORYX.configrationRetries++;
-			window.setTimeout(ORYX._load, ORYX_CONFIGURATION_DELAY);
-			return;
-		}
-		
-		ORYX.Log.info("Configuration loaded.");
-		
-		// load necessary scripts.
-		ORYX.URLS.each(function(url) {
-			ORYX.Log.debug("Requireing '%0'", url);
-			Kickstart.require(ORYX.PATH + url) });
-	*/
-		// configurate logging and load plugins.
 		ORYX.loadPlugins();
 	},
 
@@ -2297,8 +2181,12 @@ ORYX = Object.extend(ORYX, {
 						
 						// get all attributes from the node and set to global properties
 						var attributes = $A(prop.attributes)
-						attributes.each(function(attr){property[attr.nodeName] = attr.nodeValue});				
-						if(attributes.length > 0) { globalProperties.push(property) };				
+						attributes.each(function(attr) {
+                            property.set(attr.nodeName, attr.nodeValue);
+                        });
+						if(attributes.length > 0) {
+							globalProperties.push(property)
+						};
 					});
 				});
 
@@ -2312,17 +2200,18 @@ ORYX = Object.extend(ORYX, {
 					// TODO: What about: var pluginData = $H(node.attributes) !?
 					var pluginData = new Hash();
 					$A(node.attributes).each( function(attr){
-						pluginData[attr.nodeName] = attr.nodeValue});				
+						pluginData.set(attr.nodeName,attr.nodeValue);
+					});
 					
 					// ensure there's a name attribute.
-					if(!pluginData['name']) {
+					if(!pluginData.get('name')) {
 						ORYX.Log.error("A plugin is not providing a name. Ingnoring this plugin.");
 						return;
 					}
 
 					// ensure there's a source attribute.
-					if(!pluginData['source']) {
-						ORYX.Log.error("Plugin with name '%0' doesn't provide a source attribute.", pluginData['name']);
+					if(!pluginData.get('source')) {
+						ORYX.Log.error("Plugin with name '%0' doesn't provide a source attribute.", pluginData.get('name'));
 						return;
 					}
 					
@@ -2334,8 +2223,13 @@ ORYX = Object.extend(ORYX, {
 						
 						// Get all Attributes from the Node			
 						var attributes = $A(prop.attributes)
-						attributes.each(function(attr){property[attr.nodeName] = attr.nodeValue});				
-						if(attributes.length > 0) { properties.push(property) };	
+						attributes.each(function(attr){
+							property.set(attr.nodeName,attr.nodeValue);
+						});
+
+						if(attributes.length > 0) {
+							properties.push(property)
+						};
 					
 					});
 					
@@ -2343,7 +2237,7 @@ ORYX = Object.extend(ORYX, {
 					properties = properties.concat(globalProperties);
 					
 					// Set Properties to Plugin-Data
-					pluginData['properties'] = properties;
+					pluginData.set('properties',properties);
 					
 					// Get the RequieredNodes
 					var requireNodes = node.getElementsByTagName("requires");
@@ -2361,7 +2255,7 @@ ORYX = Object.extend(ORYX, {
 					
 					// Set Requires to the Plugin-Data, if there is one
 					if( requires ){
-						pluginData['requires'] = requires;
+						pluginData.set('requires',requires);
 					}
 
 
@@ -2381,18 +2275,18 @@ ORYX = Object.extend(ORYX, {
 					
 					// Set Requires to the Plugin-Data, if there is one
 					if( notUsesIn ){
-						pluginData['notUsesIn'] = notUsesIn;
+						pluginData.set('notUsesIn',notUsesIn);
 					}		
 					
 								
-					var url = ORYX.PATH + ORYX.CONFIG.PLUGINS_FOLDER + pluginData['source'];
+					var url = ORYX.PATH + ORYX.CONFIG.PLUGINS_FOLDER + pluginData.get('source');
 		
 					ORYX.Log.debug("Requireing '%0'", url);
 		
 					// Add the Script-Tag to the Site
 					//Kickstart.require(url);
 		
-					ORYX.Log.info("Plugin '%0' successfully loaded.", pluginData['name']);
+					ORYX.Log.info("Plugin '%0' successfully loaded.", pluginData.get('name'));
 		
 					// Add the Plugin-Data to all available Plugins
 					ORYX.availablePlugins.push(pluginData);
@@ -2411,16 +2305,6 @@ ORYX = Object.extend(ORYX, {
 	}
 });
 
-
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
 
 /**
  * Init namespaces
@@ -2786,16 +2670,7 @@ ORYX.Core.SVG.EditPathHandler = Clazz.extend({
 	    this.d = this.d.concat(" z");
 	}
 
-});/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
+});
 /**
  * Init namespaces
  */
@@ -3068,17 +2943,7 @@ ORYX.Core.SVG.MinMaxPathHandler = Clazz.extend({
 	    return;// do nothing
 	}
 
-});/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-/**
+});/**
  * Init namespaces
  */
 if(!ORYX) {var ORYX = {};}
@@ -3344,17 +3209,7 @@ ORYX.Core.SVG.PointsPathHandler = Clazz.extend({
 	    return;// do nothing
 	}
 
-});/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-/**
+});/**
  *
  * Config variables
  */
@@ -3537,17 +3392,7 @@ ORYX.Core.SVG.SVGMarker = Clazz.extend({
 	},
 	
 	toString: function() { return (this.element) ? "SVGMarker " + this.element.id : "SVGMarker " + this.element;}
- });/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-/**
+ });/**
  *
  * Config variables
  */
@@ -4097,17 +3942,7 @@ ORYX.Core.SVG.SVGShape = Clazz.extend({
 	},
 
 	toString: function() { return (this.element) ? "SVGShape " + this.element.id : "SVGShape " + this.element;}
- });/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-/**
+ });/**
  * Init namespaces
  */
 if(!ORYX) {var ORYX = {};}
@@ -4124,10 +3959,10 @@ ORYX.Core.SVG.Label = Clazz.extend({
 		"%W",
 		"@",
 		"m",
-		"wDGMOQ?????#+=<>~^",
-		"ABCHKNRSUVXZ??????????&",
-		"bdghnopqux???????????ETY1234567890?????_????${}*????`???????????",
-		"aeksvyz?????FLP????????????????",
+		"wDGMOQ√ñ#+=<>~^",
+		"ABCHKNRSUVXZ√ú√Ñ&",
+		"bdghnopqux√∂√ºETY1234567890√ü_¬ß${}*¬¥`¬µ‚Ç¨",
+		"aeksvyz√§FLP?¬∞¬≤¬≥",
 		"c-",
 		"rtJ\"/()[]:;!|\\",
 		"fjI., ",
@@ -4851,7 +4686,7 @@ ORYX.Core.SVG.Label = Clazz.extend({
 	_getRenderedTextLength: function(tspan, startIndex, endIndex, fontSize) {
 		//if (/Firefox[\/\s](\d+\.\d+)/.test(navigator.userAgent) && new Number(RegExp.$1) >= 3) {
 			if(startIndex === undefined) {
-//test string: abcdefghijklmnopqrstuvwxyz????????????????,.-#+ 1234567890?????ABCDEFGHIJKLMNOPQRSTUVWXYZ;:_'*???????????????!"????$%&/()=?[]{}|<>'~????`\^?????????@?????????????????
+//test string: abcdefghijklmnopqrstuvwxyz√∂√§√º,.-#+ 1234567890√üABCDEFGHIJKLMNOPQRSTUVWXYZ;:_'*√ú√Ñ√ñ!"¬ß$%&/()=?[]{}|<>'~¬¥`\^¬∞¬µ@‚Ç¨¬≤¬≥
 //				for(var i = 0; i < tspan.textContent.length; i++) {
 //					console.log(tspan.textContent.charAt(i), tspan.getSubStringLength(i,1), this._estimateCharacterWidth(tspan.textContent.charAt(i))*(fontSize/14.0));
 //				}
@@ -5218,17 +5053,7 @@ ORYX.Core.SVG.Label = Clazz.extend({
 	},
 	
 	toString: function() { return "Label " + this.id }
- });/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-/**
+ });/**
  * Init namespaces
  */
 if(!ORYX) {var ORYX = {};}
@@ -5506,7 +5331,7 @@ ORYX.Core.Math.getPointOfIntersectionPointLine = function(
 
 	/* 
 	 * [P3 - P1 - u(P2 - P1)] dot (P2 - P1) = 0
-	 * u =((x3-x1)(x2-x1)+(y3-y1)(y2-y1))/(p2-p1)??
+	 * u =((x3-x1)(x2-x1)+(y3-y1)(y2-y1))/(p2-p1)²
 	 */
 	var denominator = Math.pow(lineP2.x - lineP1.x, 2) 
 						+ Math.pow(lineP2.y - lineP1.y, 2);
@@ -5742,16 +5567,6 @@ new function(){
 }();
 
 
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
 /**
  * Init namespace
  */
@@ -5892,13 +5707,13 @@ ORYX.Core.StencilSet.Stencil = {
 		if(this._jsonStencil.propertyPackages && this._jsonStencil.propertyPackages instanceof Array) {
 			
 			this._jsonStencil.propertyPackages.each((function(ppId) {
-				var pp = this._propertyPackages[ppId];
+				var pp = this._propertyPackages.get(ppId);
 				
 				if(pp) {
 					pp.each((function(prop){
 						var oProp = new ORYX.Core.StencilSet.Property(prop, this._namespace, this);
-						this._properties[oProp.prefix() + "-" + oProp.id()] = oProp;
-						
+						var key = oProp.prefix() + "-" + oProp.id();
+						this._properties.set(key,oProp);
 					}).bind(this));
 				}
 			}).bind(this));
@@ -5908,7 +5723,8 @@ ORYX.Core.StencilSet.Stencil = {
 		if(this._jsonStencil.properties && this._jsonStencil.properties instanceof Array) {
 			this._jsonStencil.properties.each((function(prop) {
 				var oProp = new ORYX.Core.StencilSet.Property(prop, this._namespace, this);
-				this._properties[oProp.prefix() + "-" + oProp.id()] = oProp;
+				var key = oProp.prefix() + "-" + oProp.id();
+				this._properties.set(key, oProp);
 			}).bind(this));
 		}
 
@@ -5984,7 +5800,7 @@ ORYX.Core.StencilSet.Stencil = {
 	},
 
 	property: function(id) {
-		return this._properties[id];
+		return this._properties.get(id);
 	},
 
 	roles: function() {
@@ -6132,17 +5948,7 @@ function _evilSafariHack(serializedXML) {
 	
 	return dom;
 }
-	/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-/**
+	/**
  * Init namespace
  */
 if (!ORYX) {
@@ -6593,16 +6399,6 @@ ORYX.Core.StencilSet.Property = Clazz.extend({
 	}
 	
 });
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
 /**
  * Init namespace
  */
@@ -6685,17 +6481,7 @@ ORYX.Core.StencilSet.PropertyItem = Clazz.extend({
 	},
 
 	toString: function() { return "PropertyItem " + this.property() + " (" + this.value() + ")"; }
-});/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-/**
+});/**
  * Init namespaces
  */
 if(!ORYX) {var ORYX = {};}
@@ -6813,17 +6599,7 @@ ORYX.Core.StencilSet.ComplexPropertyItem = Clazz.extend({
 	disable: function() {
 		return this._jsonItem.disable;
 	}
-});/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-/**
+});/**
  * Init namespaces
  */
 if(!ORYX) {var ORYX = {};}
@@ -6929,58 +6705,61 @@ ORYX.Core.StencilSet.Rules = {
 			
 			// init connection rules
 			var cr = this._connectionRules;
-			if (jsonRules.connectionRules) {
-				jsonRules.connectionRules.each((function(rules){
+			if (jsonRules.get('connectionRules')) {
+				jsonRules.get('connectionRules').each((function(rules){
 					if (this._isRoleOfOtherNamespace(rules.role)) {
-						if (!cr[rules.role]) {
-							cr[rules.role] = new Hash();
+						if (!cr.get(rules.role)) {
+							cr.set(rules.role,new Hash());
 						}
 					}
 					else {
-						if (!cr[namespace + rules.role]) 
-							cr[namespace + rules.role] = new Hash();
+						if (!cr.get(namespace + rules.role))
+							cr.set(namespace + rules.role,new Hash());
 					}
-					
-					rules.connects.each((function(connect){
-						var toRoles = [];
-						if (connect.to) {
-							if (!(connect.to instanceof Array)) {
-								connect.to = [connect.to];
-							}
-							connect.to.each((function(to){
-								if (this._isRoleOfOtherNamespace(to)) {
-									toRoles.push(to);
-								}
-								else {
-									toRoles.push(namespace + to);
-								}
-							}).bind(this));
+                    rules.connects.each((function(connect){
+                        var toRoles = [];
+                        if (connect.to) {
+                            if (!(connect.to instanceof Array)) {
+                                connect.to = [connect.to];
+                            }
+                            connect.to.each((function(to){
+                                if (this._isRoleOfOtherNamespace(to)) {
+                                    toRoles.push(to);
+                                }
+                                else {
+                                    toRoles.push(namespace + to);
+                                }
+                            }).bind(this));
+                        }
+
+                        var role, from;
+                        if (this._isRoleOfOtherNamespace(rules.role))
+                            role = rules.role;
+                        else
+                            role = namespace + rules.role;
+
+                        if (this._isRoleOfOtherNamespace(connect.from)) {
+                            from = connect.from;
+                        } else {
+                            from = namespace + connect.from;
 						}
-						
-						var role, from;
-						if (this._isRoleOfOtherNamespace(rules.role)) 
-							role = rules.role;
-						else 
-							role = namespace + rules.role;
-						
-						if (this._isRoleOfOtherNamespace(connect.from)) 
-							from = connect.from;
-						else 
-							from = namespace + connect.from;
-						
-						if (!cr[role][from]) 
-							cr[role][from] = toRoles;
-						else 
-							cr[role][from] = cr[role][from].concat(toRoles);
-						
-					}).bind(this));
+
+						//TODO reduce the calls to the same object.
+                        if (!cr.get(role).get(from)){
+                            cr.get(role).set(from,toRoles);
+						} else {
+                            cr.get(role).set(from,cr.get(role).get(from).concat(toRoles));
+						}
+
+                    }).bind(this));
+
 				}).bind(this));
 			}
 			
 			// init cardinality rules
 			var cardr = this._cardinalityRules;
-			if (jsonRules.cardinalityRules) {
-				jsonRules.cardinalityRules.each((function(rules){
+			if (jsonRules.get("cardinalityRules")) {
+				jsonRules.get("cardinalityRules").each((function(rules){
 					var cardrKey;
 					if (this._isRoleOfOtherNamespace(rules.role)) {
 						cardrKey = rules.role;
@@ -6989,10 +6768,11 @@ ORYX.Core.StencilSet.Rules = {
 						cardrKey = namespace + rules.role;
 					}
 					
-					if (!cardr[cardrKey]) {
-						cardr[cardrKey] = {};
+					if (!cardr.get(cardrKey)) {
+						//TODO: correct this clumsy code here
+						cardr.set(cardrKey,{});
 						for (i in rules) {
-							cardr[cardrKey][i] = rules[i];
+							cardr.get(cardrKey)[i] = rules[i];
 						}
 					}
 					
@@ -7000,50 +6780,50 @@ ORYX.Core.StencilSet.Rules = {
 					if (rules.outgoingEdges) {
 						rules.outgoingEdges.each((function(rule){
 							if (this._isRoleOfOtherNamespace(rule.role)) {
-								oe[rule.role] = rule;
+								oe.set(rule.role,rule);
 							}
 							else {
-								oe[namespace + rule.role] = rule;
+								oe.set(namespace + rule.role,rule);
 							}
 						}).bind(this));
 					}
-					cardr[cardrKey].outgoingEdges = oe;
+
+					cardr.get(cardrKey).outgoingEdges = oe;
 					var ie = new Hash();
 					if (rules.incomingEdges) {
 						rules.incomingEdges.each((function(rule){
 							if (this._isRoleOfOtherNamespace(rule.role)) {
-								ie[rule.role] = rule;
+								ie.set(rule.role, rule);
 							}
 							else {
-								ie[namespace + rule.role] = rule;
+								ie.set(namespace + rule.role,rule);
 							}
 						}).bind(this));
 					}
-					cardr[cardrKey].incomingEdges = ie;
+					cardr.get(cardrKey).incomingEdges = ie;
 				}).bind(this));
 			}
 			
 			// init containment rules
 			var conr = this._containmentRules;
-			if (jsonRules.containmentRules) {
-				jsonRules.containmentRules.each((function(rules){
+			if (jsonRules.get("containmentRules")) {
+				jsonRules.get("containmentRules").each((function(rules){
 					var conrKey;
 					if (this._isRoleOfOtherNamespace(rules.role)) {
 						conrKey = rules.role;
-					}
-					else {
+					} else {
 						this._containerStencils.push(namespace + rules.role);
 						conrKey = namespace + rules.role;
 					}
-					if (!conr[conrKey]) {
-						conr[conrKey] = [];
+					if (!conr.get(conrKey)) {
+						conr.set(conrKey, []);
 					}
 					(rules.contains||[]).each((function(containRole){
 						if (this._isRoleOfOtherNamespace(containRole)) {
-							conr[conrKey].push(containRole);
+							conr.get(conrKey).push(containRole);
 						}
 						else {
-							conr[conrKey].push(namespace + containRole);
+							conr.get(conrKey).push(namespace + containRole);
 						}
 					}).bind(this));
 				}).bind(this));
@@ -7051,8 +6831,8 @@ ORYX.Core.StencilSet.Rules = {
 			
 			// init morphing rules
 			var morphr = this._morphingRules;
-			if (jsonRules.morphingRules) {
-				jsonRules.morphingRules.each((function(rules){
+			if (jsonRules.get("morphingRules")) {
+				jsonRules.get("morphingRules").each((function(rules){
 					var morphrKey;
 					if (this._isRoleOfOtherNamespace(rules.role)) {
 						morphrKey = rules.role;
@@ -7060,8 +6840,8 @@ ORYX.Core.StencilSet.Rules = {
 					else {
 						morphrKey = namespace + rules.role;
 					}
-					if (!morphr[morphrKey]) {
-						morphr[morphrKey] = [];
+					if (!morphr.get(morphrKey)) {
+						morphr.set(morphrKey,[]);
 					}
 					if(!rules.preserveBounds) {
 						rules.preserveBounds = false;
@@ -7069,7 +6849,7 @@ ORYX.Core.StencilSet.Rules = {
 					rules.baseMorphs.each((function(baseMorphStencilId){
 						var morphStencil = this._getStencilById(namespace + baseMorphStencilId);
 						if(morphStencil) {
-							morphr[morphrKey].push(morphStencil);
+							morphr.get(morphrKey).push(morphStencil);
 						}
 					}).bind(this));
 				}).bind(this));
@@ -7077,7 +6857,7 @@ ORYX.Core.StencilSet.Rules = {
 			
 			// init layouting rules
 			var layoutRules = this._layoutRules;
-			if (jsonRules.layoutRules) {
+			if (jsonRules.get("layoutRules")) {
 				
 				var getDirections = function(o){
 					return {
@@ -7089,7 +6869,7 @@ ORYX.Core.StencilSet.Rules = {
 						}
 				}
 				
-				jsonRules.layoutRules.each(function(rules){
+				jsonRules.get("layoutRules").each(function(rules){
 					var layoutKey;
 					if (this._isRoleOfOtherNamespace(rules.role)) {
 						layoutKey = rules.role;
@@ -7097,20 +6877,20 @@ ORYX.Core.StencilSet.Rules = {
 					else {
 						layoutKey = namespace + rules.role;
 					}
-					if (!layoutRules[layoutKey]) {
-						layoutRules[layoutKey] = {};
+					if (!layoutRules.get(layoutKey)) {
+						layoutRules.set(layoutKey,{});
 					}
 					if (rules["in"]){
-						layoutRules[layoutKey]["in"] = getDirections(rules["in"]);
+						layoutRules.get(layoutKey)["in"] = getDirections(rules["in"]);
 					}
 					if (rules["ins"]){
-						layoutRules[layoutKey]["ins"] = (rules["ins"]||[]).map(function(e){ return getDirections(e) })
+						layoutRules.get(layoutKey)["ins"] = (rules["ins"]||[]).map(function(e){ return getDirections(e) })
 					}
 					if (rules["out"]) {
-						layoutRules[layoutKey]["out"] = getDirections(rules["out"]);
+						layoutRules.get(layoutKey)["out"] = getDirections(rules["out"]);
 					}
 					if (rules["outs"]){
-						layoutRules[layoutKey]["outs"] = (rules["outs"]||[]).map(function(e){ return getDirections(e) })
+						layoutRules.get(layoutKey)["outs"] = (rules["outs"]||[]).map(function(e){ return getDirections(e) })
 					}
 				}.bind(this));
 			}			
@@ -7601,7 +7381,7 @@ ORYX.Core.StencilSet.Rules = {
 		} else {
 			if(args.sourceStencil) {
 				resultCR = args.sourceStencil.roles().any(function(sourceRole) {
-					var targetRoles = edgeRules[sourceRole];
+					var targetRoles = edgeRules.get(sourceRole);
 
 					if(!targetRoles) {return false;}
 		
@@ -8106,12 +7886,12 @@ ORYX.Core.StencilSet.Rules = {
 	_getConnectionRulesOfEdgeStencil: function(edgeStencil) {
 		var edgeRules = new Hash();
 		edgeStencil.roles().each((function(role) {
-			if(this._connectionRules[role]) {
-				this._connectionRules[role].each(function(cr) {
-					if(edgeRules[cr.key]) {
-						edgeRules[cr.key] = edgeRules[cr.key].concat(cr.value);
+			if(this._connectionRules.get(role)) {
+				this._connectionRules.get(role).each(function(cr) {
+					if(edgeRules.get(cr.key)) {
+						edgeRules.set(cr.key,edgeRules.get([cr.key]).concat(cr.value));
 					} else {
-						edgeRules[cr.key] = cr.value;
+						edgeRules.set(cr.key,cr.value);
 					}
 				});
 			}
@@ -8127,16 +7907,6 @@ ORYX.Core.StencilSet.Rules = {
 	toString: function() { return "Rules"; }
 }
 ORYX.Core.StencilSet.Rules = Clazz.extend(ORYX.Core.StencilSet.Rules);
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
 /**
  * Init namespace
  */
@@ -8311,7 +8081,7 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
     },
     
     stencil: function(id){
-        return this._stencils[id];
+        return this._stencils.get(id);
     },
     
     title: function(){
@@ -8361,11 +8131,12 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
 		try {
 			eval("var jsonExtension = " + str);
 
-			if(!(jsonExtension["extends"].endsWith("#")))
-					jsonExtension["extends"] += "#";
-					
+			if(!(jsonExtension["extends"].endsWith("#"))){
+                jsonExtension["extends"] += "#";
+            }
+
 			if(jsonExtension["extends"] == this.namespace()) {
-				this._extensions[jsonExtension.namespace] = jsonExtension;
+				this._extensions.set(jsonExtension.namespace,jsonExtension);
 				
 				var defaultPosition = this._stencils.keys().size();
 				//load new stencils
@@ -8373,8 +8144,8 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
 					$A(jsonExtension.stencils).each(function(stencil) {
 						defaultPosition++;
 						var oStencil = new ORYX.Core.StencilSet.Stencil(stencil, this.namespace(), this._baseUrl, this, undefined, defaultPosition);            
-						this._stencils[oStencil.id()] = oStencil;
-						this._availableStencils[oStencil.id()] = oStencil;
+						this._stencils.set(oStencil.id(),oStencil);
+						this._availableStencils.set(oStencil.id(),oStencil);
 					}.bind(this));
 				}
 				
@@ -8434,8 +8205,8 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
 			if(jsonExtension.stencils) {
 				$A(jsonExtension.stencils).each(function(stencil) {
 					var oStencil = new ORYX.Core.StencilSet.Stencil(stencil, this.namespace(), this._baseUrl, this);            
-					delete this._stencils[oStencil.id()]; // maybe not ??
-					delete this._availableStencils[oStencil.id()];
+					this._stencils.unset(oStencil.id());
+					this._availableStencils(oStencil.id());
 				}.bind(this));
 			}
 			
@@ -8481,7 +8252,7 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
 			if(jsonExtension.removestencils) {
 				$A(jsonExtension.removestencils).each(function(remstencil) {
 					var sId = jsonExtension["extends"] + remstencil;
-					this._availableStencils[sId] = this._stencils[sId];
+					this._availableStencils.set(sId, this._stencils.get(sId));
 				}.bind(this));
 			}
 		}
@@ -8489,15 +8260,9 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
 	},
     
     __handleStencilset: function(response){
-    
-        try {
-            // using eval instead of prototype's parsing,
-            // since there are functions in this JSON.
-            eval("this._jsonObject =" + response.responseText);
-        } 
-        catch (e) {
-            throw "Stenciset corrupt: " + e;
-        }
+
+		//removed eval call seemed overkill.
+       this._jsonObject = response.responseJSON;
         
         // assert it was parsed.
         if (!this._jsonObject) {
@@ -8542,7 +8307,7 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
 		// init property packages
 		if(this._jsonObject.propertyPackages) {
 			$A(this._jsonObject.propertyPackages).each((function(pp) {
-				pps[pp.name] = pp.properties;
+				pps.set(pp.name,pp.properties);
 			}).bind(this));
 		}
 		
@@ -8554,8 +8319,8 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
         	
             // instantiate normally.
             var oStencil = new ORYX.Core.StencilSet.Stencil(stencil, this.namespace(), this._baseUrl, this, pps, defaultPosition);      
-			this._stencils[oStencil.id()] = oStencil;
-			this._availableStencils[oStencil.id()] = oStencil;
+			this._stencils.set(oStencil.id(),oStencil);
+			this._availableStencils.set(oStencil.id(),oStencil);
             
         }).bind(this));
     },
@@ -8568,16 +8333,6 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
         return "StencilSet " + this.title() + " (" + this.namespace() + ")";
     }
 });
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
 /**
  * Init namespace
  */
@@ -8617,7 +8372,7 @@ ORYX.Core.StencilSet.stencilSets = function(editorId) {
 	if(stencilSetNSs) {
 		stencilSetNSs.each(function(stencilSetNS) {
 			var stencilSet = ORYX.Core.StencilSet.stencilSet(stencilSetNS)
-			stencilSets[stencilSet.namespace()] = stencilSet;
+			stencilSets.set(stencilSet.namespace(),stencilSet);
 		});
 	}
 	return stencilSets;
@@ -8745,16 +8500,6 @@ ORYX.Core.StencilSet.getTranslation = function(jsonObject, name) {
 		
 	return jsonObject[name];
 };
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
 /**
  * Init namespaces
  */
@@ -8783,17 +8528,7 @@ ORYX.Core.Command = Clazz.extend({
 	}
 	
 	
- });/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-/**
+ });/**
  * Init namespaces
  */
 if(!ORYX) {var ORYX = {};}
@@ -9201,17 +8936,7 @@ ORYX.Core.Bounds = {
 	}
  };
  
-ORYX.Core.Bounds = Clazz.extend(ORYX.Core.Bounds);/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-/**
+ORYX.Core.Bounds = Clazz.extend(ORYX.Core.Bounds);/**
  * Init namespaces
  */
 if(!ORYX) {var ORYX = {};}
@@ -9497,17 +9222,7 @@ ORYX.Core.UIObject = {
 	
 	toString: function() { return "UIObject " + this.id }
  };
- ORYX.Core.UIObject = Clazz.extend(ORYX.Core.UIObject);/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-/**
+ ORYX.Core.UIObject = Clazz.extend(ORYX.Core.UIObject);/**
  * Init namespaces
  */
 if(!ORYX) {var ORYX = {};}
@@ -9553,8 +9268,8 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 		//Initialization of property map and initial value.
 		this._stencil.properties().each((function(property) {
 			var key = property.prefix() + "-" + property.id();
-			this.properties[key] = property.value();
-			this.propertiesChanged[key] = true;
+			this.properties.set(key,property.value());
+			this.propertiesChanged.set(key,true);
 		}).bind(this));
 		
 		// if super stencil was defined, also regard stencil's properties:
@@ -9562,9 +9277,9 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 			stencil.properties().each((function(property) {
 				var key = property.prefix() + "-" + property.id();
 				var value = property.value();
-				var oldValue = this.properties[key];
-				this.properties[key] = value;
-				this.propertiesChanged[key] = true;
+				var oldValue = this.properties.get(key);
+				this.properties.set(key,value);
+				this.propertiesChanged.set(key,true);
 
 				// Raise an event, to show that the property has changed
 				// required for plugins like processLink.js
@@ -9730,12 +9445,12 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 					if(candidates.length > 0) {
 						var nodesInZOrder = $A(node.node.parentNode.childNodes);
 						var zOrderIndex = nodesInZOrder.indexOf(node.node);
-						nodesAtPosition[zOrderIndex] = candidates;
+						nodesAtPosition.set(zOrderIndex,candidates);
 					}
 				});
 				
 				nodesAtPosition.keys().sort().each(function(key) {
-					result = result.concat(nodesAtPosition[key]);
+					result = result.concat(nodesAtPosition.get(key));
 				});
  			});
 						
@@ -9752,10 +9467,10 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 	 * @param value {Object} Can be of type String or Number according to property type.
 	 */
 	setProperty: function(key, value, force) {
-		var oldValue = this.properties[key];
+		var oldValue = this.properties.get(key);
 		if(oldValue !== value || force === true) {
-			this.properties[key] = value;
-			this.propertiesChanged[key] = true;
+			this.properties.set(key,value);
+			this.propertiesChanged.set(key,true);
 			this._changed();
 			
 			// Raise an event, to show that the property has changed
@@ -9794,12 +9509,12 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 	setHiddenProperty: function(key, value) {
 		// IF undefined, Delete
 		if (value === undefined) {
-			delete this.hiddenProperties[key];
+			this.hiddenProperties.unset(key);
 			return;
 		}
-		var oldValue = this.hiddenProperties[key];
+		var oldValue = this.hiddenProperties.get(key);
 		if (oldValue !== value) {
-			this.hiddenProperties[key] = value;
+			this.hiddenProperties.set(key,value);
 		}
 	},
 	/**
@@ -9809,7 +9524,6 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 	isPointIncluded: function(pointX, pointY, absoluteBounds) {
 		var absBounds = absoluteBounds ? absoluteBounds : this.absoluteBounds();
 		return absBounds.isIncluded(pointX, pointY);
-				
 	},
 	
 	/**
@@ -9823,11 +9537,21 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 		var serializedObject = [];
 		
 		// Add the type
-		serializedObject.push({name: 'type', prefix:'oryx', value: this.getStencil().id(), type: 'literal'});	
+		serializedObject.push({
+			name: 'type',
+			prefix:'oryx',
+			value: this.getStencil().id(),
+			type: 'literal'
+		});
 	
 		// Add hidden properties
 		this.hiddenProperties.each(function(prop){
-			serializedObject.push({name: prop.key.replace("oryx-", ""), prefix: "oryx", value: prop.value, type: 'literal'});
+			serializedObject.push({
+				name: prop.key.replace("oryx-", ""),
+				prefix: "oryx",
+				value: prop.value,
+				type: 'literal'
+			});
 		}.bind(this));
 		
 		// Add all properties
@@ -9837,7 +9561,12 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 			var name = property.id();		// Get name
 			
 			//if(typeof this.properties[prefix+'-'+name] == 'boolean' || this.properties[prefix+'-'+name] != "")
-				serializedObject.push({name: name, prefix: prefix, value: this.properties[prefix+'-'+name], type: 'literal'});
+			serializedObject.push({
+				name: name,
+				prefix: prefix,
+				value: this.properties.get(prefix+'-'+name),
+				type: 'literal'
+			});
 
 		}).bind(this));
 		
@@ -9850,7 +9579,11 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 		var initializedDocker = 0;
 		
 		// Sort properties so that the hidden properties are first in the list
-		serialize = serialize.sort(function(a,b){ a = Number(this.properties.keys().member(a.prefix+"-"+a.name)); b = Number(this.properties.keys().member(b.prefix+"-"+b.name)); return a > b ? 1 : (a < b ? -1 : 0) }.bind(this));
+		serialize = serialize.sort(function(a,b){
+			a = Number(this.properties.keys().member(a.prefix+"-"+a.name));
+			b = Number(this.properties.keys().member(b.prefix+"-"+b.name));
+			return a > b ? 1 : (a < b ? -1 : 0)
+		}.bind(this));
 		
 		serialize.each((function(obj){
 			
@@ -9900,33 +9633,35 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
      * @return {Object} A JSON object with included ORYX.Core.AbstractShape.JSONHelper and getShape() method.
      */
     toJSON: function(){
+    	//upgrade to prototype 1.6/1.7 breaks the jquery extend call. rebuilding the properties here.
+		var mergedProperties = this.properties.merge(this.hiddenProperties);
+		var resultProperties = new Hash();
+        mergedProperties.each(function(pair){
+            var key = pair.key;
+            var value = pair.value;
+
+            //If complex property, value should be a json object
+            if ( this.getStencil().property(key)
+                && this.getStencil().property(key).type() === ORYX.CONFIG.TYPE_COMPLEX
+                && Object.prototype.toString.call(value) === "String"){
+
+                try {value = JSON.parse(value);} catch(error){}
+
+                // Parse date
+            } else if (value instanceof Date&&this.getStencil().property(key)){
+                try {
+                    value = value.format(this.getStencil().property(key).dateFormat());
+                } catch(e){}
+            }
+
+            //Takes "my_property" instead of "oryx-my_property" as key
+            key = key.replace(/^[\w_]+-/, "");
+            resultProperties.set(key,value);
+		}.bind(this));
+
         var json = {
             resourceId: this.resourceId,
-            properties: jQuery.extend({}, this.properties, this.hiddenProperties).inject({}, function(props, prop){
-              var key = prop[0];
-              var value = prop[1];
-                
-              //If complex property, value should be a json object
-              if ( this.getStencil().property(key)
-                	&& this.getStencil().property(key).type() === ORYX.CONFIG.TYPE_COMPLEX 
-                	&& Object.prototype.toString.call(value) === "String"){
-						
-                  try {value = JSON.parse(value);} catch(error){}
-            	  //try {value = JSON.parse(value);} catch(error){}
-              
-			  // Parse date
-			  } else if (value instanceof Date&&this.getStencil().property(key)){
-			  	try {
-					value = value.format(this.getStencil().property(key).dateFormat());
-				} catch(e){}
-			  }
-              
-              //Takes "my_property" instead of "oryx-my_property" as key
-              key = key.replace(/^[\w_]+-/, "");
-              props[key] = value;
-              
-              return props;
-            }.bind(this)),
+            properties: resultProperties.toObject(),
             stencil: {
                 id: this.getStencil().idWithoutNs()
             },
@@ -10031,16 +9766,6 @@ ORYX.Core.AbstractShape.JSONHelper = {
          return JSON.stringify(this);
      }
  }
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
 /**
  * Init namespaces
  */
@@ -10168,20 +9893,7 @@ ORYX.Core.Canvas = ORYX.Core.AbstractShape.extend({
 	},
 	
 	focus: function(){
-		
-		try {
-			// Get a href
-			if (!this.focusEl) 
-			{
-				this.focusEl = jQuery('body').append(jQuery('<a href="#" class="x-grid3-focus x-grid3-focus-canvas"/>'));
-				this.focusEl.swallowEvent("click", true);
-			}
-			
-			// Focus it
-			this.focusEl.focus.defer(1, this.focusEl);
-			this.focusEl.blur.defer(3, this.focusEl);
-			
-		} catch(e){}
+		//removed old code that tried to focus an ExtJs widget... very strange logic...
 	},
 	
 	setHightlightState: function(state) {
@@ -10813,12 +10525,7 @@ ORYX.Core.Canvas = ORYX.Core.AbstractShape.extend({
         
         return json;
     }
- });/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
+ });
 var idCounter = 0;
 var ID_PREFIX = "resource";
 
@@ -10963,12 +10670,12 @@ ORYX.Editor = {
 		this._keydownEnabled = 	true;
 		this._keyupEnabled =  	true;
 
-		this.DOMEventListeners[ORYX.CONFIG.EVENT_MOUSEDOWN] = [];
-		this.DOMEventListeners[ORYX.CONFIG.EVENT_MOUSEUP] 	= [];
-		this.DOMEventListeners[ORYX.CONFIG.EVENT_MOUSEOVER] = [];
-		this.DOMEventListeners[ORYX.CONFIG.EVENT_MOUSEOUT] 	= [];
-		this.DOMEventListeners[ORYX.CONFIG.EVENT_SELECTION_CHANGED] = [];
-		this.DOMEventListeners[ORYX.CONFIG.EVENT_MOUSEMOVE] = [];
+		this.DOMEventListeners.set(ORYX.CONFIG.EVENT_MOUSEDOWN,[]);
+		this.DOMEventListeners.set(ORYX.CONFIG.EVENT_MOUSEUP,[]);
+		this.DOMEventListeners.set(ORYX.CONFIG.EVENT_MOUSEOVER,[]);
+		this.DOMEventListeners.set(ORYX.CONFIG.EVENT_MOUSEOUT,[]);
+		this.DOMEventListeners.set(ORYX.CONFIG.EVENT_SELECTION_CHANGED,[]);
+		this.DOMEventListeners.set(ORYX.CONFIG.EVENT_MOUSEMOVE, []);
 				
 	},
 	
@@ -11133,26 +10840,27 @@ ORYX.Editor = {
 		
 		
 		ORYX.availablePlugins.each(function(value) {
-			ORYX.Log.debug("Initializing plugin '%0'", value.name);
-				if( (!value.requires 	|| !value.requires.namespaces 	|| value.requires.namespaces.any(function(req){ return loadedStencilSetsNamespaces.indexOf(req) >= 0 }) ) &&
-					(!value.notUsesIn 	|| !value.notUsesIn.namespaces 	|| !value.notUsesIn.namespaces.any(function(req){ return loadedStencilSetsNamespaces.indexOf(req) >= 0 }) )&&
-					/*only load activated plugins or undefined */
-					(value.engaged || (value.engaged===undefined)) ){
+			ORYX.Log.debug("Initializing plugin '%0'", value.get("name"));
 
-				try {
-					var className 	= eval(value.name);
-					if( className ){
-						var plugin		= new className(facade, value);
-						plugin.type		= value.name;
-						newPlugins.push( plugin );
-						plugin.engaged=true;
-					}
-				} catch(e) {
-					ORYX.Log.warn("Plugin %0 is not available %1", value.name, e);
+			if( (!value.get("requires") || !value.get("requires").namespaces 	|| value.get("requires").namespaces.any(function(req){ return loadedStencilSetsNamespaces.indexOf(req) >= 0 }) ) &&
+				(!value.get("notUsesIn")|| !value.get("notUsesIn").namespaces 	|| !value.get("notUsesIn").namespaces.any(function(req){ return loadedStencilSetsNamespaces.indexOf(req) >= 0 }) )&&
+				/*only load activated plugins or undefined */
+				(value.get("engaged") || (value.get("engaged")===undefined)) ){
+
+			try {
+				var className 	= eval(value.get("name"));//wow funcky code here!
+				if( className ){
+					var plugin		= new className(facade, value);
+					plugin.type		= value.get("name");
+					newPlugins.push( plugin );
+					plugin.engaged=true;
 				}
+			} catch(e) {
+				ORYX.Log.warn("Plugin %0 is not available %1", value.get("name"), e);
+			}
 							
 			} else {
-				ORYX.Log.info("Plugin need a stencilset which is not loaded'", value.name);
+				ORYX.Log.info("Plugin need a stencilset which is not loaded'", value.get("name"));
 			}
 			
 		});
@@ -11657,8 +11365,8 @@ ORYX.Editor = {
 			this._keyupEnabled = false;
 		}
 		if(this.DOMEventListeners.keys().member(eventType)) {
-			var value = this.DOMEventListeners.remove(eventType);
-			this.DOMEventListeners['disable_' + eventType] = value;
+			var value = this.DOMEventListeners.unset(eventType);
+			this.DOMEventListeners.set('disable_' + eventType, value);
 		}
 	},
 
@@ -11672,8 +11380,8 @@ ORYX.Editor = {
 		}
 		
 		if(this.DOMEventListeners.keys().member("disable_" + eventType)) {
-			var value = this.DOMEventListeners.remove("disable_" + eventType);
-			this.DOMEventListeners[eventType] = value;
+			var value = this.DOMEventListeners.unset("disable_" + eventType);
+			this.DOMEventListeners.set(eventType,value);
 		}
 	},
 
@@ -11682,15 +11390,15 @@ ORYX.Editor = {
 	 */
 	registerOnEvent: function(eventType, callback) {
 		if(!(this.DOMEventListeners.keys().member(eventType))) {
-			this.DOMEventListeners[eventType] = [];
+			this.DOMEventListeners.set(eventType,[]);
 		}
 
-		this.DOMEventListeners[eventType].push(callback);
+		this.DOMEventListeners.get(eventType).push(callback);
 	},
 
 	unregisterOnEvent: function(eventType, callback) {
 		if(this.DOMEventListeners.keys().member(eventType)) {
-			this.DOMEventListeners[eventType] = this.DOMEventListeners[eventType].without(callback);
+			this.DOMEventListeners.set(eventType,this.DOMEventListeners.get(eventType).without(callback));
 		} else {
 			// Event is not supported
 			// TODO: Error Handling
@@ -12028,7 +11736,7 @@ ORYX.Editor = {
 	*/
 	_executeEventImmediately: function(eventObj) {
 		if(this.DOMEventListeners.keys().member(eventObj.event.type)) {
-			this.DOMEventListeners[eventObj.event.type].each((function(value) {
+			this.DOMEventListeners.get(eventObj.event.type).each((function(value) {
 				value(eventObj.event, eventObj.arg);		
 			}).bind(this));
 		}
@@ -12420,7 +12128,7 @@ ORYX.Editor.createByUrl = function(modelUrl){
  * need to graft elements in a certain xmlns and wish to assign attributes
  * in both that and another xmlns, you will need to do stepwise grafting,
  * adding non-default attributes yourself or you'll have to enhance this
- * function. Latter, I would appreciate: martin???apfelfabrik.de
+ * function. Latter, I would appreciate: martin�apfelfabrik.de
  * @param {Object} namespace The namespace in which
  * 					elements should be grafted.
  * @param {Object} parent The element that should contain the grafted
@@ -12598,16 +12306,6 @@ ORYX.Editor.checkClassType = function( classInst, classType ) {
 		return classInst == classType
 	}
 };
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
 /**
  * Init namespaces
  */
@@ -12760,16 +12458,6 @@ new function(){
 	});
 	
 }();
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
 /**
  * Init namespaces
  */
@@ -12850,10 +12538,10 @@ ORYX.Core.Shape = {
 			var me = this;
 			this.propertiesChanged.each((function(propChanged) {
 				if(propChanged.value) {
-					var prop = this.properties[propChanged.key];
+					var prop = this.properties.get(propChanged.key);
 					var property = this.getStencil().property(propChanged.key);
 					if (property != undefined) {
-						this.propertiesChanged[propChanged.key] = false;
+						this.propertiesChanged.set(propChanged.key,false);
 	
 						//handle choice properties
 						if(property.type() == ORYX.CONFIG.TYPE_CHOICE) {
@@ -12861,7 +12549,7 @@ ORYX.Core.Shape = {
 							property.refToView().each((function(ref) {
 								//if property is referencing a label, update the label
 								if(ref !== "") {
-									var label = this._labels[this.id + ref];
+									var label = this._labels.get(this.id + ref);
 									if (label && property.item(prop)) {
 										label.text(property.item(prop).title());
 									}
@@ -12882,9 +12570,9 @@ ORYX.Core.Shape = {
 									
 									
 									/* Do not refresh the same svg element multiple times */
-									if(!refreshedSvgElements[svgElem.id] || prop == item.value()) {
+									if(!refreshedSvgElements.get(svgElem.id) || prop == item.value()) {
 										svgElem.setAttributeNS(null, 'display', ((prop == item.value()) ? 'inherit' : 'none'));
-										refreshedSvgElements[svgElem.id] = svgElem;
+										refreshedSvgElements.set(svgElem.id,svgElem);
 									}
 									
 									// Reload the href if there is an image-tag
@@ -12978,7 +12666,7 @@ ORYX.Core.Shape = {
 								}
 								
 								if (property.complexAttributeToView()) {
-									var label = this._labels[refId];
+									var label = this._labels.get(refId);
 									if (label) {
 										try {
 									    	propJson = prop.evalJSON();
@@ -13030,25 +12718,25 @@ ORYX.Core.Shape = {
 											}
 											break;
 										case ORYX.CONFIG.TYPE_STRING:
-											var label = this._labels[refId];
+											var label = this._labels.get(refId);
 											if (label) {
 												label.text(prop);
 											}
 											break;
 										case ORYX.CONFIG.TYPE_EXPRESSION:
-											var label = this._labels[refId];
+											var label = this._labels.get(refId);
 											if (label) {
 												label.text(prop);
 											}
 											break;
 										case ORYX.CONFIG.TYPE_DATASOURCE:
-											var label = this._labels[refId];
+											var label = this._labels.get(refId);
 											if (label) {
 												label.text(prop);
 											}
 											break;	
 										case ORYX.CONFIG.TYPE_INTEGER:
-											var label = this._labels[refId];
+											var label = this._labels.get[refId];
 											if (label) {
 												label.text(prop);
 											}
@@ -13061,7 +12749,7 @@ ORYX.Core.Shape = {
 												svgElem.setAttributeNS(null, 'stroke-opacity', prop);
 											}
 											if(!property.fillOpacity() && !property.strokeOpacity()) {
-												var label = this._labels[refId];
+												var label = this._labels.get(refId);
 												if (label) {
 													label.text(prop);
 												}
@@ -13679,17 +13367,7 @@ ORYX.Core.Shape = {
 
 	toString: function() { return "ORYX.Core.Shape " + this.getId() }
 };
-ORYX.Core.Shape = ORYX.Core.AbstractShape.extend(ORYX.Core.Shape);/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-/**
+ORYX.Core.Shape = ORYX.Core.AbstractShape.extend(ORYX.Core.Shape);/**
  * Init namespaces
  */
 if(!ORYX) {var ORYX = {};}
@@ -13703,17 +13381,7 @@ if(!ORYX.Core.Controls) {ORYX.Core.Controls = {};}
 ORYX.Core.Controls.Control = ORYX.Core.UIObject.extend({
 	
 	toString: function() { return "Control " + this.id; }
- });/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-/**
+ });/**
  * Init namespaces
  */
 if(!ORYX) {var ORYX = {};}
@@ -14084,17 +13752,7 @@ ORYX.Core.Controls.Docker = ORYX.Core.Controls.Control.extend({
 	},
 	
 	toString: function() { return "Docker " + this.id }
-});/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-/**
+});/**
  * Init namespaces
  */
 if(!ORYX) {var ORYX = {};}
@@ -14168,16 +13826,6 @@ ORYX.Core.Controls.Magnet = ORYX.Core.Controls.Control.extend({
 		return "Magnet " + this.id;
 	}
 });
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
 /**
  * Init namespaces
  */
@@ -14956,7 +14604,7 @@ ORYX.Core.Node = {
             });
             label.x -= offsetX;
             label.y -= offsetY;
-            this._labels[label.id] = label;
+            this._labels.set(label.id,label);
 			
 			label.registerOnChange(this.layout.bind(this));
 			
@@ -15031,15 +14679,6 @@ ORYX.Core.Node = {
     }
 };
 ORYX.Core.Node = ORYX.Core.Shape.extend(ORYX.Core.Node);
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
 
 NAMESPACE_SVG = "http://www.w3.org/2000/svg";
 NAMESPACE_ORYX = "http://www.b3mn.org/oryx";
@@ -15509,12 +15148,11 @@ ORYX.Core.Edge = {
 		position.y = 0;
 		
 		/* Case: Node was just added */
-		if(!this.attachedNodePositionData[node.getId()]) {
-			this.attachedNodePositionData[node.getId()] = new Object();
-			this.attachedNodePositionData[node.getId()]
-					.relativDistanceFromDocker1 = 0;
-			this.attachedNodePositionData[node.getId()].node = node;
-			this.attachedNodePositionData[node.getId()].segment = new Object();
+		if(!this.attachedNodePositionData.get(node.getId())) {
+			this.attachedNodePositionData.set(node.getId(),new Object());
+			this.attachedNodePositionData.get(node.getId()).relativDistanceFromDocker1 = 0;
+			this.attachedNodePositionData.get(node.getId()).node = node;
+			this.attachedNodePositionData.get(node.getId()).segment = new Object();
 			this.findEdgeSegmentForNode(node);
 		}else if(node.isChanged) {
 			this.findEdgeSegmentForNode(node);
@@ -15553,10 +15191,8 @@ ORYX.Core.Edge = {
 				
 				smallestDistance = distance;
 				
-				this.attachedNodePositionData[node.getId()].segment.docker1 = 
-													this.dockers[i-1];
-				this.attachedNodePositionData[node.getId()].segment.docker2 = 
-													this.dockers[i];
+				this.attachedNodePositionData.get(node.getId()).segment.docker1 = this.dockers[i-1];
+				this.attachedNodePositionData.get(node.getId()).segment.docker2 = this.dockers[i];
 	
 			}
 			
@@ -15567,23 +15203,25 @@ ORYX.Core.Edge = {
 			 * 
 			 */
 			if(!distance && !smallestDistance && smallestDistance != 0) {
-				(ORYX.Core.Math.getDistancePointToPoint(nodeCenterPoint, lineP1)
-					< ORYX.Core.Math.getDistancePointToPoint(nodeCenterPoint, lineP2)) ?
-					this.attachedNodePositionData[node.getId()].relativDistanceFromDocker1 = 0 :
-					this.attachedNodePositionData[node.getId()].relativDistanceFromDocker1 = 1;
-				this.attachedNodePositionData[node.getId()].segment.docker1 = 
-													this.dockers[i-1];
-				this.attachedNodePositionData[node.getId()].segment.docker2 = 
-													this.dockers[i];
+				var distanceCenterToLineOne = ORYX.Core.Math.getDistancePointToPoint(nodeCenterPoint, lineP1);
+				var distanceCenterToLineTwo = ORYX.Core.Math.getDistancePointToPoint(nodeCenterPoint, lineP2);
+
+				if(distanceCenterToLineOne < distanceCenterToLineTwo){
+                    this.attachedNodePositionData.get(node.getId()).relativDistanceFromDocker1 = 0
+                }else{
+                    this.attachedNodePositionData.get(node.getId()).relativDistanceFromDocker1 = 1;
+				}
+				this.attachedNodePositionData.get(node.getId()).segment.docker1 = this.dockers[i-1];
+				this.attachedNodePositionData.get(node.getId()).segment.docker2 = this.dockers[i];
 			}
 		}
 		
 		/* Calculate position on edge segment for the node */
 		if(smallestDistance || smallestDistance == 0) {
-			this.attachedNodePositionData[node.getId()].relativDistanceFromDocker1 =
+			this.attachedNodePositionData.get(node.getId()).relativDistanceFromDocker1 =
 			this.getLineParameterForPosition(
-					this.attachedNodePositionData[node.getId()].segment.docker1,
-					this.attachedNodePositionData[node.getId()].segment.docker2,
+					this.attachedNodePositionData.get(node.getId()).segment.docker1,
+					this.attachedNodePositionData.get(node.getId()).segment.docker2,
 					node);
 		}
 	},
@@ -15697,7 +15335,7 @@ ORYX.Core.Edge = {
         //TODO consider points for marker mids
         var lastPoint;
         this._paths.each((function(path, index){
-            var dockers = this._dockersByPath[path.id];
+            var dockers = this._dockersByPath.get(path.id);
             var c = undefined;
 			var d = undefined;
             if (lastPoint) {
@@ -16000,8 +15638,8 @@ ORYX.Core.Edge = {
 	remove: function(shape) {
 		arguments.callee.$.remove.apply(this, arguments);
 		
-		if(this.attachedNodePositionData[shape.getId()]) {
-			delete this.attachedNodePositionData[shape.getId()];
+		if(this.attachedNodePositionData.get(shape.getId())) {
+			this.attachedNodePositionData.unset[shape.getId()];
 		}
 		
 		/* Adjust child shapes if neccessary */
@@ -16217,7 +15855,7 @@ ORYX.Core.Edge = {
                     }
                     else {
                         this.remove(docker);
-                        this._dockersByPath[pair.key] = pair.value.without(docker);
+                        this._dockersByPath.set(pair.key,pair.value.without(docker));
                         this.isChanged = true;
                         this._dockerChanged();
                         return true;
@@ -16286,7 +15924,7 @@ ORYX.Core.Edge = {
             markerElements.each(function(markerElement){
                 try {
                     marker = new ORYX.Core.SVG.SVGMarker(markerElement.cloneNode(true));
-                    me._markers[marker.id] = marker;
+                    me._markers.set(marker.id,marker);
                     var textElements = $A(marker.element.getElementsByTagNameNS(NAMESPACE_SVG, "text"));
                     var label;
                     textElements.each(function(textElement){
@@ -16294,7 +15932,7 @@ ORYX.Core.Edge = {
                             textElement: textElement,
 							shapeId: this.id
                         });
-                        me._labels[label.id] = label;
+                        me._labels.set(label.id,label);
                     });
                 } 
                 catch (e) {
@@ -16333,7 +15971,7 @@ ORYX.Core.Edge = {
                     var markerStartId = this.getValidMarkerId(markerUrl);
                     path.setAttributeNS(null, "marker-start", "url(#" + markerStartId + ")");
                     
-                    markersByThisPath.push(this._markers[markerStartId]);
+                    markersByThisPath.push(this._markers.get(markerStartId));
                 }
                 
                 markerUrl = path.getAttributeNS(null, "marker-mid");
@@ -16344,7 +15982,7 @@ ORYX.Core.Edge = {
                     var markerMidId = this.getValidMarkerId(markerUrl);
                     path.setAttributeNS(null, "marker-mid", "url(#" + markerMidId + ")");
                     
-                    markersByThisPath.push(this._markers[markerMidId]);
+                    markersByThisPath.push(this._markers.get(markerMidId));
                 }
                 
                 markerUrl = path.getAttributeNS(null, "marker-end");
@@ -16355,10 +15993,10 @@ ORYX.Core.Edge = {
                     var markerEndId = this.getValidMarkerId(markerUrl);
                     path.setAttributeNS(null, "marker-end", "url(#" + markerEndId + ")");
                     
-                    markersByThisPath.push(this._markers[markerEndId]);
+                    markersByThisPath.push(this._markers.get(markerEndId));
                 }
                 
-                this._markersByPath[pathId] = markersByThisPath;
+                this._markersByPath.set(pathId,markersByThisPath);
                 
                 //init dockers
                 var parser = new PathParser();
@@ -16370,7 +16008,7 @@ ORYX.Core.Edge = {
                     throw "Edge: Path has to have two or more points specified.";
                 }
                 
-                this._dockersByPath[pathId] = [];
+                this._dockersByPath.set(pathId,[]);
                 
 				for (var i = 0; i < handler.points.length; i += 2) {
 					//handler.points.each((function(point, pIndex){
@@ -16465,7 +16103,7 @@ ORYX.Core.Edge = {
 				shapeId: this.id
             });
             this.node.childNodes[0].childNodes[0].appendChild(label.node);
-            this._labels[label.id] = label;
+            this._labels.set(label.id,label);
 			
 			label.registerOnChange(this.layout.bind(this));
         }).bind(this)); 
@@ -16724,17 +16362,17 @@ ORYX.Core.Edge = {
                     
                     if (path) {
                         if (index === 0) {
-                            while (this._dockersByPath[path.id].length > 2) {
-                                this.removeDocker(this._dockersByPath[path.id][1]);
+                            while (this._dockersByPath.get(path.id).length > 2) {
+                                this.removeDocker(this._dockersByPath.get(path.id)[1]);
                             }
                         }
                         else {
                             while (this._dockersByPath[path.id].length > 1) {
-                                this.removeDocker(this._dockersByPath[path.id][0]);
+                                this.removeDocker(this._dockersByPath.get(path.id)[0]);
                             }
                         }
                         
-                        var dockersByPath = this._dockersByPath[path.id];
+                        var dockersByPath = this._dockersByPath.get(path.id);
                         
                         if (index === 0) {
                             //set position of first docker
@@ -16839,15 +16477,6 @@ ORYX.Core.Edge = {
     }
 };
 ORYX.Core.Edge = ORYX.Core.Shape.extend(ORYX.Core.Edge);
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
 
 if(!ORYX){ var ORYX = {} }
 if(!ORYX.Plugins){ ORYX.Plugins = {} }
@@ -17383,16 +17012,7 @@ ORYX.Plugins.AbstractPlugin = Clazz.extend({
 		this.facade.executeCommands([new Command(allEdges, node, offset, this)]);
 
 	}
-});/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
+});
 if(!ORYX){ var ORYX = {} }
 if(!ORYX.Plugins){ ORYX.Plugins = {} }
 
@@ -17484,17 +17104,7 @@ ORYX.Plugins.AbstractLayouter = ORYX.Plugins.AbstractPlugin.extend({
 	layout: function(shapes){
 		throw new Error("Layouter has to implement the layout function.")
 	}
-});/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-if (!ORYX.Plugins) 
+});if (!ORYX.Plugins) 
     ORYX.Plugins = new Object();
 
 ORYX.Plugins.Edit = Clazz.extend({
@@ -17964,17 +17574,7 @@ ORYX.Plugins.Edit.DeleteCommand = ORYX.Core.Command.extend({
 		this.facade.updateSelection();
         
     }
-});/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-/**
+});/**
  * @namespace Oryx name space for plugins
  * @name ORYX.Plugins
 */
@@ -18004,7 +17604,7 @@ ORYX.Plugins.View = {
 		
 		//Read properties
 		if (ownPluginData !== undefined && ownPluginData !== null) {
-			ownPluginData.properties.each( function(property) {			
+			ownPluginData.get("properties").each( function(property) {
 				if (property.zoomLevel) {this.zoomLevel = Number(1.0);}		
 				if (property.maxFitToScreenLevel) {this.maxFitToScreenLevel=Number(property.maxFitToScreenLevel);}
 				if (property.minZoomLevel) {this.minZoomLevel = Number(property.minZoomLevel);}
@@ -18198,26 +17798,10 @@ ORYX.Plugins.View = {
 };
 
 ORYX.Plugins.View = Clazz.extend(ORYX.Plugins.View);
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
 if(!Signavio){ var Signavio = {} };
 	if (!Signavio.Core) { Signavio.Core = {} };
 	Signavio.Core.Version = "1.0";
-			/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-if (!Signavio) {
+			if (!Signavio) {
 	var Signavio = new Object();
 }
 
@@ -18259,16 +17843,6 @@ new function() {
 
 
 }();
-
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
 
 if (!ORYX.Plugins) {
     ORYX.Plugins = new Object();
@@ -18343,19 +17917,9 @@ ORYX.Plugins.Loading = {
 }
 
 ORYX.Plugins.Loading = Clazz.extend(ORYX.Plugins.Loading);
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
 if (!ORYX.Plugins) {
     ORYX.Plugins = new Object();
 }
-
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
 
 /**
  * This plugin is responsible for resizing the canvas.
@@ -18396,9 +17960,18 @@ ORYX.Plugins.CanvasResize = Clazz.extend({
     			// Move all children
     			canvas.getChildNodes(false, function(shape){ shape.bounds.moveBy(move) })
     			// Move all dockers, when the edge has at least one docked shape
-    			var edges = canvas.getChildEdges().findAll(function(edge){ return edge.getAllDockedShapes().length > 0})
-    			var dockers = edges.collect(function(edge){ return edge.dockers.findAll(function(docker){ return !docker.getDockedShape() })}).flatten();
-    			dockers.each(function(docker){ docker.bounds.moveBy(move)})
+    			var edges = canvas.getChildEdges().findAll(function(edge){
+    				return edge.getAllDockedShapes().length > 0
+    			});
+    			var dockers = edges.collect(function(edge){
+						return edge.dockers.findAll(function(docker){
+							return !docker.getDockedShape();
+						});
+    			}).flatten();
+
+    			dockers.each(function(docker){
+    				docker.bounds.moveBy(move);
+    			});
     		} else if( position == "S" ){
     			scrollNode.scrollTop += extentionSize;
     		} else if( position == "E" ){
@@ -18448,8 +18021,8 @@ ORYX.Plugins.CanvasResizeButton = Clazz.extend({
 			
 		var actualScrollNode = jQuery('#canvasSection')[0];
 		var scrollNode 	= actualScrollNode;
-		var canvasNode = jQuery('#canvasSection').find(".ORYX_Editor")[0];
-		var svgRootNode = canvasNode.children[0];
+		var canvasNode = $$("#canvasSection .ORYX_Editor")[0];
+        var svgRootNode = canvasNode.children[0];
 		
 		var iconClass = 'glyphicon glyphicon-chevron-';
 		var iconClassShrink = 'glyphicon glyphicon-chevron-';
@@ -18568,16 +18141,6 @@ ORYX.Plugins.CanvasResizeButton = Clazz.extend({
 	
 
 });
-
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
 
 if (!ORYX.Plugins) 
     ORYX.Plugins = new Object();
@@ -18702,8 +18265,8 @@ ORYX.Plugins.RenameShapes = Clazz.extend({
 		textInput.style.left = (center.x < 10) ? 10 : center.x + 'px';
 		textInput.style.top = (center.y - 15) + 'px';
 		textInput.className = 'x-form-textarea x-form-field x_form_text_set_absolute';
-		textInput.value = shape.properties[propId];
-		this.oldValueText = shape.properties[propId];
+		textInput.value = shape.properties.get(propId);
+		this.oldValueText = shape.properties.get(propId);
 		document.getElementById('canvasSection').appendChild(textInput);
 		this.shownTextField = textInput;
 		
@@ -18847,16 +18410,6 @@ ORYX.Plugins.RenameShapes = Clazz.extend({
 		}
 	}
 });
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
 if(!ORYX.Plugins)
 	ORYX.Plugins = new Object();
 
@@ -18972,17 +18525,7 @@ ORYX.Plugins.ProcessLink = Clazz.extend({
 				});	
 							
 	}		
-});/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-Array.prototype.insertFrom = function(from, to){
+});Array.prototype.insertFrom = function(from, to){
 	to 			= Math.max(0, to);
 	from 		= Math.min( Math.max(0, from), this.length-1 );
 		
@@ -19435,17 +18978,7 @@ ORYX.Plugins.Arrangement = ORYX.Plugins.AbstractPlugin.extend({
 		
 		this.facade.executeCommands([command]);	
 	}
-});/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-if (!ORYX.Plugins) 
+});if (!ORYX.Plugins) 
     ORYX.Plugins = new Object();
 
 ORYX.Plugins.Save = Clazz.extend({
@@ -19506,16 +19039,6 @@ ORYX.Plugins.Save = Clazz.extend({
 		}	
 	}
 });
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
 if(!ORYX.Plugins) 
 	ORYX.Plugins = new Object();
 
@@ -21041,16 +20564,6 @@ ORYX.Core.Command.Move = ORYX.Core.Command.extend({
 		this.plugin.facade.setSelection( this.selectedShapes );
 	}
 });
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
 if(!ORYX.Plugins)
 	ORYX.Plugins = new Object();
 
@@ -21595,16 +21108,6 @@ ORYX.Plugins.DragDocker = Clazz.extend({
 
 });
 
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
 if(!ORYX.Plugins)
 	ORYX.Plugins = new Object();
 
@@ -21726,16 +21229,6 @@ ORYX.Plugins.AddDocker = Clazz.extend({
         this.facade.executeCommands([command]);
     }
 });
-
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
 
 if(!ORYX.Plugins)
 	ORYX.Plugins = new Object();
@@ -21934,16 +21427,6 @@ if(!ORYX.Plugins)
 
 });
 
-
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
 
 if(!ORYX.Plugins)
 	ORYX.Plugins = new Object(); 
@@ -22174,17 +21657,7 @@ ORYX.Plugins.HighlightingSelectedShapes = Clazz.extend({
 			this.facade.raiseEvent({type:ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE, highlightId:'subselection'});
 		}		
 	}
-});/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
-if (!ORYX.Plugins) 
+});if (!ORYX.Plugins) 
     ORYX.Plugins = new Object();
 
 ORYX.Plugins.Overlay = Clazz.extend({
@@ -22489,16 +21962,6 @@ ORYX.Plugins.Overlay = Clazz.extend({
 
     
 });
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
 if (!ORYX.Plugins) 
     ORYX.Plugins = new Object();
 
@@ -22802,16 +22265,6 @@ ORYX.Plugins.KeysMove = ORYX.Plugins.AbstractPlugin.extend({
 //    }
 	
 });
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
 if(!ORYX.Plugins) { ORYX.Plugins = {} }
 if(!ORYX.Plugins.Layouter) { ORYX.Plugins.Layouter = {} }
 
@@ -23094,16 +22547,6 @@ new function(){
 	
 	
 }()
-/*
- * Copyright 2005-2014 Alfresco Software, Ltd. All rights reserved.
- * License rights for this program may be obtained from Alfresco Software, Ltd.
- * pursuant to a written agreement and any use of this program without such an
- * agreement is prohibited.
- */
-/*
- * All code Copyright 2013 KIS Consultancy all rights reserved
- */
-
 if(!ORYX.Plugins)
 	ORYX.Plugins = new Object();
 
@@ -23594,7 +23037,7 @@ new function(){
                         width = this.adjustWidth(lanes, pool.bounds.width());          
                 }
                
-                /**???
+                /**‚
                  * Set width/height depending on containing lanes
                  */            
                 else {

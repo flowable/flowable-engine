@@ -44,8 +44,8 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 		//Initialization of property map and initial value.
 		this._stencil.properties().each((function(property) {
 			var key = property.prefix() + "-" + property.id();
-			this.properties[key] = property.value();
-			this.propertiesChanged[key] = true;
+			this.properties.set(key,property.value());
+			this.propertiesChanged.set(key,true);
 		}).bind(this));
 		
 		// if super stencil was defined, also regard stencil's properties:
@@ -53,9 +53,9 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 			stencil.properties().each((function(property) {
 				var key = property.prefix() + "-" + property.id();
 				var value = property.value();
-				var oldValue = this.properties[key];
-				this.properties[key] = value;
-				this.propertiesChanged[key] = true;
+				var oldValue = this.properties.get(key);
+				this.properties.set(key,value);
+				this.propertiesChanged.set(key,true);
 
 				// Raise an event, to show that the property has changed
 				// required for plugins like processLink.js
@@ -221,12 +221,12 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 					if(candidates.length > 0) {
 						var nodesInZOrder = $A(node.node.parentNode.childNodes);
 						var zOrderIndex = nodesInZOrder.indexOf(node.node);
-						nodesAtPosition[zOrderIndex] = candidates;
+						nodesAtPosition.set(zOrderIndex,candidates);
 					}
 				});
 				
 				nodesAtPosition.keys().sort().each(function(key) {
-					result = result.concat(nodesAtPosition[key]);
+					result = result.concat(nodesAtPosition.get(key));
 				});
  			});
 						
@@ -243,10 +243,10 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 	 * @param value {Object} Can be of type String or Number according to property type.
 	 */
 	setProperty: function(key, value, force) {
-		var oldValue = this.properties[key];
+		var oldValue = this.properties.get(key);
 		if(oldValue !== value || force === true) {
-			this.properties[key] = value;
-			this.propertiesChanged[key] = true;
+			this.properties.set(key,value);
+			this.propertiesChanged.set(key,true);
 			this._changed();
 			
 			// Raise an event, to show that the property has changed
@@ -285,12 +285,12 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 	setHiddenProperty: function(key, value) {
 		// IF undefined, Delete
 		if (value === undefined) {
-			delete this.hiddenProperties[key];
+			this.hiddenProperties.unset(key);
 			return;
 		}
-		var oldValue = this.hiddenProperties[key];
+		var oldValue = this.hiddenProperties.get(key);
 		if (oldValue !== value) {
-			this.hiddenProperties[key] = value;
+			this.hiddenProperties.set(key,value);
 		}
 	},
 	/**
@@ -300,7 +300,6 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 	isPointIncluded: function(pointX, pointY, absoluteBounds) {
 		var absBounds = absoluteBounds ? absoluteBounds : this.absoluteBounds();
 		return absBounds.isIncluded(pointX, pointY);
-				
 	},
 	
 	/**
@@ -314,11 +313,21 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 		var serializedObject = [];
 		
 		// Add the type
-		serializedObject.push({name: 'type', prefix:'oryx', value: this.getStencil().id(), type: 'literal'});	
+		serializedObject.push({
+			name: 'type',
+			prefix:'oryx',
+			value: this.getStencil().id(),
+			type: 'literal'
+		});
 	
 		// Add hidden properties
 		this.hiddenProperties.each(function(prop){
-			serializedObject.push({name: prop.key.replace("oryx-", ""), prefix: "oryx", value: prop.value, type: 'literal'});
+			serializedObject.push({
+				name: prop.key.replace("oryx-", ""),
+				prefix: "oryx",
+				value: prop.value,
+				type: 'literal'
+			});
 		}.bind(this));
 		
 		// Add all properties
@@ -328,7 +337,12 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 			var name = property.id();		// Get name
 			
 			//if(typeof this.properties[prefix+'-'+name] == 'boolean' || this.properties[prefix+'-'+name] != "")
-				serializedObject.push({name: name, prefix: prefix, value: this.properties[prefix+'-'+name], type: 'literal'});
+			serializedObject.push({
+				name: name,
+				prefix: prefix,
+				value: this.properties.get(prefix+'-'+name),
+				type: 'literal'
+			});
 
 		}).bind(this));
 		
@@ -341,7 +355,11 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 		var initializedDocker = 0;
 		
 		// Sort properties so that the hidden properties are first in the list
-		serialize = serialize.sort(function(a,b){ a = Number(this.properties.keys().member(a.prefix+"-"+a.name)); b = Number(this.properties.keys().member(b.prefix+"-"+b.name)); return a > b ? 1 : (a < b ? -1 : 0) }.bind(this));
+		serialize = serialize.sort(function(a,b){
+			a = Number(this.properties.keys().member(a.prefix+"-"+a.name));
+			b = Number(this.properties.keys().member(b.prefix+"-"+b.name));
+			return a > b ? 1 : (a < b ? -1 : 0)
+		}.bind(this));
 		
 		serialize.each((function(obj){
 			
@@ -391,33 +409,35 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
      * @return {Object} A JSON object with included ORYX.Core.AbstractShape.JSONHelper and getShape() method.
      */
     toJSON: function(){
+    	//upgrade to prototype 1.6/1.7 breaks the jquery extend call. rebuilding the properties here.
+		var mergedProperties = this.properties.merge(this.hiddenProperties);
+		var resultProperties = new Hash();
+        mergedProperties.each(function(pair){
+            var key = pair.key;
+            var value = pair.value;
+
+            //If complex property, value should be a json object
+            if ( this.getStencil().property(key)
+                && this.getStencil().property(key).type() === ORYX.CONFIG.TYPE_COMPLEX
+                && Object.prototype.toString.call(value) === "String"){
+
+                try {value = JSON.parse(value);} catch(error){}
+
+                // Parse date
+            } else if (value instanceof Date&&this.getStencil().property(key)){
+                try {
+                    value = value.format(this.getStencil().property(key).dateFormat());
+                } catch(e){}
+            }
+
+            //Takes "my_property" instead of "oryx-my_property" as key
+            key = key.replace(/^[\w_]+-/, "");
+            resultProperties.set(key,value);
+		}.bind(this));
+
         var json = {
             resourceId: this.resourceId,
-            properties: jQuery.extend({}, this.properties, this.hiddenProperties).inject({}, function(props, prop){
-              var key = prop[0];
-              var value = prop[1];
-                
-              //If complex property, value should be a json object
-              if ( this.getStencil().property(key)
-                	&& this.getStencil().property(key).type() === ORYX.CONFIG.TYPE_COMPLEX 
-                	&& Object.prototype.toString.call(value) === "String"){
-						
-                  try {value = JSON.parse(value);} catch(error){}
-            	  //try {value = JSON.parse(value);} catch(error){}
-              
-			  // Parse date
-			  } else if (value instanceof Date&&this.getStencil().property(key)){
-			  	try {
-					value = value.format(this.getStencil().property(key).dateFormat());
-				} catch(e){}
-			  }
-              
-              //Takes "my_property" instead of "oryx-my_property" as key
-              key = key.replace(/^[\w_]+-/, "");
-              props[key] = value;
-              
-              return props;
-            }.bind(this)),
+            properties: resultProperties.toObject(),
             stencil: {
                 id: this.getStencil().idWithoutNs()
             },

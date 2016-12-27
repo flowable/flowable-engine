@@ -78,10 +78,10 @@ ORYX.Core.Shape = {
 			var me = this;
 			this.propertiesChanged.each((function(propChanged) {
 				if(propChanged.value) {
-					var prop = this.properties[propChanged.key];
+					var prop = this.properties.get(propChanged.key);
 					var property = this.getStencil().property(propChanged.key);
 					if (property != undefined) {
-						this.propertiesChanged[propChanged.key] = false;
+						this.propertiesChanged.set(propChanged.key,false);
 	
 						//handle choice properties
 						if(property.type() == ORYX.CONFIG.TYPE_CHOICE) {
@@ -89,7 +89,7 @@ ORYX.Core.Shape = {
 							property.refToView().each((function(ref) {
 								//if property is referencing a label, update the label
 								if(ref !== "") {
-									var label = this._labels[this.id + ref];
+									var label = this._labels.get(this.id + ref);
 									if (label && property.item(prop)) {
 										label.text(property.item(prop).title());
 									}
@@ -110,9 +110,9 @@ ORYX.Core.Shape = {
 									
 									
 									/* Do not refresh the same svg element multiple times */
-									if(!refreshedSvgElements[svgElem.id] || prop == item.value()) {
+									if(!refreshedSvgElements.get(svgElem.id) || prop == item.value()) {
 										svgElem.setAttributeNS(null, 'display', ((prop == item.value()) ? 'inherit' : 'none'));
-										refreshedSvgElements[svgElem.id] = svgElem;
+										refreshedSvgElements.set(svgElem.id,svgElem);
 									}
 									
 									// Reload the href if there is an image-tag
@@ -206,7 +206,7 @@ ORYX.Core.Shape = {
 								}
 								
 								if (property.complexAttributeToView()) {
-									var label = this._labels[refId];
+									var label = this._labels.get(refId);
 									if (label) {
 										try {
 									    	propJson = prop.evalJSON();
@@ -258,25 +258,25 @@ ORYX.Core.Shape = {
 											}
 											break;
 										case ORYX.CONFIG.TYPE_STRING:
-											var label = this._labels[refId];
+											var label = this._labels.get(refId);
 											if (label) {
 												label.text(prop);
 											}
 											break;
 										case ORYX.CONFIG.TYPE_EXPRESSION:
-											var label = this._labels[refId];
+											var label = this._labels.get(refId);
 											if (label) {
 												label.text(prop);
 											}
 											break;
 										case ORYX.CONFIG.TYPE_DATASOURCE:
-											var label = this._labels[refId];
+											var label = this._labels.get(refId);
 											if (label) {
 												label.text(prop);
 											}
 											break;	
 										case ORYX.CONFIG.TYPE_INTEGER:
-											var label = this._labels[refId];
+											var label = this._labels.get[refId];
 											if (label) {
 												label.text(prop);
 											}
@@ -289,7 +289,7 @@ ORYX.Core.Shape = {
 												svgElem.setAttributeNS(null, 'stroke-opacity', prop);
 											}
 											if(!property.fillOpacity() && !property.strokeOpacity()) {
-												var label = this._labels[refId];
+												var label = this._labels.get(refId);
 												if (label) {
 													label.text(prop);
 												}
