@@ -11,41 +11,41 @@
  * limitations under the License.
  */
 
-package org.flowable.rest.service.api.engine.variable;
+package org.flowable.rest.variable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 
 /**
  * @author Frederik Heremans
  */
-public class LongRestVariableConverter implements RestVariableConverter {
+public class BooleanRestVariableConverter implements RestVariableConverter {
 
   @Override
   public String getRestTypeName() {
-    return "long";
+    return "boolean";
   }
 
   @Override
   public Class<?> getVariableType() {
-    return Long.class;
+    return Boolean.class;
   }
 
   @Override
-  public Object getVariableValue(RestVariable result) {
+  public Object getVariableValue(EngineRestVariable result) {
     if (result.getValue() != null) {
-      if (!(result.getValue() instanceof Number)) {
-        throw new FlowableIllegalArgumentException("Converter can only convert longs");
+      if (!(result.getValue() instanceof Boolean)) {
+        throw new FlowableIllegalArgumentException("Converter can only convert booleans");
       }
-      return ((Number) result.getValue()).longValue();
+      return result.getValue();
     }
     return null;
   }
 
   @Override
-  public void convertVariableValue(Object variableValue, RestVariable result) {
+  public void convertVariableValue(Object variableValue, EngineRestVariable result) {
     if (variableValue != null) {
-      if (!(variableValue instanceof Long)) {
-        throw new FlowableIllegalArgumentException("Converter can only convert integers");
+      if (!(variableValue instanceof Boolean)) {
+        throw new FlowableIllegalArgumentException("Converter can only convert booleans");
       }
       result.setValue(variableValue);
     } else {

@@ -11,41 +11,41 @@
  * limitations under the License.
  */
 
-package org.flowable.rest.service.api.engine.variable;
+package org.flowable.rest.variable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 
 /**
  * @author Frederik Heremans
  */
-public class BooleanRestVariableConverter implements RestVariableConverter {
+public class DoubleRestVariableConverter implements RestVariableConverter {
 
   @Override
   public String getRestTypeName() {
-    return "boolean";
+    return "double";
   }
 
   @Override
   public Class<?> getVariableType() {
-    return Boolean.class;
+    return Double.class;
   }
 
   @Override
-  public Object getVariableValue(RestVariable result) {
+  public Object getVariableValue(EngineRestVariable result) {
     if (result.getValue() != null) {
-      if (!(result.getValue() instanceof Boolean)) {
-        throw new FlowableIllegalArgumentException("Converter can only convert booleans");
+      if (!(result.getValue() instanceof Number)) {
+        throw new FlowableIllegalArgumentException("Converter can only convert doubles");
       }
-      return result.getValue();
+      return ((Number) result.getValue()).doubleValue();
     }
     return null;
   }
 
   @Override
-  public void convertVariableValue(Object variableValue, RestVariable result) {
+  public void convertVariableValue(Object variableValue, EngineRestVariable result) {
     if (variableValue != null) {
-      if (!(variableValue instanceof Boolean)) {
-        throw new FlowableIllegalArgumentException("Converter can only convert booleans");
+      if (!(variableValue instanceof Double)) {
+        throw new FlowableIllegalArgumentException("Converter can only convert doubles");
       }
       result.setValue(variableValue);
     } else {
