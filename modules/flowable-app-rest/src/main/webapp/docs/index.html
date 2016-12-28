@@ -37,7 +37,7 @@
       if (url && url.length > 1) {
         url = decodeURIComponent(url[1]);
       } else {
-        url = "specfile/flowable.json";
+        url = "specfile/process/flowable.json";
       }
 
       hljs.configure({
@@ -53,26 +53,21 @@
         dom_id: "swagger-ui-container",
         supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
         onComplete: function(swaggerApi, swaggerUi){
-          if(typeof initOAuth == "function") {
-            initOAuth({
-              clientId: "your-client-id",
-              clientSecret: "your-client-secret-if-required",
-              realm: "your-realms",
-              appName: "your-app-name",
-              scopeSeparator: " ",
-              additionalQueryStringParams: {}
-            });
-          }
-
-          if(window.SwaggerTranslator) {
+            if(window.SwaggerTranslator) {
             window.SwaggerTranslator.translate();
           }
+
+//          temp disabled; needed for basic auth on curl example
+//
+//          var basicAuth = new SwaggerClient.PasswordAuthorization('basic', 'kermit', 'kermit');
+//          swaggerUi.api.clientAuthorizations.add("basicAuth", basicAuth);
+
         },
         onFailure: function(data) {
           log("Unable to Load SwaggerUI");
         },
         docExpansion: "none",
-        jsonEditor: false,
+        jsonEditor: true,
         defaultModelRendering: 'schema',
         showRequestHeaders: false
       });
