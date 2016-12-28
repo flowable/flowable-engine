@@ -401,9 +401,9 @@ new function(){
                 var allLanes = this.getLanes(pool, true), hp;
                 var considerForDockers = allLanes.clone();
                
-                var hashedPositions = $H({});
+                var hashedPositions = new Hash();
                 allLanes.each(function(lane){
-                        hashedPositions[lane.id] = lane.bounds.upperLeft();
+                        hashedPositions.set(lane.id,lane.bounds.upperLeft());
                 })
                
                
@@ -411,7 +411,8 @@ new function(){
                 // Show/hide caption regarding the number of lanes
                 if (lanes.length === 1 && this.getLanes(lanes.first()).length <= 0) {
                         // TRUE if there is a caption
-                        lanes.first().setProperty("oryx-showcaption", lanes.first().properties["oryx-name"].trim().length > 0);
+                        var caption = lanes.first().properties.get("oryx-name").trim().length > 0;
+                        lanes.first().setProperty("oryx-showcaption", caption);
                         var rect = lanes.first().node.getElementsByTagName("rect");
                         rect[0].setAttributeNS(null, "display", "none");
                 } else {
@@ -542,7 +543,8 @@ new function(){
                         this.updateDockers(considerForDockers, pool);
                        
                         // Check if the order has changed
-                        if (this.hashedPositions[pool.id] && this.hashedPositions[pool.id].keys().any(function(key, i){
+                        var poolHashedPositions = this.hashedPositions[pool.id];
+                        if ( poolHashedPositions && poolHashedPositions.keys().any(function(key, i){
                                         return (allLanes[i]||{}).id     !== key;
                                 })){
                                
@@ -573,9 +575,9 @@ new function(){
                                         }
                                 });
                                
-                                var hp2 = $H({});
+                                var hp2 = new Hash();
                                 allLanes.each(function(lane){
-                                        hp2[lane.id] = lane.bounds.upperLeft();
+                                        hp2.set(lane.id,lane.bounds.upperLeft());
                                 })
                        
                                 var command = new LanesHasBeenReordered(hashedPositions, hp2, allLanes, this, pool.id);

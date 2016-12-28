@@ -1192,7 +1192,7 @@ ORYX.Core.Edge = {
 	 * (key is the removed position of the docker, value is docker themselve)
 	 */
 	removeUnusedDockers:function(){
-		var marked = $H({});
+		var marked = new Hash();
 		
 		this.dockers.each(function(docker, i){
 			if (i==0||i==this.dockers.length-1){ return }
@@ -1209,7 +1209,7 @@ ORYX.Core.Edge = {
 			var cd = docker.bounds.center();
 			
 			if (ORYX.Core.Math.isPointInLine(cd.x, cd.y, cp.x, cp.y, cn.x, cn.y, 1)){
-				marked[i] = docker;
+				marked.set(i,docker);
 			}
 		}.bind(this))
 		

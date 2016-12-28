@@ -81,35 +81,37 @@ new function(){
 	 */	
 	ORYX.Core.MoveDockersCommand = ORYX.Core.Command.extend({
 		construct: function(dockers){
-			this.dockers 	= $H(dockers);
-			this.edges 		= $H({});
+			this.dockers 	= new Hash(dockers);
+			this.edges 		= new Hash();
 		},
 		execute: function(){
 			if (this.changes) {
 				this.executeAgain();
 				return;
 			} else {
-				this.changes = $H({});
+				this.changes = new Hash();
 			}
 			
 			this.dockers.values().each(function(docker){
 				var edge = docker.docker.parent;
 				if (!edge){ return }
 				
-				if (!this.changes[edge.getId()]) {
-					this.changes[edge.getId()] = {
+				if (!this.changes.get(edge.getId())) {
+					this.changes.set(edge.getId(),{
 						edge				: edge,
 						oldDockerPositions	: edge.dockers.map(function(r){ return r.bounds.center() })
-					}
+					});
 				}
 				docker.docker.bounds.moveBy(docker.offset);
-				this.edges[edge.getId()] = edge;
+				this.edges.set(edge.getId(),edge);
 				docker.docker.update();
 			}.bind(this));
 			this.edges.each(function(edge){
 				this.updateEdge(edge.value);
-				if (this.changes[edge.value.getId()])
-					this.changes[edge.value.getId()].dockerPositions = edge.value.dockers.map(function(r){ return r.bounds.center() })
+				if (this.changes.get(edge.value.getId()))
+					this.changes.get(edge.value.getId()).dockerPositions = edge.value.dockers.map(function(r){
+						return r.bounds.center();
+					});
 			}.bind(this));
 		},
 		updateEdge: function(edge){

@@ -910,7 +910,7 @@ ORYX.Core.StencilSet.Rules = {
 		
 		// check containment rules
 		result = args.containingStencil.roles().any((function(role) {
-			var roles = this._containmentRules[role];
+			var roles = this._containmentRules.get(role);
 			if(roles) {
 				return roles.any(function(role) {
 					return args.containedStencil.roles().member(role);
@@ -1186,7 +1186,7 @@ ORYX.Core.StencilSet.Rules = {
 	_getMaximumOccurrence: function(parent, child) {
 		var max;
 		child.roles().each((function(role) {
-			var cardRule = this._cardinalityRules[role];
+			var cardRule = this._cardinalityRules.get(role);
 			if(cardRule && cardRule.maximumOccurrence) {
 				if(max) {
 					max = Math.min(max, cardRule.maximumOccurrence);
@@ -1218,7 +1218,7 @@ ORYX.Core.StencilSet.Rules = {
 		
 		var max;
 		args.sourceStencil.roles().each((function(role) {
-			var cardRule = this._cardinalityRules[role];
+			var cardRule = this._cardinalityRules.get(role);
 
 			if(cardRule && cardRule.outgoingEdges) {
 				args.edgeStencil.roles().each(function(edgeRole) {

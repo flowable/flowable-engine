@@ -7511,7 +7511,7 @@ ORYX.Core.StencilSet.Rules = {
 		
 		// check containment rules
 		result = args.containingStencil.roles().any((function(role) {
-			var roles = this._containmentRules[role];
+			var roles = this._containmentRules.get(role);
 			if(roles) {
 				return roles.any(function(role) {
 					return args.containedStencil.roles().member(role);
@@ -7787,7 +7787,7 @@ ORYX.Core.StencilSet.Rules = {
 	_getMaximumOccurrence: function(parent, child) {
 		var max;
 		child.roles().each((function(role) {
-			var cardRule = this._cardinalityRules[role];
+			var cardRule = this._cardinalityRules.get(role);
 			if(cardRule && cardRule.maximumOccurrence) {
 				if(max) {
 					max = Math.min(max, cardRule.maximumOccurrence);
@@ -7819,7 +7819,7 @@ ORYX.Core.StencilSet.Rules = {
 		
 		var max;
 		args.sourceStencil.roles().each((function(role) {
-			var cardRule = this._cardinalityRules[role];
+			var cardRule = this._cardinalityRules.get(role);
 
 			if(cardRule && cardRule.outgoingEdges) {
 				args.edgeStencil.roles().each(function(edgeRole) {
@@ -12389,35 +12389,37 @@ new function(){
 	 */	
 	ORYX.Core.MoveDockersCommand = ORYX.Core.Command.extend({
 		construct: function(dockers){
-			this.dockers 	= $H(dockers);
-			this.edges 		= $H({});
+			this.dockers 	= new Hash(dockers);
+			this.edges 		= new Hash();
 		},
 		execute: function(){
 			if (this.changes) {
 				this.executeAgain();
 				return;
 			} else {
-				this.changes = $H({});
+				this.changes = new Hash();
 			}
 			
 			this.dockers.values().each(function(docker){
 				var edge = docker.docker.parent;
 				if (!edge){ return }
 				
-				if (!this.changes[edge.getId()]) {
-					this.changes[edge.getId()] = {
+				if (!this.changes.get(edge.getId())) {
+					this.changes.set(edge.getId(),{
 						edge				: edge,
 						oldDockerPositions	: edge.dockers.map(function(r){ return r.bounds.center() })
-					}
+					});
 				}
 				docker.docker.bounds.moveBy(docker.offset);
-				this.edges[edge.getId()] = edge;
+				this.edges.set(edge.getId(),edge);
 				docker.docker.update();
 			}.bind(this));
 			this.edges.each(function(edge){
 				this.updateEdge(edge.value);
-				if (this.changes[edge.value.getId()])
-					this.changes[edge.value.getId()].dockerPositions = edge.value.dockers.map(function(r){ return r.bounds.center() })
+				if (this.changes.get(edge.value.getId()))
+					this.changes.get(edge.value.getId()).dockerPositions = edge.value.dockers.map(function(r){
+						return r.bounds.center();
+					});
 			}.bind(this));
 		},
 		updateEdge: function(edge){
@@ -15873,7 +15875,7 @@ ORYX.Core.Edge = {
 	 * (key is the removed position of the docker, value is docker themselve)
 	 */
 	removeUnusedDockers:function(){
-		var marked = $H({});
+		var marked = new Hash();
 		
 		this.dockers.each(function(docker, i){
 			if (i==0||i==this.dockers.length-1){ return }
@@ -15890,7 +15892,7 @@ ORYX.Core.Edge = {
 			var cd = docker.bounds.center();
 			
 			if (ORYX.Core.Math.isPointInLine(cd.x, cd.y, cp.x, cp.y, cn.x, cn.y, 1)){
-				marked[i] = docker;
+				marked.set(i,docker);
 			}
 		}.bind(this))
 		
@@ -22950,9 +22952,9 @@ new function(){
                 var allLanes = this.getLanes(pool, true), hp;
                 var considerForDockers = allLanes.clone();
                
-                var hashedPositions = $H({});
+                var hashedPositions = new Hash();
                 allLanes.each(function(lane){
-                        hashedPositions[lane.id] = lane.bounds.upperLeft();
+                        hashedPositions.set(lane.id,lane.bounds.upperLeft());
                 })
                
                
@@ -22960,7 +22962,8 @@ new function(){
                 // Show/hide caption regarding the number of lanes
                 if (lanes.length === 1 && this.getLanes(lanes.first()).length <= 0) {
                         // TRUE if there is a caption
-                        lanes.first().setProperty("oryx-showcaption", lanes.first().properties["oryx-name"].trim().length > 0);
+                        var caption = lanes.first().properties.get("oryx-name").trim().length > 0;
+                        lanes.first().setProperty("oryx-showcaption", caption);
                         var rect = lanes.first().node.getElementsByTagName("rect");
                         rect[0].setAttributeNS(null, "display", "none");
                 } else {
@@ -23091,7 +23094,8 @@ new function(){
                         this.updateDockers(considerForDockers, pool);
                        
                         // Check if the order has changed
-                        if (this.hashedPositions[pool.id] && this.hashedPositions[pool.id].keys().any(function(key, i){
+                        var poolHashedPositions = this.hashedPositions[pool.id];
+                        if ( poolHashedPositions && poolHashedPositions.keys().any(function(key, i){
                                         return (allLanes[i]||{}).id     !== key;
                                 })){
                                
@@ -23122,9 +23126,9 @@ new function(){
                                         }
                                 });
                                
-                                var hp2 = $H({});
+                                var hp2 = new Hash();
                                 allLanes.each(function(lane){
-                                        hp2[lane.id] = lane.bounds.upperLeft();
+                                        hp2.set(lane.id,lane.bounds.upperLeft());
                                 })
                        
                                 var command = new LanesHasBeenReordered(hashedPositions, hp2, allLanes, this, pool.id);
