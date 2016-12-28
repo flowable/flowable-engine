@@ -19,6 +19,7 @@ import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.MessageEventDefinition;
@@ -93,6 +94,12 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
       }
     }
 
+    if (startEvent.getSubProcess() instanceof EventSubProcess && startEvent.isInterrupting() == false) {
+      propertiesNode.put(PROPERTY_INTERRUPTING, false);
+    } else {
+      propertiesNode.put(PROPERTY_INTERRUPTING, true);
+    }
+    
     addFormProperties(startEvent.getFormProperties(), propertiesNode);
     addEventProperties(startEvent, propertiesNode);
   }
@@ -125,6 +132,11 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
     } else if (STENCIL_EVENT_START_SIGNAL.equals(stencilId)) {
       convertJsonToSignalDefinition(elementNode, startEvent);
     }
+    
+    if (getPropertyValueAsBoolean(PROPERTY_INTERRUPTING, elementNode) == false) {
+      startEvent.setInterrupting(false);
+    }
+    
     return startEvent;
   }
 
