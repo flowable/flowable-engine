@@ -12,28 +12,29 @@
  */
 package org.flowable.rest.dmn.service.api.decision;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.flowable.dmn.api.RuleEngineExecutionResult;
+import org.flowable.rest.variable.EngineRestVariable;
 
 /**
  * @author Yvo Swillens
  */
 public class ExecuteDecisionResponse {
 
-  protected Map<String, Object> resultVariables;
+  protected List<EngineRestVariable> resultVariables = new ArrayList<>();
   protected String url;
 
-  public ExecuteDecisionResponse(RuleEngineExecutionResult executionResult) {
-    setResultVariables(executionResult.getResultVariables());
-  }
-
-  public Map<String, Object> getResultVariables() {
+  public List<EngineRestVariable> getResultVariables() {
     return resultVariables;
   }
 
-  public void setResultVariables(Map<String, Object> resultVariables) {
+  public void setResultVariables(List<EngineRestVariable> resultVariables) {
     this.resultVariables = resultVariables;
+  }
+
+  public void addResultVariable(EngineRestVariable variable) {
+    resultVariables.add(variable);
   }
 
   public String getUrl() {

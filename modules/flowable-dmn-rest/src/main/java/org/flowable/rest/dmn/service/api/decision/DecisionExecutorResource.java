@@ -26,6 +26,7 @@ import io.swagger.annotations.ApiResponses;
 import org.flowable.dmn.api.RuleEngineExecutionResult;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.rest.variable.EngineRestVariable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,17 +53,17 @@ public class DecisionExecutorResource extends BaseDecisionExecutorResource {
 
     Map<String, Object> inputVariables = null;
     if (request.getInputVariables() != null) {
-      inputVariables = new HashMap<>();
-      for (Map.Entry<String, Object> variable : request.getInputVariables().entrySet()) {
-        if (variable.getKey() == null) {
+      inputVariables = new HashMap<String, Object>();
+      for (EngineRestVariable variable : request.getInputVariables()) {
+        if (variable.getName() == null) {
           throw new FlowableIllegalArgumentException("Variable name is required.");
         }
-        inputVariables.put(variable.getKey(), variable.getValue());
+        inputVariables.put(variable.getName(), dmnRestResponseFactory.getVariableValue(variable));
       }
     }
 
     try {
-      RuleEngineExecutionResult executionResult = executeDecisionByKeyAndTenantId(request.getDecisionKey(), request.getTenantId(), request.getInputVariables());
+      RuleEngineExecutionResult executionResult = executeDecisionByKeyAndTenantId(request.getDecisionKey(), request.getTenantId(), inputVariables);
 
       response.setStatus(HttpStatus.CREATED.value());
 

@@ -12,7 +12,9 @@
  */
 package org.flowable.rest.dmn.service.api.decision;
 
-import java.util.Map;
+import org.flowable.rest.variable.EngineRestVariable;
+
+import java.util.List;
 
 /**
  * @author Yvo Swillens
@@ -21,7 +23,7 @@ public class ExecuteDecisionRequest {
 
   protected String decisionKey;
   protected String tenantId;
-  protected Map<String, Object> inputVariables;
+  protected List<EngineRestVariable> inputVariables;
 
   public String getDecisionKey() {
     return decisionKey;
@@ -39,11 +41,12 @@ public class ExecuteDecisionRequest {
     this.tenantId = tenantId;
   }
 
-  public Map<String, Object> getInputVariables() {
+  public List<EngineRestVariable> getInputVariables() {
     return inputVariables;
   }
 
-  public void setInputVariables(Map<String, Object> variables) {
+  public void setInputVariables(List<EngineRestVariable> variables) {
     this.inputVariables = variables;
   }
+
 }
