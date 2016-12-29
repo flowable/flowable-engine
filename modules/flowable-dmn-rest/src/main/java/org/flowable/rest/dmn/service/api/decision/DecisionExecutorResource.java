@@ -44,7 +44,7 @@ public class DecisionExecutorResource extends BaseDecisionExecutorResource {
   @ApiResponses(value = {
       @ApiResponse(code = 201, message = "Indicates the Decision has been executed")
   })
-  @RequestMapping(value = "/rules/decision-executor", method = RequestMethod.POST, produces = "application/json")
+  @RequestMapping(value = "/dmn-rule/decision-executor", method = RequestMethod.POST, produces = "application/json")
   public ExecuteDecisionResponse executeDecision(@ApiParam("request") @RequestBody ExecuteDecisionRequest request, HttpServletRequest httpRequest, HttpServletResponse response) {
 
     if (request.getDecisionKey() == null) {

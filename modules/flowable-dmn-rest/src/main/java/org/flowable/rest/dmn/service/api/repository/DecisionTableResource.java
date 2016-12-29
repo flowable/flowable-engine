@@ -14,6 +14,11 @@ package org.flowable.rest.dmn.service.api.repository;
 
 import javax.servlet.http.HttpServletRequest;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.flowable.dmn.api.DecisionTable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,10 +29,16 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
+@Api(tags = { "Decision Tables" }, description = "Manage Decision Tables")
 public class DecisionTableResource extends BaseDecisionTableResource {
 
+  @ApiOperation(value = "Get a decision table", tags = {"Decision Tables"})
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Indicates request was successful and the decision table is returned"),
+      @ApiResponse(code = 404, message = "Indicates the requested decision table was not found.")
+  })
   @RequestMapping(value = "/dmn-repository/decision-tables/{decisionTableId}", method = RequestMethod.GET, produces = "application/json")
-  public DecisionTableResponse getDecisionTable(@PathVariable String decisionTableId, HttpServletRequest request) {
+  public DecisionTableResponse getDecisionTable(@ApiParam(name = "decisionTableId") @PathVariable String decisionTableId, HttpServletRequest request) {
     DecisionTable decisionTable = geDecisionTableFromRequest(decisionTableId);
 
     return dmnRestResponseFactory.createDecisionTableResponse(decisionTable);
