@@ -13,13 +13,14 @@
 
 package org.flowable.engine.test.bpmn.event.message;
 
+import java.util.Calendar;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.EventSubscriptionQueryImpl;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.EventSubscription;
+import org.flowable.engine.runtime.EventSubscriptionQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
@@ -33,7 +34,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
     String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/message/MessageStartEventTest.testSingleMessageStartEvent.bpmn20.xml")
         .deploy().getId();
 
-    List<EventSubscriptionEntity> eventSubscriptions = new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor()).list();
+    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
 
     assertEquals(1, eventSubscriptions.size());
 
@@ -68,7 +69,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
     String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/message/MessageStartEventTest.testSingleMessageStartEvent.bpmn20.xml")
         .deploy().getId();
 
-    List<EventSubscriptionEntity> eventSubscriptions = new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor()).list();
+    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
 
     assertEquals(1, eventSubscriptions.size());
@@ -77,18 +78,18 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
     String newDeploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/message/MessageStartEventTest.testSingleMessageStartEvent.bpmn20.xml")
         .deploy().getId();
 
-    List<EventSubscriptionEntity> newEventSubscriptions = new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor()).list();
+    List<EventSubscription> newEventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
     List<ProcessDefinition> newProcessDefinitions = repositoryService.createProcessDefinitionQuery().list();
 
     assertEquals(1, newEventSubscriptions.size());
     assertEquals(2, newProcessDefinitions.size());
     for (ProcessDefinition processDefinition : newProcessDefinitions) {
       if (processDefinition.getVersion() == 1) {
-        for (EventSubscriptionEntity subscription : newEventSubscriptions) {
+        for (EventSubscription subscription : newEventSubscriptions) {
           assertFalse(subscription.getConfiguration().equals(processDefinition.getId()));
         }
       } else {
-        for (EventSubscriptionEntity subscription : newEventSubscriptions) {
+        for (EventSubscription subscription : newEventSubscriptions) {
           assertEquals(subscription.getConfiguration(), processDefinition.getId());
         }
       }
@@ -115,8 +116,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
 
     assertProcessEnded(processInstance.getId());
 
-    // using startProcessInstanceByKey also triggers the message event, if
-    // there is a single start event
+    // using startProcessInstanceByKey also triggers the message event, if there is a single start event
 
     processInstance = runtimeService.startProcessInstanceByKey("singleMessageStartEvent");
 
@@ -199,6 +199,39 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
     assertNotNull(task);
     taskService.complete(task.getId());
     assertProcessEnded(processInstance.getId());
+  }
+  
+  @Deployment
+  public void testQueryMessageStartEvents() {
+    assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery(), 2);
+    
+    assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery().eventType("message").orderByExecutionId().asc(), 2);
+    
+    assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery().eventType("signal").orderById().desc(), 0);
+    
+    assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery().eventName("newInvoiceMessage").orderByProcessDefinitionId().asc(), 1);
+    
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("testProcess").singleResult();
+    
+    assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery().processDefinitionId(processDefinition.getId()).orderByProcessInstanceId().desc(), 2);
+    
+    assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery().processDefinitionId("nonexisting"), 0);
+    
+    assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery().activityId("messageStart").orderByTenantId().asc(), 1);
+    
+    assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery().activityId("nonexisting"), 0);
+    
+    Calendar compareCal = Calendar.getInstance();
+    compareCal.set(2010, 1, 1, 0, 0, 0);
+    assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery().createdAfter(compareCal.getTime()), 2);
+    
+    compareCal = Calendar.getInstance();
+    assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery().createdBefore(compareCal.getTime()), 2);
+  }
+  
+  protected void assertEventSubscriptionQuery(EventSubscriptionQuery query, int count) {
+    assertEquals(count, query.count());
+    assertEquals(count, query.list().size());
   }
 
 }

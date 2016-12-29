@@ -13,28 +13,32 @@
 
 package org.flowable.engine.impl;
 
-import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.interceptor.CommandExecutor;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
+import org.flowable.engine.runtime.EventSubscription;
+import org.flowable.engine.runtime.EventSubscriptionQuery;
 
 /**
  * @author Daniel Meyer
  */
-public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQueryImpl, EventSubscriptionEntity> implements Serializable {
+public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQuery, EventSubscription> implements EventSubscriptionQuery {
 
   private static final long serialVersionUID = 1L;
 
-  protected String eventSubscriptionId;
-  protected String eventName;
+  protected String id;
   protected String eventType;
+  protected String eventName;
   protected String executionId;
   protected String processInstanceId;
+  protected String processDefinitionId;
   protected String activityId;
+  protected Date createdBefore;
+  protected Date createdAfter;
   protected String tenantId;
 
   public EventSubscriptionQueryImpl(CommandContext commandContext) {
@@ -45,11 +49,19 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
     super(commandExecutor);
   }
 
-  public EventSubscriptionQueryImpl eventSubscriptionId(String eventSubscriptionId) {
-    if (eventSubscriptionId == null) {
+  public EventSubscriptionQueryImpl id(String id) {
+    if (id == null) {
       throw new FlowableIllegalArgumentException("Provided event subscription id is null");
     }
-    this.eventSubscriptionId = eventSubscriptionId;
+    this.id = id;
+    return this;
+  }
+  
+  public EventSubscriptionQueryImpl eventType(String eventType) {
+    if (eventType == null) {
+      throw new FlowableIllegalArgumentException("Provided event type is null");
+    }
+    this.eventType = eventType;
     return this;
   }
 
@@ -76,6 +88,14 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
     this.processInstanceId = processInstanceId;
     return this;
   }
+  
+  public EventSubscriptionQueryImpl processDefinitionId(String processDefinitionId) {
+    if (processDefinitionId == null) {
+      throw new FlowableIllegalArgumentException("Provided process definition id is null");
+    }
+    this.processDefinitionId = processDefinitionId;
+    return this;
+  }
 
   public EventSubscriptionQueryImpl activityId(String activityId) {
     if (activityId == null) {
@@ -84,26 +104,55 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
     this.activityId = activityId;
     return this;
   }
-
-  public EventSubscriptionQueryImpl eventType(String eventType) {
-    if (eventType == null) {
-      throw new FlowableIllegalArgumentException("Provided event type is null");
+  
+  public EventSubscriptionQueryImpl createdBefore(Date beforeTime) {
+    if (beforeTime == null) {
+      throw new FlowableIllegalArgumentException("created before time is null");
     }
-    this.eventType = eventType;
+    this.createdBefore = beforeTime;
+
     return this;
   }
+  
+  public EventSubscriptionQueryImpl createdAfter(Date afterTime) {
+    if (afterTime == null) {
+      throw new FlowableIllegalArgumentException("created after time is null");
+    }
+    this.createdAfter = afterTime;
 
-  public String getTenantId() {
-    return tenantId;
+    return this;
   }
 
   public EventSubscriptionQueryImpl tenantId(String tenantId) {
+    if (tenantId == null) {
+      throw new FlowableIllegalArgumentException("tenant id is null");
+    }
     this.tenantId = tenantId;
     return this;
   }
+  
+  public EventSubscriptionQuery orderById() {
+    return orderBy(EventSubscriptionQueryProperty.ID);
+  }
+  
+  public EventSubscriptionQuery orderByExecutionId() {
+    return orderBy(EventSubscriptionQueryProperty.EXECUTION_ID);
+  }
+  
+  public EventSubscriptionQuery orderByProcessInstanceId() {
+    return orderBy(EventSubscriptionQueryProperty.PROCESS_INSTANCE_ID);
+  }
+  
+  public EventSubscriptionQuery orderByProcessDefinitionId() {
+    return orderBy(EventSubscriptionQueryProperty.PROCESS_DEFINITION_ID);
+  }
 
-  public EventSubscriptionQueryImpl orderByCreated() {
+  public EventSubscriptionQuery orderByCreateDate() {
     return orderBy(EventSubscriptionQueryProperty.CREATED);
+  }
+  
+  public EventSubscriptionQuery orderByTenantId() {
+    return orderBy(EventSubscriptionQueryProperty.TENANT_ID);
   }
 
   // results //////////////////////////////////////////
@@ -115,23 +164,24 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
   }
 
   @Override
-  public List<EventSubscriptionEntity> executeList(CommandContext commandContext, Page page) {
+  @SuppressWarnings({ "unchecked" })
+  public List<EventSubscription> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext.getEventSubscriptionEntityManager().findEventSubscriptionsByQueryCriteria(this, page);
+    return (List<EventSubscription>) commandContext.getEventSubscriptionEntityManager().findEventSubscriptionsByQueryCriteria(this, page);
   }
 
   // getters //////////////////////////////////////////
 
-  public String getEventSubscriptionId() {
-    return eventSubscriptionId;
+  public String getId() {
+    return id;
+  }
+  
+  public String getEventType() {
+    return eventType;
   }
 
   public String getEventName() {
     return eventName;
-  }
-
-  public String getEventType() {
-    return eventType;
   }
 
   public String getExecutionId() {
@@ -144,6 +194,22 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
 
   public String getActivityId() {
     return activityId;
+  }
+  
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+
+  public Date getCreatedBefore() {
+    return createdBefore;
+  }
+
+  public Date getCreatedAfter() {
+    return createdAfter;
+  }
+
+  public String getTenantId() {
+    return tenantId;
   }
 
 }

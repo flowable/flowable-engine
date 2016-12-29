@@ -17,22 +17,17 @@ import java.util.Date;
 
 import org.flowable.engine.common.impl.db.HasRevision;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.engine.runtime.EventSubscription;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public interface EventSubscriptionEntity extends Entity, HasRevision {
+public interface EventSubscriptionEntity extends EventSubscription, Entity, HasRevision {
   
-  String getEventType();
-
   void setEventType(String eventType);
 
-  String getEventName();
-
   void setEventName(String eventName);
-
-  String getExecutionId();
 
   void setExecutionId(String executionId);
   
@@ -40,28 +35,15 @@ public interface EventSubscriptionEntity extends Entity, HasRevision {
 
   void setExecution(ExecutionEntity execution);
 
-  String getProcessInstanceId();
-
   void setProcessInstanceId(String processInstanceId);
-
-  String getConfiguration();
 
   void setConfiguration(String configuration);
 
-  String getActivityId();
-
   void setActivityId(String activityId);
-
-  Date getCreated();
 
   void setCreated(Date created);
 
-  String getProcessDefinitionId();
-
   void setProcessDefinitionId(String processDefinitionId);
 
-  String getTenantId();
-
   void setTenantId(String tenantId);
-
 }

@@ -17,8 +17,8 @@ import java.util.Date;
 
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -103,7 +103,7 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
 
     processEngineConfiguration.getClock().setCurrentTime(new Date(processEngineConfiguration.getClock().getCurrentTime().getTime() + 10000));
 
-    EventSubscriptionEntity messageEventSubscription = messageEventSubscriptionQuery.singleResult();
+    EventSubscription messageEventSubscription = messageEventSubscriptionQuery.singleResult();
     runtimeService.messageEventReceived(messageEventSubscription.getEventName(), messageEventSubscription.getExecutionId());
 
     assertEquals(0, createEventSubscriptionQuery().count());

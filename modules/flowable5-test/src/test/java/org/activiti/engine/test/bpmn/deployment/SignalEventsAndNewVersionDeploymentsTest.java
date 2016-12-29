@@ -16,12 +16,9 @@ package org.activiti.engine.test.bpmn.deployment;
 import java.util.List;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.history.HistoryLevel;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
@@ -146,7 +143,7 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
     // Deploy two version of process definition, delete latest and check if all is good
     
     String deploymentId1 = deployStartSignalTestProcess();
-    List<EventSubscriptionEntity> eventSubscriptions = getAllEventSubscriptions();
+    List<EventSubscription> eventSubscriptions = getAllEventSubscriptions();
     assertEquals(1, eventSubscriptions.size());
 
     String deploymentId2 = deployStartSignalTestProcess();
@@ -201,7 +198,7 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
     assertEquals(2, runtimeService.createProcessInstanceQuery().count());
     assertEventSubscriptionsCount(1);
     
-    List<EventSubscriptionEntity> eventSubscriptions = getAllEventSubscriptions();
+    List<EventSubscription> eventSubscriptions = getAllEventSubscriptions();
     assertEquals(repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId3).singleResult().getId(), 
         eventSubscriptions.get(0).getProcessDefinitionId());
     
@@ -426,19 +423,16 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
     }
   }
   
-  private List<EventSubscriptionEntity> getAllEventSubscriptions() {
-    return managementService.executeCommand(new Command<List<EventSubscriptionEntity>>() {
-      public List<EventSubscriptionEntity> execute(CommandContext commandContext) {
-        EventSubscriptionQueryImpl query = new EventSubscriptionQueryImpl(commandContext);
-        query.orderByCreated().desc();
-        
-        List<EventSubscriptionEntity> eventSubscriptionEntities = query.list();
-        for (EventSubscriptionEntity eventSubscriptionEntity : eventSubscriptionEntities) {
-          assertEquals("signal", eventSubscriptionEntity.getEventType());
-        }
-        return eventSubscriptionEntities;
-      }
-    });
+  private List<EventSubscription> getAllEventSubscriptions() {
+    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery()
+        .orderByCreateDate()
+        .desc()
+        .list();
+    
+    for (EventSubscription eventSubscriptionEntity : eventSubscriptions) {
+      assertEquals("signal", eventSubscriptionEntity.getEventType());
+    }
+    return eventSubscriptions;
   }
   
   private void assertEventSubscriptionsCount(long count) {

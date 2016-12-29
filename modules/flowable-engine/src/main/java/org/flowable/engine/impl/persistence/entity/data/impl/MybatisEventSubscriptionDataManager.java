@@ -40,6 +40,7 @@ import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.Messag
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.SignalEventSubscriptionByEventNameMatcher;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.SignalEventSubscriptionByNameAndExecutionMatcher;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.SignalEventSubscriptionByProcInstAndEventNameMatcher;
+import org.flowable.engine.runtime.EventSubscription;
 
 /**
  * @author Joram Barrez
@@ -121,7 +122,7 @@ public class MybatisEventSubscriptionDataManager extends AbstractDataManager<Eve
 
   @Override
   @SuppressWarnings("unchecked")
-  public List<EventSubscriptionEntity> findEventSubscriptionsByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl, Page page) {
+  public List<EventSubscription> findEventSubscriptionsByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl, Page page) {
     final String query = "selectEventSubscriptionByQueryCriteria";
     return getDbSqlSession().selectList(query, eventSubscriptionQueryImpl, page);
   }

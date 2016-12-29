@@ -24,7 +24,12 @@ public class EventSubscriptionQueryProperty implements QueryProperty {
 
   // properties used in event subscription queries:
 
+  public static final EventSubscriptionQueryProperty ID = new EventSubscriptionQueryProperty("RES.ID_");
+  public static final EventSubscriptionQueryProperty EXECUTION_ID = new EventSubscriptionQueryProperty("RES.EXECUTION_ID_");
+  public static final EventSubscriptionQueryProperty PROCESS_INSTANCE_ID = new EventSubscriptionQueryProperty("RES.PROC_INST_ID_");
+  public static final EventSubscriptionQueryProperty PROCESS_DEFINITION_ID = new EventSubscriptionQueryProperty("RES.PROC_DEF_ID_");
   public static final EventSubscriptionQueryProperty CREATED = new EventSubscriptionQueryProperty("RES.CREATED_");
+  public static final EventSubscriptionQueryProperty TENANT_ID = new EventSubscriptionQueryProperty("RES.TENANT_ID_");
 
   // ///////////////////////////////////////////////
 

@@ -29,6 +29,7 @@ import org.flowable.engine.form.FormData;
 import org.flowable.engine.impl.cmd.ActivateProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.AddEventListenerCommand;
 import org.flowable.engine.impl.cmd.AddIdentityLinkForProcessInstanceCmd;
+import org.flowable.engine.impl.cmd.ChangeActivityStateCmd;
 import org.flowable.engine.impl.cmd.CompleteAdhocSubProcessCmd;
 import org.flowable.engine.impl.cmd.DeleteIdentityLinkForProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.DeleteProcessInstanceCmd;
@@ -62,8 +63,11 @@ import org.flowable.engine.impl.cmd.StartProcessInstanceWithFormCmd;
 import org.flowable.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.TriggerCmd;
 import org.flowable.engine.impl.persistence.entity.VariableInstance;
+import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
+import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.DataObject;
+import org.flowable.engine.runtime.EventSubscriptionQuery;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ExecutionQuery;
 import org.flowable.engine.runtime.NativeExecutionQuery;
@@ -152,6 +156,10 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
 
   public NativeProcessInstanceQuery createNativeProcessInstanceQuery() {
     return new NativeProcessInstanceQueryImpl(commandExecutor);
+  }
+  
+  public EventSubscriptionQuery createEventSubscriptionQuery() {
+    return new EventSubscriptionQueryImpl(commandExecutor);
   }
 
   public void updateBusinessKey(String processInstanceId, String businessKey) {
@@ -544,6 +552,11 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   public ProcessInstanceBuilder createProcessInstanceBuilder() {
     return new ProcessInstanceBuilderImpl(this);
   }
+  
+  @Override
+  public ChangeActivityStateBuilder createChangeActivityStateBuilder() {
+    return new ChangeActivityStateBuilderImpl(this);
+  }
 
   public ProcessInstance startProcessInstance(ProcessInstanceBuilderImpl processInstanceBuilder) {
     if (processInstanceBuilder.getProcessDefinitionId() != null || processInstanceBuilder.getProcessDefinitionKey() != null) {
@@ -553,6 +566,9 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     } else {
       throw new FlowableIllegalArgumentException("No processDefinitionId, processDefinitionKey nor messageName provided");
     }
-    
+  }
+  
+  public void changeActivityState(ChangeActivityStateBuilderImpl changeActivityStateBuilder) {
+    commandExecutor.execute(new ChangeActivityStateCmd(changeActivityStateBuilder));
   }
 }

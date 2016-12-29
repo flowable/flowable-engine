@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -42,7 +43,15 @@ public class MessageIntermediateEventTest extends PluggableFlowableTestCase {
     Execution execution = runtimeService.createExecutionQuery().messageEventSubscriptionName(messageName).singleResult();
 
     assertNotNull(execution);
-
+    
+    EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().executionId(execution.getId()).singleResult();
+    assertNotNull(eventSubscription);
+    assertEquals(messageName, eventSubscription.getEventName());
+    
+    eventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(execution.getProcessInstanceId()).singleResult();
+    assertNotNull(eventSubscription);
+    assertEquals(messageName, eventSubscription.getEventName());
+    
     runtimeService.messageEventReceived(messageName, execution.getId());
 
     Task task = taskService.createTaskQuery().singleResult();

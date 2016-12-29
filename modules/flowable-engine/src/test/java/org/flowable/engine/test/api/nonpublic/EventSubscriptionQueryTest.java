@@ -15,15 +15,17 @@ package org.flowable.engine.test.api.nonpublic;
 
 import java.util.List;
 
-import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
 import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.EventSubscription;
+import org.flowable.engine.runtime.EventSubscriptionQuery;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -34,7 +36,7 @@ import org.flowable.engine.test.Deployment;
 public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
 
   public void testQueryByEventName() {
-
+    
     processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
 
@@ -54,7 +56,7 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
       }
     });
 
-    List<EventSubscriptionEntity> list = newEventSubscriptionQuery().eventName("messageName").list();
+    List<EventSubscription> list = newEventSubscriptionQuery().eventName("messageName").list();
     assertEquals(2, list.size());
 
     list = newEventSubscriptionQuery().eventName("messageName2").list();
@@ -85,7 +87,7 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
       }
     });
 
-    List<EventSubscriptionEntity> list = newEventSubscriptionQuery().eventType("signal").list();
+    List<EventSubscription> list = newEventSubscriptionQuery().eventType("signal").list();
     assertEquals(1, list.size());
 
     list = newEventSubscriptionQuery().eventType("message").list();
@@ -119,7 +121,7 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
       }
     });
 
-    List<EventSubscriptionEntity> list = newEventSubscriptionQuery().activityId("someOtherActivity").list();
+    List<EventSubscription> list = newEventSubscriptionQuery().activityId("someOtherActivity").list();
     assertEquals(1, list.size());
 
     list = newEventSubscriptionQuery().activityId("someActivity").eventType("message").list();
@@ -148,12 +150,12 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
       }
     });
 
-    List<EventSubscriptionEntity> list = newEventSubscriptionQuery().activityId("someOtherActivity").list();
+    List<EventSubscription> list = newEventSubscriptionQuery().activityId("someOtherActivity").list();
     assertEquals(1, list.size());
 
-    final EventSubscriptionEntity entity = list.get(0);
+    final EventSubscription entity = list.get(0);
 
-    list = newEventSubscriptionQuery().eventSubscriptionId(entity.getId()).list();
+    list = newEventSubscriptionQuery().id(entity.getId()).list();
 
     assertEquals(1, list.size());
 
@@ -169,13 +171,13 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
     runtimeService.startProcessInstanceByKey("catchSignal");
 
     // test query by process instance id
-    EventSubscriptionEntity subscription = newEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
+    EventSubscription subscription = newEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
     assertNotNull(subscription);
 
     Execution executionWaitingForSignal = runtimeService.createExecutionQuery().activityId("signalEvent").processInstanceId(processInstance.getId()).singleResult();
 
     // test query by execution id
-    EventSubscriptionEntity signalSubscription = newEventSubscriptionQuery().executionId(executionWaitingForSignal.getId()).singleResult();
+    EventSubscription signalSubscription = newEventSubscriptionQuery().executionId(executionWaitingForSignal.getId()).singleResult();
     assertNotNull(signalSubscription);
 
     assertEquals(signalSubscription, subscription);
@@ -184,22 +186,24 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
 
   }
 
-  protected EventSubscriptionQueryImpl newEventSubscriptionQuery() {
-    return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor());
+  protected EventSubscriptionQuery newEventSubscriptionQuery() {
+    return runtimeService.createEventSubscriptionQuery();
   }
 
   protected void cleanDb() {
-    processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-        final List<EventSubscriptionEntity> subscriptions = new EventSubscriptionQueryImpl(commandContext).list();
-        for (EventSubscriptionEntity eventSubscriptionEntity : subscriptions) {
+    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
+    List<EventSubscription> subscriptions = runtimeService.createEventSubscriptionQuery().list();
+    for (final EventSubscription eventSubscriptionEntity : subscriptions) {
+      commandExecutor.execute(new Command<Void>() {
+
+        @Override
+        public Void execute(CommandContext commandContext) {
           EventSubscriptionEntityManager eventSubscriptionEntityManager = Context.getCommandContext().getEventSubscriptionEntityManager();
-          eventSubscriptionEntityManager.delete(eventSubscriptionEntity);
+          eventSubscriptionEntityManager.delete((EventSubscriptionEntity) eventSubscriptionEntity);
+          
+          return null;
         }
-        return null;
-      }
-    });
-
+      });
+    }
   }
-
 }
