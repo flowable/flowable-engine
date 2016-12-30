@@ -99,6 +99,16 @@ flowableAdminApp
                 	controller: 'JobController',
                   	reloadOnSearch: true
                 })
+                .when('/event-subscriptions', {
+                	templateUrl: 'views/event-subscriptions.html',
+                	controller: 'EventSubscriptionsController',
+                  	reloadOnSearch: true
+                })
+                .when('/event-subscriptions/:eventSubscriptionId', {
+                	templateUrl: 'views/event-subscription.html',
+                	controller: 'EventSubscriptionController',
+                  	reloadOnSearch: true
+                })
                 .when('/users', {
                 	templateUrl: 'views/users.html',
                 	controller: 'UsersController',

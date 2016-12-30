@@ -19,6 +19,8 @@ import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.DecisionTableDeploymentService;
 import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.app.service.exception.BadRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +34,8 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 @RestController
 public class DecisionTableDeploymentClientResource extends AbstractClientResource {
+  
+  private static final Logger logger = LoggerFactory.getLogger(DecisionTableDeploymentClientResource.class);
 
 	@Autowired
 	protected DecisionTableDeploymentService clientService;
@@ -43,6 +47,7 @@ public class DecisionTableDeploymentClientResource extends AbstractClientResourc
 		try {
 			return clientService.getDeployment(serverConfig, deploymentId);
 		} catch (FlowableServiceException e) {
+		  logger.error("Error getting deployment {}", deploymentId, e);
 			throw new BadRequestException(e.getMessage());
 		}
 	}

@@ -33,31 +33,30 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RestController
 public class ProcessDefinitionsClientResource extends AbstractClientResource {
 
-    private final Logger log = LoggerFactory.getLogger(ProcessDefinitionsClientResource.class);
+  private static final Logger logger = LoggerFactory.getLogger(ProcessDefinitionsClientResource.class);
 
-    @Autowired
-    protected ProcessDefinitionService clientService;
+  @Autowired
+  protected ProcessDefinitionService clientService;
 
-    /**
-     * GET  /rest/authenticate -> check if the user is authenticated, and return its login.
-     */
-    @RequestMapping(value = "/rest/admin/process-definitions",
-            method = RequestMethod.GET,
-            produces = "application/json")
-    public JsonNode listProcessDefinitions(HttpServletRequest request) {
-        log.debug("REST request to get a list of process definitions");
-        
-        JsonNode resultNode = null;
-        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-    	Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
-    	
-    	try {
-    		resultNode = clientService.listProcesDefinitions(serverConfig, parameterMap, true);
-	        
-        } catch (FlowableServiceException e) {
-            throw new BadRequestException(e.getMessage());
-        }
-    	
-        return resultNode;
+  /**
+   * GET /rest/authenticate -> check if the user is authenticated, and return its login.
+   */
+  @RequestMapping(value = "/rest/admin/process-definitions", method = RequestMethod.GET, produces = "application/json")
+  public JsonNode listProcessDefinitions(HttpServletRequest request) {
+    logger.debug("REST request to get a list of process definitions");
+
+    JsonNode resultNode = null;
+    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+    Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
+
+    try {
+      resultNode = clientService.listProcesDefinitions(serverConfig, parameterMap, true);
+
+    } catch (FlowableServiceException e) {
+      logger.error("Error getting process definitions", e);
+      throw new BadRequestException(e.getMessage());
     }
+
+    return resultNode;
+  }
 }

@@ -16,7 +16,7 @@
 
 flowableAdminApp.controller('JobController', ['$scope', '$rootScope', '$http', '$timeout','$location','$routeParams', '$modal', '$translate',
     function ($scope, $rootScope, $http, $timeout, $location, $routeParams, $modal, $translate) {
-		$rootScope.navigation = {selection: 'jobs'};
+		$rootScope.navigation = {main: 'process-engine', sub: 'jobs'};
 		
 		$scope.returnToList = function() {
 			$location.path("/jobs");

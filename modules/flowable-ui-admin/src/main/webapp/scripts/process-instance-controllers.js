@@ -559,7 +559,7 @@ flowableAdminApp.controller('ShowProcessInstanceDiagramPopupCrtl',
         $timeout(function () {
             $("#bpmnModel").attr("data-instance-id", process.id);
             $("#bpmnModel").attr("data-definition-id", process.processDefinitionId);
-            $("#bpmnModel").attr("data-server-id", $rootScope.activeServer.id);
+            $("#bpmnModel").attr("data-server-id", $rootScope.activeServers['process'].id);
             $("#bpmnModel").load("./display/displaymodel.html?instanceId=" + process.id);
         }, 200);
 

@@ -19,6 +19,8 @@ import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.FormInstanceService;
 import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.app.service.exception.BadRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +36,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @RestController
 public class FormInstanceClientResource extends AbstractClientResource {
+  
+  private static final Logger logger = LoggerFactory.getLogger(FormInstanceClientResource.class);
 
   @Autowired
   protected FormInstanceService clientService;
@@ -48,7 +52,7 @@ public class FormInstanceClientResource extends AbstractClientResource {
   }
 
   @RequestMapping(value = "/rest/admin/task-form-instance/{taskId}", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode getTaskSubmittedForm(@PathVariable String taskId) {
+  public JsonNode getTaskFormInstance(@PathVariable String taskId) {
     ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 
     try {
@@ -58,6 +62,7 @@ public class FormInstanceClientResource extends AbstractClientResource {
       return clientService.getFormInstances(serverConfig, bodyNode);
 
     } catch (FlowableServiceException e) {
+      logger.error("Error getting form instance for task id {}", taskId, e);
       throw new BadRequestException(e.getMessage());
     }
   }

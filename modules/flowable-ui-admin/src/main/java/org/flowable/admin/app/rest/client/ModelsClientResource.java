@@ -21,6 +21,8 @@ import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.ModelService;
 import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.app.service.exception.BadRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,23 +36,26 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RestController
 @RequestMapping("/rest/admin/models")
 public class ModelsClientResource extends AbstractClientResource {
+  
+  private static final Logger logger = LoggerFactory.getLogger(ModelsClientResource.class);
 
-    @Autowired
-    protected ModelService clientService;
+  @Autowired
+  protected ModelService clientService;
 
-    /**
-     * GET  /rest/admin/models -> get a list of apps.
-     */
-    @RequestMapping(method = RequestMethod.GET, produces = "application/json")
-    public JsonNode listModels(HttpServletRequest request) {
-        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-    	Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
-    	
-    	try {
-    		return clientService.listModels(serverConfig, parameterMap);
-	        
-        } catch (FlowableServiceException e) {
-        	throw new BadRequestException(e.getMessage());
-        }
+  /**
+   * GET /rest/admin/models -> get a list of apps.
+   */
+  @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+  public JsonNode listModels(HttpServletRequest request) {
+    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+    Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
+
+    try {
+      return clientService.listModels(serverConfig, parameterMap);
+
+    } catch (FlowableServiceException e) {
+      logger.error("Error getting models", e);
+      throw new BadRequestException(e.getMessage());
     }
+  }
 }

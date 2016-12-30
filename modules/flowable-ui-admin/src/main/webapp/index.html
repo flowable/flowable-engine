@@ -56,6 +56,7 @@
                             <li ng-class="{'active': navigation.sub == 'instances'}"><a href="#process-instances" translate="GENERAL.MENU.INSTANCES"></a></li>
                             <li ng-class="{'active': navigation.sub == 'tasks'}"><a href="#tasks" translate="GENERAL.MENU.TASKS"></a></li>
                             <li ng-class="{'active': navigation.sub == 'jobs'}"><a href="#jobs" translate="GENERAL.MENU.JOBS"></a></li>
+                            <li ng-class="{'active': navigation.sub == 'event-subscriptions'}"><a href="#event-subscriptions" translate="GENERAL.MENU.EVENT-SUBSCRIPTIONS"></a></li>
                         </ul>
                         <ul class="nav navbar-nav" ng-if="navigation.main == 'form-engine'">
                             <li ng-class="{active: navigation.sub == 'deployments'}"><a href="#form-deployments" translate="GENERAL.MENU.DEPLOYMENTS"></a></li>
@@ -141,6 +142,8 @@
         <script src="scripts/engine-controller.js"></script>
         <script src="scripts/jobs-controllers.js"></script>
         <script src="scripts/job-controllers.js"></script>
+        <script src="scripts/event-subscriptions-controllers.js"></script>
+        <script src="scripts/event-subscription-controllers.js"></script>
         <script src="scripts/users-controllers.js"></script>
         <script src="scripts/services.js"></script>
         <script src="scripts/directives.js"></script>

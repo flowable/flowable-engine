@@ -21,6 +21,8 @@ import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.FormInstanceService;
 import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.app.service.exception.BadRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +39,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @RestController
 public class FormInstancesClientResource extends AbstractClientResource {
+  
+  private static final Logger logger = LoggerFactory.getLogger(FormInstancesClientResource.class);
 
   @Autowired
   protected FormInstanceService clientService;
@@ -45,7 +49,7 @@ public class FormInstancesClientResource extends AbstractClientResource {
   protected ObjectMapper objectMapper;
 
   @RequestMapping(value = "/rest/admin/form-definition-form-instances/{formDefinitionId}", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode listFormSubmittedForms(HttpServletRequest request, @PathVariable String formDefinitionId) {
+  public JsonNode listFormInstances(HttpServletRequest request, @PathVariable String formDefinitionId) {
     ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 
     try {
@@ -54,12 +58,13 @@ public class FormInstancesClientResource extends AbstractClientResource {
 
       return clientService.getFormInstances(serverConfig, bodyNode);
     } catch (FlowableServiceException e) {
+      logger.error("Error getting form instance", e);
       throw new BadRequestException(e.getMessage());
     }
   }
 
   @RequestMapping(value = "/rest/admin/process-form-instances/{processInstanceId}", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode getProcessSubmittedForms(@PathVariable String processInstanceId) {
+  public JsonNode getProcessFormInstances(@PathVariable String processInstanceId) {
     ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 
     try {
@@ -68,6 +73,7 @@ public class FormInstancesClientResource extends AbstractClientResource {
 
       return clientService.getFormInstances(serverConfig, bodyNode);
     } catch (FlowableServiceException e) {
+      logger.error("Error getting form instances for process instance id {}", processInstanceId, e);
       throw new BadRequestException(e.getMessage());
     }
   }

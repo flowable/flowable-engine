@@ -16,8 +16,6 @@ package org.flowable.rest.service.api.runtime.process;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import io.swagger.annotations.*;
-
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.rest.exception.FlowableConflictException;
@@ -28,6 +26,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 /**
  * @author Frederik Heremans
@@ -87,6 +91,27 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
     }
     throw new FlowableIllegalArgumentException("Invalid action: '" + actionRequest.getAction() + "'.");
   }
+  
+  @ApiOperation(value = "Change the state a process instance", tags = {"Process Instances"},
+          notes="```JSON\n" + "{\n" + "  \"cancelActivityId\" : \"task2\"\n" 
+                  + "  \"startActivityId\" : \"task1\"\n } ```"
+                  + "\n\n\n"
+  )
+  @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Indicates the process instance was found and change state activity was executed."),
+        @ApiResponse(code = 409, message = "Indicates the requested process instance action cannot be executed since the process-instance is already activated/suspended."),
+        @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
+  })
+  @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/change-state", method = RequestMethod.POST, produces = "application/json")
+  public void changeActivityState(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, 
+      @RequestBody ProcessInstanceChangeActivityStateRequest activityStateRequest, HttpServletRequest request) {
+
+    runtimeService.createChangeActivityStateBuilder()
+        .processInstanceId(processInstanceId)
+        .cancelActivityId(activityStateRequest.getCancelActivityId())
+        .startActivityId(activityStateRequest.getStartActivityId())
+        .changeState();
+  }
 
   protected ProcessInstanceResponse activateProcessInstance(ProcessInstance processInstance) {
     if (!processInstance.isSuspended()) {
@@ -96,8 +121,7 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
 
     ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(processInstance);
 
-    // No need to re-fetch the instance, just alter the suspended state of
-    // the result-object
+    // No need to re-fetch the instance, just alter the suspended state of the result-object
     response.setSuspended(false);
     return response;
   }
@@ -110,8 +134,7 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
 
     ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(processInstance);
 
-    // No need to re-fetch the instance, just alter the suspended state of
-    // the result-object
+    // No need to re-fetch the instance, just alter the suspended state of the result-object
     response.setSuspended(true);
     return response;
   }

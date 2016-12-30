@@ -1,0 +1,61 @@
+
+<div class="container" id="detail-container">
+	<div class="row">
+		<div class="col-md-9">
+			<div class="component" ng-show="eventSubscription">
+				<div class="title">
+					<div class="pull-right">
+						<a ng-click="returnToList()" class="action">&larr; {{'GENERAL.ACTION.RETURN-TO-LIST' | translate}}</a>
+					</div>
+					<h2>{{'EVENT-SUBSCRIPTION.TITLE.MAIN' | translate:eventSubscription}}</h2>
+				</div>
+				<div class="property-wrapper">
+					<table>
+						<tr class="property">
+							<td class="property-name" translate="EVENT-SUBSCRIPTION.ID"></td>
+							<td>{{eventSubscription.id}}</td>
+							<td class="property-name"><span class="glyphicon glyphicon-time"></span> {{'EVENT-SUBSCRIPTION.CREATE-DATE' | translate}}</td>
+							<td>{{eventSubscription.created | dateformat}}</td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="EVENT-SUBSCRIPTION.EVENT-TYPE"></td>
+							<td>{{eventSubscription.eventType}}</td>
+							<td class="property-name" translate="EVENT-SUBSCRIPTION.EVENT-NAME"></td>
+							<td>{{eventSubscription.eventName}}</td>
+						</tr>
+						<tr class="property" ng-if="eventSubscription.processInstanceId">
+							<td class="property-name"></span> {{'EVENT-SUBSCRIPTION.PROCESS-INSTANCE' | translate}}</td>
+							<td><a ng-click="openProcessInstance(eventSubscription.processInstanceId)"><i class="glyphicon glyphicon-zoom-in"></i> {{eventSubscription.processInstanceId | empty}}</a></td>
+							<td class="property-name" translate="EVENT-SUBSCRIPTION.EXECUTION-ID"></td>
+							<td>{{eventSubscription.executionId}}</td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="EVENT-SUBSCRIPTION.ACTIVITY-ID"></td>
+							<td>{{eventSubscription.activityId}}</td>
+							<td class="property-name" ng-if="eventSubscription.processDefinitionId"></span> {{'EVENT-SUBSCRIPTION.PROCESS-DEFINITION' | translate}}</td>
+							<td ng-if="eventSubscription.processDefinitionId"><a ng-click="openProcessDefinition(eventSubscription.processDefinitionId)"><i class="glyphicon glyphicon-zoom-in"></i> {{eventSubscription.processDefinitionId | empty}}</a></td>
+						</tr>
+						<tr class="property">
+                            <td class="property-name" translate="EVENT-SUBSCRIPTION.TENANT-ID"></td>
+                            <td>{{eventSubscription.tenantId}}</td>
+                        </tr>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<div class="component tip-left">
+				<div class="title">
+					<h2 translate="GENERAL.TITLE.ACTIONS"></h2>
+				</div>
+				<ul class="list-group">
+					  <li>
+					    <button type="button" class="btn btn-sm btn-default" ng-click="triggerEvent()">
+							<i class="glyphicon glyphicon-play"></i> {{'EVENT-SUBSCRIPTION.ACTIONS.TRIGGER' | translate}}
+					    </button>
+					  </li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>

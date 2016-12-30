@@ -32,6 +32,7 @@
             "INSTANCES": "Instances",
             "TASKS": "Tasks",
             "JOBS": "Jobs",
+            "EVENT-SUBSCRIPTIONS": "Event subscriptions",
             "CONFIGURATION": "Configuration",
             "CONFIGURATION-ENGINE": "Engine",
             "DECISION-TABLES": "Decision tables",
@@ -481,6 +482,48 @@
             "EXCEPTION": "Exception"
         }
     },
+    "EVENT-SUBSCRIPTION": {
+        "TITLE": {
+            "MAIN": "Event subscription {{id}}"
+        },
+        "ACTIONS": {
+            "TRIGGER": "Trigger event"
+        },
+        "ID": "ID:",
+        "ACTIVITY-ID": "Activity ID:",
+        "EXECUTION-ID": "Execution ID:",
+        "PROCESS-INSTANCE": "Process instance:",
+        "PROCESS-DEFINITION": "Process definition:",
+        "CREATE-DATE": "Created:",
+        "EVENT-TYPE": "Event type:",
+        "EVENT-NAME": "Event name:",
+        "TENANT-ID": "Tenant:"
+    },
+    "EVENT-SUBSCRIPTIONS": {
+    	"TITLE": "Event subscriptions",
+        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching event subscriptions.",
+        "LIST-MESSAGE-EMPTY": "No matching event subscriptions.",
+    	"FILTER": {
+            "PROCESS-DEFINITION": "Process definition",
+            "ALL-PROCESS-DEFINITIONS": "All process definitions",
+            "PROCESS-INSTANCE-ID": "Process instance ID",
+            "TENANT-ID": "Tenant identifier",
+            "CREATED-BEFORE": "Created before",
+            "CREATED-AFTER": "Created after"
+        },
+        "SORT": {
+            "ID": "Event subscription ID",
+            "CREATE-DATE": "Created",
+            "PROCESS-INSTANCE-ID": "Process instance ID"
+        },
+    	"HEADER": {
+            "ID": "ID",
+            "CREATE-DATE": "Created",
+            "PROCESS-DEFINITION": "Process definition",
+            "EVENT-TYPE": "Event type",
+            "EVENT-NAME": "Event name"
+        }
+    },
     "LOGIN": {
         "TITLE": "Sign in",
         "USERNAME": "Username",
@@ -673,6 +716,9 @@
         "JOB": {
             "DELETED": "Job '{{id}}' deleted successfully.",
             "EXECUTED": "Job '{{id}}' was executed successfully."
+        },
+        "EVENT-SUBSCRIPTION": {
+        	"TRIGGERED": "Event subscription '{{id}}' triggered successfully."
         },
         "PROCESS-INSTANCE": {
             "DELETED": "Process instance '{{id}}' deleted successfully.",

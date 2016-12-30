@@ -18,44 +18,40 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.domain.ServerConfig;
-import org.flowable.admin.service.engine.FormDefinitionService;
+import org.flowable.admin.service.engine.EventSubscriptionService;
+import org.flowable.admin.service.engine.exception.FlowableServiceException;
+import org.flowable.app.service.exception.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-/**
- * @author Bassam Al-Sarori
- * @author Yvo Swillens
- */
 @RestController
-public class FormDefinitionsClientResource extends AbstractClientResource {
+public class EventSubscriptionsClientResource extends AbstractClientResource {
 
-  private static final Logger logger = LoggerFactory.getLogger(FormDefinitionsClientResource.class);
+  private static final Logger logger = LoggerFactory.getLogger(EventSubscriptionsClientResource.class);
 
   @Autowired
-  protected FormDefinitionService clientService;
+  protected EventSubscriptionService eventSubscriptionService;
 
   /**
-   * GET a list of deployed form definitions.
+   * GET /rest/admin/event-subscriptions -> Get a list of event subscriptions.
    */
-  @RequestMapping(value = "/rest/admin/form-definitions", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode listFormDefinitions(HttpServletRequest request) {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+  @RequestMapping(value = "/rest/admin/event-subscriptions", method = RequestMethod.GET, produces = "application/json")
+  public JsonNode listEventSubscriptions(HttpServletRequest request) {
+    logger.debug("REST request to get a list of event subscriptions");
+    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
     Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
-    return clientService.listForms(serverConfig, parameterMap);
-  }
 
-  /**
-   * GET process definition's list of deployed form definitions.
-   */
-  @RequestMapping(value = "/rest/admin/process-definition-form-definitions/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode getProcessDefinitionForms(@PathVariable String processDefinitionId, HttpServletRequest request) {
-    return clientService.getProcessDefinitionForms(retrieveServerConfig(EndpointType.PROCESS), processDefinitionId);
+    try {
+      return eventSubscriptionService.listEventSubscriptions(serverConfig, parameterMap);
+    } catch (FlowableServiceException e) {
+      logger.error("Error getting event subscriptions");
+      throw new BadRequestException(e.getMessage());
+    }
   }
 }

@@ -38,6 +38,7 @@ import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -61,10 +62,10 @@ import org.flowable.rest.service.api.engine.variable.IntegerRestVariableConverte
 import org.flowable.rest.service.api.engine.variable.LongRestVariableConverter;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
+import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
 import org.flowable.rest.service.api.engine.variable.RestVariableConverter;
 import org.flowable.rest.service.api.engine.variable.ShortRestVariableConverter;
 import org.flowable.rest.service.api.engine.variable.StringRestVariableConverter;
-import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
 import org.flowable.rest.service.api.form.FormDataResponse;
 import org.flowable.rest.service.api.form.RestEnumFormProperty;
 import org.flowable.rest.service.api.form.RestFormProperty;
@@ -86,6 +87,7 @@ import org.flowable.rest.service.api.repository.DeploymentResponse;
 import org.flowable.rest.service.api.repository.FormDefinitionResponse;
 import org.flowable.rest.service.api.repository.ModelResponse;
 import org.flowable.rest.service.api.repository.ProcessDefinitionResponse;
+import org.flowable.rest.service.api.runtime.process.EventSubscriptionResponse;
 import org.flowable.rest.service.api.runtime.process.ExecutionResponse;
 import org.flowable.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.flowable.rest.service.api.runtime.task.TaskResponse;
@@ -993,6 +995,49 @@ public class RestResponseFactory {
 
     if (job.getExecutionId() != null) {
       response.setExecutionUrl(urlBuilder.buildUrl(RestUrls.URL_EXECUTION, job.getExecutionId()));
+    }
+
+    return response;
+  }
+  
+  public List<EventSubscriptionResponse> createEventSubscriptionResponseList(List<EventSubscription> eventSubscriptions) {
+    RestUrlBuilder urlBuilder = createUrlBuilder();
+    List<EventSubscriptionResponse> responseList = new ArrayList<EventSubscriptionResponse>();
+    for (EventSubscription instance : eventSubscriptions) {
+      responseList.add(createEventSubscriptionResponse(instance, urlBuilder));
+    }
+    return responseList;
+  }
+
+  public EventSubscriptionResponse createEventSubscriptionResponse(EventSubscription eventSubscription) {
+    return createEventSubscriptionResponse(eventSubscription, createUrlBuilder());
+  }
+
+  public EventSubscriptionResponse createEventSubscriptionResponse(EventSubscription eventSubscription, RestUrlBuilder urlBuilder) {
+    EventSubscriptionResponse response = new EventSubscriptionResponse();
+    response.setId(eventSubscription.getId());
+    response.setCreated(eventSubscription.getCreated());
+    response.setEventType(eventSubscription.getEventType());
+    response.setEventName(eventSubscription.getEventName());
+    response.setActivityId(eventSubscription.getActivityId());
+    response.setExecutionId(eventSubscription.getExecutionId());
+    response.setProcessDefinitionId(eventSubscription.getProcessDefinitionId());
+    response.setProcessInstanceId(eventSubscription.getProcessInstanceId());
+    response.setConfiguration(eventSubscription.getConfiguration());
+    response.setTenantId(eventSubscription.getTenantId());
+
+    response.setUrl(urlBuilder.buildUrl(RestUrls.URL_EVENT_SUBSCRIPTION, eventSubscription.getId()));
+
+    if (eventSubscription.getProcessDefinitionId() != null) {
+      response.setProcessDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION, eventSubscription.getProcessDefinitionId()));
+    }
+
+    if (eventSubscription.getProcessInstanceId() != null) {
+      response.setProcessInstanceUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_INSTANCE, eventSubscription.getProcessInstanceId()));
+    }
+
+    if (eventSubscription.getExecutionId() != null) {
+      response.setExecutionUrl(urlBuilder.buildUrl(RestUrls.URL_EXECUTION, eventSubscription.getExecutionId()));
     }
 
     return response;

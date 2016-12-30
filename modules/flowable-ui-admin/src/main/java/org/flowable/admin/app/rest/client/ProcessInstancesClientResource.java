@@ -31,33 +31,31 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @RestController
 public class ProcessInstancesClientResource extends AbstractClientResource {
 
-    private final Logger log = LoggerFactory.getLogger(ProcessInstancesClientResource.class);
+  private final Logger logger = LoggerFactory.getLogger(ProcessInstancesClientResource.class);
 
-    @Autowired
-    protected ProcessInstanceService clientService;
-    
-    protected ObjectMapper objectMapper = new ObjectMapper();
+  @Autowired
+  protected ProcessInstanceService clientService;
 
-    /**
-     * GET  /rest/authenticate -> check if the user is authenticated, and return its login.
-     */
-    @RequestMapping(value = "/rest/admin/process-instances",
-            method = RequestMethod.POST,
-            consumes = "application/json",
-            produces = "application/json")
-    public JsonNode listProcessInstances(@RequestBody ObjectNode bodyNode) {
-        log.debug("REST request to get a list of process instances");
-        
-        JsonNode resultNode = null;
-        try {
-            ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-	        resultNode = clientService.listProcesInstances(bodyNode, serverConfig);
-			
-		} catch (Exception e) {
-			log.error("Error processing process instance list request", e);
-			throw new BadRequestException(e.getMessage());
-		}
-        
-        return resultNode;
+  protected ObjectMapper objectMapper = new ObjectMapper();
+
+  /**
+   * GET /rest/authenticate -> check if the user is authenticated, and return
+   * its login.
+   */
+  @RequestMapping(value = "/rest/admin/process-instances", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+  public JsonNode listProcessInstances(@RequestBody ObjectNode bodyNode) {
+    logger.debug("REST request to get a list of process instances");
+
+    JsonNode resultNode = null;
+    try {
+      ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+      resultNode = clientService.listProcesInstances(bodyNode, serverConfig);
+
+    } catch (Exception e) {
+      logger.error("Error processing process instance list request", e);
+      throw new BadRequestException(e.getMessage());
     }
+
+    return resultNode;
+  }
 }

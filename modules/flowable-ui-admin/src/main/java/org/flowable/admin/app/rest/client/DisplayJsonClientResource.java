@@ -61,7 +61,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @RestController
 public class DisplayJsonClientResource extends AbstractClientResource {
 
-	private final Logger log = LoggerFactory.getLogger(DisplayJsonClientResource.class);
+	private static final Logger logger = LoggerFactory.getLogger(DisplayJsonClientResource.class);
 
 	@Autowired
 	protected ProcessDefinitionService clientService;
@@ -103,7 +103,7 @@ public class DisplayJsonClientResource extends AbstractClientResource {
 				displayNode.put("diagramHeight", diagramInfo.getHeight());
 
 			} catch (Exception e) {
-				log.error("Error creating model JSON", e);
+			  logger.error("Error creating model JSON", e);
 			}
 		}
 
@@ -162,7 +162,7 @@ public class DisplayJsonClientResource extends AbstractClientResource {
 				}
 
 			} catch (Exception e) {
-				log.error("Error creating model JSON", e);
+			  logger.error("Error creating model JSON", e);
 			}
 		}
 

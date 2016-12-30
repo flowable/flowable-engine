@@ -16,6 +16,8 @@ import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.service.engine.ProcessEngineInfoService;
 import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.app.service.exception.BadRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,25 +33,29 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 @RestController
 public class ProcessEngineInfoClientResource extends AbstractClientResource {
+  
+  private static final Logger logger = LoggerFactory.getLogger(ProcessEngineInfoClientResource.class);
 
-    @Autowired
-    protected ProcessEngineInfoService clientService;
+  @Autowired
+  protected ProcessEngineInfoService clientService;
 
-    @Autowired
-    protected Environment env;
+  @Autowired
+  protected Environment env;
 
-    @RequestMapping(value = "/rest/admin/engine-info/{endpointTypeCode}", method = RequestMethod.GET)
-    public JsonNode getEngineInfo(@PathVariable Integer endpointTypeCode) throws BadRequestException {
-        EndpointType endpointType = EndpointType.valueOf(endpointTypeCode);
+  @RequestMapping(value = "/rest/admin/engine-info/{endpointTypeCode}", method = RequestMethod.GET)
+  public JsonNode getEngineInfo(@PathVariable Integer endpointTypeCode) throws BadRequestException {
+    EndpointType endpointType = EndpointType.valueOf(endpointTypeCode);
 
-        if (endpointType == null) {
-            throw new BadRequestException("No valid endpoint type code provided: "+endpointTypeCode);
-        }
-
-        try {
-            return clientService.getEngineInfo(retrieveServerConfig(endpointType));
-        } catch (FlowableServiceException e) {
-            throw new BadRequestException(e.getMessage());
-        }
+    if (endpointType == null) {
+      throw new BadRequestException("No valid endpoint type code provided: " + endpointTypeCode);
     }
+
+    try {
+      return clientService.getEngineInfo(retrieveServerConfig(endpointType));
+      
+    } catch (FlowableServiceException e) {
+      logger.error("Error getting engine info {}", endpointType, e);
+      throw new BadRequestException(e.getMessage());
+    }
+  }
 }

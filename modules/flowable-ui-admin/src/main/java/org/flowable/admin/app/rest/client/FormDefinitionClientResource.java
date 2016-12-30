@@ -17,6 +17,8 @@ import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.FormDefinitionService;
 import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.app.service.exception.BadRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,18 +33,21 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 @RestController
 public class FormDefinitionClientResource extends AbstractClientResource {
+  
+  private static final Logger logger = LoggerFactory.getLogger(FormDefinitionClientResource.class);
 
-    @Autowired
-    protected FormDefinitionService clientService;
+  @Autowired
+  protected FormDefinitionService clientService;
 
-    @RequestMapping(value = "/rest/admin/form-definitions/{formDefinitionId}", method = RequestMethod.GET, produces = "application/json")
-    public JsonNode getForm(@PathVariable String formDefinitionId) throws BadRequestException {
+  @RequestMapping(value = "/rest/admin/form-definitions/{formDefinitionId}", method = RequestMethod.GET, produces = "application/json")
+  public JsonNode getFormDefinition(@PathVariable String formDefinitionId) throws BadRequestException {
 
-        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
-        try {
-            return clientService.getForm(serverConfig, formDefinitionId);
-        } catch (FlowableServiceException e) {
-            throw new BadRequestException(e.getMessage());
-        }
+    ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+    try {
+      return clientService.getForm(serverConfig, formDefinitionId);
+    } catch (FlowableServiceException e) {
+      logger.error("Error getting form definition {}", formDefinitionId, e);
+      throw new BadRequestException(e.getMessage());
     }
+  }
 }

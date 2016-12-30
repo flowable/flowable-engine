@@ -522,6 +522,13 @@ public class FlowableClientService {
     post.setHeader("Accept", "application/json");
     return post;
   }
+  
+  public HttpPut createPut(String uri, ServerConfig serverConfig) {
+    HttpPut put = new HttpPut(getServerUrl(serverConfig, uri));
+    put.setHeader("Content-Type", "application/json");
+    put.setHeader("Accept", "application/json");
+    return put;
+  }
 
   public HttpPut createPut(URIBuilder builder, ServerConfig serverConfig) {
     HttpPut put = new HttpPut(getServerUrl(serverConfig, builder));

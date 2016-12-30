@@ -52,6 +52,7 @@ public class ProcessInstanceService {
   public static final String RUNTIME_PROCESS_INSTANCE_URL = "runtime/process-instances/{0}";
   public static final String RUNTIME_PROCESS_INSTANCE_VARIABLES = "runtime/process-instances/{0}/variables";
   public static final String RUNTIME_PROCESS_INSTANCE_VARIABLE_URL = "runtime/process-instances/{0}/variables/{1}";
+  public static final String RUNTIME_PROCESS_INSTANCE_CHANGE_STATE_URL = "runtime/process-instances/{0}/change-state";
 
   private static final String DEFAULT_SUBTASK_RESULT_SIZE = "1024";
   private static final String DEFAULT_ACTIVITY_SIZE = "1024";
@@ -184,6 +185,19 @@ public class ProcessInstanceService {
 
     if (!validAction) {
       throw new BadRequestException("Action is missing in the request body or the given action is not supported.");
+    }
+  }
+  
+  public void changeActivityState(ServerConfig serverConfig, String processInstanceId, JsonNode changeActivityBody) throws FlowableServiceException {
+    try {
+      URIBuilder builder = clientUtil.createUriBuilder(MessageFormat.format(RUNTIME_PROCESS_INSTANCE_CHANGE_STATE_URL, processInstanceId));
+      HttpPost post = clientUtil.createPost(builder.build().toString(), serverConfig);
+
+      post.setEntity(clientUtil.createStringEntity(changeActivityBody.toString()));
+      clientUtil.executeRequestNoResponseBody(post, serverConfig, HttpStatus.SC_OK);
+      
+    } catch (Exception e) {
+      throw new FlowableServiceException(e.getMessage(), e);
     }
   }
 
