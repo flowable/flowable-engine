@@ -145,52 +145,6 @@ ORYX = Object.extend(ORYX, {
 	 * the server. Once everything is loaded, the third layer is being invoked.
 	 */
 	_load: function() {
-	/*
-		// if configuration not there already,
-		if(!(ORYX.CONFIG)) {
-			
-			// if this is the first attempt...
-			if(ORYX.configrationRetries == 0) {
-				
-				// get the path and filename.
-				var configuration = ORYX.PATH + ORYX.CONFIGURATION;
-	
-				ORYX.Log.debug("Configuration not found, loading from '%0'.",
-					configuration);
-				
-				// require configuration file.
-				Kickstart.require(configuration);
-				
-			// else if attempts exceeded ...
-			} else if(ORYX.configrationRetries >= ORYX_CONFIGURATION_WAIT_ATTEMPTS) {
-				
-				throw "Tried to get configuration" +
-					ORYX_CONFIGURATION_WAIT_ATTEMPTS +
-					" times from '" + configuration + "'. Giving up."
-					
-			} else if(ORYX.configrationRetries > 0){
-				
-				// point out how many attempts are left...
-				ORYX.Log.debug("Waiting once more (%0 attempts left)",
-					(ORYX_CONFIGURATION_WAIT_ATTEMPTS -
-						ORYX.configrationRetries));
-
-			}
-			
-			// any case: continue in a moment with increased retry count.
-			ORYX.configrationRetries++;
-			window.setTimeout(ORYX._load, ORYX_CONFIGURATION_DELAY);
-			return;
-		}
-		
-		ORYX.Log.info("Configuration loaded.");
-		
-		// load necessary scripts.
-		ORYX.URLS.each(function(url) {
-			ORYX.Log.debug("Requireing '%0'", url);
-			Kickstart.require(ORYX.PATH + url) });
-	*/
-		// configurate logging and load plugins.
 		ORYX.loadPlugins();
 	},
 
@@ -248,8 +202,12 @@ ORYX = Object.extend(ORYX, {
 						
 						// get all attributes from the node and set to global properties
 						var attributes = $A(prop.attributes)
-						attributes.each(function(attr){property[attr.nodeName] = attr.nodeValue});				
-						if(attributes.length > 0) { globalProperties.push(property) };				
+						attributes.each(function(attr) {
+							property.set(attr.nodeName, attr.nodeValue);
+						});
+						if(attributes.length > 0) { 
+							globalProperties.push(property) 
+						};				
 					});
 				});
 
@@ -263,17 +221,18 @@ ORYX = Object.extend(ORYX, {
 					// TODO: What about: var pluginData = $H(node.attributes) !?
 					var pluginData = new Hash();
 					$A(node.attributes).each( function(attr){
-						pluginData[attr.nodeName] = attr.nodeValue});				
+						pluginData.set(attr.nodeName, attr.nodeValue);
+					});
 					
 					// ensure there's a name attribute.
-					if(!pluginData['name']) {
+					if (!pluginData.get('name')) {
 						ORYX.Log.error("A plugin is not providing a name. Ingnoring this plugin.");
 						return;
 					}
 
 					// ensure there's a source attribute.
-					if(!pluginData['source']) {
-						ORYX.Log.error("Plugin with name '%0' doesn't provide a source attribute.", pluginData['name']);
+					if (!pluginData.get('source')) {
+						ORYX.Log.error("Plugin with name '%0' doesn't provide a source attribute.", pluginData.get('name'));
 						return;
 					}
 					
@@ -285,8 +244,13 @@ ORYX = Object.extend(ORYX, {
 						
 						// Get all Attributes from the Node			
 						var attributes = $A(prop.attributes)
-						attributes.each(function(attr){property[attr.nodeName] = attr.nodeValue});				
-						if(attributes.length > 0) { properties.push(property) };	
+						attributes.each(function(attr){
+							property.set(attr.nodeName, attr.nodeValue);
+						});
+
+						if (attributes.length > 0) {
+							properties.push(property);
+						}
 					
 					});
 					
@@ -294,7 +258,7 @@ ORYX = Object.extend(ORYX, {
 					properties = properties.concat(globalProperties);
 					
 					// Set Properties to Plugin-Data
-					pluginData['properties'] = properties;
+					pluginData.set('properties', properties);
 					
 					// Get the RequieredNodes
 					var requireNodes = node.getElementsByTagName("requires");
@@ -312,7 +276,7 @@ ORYX = Object.extend(ORYX, {
 					
 					// Set Requires to the Plugin-Data, if there is one
 					if( requires ){
-						pluginData['requires'] = requires;
+						pluginData.set('requires', requires);
 					}
 
 
@@ -332,18 +296,18 @@ ORYX = Object.extend(ORYX, {
 					
 					// Set Requires to the Plugin-Data, if there is one
 					if( notUsesIn ){
-						pluginData['notUsesIn'] = notUsesIn;
+						pluginData.set('notUsesIn', notUsesIn);
 					}		
 					
 								
-					var url = ORYX.PATH + ORYX.CONFIG.PLUGINS_FOLDER + pluginData['source'];
+					var url = ORYX.PATH + ORYX.CONFIG.PLUGINS_FOLDER + pluginData.get('source');
 		
 					ORYX.Log.debug("Requireing '%0'", url);
 		
 					// Add the Script-Tag to the Site
 					//Kickstart.require(url);
 		
-					ORYX.Log.info("Plugin '%0' successfully loaded.", pluginData['name']);
+					ORYX.Log.info("Plugin '%0' successfully loaded.", pluginData.get('name'));
 		
 					// Add the Plugin-Data to all available Plugins
 					ORYX.availablePlugins.push(pluginData);

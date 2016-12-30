@@ -496,14 +496,13 @@ ORYX.Core.Edge = {
 		position.y = 0;
 		
 		/* Case: Node was just added */
-		if(!this.attachedNodePositionData[node.getId()]) {
-			this.attachedNodePositionData[node.getId()] = new Object();
-			this.attachedNodePositionData[node.getId()]
-					.relativDistanceFromDocker1 = 0;
-			this.attachedNodePositionData[node.getId()].node = node;
-			this.attachedNodePositionData[node.getId()].segment = new Object();
+		if(!this.attachedNodePositionData.get(node.getId())) {
+			this.attachedNodePositionData.set(node.getId(),new Object());
+			this.attachedNodePositionData.get(node.getId()).relativDistanceFromDocker1 = 0;
+			this.attachedNodePositionData.get(node.getId()).node = node;
+			this.attachedNodePositionData.get(node.getId()).segment = new Object();
 			this.findEdgeSegmentForNode(node);
-		}else if(node.isChanged) {
+		} else if(node.isChanged) {
 			this.findEdgeSegmentForNode(node);
 		}
 		
@@ -540,10 +539,8 @@ ORYX.Core.Edge = {
 				
 				smallestDistance = distance;
 				
-				this.attachedNodePositionData[node.getId()].segment.docker1 = 
-													this.dockers[i-1];
-				this.attachedNodePositionData[node.getId()].segment.docker2 = 
-													this.dockers[i];
+				this.attachedNodePositionData.get(node.getId()).segment.docker1 = this.dockers[i-1];
+				this.attachedNodePositionData.get(node.getId()).segment.docker2 = this.dockers[i];
 	
 			}
 			
@@ -554,23 +551,25 @@ ORYX.Core.Edge = {
 			 * 
 			 */
 			if(!distance && !smallestDistance && smallestDistance != 0) {
-				(ORYX.Core.Math.getDistancePointToPoint(nodeCenterPoint, lineP1)
-					< ORYX.Core.Math.getDistancePointToPoint(nodeCenterPoint, lineP2)) ?
-					this.attachedNodePositionData[node.getId()].relativDistanceFromDocker1 = 0 :
-					this.attachedNodePositionData[node.getId()].relativDistanceFromDocker1 = 1;
-				this.attachedNodePositionData[node.getId()].segment.docker1 = 
-													this.dockers[i-1];
-				this.attachedNodePositionData[node.getId()].segment.docker2 = 
-													this.dockers[i];
+				var distanceCenterToLineOne = ORYX.Core.Math.getDistancePointToPoint(nodeCenterPoint, lineP1);
+				var distanceCenterToLineTwo = ORYX.Core.Math.getDistancePointToPoint(nodeCenterPoint, lineP2);
+
+				if (distanceCenterToLineOne < distanceCenterToLineTwo) {
+					this.attachedNodePositionData.get(node.getId()).relativDistanceFromDocker1 = 0
+				} else {
+					this.attachedNodePositionData.get(node.getId()).relativDistanceFromDocker1 = 1;
+				}
+				this.attachedNodePositionData.get(node.getId()).segment.docker1 = this.dockers[i-1];
+				this.attachedNodePositionData.get(node.getId()).segment.docker2 = this.dockers[i];
 			}
 		}
 		
 		/* Calculate position on edge segment for the node */
 		if(smallestDistance || smallestDistance == 0) {
-			this.attachedNodePositionData[node.getId()].relativDistanceFromDocker1 =
+			this.attachedNodePositionData.get(node.getId()).relativDistanceFromDocker1 =
 			this.getLineParameterForPosition(
-					this.attachedNodePositionData[node.getId()].segment.docker1,
-					this.attachedNodePositionData[node.getId()].segment.docker2,
+					this.attachedNodePositionData.get(node.getId()).segment.docker1,
+ 					this.attachedNodePositionData.get(node.getId()).segment.docker2,
 					node);
 		}
 	},
@@ -684,7 +683,7 @@ ORYX.Core.Edge = {
         //TODO consider points for marker mids
         var lastPoint;
         this._paths.each((function(path, index){
-            var dockers = this._dockersByPath[path.id];
+            var dockers = this._dockersByPath.get(path.id);
             var c = undefined;
 			var d = undefined;
             if (lastPoint) {
@@ -987,8 +986,8 @@ ORYX.Core.Edge = {
 	remove: function(shape) {
 		arguments.callee.$.remove.apply(this, arguments);
 		
-		if(this.attachedNodePositionData[shape.getId()]) {
-			delete this.attachedNodePositionData[shape.getId()];
+		if(this.attachedNodePositionData.get(shape.getId())) {
+			this.attachedNodePositionData.unset[shape.getId()];
 		}
 		
 		/* Adjust child shapes if neccessary */
@@ -1204,7 +1203,7 @@ ORYX.Core.Edge = {
                     }
                     else {
                         this.remove(docker);
-                        this._dockersByPath[pair.key] = pair.value.without(docker);
+                        this._dockersByPath.set(pair.key,pair.value.without(docker));
                         this.isChanged = true;
                         this._dockerChanged();
                         return true;
@@ -1222,7 +1221,7 @@ ORYX.Core.Edge = {
 	 * (key is the removed position of the docker, value is docker themselve)
 	 */
 	removeUnusedDockers:function(){
-		var marked = $H({});
+		var marked = new Hash();
 		
 		this.dockers.each(function(docker, i){
 			if (i==0||i==this.dockers.length-1){ return }
@@ -1239,7 +1238,7 @@ ORYX.Core.Edge = {
 			var cd = docker.bounds.center();
 			
 			if (ORYX.Core.Math.isPointInLine(cd.x, cd.y, cp.x, cp.y, cn.x, cn.y, 1)){
-				marked[i] = docker;
+				marked.set(i, docker);
 			}
 		}.bind(this))
 		
@@ -1273,7 +1272,7 @@ ORYX.Core.Edge = {
             markerElements.each(function(markerElement){
                 try {
                     marker = new ORYX.Core.SVG.SVGMarker(markerElement.cloneNode(true));
-                    me._markers[marker.id] = marker;
+                    me._markers.set(marker.id, marker);
                     var textElements = $A(marker.element.getElementsByTagNameNS(NAMESPACE_SVG, "text"));
                     var label;
                     textElements.each(function(textElement){
@@ -1281,7 +1280,7 @@ ORYX.Core.Edge = {
                             textElement: textElement,
 							shapeId: this.id
                         });
-                        me._labels[label.id] = label;
+                        me._labels.set(label.id, label);
                     });
                 } 
                 catch (e) {
@@ -1320,7 +1319,7 @@ ORYX.Core.Edge = {
                     var markerStartId = this.getValidMarkerId(markerUrl);
                     path.setAttributeNS(null, "marker-start", "url(#" + markerStartId + ")");
                     
-                    markersByThisPath.push(this._markers[markerStartId]);
+                    markersByThisPath.push(this._markers.get(markerStartId));
                 }
                 
                 markerUrl = path.getAttributeNS(null, "marker-mid");
@@ -1331,7 +1330,7 @@ ORYX.Core.Edge = {
                     var markerMidId = this.getValidMarkerId(markerUrl);
                     path.setAttributeNS(null, "marker-mid", "url(#" + markerMidId + ")");
                     
-                    markersByThisPath.push(this._markers[markerMidId]);
+                    markersByThisPath.push(this._markers.get(markerMidId));
                 }
                 
                 markerUrl = path.getAttributeNS(null, "marker-end");
@@ -1342,7 +1341,7 @@ ORYX.Core.Edge = {
                     var markerEndId = this.getValidMarkerId(markerUrl);
                     path.setAttributeNS(null, "marker-end", "url(#" + markerEndId + ")");
                     
-                    markersByThisPath.push(this._markers[markerEndId]);
+                    markersByThisPath.push(this._markers.get(markerEndId));
                 }
                 
                 this._markersByPath[pathId] = markersByThisPath;
@@ -1357,7 +1356,7 @@ ORYX.Core.Edge = {
                     throw "Edge: Path has to have two or more points specified.";
                 }
                 
-                this._dockersByPath[pathId] = [];
+                this._dockersByPath.set(pathId, []);
                 
 				for (var i = 0; i < handler.points.length; i += 2) {
 					//handler.points.each((function(point, pIndex){
@@ -1452,7 +1451,7 @@ ORYX.Core.Edge = {
 				shapeId: this.id
             });
             this.node.childNodes[0].childNodes[0].appendChild(label.node);
-            this._labels[label.id] = label;
+            this._labels.set(label.id, label);
 			
 			label.registerOnChange(this.layout.bind(this));
         }).bind(this)); 
@@ -1711,17 +1710,17 @@ ORYX.Core.Edge = {
                     
                     if (path) {
                         if (index === 0) {
-                            while (this._dockersByPath[path.id].length > 2) {
-                                this.removeDocker(this._dockersByPath[path.id][1]);
+                            while (this._dockersByPath.get(path.id).length > 2) {
+								this.removeDocker(this._dockersByPath.get(path.id)[1]);
                             }
                         }
                         else {
-                            while (this._dockersByPath[path.id].length > 1) {
-                                this.removeDocker(this._dockersByPath[path.id][0]);
+                            while (this._dockersByPath.get(path.id).length > 1) {
+                                this.removeDocker(this._dockersByPath.get(path.id)[0]);
                             }
                         }
                         
-                        var dockersByPath = this._dockersByPath[path.id];
+                        var dockersByPath = this._dockersByPath.get(path.id);
                         
                         if (index === 0) {
                             //set position of first docker

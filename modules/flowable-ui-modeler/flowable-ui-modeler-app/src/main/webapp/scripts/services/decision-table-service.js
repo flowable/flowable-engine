@@ -118,9 +118,7 @@ angular.module('flowableModeler').service('DecisionTableService', [ '$rootScope'
 
                     data.decisionTableImageBase64 = extra_canvas.toDataURL('image/png');
                     
-                    delete Array.prototype.toJSON;
-
-	                $http({
+                    $http({
 	                    method: 'PUT',
 	                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/decision-table-models/' + $rootScope.currentDecisionTable.id,
 	                    data: data}).

@@ -80,12 +80,6 @@ angular.module('dndLists', [])
       element.on('dragstart', function(event) {
         event = event.originalEvent || event;
 
-        // <FLOWABLE>
-        // Prototype (used by the oryx editor) adds a toJSON method to the form fields
-        // which corrupts the serialization, therefor remove it before drag value is stored.
-        delete Array.prototype.toJSON;
-        // </FLOWABLE>
-
         // Serialize the data associated with this element. IE only supports the Text drag type
         event.dataTransfer.setData("Text", angular.toJson(scope.$eval(attr.dndDraggable)));
 

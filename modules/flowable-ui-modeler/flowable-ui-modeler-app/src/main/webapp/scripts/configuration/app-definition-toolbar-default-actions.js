@@ -97,7 +97,6 @@ angular.module('flowableModeler').controller('SaveAppDefinitionCtrl',
             data.force = true;
         }
         
-        delete Array.prototype.toJSON;
         delete $scope.conflict;
         $http({method: 'PUT', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/' + $rootScope.currentAppDefinition.id, data: data}).
             success(function(response, status, headers, config) {

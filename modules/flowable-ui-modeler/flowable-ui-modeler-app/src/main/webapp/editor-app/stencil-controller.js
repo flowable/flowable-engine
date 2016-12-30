@@ -283,7 +283,7 @@ angular.module('flowableModeler')
                         var key = property.prefix() + "-" + property.id();
 
                         if (key === 'oryx-name') {
-                            selectedItem.title = selectedShape.properties[key];
+                            selectedItem.title = selectedShape.properties.get(key);
                         }
 
                         // First we check if there is a config for 'key-type' and then for 'type' alone
@@ -296,8 +296,8 @@ angular.module('flowableModeler')
                             console.log('WARNING: no property configuration defined for ' + key + ' of type ' + property.type());
                         } else {
 
-                            if (selectedShape.properties[key] === 'true') {
-                                selectedShape.properties[key] = true;
+                            if (selectedShape.properties.get(key) === 'true') {
+                                selectedShape.properties.set(key, true);
                             }
                             
                             if (KISBPM.CONFIG.showRemovedProperties == false && property.isHidden())
@@ -312,7 +312,7 @@ angular.module('flowableModeler')
                                 'type': property.type(),
                                 'mode': 'read',
                                 'hidden': property.isHidden(),
-                                'value': selectedShape.properties[key]
+                                'value': selectedShape.properties.get(key)
                             };
                             
                             if ((currentProperty.type === 'complex' || currentProperty.type === 'multiplecomplex') && currentProperty.value && currentProperty.value.length > 0) {
@@ -643,7 +643,7 @@ angular.module('flowableModeler')
             }
             var key = property.key;
             var newValue = property.value;
-            var oldValue = shape.properties[key];
+            var oldValue = shape.properties.get(key);
 
             if (newValue != oldValue) {
                 var commandClass = ORYX.Core.Command.extend({

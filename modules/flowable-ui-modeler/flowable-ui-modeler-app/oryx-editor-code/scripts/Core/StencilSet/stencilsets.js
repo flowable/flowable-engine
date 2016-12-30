@@ -67,7 +67,7 @@ ORYX.Core.StencilSet.stencilSets = function(editorId) {
 	if(stencilSetNSs) {
 		stencilSetNSs.each(function(stencilSetNS) {
 			var stencilSet = ORYX.Core.StencilSet.stencilSet(stencilSetNS)
-			stencilSets[stencilSet.namespace()] = stencilSet;
+			stencilSets.set(stencilSet.namespace(), stencilSet);
 		});
 	}
 	return stencilSets;

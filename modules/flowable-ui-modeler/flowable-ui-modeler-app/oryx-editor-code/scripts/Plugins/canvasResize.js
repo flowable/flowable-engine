@@ -125,7 +125,7 @@ ORYX.Plugins.CanvasResizeButton = Clazz.extend({
 			
 		var actualScrollNode = jQuery('#canvasSection')[0];
 		var scrollNode 	= actualScrollNode;
-		var canvasNode = jQuery('#canvasSection').find(".ORYX_Editor")[0];
+		var canvasNode = $$("#canvasSection .ORYX_Editor")[0];
 		var svgRootNode = canvasNode.children[0];
 		
 		var iconClass = 'glyphicon glyphicon-chevron-';
