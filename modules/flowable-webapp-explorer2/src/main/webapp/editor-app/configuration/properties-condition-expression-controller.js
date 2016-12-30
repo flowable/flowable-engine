@@ -21,7 +21,7 @@
  * Condition expression
  */
 
-var KisBpmConditionExpressionCtrl = [ '$scope', '$modal', function($scope, $modal) {
+activitiModule.controller('KisBpmConditionExpressionCtrl',[ '$scope', '$modal', function($scope, $modal) {
 
     // Config for the modal window
     var opts = {
@@ -31,9 +31,9 @@ var KisBpmConditionExpressionCtrl = [ '$scope', '$modal', function($scope, $moda
 
     // Open the dialog
     $modal(opts);
-}];
+}]);
 
-var KisBpmConditionExpressionPopupCtrl = [ '$scope', '$translate', '$http', function($scope, $translate, $http) {
+activitiModule.controller('KisBpmConditionExpressionPopupCtrl',[ '$scope', '$translate', '$http', function($scope, $translate, $http) {
 
 	// Put json representing condition on scope
     if ($scope.property.value !== undefined && $scope.property.value !== null) {
@@ -55,4 +55,4 @@ var KisBpmConditionExpressionPopupCtrl = [ '$scope', '$translate', '$http', func
     	$scope.property.mode = 'read';
     	$scope.$hide();
     };
-}];
+}]);

@@ -20,7 +20,7 @@
 /*
  * Assignment
  */
-var KisBpmAssignmentCtrl = [ '$scope', '$modal', function($scope, $modal) {
+activitiModule.controller('KisBpmAssignmentCtrl',[ '$scope', '$modal', function($scope, $modal) {
 
     // Config for the modal window
     var opts = {
@@ -30,9 +30,9 @@ var KisBpmAssignmentCtrl = [ '$scope', '$modal', function($scope, $modal) {
 
     // Open the dialog
     $modal(opts);
-}];
+}]);
 
-var KisBpmAssignmentPopupCtrl = [ '$scope', function($scope) {
+activitiModule.controller('KisBpmAssignmentPopupCtrl',[ '$scope', function($scope) {
     	
     // Put json representing assignment on scope
     if ($scope.property.value !== undefined && $scope.property.value !== null
@@ -147,4 +147,4 @@ var KisBpmAssignmentPopupCtrl = [ '$scope', function($scope) {
 	        }
     	}
     };
-}];
+}]);

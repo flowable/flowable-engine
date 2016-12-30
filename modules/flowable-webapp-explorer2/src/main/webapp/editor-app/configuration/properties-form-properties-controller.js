@@ -21,7 +21,7 @@
  * Form Properties
  */
 
-var KisBpmFormPropertiesCtrl = [ '$scope', '$modal', '$timeout', '$translate', function($scope, $modal, $timeout, $translate) {
+activitiModule.controller('KisBpmFormPropertiesCtrl', [ '$scope', '$modal', '$timeout', '$translate', function($scope, $modal, $timeout, $translate) {
 
     // Config for the modal window
     var opts = {
@@ -31,9 +31,9 @@ var KisBpmFormPropertiesCtrl = [ '$scope', '$modal', '$timeout', '$translate', f
 
     // Open the dialog
     $modal(opts);
-}];
+}]);
 
-var KisBpmFormPropertiesPopupCtrl = ['$scope', '$q', '$translate', '$timeout', function($scope, $q, $translate, $timeout) {
+activitiModule.controller('KisBpmFormPropertiesPopupCtrl', ['$scope', '$q', '$translate', '$timeout', function($scope, $q, $translate, $timeout) {
 
     // Put json representing form properties on scope
     if ($scope.property.value !== undefined && $scope.property.value !== null
@@ -273,4 +273,4 @@ var KisBpmFormPropertiesPopupCtrl = ['$scope', '$q', '$translate', '$timeout', f
     	$scope.property.mode = 'read';
     };
 
-}];
+}]);

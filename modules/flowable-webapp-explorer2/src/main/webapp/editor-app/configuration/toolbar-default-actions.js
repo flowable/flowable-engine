@@ -292,7 +292,7 @@ KISBPM.TOOLBAR = {
 };
 
 /** Custom controller for the save dialog */
-var SaveModelCtrl = [ '$rootScope', '$scope', '$http', '$route', '$location',
+activitiModule.controller('SaveModelCtrl',[ '$rootScope', '$scope', '$http', '$route', '$location',
     function ($rootScope, $scope, $http, $route, $location) {
 
     var modelMetaData = $scope.editor.getModelMetaData();
@@ -376,11 +376,14 @@ var SaveModelCtrl = [ '$rootScope', '$scope', '$http', '$route', '$location',
         };
 
         // Update
-        $http({    method: 'PUT',
+        $http({
+            method: 'PUT',
             data: params,
             ignoreErrors: true,
-            headers: {'Accept': 'application/json',
-                      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+            },
             transformRequest: function (obj) {
                 var str = [];
                 for (var p in obj) {
@@ -389,8 +392,8 @@ var SaveModelCtrl = [ '$rootScope', '$scope', '$http', '$route', '$location',
                 return str.join("&");
             },
             url: KISBPM.URL.putModel(modelMetaData.modelId)})
-
-            .success(function (data, status, headers, config) {
+            .then(function (response) {
+                var data = response.data;
                 $scope.editor.handleEvents({
                     type: ORYX.CONFIG.EVENT_SAVED
                 });
@@ -418,12 +421,13 @@ var SaveModelCtrl = [ '$rootScope', '$scope', '$http', '$route', '$location',
                     successCallback();
                 }
 
-            })
-            .error(function (data, status, headers, config) {
+            },function (errorResponse) {
+                //this is probally never called as ignoreError is true...
+                var data = errorResponse;
                 $scope.error = {};
                 console.log('Something went wrong when updating the process model:' + JSON.stringify(data));
                 $scope.status.loading = false;
             });
     };
 
-}];
+}]);

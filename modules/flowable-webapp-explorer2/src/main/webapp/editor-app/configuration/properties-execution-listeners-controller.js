@@ -21,7 +21,7 @@
  * Execution listeners
  */
 
-var KisBpmExecutionListenersCtrl = [ '$scope', '$modal', '$timeout', '$translate', function($scope, $modal, $timeout, $translate) {
+activitiModule.controller('KisBpmExecutionListenersCtrl',[ '$scope', '$modal', '$timeout', '$translate', function($scope, $modal, $timeout, $translate) {
 
     // Config for the modal window
     var opts = {
@@ -31,9 +31,9 @@ var KisBpmExecutionListenersCtrl = [ '$scope', '$modal', '$timeout', '$translate
 
     // Open the dialog
     $modal(opts);
-}];
+}]);
 
-var KisBpmExecutionListenersPopupCtrl = [ '$scope', '$q', '$translate', function($scope, $q, $translate) {
+activitiModule.controller('KisBpmExecutionListenersPopupCtrl',[ '$scope', '$q', '$translate', function($scope, $q, $translate) {
 
     // Put json representing form properties on scope
     if ($scope.property.value !== undefined && $scope.property.value !== null
@@ -323,4 +323,4 @@ var KisBpmExecutionListenersPopupCtrl = [ '$scope', '$q', '$translate', function
         $scope.property.mode = 'read';
     };
 
-}];
+}]);

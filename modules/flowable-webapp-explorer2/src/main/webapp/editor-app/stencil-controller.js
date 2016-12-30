@@ -62,8 +62,11 @@ angular.module('activitiModeler')
             /*
              StencilSet items
              */
-            $http({method: 'GET', url: KISBPM.URL.getStencilSet()}).success(function (data, status, headers, config) {
-
+            $http({
+                method: 'GET',
+                url: KISBPM.URL.getStencilSet()
+            }).then(function (response) {
+                var data = response.data;
             	var quickMenuDefinition = ['UserTask', 'EndNoneEvent', 'ExclusiveGateway', 
             	                           'CatchTimerEvent', 'ThrowNoneEvent', 'TextAnnotation',
             	                           'SequenceFlow', 'Association'];
@@ -211,10 +214,8 @@ angular.module('activitiModeler')
                 
                 $scope.quickMenuItems = availableQuickMenuItems;
                 $scope.morphRoles = morphRoles;
-            }).
-            
-            error(function (data, status, headers, config) {
-                console.log('Something went wrong when fetching stencil items:' + JSON.stringify(data));
+            },function (errorResponse) {
+                console.log('Something went wrong when fetching stencil items:' + JSON.stringify(errorResponse.data));
             });
 
             /*

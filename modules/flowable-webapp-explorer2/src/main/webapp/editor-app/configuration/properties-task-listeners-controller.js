@@ -21,7 +21,7 @@
  * Task listeners
  */
 
-var KisBpmTaskListenersCtrl = [ '$scope', '$modal', '$timeout', '$translate', function($scope, $modal, $timeout, $translate) {
+activitiModule.controller('KisBpmTaskListenersCtrl',[ '$scope', '$modal', '$timeout', '$translate', function($scope, $modal, $timeout, $translate) {
 
     // Config for the modal window
     var opts = {
@@ -31,9 +31,9 @@ var KisBpmTaskListenersCtrl = [ '$scope', '$modal', '$timeout', '$translate', fu
 
     // Open the dialog
     $modal(opts);
-}];
+}]);
 
-var KisBpmTaskListenersPopupCtrl = [ '$scope', '$q', '$translate', function($scope, $q, $translate) {
+activitiModule.controller('KisBpmTaskListenersPopupCtrl', [ '$scope', '$q', '$translate', function($scope, $q, $translate) {
 
     // Put json representing form properties on scope
     if ($scope.property.value !== undefined && $scope.property.value !== null
@@ -322,4 +322,4 @@ var KisBpmTaskListenersPopupCtrl = [ '$scope', '$q', '$translate', function($sco
         $scope.$hide();
     };
 
-}];
+}]);

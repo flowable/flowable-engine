@@ -21,7 +21,7 @@
  * Controller for morph shape selection
  */
 
-var KisBpmShapeSelectionCtrl = [ '$rootScope', '$scope', '$timeout', '$translate', function($rootScope, $scope, $timeout, $translate) {
+activitiModule.controller('KisBpmShapeSelectionCtrl', [ '$rootScope', '$scope', '$timeout', '$translate', function($rootScope, $scope, $timeout, $translate) {
 
     $scope.selectedMorphShapes = [];
     
@@ -311,4 +311,4 @@ var KisBpmShapeSelectionCtrl = [ '$rootScope', '$scope', '$timeout', '$translate
     	$scope.$hide();
     };
 
-}];
+}]);

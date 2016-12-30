@@ -52,6 +52,8 @@ activitiModeler
 
         // remember language
         $translateProvider.useCookieStorage();
+
+        $translateProvider.useSanitizeValueStrategy('sanitize');
         
   }])
   .run(['$rootScope', '$timeout', '$modal', '$translate', '$location', '$window', '$http', '$q',
@@ -97,15 +99,16 @@ activitiModeler
 
                 var modelUrl = KISBPM.URL.getModel(modelId);
 
-                $http({method: 'GET', url: modelUrl}).
-                    success(function (data, status, headers, config) {
-                        $rootScope.editor = new ORYX.Editor(data);
-                        $rootScope.modelData = angular.fromJson(data);
+                $http({
+                    method: 'GET',
+                    url: modelUrl
+                }).then(function (response) {
+                        $rootScope.editor = new ORYX.Editor(response.data);
+                        $rootScope.modelData = angular.fromJson(response.data);
                         $rootScope.editorFactory.resolve();
-                    }).
-                    error(function (data, status, headers, config) {
-                      console.log('Error loading model with id ' + modelId + ' ' + data);
-                    });
+                },function (errorResponse) {
+                      console.log('Error loading model with id ' + modelId + ' ' + errorResponse.data);
+                });
             }
 
 

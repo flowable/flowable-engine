@@ -21,7 +21,7 @@
  * Sequence flow order controller
  */
 
-var KisBpmSequenceFlowOrderCtrl = [ '$scope', '$modal', '$timeout', '$translate', function($scope, $modal, $timeout, $translate) {
+activitiModule.controller('KisBpmSequenceFlowOrderCtrl', [ '$scope', '$modal', '$timeout', '$translate', function($scope, $modal, $timeout, $translate) {
 
     // Config for the modal window
     var opts = {
@@ -30,9 +30,9 @@ var KisBpmSequenceFlowOrderCtrl = [ '$scope', '$modal', '$timeout', '$translate'
     };
 
     $modal(opts);
-}];
+}]);
 
-var KisBpmSequenceFlowOrderPopupCtrl = ['$scope', '$translate', function($scope, $translate) {
+activitiModule.controller('KisBpmSequenceFlowOrderPopupCtrl', ['$scope', '$translate', function($scope, $translate) {
 
     // Find the outgoing sequence flow of the current selected shape
     var outgoingSequenceFlow = [];
@@ -127,4 +127,4 @@ var KisBpmSequenceFlowOrderPopupCtrl = ['$scope', '$translate', function($scope,
         $scope.$hide();
     };
 
-}];
+}]);

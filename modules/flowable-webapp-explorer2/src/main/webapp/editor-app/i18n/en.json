@@ -287,5 +287,7 @@
     "EVENT_TYPE.UNCAUGHT.BPMNERROR.TOOLTIP": "When a BPMN Error was thrown, but was not caught within in the process",
     "EVENT_TYPE.VARIABLE.CREATED.TOOLTIP": "A new variable has been created",
     "EVENT_TYPE.VARIABLE.DELETED.TOOLTIP": "An existing variable has been deleted",
-    "EVENT_TYPE.VARIABLE.UPDATED.TOOLTIP": "An existing variable has been updated"
+    "EVENT_TYPE.VARIABLE.UPDATED.TOOLTIP": "An existing variable has been updated",
+
+    "GENERAL.MAIN-TITLE": "test"
 }
