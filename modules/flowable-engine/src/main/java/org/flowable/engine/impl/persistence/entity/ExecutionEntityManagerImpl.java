@@ -585,7 +585,6 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
     }
 
     // Delete jobs
-    
     if (!enableExecutionRelationshipCounts 
         || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getTimerJobCount() > 0)) {
       TimerJobEntityManager timerJobEntityManager = getTimerJobEntityManager();

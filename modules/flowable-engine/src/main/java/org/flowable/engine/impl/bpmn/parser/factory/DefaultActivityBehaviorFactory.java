@@ -67,6 +67,7 @@ import org.flowable.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessErrorStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessMessageStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessSignalStartEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.EventSubProcessTimerStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
@@ -365,6 +366,10 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
   
   public EventSubProcessSignalStartEventActivityBehavior createEventSubProcessSignalStartEventActivityBehavior(StartEvent startEvent, SignalEventDefinition signalEventDefinition, Signal signal) {
     return new EventSubProcessSignalStartEventActivityBehavior(signalEventDefinition, signal);
+  }
+  
+  public EventSubProcessTimerStartEventActivityBehavior createEventSubProcessTimerStartEventActivityBehavior(StartEvent startEvent, TimerEventDefinition timerEventDefinition) {
+    return new EventSubProcessTimerStartEventActivityBehavior(timerEventDefinition);
   }
   
   public AdhocSubProcessActivityBehavior createAdhocSubprocessActivityBehavior(SubProcess subProcess) {
