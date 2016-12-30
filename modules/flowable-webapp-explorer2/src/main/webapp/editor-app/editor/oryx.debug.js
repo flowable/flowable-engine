@@ -11047,8 +11047,7 @@ ORYX.Editor = {
      * @return {Object} Returns JSON representation as JSON object.
      */
     getJSON: function(){
-    	delete Array.prototype.toJSON;
-        var canvasJSON = this.getCanvas().toJSON();
+    	var canvasJSON = this.getCanvas().toJSON();
         canvasJSON.ssextensions = this.getStencilSets().values()[0].extensions().keys().findAll(function(sse){ return !sse.endsWith('/meta#') });
         return canvasJSON;
     },
