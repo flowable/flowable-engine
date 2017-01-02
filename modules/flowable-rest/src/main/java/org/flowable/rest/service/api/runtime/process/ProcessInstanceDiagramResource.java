@@ -13,13 +13,11 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import java.io.InputStream;
-import java.util.Collections;
-
-import javax.servlet.http.HttpServletResponse;
-
-import io.swagger.annotations.*;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.io.IOUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -36,6 +34,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.InputStream;
+import java.util.Collections;
 
 /**
  * @author Frederik Heremans
