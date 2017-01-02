@@ -3,11 +3,16 @@
 
 === What is Flowable?
 
-Flowable is a light-weight business process engine written in Java. The Flowable process engine allows you to deploy BPMN 2.0 process definitions (an industry XML standard for defining processes), creating process instance of those process definitions, running queries, accessing active or historical process instances and related data, plus much more. This section will gradually introduce various concepts and APIs to do that using examples that you can follow on your own development machine.
+Flowable is a light-weight business process engine written in Java. The Flowable process engine allows you to deploy BPMN 2.0 process definitions (an industry XML standard for defining processes), 
+creating process instance of those process definitions, running queries, accessing active or historical process instances and related data, plus much more. This section will gradually introduce various concepts and 
+APIs to do that using examples that you can follow on your own development machine.
 
-Flowable is extremely flexible when it comes to adding it to your application/services/architecture. You can _embed_ the engine in your application or services by including the Flowable library, which is shipped as a jar. Since it's a jar, you can add it easily to any Java environment: Java SE; servlet containers such as Tomcat or Jetty, Spring; Java EE servers like JBoss or Websphere, etc. Alternatively, you can use the Flowable REST API to communicate over HTTP. There is also the Flowable Application, that offers an out-of-the-box UI for working with processes and tasks.
+Flowable is extremely flexible when it comes to adding it to your application/services/architecture. You can _embed_ the engine in your application or services by including the Flowable library, 
+which is shipped as a jar. Since it's a jar, you can add it easily to any Java environment: Java SE; servlet containers such as Tomcat or Jetty, Spring; Java EE servers like JBoss or Websphere, etc. 
+Alternatively, you can use the Flowable REST API to communicate over HTTP. There are also several Flowable Applications, Flowable Modeler, Flowable Admin, Flowable IDM and Flowable Task that offers an out-of-the-box UI for working with processes and tasks.
 
-Common to all the ways of setting up Flowable is the core engine, which can be seen as a collection of services that expose APIs to manage and execute business processes. The various tutorials below start by introducing how to set up and use this core engine. The sections afterwards build upon the knowledge acquired in the previous sections.
+Common to all the ways of setting up Flowable is the core engine, which can be seen as a collection of services that expose APIs to manage and execute business processes. 
+The various tutorials below start by introducing how to set up and use this core engine. The sections afterwards build upon the knowledge acquired in the previous sections.
 
 * The <<getting.started.command.line, first section>> shows how to run Flowable in the simplest way possible: a regular Java main using only Java SE. Many core concepts and API's will be explained here.
 * The <<getting.started.rest, section on the Flowable REST API>> shows how to run and use the same API via REST.
@@ -22,7 +27,8 @@ Flowable is a fork of Activiti (registered trademark by Alfresco). In all the fo
 
 ==== Creating a process engine
 
-In this first tutorial we're going to build a simple example that shows you how to create a Flowable process engine, introduces some core concepts and shows how to work with the API. The screenshots show Eclipse, but any IDE works. We'll use Maven to fetch the Flowable dependencies and manage the build, but likewise any alternative also works (Gradle, Ivy, etc.).
+In this first tutorial we're going to build a simple example that shows you how to create a Flowable process engine, introduces some core concepts and shows how to work with the API. 
+The screenshots show Eclipse, but any IDE works. We'll use Maven to fetch the Flowable dependencies and manage the build, but likewise any alternative also works (Gradle, Ivy, etc.).
 
 The example we'll build is a simple _holiday request_ process:
 
@@ -45,7 +51,8 @@ image::images/getting.started.new.maven3.png[align="center"]
 We now have an empty Maven project, to which we'll add two dependencies:
 
 * The Flowable process engine, which will allow us to create a ProcessEngine object and access the Flowable API's.
-* An in-memory database, H2 in this case, as the Flowable engine needs a database to store execution and historical data while running process instances. Note that the H2 dependency includes both the database _and_ the driver. If you use another database (e.g. PostgresQL, MySQL, etc.), you'll need to add the specific database driver dependency.
+* An in-memory database, H2 in this case, as the Flowable engine needs a database to store execution and historical data while running process instances. 
+Note that the H2 dependency includes both the database _and_ the driver. If you use another database (e.g. PostgresQL, MySQL, etc.), you'll need to add the specific database driver dependency.
 
 Add the following to your _pom.xml_ file:
 
@@ -60,12 +67,13 @@ Add the following to your _pom.xml_ file:
   <dependency>
     <groupId>com.h2database</groupId>
     <artifactId>h2</artifactId>
-    <version>1.4.192</version>
+    <version>1.3.176</version>
   </dependency>
 </dependencies>
 ----
 
-If the dependent jars are not automatically retrieved for some reason, you can right-click the project and select '_Maven -> Update Project'_ to force a manual refresh (but this should not be needed normally). In the project, under '_Maven Dependencies_', you should now see the _flowable-engine_ and various other (transitive) dependencies.
+If the dependent jars are not automatically retrieved for some reason, you can right-click the project and select '_Maven -> Update Project'_ to force a manual refresh (but this should not be needed normally). 
+In the project, under '_Maven Dependencies_', you should now see the _flowable-engine_ and various other (transitive) dependencies.
 
 Create a new Java class and add a regular Java main method:
 
@@ -82,7 +90,9 @@ public class HolidayRequest {
 }
 ----
 
-The first thing we need to do is to instantiate a *ProcessEngine* instance. This is a thread-safe object that you typically have to instantiate only once in an application. A _ProcessEngine_ is created from a *ProcessEngineConfiguration* instance, which allows you to configure and tweak the settings for the process engine. Often, the _ProcessEngineConfiguration_ is created using a configuration XML file, but (as we do here) you can also create it programmatically.  The minimum configuration a ProcessEngineConfiguration_ needs is a JDBC connection to a database:
+The first thing we need to do is to instantiate a *ProcessEngine* instance. This is a thread-safe object that you typically have to instantiate only once in an application. 
+A _ProcessEngine_ is created from a *ProcessEngineConfiguration* instance, which allows you to configure and tweak the settings for the process engine. Often, the _ProcessEngineConfiguration_ is created 
+using a configuration XML file, but (as we do here) you can also create it programmatically. The minimum configuration a ProcessEngineConfiguration_ needs is a JDBC connection to a database:
 
 [source,java,linenums]
 ----
@@ -108,7 +118,11 @@ public class HolidayRequest {
 }
 ----
 
-In the code above, on line 10 a _standalone_ configuration object is created. The _'standalone'_ here refers to the fact that the engine is created and used completely by itself (and not, for example, in a Spring environment, where you'd use the _SpringProcessEngineConfiguration_ class instead). On lines 11 to 14, the JDBC connection parameters to an in-memory H2 database instance are passed. Note that such a database does not survive a JVM restart. If you want your data to be persistent, you'll need to switch to a persistent database and switch the connection parameters accordingly. On line 15 we're setting a flag to _true_ to make sure that the database schema is created if it doesn't already exist in the database pointed to by the JDBC parameters. Alternatively, Flowable ships with a set of SQL files that can be used to create the database schema with all the tables manually.
+In the code above, on line 10 a _standalone_ configuration object is created. The _'standalone'_ here refers to the fact that the engine is created and used completely by itself (and not, for example, 
+in a Spring environment, where you'd use the _SpringProcessEngineConfiguration_ class instead). On lines 11 to 14, the JDBC connection parameters to an in-memory H2 database instance are passed. 
+Note that such a database does not survive a JVM restart. If you want your data to be persistent, you'll need to switch to a persistent database and switch the connection parameters accordingly. 
+On line 15 we're setting a flag to _true_ to make sure that the database schema is created if it doesn't already exist in the database pointed to by the JDBC parameters. 
+Alternatively, Flowable ships with a set of SQL files that can be used to create the database schema with all the tables manually.
 
 The *ProcessEngine* object is then created using this configuration (line 17).
 
@@ -154,9 +168,12 @@ We've now got a process engine booted up and ready to go. Time to feed it a proc
 
 ==== Deploying a process definition
 
-The process we'll build is a very simple holiday request process. The Flowable engine expects processes to be defined in the BPMN 2.0 format, which is an XML standard that is widely accepted in the industry. In Flowable terminology, we speak about this as a *process definition*. From a _process definition_ many *process instances* can be started. Think of the _process definition_ as the blueprint for many executions of the process. In this particular case, the _process definition_ defines the different steps involved in requesting holidays, while one _process instance_ matches the request for the holiday for one particular employee.
+The process we'll build is a very simple holiday request process. The Flowable engine expects processes to be defined in the BPMN 2.0 format, which is an XML standard that is widely accepted in the industry. 
+In Flowable terminology, we speak about this as a *process definition*. From a _process definition_ many *process instances* can be started. Think of the _process definition_ as the blueprint for many executions 
+of the process. In this particular case, the _process definition_ defines the different steps involved in requesting holidays, while one _process instance_ matches the request for the holiday for one particular employee.
 
-BPMN 2.0 is stored as XML, but it has a visualization part too: it defines in a standard way how each different step type (a human task, an automatic service call, etc.) is represented and how to connect these different steps to each other. This way, the BPMN 2.0 standard allows technical and business people to communicate about business processes in a way that both parties understand.
+BPMN 2.0 is stored as XML, but it has a visualization part too: it defines in a standard way how each different step type (a human task, an automatic service call, etc.) is represented and how to connect 
+these different steps to each other. This way, the BPMN 2.0 standard allows technical and business people to communicate about business processes in a way that both parties understand.
 
 The process definition we'll use is the following:
 
@@ -164,14 +181,17 @@ image::images/getting.started.bpmn.process.png[align="center"]
 
 The process should be quite self-explanatory, but for clarity's sake let's describe the different bits:
 
-* We assume the process is started by providing some information, such as the employee name, the amount of holiday requested and a description. Of course, this could be modeled as a separate first step in the process. But by having it as 'input data' for the process, a process instance is only really created when a real request has been made. In the alternative case, a user could change his mind and cancel before submitting, yet the process instance would be there already. In some scenarios this could be valuable information (e.g. how many times is a request started, but not finished), depending on the business goal.
+* We assume the process is started by providing some information, such as the employee name, the amount of holiday requested and a description. Of course, this could be modeled as a separate first step in the process. 
+But by having it as 'input data' for the process, a process instance is only really created when a real request has been made. In the alternative case, a user could change his mind and cancel before submitting, yet the process instance would be there already. 
+In some scenarios this could be valuable information (e.g. how many times is a request started, but not finished), depending on the business goal.
 * The circle on the left is called a *start event*. It's the starting point of a process instance.
 * The first rectangle is a *user task*. This is a step in the process that a human user has to perform. In this case, the manager needs to approve or reject the request.
 * Depending on what the manager decides, the *exclusive gateway* (the diamond shape with the cross) will route the process instance to either the approval or the rejection path.
-* In case of approval, we have to register the request in some external system, which is followed by a user task again for the original employee to notify him/her of the decision. This could of course be replaced by an email.
+* In case of approval, we have to register the request in some external system, which is followed by a user task again for the original employee to notify him/her of the decision. 
+This could of course be replaced by an email.
 * In case of rejection, an email is sent to the employee.
 
-Typically, such a _process definition_ is modeled with a visual modeling tool, like the Flowable Designer (Eclipse) or the Flowable Web Modeler.
+Typically, such a _process definition_ is modeled with a visual modeling tool, like the Flowable Designer (Eclipse) or the Flowable Modeler (web application).
 
 Here, however, we're going to write the XML itself to familiarize ourselves with BPMN 2.0 and its concepts.
 
@@ -362,7 +382,8 @@ System.out.println("Which task would you like to complete?");
 int taskIndex = Integer.valueOf(scanner.nextLine());
 Task task = tasks.get(taskIndex - 1);
 Map<String, Object> processVariables = taskService.getVariables(task.getId());
-System.out.println(processVariables.get("employee") + " wants " + processVariables.get("nrOfHolidays") + " of holidays. Do you approve this?");
+System.out.println(processVariables.get("employee") + " wants " + 
+    processVariables.get("nrOfHolidays") + " of holidays. Do you approve this?");
 ----
 
 Which, if you run this, should look something like this:
@@ -404,10 +425,10 @@ import org.flowable.engine.delegate.JavaDelegate;
 
 public class CallExternalSystemDelegate implements JavaDelegate {
 
-	public void execute(DelegateExecution execution) {
-		System.out.println("Calling the external system for employee "
-      + execution.getVariable("employee"));
-	}
+    public void execute(DelegateExecution execution) {
+        System.out.println("Calling the external system for employee "
+            + execution.getVariable("employee"));
+    }
 
 }
 ----
