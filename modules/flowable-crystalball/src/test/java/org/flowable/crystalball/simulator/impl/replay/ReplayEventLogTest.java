@@ -1,6 +1,11 @@
 package org.flowable.crystalball.simulator.impl.replay;
 
-import org.flowable.crystalball.simulator.*;
+import org.flowable.crystalball.simulator.ReplaySimulationRun;
+import org.flowable.crystalball.simulator.SimpleEventCalendar;
+import org.flowable.crystalball.simulator.SimulationDebugger;
+import org.flowable.crystalball.simulator.SimulationEvent;
+import org.flowable.crystalball.simulator.SimulationEventComparator;
+import org.flowable.crystalball.simulator.SimulationEventHandler;
 import org.flowable.crystalball.simulator.delegate.event.Function;
 import org.flowable.crystalball.simulator.delegate.event.impl.EventLogProcessInstanceCreateTransformer;
 import org.flowable.crystalball.simulator.delegate.event.impl.EventLogTransformer;
@@ -26,7 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author martin.grofcik

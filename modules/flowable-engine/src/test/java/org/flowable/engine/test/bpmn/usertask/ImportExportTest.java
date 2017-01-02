@@ -1,7 +1,7 @@
 package org.flowable.engine.test.bpmn.usertask;
 
 import org.flowable.bpmn.converter.BpmnXMLConverter;
-import org.flowable.bpmn.model.*;
+import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.common.impl.util.io.InputStreamSource;
 import org.flowable.engine.common.impl.util.io.StreamSource;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;

@@ -5,7 +5,11 @@ import org.flowable.crystalball.simulator.delegate.event.impl.DeploymentCreateTr
 import org.flowable.crystalball.simulator.delegate.event.impl.InMemoryRecordFlowableEventListener;
 import org.flowable.crystalball.simulator.delegate.event.impl.ProcessInstanceCreateTransformer;
 import org.flowable.crystalball.simulator.delegate.event.impl.UserTaskCompleteTransformer;
-import org.flowable.crystalball.simulator.impl.*;
+import org.flowable.crystalball.simulator.impl.DeployResourcesEventHandler;
+import org.flowable.crystalball.simulator.impl.EventRecorderTestUtils;
+import org.flowable.crystalball.simulator.impl.RecordableProcessEngineFactory;
+import org.flowable.crystalball.simulator.impl.SimulationProcessEngineFactory;
+import org.flowable.crystalball.simulator.impl.StartProcessByIdEventHandler;
 import org.flowable.crystalball.simulator.impl.clock.DefaultClockFactory;
 import org.flowable.crystalball.simulator.impl.clock.ThreadLocalClock;
 import org.flowable.crystalball.simulator.impl.playback.PlaybackUserTaskCompleteEventHandler;
@@ -30,9 +34,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 /**
  * @author martin.grofcik
