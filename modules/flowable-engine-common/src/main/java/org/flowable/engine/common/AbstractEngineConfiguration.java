@@ -261,7 +261,7 @@ public abstract class AbstractEngineConfiguration {
         if (jdbcMaxWaitTime > 0) {
           pooledDataSource.setPoolTimeToWait(jdbcMaxWaitTime);
         }
-        if (jdbcPingEnabled == true) {
+        if (jdbcPingEnabled) {
           pooledDataSource.setPoolPingEnabled(true);
           if (jdbcPingQuery != null) {
             pooledDataSource.setPoolPingQuery(jdbcPingQuery);

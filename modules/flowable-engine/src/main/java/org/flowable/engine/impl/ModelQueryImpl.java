@@ -133,7 +133,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
   }
 
   public ModelQuery notDeployed() {
-    if (deployed == true) {
+    if (deployed) {
       throw new FlowableIllegalArgumentException("Invalid usage: cannot use deployed() and notDeployed() in the same query");
     }
     this.notDeployed = true;
@@ -141,7 +141,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
   }
 
   public ModelQuery deployed() {
-    if (notDeployed == true) {
+    if (notDeployed) {
       throw new FlowableIllegalArgumentException("Invalid usage: cannot use deployed() and notDeployed() in the same query");
     }
     this.deployed = true;
