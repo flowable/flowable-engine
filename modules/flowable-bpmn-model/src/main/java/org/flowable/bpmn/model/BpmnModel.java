@@ -108,7 +108,7 @@ public class BpmnModel {
 
       if (poolRef == null && foundPool == false) {
         return process;
-      } else if (poolRef != null && foundPool == true) {
+      } else if (poolRef != null && foundPool) {
         return process;
       }
     }
