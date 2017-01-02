@@ -297,7 +297,7 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
 				$A(jsonExtension.stencils).each(function(stencil) {
 					var oStencil = new ORYX.Core.StencilSet.Stencil(stencil, this.namespace(), this._baseUrl, this);            
 					this._stencils.unset(oStencil.id());
-					this._availableStencils(oStencil.id());
+					this._availableStencils.unset(oStencil.id());
 				}.bind(this));
 			}
 			
