@@ -23,9 +23,9 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
 @PropertySources({
-	@PropertySource(value = "classpath:/META-INF/flowable-admin-app/flowable-admin-app.properties"),
-	@PropertySource(value = "classpath:flowable-admin-app.properties", ignoreResourceNotFound = true),
-	@PropertySource(value = "file:flowable-admin-app.properties", ignoreResourceNotFound = true)
+	@PropertySource(value = "classpath:/META-INF/flowable-ui-app/flowable-ui-app.properties"),
+	@PropertySource(value = "classpath:flowable-ui-app.properties", ignoreResourceNotFound = true),
+	@PropertySource(value = "file:flowable-ui-app.properties", ignoreResourceNotFound = true)
 })
 @ComponentScan(basePackages = {
         "org.flowable.admin.repository",

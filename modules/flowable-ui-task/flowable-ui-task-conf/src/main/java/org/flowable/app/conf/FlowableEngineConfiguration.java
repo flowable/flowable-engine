@@ -49,7 +49,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @ComponentScan(basePackages= {
-		"org.flowable.app.runtime.flowable",
 		"org.flowable.app.extension.conf", // For custom configuration classes
 		"org.flowable.app.extension.bean" // For custom beans (delegates etc.)
 })
