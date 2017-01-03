@@ -145,7 +145,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     runtimeService.startProcessInstanceByKey("orderProcess");
     HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processDefinitionKey(processDefinitionKey).singleResult();
     assertNotNull(historicProcessInstance);
-    assertEquals(historicProcessInstance.getProcessDefinitionKey(), processDefinitionKey);
+    assertEquals(processDefinitionKey, historicProcessInstance.getProcessDefinitionKey());
     assertEquals("theStart", historicProcessInstance.getStartActivityId());
 
     // now complete the task to end the process instance

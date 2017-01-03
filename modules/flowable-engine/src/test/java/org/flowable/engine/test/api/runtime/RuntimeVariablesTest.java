@@ -123,17 +123,17 @@ public class RuntimeVariablesTest extends PluggableFlowableTestCase {
     }
     
     List<VariableInstance> executionVariableInstances = runtimeService.getVariableInstancesByExecutionIds(executionIds);
-    assertEquals(executionVariableInstances.size(), 2);
-    assertEquals(executionVariableInstances.get(0).getName(), "executionVar");
-    assertEquals(executionVariableInstances.get(0).getValue() , "executionVar");
-    assertEquals(executionVariableInstances.get(1).getName(), "executionVar");
-    assertEquals(executionVariableInstances.get(1).getValue() , "executionVar");
+    assertEquals(2, executionVariableInstances.size());
+    assertEquals("executionVar", executionVariableInstances.get(0).getName());
+    assertEquals("executionVar", executionVariableInstances.get(0).getValue());
+    assertEquals("executionVar", executionVariableInstances.get(1).getName());
+    assertEquals("executionVar", executionVariableInstances.get(1).getValue());
     
     executionIds = new HashSet<String>();
     executionIds.add(processInstance.getId());
     executionVariableInstances = runtimeService.getVariableInstancesByExecutionIds(executionIds);
-    assertEquals(executionVariableInstances.size(), 1);
-    assertEquals(executionVariableInstances.get(0).getName(), "processVar");
-    assertEquals(executionVariableInstances.get(0).getValue() , "processVar");
+    assertEquals(1, executionVariableInstances.size());
+    assertEquals("processVar", executionVariableInstances.get(0).getName());
+    assertEquals("processVar", executionVariableInstances.get(0).getValue());
   }
 }

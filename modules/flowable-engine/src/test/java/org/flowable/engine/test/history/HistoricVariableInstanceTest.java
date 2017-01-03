@@ -334,16 +334,16 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
     Set<String> processInstanceIds = new HashSet<String>();
     processInstanceIds.add(processInstance.getId());
     List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery().executionIds(processInstanceIds).list();
-    assertEquals(historicVariableInstances.size(), 1);
-    assertEquals(historicVariableInstances.get(0).getVariableName(), "processVar");
-    assertEquals(historicVariableInstances.get(0).getValue() , "processVar");
+    assertEquals(1, historicVariableInstances.size());
+    assertEquals("processVar", historicVariableInstances.get(0).getVariableName());
+    assertEquals("processVar", historicVariableInstances.get(0).getValue());
     
     historicVariableInstances = historyService.createHistoricVariableInstanceQuery().executionIds(executionIds).excludeTaskVariables().list();
-    assertEquals(historicVariableInstances.size(), 2);
-    assertEquals(historicVariableInstances.get(0).getVariableName(), "executionVar");
-    assertEquals(historicVariableInstances.get(0).getValue() , "executionVar");
-    assertEquals(historicVariableInstances.get(1).getVariableName(), "executionVar");
-    assertEquals(historicVariableInstances.get(1).getValue() , "executionVar");
+    assertEquals(2, historicVariableInstances.size());
+    assertEquals("executionVar", historicVariableInstances.get(0).getVariableName());
+    assertEquals("executionVar", historicVariableInstances.get(0).getValue());
+    assertEquals("executionVar", historicVariableInstances.get(1).getVariableName());
+    assertEquals("executionVar", historicVariableInstances.get(1).getValue());
   }
 
   public void testHistoricVariableQueryByTaskIds() {
@@ -399,11 +399,11 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
     }
     
     List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery().taskIds(taskIds).list();
-    assertEquals(historicVariableInstances.size(), 2);
-    assertEquals(historicVariableInstances.get(0).getVariableName(), "taskVar");
-    assertEquals(historicVariableInstances.get(0).getValue() , "taskVar");
-    assertEquals(historicVariableInstances.get(1).getVariableName(), "taskVar");
-    assertEquals(historicVariableInstances.get(1).getValue() , "taskVar");
+    assertEquals(2, historicVariableInstances.size());
+    assertEquals("taskVar", historicVariableInstances.get(0).getVariableName());
+    assertEquals("taskVar", historicVariableInstances.get(0).getValue());
+    assertEquals("taskVar", historicVariableInstances.get(1).getVariableName());
+    assertEquals("taskVar", historicVariableInstances.get(1).getValue());
   }
 
   @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })

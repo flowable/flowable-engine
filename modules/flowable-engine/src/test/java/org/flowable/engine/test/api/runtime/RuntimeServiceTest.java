@@ -426,7 +426,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     runtimeService.trigger(execution.getId(), processVariables);
 
     Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
-    assertEquals(variables, processVariables);
+    assertEquals(processVariables, variables);
 
   }
 
