@@ -19,7 +19,6 @@ import org.junit.Test;
  */
 public class LaneExtensionTest extends PluggableFlowableTestCase {
 
-  @Test
   @Deployment
   public void testLaneExtensionElement() {
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("swimlane-extension").singleResult();
