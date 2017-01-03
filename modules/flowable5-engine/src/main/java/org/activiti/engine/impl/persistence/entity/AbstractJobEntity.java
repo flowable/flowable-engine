@@ -45,16 +45,16 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
 
   protected Date duedate;
 
-  protected String executionId = null;
-  protected String processInstanceId = null;
-  protected String processDefinitionId = null;
+  protected String executionId;
+  protected String processInstanceId;
+  protected String processDefinitionId;
 
   protected boolean isExclusive = DEFAULT_EXCLUSIVE;
 
   protected int retries = DEFAULT_RETRIES;
 
-  protected String jobHandlerType = null;
-  protected String jobHandlerConfiguration = null;
+  protected String jobHandlerType;
+  protected String jobHandlerConfiguration;
   protected int maxIterations;
   protected String repeat;
   protected Date endDate;

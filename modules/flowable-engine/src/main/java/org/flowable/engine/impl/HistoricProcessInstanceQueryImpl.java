@@ -79,8 +79,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected String locale;
   protected boolean withLocalizationFallback;
   protected List<HistoricProcessInstanceQueryImpl> orQueryObjects = new ArrayList<HistoricProcessInstanceQueryImpl>();
-  protected HistoricProcessInstanceQueryImpl currentOrQueryObject = null;
-  protected boolean inOrStatement = false;
+  protected HistoricProcessInstanceQueryImpl currentOrQueryObject;
+  protected boolean inOrStatement;
   
   public HistoricProcessInstanceQueryImpl() {
   }

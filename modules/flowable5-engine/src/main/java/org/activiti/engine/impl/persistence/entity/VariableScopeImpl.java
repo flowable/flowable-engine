@@ -54,7 +54,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
   
   protected ELContext cachedElContext;
 
-  protected String id = null;
+  protected String id;
 
   protected abstract List<VariableInstanceEntity> loadVariableInstances();
   protected abstract VariableScopeImpl getParentVariableScope();

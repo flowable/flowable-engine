@@ -94,8 +94,8 @@ public class DefaultProcessDiagramCanvas {
   protected static Color SUBPROCESS_BORDER_COLOR = new Color(0, 0, 0);
   
   // Fonts
-  protected static Font LABEL_FONT = null;
-  protected static Font ANNOTATION_FONT = null;
+  protected static Font LABEL_FONT;
+  protected static Font ANNOTATION_FONT;
   
   // Strokes
   protected static Stroke THICK_TASK_BORDER_STROKE = new BasicStroke(3.0f);

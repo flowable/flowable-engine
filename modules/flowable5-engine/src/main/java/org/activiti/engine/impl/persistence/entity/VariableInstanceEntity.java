@@ -52,7 +52,7 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
 
   protected Object cachedValue;
   protected boolean forcedUpdate;
-  protected boolean deleted = false;
+  protected boolean deleted;
   
   // Default constructor for SQL mapping
   protected VariableInstanceEntity() {

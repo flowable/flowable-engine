@@ -44,7 +44,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
   protected int maxAsyncJobsDuePerAcquisition = 1;
   protected int defaultTimerJobAcquireWaitTimeInMillis = 10 * 1000;
   protected int defaultAsyncJobAcquireWaitTimeInMillis = 10 * 1000;
-  protected int defaultQueueSizeFullWaitTime = 0;
+  protected int defaultQueueSizeFullWaitTime;
 
   protected String lockOwner = UUID.randomUUID().toString();
   protected int timerLockTimeInMillis = 5 * 60 * 1000;

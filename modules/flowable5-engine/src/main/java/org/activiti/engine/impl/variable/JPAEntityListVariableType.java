@@ -28,7 +28,7 @@ public class JPAEntityListVariableType implements VariableType, CacheableVariabl
   
   protected JPAEntityMappings mappings;
   
-  protected boolean forceCachedValue = false;
+  protected boolean forceCachedValue;
   
   public JPAEntityListVariableType() {
     mappings = new JPAEntityMappings();

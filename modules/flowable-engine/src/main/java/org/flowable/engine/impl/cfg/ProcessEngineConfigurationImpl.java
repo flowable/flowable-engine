@@ -640,7 +640,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    * The time (in milliseconds) the async job (both timer and async continuations) acquisition thread will
    * wait when the queueu is full to execute the next query. By default set to 0 (for backwards compatibility)
    */
-  protected int asyncExecutorDefaultQueueSizeFullWaitTime = 0;
+  protected int asyncExecutorDefaultQueueSizeFullWaitTime;
 
   /**
    * When a job is acquired, it is locked so other async executors can't lock

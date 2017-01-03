@@ -45,7 +45,7 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
   protected String script;
   protected String language;
   protected String resultVariable;
-  protected boolean storeScriptVariables = false; // https://activiti.atlassian.net/browse/ACT-1626
+  protected boolean storeScriptVariables; // https://activiti.atlassian.net/browse/ACT-1626
 
   public ScriptTaskActivityBehavior(String script, String language, String resultVariable) {
     this.script = script;

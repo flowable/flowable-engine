@@ -45,7 +45,7 @@ public class FileSystemContentStorage implements ContentStorage {
   private PathConverter converter;
 
   private Object idLock = new Object();
-  private int currentIndex = 0;
+  private int currentIndex;
 
   private static final Logger logger = LoggerFactory.getLogger(FileSystemContentStorage.class);
 
