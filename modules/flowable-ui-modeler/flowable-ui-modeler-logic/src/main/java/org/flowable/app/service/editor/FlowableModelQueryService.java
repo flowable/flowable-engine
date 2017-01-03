@@ -184,7 +184,7 @@ public class FlowableModelQueryService {
         throw e;
 
       } catch (Exception e) {
-        logger.error("Import failed for " + fileName, e);
+        logger.error("Import failed for {}", fileName, e);
         throw new BadRequestException("Import failed for " + fileName + ", error message " + e.getMessage());
       }
     } else {
@@ -201,7 +201,7 @@ public class FlowableModelQueryService {
       try {
         appDefinition = objectMapper.readValue(model.getModelEditorJson(), AppDefinition.class);
       } catch (Exception e) {
-        logger.error("Error deserializing app " + model.getId(), e);
+        logger.error("Error deserializing app {}", model.getId(), e);
         throw new InternalServerErrorException("Could not deserialize app definition");
       }
       ((AppDefinitionListModelRepresentation) representation).setAppDefinition(appDefinition);

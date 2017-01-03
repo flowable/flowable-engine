@@ -133,7 +133,7 @@ public class AppDefinitionExportService {
     try {
       modelJson.set("editorJson", objectMapper.readTree(model.getModelEditorJson()));
     } catch (Exception e) {
-      logger.error("Error exporting model json for id " + model.getId(), e);
+      logger.error("Error exporting model json for id {}", model.getId(), e);
       throw new InternalServerErrorException("Error exporting model json for id " + model.getId());
     }
     
@@ -145,7 +145,7 @@ public class AppDefinitionExportService {
     try {
       appDefinition = objectMapper.readValue(model.getModelEditorJson(), AppDefinition.class);
     } catch (Exception e) {
-      logger.error("Error deserializing app " + model.getId(), e);
+      logger.error("Error deserializing app {}", model.getId(), e);
       throw new InternalServerErrorException("Could not deserialize app definition");
     }
     AppDefinitionRepresentation result = new AppDefinitionRepresentation(model);

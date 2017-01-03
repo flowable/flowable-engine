@@ -115,14 +115,14 @@ public class ProcessDefinitionService {
 					exception = new FlowableServiceException("An error occurred while calling Activiti: " + response.getStatusLine());
 				}
 			} catch (Exception e) {
-				log.warn("Error consuming response from uri " + request.getURI(), e);
+                log.warn("Error consuming response from uri {}", request.getURI(), e);
 				exception = clientUtil.wrapException(e, request);
 			} finally {
 				response.close();
 			}
 
 		} catch (Exception e) {
-			log.error("Error executing request to uri " + request.getURI(), e);
+            log.error("Error executing request to uri {}", request.getURI(), e);
 			exception = clientUtil.wrapException(e, request);
 
 		} finally {

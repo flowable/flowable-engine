@@ -149,14 +149,14 @@ public class FlowableClientService {
           exception = new FlowableServiceException(extractError(bodyNode, "An error occurred while calling Flowable: " + response.getStatusLine()));
         }
       } catch (Exception e) {
-        log.warn("Error consuming response from uri " + request.getURI(), e);
+        log.warn("Error consuming response from uri {}", request.getURI(), e);
         exception = wrapException(e, request);
       } finally {
         response.close();
       }
 
     } catch (Exception e) {
-      log.error("Error executing request to uri " + request.getURI(), e);
+      log.error("Error executing request to uri {}", request.getURI(), e);
       exception = wrapException(e, request);
     } finally {
       try {
@@ -205,14 +205,14 @@ public class FlowableClientService {
           exception = new FlowableServiceException(extractError(bodyNode, "An error occurred while calling Flowable: " + response.getStatusLine()));
         }
       } catch (Exception e) {
-        log.warn("Error consuming response from uri " + request.getURI(), e);
+        log.warn("Error consuming response from uri {}", request.getURI(), e);
         exception = wrapException(e, request);
       } finally {
         response.close();
       }
 
     } catch (Exception e) {
-      log.error("Error executing request to uri " + request.getURI(), e);
+      log.error("Error executing request to uri {}", request.getURI(), e);
       exception = wrapException(e, request);
     } finally {
       try {
@@ -266,14 +266,14 @@ public class FlowableClientService {
           exception = new FlowableServiceException(extractError(readJsonContent(response.getEntity().getContent()), "An error occurred while calling Flowable: " + response.getStatusLine()));
         }
       } catch (Exception e) {
-        log.warn("Error consuming response from uri " + request.getURI(), e);
+        log.warn("Error consuming response from uri {}", request.getURI(), e);
         exception = wrapException(e, request);
       } finally {
         response.close();
       }
 
     } catch (Exception e) {
-      log.error("Error executing request to uri " + request.getURI(), e);
+      log.error("Error executing request to uri {}", request.getURI(), e);
       exception = wrapException(e, request);
     } finally {
       try {
@@ -321,14 +321,14 @@ public class FlowableClientService {
           exception = new FlowableServiceException(extractError(readJsonContent(response.getEntity().getContent()), "An error occurred while calling Flowable: " + response.getStatusLine()));
         }
       } catch (Exception e) {
-        log.warn("Error consuming response from uri " + request.getURI(), e);
+        log.warn("Error consuming response from uri {}", request.getURI(), e);
         exception = wrapException(e, request);
       } finally {
         response.close();
       }
 
     } catch (Exception e) {
-      log.error("Error executing request to uri " + request.getURI(), e);
+      log.error("Error executing request to uri {}", request.getURI(), e);
       exception = wrapException(e, request);
     } finally {
       try {
@@ -367,14 +367,14 @@ public class FlowableClientService {
           exception = new FlowableServiceException(extractError(readJsonContent(response.getEntity().getContent()), "An error occurred while calling Flowable: " + response.getStatusLine()));
         }
       } catch (Exception e) {
-        log.warn("Error consuming response from uri " + request.getURI(), e);
+        log.warn("Error consuming response from uri {}", request.getURI(), e);
         exception = wrapException(e, request);
       } finally {
         response.close();
       }
 
     } catch (Exception e) {
-      log.error("Error executing request to uri " + request.getURI(), e);
+      log.error("Error executing request to uri {}", request.getURI(), e);
       exception = wrapException(e, request);
     } finally {
       try {
@@ -411,7 +411,7 @@ public class FlowableClientService {
             errorMessage = "An error was returned when calling the Activiti server";
           }
         } catch (Exception e) {
-          log.warn("Error consuming response from uri " + request.getURI(), e);
+          log.warn("Error consuming response from uri {}", request.getURI(), e);
           exception = wrapException(e, request);
 
         } finally {
@@ -420,7 +420,7 @@ public class FlowableClientService {
         exception = new FlowableServiceException(errorMessage);
       }
     } catch (Exception e) {
-      log.error("Error executing request to uri " + request.getURI(), e);
+      log.error("Error executing request to uri {}", request.getURI(), e);
       exception = wrapException(e, request);
 
     } finally {
@@ -477,7 +477,7 @@ public class FlowableClientService {
             errorMessage = "An error was returned when calling the Activiti server";
           }
         } catch (Exception e) {
-          log.warn("Error consuming response from uri " + request.getURI(), e);
+          log.warn("Error consuming response from uri {}", request.getURI(), e);
           exception = wrapException(e, request);
         } finally {
           response.close();
@@ -485,7 +485,7 @@ public class FlowableClientService {
         exception = new FlowableServiceException(errorMessage);
       }
     } catch (Exception e) {
-      log.error("Error executing request to uri " + request.getURI(), e);
+      log.error("Error executing request to uri {}", request.getURI(), e);
       exception = wrapException(e, request);
 
     } finally {
@@ -522,7 +522,7 @@ public class FlowableClientService {
     post.setHeader("Accept", "application/json");
     return post;
   }
-  
+
   public HttpPut createPut(String uri, ServerConfig serverConfig) {
     HttpPut put = new HttpPut(getServerUrl(serverConfig, uri));
     put.setHeader("Content-Type", "application/json");
@@ -551,7 +551,7 @@ public class FlowableClientService {
     try {
       return new StringEntity(json.toString());
     } catch (Exception e) {
-      log.warn("Error translation json to http client entity " + json, e);
+      log.warn("Error translation json to http client entity {}", json, e);
     }
     return null;
   }
@@ -560,7 +560,7 @@ public class FlowableClientService {
     try {
       return new StringEntity(json);
     } catch (Exception e) {
-      log.warn("Error translation json to http client entity " + json, e);
+      log.warn("Error translation json to http client entity {}", json, e);
     }
     return null;
   }

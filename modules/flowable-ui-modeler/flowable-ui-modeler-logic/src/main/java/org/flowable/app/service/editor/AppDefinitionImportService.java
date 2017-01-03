@@ -160,7 +160,7 @@ public class AppDefinitionImportService {
     try {
       appDefinition = objectMapper.readValue(model.getModelEditorJson(), AppDefinition.class);
     } catch (Exception e) {
-      logger.error("Error deserializing app " + model.getId(), e);
+      logger.error("Error deserializing app {}", model.getId(), e);
       throw new InternalServerErrorException("Could not deserialize app definition");
     }
     AppDefinitionRepresentation result = new AppDefinitionRepresentation(model);
@@ -329,7 +329,7 @@ public class AppDefinitionImportService {
       try {
         bpmnModelNode = objectMapper.readTree(bpmnModelObject.getModelEditorJson());
       } catch (Exception e) {
-        logger.error("Error reading BPMN json for " + bpmnModelKey, e);
+        logger.error("Error reading BPMN json for {}", bpmnModelKey, e);
         throw new InternalServerErrorException("Error reading BPMN json for " + bpmnModelKey);
       }
       
@@ -387,7 +387,7 @@ public class AppDefinitionImportService {
     try {
       appDefinition = objectMapper.readValue(appDefinitionModel.getModelEditorJson(), AppDefinition.class);
     } catch (Exception e) {
-      logger.error("Error reading app definition " + appDefinitionModel.getName(), e);
+      logger.error("Error reading app definition {}", appDefinitionModel.getName(), e);
       throw new BadRequestException("Error reading app definition", e);
     }
     
