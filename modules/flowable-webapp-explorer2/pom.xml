@@ -123,6 +123,7 @@
               <webappDirectory>src/main/webapp/VAADIN/widgetsets</webappDirectory>
               <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
               <runTarget>clean</runTarget>
+              <soyc>false</soyc>
             </configuration>
             <executions>
               <execution>

@@ -67,7 +67,7 @@
     
     "PROPERTY.REMOVED" : "removed",
     "PROPERTY.EMPTY" : "No value",
-    "PROPERTY.PROPERTY.EDIT.TITLE" : "Change value for \"{{title}}\"",
+    "PROPERTY.PROPERTY.EDIT.TITLE" : "Change value for '{{title}}'",
     
     "PROPERTY.FEEDBACK.TITLE" : "Please fill-in your feedback",
     
