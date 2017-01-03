@@ -165,7 +165,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
   public void testHistoricProcessInstanceQueryByProcessInstanceIds() {
     HashSet<String> processInstanceIds = new HashSet<String>();
     for (int i = 0; i < 4; i++) {
-      processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", i + "").getId());
+      processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i)).getId());
     }
     processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1").getId());
 
@@ -250,7 +250,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
     HashSet<String> processInstanceIds = new HashSet<String>();
     for (int i = 0; i < 4; i++) {
-      processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", i + "").getId());
+      processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i)).getId());
     }
     processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1").getId());
 
@@ -271,7 +271,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
     HashSet<String> processInstanceIds = new HashSet<String>();
     for (int i = 0; i < 4; i++) {
-      processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", i + "").getId());
+      processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i)).getId());
     }
     processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1").getId());
 
@@ -296,7 +296,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
     HashSet<String> processInstanceIds = new HashSet<String>();
     for (int i = 0; i < 4; i++) {
-      processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", i + "").getId());
+      processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i)).getId());
     }
     processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1").getId());
 
@@ -316,7 +316,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
     HashSet<String> processInstanceIds = new HashSet<String>();
     for (int i = 0; i < 4; i++) {
-      processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", i + "").getId());
+      processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i)).getId());
     }
     processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1").getId());
 
@@ -344,7 +344,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
     HashSet<String> processInstanceIds = new HashSet<String>();
     for (int i = 0; i < 4; i++) {
-      processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", i + "").getId());
+      processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i)).getId());
     }
     processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1").getId());
 
@@ -428,7 +428,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
     HashSet<String> processInstanceIds = new HashSet<String>();
     for (int i = 0; i < 4; i++) {
-      processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", i + "").getId());
+      processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i)).getId());
     }
     processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1").getId());
 

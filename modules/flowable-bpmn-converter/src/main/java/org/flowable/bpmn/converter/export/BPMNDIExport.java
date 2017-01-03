@@ -58,10 +58,11 @@ public class BPMNDIExport implements BpmnXMLConstants {
         }
 
         xtw.writeStartElement(OMGDC_PREFIX, ELEMENT_DI_BOUNDS, OMGDC_NAMESPACE);
-        xtw.writeAttribute(ATTRIBUTE_DI_HEIGHT, "" + graphicInfo.getHeight());
-        xtw.writeAttribute(ATTRIBUTE_DI_WIDTH, "" + graphicInfo.getWidth());
-        xtw.writeAttribute(ATTRIBUTE_DI_X, "" + graphicInfo.getX());
-        xtw.writeAttribute(ATTRIBUTE_DI_Y, "" + graphicInfo.getY());
+        xtw.writeAttribute(ATTRIBUTE_DI_HEIGHT, String.valueOf(graphicInfo.getHeight()));
+        xtw.writeAttribute(ATTRIBUTE_DI_HEIGHT, String.valueOf(graphicInfo.getHeight()));
+        xtw.writeAttribute(ATTRIBUTE_DI_WIDTH, String.valueOf(graphicInfo.getWidth()));
+        xtw.writeAttribute(ATTRIBUTE_DI_X, String.valueOf(graphicInfo.getX()));
+        xtw.writeAttribute(ATTRIBUTE_DI_Y, String.valueOf(graphicInfo.getY()));
         xtw.writeEndElement();
 
         xtw.writeEndElement();
@@ -79,8 +80,8 @@ public class BPMNDIExport implements BpmnXMLConstants {
         List<GraphicInfo> graphicInfoList = model.getFlowLocationGraphicInfo(elementId);
         for (GraphicInfo graphicInfo : graphicInfoList) {
           xtw.writeStartElement(OMGDI_PREFIX, ELEMENT_DI_WAYPOINT, OMGDI_NAMESPACE);
-          xtw.writeAttribute(ATTRIBUTE_DI_X, "" + graphicInfo.getX());
-          xtw.writeAttribute(ATTRIBUTE_DI_Y, "" + graphicInfo.getY());
+          xtw.writeAttribute(ATTRIBUTE_DI_X, String.valueOf(graphicInfo.getX()));
+          xtw.writeAttribute(ATTRIBUTE_DI_Y, String.valueOf(graphicInfo.getY()));
           xtw.writeEndElement();
         }
 
@@ -102,10 +103,10 @@ public class BPMNDIExport implements BpmnXMLConstants {
         if (labelGraphicInfo != null && hasName) {
           xtw.writeStartElement(BPMNDI_PREFIX, ELEMENT_DI_LABEL, BPMNDI_NAMESPACE);
           xtw.writeStartElement(OMGDC_PREFIX, ELEMENT_DI_BOUNDS, OMGDC_NAMESPACE);
-          xtw.writeAttribute(ATTRIBUTE_DI_HEIGHT, "" + labelGraphicInfo.getHeight());
-          xtw.writeAttribute(ATTRIBUTE_DI_WIDTH, "" + labelGraphicInfo.getWidth());
-          xtw.writeAttribute(ATTRIBUTE_DI_X, "" + labelGraphicInfo.getX());
-          xtw.writeAttribute(ATTRIBUTE_DI_Y, "" + labelGraphicInfo.getY());
+          xtw.writeAttribute(ATTRIBUTE_DI_HEIGHT, String.valueOf(labelGraphicInfo.getHeight()));
+          xtw.writeAttribute(ATTRIBUTE_DI_WIDTH, String.valueOf(labelGraphicInfo.getWidth()));
+          xtw.writeAttribute(ATTRIBUTE_DI_X, String.valueOf(labelGraphicInfo.getX()));
+          xtw.writeAttribute(ATTRIBUTE_DI_Y, String.valueOf(labelGraphicInfo.getY()));
           xtw.writeEndElement();
           xtw.writeEndElement();
         }

@@ -48,7 +48,7 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
     startMap.put("test2", "test2");
     processInstanceIds = new ArrayList<String>();
     for (int i = 0; i < 4; i++) {
-      processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, i + "", startMap).getId());
+      processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, String.valueOf(i), startMap).getId());
     }
     
     startMap.clear();
