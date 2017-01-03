@@ -34,7 +34,6 @@ import org.junit.Test;
  */
 public class OptimisticLockingExceptionTest extends PluggableFlowableTestCase {
   
-  @Test
   @Deployment(resources = { "org/flowable/engine/test/concurrency/CompetingJoinTest.testCompetingJoins.bpmn20.xml" })
   public void testOptimisticLockExceptionForConcurrentJoin() throws Exception {
     

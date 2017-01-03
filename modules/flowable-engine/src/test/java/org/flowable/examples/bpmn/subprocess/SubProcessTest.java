@@ -27,7 +27,6 @@ import org.junit.Test;
  */
 public class SubProcessTest extends PluggableFlowableTestCase {
 
-  @Test
   public void testSimpleSubProcess() {
 
     Deployment deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/examples/bpmn/subprocess/SubProcessTest.fixSystemFailureProcess.bpmn20.xml").deploy();

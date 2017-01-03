@@ -21,7 +21,6 @@ public class NonCascadeDeleteTest extends PluggableFlowableTestCase {
   protected void tearDown() throws Exception {
 	  super.tearDown();
   }
-  @Test
   public void testHistoricProcessInstanceQuery(){
     deploymentId = repositoryService.createDeployment()
       .addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
