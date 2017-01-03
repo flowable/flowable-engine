@@ -49,7 +49,7 @@ public class RetryInterceptor extends AbstractCommandInterceptor {
         return next.execute(config, command);
 
       } catch (ActivitiOptimisticLockingException e) {
-          log.info("Caught optimistic locking exception: {}", e);
+          log.info("Caught optimistic locking exception: {}", e.getMessage(), e);
       }
             
       failedAttempts ++;      

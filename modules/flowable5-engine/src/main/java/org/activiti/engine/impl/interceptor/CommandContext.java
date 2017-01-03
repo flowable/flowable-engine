@@ -165,7 +165,7 @@ public class CommandContext {
               log.info("Error while closing command context", exception);
             } else if (exception instanceof ActivitiOptimisticLockingException) {
               // reduce log level, as normally we're not interested in logging this exception
-                log.debug("Optimistic locking exception : {}", exception);
+                log.debug("Optimistic locking exception : {}", exception.getMessage(), exception);
             } else {
               log.error("Error while closing command context", exception);
             }
