@@ -159,7 +159,7 @@ public class LDAPIdentityServiceImpl extends IdmIdentityServiceImpl {
       });
 
     } catch (FlowableException e) {
-        logger.info("Could not authenticate user : {}", e);
+        logger.info("Could not authenticate user : {}", userId, e);
       return false;
     }
   }
