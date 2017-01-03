@@ -81,24 +81,24 @@ public class TestEventListener {
 
   // ---------------------------------------------------------
   
-  private int startActivityService1WithLoopCounter = 0;
-  private int startActivityService1WithoutLoopCounter = 0;
-  private int endActivityService1WithLoopCounter = 0;
-  private int endActivityService1WithoutLoopCounter = 0;
-  private int startActivityService2WithLoopCounter = 0;
-  private int startActivityService2WithoutLoopCounter = 0;
-  private int endActivityService2WithLoopCounter = 0;
-  private int endActivityService2WithoutLoopCounter = 0;
-  private int takeTransitiont1 = 0;
-  private int takeTransitiont2 = 0;
-  private int takeTransitiont3 = 0;
-  private int assignTask1 = 0;
-  private int completeTask1 = 0;
-  private int completeTask2 = 0;
-  private int completeTask3 = 0;
-  private int createTask1 = 0;
-  private int createTask2 = 0;
-  private int deleteTask3 = 0;
+  private int startActivityService1WithLoopCounter;
+  private int startActivityService1WithoutLoopCounter;
+  private int endActivityService1WithLoopCounter;
+  private int endActivityService1WithoutLoopCounter;
+  private int startActivityService2WithLoopCounter;
+  private int startActivityService2WithoutLoopCounter;
+  private int endActivityService2WithLoopCounter;
+  private int endActivityService2WithoutLoopCounter;
+  private int takeTransitiont1;
+  private int takeTransitiont2;
+  private int takeTransitiont3;
+  private int assignTask1;
+  private int completeTask1;
+  private int completeTask2;
+  private int completeTask3;
+  private int createTask1;
+  private int createTask2;
+  private int deleteTask3;
     
   public void onStartActivityService1(@Observes @StartActivity("service1") BusinessProcessEvent businessProcessEvent) {    
   	Integer loopCounter = (Integer) businessProcessEvent.getVariableScope().getVariable("loopCounter");

@@ -30,7 +30,7 @@ public class DelegateFlowableEventListener extends BaseDelegateEventListener {
 
   protected String className;
   protected FlowableEventListener delegateInstance;
-  protected boolean failOnException = false;
+  protected boolean failOnException;
 
   public DelegateFlowableEventListener(String className, Class<?> entityClass) {
     this.className = className;

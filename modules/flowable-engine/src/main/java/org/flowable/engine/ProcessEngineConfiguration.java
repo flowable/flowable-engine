@@ -128,7 +128,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
   
   protected ProcessEngineLifecycleListener processEngineLifecycleListener;
   
-  protected boolean enableProcessDefinitionInfoCache = false;
+  protected boolean enableProcessDefinitionInfoCache;
 
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {

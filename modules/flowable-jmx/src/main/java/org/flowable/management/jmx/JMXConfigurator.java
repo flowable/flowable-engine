@@ -55,7 +55,7 @@ public class JMXConfigurator extends AbstractProcessEngineConfigurator {
   private static final Logger LOG = LoggerFactory.getLogger(JMXConfigurator.class);
 
   // disable jmx
-  private boolean disabled = false;
+  private boolean disabled;
 
   public String getDomain() {
     return domain;

@@ -50,9 +50,9 @@ public class FlowableProducer extends DefaultProducer {
 
   private final long timeResolution;
 
-  private String processKey = null;
+  private String processKey;
 
-  private String activity = null;
+  private String activity;
 
   public FlowableProducer(FlowableEndpoint endpoint, long timeout, long timeResolution) {
     super(endpoint);

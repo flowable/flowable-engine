@@ -47,10 +47,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected String businessKey;
   protected String deploymentId;
   protected List<String> deploymentIds;
-  protected boolean finished = false;
-  protected boolean unfinished = false;
-  protected boolean deleted = false;
-  protected boolean notDeleted = false;
+  protected boolean finished;
+  protected boolean unfinished;
+  protected boolean deleted;
+  protected boolean notDeleted;
   protected String startedBy;
   protected String superProcessInstanceId;
   protected boolean excludeSubprocesses;
@@ -78,8 +78,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected String locale;
   protected boolean withLocalizationFallback;
   protected List<HistoricProcessInstanceQueryImpl> orQueryObjects = new ArrayList<HistoricProcessInstanceQueryImpl>();
-  protected HistoricProcessInstanceQueryImpl currentOrQueryObject = null;
-  protected boolean inOrStatement = false;
+  protected HistoricProcessInstanceQueryImpl currentOrQueryObject;
+  protected boolean inOrStatement;
   
   public HistoricProcessInstanceQueryImpl() {
   }

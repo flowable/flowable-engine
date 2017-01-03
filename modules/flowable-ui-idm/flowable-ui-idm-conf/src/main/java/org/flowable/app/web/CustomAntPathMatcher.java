@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 public class CustomAntPathMatcher implements RequestMatcher {
 
     protected AntPathRequestMatcher wrapped;
-    protected boolean httpMethodUsed = false;
+    protected boolean httpMethodUsed;
 
     /**
      * Creates a matcher with the specific pattern which will match all HTTP

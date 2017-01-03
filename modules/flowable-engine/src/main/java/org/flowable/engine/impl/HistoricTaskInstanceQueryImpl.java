@@ -103,12 +103,12 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
   protected boolean withoutTenantId;
   protected String locale;
   protected boolean withLocalizationFallback;
-  protected boolean includeTaskLocalVariables = false;
-  protected boolean includeProcessVariables = false;
+  protected boolean includeTaskLocalVariables;
+  protected boolean includeProcessVariables;
   protected Integer taskVariablesLimit;
   protected List<HistoricTaskInstanceQueryImpl> orQueryObjects = new ArrayList<HistoricTaskInstanceQueryImpl>();
-  protected HistoricTaskInstanceQueryImpl currentOrQueryObject = null;
-  protected boolean inOrStatement = false;
+  protected HistoricTaskInstanceQueryImpl currentOrQueryObject;
+  protected boolean inOrStatement;
 
   public HistoricTaskInstanceQueryImpl() {
   }

@@ -109,7 +109,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
   protected boolean withLocalizationFallback;
   protected boolean orActive;
   protected List<TaskQueryImpl> orQueryObjects = new ArrayList<TaskQueryImpl>();
-  protected TaskQueryImpl currentOrQueryObject = null;
+  protected TaskQueryImpl currentOrQueryObject;
   
   private List<String> cachedCandidateGroups;
   

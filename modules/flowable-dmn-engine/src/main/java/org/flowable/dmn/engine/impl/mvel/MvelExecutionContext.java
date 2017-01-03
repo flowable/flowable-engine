@@ -27,10 +27,10 @@ import org.mvel2.integration.PropertyHandler;
 public class MvelExecutionContext {
 
     protected Map<String, Object> resultVariables = new HashMap<String, Object>();
-    protected Map<String, Object> stackVariables = null;
-    protected ParserContext parserContext = null;
+    protected Map<String, Object> stackVariables;
+    protected ParserContext parserContext;
     protected Map<Class<?>, PropertyHandler> propertyHandlers = new HashMap<Class<?>, PropertyHandler>();
-    protected DecisionExecutionAuditContainer auditContainer = null;
+    protected DecisionExecutionAuditContainer auditContainer;
 
     public void checkExecutionContext(String variableId) {
 

@@ -35,7 +35,7 @@ public class SpringIdmEngineConfiguration extends IdmEngineConfiguration impleme
 
   protected PlatformTransactionManager transactionManager;
   protected ApplicationContext applicationContext;
-  protected Integer transactionSynchronizationAdapterOrder = null;
+  protected Integer transactionSynchronizationAdapterOrder;
 
   public SpringIdmEngineConfiguration() {
     this.transactionsExternallyManaged = true;

@@ -40,7 +40,7 @@ public class BusinessRuleTaskActivityBehavior extends TaskActivityBehavior imple
   
   protected Set<Expression> variablesInputExpressions = new HashSet<Expression>();
   protected Set<Expression> rulesExpressions = new HashSet<Expression>();
-  protected boolean exclude = false;
+  protected boolean exclude;
   protected String resultVariable;
 
   public BusinessRuleTaskActivityBehavior() {}

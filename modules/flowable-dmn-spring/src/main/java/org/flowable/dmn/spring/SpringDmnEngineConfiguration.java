@@ -48,7 +48,7 @@ public class SpringDmnEngineConfiguration extends DmnEngineConfiguration impleme
   protected Resource[] deploymentResources = new Resource[0];
   protected String deploymentMode = "default";
   protected ApplicationContext applicationContext;
-  protected Integer transactionSynchronizationAdapterOrder = null;
+  protected Integer transactionSynchronizationAdapterOrder;
   protected Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<AutoDeploymentStrategy>();
 
   public SpringDmnEngineConfiguration() {

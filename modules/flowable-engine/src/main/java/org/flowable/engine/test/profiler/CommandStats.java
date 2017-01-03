@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class CommandStats {
 
-    protected long getTotalCommandTime = 0L;
+    protected long getTotalCommandTime;
     
     protected List<Long> commandExecutionTimings = new ArrayList<Long>();
     protected List<Long> databaseTimings = new ArrayList<Long>();

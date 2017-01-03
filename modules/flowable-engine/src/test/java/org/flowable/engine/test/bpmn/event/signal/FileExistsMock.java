@@ -14,7 +14,7 @@ package org.flowable.engine.test.bpmn.event.signal;
 
 public class FileExistsMock {
 
-	private boolean exists = false;
+	private boolean exists;
 	
 	private static FileExistsMock instance;
 

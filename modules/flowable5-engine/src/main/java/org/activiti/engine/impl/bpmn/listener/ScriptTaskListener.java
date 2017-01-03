@@ -25,13 +25,13 @@ import org.flowable.engine.delegate.TaskListener;
  */
 public class ScriptTaskListener implements TaskListener {
 
-	private static final long serialVersionUID = -8915149072830499057L;
+  private static final long serialVersionUID = -8915149072830499057L;
 
   protected Expression script;
 
-  protected Expression language = null;
+  protected Expression language;
 
-  protected Expression resultVariable = null;
+  protected Expression resultVariable;
   
   protected boolean autoStoreVariables;
 

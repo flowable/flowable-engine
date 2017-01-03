@@ -29,9 +29,9 @@ import org.springframework.security.ldap.server.ApacheDSContainer;
  */
 public class LDAPTestCase extends SpringFlowableTestCase {
 
-  private static int testCount = 0;
+  private static int testCount;
   private static int totalTestCount = -1;
-  private static boolean disableAfterTestCase = false;
+  private static boolean disableAfterTestCase;
 
   @Resource(name = "org.springframework.security.apacheDirectoryServerContainer")
   private ApacheDSContainer apacheDSContainer;

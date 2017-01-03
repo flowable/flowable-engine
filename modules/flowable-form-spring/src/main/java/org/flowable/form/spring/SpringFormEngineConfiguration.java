@@ -48,7 +48,7 @@ public class SpringFormEngineConfiguration extends FormEngineConfiguration imple
   protected Resource[] deploymentResources = new Resource[0];
   protected String deploymentMode = "default";
   protected ApplicationContext applicationContext;
-  protected Integer transactionSynchronizationAdapterOrder = null;
+  protected Integer transactionSynchronizationAdapterOrder;
   private Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<AutoDeploymentStrategy>();
 
   public SpringFormEngineConfiguration() {

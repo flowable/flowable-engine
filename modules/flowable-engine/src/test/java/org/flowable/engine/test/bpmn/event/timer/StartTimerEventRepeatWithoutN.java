@@ -27,7 +27,7 @@ import org.flowable.engine.test.Deployment;
 
 public class StartTimerEventRepeatWithoutN extends PluggableFlowableTestCase {
 
-	protected long counter = 0;
+	protected long counter;
 	protected StartEventListener startEventListener;
 	
 	class StartEventListener implements FlowableEventListener {

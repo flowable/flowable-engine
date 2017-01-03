@@ -63,8 +63,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
   protected String owner;
   protected String ownerLike;
   protected String ownerLikeIgnoreCase;
-  protected boolean unassigned = false;
-  protected boolean noDelegationState = false;
+  protected boolean unassigned;
+  protected boolean noDelegationState;
   protected DelegationState delegationState;
   protected String candidateUser;
   protected String candidateGroup;
@@ -98,19 +98,19 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
   protected Date dueDate;
   protected Date dueBefore;
   protected Date dueAfter;
-  protected boolean withoutDueDate = false;
+  protected boolean withoutDueDate;
   protected SuspensionState suspensionState;
-  protected boolean excludeSubtasks = false;
-  protected boolean includeTaskLocalVariables = false;
-  protected boolean includeProcessVariables = false;
+  protected boolean excludeSubtasks;
+  protected boolean includeTaskLocalVariables;
+  protected boolean includeProcessVariables;
   protected Integer taskVariablesLimit;
   protected String userIdForCandidateAndAssignee;
-  protected boolean bothCandidateAndAssigned = false;
+  protected boolean bothCandidateAndAssigned;
   protected String locale;
   protected boolean withLocalizationFallback;
   protected boolean orActive;
   protected List<TaskQueryImpl> orQueryObjects = new ArrayList<TaskQueryImpl>();
-  protected TaskQueryImpl currentOrQueryObject = null;
+  protected TaskQueryImpl currentOrQueryObject;
   
   public TaskQueryImpl() {
   }
