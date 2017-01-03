@@ -113,13 +113,13 @@ public class IntegrationAutoConfigurationTest {
                 .processDefinitionKey(integrationGatewayProcess)
                 .list();
         ProcessDefinition processDefinition = processDefinitionList.iterator().next();
-        Assert.assertEquals(processDefinition.getKey(), integrationGatewayProcess);
+        Assert.assertEquals(integrationGatewayProcess, processDefinition.getKey());
         Map<String, Object> vars = new HashMap<String, Object>();
         vars.put("customerId", 232);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(integrationGatewayProcess, vars);
         Assert.assertNotNull("the processInstance should not be null", processInstance);
-        Assert.assertEquals(applicationContext.getBean(InboundGatewayConfiguration.AnalysingService.class)
-                .getStringAtomicReference().get(), projectId);
+        Assert.assertEquals(projectId, applicationContext.getBean(InboundGatewayConfiguration.AnalysingService.class)
+                .getStringAtomicReference().get());
     }
 
     @Configuration

@@ -59,8 +59,8 @@ public class CustomConfigRuntimeTest {
         processVariablesInput.put("input1", localDate.toDate());
         RuleEngineExecutionResult result = ruleService.executeDecisionByKey("decision", processVariablesInput);
         Assert.assertNotNull(result);
-        Assert.assertSame(result.getResultVariables().get("output1").getClass(), String.class);
-        Assert.assertEquals(result.getResultVariables().get("output1"), "test2");
+        Assert.assertSame(String.class, result.getResultVariables().get("output1").getClass());
+        Assert.assertEquals("test2", result.getResultVariables().get("output1"));
     }
 
     @Test

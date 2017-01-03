@@ -101,7 +101,7 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
     assertNotNull(task.getDueDate());
-    assertEquals(task.getDueDate(), new Date(0));
+    assertEquals(new Date(0), task.getDueDate());
   }
 
   public static class CustomBusinessCalendar implements BusinessCalendar {
