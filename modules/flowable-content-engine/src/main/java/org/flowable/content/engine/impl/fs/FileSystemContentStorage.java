@@ -224,7 +224,7 @@ public class FileSystemContentStorage implements ContentStorage {
       leafToUse = currentLeafFolder;
     }
 
-    File contentFile = new File(leafToUse, indexToUse + "");
+    File contentFile = new File(leafToUse, String.valueOf(indexToUse));
     if (contentFile.exists()) {
       throw new ContentStorageException("Content already stored at that location, shouldn't have happened: " + contentFile);
     }
@@ -298,7 +298,7 @@ public class FileSystemContentStorage implements ContentStorage {
 
         StringBuffer buffer = new StringBuffer();
         for (int i = 0; i < indexes.length; i++) {
-          buffer.append((indexes[i]) + "").append(File.separatorChar);
+          buffer.append(String.valueOf(indexes[i])).append(File.separatorChar);
         }
 
         File newFolder = new File(rootFolder, buffer.toString());
@@ -311,7 +311,7 @@ public class FileSystemContentStorage implements ContentStorage {
         logger.debug("Next folder already created, retrying...");
         return getFirstAvailableFolder(--maxRetries);
       } else {
-        File newFolder = new File(currentMaxFolder.getParentFile(), (lastIndex + 1) + "");
+        File newFolder = new File(currentMaxFolder.getParentFile(), String.valueOf(lastIndex + 1));
         if (newFolder.mkdir()) {
           return newFolder;
         }

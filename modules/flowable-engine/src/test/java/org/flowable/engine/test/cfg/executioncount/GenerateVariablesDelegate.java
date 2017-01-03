@@ -15,7 +15,7 @@ public class GenerateVariablesDelegate implements JavaDelegate {
             if (i%2 == 0) {
                 delegateExecution.setVariable("var" + i, i); // integer
             } else {
-                delegateExecution.setVariable("var" + i, i + ""); // string
+                delegateExecution.setVariable("var" + i, String.valueOf(i)); // string
             }
         }
     }

@@ -82,7 +82,7 @@ public class TablePageQueryTest extends PluggableFlowableTestCase {
     ArrayList<String> taskIds = new ArrayList<String>();
     for (int i = 0; i < nrOfTasks; i++) {
       Task task = taskService.newTask();
-      task.setName(((char) ('A' + i)) + "");
+      task.setName(String.valueOf((char) ('A' + i)));
       taskService.saveTask(task);
       taskIds.add(task.getId());
     }

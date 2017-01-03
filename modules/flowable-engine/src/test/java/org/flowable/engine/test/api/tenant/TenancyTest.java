@@ -264,7 +264,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
     int nrOfModelsWithTenant = 3;
     for (int i = 0; i < nrOfModelsWithTenant; i++) {
       Model model = repositoryService.newModel();
-      model.setName(i + "");
+      model.setName(String.valueOf(i));
       model.setTenantId(TEST_TENANT_ID);
       repositoryService.saveModel(model);
     }
@@ -273,7 +273,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
     int nrOfModelsWithoutTenant = 5;
     for (int i = 0; i < nrOfModelsWithoutTenant; i++) {
       Model model = repositoryService.newModel();
-      model.setName(i + "");
+      model.setName(String.valueOf(i));
       repositoryService.saveModel(model);
     }
 

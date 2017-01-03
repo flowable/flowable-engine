@@ -52,7 +52,7 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
     startMap.put("test2", "test2");
     processInstanceIds = new ArrayList<String>();
     for (int i = 0; i < 4; i++) {
-      processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, i + "", startMap).getId());
+      processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, String.valueOf(i), startMap).getId());
       if (i == 0) {
         Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(0)).singleResult();
         taskService.complete(task.getId());

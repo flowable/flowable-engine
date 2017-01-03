@@ -173,9 +173,9 @@ public class JPAEntityMappings {
     // other types
     // can just use toString()
     if (value instanceof java.util.Date) {
-      return "" + ((java.util.Date) value).getTime();
+      return String.valueOf(((java.util.Date) value).getTime());
     } else if (value instanceof java.sql.Date) {
-      return "" + ((java.sql.Date) value).getTime();
+      return String.valueOf(((java.sql.Date) value).getTime());
     } else if (value instanceof Long || value instanceof String || value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Float || value instanceof Double
         || value instanceof Character || value instanceof BigDecimal || value instanceof BigInteger || value instanceof UUID) {
       return value.toString();
