@@ -94,7 +94,13 @@ public class VariablesTest extends PluggableFlowableTestCase {
     // Regular getVariables after process instance start
     Map<String, Object> vars = runtimeService.getVariables(processInstanceId);
     assertEquals(70, vars.size());
-    int nrOfStrings = 0, nrOfInts = 0, nrOfDates = 0, nrOfLocalDates = 0, nrOfDateTimes = 0, nrOfBooleans = 0, nrOfSerializable = 0;
+    int nrOfStrings = 0;
+    int nrOfInts = 0;
+    int nrOfDates = 0;
+    int nrOfLocalDates = 0;
+    int nrOfDateTimes = 0;
+    int nrOfBooleans = 0;
+    int nrOfSerializable = 0;
     for (String variableName : vars.keySet()) {
       Object variableValue = vars.get(variableName);
       if (variableValue instanceof String) {
@@ -172,7 +178,13 @@ public class VariablesTest extends PluggableFlowableTestCase {
     // Regular getVariables after process instance start
     Map<String, Object> vars = runtimeService.getVariablesLocal(processInstanceId);
     assertEquals(70, vars.size());
-    int nrOfStrings = 0, nrOfInts = 0, nrOfDates = 0, nrOfLocalDates = 0, nrOfDateTimes = 0, nrOfBooleans = 0, nrOfSerializable = 0;
+    int nrOfStrings = 0;
+    int nrOfInts = 0;
+    int nrOfDates = 0;
+    int nrOfLocalDates = 0;
+    int nrOfDateTimes = 0;
+    int nrOfBooleans = 0;
+    int nrOfSerializable = 0;
     for (String variableName : vars.keySet()) {
       Object variableValue = vars.get(variableName);
       if (variableValue instanceof String) {
@@ -428,7 +440,13 @@ public class VariablesTest extends PluggableFlowableTestCase {
     Task task = taskService.createTaskQuery().taskName("Task 1").singleResult();
     Map<String, Object> vars = taskService.getVariables(task.getId());
     assertEquals(70, vars.size());
-    int nrOfStrings = 0, nrOfInts = 0, nrOfDates = 0, nrOfLocalDates = 0, nrOfDateTimes = 0, nrOfBooleans = 0, nrOfSerializable = 0;
+    int nrOfStrings = 0;
+    int nrOfInts = 0;
+    int nrOfDates = 0;
+    int nrOfLocalDates = 0;
+    int nrOfDateTimes = 0;
+    int nrOfBooleans = 0;
+    int nrOfSerializable = 0;
     for (String variableName : vars.keySet()) {
       Object variableValue = vars.get(variableName);
       if (variableValue instanceof String) {

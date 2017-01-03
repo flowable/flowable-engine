@@ -205,7 +205,9 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
   }
   
   public void testDeleteDeploymentWithStartSignalEvents1() {
-    String deploymentId1, deploymentId2, deploymentId3;
+    String deploymentId1;
+    String deploymentId2;
+    String deploymentId3;
     deploymentId1 = deployStartSignalTestProcess();
     deploymentId2 = deployProcessWithoutEvents();
     deploymentId3 = deployStartSignalTestProcess();

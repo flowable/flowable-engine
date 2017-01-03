@@ -20,7 +20,9 @@ import org.activiti.engine.impl.javax.el.ELException;
 
 
 public class AstChoice extends AstRightValue {
-	private final AstNode question, yes, no;
+	private final AstNode question;
+    private final AstNode yes;
+    private final AstNode no;
 	
 	public AstChoice(AstNode question, AstNode yes, AstNode no) {
 		this.question = question;

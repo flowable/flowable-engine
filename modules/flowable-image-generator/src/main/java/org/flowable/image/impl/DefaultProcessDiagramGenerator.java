@@ -593,7 +593,9 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
       drawInstruction.draw(processDiagramCanvas, bpmnModel, flowNode);
 
       // Gather info on the multi instance marker
-      boolean multiInstanceSequential = false, multiInstanceParallel = false, collapsed = false;
+      boolean multiInstanceSequential = false;
+      boolean multiInstanceParallel = false;
+      boolean collapsed = false;
       if (flowNode instanceof Activity) {
         Activity activity = (Activity) flowNode;
         MultiInstanceLoopCharacteristics multiInstanceLoopCharacteristics = activity.getLoopCharacteristics();
@@ -750,7 +752,8 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
         lengths[i] = length;
       }
       m = length / 2;
-      int p1 = 0, p2 = 1;
+      int p1 = 0;
+      int p2 = 1;
       for (int i = 1; i < lengths.length; i++) {
 			double len = lengths[i];
 			p1 = i-1;

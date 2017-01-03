@@ -908,7 +908,9 @@ public class TenancyTest extends PluggableFlowableTestCase {
       assertEquals(3, processDefinitions.size());
       
       // Verify they have different tenant ids
-      int tenant1Count = 0, tenant2Count = 0, noTenantCount = 0 ;
+      int tenant1Count = 0;
+      int tenant2Count = 0;
+      int noTenantCount = 0 ;
       for (ProcessDefinition p : processDefinitions) {
         if (p.getTenantId() == null || p.getTenantId().equals(ProcessEngineConfiguration.NO_TENANT_ID)) {
           noTenantCount++;

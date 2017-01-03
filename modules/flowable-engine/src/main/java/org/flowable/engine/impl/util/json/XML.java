@@ -106,7 +106,8 @@ public class XML {
    * @throws JSONException
    */
   public static void noSpace(String string) throws JSONException {
-    int i, length = string.length();
+    int i;
+    int length = string.length();
     if (length == 0) {
       throw new JSONException("Empty string.");
     }
