@@ -32,7 +32,7 @@ flowableAdminApp.controller('DecisionTableController', ['$scope', '$rootScope', 
             $modal.open({
                 templateUrl: 'views/decision-table-popup.html',
                 windowClass: 'modal modal-full-width',
-                controller: 'ShowDecisionTablePopupCrtl',
+                controller: 'ShowDecisionTablePopupCtrl',
                 resolve: {
                     decisionTable: function () {
                         return $scope.decisionTable;
@@ -100,7 +100,7 @@ flowableAdminApp.controller('DecisionTableController', ['$scope', '$rootScope', 
 
     }]);
 
-flowableAdminApp.controller('ShowDecisionTablePopupCrtl',
+flowableAdminApp.controller('ShowDecisionTablePopupCtrl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'decisionTable', '$timeout', '$translate', 'uiGridConstants',
         function ($rootScope, $scope, $modalInstance, $http, decisionTable, $timeout, $translate, uiGridConstants) {
 

@@ -121,6 +121,26 @@ function _drawEventSubProcess(element)
  	});
 }
 
+function _drawAdhocSubProcess(element)
+{
+	var rect = paper.rect(element.x, element.y, element.width, element.height, 4);
+
+	var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
+	
+	rect.attr({"stroke-width": 1,
+		"stroke": strokeColor,
+		"fill": "white"
+ 	});
+ 	
+ 	paper.text(element.x + (element.width / 2), element.y + element.height - 8).attr({
+        "text-anchor" : "middle",
+        "font-family" : "Arial",
+        "font-size" : 20,
+        "text" : "~",
+        "fill" : "#373e48"
+  	});
+}
+
 function _drawStartEvent(element)
 {
 	var startEvent = _drawEvent(element, NORMAL_STROKE, 15);

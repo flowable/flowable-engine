@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-angular.module('flowableModeler').controller('KisBpmCollapsedSubprocessReferenceCrtl',
+angular.module('flowableModeler').controller('FlowableCollapsedSubprocessReferenceCtrl',
     [ '$scope', '$modal', '$http', function($scope, $modal, $http) {
 	
      // Config for the modal window
@@ -24,7 +24,7 @@ angular.module('flowableModeler').controller('KisBpmCollapsedSubprocessReference
         _internalCreateModal(opts, $modal, $scope);
 }]);
 
-angular.module('flowableModeler').controller('KisBpmCollapsedSubprocessReferencePopupCrtl', [ '$scope', '$http', function($scope, $http) {
+angular.module('flowableModeler').controller('FlowableCollapsedSubprocessReferencePopupCtrl', [ '$scope', '$http', function($scope, $http) {
 	
     $scope.state = {'loadingSubprocesses' : true, 'error' : false};
     

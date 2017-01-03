@@ -15,7 +15,7 @@
  * Sequence flow order controller
  */
 
-angular.module('flowableModeler').controller('KisBpmSequenceFlowOrderCtrl',
+angular.module('flowableModeler').controller('FlowableSequenceFlowOrderCtrl',
     [ '$scope', '$modal', '$timeout', '$translate', function($scope, $modal, $timeout, $translate) {
 
     // Config for the modal window
@@ -27,7 +27,7 @@ angular.module('flowableModeler').controller('KisBpmSequenceFlowOrderCtrl',
     _internalCreateModal(opts, $modal, $scope);
 }]);
 
-angular.module('flowableModeler').controller('KisBpmSequenceFlowOrderPopupCtrl',
+angular.module('flowableModeler').controller('FlowableSequenceFlowOrderPopupCtrl',
     ['$scope', '$translate', function($scope, $translate) {
 
     // Find the outgoing sequence flow of the current selected shape

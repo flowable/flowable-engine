@@ -21,7 +21,7 @@ public interface DmnXMLConstants {
   public static final String XSI_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance";
   public static final String XSI_PREFIX = "xsi";
   public static final String SCHEMA_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
-  public static final String MODEL_NAMESPACE = "http://www.activiti.org/dmn";
+  public static final String MODEL_NAMESPACE = "http://www.flowable.org/dmn";
   public static final String TARGET_NAMESPACE_ATTRIBUTE = "targetNamespace";
   public static final String FLOWABLE_EXTENSIONS_NAMESPACE = "http://flowable.org/dmn";
   public static final String FLOWABLE_EXTENSIONS_PREFIX = "flowable";

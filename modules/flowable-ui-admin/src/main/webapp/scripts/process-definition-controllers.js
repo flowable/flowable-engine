@@ -47,7 +47,7 @@ flowableAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
     $scope.editCategory = function() {
       var modalInstance = $modal.open({
         templateUrl: 'views/process-definition-edit-category-popup.html',
-        controller: 'EditProcessDefinitionCategoryModalCrtl',
+        controller: 'EditProcessDefinitionCategoryModalCtrl',
         resolve: {
           definition: function() {
             return $scope.definition;
@@ -67,7 +67,7 @@ flowableAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
       $modal.open({
         templateUrl: 'views/process-definition-diagram-popup.html',
         windowClass: 'modal modal-full-width',
-        controller: 'ShowProcessDefinitionDiagramPopupCrtl',
+        controller: 'ShowProcessDefinitionDiagramPopupCtrl',
         resolve: {
           definition: function() {
             return $scope.definition;
@@ -295,7 +295,7 @@ flowableAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
 
 }]);
 
-flowableAdminApp.controller('EditProcessDefinitionCategoryModalCrtl',
+flowableAdminApp.controller('EditProcessDefinitionCategoryModalCtrl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'definition', function ($rootScope, $scope, $modalInstance, $http, definition) {
 
   $scope.model = {
@@ -333,7 +333,7 @@ flowableAdminApp.controller('EditProcessDefinitionCategoryModalCrtl',
   };
 }]);
 
-flowableAdminApp.controller('ShowProcessDefinitionDiagramPopupCrtl',
+flowableAdminApp.controller('ShowProcessDefinitionDiagramPopupCtrl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'definition', '$timeout', function ($rootScope, $scope, $modalInstance, $http, definition, $timeout) {
 
   $scope.model = {

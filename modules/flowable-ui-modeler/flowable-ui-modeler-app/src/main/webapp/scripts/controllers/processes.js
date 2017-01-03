@@ -141,7 +141,7 @@ angular.module('flowableModeler')
   }]);
 
 angular.module('flowableModeler')
-.controller('CreateNewProcessModelCrtl', ['$rootScope', '$scope', '$modal', '$http', '$location',
+.controller('CreateNewProcessModelCtrl', ['$rootScope', '$scope', '$modal', '$http', '$location',
                                           function ($rootScope, $scope, $modal, $http, $location) {
 
     $scope.model = {
@@ -190,7 +190,7 @@ angular.module('flowableModeler')
 }]);
 
 angular.module('flowableModeler')
-.controller('DuplicateProcessModelCrtl', ['$rootScope', '$scope', '$modal', '$http', '$location',
+.controller('DuplicateProcessModelCtrl', ['$rootScope', '$scope', '$modal', '$http', '$location',
                                           function ($rootScope, $scope, $modal, $http, $location) {
 
     $scope.model = {
@@ -242,7 +242,7 @@ angular.module('flowableModeler')
 }]);
 
 angular.module('flowableModeler')
-.controller('ImportProcessModelCrtl', ['$rootScope', '$scope', '$http', 'Upload', '$location', function ($rootScope, $scope, $http, Upload, $location) {
+.controller('ImportProcessModelCtrl', ['$rootScope', '$scope', '$http', 'Upload', '$location', function ($rootScope, $scope, $http, Upload, $location) {
 
   $scope.model = {
        loading: false

@@ -1986,7 +1986,7 @@ ORYX.CONFIG.BACKEND_SWITCH 		= 		true;
 ORYX.CONFIG.PANEL_LEFT_WIDTH 	= 		250;
 ORYX.CONFIG.PANEL_RIGHT_COLLAPSED 	= 	true;
 ORYX.CONFIG.PANEL_RIGHT_WIDTH	= 		300;
-ORYX.CONFIG.APPNAME = 					'KISBPM';
+ORYX.CONFIG.APPNAME = 					'Flowable';
 ORYX.CONFIG.WEB_URL = 					".";
 
 ORYX.CONFIG.BLANK_IMAGE = ORYX.CONFIG.LIBS_PATH + '/ext-2.0.2/resources/images/default/s.gif';
@@ -2064,7 +2064,7 @@ ORYX.CONFIG.TYPE_DIAGRAM_LINK =			"diagramlink";
 ORYX.CONFIG.TYPE_COMPLEX =				"complex";
 ORYX.CONFIG.TYPE_MULTIPLECOMPLEX =		"multiplecomplex";
 ORYX.CONFIG.TYPE_TEXT =					"text";
-ORYX.CONFIG.TYPE_KISBPM_MULTIINSTANCE =	"kisbpm-multiinstance";
+ORYX.CONFIG.TYPE_FLOWABLE_MULTIINSTANCE = "flowable-multiinstance";
 ORYX.CONFIG.TYPE_MODEL_LINK =			"modellink";
 ORYX.CONFIG.TYPE_FORM_FLOW_LINK =		"formflowlink";
 ORYX.CONFIG.TYPE_FORM_LINK =			"formlink";
@@ -8857,7 +8857,7 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
 				$A(jsonExtension.stencils).each(function(stencil) {
 					var oStencil = new ORYX.Core.StencilSet.Stencil(stencil, this.namespace(), this._baseUrl, this);            
 					this._stencils.unset(oStencil.id());
-					this._availableStencils(oStencil.id());
+					this._availableStencils.unset(oStencil.id());
 				}.bind(this));
 			}
 			
@@ -13502,7 +13502,7 @@ ORYX.Core.Shape = {
 
 								var refId = this.id + ref;
 								
-								if (property.type() === ORYX.CONFIG.TYPE_KISBPM_MULTIINSTANCE)
+								if (property.type() === ORYX.CONFIG.TYPE_FLOWABLE_MULTIINSTANCE)
 								{
 									if (ref === "multiinstance") {
 										
@@ -13676,7 +13676,7 @@ ORYX.Core.Shape = {
 	  													if (styleAttr) {
                                                         	styleAttr.textContent = "cursor:pointer;"
                                                     	}
-	  													onclickAttr.textContent = "KISBPM.TOOLBAR.ACTIONS.navigateToProcess(" + prop.id + ");return false;";
+	  													onclickAttr.textContent = "FLOWABLE.TOOLBAR.ACTIONS.navigateToProcess(" + prop.id + ");return false;";
 	  							    	   			} else {
 	  							    	   				if (styleAttr) {
                                                         	styleAttr.textContent = "cursor:default;"
@@ -19541,7 +19541,7 @@ ORYX.Plugins.RenameShapes = Clazz.extend({
                 }
 
 				evtCoord.y += $("editor-header").clientHeight - $("canvasSection").scrollTop - 5;
-				if (KISBPM.HEADER_CONFIG.showAppTitle == false)
+				if (FLOWABLE.HEADER_CONFIG.showAppTitle == false)
 				{
 					evtCoord.y += 61;
 				}

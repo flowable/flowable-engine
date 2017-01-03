@@ -161,7 +161,7 @@ ORYX.Core.Shape = {
 
 								var refId = this.id + ref;
 								
-								if (property.type() === ORYX.CONFIG.TYPE_KISBPM_MULTIINSTANCE)
+								if (property.type() === ORYX.CONFIG.TYPE_FLOWABLE_MULTIINSTANCE)
 								{
 									if (ref === "multiinstance") {
 										
@@ -335,7 +335,7 @@ ORYX.Core.Shape = {
 	  													if (styleAttr) {
                                                         	styleAttr.textContent = "cursor:pointer;"
                                                     	}
-	  													onclickAttr.textContent = "KISBPM.TOOLBAR.ACTIONS.navigateToProcess(" + prop.id + ");return false;";
+	  													onclickAttr.textContent = "FLOWABLE.TOOLBAR.ACTIONS.navigateToProcess(" + prop.id + ");return false;";
 	  							    	   			} else {
 	  							    	   				if (styleAttr) {
                                                         	styleAttr.textContent = "cursor:default;"

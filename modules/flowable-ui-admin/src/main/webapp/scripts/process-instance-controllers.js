@@ -84,7 +84,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
             $modal.open({
                 templateUrl: 'views/process-instance-diagram-popup.html',
                 windowClass: 'modal modal-full-width',
-                controller: 'ShowProcessInstanceDiagramPopupCrtl',
+                controller: 'ShowProcessInstanceDiagramPopupCtrl',
                 resolve: {
                     process: function () {
                         return $scope.process;
@@ -408,7 +408,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
             }
             var modalInstance = $modal.open({
                 templateUrl: 'views/process-instance-delete-popup.html',
-                controller: 'DeleteProcessModalInstanceCrtl',
+                controller: 'DeleteProcessModalInstanceCtrl',
                 resolve: {
                     process: function () {
                         return $scope.process;
@@ -437,7 +437,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
                 var selectedVariable = $scope.selectedVariables[0];
                 var modalInstance = $modal.open({
                     templateUrl: 'views/update-variable-popup.html',
-                    controller: 'UpdateVariableCrtl',
+                    controller: 'UpdateVariableCtrl',
                     resolve: {
                         variable: function () {
                             return selectedVariable.variable;
@@ -462,7 +462,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
                 var selectedVariable = $scope.selectedVariables[0];
                 var modalInstance = $modal.open({
                     templateUrl: 'views/variable-delete-popup.html',
-                    controller: 'DeleteVariableCrtl',
+                    controller: 'DeleteVariableCtrl',
                     resolve: {
                         variable: function () {
                             return selectedVariable.variable;
@@ -485,7 +485,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
         $scope.addVariable = function () {
             var modalInstance = $modal.open({
                 templateUrl: 'views/variable-add-popup.html',
-                controller: 'AddVariableCrtl',
+                controller: 'AddVariableCtrl',
                 resolve: {
                     processInstanceId: function () {
                         return $scope.process.id;
@@ -506,7 +506,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
         };
     }]);
 
-flowableAdminApp.controller('DeleteProcessModalInstanceCrtl',
+flowableAdminApp.controller('DeleteProcessModalInstanceCtrl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'process', 'action', function ($rootScope, $scope, $modalInstance, $http, process, action) {
 
         $scope.process = process;
@@ -540,7 +540,7 @@ flowableAdminApp.controller('DeleteProcessModalInstanceCrtl',
         };
     }]);
 
-flowableAdminApp.controller('ShowProcessInstanceDiagramPopupCrtl',
+flowableAdminApp.controller('ShowProcessInstanceDiagramPopupCtrl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'process', '$timeout', function ($rootScope, $scope, $modalInstance, $http, process, $timeout) {
 
         $scope.model = {
@@ -566,7 +566,7 @@ flowableAdminApp.controller('ShowProcessInstanceDiagramPopupCrtl',
 
     }]);
 
-flowableAdminApp.controller('UpdateVariableCrtl',
+flowableAdminApp.controller('UpdateVariableCtrl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'variable', 'processInstanceId', function ($rootScope, $scope, $modalInstance, $http, variable, processInstanceId) {
 
         $scope.status = {loading: false};
@@ -640,7 +640,7 @@ flowableAdminApp.controller('UpdateVariableCrtl',
 
     }]);
 
-flowableAdminApp.controller('DeleteVariableCrtl',
+flowableAdminApp.controller('DeleteVariableCtrl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'variable', 'processInstanceId',
         function ($rootScope, $scope, $modalInstance, $http, variable, processInstanceId) {
 
@@ -666,7 +666,7 @@ flowableAdminApp.controller('DeleteVariableCrtl',
 
         }]);
 
-flowableAdminApp.controller('AddVariableCrtl',
+flowableAdminApp.controller('AddVariableCtrl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'processInstanceId',
         function ($rootScope, $scope, $modalInstance, $http, processInstanceId) {
 

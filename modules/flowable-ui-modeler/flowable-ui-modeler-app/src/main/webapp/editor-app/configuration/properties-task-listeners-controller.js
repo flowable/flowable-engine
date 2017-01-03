@@ -15,7 +15,7 @@
  * Task listeners
  */
 
-angular.module('flowableModeler').controller('KisBpmTaskListenersCtrl',
+angular.module('flowableModeler').controller('FlowableTaskListenersCtrl',
     ['$scope', '$modal', '$timeout', '$translate', function ($scope, $modal, $timeout, $translate) {
 
         // Config for the modal window
@@ -28,7 +28,7 @@ angular.module('flowableModeler').controller('KisBpmTaskListenersCtrl',
         _internalCreateModal(opts, $modal, $scope);
     }]);
 
-angular.module('flowableModeler').controller('KisBpmTaskListenersPopupCtrl',
+angular.module('flowableModeler').controller('FlowableTaskListenersPopupCtrl',
     ['$scope', '$q', '$translate', '$timeout', function ($scope, $q, $translate, $timeout) {
 
         // Put json representing form properties on scope

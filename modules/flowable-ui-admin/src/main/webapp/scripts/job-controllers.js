@@ -42,7 +42,7 @@ flowableAdminApp.controller('JobController', ['$scope', '$rootScope', '$http', '
 		$scope.deleteJob = function() {
 			var modalInstance = $modal.open({
 				templateUrl: 'views/job-delete-popup.html',
-				controller: 'DeleteModalInstanceCrtl',
+				controller: 'DeleteModalInstanceCtrl',
 				resolve: {
 					job: function() {
 						return $scope.job;
@@ -102,7 +102,7 @@ flowableAdminApp.controller('JobController', ['$scope', '$rootScope', '$http', '
 
 }]);
 
-flowableAdminApp.controller('DeleteModalInstanceCrtl',
+flowableAdminApp.controller('DeleteModalInstanceCtrl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'job', function ($rootScope, $scope, $modalInstance, $http, job) {
 
 	  $scope.job = job;

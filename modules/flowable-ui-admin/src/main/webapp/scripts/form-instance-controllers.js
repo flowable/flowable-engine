@@ -81,7 +81,7 @@ flowableAdminApp.controller('FormInstanceController', ['$rootScope', '$scope', '
         });
     }]);
 
-flowableAdminApp.controller('ShowFormRenderPopupCrtl',
+flowableAdminApp.controller('ShowFormRenderPopupCtrl',
         ['$rootScope', '$scope', '$modalInstance', '$http', 'form', '$timeout', '$translate', 'uiGridConstants',
             function ($rootScope, $scope, $modalInstance, $http, form, $timeout, $translate, uiGridConstants) {
 

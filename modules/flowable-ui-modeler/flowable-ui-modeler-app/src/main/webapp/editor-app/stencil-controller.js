@@ -21,7 +21,7 @@ angular.module('flowableModeler')
         $scope.propertyWindowState = {'collapsed': false};
 
         // Add reference to global header-config
-        $scope.headerConfig = KISBPM.HEADER_CONFIG;
+        $scope.headerConfig = FLOWABLE.HEADER_CONFIG;
 
         $scope.propertyWindowState.toggle = function () {
             $scope.propertyWindowState.collapsed = !$scope.propertyWindowState.collapsed;
@@ -58,7 +58,7 @@ angular.module('flowableModeler')
             /*
              StencilSet items
              */
-            $http({method: 'GET', url: KISBPM.URL.getStencilSet($scope.modelData.stencilSetId)}).success(function (data, status, headers, config) {
+            $http({method: 'GET', url: FLOWABLE.URL.getStencilSet($scope.modelData.stencilSetId)}).success(function (data, status, headers, config) {
 
               var quickMenuDefinition = ['UserTask', 'EndNoneEvent', 'ExclusiveGateway', 
                                          'CatchTimerEvent', 'ThrowNoneEvent', 'TextAnnotation',
@@ -287,9 +287,9 @@ angular.module('flowableModeler')
                         }
 
                         // First we check if there is a config for 'key-type' and then for 'type' alone
-                        var propertyConfig = KISBPM.PROPERTY_CONFIG[key + '-' + property.type()];
+                        var propertyConfig = FLOWABLE.PROPERTY_CONFIG[key + '-' + property.type()];
                         if (propertyConfig === undefined || propertyConfig === null) {
-                            propertyConfig = KISBPM.PROPERTY_CONFIG[property.type()];
+                            propertyConfig = FLOWABLE.PROPERTY_CONFIG[property.type()];
                         }
 
                         if (propertyConfig === undefined || propertyConfig === null) {
@@ -300,7 +300,7 @@ angular.module('flowableModeler')
                                 selectedShape.properties.set(key, true);
                             }
                             
-                            if (KISBPM.CONFIG.showRemovedProperties == false && property.isHidden())
+                            if (FLOWABLE.UI_CONFIG.showRemovedProperties == false && property.isHidden())
                             {
                               continue;
                             }
@@ -364,7 +364,7 @@ angular.module('flowableModeler')
             
             $scope.editor.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, function (event) {
               
-              KISBPM.eventBus.dispatch(KISBPM.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS);
+              FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS);
               var shapes = event.elements;
                 
                 if (shapes && shapes.length == 1) {
@@ -474,7 +474,7 @@ angular.module('flowableModeler')
             });
             
             if (!$rootScope.stencilInitialized) {
-              KISBPM.eventBus.addListener(KISBPM.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS, function (event) {
+              FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS, function (event) {
                 jQuery('.Oryx_button').each(function(i, obj) {
                   obj.style.display = "none";
               });
@@ -483,7 +483,7 @@ angular.module('flowableModeler')
               /*
                * Listen to property updates and act upon them
                */
-              KISBPM.eventBus.addListener(KISBPM.eventBus.EVENT_TYPE_PROPERTY_VALUE_CHANGED, function (event) {
+              FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_PROPERTY_VALUE_CHANGED, function (event) {
                   if (event.property && event.property.key) {
                       // If the name property is been updated, we also need to change the title of the currently selected item
                       if (event.property.key === 'oryx-name' && $scope.selectedItem !== undefined && $scope.selectedItem !== null) {
@@ -497,7 +497,7 @@ angular.module('flowableModeler')
                   }
               });
               
-              KISBPM.eventBus.addListener(KISBPM.eventBus.EVENT_TYPE_SHOW_VALIDATION_POPUP, function (event) {
+              FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_SHOW_VALIDATION_POPUP, function (event) {
                 // Method to open validation dialog
                   var showValidationDialog = function() {
                     $rootScope.currentValidationId = event.validationId;
@@ -509,7 +509,7 @@ angular.module('flowableModeler')
                   showValidationDialog();
               });
               
-              KISBPM.eventBus.addListener(KISBPM.eventBus.EVENT_TYPE_NAVIGATE_TO_PROCESS, function (event) {
+              FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_NAVIGATE_TO_PROCESS, function (event) {
                   var modelMetaData = $rootScope.editor.getModelMetaData();
                   $rootScope.editorHistory.push({
                         id: modelMetaData.modelId, 
@@ -556,7 +556,7 @@ angular.module('flowableModeler')
             };
             
             $scope.deleteShape = function() {
-              KISBPM.TOOLBAR.ACTIONS.deleteItem({'$scope': $scope});
+              FLOWABLE.TOOLBAR.ACTIONS.deleteItem({'$scope': $scope});
             };
             
             $scope.quickAddItem = function(newItemId) {
@@ -595,7 +595,7 @@ angular.module('flowableModeler')
                   if (!targetStencil){ return; }// Check if there can be a target shape
                   option['connectingType'] = targetStencil.id();
 
-                  var command = new KISBPM.CreateCommand(option, undefined, undefined, $scope.editor);
+                  var command = new FLOWABLE.CreateCommand(option, undefined, undefined, $scope.editor);
                 
                   $scope.editor.executeCommands([command]);
                 }
@@ -682,12 +682,12 @@ angular.module('flowableModeler')
                 // Fire event to all who is interested
                 // Fire event to all who want to know about this
                 var event = {
-                    type: KISBPM.eventBus.EVENT_TYPE_PROPERTY_VALUE_CHANGED,
+                    type: FLOWABLE.eventBus.EVENT_TYPE_PROPERTY_VALUE_CHANGED,
                     property: property,
                     oldValue: oldValue,
                     newValue: newValue
                 };
-                KISBPM.eventBus.dispatch(event.type, event);
+                FLOWABLE.eventBus.dispatch(event.type, event);
             } else {
                 // Switch the property back to read mode, no update was needed
                 property.mode = 'read';
@@ -766,7 +766,7 @@ angular.module('flowableModeler')
                 highlightId: "shapeMenu"
             });
             
-            KISBPM.eventBus.dispatch(KISBPM.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS);
+            FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS);
 
             if ($scope.dragCanContain) {
 
@@ -875,7 +875,7 @@ angular.module('flowableModeler')
                   option.connectingType = targetStencil.id();
                 }
   
-                var command = new KISBPM.CreateCommand(option, $scope.dropTargetElement, pos, $scope.editor);
+                var command = new FLOWABLE.CreateCommand(option, $scope.dropTargetElement, pos, $scope.editor);
               
                 $scope.editor.executeCommands([command]);
                 }
@@ -956,11 +956,11 @@ angular.module('flowableModeler')
 
                     // Fire event to all who want to know about this
                     var dropEvent = {
-                        type: KISBPM.eventBus.EVENT_TYPE_ITEM_DROPPED,
+                        type: FLOWABLE.eventBus.EVENT_TYPE_ITEM_DROPPED,
                         droppedItem: item,
                         position: pos
                     };
-                    KISBPM.eventBus.dispatch(dropEvent.type, dropEvent);
+                    FLOWABLE.eventBus.dispatch(dropEvent.type, dropEvent);
                 }
             }
 
@@ -1356,9 +1356,9 @@ angular.module('flowableModeler')
 
     }]);
 
-var KISBPM = KISBPM || {};
+var FLOWABLE = FLOWABLE || {};
 //create command for undo/redo
-KISBPM.CreateCommand = ORYX.Core.Command.extend({
+FLOWABLE.CreateCommand = ORYX.Core.Command.extend({
   construct: function(option, currentReference, position, facade){
     this.option = option;
     this.currentReference = currentReference;

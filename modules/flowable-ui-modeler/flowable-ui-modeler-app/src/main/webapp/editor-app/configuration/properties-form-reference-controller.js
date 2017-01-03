@@ -11,7 +11,7 @@
  * limitations under the License.
  */
  
-angular.module('flowableModeler').controller('KisBpmFormReferenceDisplayCtrl',
+angular.module('flowableModeler').controller('FlowableFormReferenceDisplayCtrl',
     [ '$scope', '$modal', '$http', function($scope, $modal, $http) {
     
     if ($scope.property && $scope.property.value && $scope.property.value.id) {
@@ -27,7 +27,7 @@ angular.module('flowableModeler').controller('KisBpmFormReferenceDisplayCtrl',
 	
 }]);
 
-angular.module('flowableModeler').controller('KisBpmFormReferenceCrtl',
+angular.module('flowableModeler').controller('FlowableFormReferenceCtrl',
     [ '$scope', '$modal', '$http', function($scope, $modal, $http) {
 	
      // Config for the modal window
@@ -40,7 +40,7 @@ angular.module('flowableModeler').controller('KisBpmFormReferenceCrtl',
      _internalCreateModal(opts, $modal, $scope);
 }]);
 
-angular.module('flowableModeler').controller('KisBpmFormReferencePopupCrtl',
+angular.module('flowableModeler').controller('FlowableFormReferencePopupCtrl',
     [ '$rootScope', '$scope', '$http', '$location', function($rootScope, $scope, $http, $location) {
 	 
 	$scope.state = {'loadingForms' : true, 'formError' : false};
@@ -120,7 +120,7 @@ angular.module('flowableModeler').controller('KisBpmFormReferencePopupCrtl',
                     }
                     return str.join("&");
                 },
-                url: KISBPM.URL.putModel(modelMetaData.modelId)})
+                url: FLOWABLE.URL.putModel(modelMetaData.modelId)})
 
                 .success(function (data, status, headers, config) {
                     $scope.editor.handleEvents({
@@ -212,7 +212,7 @@ angular.module('flowableModeler').controller('KisBpmFormReferencePopupCrtl',
                         }
                         return str.join("&");
                     },
-                    url: KISBPM.URL.putModel(modelMetaData.modelId)})
+                    url: FLOWABLE.URL.putModel(modelMetaData.modelId)})
 
                     .success(function (data, status, headers, config) {
                         $scope.editor.handleEvents({

@@ -13,7 +13,7 @@
 'use strict';
 
 angular.module('flowableModeler')
-.controller('EditModelPopupCrtl', ['$rootScope', '$scope', '$http', '$translate', '$location',
+.controller('EditModelPopupCtrl', ['$rootScope', '$scope', '$http', '$translate', '$location',
     function ($rootScope, $scope, $http, $translate, $location) {
 
         var model;
@@ -101,7 +101,7 @@ angular.module('flowableModeler')
 }]);
 
 angular.module('flowableModeler')
-    .controller('DeleteModelPopupCrtl', ['$rootScope', '$scope', '$http', '$translate', function ($rootScope, $scope, $http, $translate) {
+    .controller('DeleteModelPopupCtrl', ['$rootScope', '$scope', '$http', '$translate', function ($rootScope, $scope, $http, $translate) {
 
         var model;
         var popupType;
@@ -167,7 +167,7 @@ angular.module('flowableModeler')
     }]);
 
 angular.module('flowableModeler')
-.controller('UseAsNewVersionPopupCrtl', ['$rootScope', '$scope', '$http', '$translate', '$location', function ($rootScope, $scope, $http, $translate, $location) {
+.controller('UseAsNewVersionPopupCtrl', ['$rootScope', '$scope', '$http', '$translate', '$location', function ($rootScope, $scope, $http, $translate, $location) {
 
 	var model;
 	var popupType;

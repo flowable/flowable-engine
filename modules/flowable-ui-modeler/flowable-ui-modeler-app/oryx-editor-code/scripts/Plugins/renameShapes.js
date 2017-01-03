@@ -113,7 +113,7 @@ ORYX.Plugins.RenameShapes = Clazz.extend({
                 }
 
 				evtCoord.y += $("editor-header").clientHeight - $("canvasSection").scrollTop - 5;
-				if (KISBPM.HEADER_CONFIG.showAppTitle == false)
+				if (FLOWABLE.HEADER_CONFIG.showAppTitle == false)
 				{
 					evtCoord.y += 61;
 				}

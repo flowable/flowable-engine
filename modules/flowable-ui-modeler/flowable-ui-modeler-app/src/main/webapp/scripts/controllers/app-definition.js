@@ -227,7 +227,7 @@ angular.module('flowableModeler')
 }]);
 
 angular.module('flowableModeler')
-.controller('DeleteAppDefinitionPopupCrtl', ['$rootScope', '$scope', '$http', '$translate', function ($rootScope, $scope, $http, $translate) {
+.controller('DeleteAppDefinitionPopupCtrl', ['$rootScope', '$scope', '$http', '$translate', function ($rootScope, $scope, $http, $translate) {
 
     $scope.popup = {
         loading: false,

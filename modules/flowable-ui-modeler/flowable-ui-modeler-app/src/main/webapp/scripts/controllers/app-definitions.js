@@ -137,7 +137,7 @@ angular.module('flowableModeler')
 
 
 angular.module('flowableModeler')
-    .controller('CreateNewAppCrtl', ['$rootScope', '$scope', '$http', '$location', '$translate', function ($rootScope, $scope, $http, $location, $translate) {
+    .controller('CreateNewAppCtrl', ['$rootScope', '$scope', '$http', '$location', '$translate', function ($rootScope, $scope, $http, $location, $translate) {
 
         $scope.model = {
             loading: false,
@@ -189,7 +189,7 @@ angular.module('flowableModeler')
     }]);
 
 angular.module('flowableModeler')
-    .controller('DuplicateAppCrtl', ['$rootScope', '$scope', '$http', '$location', '$translate', function ($rootScope, $scope, $http, $location, $translate) {
+    .controller('DuplicateAppCtrl', ['$rootScope', '$scope', '$http', '$location', '$translate', function ($rootScope, $scope, $http, $location, $translate) {
 
         $scope.model = {
             loading: false,

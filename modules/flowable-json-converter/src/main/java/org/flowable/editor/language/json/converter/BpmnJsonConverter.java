@@ -115,6 +115,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
     // scope constructs
     SubProcessJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
     EventSubProcessJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
+    AdhocSubProcessJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
 
     // catch events
     CatchEventJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
@@ -163,6 +164,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
     DI_RECTANGLES.add(STENCIL_CALL_ACTIVITY);
     DI_RECTANGLES.add(STENCIL_SUB_PROCESS);
     DI_RECTANGLES.add(STENCIL_EVENT_SUB_PROCESS);
+    DI_RECTANGLES.add(STENCIL_ADHOC_SUB_PROCESS);
     DI_RECTANGLES.add(STENCIL_TASK_BUSINESS_RULE);
     DI_RECTANGLES.add(STENCIL_TASK_MAIL);
     DI_RECTANGLES.add(STENCIL_TASK_MANUAL);

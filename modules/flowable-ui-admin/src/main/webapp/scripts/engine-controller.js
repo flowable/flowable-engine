@@ -81,7 +81,7 @@ flowableAdminApp.controller('EngineController', ['$rootScope', '$scope', '$http'
 
                 var modalInstance = $modal.open({
                     templateUrl: 'views/engine-edit-endpoint-popup.html',
-                    controller: 'EditEndpointConfigModalInstanceCrtl',
+                    controller: 'EditEndpointConfigModalInstanceCtrl',
                     resolve: {
                         server: function () {
                             return cloneOfModel;
@@ -134,7 +134,7 @@ flowableAdminApp.controller('EngineController', ['$rootScope', '$scope', '$http'
     }]);
 
 
-flowableAdminApp.controller('EditEndpointConfigModalInstanceCrtl',
+flowableAdminApp.controller('EditEndpointConfigModalInstanceCtrl',
     ['$scope', '$modalInstance', '$http', 'server', function ($scope, $modalInstance, $http, server) {
 
         $scope.model = {server: server};

@@ -12,8 +12,8 @@
  */
 'use strict';
 
-var KISBPM = KISBPM || {};
-KISBPM.TOOLBAR = {
+var FLOWABLE = FLOWABLE || {};
+FLOWABLE.TOOLBAR = {
     ACTIONS: {
     	
         saveModel: function (services) {
@@ -73,12 +73,12 @@ KISBPM.TOOLBAR = {
             if (toggleUndo || toggleRedo) {
                 for (var i = 0; i < services.$scope.items.length; i++) {
                     var item = services.$scope.items[i];
-                    if (toggleUndo && item.action === 'KISBPM.TOOLBAR.ACTIONS.undo') {
+                    if (toggleUndo && item.action === 'FLOWABLE.TOOLBAR.ACTIONS.undo') {
                         services.$scope.safeApply(function () {
                             item.enabled = false;
                         });
                     }
-                    else if (toggleRedo && item.action === 'KISBPM.TOOLBAR.ACTIONS.redo') {
+                    else if (toggleRedo && item.action === 'FLOWABLE.TOOLBAR.ACTIONS.redo') {
                         services.$scope.safeApply(function () {
                             item.enabled = true;
                         });
@@ -132,12 +132,12 @@ KISBPM.TOOLBAR = {
             if (toggleUndo || toggleRedo) {
                 for (var i = 0; i < services.$scope.items.length; i++) {
                     var item = services.$scope.items[i];
-                    if (toggleUndo && item.action === 'KISBPM.TOOLBAR.ACTIONS.undo') {
+                    if (toggleUndo && item.action === 'FLOWABLE.TOOLBAR.ACTIONS.undo') {
                         services.$scope.safeApply(function () {
                             item.enabled = true;
                         });
                     }
-                    else if (toggleRedo && item.action === 'KISBPM.TOOLBAR.ACTIONS.redo') {
+                    else if (toggleRedo && item.action === 'FLOWABLE.TOOLBAR.ACTIONS.redo') {
                         services.$scope.safeApply(function () {
                             item.enabled = false;
                         });
@@ -147,10 +147,10 @@ KISBPM.TOOLBAR = {
         },
 
         cut: function (services) {
-            KISBPM.TOOLBAR.ACTIONS._getOryxEditPlugin(services.$scope).editCut();
+            FLOWABLE.TOOLBAR.ACTIONS._getOryxEditPlugin(services.$scope).editCut();
             for (var i = 0; i < services.$scope.items.length; i++) {
                 var item = services.$scope.items[i];
-                if (item.action === 'KISBPM.TOOLBAR.ACTIONS.paste') {
+                if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.paste') {
                     services.$scope.safeApply(function () {
                         item.enabled = true;
                     });
@@ -159,10 +159,10 @@ KISBPM.TOOLBAR = {
         },
 
         copy: function (services) {
-            KISBPM.TOOLBAR.ACTIONS._getOryxEditPlugin(services.$scope).editCopy();
+            FLOWABLE.TOOLBAR.ACTIONS._getOryxEditPlugin(services.$scope).editCopy();
             for (var i = 0; i < services.$scope.items.length; i++) {
                 var item = services.$scope.items[i];
-                if (item.action === 'KISBPM.TOOLBAR.ACTIONS.paste') {
+                if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.paste') {
                     services.$scope.safeApply(function () {
                         item.enabled = true;
                     });
@@ -171,11 +171,11 @@ KISBPM.TOOLBAR = {
         },
 
         paste: function (services) {
-            KISBPM.TOOLBAR.ACTIONS._getOryxEditPlugin(services.$scope).editPaste();
+            FLOWABLE.TOOLBAR.ACTIONS._getOryxEditPlugin(services.$scope).editPaste();
         },
 
         deleteItem: function (services) {
-            KISBPM.TOOLBAR.ACTIONS._getOryxEditPlugin(services.$scope).editDelete();
+            FLOWABLE.TOOLBAR.ACTIONS._getOryxEditPlugin(services.$scope).editDelete();
         },
 
         addBendPoint: function (services) {
@@ -183,7 +183,7 @@ KISBPM.TOOLBAR = {
             // Show the tutorial the first time
             FLOWABLE_EDITOR_TOUR.sequenceFlowBendpoint(services.$scope, services.$translate, services.$q, true);
 
-            var dockerPlugin = KISBPM.TOOLBAR.ACTIONS._getOryxDockerPlugin(services.$scope);
+            var dockerPlugin = FLOWABLE.TOOLBAR.ACTIONS._getOryxDockerPlugin(services.$scope);
 
             var enableAdd = !dockerPlugin.enabledAdd();
             dockerPlugin.setEnableAdd(enableAdd);
@@ -203,7 +203,7 @@ KISBPM.TOOLBAR = {
             // Show the tutorial the first time
             FLOWABLE_EDITOR_TOUR.sequenceFlowBendpoint(services.$scope, services.$translate, services.$q, true);
 
-            var dockerPlugin = KISBPM.TOOLBAR.ACTIONS._getOryxDockerPlugin(services.$scope);
+            var dockerPlugin = FLOWABLE.TOOLBAR.ACTIONS._getOryxDockerPlugin(services.$scope);
 
             var enableRemove = !dockerPlugin.enabledRemove();
             dockerPlugin.setEnableRemove(enableRemove);
@@ -233,31 +233,31 @@ KISBPM.TOOLBAR = {
         },
 
         zoomIn: function (services) {
-            KISBPM.TOOLBAR.ACTIONS._getOryxViewPlugin(services.$scope).zoom([1.0 + ORYX.CONFIG.ZOOM_OFFSET]);
+            FLOWABLE.TOOLBAR.ACTIONS._getOryxViewPlugin(services.$scope).zoom([1.0 + ORYX.CONFIG.ZOOM_OFFSET]);
         },
 
         zoomOut: function (services) {
-            KISBPM.TOOLBAR.ACTIONS._getOryxViewPlugin(services.$scope).zoom([1.0 - ORYX.CONFIG.ZOOM_OFFSET]);
+            FLOWABLE.TOOLBAR.ACTIONS._getOryxViewPlugin(services.$scope).zoom([1.0 - ORYX.CONFIG.ZOOM_OFFSET]);
         },
         
         zoomActual: function (services) {
-            KISBPM.TOOLBAR.ACTIONS._getOryxViewPlugin(services.$scope).setAFixZoomLevel(1);
+            FLOWABLE.TOOLBAR.ACTIONS._getOryxViewPlugin(services.$scope).setAFixZoomLevel(1);
         },
         
         zoomFit: function (services) {
-        	KISBPM.TOOLBAR.ACTIONS._getOryxViewPlugin(services.$scope).zoomFitToModel();
+        	FLOWABLE.TOOLBAR.ACTIONS._getOryxViewPlugin(services.$scope).zoomFitToModel();
         },
         
         alignVertical: function (services) {
-        	KISBPM.TOOLBAR.ACTIONS._getOryxArrangmentPlugin(services.$scope).alignShapes([ORYX.CONFIG.EDITOR_ALIGN_MIDDLE]);
+        	FLOWABLE.TOOLBAR.ACTIONS._getOryxArrangmentPlugin(services.$scope).alignShapes([ORYX.CONFIG.EDITOR_ALIGN_MIDDLE]);
         },
         
         alignHorizontal: function (services) {
-        	KISBPM.TOOLBAR.ACTIONS._getOryxArrangmentPlugin(services.$scope).alignShapes([ORYX.CONFIG.EDITOR_ALIGN_CENTER]);
+        	FLOWABLE.TOOLBAR.ACTIONS._getOryxArrangmentPlugin(services.$scope).alignShapes([ORYX.CONFIG.EDITOR_ALIGN_CENTER]);
         },
         
         sameSize: function (services) {
-        	KISBPM.TOOLBAR.ACTIONS._getOryxArrangmentPlugin(services.$scope).alignShapes([ORYX.CONFIG.EDITOR_ALIGN_SIZE]);
+        	FLOWABLE.TOOLBAR.ACTIONS._getOryxArrangmentPlugin(services.$scope).alignShapes([ORYX.CONFIG.EDITOR_ALIGN_SIZE]);
         },
 
         help: function (services) {
@@ -386,7 +386,7 @@ angular.module('flowableModeler').controller('SaveModelCtrl', [ '$rootScope', '$
                 }
                 return str.join("&");
             },
-            url: KISBPM.URL.putModel(modelMetaData.modelId)})
+            url: FLOWABLE.URL.putModel(modelMetaData.modelId)})
 
             .success(function (data, status, headers, config) {
                 $scope.editor.handleEvents({
@@ -401,12 +401,12 @@ angular.module('flowableModeler').controller('SaveModelCtrl', [ '$rootScope', '$
 
                 // Fire event to all who is listening
                 var saveEvent = {
-                    type: KISBPM.eventBus.EVENT_TYPE_MODEL_SAVED,
+                    type: FLOWABLE.eventBus.EVENT_TYPE_MODEL_SAVED,
                     model: params,
                     modelId: modelMetaData.modelId,
 		            eventType: 'update-model'
                 };
-                KISBPM.eventBus.dispatch(KISBPM.eventBus.EVENT_TYPE_MODEL_SAVED, saveEvent);
+                FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_MODEL_SAVED, saveEvent);
 
                 // Reset state
                 $scope.error = undefined;

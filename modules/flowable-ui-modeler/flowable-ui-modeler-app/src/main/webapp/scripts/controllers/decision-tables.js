@@ -255,7 +255,7 @@ angular.module('flowableModeler')
 		}]);
 
 angular.module('flowableModeler')
-.controller('ImportDecisionTableModelCrtl', ['$rootScope', '$scope', '$http', 'Upload', '$location', 'EventTrackingService', function ($rootScope, $scope, $http, Upload, $location, EventTrackingService) {
+.controller('ImportDecisionTableModelCtrl', ['$rootScope', '$scope', '$http', 'Upload', '$location', 'EventTrackingService', function ($rootScope, $scope, $http, Upload, $location, EventTrackingService) {
 
   $scope.model = {
        loading: false

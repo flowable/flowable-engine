@@ -590,7 +590,7 @@
     "name" : "multiinstance_typepackage",
     "properties" : [ {
       "id" : "multiinstance_type",
-      "type" : "kisbpm-multiinstance",
+      "type" : "flowable-multiinstance",
       "title" : "Multi-instance type",
       "value" : "None",
       "description" : "Repeated activity execution (parallel or sequential) can be displayed through different loop types",
@@ -729,6 +729,36 @@
       "description" : "Should all parent executions be terminated?",
       "popular" : true,
       "refToView" : [ "frame" ]
+    } ]
+  }, {
+    "name" : "completionconditionpackage",
+    "properties" : [ {
+      "id" : "completioncondition",
+      "type" : "String",
+      "title" : "Completion condition",
+      "value" : "",
+      "description" : "The completion condition for the adhoc sub process",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "orderingpackage",
+    "properties" : [ {
+      "id" : "ordering",
+      "type" : "flowable-ordering",
+      "title" : "Ordering",
+      "value" : "Parallel",
+      "description" : "The ordering for the adhoc sub process",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "cancelremaininginstancespackage",
+    "properties" : [ {
+      "id" : "cancelremaininginstances",
+      "type" : "Boolean",
+      "title" : "Cancel remaining instances",
+      "value" : "true",
+      "description" : "Cancel the remaining instances for the adhoc sub process?",
+      "popular" : true
     } ]
   } ],
   "stencils" : [ {
@@ -1265,6 +1295,17 @@
     "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "all" ]
+  }, {
+    "type" : "node",
+    "id" : "AdhocSubProcess",
+    "title" : "Adhoc sub process",
+    "description" : "An adhoc sub process",
+    "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n   width=\"200\"\n   height=\"160\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"50\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"80\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"110\" oryx:anchors=\"left\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"70\" oryx:cy=\"159\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"100\" oryx:cy=\"159\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"130\" oryx:cy=\"159\" oryx:anchors=\"bottom\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"199\" oryx:cy=\"50\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"199\" oryx:cy=\"80\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"199\" oryx:cy=\"110\" oryx:anchors=\"right\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"70\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"100\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"130\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"100\" oryx:cy=\"80\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"fill\" oryx:minimumSize=\"120 100\" oryx:maximumSize=\"\" >\n    <rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"0\" y=\"0\" width=\"190\" height=\"160\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" />\n\t<rect id=\"bg_frame\" oryx:anchors=\"bottom top right left\" x=\"0\" y=\"0\" width=\"200\" height=\"160\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#ffffff\" />\n\t<text \n\t\tfont-size=\"12\" \n\t\tid=\"text_name\" \n\t\tx=\"8\" \n\t\ty=\"10\" \n\t\toryx:align=\"top left\"\n\t\toryx:fittoelem=\"text_frame\"\n\t\toryx:anchors=\"left top\" \n\t\tstroke=\"#373e48\">\n\t</text>\n\t\n\t<text \n\t\toryx:anchors=\"bottom\"\n\t\tx=\"101\"\n\t\ty=\"157\"\n\t\tfont-size=\"20\"\n\t\ttransform=\"translate(8,0)\"\n\t>~</text>\n  </g>\n</svg>",
+    "icon" : "activity/adhoc.subprocess.png",
+    "groups" : [ "Structural" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "completionconditionpackage", "orderingpackage", "cancelremaininginstancespackage" ],
+    "hiddenPropertyPackages" : [ ],
+    "roles" : [ "Activity", "sequence_start", "sequence_end", "all" ]
   } ],
   "rules" : {
     "cardinalityRules" : [ {
@@ -1335,6 +1376,9 @@
     }, {
       "role" : "SubProcess",
       "contains" : [ "sequence_start", "sequence_end", "from_task_event", "to_task_event", "EventSubProcess", "TextAnnotation", "DataStore" ]
+    }, {
+      "role" : "AdhocSubProcess",
+      "contains" : [ "sequence_start", "sequence_end", "from_task_event", "to_task_event", "TextAnnotation", "DataStore" ]
     }, {
       "role" : "EventSubProcess",
       "contains" : [ "sequence_start", "sequence_end", "from_task_event", "to_task_event", "TextAnnotation", "DataStore" ]

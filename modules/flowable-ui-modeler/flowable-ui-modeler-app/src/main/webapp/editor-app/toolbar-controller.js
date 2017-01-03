@@ -17,7 +17,7 @@ angular.module('flowableModeler')
     .controller('ToolbarController', ['$scope', '$http', '$modal', '$q', '$rootScope', '$translate', '$location', function ($scope, $http, $modal, $q, $rootScope, $translate, $location) {
 
     	$scope.editorFactory.promise.then(function () {
-	        var toolbarItems = KISBPM.TOOLBAR_CONFIG.items;
+	        var toolbarItems = FLOWABLE.TOOLBAR_CONFIG.items;
 	        $scope.items = [];
 	        
 	        for (var i = 0; i < toolbarItems.length; i++)
@@ -36,7 +36,7 @@ angular.module('flowableModeler')
 	        }
     	});
         
-        $scope.secondaryItems = KISBPM.TOOLBAR_CONFIG.secondaryItems;
+        $scope.secondaryItems = FLOWABLE.TOOLBAR_CONFIG.secondaryItems;
 
         // Call configurable click handler (From http://stackoverflow.com/questions/359788/how-to-execute-a-javascript-function-when-i-have-its-name-as-a-string)
         var executeFunctionByName = function(functionName, context /*, args */) {
@@ -59,10 +59,10 @@ angular.module('flowableModeler')
 
             // Other events
             var event = {
-                type : KISBPM.eventBus.EVENT_TYPE_TOOLBAR_BUTTON_CLICKED,
+                type : FLOWABLE.eventBus.EVENT_TYPE_TOOLBAR_BUTTON_CLICKED,
                 toolbarItem : buttonClicked
             };
-            KISBPM.eventBus.dispatch(event.type, event);
+            FLOWABLE.eventBus.dispatch(event.type, event);
         };
         
         // Click handler for secondary toolbar buttons
@@ -75,31 +75,31 @@ angular.module('flowableModeler')
         /* Key bindings */
         Mousetrap.bind(['command+z', 'ctrl+z'], function(e) {
         	var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate};
-        	KISBPM.TOOLBAR.ACTIONS.undo(services);
+        	FLOWABLE.TOOLBAR.ACTIONS.undo(services);
             return false;
         });
         
         Mousetrap.bind(['command+y', 'ctrl+y'], function(e) {
         	var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate};
-        	KISBPM.TOOLBAR.ACTIONS.redo(services);
+        	FLOWABLE.TOOLBAR.ACTIONS.redo(services);
             return false;
         });
         
         Mousetrap.bind(['command+c', 'ctrl+c'], function(e) {
         	var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate};
-        	KISBPM.TOOLBAR.ACTIONS.copy(services);
+        	FLOWABLE.TOOLBAR.ACTIONS.copy(services);
             return false;
         });
         
         Mousetrap.bind(['command+v', 'ctrl+v'], function(e) {
         	var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate};
-        	KISBPM.TOOLBAR.ACTIONS.paste(services);
+        	FLOWABLE.TOOLBAR.ACTIONS.paste(services);
             return false;
         });
         
         Mousetrap.bind(['del'], function(e) {
         	var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate};
-        	KISBPM.TOOLBAR.ACTIONS.deleteItem(services);
+        	FLOWABLE.TOOLBAR.ACTIONS.deleteItem(services);
             return false;
         });
 
@@ -122,11 +122,11 @@ angular.module('flowableModeler')
                 for(var i = 0; i < $scope.items.length; i++) 
         		{
                     var item = $scope.items[i];
-                    if (item.action === 'KISBPM.TOOLBAR.ACTIONS.undo')
+                    if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.undo')
                     {
                     	item.enabled = true;
                     }
-                    else if (item.action === 'KISBPM.TOOLBAR.ACTIONS.redo')
+                    else if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.redo')
                     {
                     	item.enabled = false;
                     }

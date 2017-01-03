@@ -26,7 +26,7 @@ flowableAdminApp.controller('FormDefinitionController', ['$scope', '$rootScope',
             $modal.open({
                 templateUrl: 'views/form-popup.html',
                 windowClass: 'modal modal-full-width',
-                controller: 'ShowFormPopupCrtl',
+                controller: 'ShowFormPopupCtrl',
                 resolve: {
                     form: function () {
                         return $scope.form;
@@ -100,7 +100,7 @@ flowableAdminApp.controller('FormDefinitionController', ['$scope', '$rootScope',
 
     }]);
 
-flowableAdminApp.controller('ShowFormPopupCrtl',
+flowableAdminApp.controller('ShowFormPopupCtrl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'form', '$timeout', '$translate', 'uiGridConstants',
         function ($rootScope, $scope, $modalInstance, $http, form, $timeout, $translate, uiGridConstants) {
 

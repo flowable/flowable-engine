@@ -11,26 +11,26 @@
  * limitations under the License.
  */
 
-// Create custom functions for the KIS-editor
-KISBPM.TOOLBAR.ACTIONS.closeEditor =  function(services) {
+// Create custom functions for the FLOWABLE-editor
+FLOWABLE.TOOLBAR.ACTIONS.closeEditor =  function(services) {
 	services.$location.path("/processes");
 };
 
-KISBPM.TOOLBAR.ACTIONS.navigateToProcess = function(processId) {
+FLOWABLE.TOOLBAR.ACTIONS.navigateToProcess = function(processId) {
     var navigateEvent = {
-        type: KISBPM.eventBus.EVENT_TYPE_NAVIGATE_TO_PROCESS,
+        type: FLOWABLE.eventBus.EVENT_TYPE_NAVIGATE_TO_PROCESS,
         processId: processId
     };
-    KISBPM.eventBus.dispatch(KISBPM.eventBus.EVENT_TYPE_NAVIGATE_TO_PROCESS, navigateEvent);
+    FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_NAVIGATE_TO_PROCESS, navigateEvent);
 },
 
 // Add custom buttons 
-KISBPM.TOOLBAR_CONFIG.secondaryItems.push( 
+FLOWABLE.TOOLBAR_CONFIG.secondaryItems.push( 
 	{
         "type" : "button",
         "title" : "Close",
         "cssClass" : "glyphicon glyphicon-remove",
-        "action" : "KISBPM.TOOLBAR.ACTIONS.closeEditor"
+        "action" : "FLOWABLE.TOOLBAR.ACTIONS.closeEditor"
     }
 );
 

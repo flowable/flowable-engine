@@ -12,8 +12,8 @@
  */
 'use strict';
 
-var KISBPM = KISBPM || {};
-KISBPM.PROPERTY_CONFIG =
+var FLOWABLE = FLOWABLE || {};
+FLOWABLE.PROPERTY_CONFIG =
 {
     "string": {
         "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
@@ -26,9 +26,13 @@ KISBPM.PROPERTY_CONFIG =
         "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/text-property-write-template.html"
     },
-    "kisbpm-multiinstance" : {
+    "flowable-multiinstance" : {
         "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/multiinstance-property-write-template.html"
+    },
+    "flowable-ordering" : {
+        "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/ordering-property-write-template.html"
     },
     "oryx-formproperties-complex": {
         "readModeTemplateUrl": "editor-app/configuration/properties/form-properties-display-template.html",
