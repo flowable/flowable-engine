@@ -62,7 +62,7 @@ public class FlowableTaskActionService extends FlowableAbstractTaskService {
     try {
       taskService.complete(task.getId());
     } catch (FlowableException e) {
-      logger.error("Error completing task " + taskId, e);
+      logger.error("Error completing task {}", taskId, e);
       throw new BadRequestException("Task " + taskId + " can't be completed", e);
     }
   }

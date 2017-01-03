@@ -93,7 +93,7 @@ public class BpmnDisplayJsonConverter {
         JsonNode modelNode = objectMapper.readTree(processModel.getModelEditorJson());
         pojoModel = bpmnJsonConverter.convertToBpmnModel(modelNode);
       } catch (Exception e) {
-        log.error("Error transforming json to pojo " + processModel.getId(), e);
+        log.error("Error transforming json to pojo {}", processModel.getId(), e);
       }
     }
 

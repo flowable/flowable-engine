@@ -188,7 +188,7 @@ public class FlowableProcessDefinitionService {
     try {
       processDefinitionId = URLDecoder.decode(processDefinitionVariable, "UTF-8");
     } catch (Exception e) {
-      logger.error("Error decoding process definition " + processDefinitionVariable, e);
+      logger.error("Error decoding process definition {}", processDefinitionVariable, e);
       throw new InternalServerErrorException("Error decoding process definition " + processDefinitionVariable);
     }
     return processDefinitionId;

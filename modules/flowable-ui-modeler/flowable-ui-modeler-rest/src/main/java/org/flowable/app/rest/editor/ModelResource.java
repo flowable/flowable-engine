@@ -154,7 +154,7 @@ public class ModelResource {
         editorJsonNode.put("modelType", "model");
         modelNode.set("model", editorJsonNode);
       } catch (Exception e) {
-        log.error("Error reading editor json " + modelId, e);
+        log.error("Error reading editor json {}", modelId, e);
         throw new InternalServerErrorException("Error reading editor json " + modelId);
       }
 
@@ -277,7 +277,7 @@ public class ModelResource {
       return new ModelRepresentation(model);
       
     } catch (Exception e) {
-      log.error("Error saving model " + model.getId(), e);
+      log.error("Error saving model {}", model.getId(), e);
       throw new BadRequestException("Process model could not be saved " + model.getId());
     }
   }
