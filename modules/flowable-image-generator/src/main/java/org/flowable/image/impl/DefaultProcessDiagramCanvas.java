@@ -503,7 +503,8 @@ public class DefaultProcessDiagramCanvas {
   }
 
   public void drawAssociation(int[] xPoints, int[] yPoints, AssociationDirection associationDirection, boolean highLighted, double scaleFactor) {
-    boolean conditional = false, isDefault = false;
+    boolean conditional = false;
+    boolean isDefault = false;
     drawConnection(xPoints, yPoints, conditional, isDefault, "association", associationDirection, highLighted, scaleFactor);
   }
 
@@ -607,12 +608,16 @@ public class DefaultProcessDiagramCanvas {
   }
 
   public void drawDefaultSequenceFlowIndicator(Line2D.Double line, double scaleFactor) {
-    double length = DEFAULT_INDICATOR_WIDTH / scaleFactor, halfOfLength = length/2, f = 8;
+    double length = DEFAULT_INDICATOR_WIDTH / scaleFactor;
+    double halfOfLength = length/2;
+    double f = 8;
     Line2D.Double defaultIndicator = new Line2D.Double(-halfOfLength, 0, halfOfLength, 0);
 
     double angle = Math.atan2(line.y2 - line.y1, line.x2 - line.x1);
-    double dx = f * Math.cos(angle), dy = f * Math.sin(angle),
-	       x1 = line.x1 + dx, y1 = line.y1 + dy;
+    double dx = f * Math.cos(angle);
+    double dy = f * Math.sin(angle);
+    double x1 = line.x1 + dx;
+    double y1 = line.y1 + dy;
 
     AffineTransform transformation = new AffineTransform();
     transformation.setToIdentity();

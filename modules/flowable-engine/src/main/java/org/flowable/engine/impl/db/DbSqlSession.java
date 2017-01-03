@@ -479,7 +479,9 @@ public class DbSqlSession implements Session {
   
   protected void debugFlush() {
     log.debug("Flushing dbSqlSession");
-    int nrOfInserts = 0, nrOfUpdates = 0, nrOfDeletes = 0;
+    int nrOfInserts = 0;
+    int nrOfUpdates = 0;
+    int nrOfDeletes = 0;
     for (Map<String, Entity> insertedObjectMap: insertedObjects.values()) {
       for (Entity insertedObject : insertedObjectMap.values()) {
         log.debug("  insert {}", insertedObject);
