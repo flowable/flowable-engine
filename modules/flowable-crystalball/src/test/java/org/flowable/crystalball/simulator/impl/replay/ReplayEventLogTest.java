@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -101,7 +102,7 @@ public class ReplayEventLogTest {
         .processDefinitionKey(USERTASK_PROCESS)
         .singleResult();
     assertNotNull(replayProcessInstance);
-    assertEquals(false, replayProcessInstance.getId().equals(processInstance.getId()));
+    assertFalse(replayProcessInstance.getId().equals(processInstance.getId()));
     assertEquals(TEST_VALUE, runtimeService.getVariable(replayProcessInstance.getId(), TEST_VARIABLE));
     // there should be one task
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("userTask").count());
