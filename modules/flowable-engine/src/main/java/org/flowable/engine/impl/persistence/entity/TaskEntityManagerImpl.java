@@ -25,6 +25,7 @@ import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.TaskQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
+import org.flowable.engine.impl.persistence.CountingTaskEntity;
 import org.flowable.engine.impl.persistence.entity.data.TaskDataManager;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.task.IdentityLinkType;
@@ -193,9 +194,14 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
       for (Task subTask : subTasks) {
         deleteTask((TaskEntity) subTask, deleteReason, cascade, cancel);
       }
+      
+      if (((CountingTaskEntity) task).getIdentityLinkCount() > 0) {
+        getIdentityLinkEntityManager().deleteIdentityLinksByTaskId(taskId);
+      }
 
-      getIdentityLinkEntityManager().deleteIdentityLinksByTaskId(taskId);
-      getVariableInstanceEntityManager().deleteVariableInstanceByTask(task);
+      if (((CountingTaskEntity) task).getVariableCount() > 0) {
+        getVariableInstanceEntityManager().deleteVariableInstanceByTask(task);
+      }
 
       if (cascade) {
         getHistoricTaskInstanceEntityManager().delete(taskId);
