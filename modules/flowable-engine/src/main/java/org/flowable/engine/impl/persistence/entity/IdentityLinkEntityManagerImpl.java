@@ -22,6 +22,7 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
+import org.flowable.engine.impl.persistence.CountingTaskEntity;
 import org.flowable.engine.impl.persistence.entity.data.IdentityLinkDataManager;
 import org.flowable.engine.task.IdentityLinkType;
 
@@ -49,7 +50,10 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
     super.insert(entity, fireCreateEvent);
     getHistoryManager().recordIdentityLinkCreated(entity);
     
-    if (entity.getProcessInstanceId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
+    if (entity.getTask() != null) {
+      CountingTaskEntity countingTaskEntity = (CountingTaskEntity) entity.getTask();
+      countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() + 1);
+    } else if (entity.getProcessInstanceId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
       CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(entity.getProcessInstanceId());
       if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
         executionEntity.setIdentityLinkCount(executionEntity.getIdentityLinkCount() + 1);
@@ -64,10 +68,13 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
       getHistoryManager().deleteHistoricIdentityLink(identityLink.getId());
     }
     
-    if (identityLink.getProcessInstanceId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
+    if (identityLink.getTask() != null) {
+      CountingTaskEntity countingTaskEntity = (CountingTaskEntity) identityLink.getTask();
+      countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() - 1);
+    } else if (identityLink.getProcessInstanceId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
       CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(identityLink.getProcessInstanceId());
       if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
-        executionEntity.setIdentityLinkCount(executionEntity.getIdentityLinkCount() -1);
+        executionEntity.setIdentityLinkCount(executionEntity.getIdentityLinkCount() - 1);
       }
     }
 
