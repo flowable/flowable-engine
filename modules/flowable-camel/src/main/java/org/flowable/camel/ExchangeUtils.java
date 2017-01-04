@@ -83,7 +83,7 @@ public class ExchangeUtils {
       Map<String, Object> exchangeVarMap = exchange.getProperties();
       // filter camel property that can't be serializable for camel version after 2.12.x+      
       for (String s : exchangeVarMap.keySet()) {
-        if (IGNORE_MESSAGE_PROPERTY.equalsIgnoreCase(s) == false) {
+        if (!IGNORE_MESSAGE_PROPERTY.equalsIgnoreCase(s)) {
           if (pattern == null || pattern.matcher(s).matches()) {
             camelVarMap.put(s, exchangeVarMap.get(s));
           }
@@ -118,7 +118,7 @@ public class ExchangeUtils {
     if (camelBody instanceof Map<?,?>) {
       Map<?,?> camelBodyMap = (Map<?,?>)camelBody;
       for (@SuppressWarnings("rawtypes") Map.Entry e : camelBodyMap.entrySet()) {
-        if (e.getKey() instanceof String && IGNORE_MESSAGE_PROPERTY.equalsIgnoreCase((String) e.getKey()) == false) {
+        if (e.getKey() instanceof String && !IGNORE_MESSAGE_PROPERTY.equalsIgnoreCase((String) e.getKey())) {
           camelVarMap.put((String) e.getKey(), e.getValue());
         }
       }

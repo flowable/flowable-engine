@@ -1338,7 +1338,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     allConfigurators = new ArrayList<ProcessEngineConfigurator>();
     
-    if (disableIdmEngine == false) {
+    if (!disableIdmEngine) {
       if (idmProcessEngineConfigurator != null) {
         allConfigurators.add(idmProcessEngineConfigurator);
       } else {

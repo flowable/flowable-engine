@@ -131,7 +131,7 @@ public class StartProcessInstanceWithFormCmd implements Command<ProcessInstance>
    */
   protected void processUploadFieldsIfNeeded(FormModel formModel, String processInstanceId, CommandContext commandContext) {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-    if (processEngineConfiguration.isContentEngineInitialized() == false) {
+    if (!processEngineConfiguration.isContentEngineInitialized()) {
       return;
     }
     

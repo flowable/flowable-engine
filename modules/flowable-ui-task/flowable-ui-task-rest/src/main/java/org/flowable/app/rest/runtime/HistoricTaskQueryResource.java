@@ -61,7 +61,7 @@ public class HistoricTaskQueryResource {
     User currentUser = SecurityUtils.getCurrentUserObject();
 
     JsonNode processInstanceIdNode = requestNode.get("processInstanceId");
-    if (processInstanceIdNode != null && processInstanceIdNode.isNull() == false) {
+    if (processInstanceIdNode != null && !processInstanceIdNode.isNull()) {
       String processInstanceId = processInstanceIdNode.asText();
       if (permissionService.hasReadPermissionOnProcessInstance(currentUser, processInstanceId)) {
         taskQuery.processInstanceId(processInstanceId);
@@ -71,7 +71,7 @@ public class HistoricTaskQueryResource {
     }
 
     JsonNode finishedNode = requestNode.get("finished");
-    if (finishedNode != null && finishedNode.isNull() == false) {
+    if (finishedNode != null && !finishedNode.isNull()) {
       boolean isFinished = finishedNode.asBoolean();
       if (isFinished) {
         taskQuery.finished();

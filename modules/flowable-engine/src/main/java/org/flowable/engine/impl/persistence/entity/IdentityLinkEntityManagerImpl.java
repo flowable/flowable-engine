@@ -219,7 +219,7 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
     List<IdentityLinkEntity> removedIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
     for (IdentityLinkEntity identityLinkEntity : taskEntity.getIdentityLinks()) {
       if (IdentityLinkType.CANDIDATE.equals(identityLinkEntity.getType()) && 
-          identityLinkIds.contains(identityLinkEntity.getId()) == false) {
+          !identityLinkIds.contains(identityLinkEntity.getId())) {
         
         if ((userId != null && userId.equals(identityLinkEntity.getUserId()))
           || (groupId != null && groupId.equals(identityLinkEntity.getGroupId()))) {

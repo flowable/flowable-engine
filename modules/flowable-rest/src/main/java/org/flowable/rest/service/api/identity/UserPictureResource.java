@@ -86,7 +86,7 @@ public class UserPictureResource extends BaseUserResource {
   public void updateUserPicture(@ApiParam(name = "userId") @PathVariable String userId, HttpServletRequest request, HttpServletResponse response) {
     User user = getUserFromRequest(userId);
 
-    if (request instanceof MultipartHttpServletRequest == false) {
+    if (!(request instanceof MultipartHttpServletRequest)) {
       throw new FlowableIllegalArgumentException("Multipart request is required");
     }
 

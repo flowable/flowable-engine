@@ -1175,7 +1175,7 @@ public class DbSqlSession implements Session {
             inOraclePlsqlBlock = true;
             sqlStatement = addSqlStatementPiece(sqlStatement, line);
 
-          } else if ((line.endsWith(";") && inOraclePlsqlBlock == false) || (line.startsWith("/") && inOraclePlsqlBlock)) {
+          } else if ((line.endsWith(";") && !inOraclePlsqlBlock) || (line.startsWith("/") && inOraclePlsqlBlock)) {
 
             if (inOraclePlsqlBlock) {
               inOraclePlsqlBlock = false;

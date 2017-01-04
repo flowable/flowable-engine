@@ -60,7 +60,7 @@ public class DmnExtensionElement extends DmnElement {
     public void addChildElement(DmnExtensionElement childElement) {
         if (childElement != null && childElement.getName() != null && !childElement.getName().trim().isEmpty()) {
             List<DmnExtensionElement> elementList = null;
-            if (this.childElements.containsKey(childElement.getName()) == false) {
+            if (!this.childElements.containsKey(childElement.getName())) {
                 elementList = new ArrayList<DmnExtensionElement>();
                 this.childElements.put(childElement.getName(), elementList);
             }

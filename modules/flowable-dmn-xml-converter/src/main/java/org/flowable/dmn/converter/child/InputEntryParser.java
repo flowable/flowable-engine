@@ -32,7 +32,7 @@ public class InputEntryParser extends BaseChildElementParser {
     }
 
     public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, DmnDefinition model) throws Exception {
-        if (parentElement instanceof DecisionRule == false)
+        if (!(parentElement instanceof DecisionRule))
             return;
 
         DecisionRule rule = (DecisionRule) parentElement;
@@ -42,7 +42,7 @@ public class InputEntryParser extends BaseChildElementParser {
 
         boolean readyWithInputEntry = false;
         try {
-            while (readyWithInputEntry == false && xtr.hasNext()) {
+            while (!readyWithInputEntry && xtr.hasNext()) {
                 xtr.next();
                 if (xtr.isStartElement() && ELEMENT_TEXT.equalsIgnoreCase(xtr.getLocalName())) {
                     inputEntry.setText(xtr.getElementText());

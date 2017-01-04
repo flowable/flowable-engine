@@ -530,7 +530,7 @@ public class BpmnAutoLayout {
           graphicInfo.setX(graphicInfo.getX() + subProcessX + subProcessMargin);
           graphicInfo.setY(graphicInfo.getY() + subProcessY + subProcessMargin);
         }
-      } else if (flowElement instanceof DataObject == false) {
+      } else if (!(flowElement instanceof DataObject)) {
 
         // Regular element
         GraphicInfo graphicInfo = bpmnModel.getLocationMap().get(flowElement.getId());

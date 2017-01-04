@@ -30,7 +30,7 @@ public class CancelEventDefinitionParser extends BaseChildElementParser {
   }
 
   public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-    if (parentElement instanceof Event == false)
+    if (!(parentElement instanceof Event))
       return;
 
     CancelEventDefinition eventDefinition = new CancelEventDefinition();

@@ -127,7 +127,7 @@ public class Context {
     ObjectNode definitionInfoNode = getProcessDefinitionInfoNode(processDefinitionId);
     ObjectNode localizationProperties = null;
     if (definitionInfoNode != null) {
-      if (useFallback == false) {
+      if (!useFallback) {
         localizationProperties = getProcessEngineConfiguration().getDynamicBpmnService().getLocalizationElementProperties(
             language, id, definitionInfoNode);
         
@@ -154,7 +154,7 @@ public class Context {
   
   protected static ObjectNode getProcessDefinitionInfoNode(String processDefinitionId) {
     Map<String, ObjectNode> bpmnOverrideMap = getBpmnOverrideContext();
-    if (bpmnOverrideMap.containsKey(processDefinitionId) == false) {
+    if (!bpmnOverrideMap.containsKey(processDefinitionId)) {
       ProcessDefinitionInfoCacheObject cacheObject = getProcessEngineConfiguration().getDeploymentManager()
           .getProcessDefinitionInfoCache()
           .get(processDefinitionId);

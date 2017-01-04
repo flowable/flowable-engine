@@ -34,7 +34,7 @@ public abstract class BaseChildElementParser implements DmnXMLConstants {
 
     protected void parseChildElements(XMLStreamReader xtr, DmnElement parentElement, DmnDefinition model, BaseChildElementParser parser) throws Exception {
         boolean readyWithChildElements = false;
-        while (readyWithChildElements == false && xtr.hasNext()) {
+        while (!readyWithChildElements && xtr.hasNext()) {
             xtr.next();
             if (xtr.isStartElement()) {
                 if (parser.getElementName().equals(xtr.getLocalName())) {

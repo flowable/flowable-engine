@@ -32,7 +32,7 @@ public class FormDeployer implements Deployer {
 
   @Override
   public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
-    if (deployment.isNew() == false) return;
+    if (!deployment.isNew()) return;
     
     log.debug("FormDeployer: processing deployment {}", deployment.getName());
 

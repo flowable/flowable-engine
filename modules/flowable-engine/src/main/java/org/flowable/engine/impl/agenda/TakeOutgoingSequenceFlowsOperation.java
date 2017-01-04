@@ -216,10 +216,10 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
     
     if (completeAdhocSubProcess) {
       boolean endAdhocSubProcess = true;
-      if (adhocSubProcess.isCancelRemainingInstances() == false) {
+      if (!adhocSubProcess.isCancelRemainingInstances()) {
         List<ExecutionEntity> childExecutions = commandContext.getExecutionEntityManager().findChildExecutionsByParentExecutionId(execution.getParentId());
         for (ExecutionEntity executionEntity : childExecutions) {
-          if (executionEntity.getId().equals(execution.getId()) == false) {
+          if (!executionEntity.getId().equals(execution.getId())) {
             endAdhocSubProcess = false;
             break;
           }

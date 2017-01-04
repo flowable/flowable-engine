@@ -94,7 +94,7 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
       }
     }
 
-    if (startEvent.getSubProcess() instanceof EventSubProcess && startEvent.isInterrupting() == false) {
+    if (startEvent.getSubProcess() instanceof EventSubProcess && !startEvent.isInterrupting()) {
       propertiesNode.put(PROPERTY_INTERRUPTING, false);
     } else {
       propertiesNode.put(PROPERTY_INTERRUPTING, true);
@@ -133,7 +133,7 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
       convertJsonToSignalDefinition(elementNode, startEvent);
     }
     
-    if (getPropertyValueAsBoolean(PROPERTY_INTERRUPTING, elementNode) == false) {
+    if (!getPropertyValueAsBoolean(PROPERTY_INTERRUPTING, elementNode)) {
       startEvent.setInterrupting(false);
     }
     

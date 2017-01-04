@@ -149,7 +149,7 @@ public class EndExecutionOperation extends AbstractOperation {
       for (FlowElement eventSubElement : eventSubProcess.getFlowElements()) {
         if (eventSubElement instanceof StartEvent) {
           StartEvent subStartEvent = (StartEvent) eventSubElement;
-          if (subStartEvent.isInterrupting() == false) {
+          if (!subStartEvent.isInterrupting()) {
             hasNonInterruptingStartEvent = true;
             break;
           }
@@ -272,7 +272,7 @@ public class EndExecutionOperation extends AbstractOperation {
         executionToContinue.setCurrentFlowElement(execution.getCurrentFlowElement());
         
       } else {
-        if (parentExecution.getId().equals(parentExecution.getProcessInstanceId()) == false) {
+        if (!parentExecution.getId().equals(parentExecution.getProcessInstanceId())) {
           // create a new execution to take the outgoing sequence flows
           executionToContinue = executionEntityManager.createChildExecution(parentExecution.getParent());
           executionToContinue.setCurrentFlowElement(parentExecution.getCurrentFlowElement());
@@ -295,7 +295,7 @@ public class EndExecutionOperation extends AbstractOperation {
     List<ExecutionEntity> activeChildExecutions = getActiveChildExecutionsForExecution(executionEntityManager, parentExecution.getId());
     boolean containsOtherChildExecutions = false;
     for (ExecutionEntity activeExecution : activeChildExecutions) {
-      if (activeExecution.getId().equals(execution.getId()) == false) {
+      if (!activeExecution.getId().equals(execution.getId())) {
         containsOtherChildExecutions = true;
       }
     }

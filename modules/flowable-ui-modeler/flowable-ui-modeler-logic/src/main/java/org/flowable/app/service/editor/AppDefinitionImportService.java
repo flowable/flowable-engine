@@ -75,7 +75,7 @@ public class AppDefinitionImportService {
       InputStream is = file.getInputStream();
       String fileName = file.getOriginalFilename();
       Model appModel = modelService.getModel(appDefId);
-      if (appModel.getModelType().equals(Model.MODEL_TYPE_APP) == false) {
+      if (!appModel.getModelType().equals(Model.MODEL_TYPE_APP)) {
         throw new BadRequestException("No app definition found for id " + appDefId);
       }
 
@@ -203,7 +203,7 @@ public class AppDefinitionImportService {
             } else if (zipEntryName.startsWith("decision-table-models/")) {
               decisionTableMap.put(modelFileName, json);
 
-            } else if (zipEntryName.contains("/") == false) {
+            } else if (!zipEntryName.contains("/")) {
               appDefinitionModel = createModelObject(json, Model.MODEL_TYPE_APP);
             }
           }
@@ -433,7 +433,7 @@ public class AppDefinitionImportService {
       model.setKey(modelNode.get("key").asText());
       
       JsonNode descriptionNode = modelNode.get("description");
-      if (descriptionNode != null && descriptionNode.isNull() == false) {
+      if (descriptionNode != null && !descriptionNode.isNull()) {
         model.setDescription(descriptionNode.asText());
       }
       

@@ -379,7 +379,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
     List<IdentityLinkEntity> removedIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
     for (IdentityLinkEntity identityLinkEntity : this.getIdentityLinks()) {
       if (IdentityLinkType.CANDIDATE.equals(identityLinkEntity.getType()) && 
-          identityLinkIds.contains(identityLinkEntity.getId()) == false) {
+          !identityLinkIds.contains(identityLinkEntity.getId())) {
         
         if ((userId != null && userId.equals(identityLinkEntity.getUserId()))
           || (groupId != null && groupId.equals(identityLinkEntity.getGroupId()))) {

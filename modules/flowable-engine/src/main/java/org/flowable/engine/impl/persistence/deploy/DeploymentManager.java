@@ -172,7 +172,7 @@ public class DeploymentManager {
   
   public AppModel getAppResourceModel(String deploymentId) {
     Object appResourceObject = getAppResourceObject(deploymentId);
-    if (appResourceObject instanceof AppModel == false) {
+    if (!(appResourceObject instanceof AppModel)) {
       throw new FlowableException("App resource is not of type AppModel");
     }
     

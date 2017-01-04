@@ -189,7 +189,7 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
           Iterator<String> fieldIdIterator = valuesNode.fieldNames();
           while (fieldIdIterator.hasNext()) {
             String fieldId = fieldIdIterator.next();
-            if (formInstanceMap.containsKey(fieldId) == false) {
+            if (!formInstanceMap.containsKey(fieldId)) {
   
               JsonNode valueNode = valuesNode.get(fieldId);
               formInstanceMap.put(fieldId, valueNode);

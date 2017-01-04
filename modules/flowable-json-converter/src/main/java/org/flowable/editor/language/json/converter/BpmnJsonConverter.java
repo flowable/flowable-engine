@@ -243,7 +243,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
     if (StringUtils.isNotEmpty(mainProcess.getDocumentation())) {
       propertiesNode.put(PROPERTY_DOCUMENTATION, mainProcess.getDocumentation());
     }
-    if (mainProcess.isExecutable() == false) {
+    if (!mainProcess.isExecutable()) {
       propertiesNode.put(PROPERTY_PROCESS_EXECUTABLE, "No");
     }
     if (StringUtils.isNoneEmpty(model.getTargetNamespace())) {
@@ -285,7 +285,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         ObjectNode poolPropertiesNode = objectMapper.createObjectNode();
         poolPropertiesNode.put(PROPERTY_OVERRIDE_ID, pool.getId());
         poolPropertiesNode.put(PROPERTY_PROCESS_ID, pool.getProcessRef());
-        if (pool.isExecutable() == false) {
+        if (!pool.isExecutable()) {
           poolPropertiesNode.put(PROPERTY_PROCESS_EXECUTABLE, PROPERTY_VALUE_NO);
         }
         if (StringUtils.isNotEmpty(pool.getName())) {
@@ -517,7 +517,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
       }
     }
 
-    if (nonEmptyPoolFound == false) {
+    if (!nonEmptyPoolFound) {
       Process process = new Process();
       bpmnModel.getProcesses().add(process);
       process.setId(BpmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_PROCESS_ID, modelNode));
@@ -766,7 +766,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
       for (JsonNode jsonChildNode : objectNode.get(EDITOR_CHILD_SHAPES)) {
 
         String stencilId = BpmnJsonConverterUtil.getStencilId(jsonChildNode);
-        if (STENCIL_SEQUENCE_FLOW.equals(stencilId) == false) {
+        if (!STENCIL_SEQUENCE_FLOW.equals(stencilId)) {
 
           GraphicInfo graphicInfo = new GraphicInfo();
 
@@ -814,7 +814,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
           String childEdgeId = BpmnJsonConverterUtil.getElementId(childNode);
           JsonNode targetNode = childNode.get("target");
-          if (targetNode != null && targetNode.isNull() == false) {
+          if (targetNode != null && !targetNode.isNull()) {
             String targetRefId = targetNode.get(EDITOR_SHAPE_ID).asText();
             List<JsonNode> sourceAndTargetList = new ArrayList<JsonNode>();
             sourceAndTargetList.add(sourceRefMap.get(childNode.get(EDITOR_SHAPE_ID).asText()));

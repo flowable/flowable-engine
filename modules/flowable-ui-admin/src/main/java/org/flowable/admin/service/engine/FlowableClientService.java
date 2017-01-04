@@ -634,7 +634,7 @@ public class FlowableClientService {
 
   public void addParameterToBuilder(String name, JsonNode bodyNode, URIBuilder builder) {
     JsonNode nameNode = bodyNode.get(name);
-    if (nameNode != null && nameNode.isNull() == false) {
+    if (nameNode != null && !nameNode.isNull()) {
       builder.addParameter(name, nameNode.asText());
       ((ObjectNode) bodyNode).remove(name);
     }

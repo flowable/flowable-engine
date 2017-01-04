@@ -263,7 +263,7 @@ public class AppDefinitionPublishService {
     String basicAuthUser = environment.getRequiredProperty("idm.admin.user");
     String basicAuthPassword = environment.getRequiredProperty("idm.admin.password");
 
-    if (deployApiUrl.endsWith("/") == false) {
+    if (!deployApiUrl.endsWith("/")) {
       deployApiUrl = deployApiUrl.concat("/");
     }
     deployApiUrl = deployApiUrl.concat(String.format("repository/deployments?deploymentKey=%s&deploymentName=%s", 

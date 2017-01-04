@@ -53,7 +53,7 @@ public class GetPotentialStarterUsersCmd implements Command<List<User>>, Seriali
     for (IdentityLink identityLink : identityLinks) {
       if (identityLink.getUserId() != null && identityLink.getUserId().length() > 0) {
         
-        if (userIds.contains(identityLink.getUserId()) == false) {
+        if (!userIds.contains(identityLink.getUserId())) {
           userIds.add(identityLink.getUserId());
         }
       }

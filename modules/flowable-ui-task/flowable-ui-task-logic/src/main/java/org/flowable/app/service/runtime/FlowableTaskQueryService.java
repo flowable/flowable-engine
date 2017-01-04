@@ -102,7 +102,7 @@ public class FlowableTaskQueryService {
     }
 
     JsonNode deploymentKeyNode = requestNode.get("deploymentKey");
-    if (deploymentKeyNode != null && deploymentKeyNode.isNull() == false) {
+    if (deploymentKeyNode != null && !deploymentKeyNode.isNull()) {
       List<Deployment> deployments = repositoryService.createDeploymentQuery().deploymentKey(deploymentKeyNode.asText()).list();
       List<String> deploymentIds = new ArrayList<String>(deployments.size());
       for (Deployment deployment : deployments) {
@@ -116,32 +116,32 @@ public class FlowableTaskQueryService {
     }
 
     JsonNode processInstanceIdNode = requestNode.get("processInstanceId");
-    if (processInstanceIdNode != null && processInstanceIdNode.isNull() == false) {
+    if (processInstanceIdNode != null && !processInstanceIdNode.isNull()) {
       handleProcessInstanceFiltering(currentUser, taskInfoQueryWrapper, processInstanceIdNode);
     }
 
     JsonNode textNode = requestNode.get("text");
-    if (textNode != null && textNode.isNull() == false) {
+    if (textNode != null && !textNode.isNull()) {
       handleTextFiltering(taskInfoQueryWrapper, textNode);
     }
 
     JsonNode assignmentNode = requestNode.get("assignment");
-    if (assignmentNode != null && assignmentNode.isNull() == false) {
+    if (assignmentNode != null && !assignmentNode.isNull()) {
       handleAssignment(taskInfoQueryWrapper, assignmentNode, currentUser);
     }
 
     JsonNode processDefinitionNode = requestNode.get("processDefinitionId");
-    if (processDefinitionNode != null && processDefinitionNode.isNull() == false) {
+    if (processDefinitionNode != null && !processDefinitionNode.isNull()) {
       handleProcessDefinition(taskInfoQueryWrapper, processDefinitionNode);
     }
 
     JsonNode dueBeforeNode = requestNode.get("dueBefore");
-    if (dueBeforeNode != null && dueBeforeNode.isNull() == false) {
+    if (dueBeforeNode != null && !dueBeforeNode.isNull()) {
       handleDueBefore(taskInfoQueryWrapper, dueBeforeNode);
     }
 
     JsonNode dueAfterNode = requestNode.get("dueAfter");
-    if (dueAfterNode != null && dueAfterNode.isNull() == false) {
+    if (dueAfterNode != null && !dueAfterNode.isNull()) {
       handleDueAfter(taskInfoQueryWrapper, dueAfterNode);
     }
 

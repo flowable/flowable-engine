@@ -193,7 +193,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
                     throw new DmnXMLException("Error reading XML", e);
                 }
 
-                if (xtr.isStartElement() == false) {
+                if (!xtr.isStartElement()) {
                     continue;
                 }
 

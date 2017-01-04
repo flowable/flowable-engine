@@ -51,7 +51,7 @@ public class SaveContentItemCmd implements Command<Void>, Serializable {
       throw new FlowableIllegalArgumentException("contentItem is null");
     }
     
-    if (contentItem instanceof ContentItemEntity == false) {
+    if (!(contentItem instanceof ContentItemEntity)) {
       throw new FlowableIllegalArgumentException("contentItem is not of type ContentItemEntity");
     }
     

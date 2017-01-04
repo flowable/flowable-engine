@@ -167,7 +167,7 @@ public class DmnJsonConverter {
     // input expressions
     JsonNode inputExpressions = modelNode.get("inputExpressions");
 
-    if (inputExpressions != null && inputExpressions.isNull() == false) {
+    if (inputExpressions != null && !inputExpressions.isNull()) {
 
       for (JsonNode inputExpressionNode : inputExpressions) {
 
@@ -195,7 +195,7 @@ public class DmnJsonConverter {
     // output expressions
     JsonNode outputExpressions = modelNode.get("outputExpressions");
 
-    if (outputExpressions != null && outputExpressions.isNull() == false) {
+    if (outputExpressions != null && !outputExpressions.isNull()) {
 
       for (JsonNode outputExpressionNode : outputExpressions) {
 
@@ -218,7 +218,7 @@ public class DmnJsonConverter {
     // rules
     JsonNode rules = modelNode.get("rules");
 
-    if (rules != null && rules.isNull() == false) {
+    if (rules != null && !rules.isNull()) {
 
       int ruleCounter = 1;
 

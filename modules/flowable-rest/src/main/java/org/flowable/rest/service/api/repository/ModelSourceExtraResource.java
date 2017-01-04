@@ -71,7 +71,7 @@ public class ModelSourceExtraResource extends BaseModelSourceResource {
     if (model != null) {
       try {
 
-        if (request instanceof MultipartHttpServletRequest == false) {
+        if (!(request instanceof MultipartHttpServletRequest)) {
           throw new FlowableIllegalArgumentException("Multipart request is required");
         }
 

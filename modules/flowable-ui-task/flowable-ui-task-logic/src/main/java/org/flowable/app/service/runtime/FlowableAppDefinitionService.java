@@ -59,7 +59,7 @@ public class FlowableAppDefinitionService {
     List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
     for (Deployment deployment : deployments) {
       if (deployment.getKey() != null) {
-        if (deploymentMap.containsKey(deployment.getKey()) == false) {
+        if (!deploymentMap.containsKey(deployment.getKey())) {
           deploymentMap.put(deployment.getKey(), deployment);
         } else if (deploymentMap.get(deployment.getKey()).getDeploymentTime().before(deployment.getDeploymentTime())) {
           deploymentMap.put(deployment.getKey(), deployment);

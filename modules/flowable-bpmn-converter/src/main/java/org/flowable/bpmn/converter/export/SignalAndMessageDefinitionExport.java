@@ -26,7 +26,7 @@ public class SignalAndMessageDefinitionExport implements BpmnXMLConstants {
           if (eventDefinition instanceof SignalEventDefinition) {
             SignalEventDefinition signalEvent = (SignalEventDefinition) eventDefinition;
             if (StringUtils.isNotEmpty(signalEvent.getSignalRef())) {
-              if (model.containsSignalId(signalEvent.getSignalRef()) == false) {
+              if (!model.containsSignalId(signalEvent.getSignalRef())) {
                 Signal signal = new Signal(signalEvent.getSignalRef(), signalEvent.getSignalRef());
                 model.addSignal(signal);
               }
@@ -35,7 +35,7 @@ public class SignalAndMessageDefinitionExport implements BpmnXMLConstants {
           } else if (eventDefinition instanceof MessageEventDefinition) {
             MessageEventDefinition messageEvent = (MessageEventDefinition) eventDefinition;
             if (StringUtils.isNotEmpty(messageEvent.getMessageRef())) {
-              if (model.containsMessageId(messageEvent.getMessageRef()) == false) {
+              if (!model.containsMessageId(messageEvent.getMessageRef())) {
                 Message message = new Message(messageEvent.getMessageRef(), messageEvent.getMessageRef(), null);
                 model.addMessage(message);
               }

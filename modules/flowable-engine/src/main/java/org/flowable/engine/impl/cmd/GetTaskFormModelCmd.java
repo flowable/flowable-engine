@@ -50,7 +50,7 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
 
   public FormModel execute(CommandContext commandContext) {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-    if (processEngineConfiguration.isFormEngineInitialized() == false) {
+    if (!processEngineConfiguration.isFormEngineInitialized()) {
       throw new FlowableIllegalArgumentException("Form engine is not initialized");
     }
     
@@ -101,7 +101,7 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
   }
   
   protected void fetchRelatedContentInfoIfNeeded(FormModel formModel, ProcessEngineConfigurationImpl processEngineConfiguration) {
-    if (processEngineConfiguration.isContentEngineInitialized() == false) {
+    if (!processEngineConfiguration.isContentEngineInitialized()) {
       return;
     }
     

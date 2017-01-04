@@ -27,7 +27,7 @@ public class DmnJsonConverterUtil {
   public static String getValueAsString(String name, JsonNode objectNode) {
     String propertyValue = null;
     JsonNode jsonNode = objectNode.get(name);
-    if (jsonNode != null && jsonNode.isNull() == false) {
+    if (jsonNode != null && !jsonNode.isNull()) {
       propertyValue = jsonNode.asText();
     }
     return propertyValue;

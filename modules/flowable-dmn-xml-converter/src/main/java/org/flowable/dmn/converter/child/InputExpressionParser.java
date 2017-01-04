@@ -29,7 +29,7 @@ public class InputExpressionParser extends BaseChildElementParser {
     }
 
     public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, DmnDefinition model) throws Exception {
-        if (parentElement instanceof InputClause == false)
+        if (!(parentElement instanceof InputClause))
             return;
 
         InputClause clause = (InputClause) parentElement;
@@ -39,7 +39,7 @@ public class InputExpressionParser extends BaseChildElementParser {
 
         boolean readyWithInputExpression = false;
         try {
-            while (readyWithInputExpression == false && xtr.hasNext()) {
+            while (!readyWithInputExpression && xtr.hasNext()) {
                 xtr.next();
                 if (xtr.isStartElement() && ELEMENT_TEXT.equalsIgnoreCase(xtr.getLocalName())) {
                     inputExpression.setText(xtr.getElementText());

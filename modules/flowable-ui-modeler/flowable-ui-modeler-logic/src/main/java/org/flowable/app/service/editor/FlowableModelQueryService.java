@@ -110,7 +110,7 @@ public class FlowableModelQueryService {
     if (CollectionUtils.isNotEmpty(models)) {
       List<String> addedModelIds = new ArrayList<String>();
       for (Model model : models) {
-        if (addedModelIds.contains(model.getId()) == false) {
+        if (!addedModelIds.contains(model.getId())) {
           addedModelIds.add(model.getId());
           ModelRepresentation representation = createModelRepresentation(model);
           resultList.add(representation);
@@ -133,7 +133,7 @@ public class FlowableModelQueryService {
 
     if (CollectionUtils.isNotEmpty(models)) {
       for (Model model : models) {
-        if (addedModelIds.contains(model.getId()) == false) {
+        if (!addedModelIds.contains(model.getId())) {
           addedModelIds.add(model.getId());
           ModelRepresentation representation = createModelRepresentation(model);
           resultList.add(representation);

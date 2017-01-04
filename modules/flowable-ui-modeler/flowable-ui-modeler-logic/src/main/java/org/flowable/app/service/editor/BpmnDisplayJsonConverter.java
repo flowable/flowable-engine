@@ -228,7 +228,7 @@ public class BpmnDisplayJsonConverter {
           
         } else if (element instanceof StartEvent) {
           StartEvent startEvent = (StartEvent) element;
-          if (startEvent.getSubProcess() instanceof EventSubProcess && startEvent.isInterrupting() == false) {
+          if (startEvent.getSubProcess() instanceof EventSubProcess && !startEvent.isInterrupting()) {
             elementNode.put("interrupting", false);
           } else {
             elementNode.put("interrupting", true);

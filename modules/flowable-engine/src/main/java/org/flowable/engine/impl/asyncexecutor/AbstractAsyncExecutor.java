@@ -125,7 +125,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
   protected abstract void startAdditionalComponents();
   
   protected void executeTemporaryJobs() {
-    while (temporaryJobQueue.isEmpty() == false) {
+    while (!temporaryJobQueue.isEmpty()) {
       Job job = temporaryJobQueue.pop();
       executeAsyncJob(job);
     }

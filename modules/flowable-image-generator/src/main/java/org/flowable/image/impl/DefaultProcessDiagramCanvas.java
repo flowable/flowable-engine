@@ -205,7 +205,7 @@ public class DefaultProcessDiagramCanvas {
     }
     
     this.g = processDiagram.createGraphics();
-    if ("png".equalsIgnoreCase(imageType) == false) {
+    if (!"png".equalsIgnoreCase(imageType)) {
       this.g.setBackground(new Color(255, 255, 255, 0));
       this.g.clearRect(0, 0, canvasWidth, canvasHeight);
     }
@@ -403,7 +403,7 @@ public class DefaultProcessDiagramCanvas {
     g.fill(outerCircle);
 
     g.setPaint(EVENT_BORDER_COLOR);
-    if (isInterrupting == false) 
+    if (!isInterrupting)
       g.setStroke(NON_INTERRUPTING_EVENT_STROKE);
     g.draw(outerCircle);
     g.setStroke(originalStroke);
@@ -1118,7 +1118,7 @@ public class DefaultProcessDiagramCanvas {
     int boxX = x + width/2 - boxWidth/2;
     int boxY = y + height/2 - boxHeight/2;
     
-    if (text != null && text.isEmpty() == false) {
+    if (text != null && !text.isEmpty()) {
       drawMultilineAnnotationText(text, boxX, boxY, boxWidth, boxHeight);
     }
 	  

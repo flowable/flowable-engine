@@ -84,7 +84,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
     if (idmAppUrl == null || idmAppUrl.isEmpty()) {
       idmAppUrl = env.getRequiredProperty("idm.app.url");
     }
-    if (idmAppUrl.endsWith("/") == false) {
+    if (!idmAppUrl.endsWith("/")) {
       idmAppUrl += "/";
     }
   }
@@ -134,7 +134,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-    if (skipAuthenticationCheck(request) == false) {
+    if (!skipAuthenticationCheck(request)) {
       RemoteToken token = getValidToken(request);
       if (token != null) {
         onValidTokenFound(request, response, token);
@@ -165,7 +165,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
           
           try {
             RemoteToken token = tokenCache.get(tokens[0]);
-            if (token.getValue().equals(tokens[1]) == false) {
+            if (!token.getValue().equals(tokens[1])) {
               // refetch the token from the database
               tokenCache.invalidate(tokens[0]);
               token = tokenCache.get(tokens[0]);

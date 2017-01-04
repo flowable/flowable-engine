@@ -67,7 +67,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
   protected Void execute(CommandContext commandContext, TaskEntity task) {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-    if (processEngineConfiguration.isFormEngineInitialized() == false) {
+    if (!processEngineConfiguration.isFormEngineInitialized()) {
       throw new FlowableIllegalArgumentException("Form engine is not initialized");
     }
     
@@ -98,7 +98,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
    */
   protected void processUploadFieldsIfNeeded(FormModel formModel, TaskEntity task, CommandContext commandContext) {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-    if (processEngineConfiguration.isContentEngineInitialized() == false) {
+    if (!processEngineConfiguration.isContentEngineInitialized()) {
       return;
     }
     

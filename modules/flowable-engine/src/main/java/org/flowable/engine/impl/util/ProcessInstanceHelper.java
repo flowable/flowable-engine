@@ -216,13 +216,13 @@ public class ProcessInstanceHelper {
     List<SignalEventSubscriptionEntity> signalEventSubscriptions = new LinkedList<>();
     
     for (FlowElement flowElement : process.getFlowElements()) {
-      if (flowElement instanceof EventSubProcess == false) {
+      if (!(flowElement instanceof EventSubProcess)) {
         continue;
       }
       
       EventSubProcess eventSubProcess = (EventSubProcess) flowElement;
       for (FlowElement subElement : eventSubProcess.getFlowElements()) {
-        if (subElement instanceof StartEvent == false) {
+        if (!(subElement instanceof StartEvent)) {
           continue;
         }
           

@@ -54,7 +54,7 @@ public class FieldExtensionParser extends BaseChildElementParser {
     } else {
       boolean readyWithFieldExtension = false;
       try {
-        while (readyWithFieldExtension == false && xtr.hasNext()) {
+        while (!readyWithFieldExtension && xtr.hasNext()) {
           xtr.next();
           if (xtr.isStartElement() && ELEMENT_FIELD_STRING.equalsIgnoreCase(xtr.getLocalName())) {
             extension.setStringValue(xtr.getElementText().trim());

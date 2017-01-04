@@ -53,7 +53,7 @@ public class GetPotentialStarterGroupsCmd implements Command<List<Group>>, Seria
     for (IdentityLink identityLink : identityLinks) {
       if (identityLink.getGroupId() != null && identityLink.getGroupId().length() > 0) {
         
-        if (groupIds.contains(identityLink.getGroupId()) == false) {
+        if (!groupIds.contains(identityLink.getGroupId())) {
           groupIds.add(identityLink.getGroupId());
         }
       }

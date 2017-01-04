@@ -30,7 +30,7 @@ public class OutputClauseParser extends BaseChildElementParser {
     }
 
     public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, DmnDefinition model) throws Exception {
-        if (parentElement instanceof DecisionTable == false)
+        if (!(parentElement instanceof DecisionTable))
             return;
 
         DecisionTable decisionTable = (DecisionTable) parentElement;

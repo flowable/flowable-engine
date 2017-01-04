@@ -75,7 +75,7 @@ public class BoundaryCancelEventActivityBehavior extends BoundaryEventActivityBe
           ExecutionEntity miExecution = subProcessExecution.getParent();
           List<ExecutionEntity> miChildExecutions = executionEntityManager.findChildExecutionsByParentExecutionId(miExecution.getId());
           for (ExecutionEntity miChildExecution : miChildExecutions) {
-            if (subProcessExecution.getId().equals(miChildExecution.getId()) == false && activity.getId().equals(miChildExecution.getCurrentActivityId())) {
+            if (!subProcessExecution.getId().equals(miChildExecution.getId()) && activity.getId().equals(miChildExecution.getCurrentActivityId())) {
               executionEntityManager.deleteExecutionAndRelatedData(miChildExecution, deleteReason, false);
             }
           }

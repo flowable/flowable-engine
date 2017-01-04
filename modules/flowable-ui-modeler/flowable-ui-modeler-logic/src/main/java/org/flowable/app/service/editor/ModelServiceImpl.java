@@ -158,7 +158,7 @@ public class ModelServiceImpl implements ModelService {
     
     List<Model> models = modelRepository.findByKeyAndType(key, modelType);
     for (Model modelInfo : models) {
-      if (model == null || modelInfo.getId().equals(model.getId()) == false) {
+      if (model == null || !modelInfo.getId().equals(model.getId())) {
         modelKeyResponse.setKeyAlreadyExists(true);
         modelKeyResponse.setId(modelInfo.getId());
         modelKeyResponse.setName(modelInfo.getName());
@@ -281,7 +281,7 @@ public class ModelServiceImpl implements ModelService {
   protected Model internalSave(String name, String key, String description, String editorJson, boolean newVersion, 
       String newVersionComment, byte[] imageBytes, User updatedBy, Model modelObject) {
 
-    if (newVersion == false) {
+    if (!newVersion) {
 
       modelObject.setLastUpdated(new Date());
       modelObject.setLastUpdatedBy(updatedBy.getId());

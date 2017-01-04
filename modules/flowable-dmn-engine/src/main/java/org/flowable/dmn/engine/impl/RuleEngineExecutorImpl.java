@@ -107,7 +107,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
 
         Boolean ruleResult = executeRule(ruleRowCounter, rule, executionContext, validConclusionsStack);
 
-        if (shouldContinueEvaluating(decisionTable.getHitPolicy(), ruleResult) == false) {
+        if (!shouldContinueEvaluating(decisionTable.getHitPolicy(), ruleResult)) {
           break;
         }
 
@@ -195,7 +195,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
       }
 
       // exit evaluation loop if a condition is evaluated false
-      if (conditionResult == false) {
+      if (!conditionResult) {
         break;
       }
     }

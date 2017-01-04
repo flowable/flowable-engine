@@ -70,7 +70,7 @@ public class BpmnModel {
   public void addDefinitionsAttribute(ExtensionAttribute attribute) {
     if (attribute != null && StringUtils.isNotEmpty(attribute.getName())) {
       List<ExtensionAttribute> attributeList = null;
-      if (this.definitionsAttributes.containsKey(attribute.getName()) == false) {
+      if (!this.definitionsAttributes.containsKey(attribute.getName())) {
         attributeList = new ArrayList<ExtensionAttribute>();
         this.definitionsAttributes.put(attribute.getName(), attributeList);
       }
@@ -106,7 +106,7 @@ public class BpmnModel {
         }
       }
 
-      if (poolRef == null && foundPool == false) {
+      if (poolRef == null && !foundPool) {
         return process;
       } else if (poolRef != null && foundPool) {
         return process;

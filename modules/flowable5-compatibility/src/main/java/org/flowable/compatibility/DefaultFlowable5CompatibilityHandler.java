@@ -773,7 +773,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
   
   public void messageEventReceived(String messageName, String executionId, Map<String, Object> processVariables, boolean async) {
     try {
-      if (async == false) {
+      if (!async) {
         getProcessEngine().getRuntimeService().messageEventReceived(messageName, executionId, processVariables);
       } else {
         getProcessEngine().getRuntimeService().messageEventReceivedAsync(messageName, executionId);

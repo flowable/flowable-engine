@@ -62,7 +62,7 @@ public abstract class BaseElement implements HasExtensionAttributes {
   public void addExtensionElement(ExtensionElement extensionElement) {
     if (extensionElement != null && StringUtils.isNotEmpty(extensionElement.getName())) {
       List<ExtensionElement> elementList = null;
-      if (this.extensionElements.containsKey(extensionElement.getName()) == false) {
+      if (!this.extensionElements.containsKey(extensionElement.getName())) {
         elementList = new ArrayList<ExtensionElement>();
         this.extensionElements.put(extensionElement.getName(), elementList);
       }
@@ -95,7 +95,7 @@ public abstract class BaseElement implements HasExtensionAttributes {
   public void addAttribute(ExtensionAttribute attribute) {
     if (attribute != null && StringUtils.isNotEmpty(attribute.getName())) {
       List<ExtensionAttribute> attributeList = null;
-      if (this.attributes.containsKey(attribute.getName()) == false) {
+      if (!this.attributes.containsKey(attribute.getName())) {
         attributeList = new ArrayList<ExtensionAttribute>();
         this.attributes.put(attribute.getName(), attributeList);
       }
