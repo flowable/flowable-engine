@@ -29,7 +29,7 @@ public class DefinitionsRootExport implements BpmnXMLConstants {
 
   /** default namespaces for definitions */
   protected static final Set<String> defaultNamespaces = new HashSet<String>(
-      Arrays.asList(XSI_PREFIX, XSD_PREFIX, ACTIVITI_EXTENSIONS_PREFIX, BPMNDI_PREFIX, OMGDC_PREFIX, OMGDI_PREFIX));
+      Arrays.asList(XSI_PREFIX, XSD_PREFIX, FLOWABLE_EXTENSIONS_PREFIX, BPMNDI_PREFIX, OMGDC_PREFIX, OMGDI_PREFIX));
   
   protected static final List<ExtensionAttribute> defaultAttributes = Arrays.asList(
       new ExtensionAttribute(TYPE_LANGUAGE_ATTRIBUTE), 
@@ -47,7 +47,7 @@ public class DefinitionsRootExport implements BpmnXMLConstants {
     xtw.writeDefaultNamespace(BPMN2_NAMESPACE);
     xtw.writeNamespace(XSI_PREFIX, XSI_NAMESPACE);
     xtw.writeNamespace(XSD_PREFIX, SCHEMA_NAMESPACE);
-    xtw.writeNamespace(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE);
+    xtw.writeNamespace(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE);
     xtw.writeNamespace(BPMNDI_PREFIX, BPMNDI_NAMESPACE);
     xtw.writeNamespace(OMGDC_PREFIX, OMGDC_NAMESPACE);
     xtw.writeNamespace(OMGDI_PREFIX, OMGDI_NAMESPACE);

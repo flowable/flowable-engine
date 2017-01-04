@@ -39,11 +39,11 @@ public class BusinessRuleTaskXMLConverter extends BaseBpmnXMLConverter {
   protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
     BusinessRuleTask businessRuleTask = new BusinessRuleTask();
     BpmnXMLUtil.addXMLLocation(businessRuleTask, xtr);
-    businessRuleTask.setInputVariables(parseDelimitedList(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_RULE_VARIABLES_INPUT)));
-    businessRuleTask.setRuleNames(parseDelimitedList(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_RULE_RULES)));
-    businessRuleTask.setResultVariableName(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_RULE_RESULT_VARIABLE));
-    businessRuleTask.setClassName(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_RULE_CLASS));
-    String exclude = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_RULE_EXCLUDE);
+    businessRuleTask.setInputVariables(parseDelimitedList(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_RULE_VARIABLES_INPUT, xtr)));
+    businessRuleTask.setRuleNames(parseDelimitedList(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_RULE_RULES, xtr)));
+    businessRuleTask.setResultVariableName(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_RULE_RESULT_VARIABLE, xtr));
+    businessRuleTask.setClassName(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_RULE_CLASS, xtr));
+    String exclude = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_RULE_EXCLUDE, xtr);
     if (ATTRIBUTE_VALUE_TRUE.equalsIgnoreCase(exclude)) {
       businessRuleTask.setExclude(true);
     }

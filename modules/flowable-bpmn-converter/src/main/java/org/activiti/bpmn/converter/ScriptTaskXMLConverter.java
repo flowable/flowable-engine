@@ -52,11 +52,11 @@ public class ScriptTaskXMLConverter extends BaseBpmnXMLConverter {
     ScriptTask scriptTask = new ScriptTask();
     BpmnXMLUtil.addXMLLocation(scriptTask, xtr);
     scriptTask.setScriptFormat(xtr.getAttributeValue(null, ATTRIBUTE_TASK_SCRIPT_FORMAT));
-    scriptTask.setResultVariable(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_SCRIPT_RESULTVARIABLE));
+    scriptTask.setResultVariable(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SCRIPT_RESULTVARIABLE, xtr));
     if (StringUtils.isEmpty(scriptTask.getResultVariable())) {
-      scriptTask.setResultVariable(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_SERVICE_RESULTVARIABLE));
+      scriptTask.setResultVariable(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_RESULTVARIABLE, xtr));
     }
-    String autoStoreVariables = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE);
+    String autoStoreVariables = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE, xtr);
     if (StringUtils.isNotEmpty(autoStoreVariables)) {
       scriptTask.setAutoStoreVariables(Boolean.valueOf(autoStoreVariables));
     }

@@ -179,6 +179,15 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
     return extensionElement;
   }
   
+  public static String getAttributeValue(String attributeName, XMLStreamReader xtr) {
+    String attributeValue = xtr.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, attributeName);
+    if (attributeValue == null) {
+      attributeValue = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, attributeName);
+    }
+
+    return attributeValue;
+  }
+  
   public static void writeDefaultAttribute(String attributeName, String value, XMLStreamWriter xtw) throws Exception {
     if (StringUtils.isNotEmpty(value) && "null".equalsIgnoreCase(value) == false) {
       xtw.writeAttribute(attributeName, value);
@@ -187,7 +196,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
   
   public static void writeQualifiedAttribute(String attributeName, String value, XMLStreamWriter xtw) throws Exception {
     if (StringUtils.isNotEmpty(value)) {
-      xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, attributeName, value);
+      xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, attributeName, value);
     }
   }
   
@@ -393,11 +402,15 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
       for (List<ExtensionAttribute> blackList : blackLists) {
         for (ExtensionAttribute blackAttribute : blackList) {
           if (blackAttribute.getName().equals(attribute.getName())) {
-            if ( blackAttribute.getNamespace() != null && attribute.getNamespace() != null
-                && blackAttribute.getNamespace().equals(attribute.getNamespace()))
+            if (attribute.getNamespace() != null && (FLOWABLE_EXTENSIONS_NAMESPACE.equals(attribute.getNamespace()) || 
+                ACTIVITI_EXTENSIONS_NAMESPACE.equals(attribute.getNamespace()))) {
+              
               return true;
-            if (blackAttribute.getNamespace() == null && attribute.getNamespace() == null)
+            }
+            
+            if (blackAttribute.getNamespace() == null && attribute.getNamespace() == null) {
               return true;
+            }
           }
         }
       }

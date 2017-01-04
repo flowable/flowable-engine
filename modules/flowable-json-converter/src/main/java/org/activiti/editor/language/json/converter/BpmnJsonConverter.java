@@ -21,12 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import math.geom2d.Point2D;
-import math.geom2d.conic.Circle2D;
-import math.geom2d.curve.AbstractContinuousCurve2D;
-import math.geom2d.line.Line2D;
-import math.geom2d.polygon.Polyline2D;
-
 import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.Artifact;
 import org.activiti.bpmn.model.BaseElement;
@@ -64,6 +58,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import math.geom2d.Point2D;
+import math.geom2d.conic.Circle2D;
+import math.geom2d.curve.AbstractContinuousCurve2D;
+import math.geom2d.line.Line2D;
+import math.geom2d.polygon.Polyline2D;
+
 /**
  * @author Tijs Rademakers
  */
@@ -78,7 +78,6 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
     protected static Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap = 
             new HashMap<String, Class<? extends BaseBpmnJsonConverter>>();
     
-    public final static String MODELER_NAMESPACE = "http://activiti.com/modeler";
     protected final static DateFormat defaultFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     protected final static DateFormat entFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 
@@ -418,7 +417,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         
         BpmnModel bpmnModel = new BpmnModel();
         
-        bpmnModel.setTargetNamespace("http://activiti.org/test");
+        bpmnModel.setTargetNamespace("http://flowable.org/model");
         Map<String, JsonNode> shapeMap = new HashMap<String, JsonNode>();
         Map<String, JsonNode> sourceRefMap = new HashMap<String, JsonNode>();
         Map<String, JsonNode> edgeMap = new HashMap<String, JsonNode>();

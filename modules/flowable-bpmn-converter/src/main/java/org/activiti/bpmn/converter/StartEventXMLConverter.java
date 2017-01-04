@@ -38,7 +38,7 @@ public class StartEventXMLConverter extends BaseBpmnXMLConverter {
   
   @Override
   protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
-    String formKey = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORM_FORMKEY);
+    String formKey = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_FORM_FORMKEY, xtr);
     StartEvent startEvent = null;
     if (StringUtils.isNotEmpty(formKey)) {
       if (model.getStartEventFormTypes() != null && model.getStartEventFormTypes().contains(formKey)) {
@@ -49,7 +49,7 @@ public class StartEventXMLConverter extends BaseBpmnXMLConverter {
       startEvent = new StartEvent();
     }
     BpmnXMLUtil.addXMLLocation(startEvent, xtr);
-    startEvent.setInitiator(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_EVENT_START_INITIATOR));
+    startEvent.setInitiator(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_EVENT_START_INITIATOR, xtr));
     startEvent.setFormKey(formKey);
     
     parseChildElements(getXMLElementName(), startEvent, model, xtr);

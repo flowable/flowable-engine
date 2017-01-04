@@ -124,7 +124,7 @@ public class ValuedDataObjectXMLConverter extends BaseBpmnXMLConverter {
         didWriteExtensionStartElement = true;
       }
 
-      xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, ELEMENT_DATA_VALUE, ACTIVITI_EXTENSIONS_NAMESPACE);
+      xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_DATA_VALUE, FLOWABLE_EXTENSIONS_NAMESPACE);
       if (dataObject.getValue() != null) {
         String value = null;
         if (dataObject instanceof DateDataObject) {

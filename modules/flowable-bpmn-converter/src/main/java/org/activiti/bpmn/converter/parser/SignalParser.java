@@ -30,7 +30,7 @@ public class SignalParser implements BpmnXMLConstants {
     
     Signal signal = new Signal(signalId, signalName);
     
-    String scope = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_SCOPE);
+    String scope = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_SCOPE, xtr);
     if (scope != null) {
       signal.setScope(scope);
     }

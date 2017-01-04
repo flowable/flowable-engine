@@ -27,6 +27,8 @@ public interface BpmnXMLConstants {
   public static final String EXPRESSION_LANGUAGE_ATTRIBUTE = "expressionLanguage";
   public static final String PROCESS_NAMESPACE = "http://www.activiti.org/test";
   public static final String TARGET_NAMESPACE_ATTRIBUTE = "targetNamespace";
+  public static final String FLOWABLE_EXTENSIONS_NAMESPACE = "http://flowable.org/bpmn";
+  public static final String FLOWABLE_EXTENSIONS_PREFIX = "flowable";
   public static final String ACTIVITI_EXTENSIONS_NAMESPACE = "http://activiti.org/bpmn";
   public static final String ACTIVITI_EXTENSIONS_PREFIX = "activiti";
   public static final String BPMNDI_NAMESPACE = "http://www.omg.org/spec/BPMN/20100524/DI";

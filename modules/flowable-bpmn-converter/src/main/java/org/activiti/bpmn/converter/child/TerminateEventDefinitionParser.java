@@ -36,7 +36,7 @@ public class TerminateEventDefinitionParser extends BaseChildElementParser {
     
     TerminateEventDefinition eventDefinition = new TerminateEventDefinition();
     
-    String terminateAllValue = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TERMINATE_ALL);
+    String terminateAllValue = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TERMINATE_ALL, xtr);
     if (terminateAllValue != null && "true".equals(terminateAllValue)) {
     	eventDefinition.setTerminateAll(true);
     } else {

@@ -56,7 +56,7 @@ public class ActivitiListenerExport implements BpmnXMLConstants {
           didWriteExtensionStartElement = true;
         }
   			
-  			 xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, ELEMENT_EVENT_LISTENER, ACTIVITI_EXTENSIONS_NAMESPACE);
+  			 xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_EVENT_LISTENER, FLOWABLE_EXTENSIONS_NAMESPACE);
   			 BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_EVENTS, eventListener.getEvents(), xtw);
   			 BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_ENTITY_TYPE, eventListener.getEntityType(), xtw);
   			 
@@ -102,7 +102,7 @@ public class ActivitiListenerExport implements BpmnXMLConstants {
             didWriteExtensionStartElement = true;
           }
           
-          xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, xmlElementName, ACTIVITI_EXTENSIONS_NAMESPACE);
+          xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, xmlElementName, FLOWABLE_EXTENSIONS_NAMESPACE);
           BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_EVENT, listener.getEvent(), xtw);
           
           if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(listener.getImplementationType())) {

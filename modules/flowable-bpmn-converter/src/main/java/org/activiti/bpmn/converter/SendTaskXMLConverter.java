@@ -41,7 +41,7 @@ public class SendTaskXMLConverter extends BaseBpmnXMLConverter {
   protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
 		SendTask sendTask = new SendTask();
 		BpmnXMLUtil.addXMLLocation(sendTask, xtr);
-		sendTask.setType(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_TYPE));
+		sendTask.setType(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TYPE, xtr));
 		
 		if ("##WebService".equals(xtr.getAttributeValue(null, ATTRIBUTE_TASK_IMPLEMENTATION))) {
 		  sendTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_WEBSERVICE);

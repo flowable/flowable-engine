@@ -31,8 +31,8 @@ public class ProcessExport implements BpmnXMLConstants {
       new ExtensionAttribute(ATTRIBUTE_ID),
       new ExtensionAttribute(ATTRIBUTE_NAME),
       new ExtensionAttribute(ATTRIBUTE_PROCESS_EXECUTABLE),
-      new ExtensionAttribute(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_PROCESS_CANDIDATE_USERS),
-      new ExtensionAttribute(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_PROCESS_CANDIDATE_GROUPS)
+      new ExtensionAttribute(ATTRIBUTE_PROCESS_CANDIDATE_USERS),
+      new ExtensionAttribute(ATTRIBUTE_PROCESS_CANDIDATE_GROUPS)
   );
 
   @SuppressWarnings("unchecked")
@@ -48,12 +48,12 @@ public class ProcessExport implements BpmnXMLConstants {
     xtw.writeAttribute(ATTRIBUTE_PROCESS_EXECUTABLE, Boolean.toString(process.isExecutable()));
 
     if (!process.getCandidateStarterUsers().isEmpty()) {
-      xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_PROCESS_CANDIDATE_USERS,
+      xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_PROCESS_CANDIDATE_USERS,
           BpmnXMLUtil.convertToDelimitedString(process.getCandidateStarterUsers()));
     }
 
     if (!process.getCandidateStarterGroups().isEmpty()) {
-      xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_PROCESS_CANDIDATE_GROUPS,
+      xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_PROCESS_CANDIDATE_GROUPS,
           BpmnXMLUtil.convertToDelimitedString(process.getCandidateStarterGroups()));
     }
 

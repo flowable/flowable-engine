@@ -25,7 +25,7 @@ public class FailedJobRetryCountExport implements BpmnXMLConstants{
     if (failedJobRetryCycle != null) {
         
   		if (StringUtils.isNotEmpty(failedJobRetryCycle)) {
-  			xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, FAILED_JOB_RETRY_TIME_CYCLE, ACTIVITI_EXTENSIONS_NAMESPACE);    		  
+  			xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, FAILED_JOB_RETRY_TIME_CYCLE, FLOWABLE_EXTENSIONS_NAMESPACE);    		  
   			xtw.writeCharacters(failedJobRetryCycle);
   			xtw.writeEndElement();
   		}

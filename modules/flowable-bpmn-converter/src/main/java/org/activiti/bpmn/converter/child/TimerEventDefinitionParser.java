@@ -34,7 +34,7 @@ public class TimerEventDefinitionParser extends BaseChildElementParser {
     if (parentElement instanceof Event == false) return;
     
     TimerEventDefinition eventDefinition = new TimerEventDefinition();
-    String calendarName = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_CALENDAR_NAME);
+    String calendarName = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALENDAR_NAME, xtr);
     if (StringUtils.isNotEmpty(calendarName)) {
       eventDefinition.setCalendarName(calendarName);
     }
