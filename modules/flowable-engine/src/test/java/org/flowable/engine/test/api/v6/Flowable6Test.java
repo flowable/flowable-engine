@@ -26,7 +26,6 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
-import org.junit.Test;
 
 /**
  * These are the first tests ever written for Activiti 6.

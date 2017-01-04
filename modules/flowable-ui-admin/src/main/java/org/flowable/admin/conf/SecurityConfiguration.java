@@ -12,7 +12,6 @@
  */
 package org.flowable.admin.conf;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 import org.flowable.admin.security.AjaxLogoutSuccessHandler;

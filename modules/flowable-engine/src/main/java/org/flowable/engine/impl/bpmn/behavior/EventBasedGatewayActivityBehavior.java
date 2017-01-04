@@ -13,8 +13,6 @@
 
 package org.flowable.engine.impl.bpmn.behavior;
 
-import org.flowable.engine.delegate.DelegateExecution;
-
 /**
  * @author Daniel Meyer
  * @author Joram Barrez

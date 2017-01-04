@@ -26,7 +26,6 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
-import org.junit.Test;
 
 public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
 

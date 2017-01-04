@@ -19,7 +19,6 @@ import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
-import org.junit.Test;
 
 public class HistoricVariableInstanceEscapeClauseTest extends AbstractEscapeClauseTestCase {
 

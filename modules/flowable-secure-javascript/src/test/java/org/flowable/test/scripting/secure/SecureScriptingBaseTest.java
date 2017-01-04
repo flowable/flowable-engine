@@ -12,7 +12,6 @@
  */
 package org.flowable.test.scripting.secure;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 

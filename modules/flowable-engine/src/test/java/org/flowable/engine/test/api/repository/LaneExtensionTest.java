@@ -12,7 +12,6 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
 import org.junit.Assert;
-import org.junit.Test;
 
 /**
  * Created by P3700487 on 2/19/2015.

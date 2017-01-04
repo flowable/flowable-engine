@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.junit.Test;
 
 public class ExecutionQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
 

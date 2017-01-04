@@ -18,7 +18,6 @@ import java.util.List;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
-import org.junit.Test;
 
 public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
 

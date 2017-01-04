@@ -117,7 +117,7 @@ public class FlowableTaskActionService extends FlowableAbstractTaskService {
       if (user == null) {
         throw new BadRequestException("Invalid user id");
       }
-      taskService.addUserIdentityLink(taskId, userId.toString(), IdentityLinkType.PARTICIPANT);
+      taskService.addUserIdentityLink(taskId, userId, IdentityLinkType.PARTICIPANT);
 
     } else {
       throw new BadRequestException("User id is required");

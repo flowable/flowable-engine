@@ -27,7 +27,6 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.junit.Assert;
-import org.junit.Test;
 
 /**
  * @author Joram Barrez
