@@ -13,6 +13,7 @@
 package org.flowable.admin.conf;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.flowable.admin.security.AjaxLogoutSuccessHandler;
 import org.flowable.app.filter.FlowableCookieFilter;
@@ -34,10 +35,10 @@ public class SecurityConfiguration {
   @Bean
   public FlowableCookieFilter flowableCookieFilter() {
     FlowableCookieFilter filter = new FlowableCookieFilter();
-    filter.setRequiredPrivileges(Arrays.asList(DefaultPrivileges.ACCESS_ADMIN));
+    filter.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_ADMIN));
     return filter;
   }
-  
+
   @Configuration
   public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 

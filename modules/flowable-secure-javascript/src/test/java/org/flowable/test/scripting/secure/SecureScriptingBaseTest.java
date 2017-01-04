@@ -13,6 +13,7 @@
 package org.flowable.test.scripting.secure;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 
 import org.flowable.engine.ProcessEngine;
@@ -40,7 +41,7 @@ public abstract class SecureScriptingBaseTest {
   public void initProcessEngine() {
 
     SecureJavascriptConfigurator configurator = new SecureJavascriptConfigurator()
-        .setWhiteListedClasses(new HashSet<String>(Arrays.asList("java.util.ArrayList")))
+        .setWhiteListedClasses(new HashSet<String>(Collections.singletonList("java.util.ArrayList")))
         .setMaxStackDepth(10).setMaxScriptExecutionTime(3000L)
         .setMaxMemoryUsed(3145728L);
 

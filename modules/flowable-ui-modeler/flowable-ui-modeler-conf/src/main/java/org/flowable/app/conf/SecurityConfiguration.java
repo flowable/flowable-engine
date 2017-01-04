@@ -13,6 +13,7 @@
 package org.flowable.app.conf;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.flowable.app.filter.FlowableCookieFilter;
 import org.flowable.app.security.AjaxLogoutSuccessHandler;
@@ -44,7 +45,7 @@ public class SecurityConfiguration {
 	@Bean
 	public FlowableCookieFilter flowableCookieFilter() {
 	  FlowableCookieFilter filter = new FlowableCookieFilter();
-	  filter.setRequiredPrivileges(Arrays.asList(DefaultPrivileges.ACCESS_MODELER));
+	  filter.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_MODELER));
 	  return filter;
 	}
 	
