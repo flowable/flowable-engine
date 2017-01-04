@@ -44,7 +44,7 @@ public class FlowableProperties {
   private String processDefinitionLocationPrefix = "classpath:/processes/";
   private List<String> processDefinitionLocationSuffixes = Arrays.asList("**.bpmn20.xml", "**.bpmn");
   private String restApiMapping = "/api/*";
-  private String restApiServletName = "activitiRestApi";
+  private String restApiServletName = "flowableRestApi";
   private boolean jpaEnabled = true; // true by default
   private List<String> customMybatisMappers;
   private List<String> customMybatisXMLMappers;
