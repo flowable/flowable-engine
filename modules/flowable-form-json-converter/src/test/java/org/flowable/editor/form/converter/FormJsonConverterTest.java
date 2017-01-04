@@ -13,6 +13,7 @@
 package org.flowable.editor.form.converter;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
@@ -58,7 +59,7 @@ public class FormJsonConverterTest {
         assertEquals("input1", formField.getId());
         assertEquals("Input1", formField.getName());
         assertEquals("text", formField.getType());
-        assertEquals(false, formField.isRequired());
+        assertFalse(formField.isRequired());
         assertEquals("empty", formField.getPlaceholder());
     }
 

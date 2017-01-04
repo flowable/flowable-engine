@@ -27,7 +27,7 @@ flowableAdminApp.controller('ContentItemController', ['$rootScope', '$scope', '$
             $modal.open({
                 templateUrl: 'views/form-render-popup.html',
                 windowClass: 'modal modal-full-width',
-                controller: 'ShowFormRenderPopupCrtl',
+                controller: 'ShowFormRenderPopupCtrl',
                 resolve: {
                     form: function () {
                         return $scope.contentItem;

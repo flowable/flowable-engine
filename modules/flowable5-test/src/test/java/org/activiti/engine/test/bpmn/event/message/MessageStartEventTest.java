@@ -17,10 +17,9 @@ import java.util.List;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.EventSubscriptionQueryImpl;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
@@ -39,8 +38,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
       .deploy()
       .getId();
     
-    List<EventSubscriptionEntity> eventSubscriptions = new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor())
-      .list();
+    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
     
     assertEquals(1, eventSubscriptions.size());
     
@@ -91,7 +89,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
       .deploy()
       .getId();
     
-    List<EventSubscriptionEntity> eventSubscriptions = new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor()).list();
+    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
         
     assertEquals(1, eventSubscriptions.size());
@@ -104,18 +102,18 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
       .deploy()
       .getId();
     
-    List<EventSubscriptionEntity> newEventSubscriptions = new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor()).list();
+    List<EventSubscription> newEventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
     List<ProcessDefinition> newProcessDefinitions = repositoryService.createProcessDefinitionQuery().list();
         
     assertEquals(1, newEventSubscriptions.size());
     assertEquals(2, newProcessDefinitions.size());
     for (ProcessDefinition processDefinition : newProcessDefinitions) {
       if(processDefinition.getVersion() == 1) {
-        for (EventSubscriptionEntity subscription : newEventSubscriptions) {
+        for (EventSubscription subscription : newEventSubscriptions) {
           assertFalse(subscription.getConfiguration().equals(processDefinition.getId()));         
         }
       } else {
-        for (EventSubscriptionEntity subscription : newEventSubscriptions) {
+        for (EventSubscription subscription : newEventSubscriptions) {
           assertTrue(subscription.getConfiguration().equals(processDefinition.getId()));         
         }
       }

@@ -37,7 +37,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RequestMapping("/rest/admin/decision-table-deployments")
 public class DecisionTableDeploymentsClientResource extends AbstractClientResource {
 
-  private final Logger log = LoggerFactory.getLogger(DecisionTableDeploymentsClientResource.class);
+  private static final Logger logger = LoggerFactory.getLogger(DecisionTableDeploymentsClientResource.class);
 
   @Autowired
   protected DecisionTableDeploymentService clientService;
@@ -47,7 +47,7 @@ public class DecisionTableDeploymentsClientResource extends AbstractClientResour
    */
   @RequestMapping(method = RequestMethod.GET, produces = "application/json")
   public JsonNode listDeployments(HttpServletRequest request) {
-    log.debug("REST request to get a list of decision table deployments");
+    logger.debug("REST request to get a list of decision table deployments");
 
     JsonNode resultNode = null;
     ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
@@ -57,6 +57,7 @@ public class DecisionTableDeploymentsClientResource extends AbstractClientResour
       resultNode = clientService.listDeployments(serverConfig, parameterMap);
 
     } catch (FlowableServiceException e) {
+      logger.error("Error getting deployments", e);
       throw new BadRequestException(e.getMessage());
     }
 

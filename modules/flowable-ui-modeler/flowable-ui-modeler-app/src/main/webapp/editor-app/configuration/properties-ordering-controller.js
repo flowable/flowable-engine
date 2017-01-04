@@ -11,9 +11,18 @@
  * limitations under the License.
  */
 
-'use strict';
+/*
+ * Adhoc sub process ordering property
+ */
 
-KISBPM.HEADER_CONFIG.showAppTitle = false;
-KISBPM.HEADER_CONFIG.showHeaderMenu = false;
-KISBPM.HEADER_CONFIG.showMainNavigation = false;
-KISBPM.HEADER_CONFIG.showPageHeader = false;
+angular.module('flowableModeler').controller('FlowableOrderingCtrl', [ '$scope', function($scope) {
+
+    if ($scope.property.value == undefined && $scope.property.value == null)
+    {
+    	$scope.property.value = 'Parallel';
+    }
+        
+    $scope.orderingChanged = function() {
+    	$scope.updatePropertyInModel($scope.property);
+    };
+}]);

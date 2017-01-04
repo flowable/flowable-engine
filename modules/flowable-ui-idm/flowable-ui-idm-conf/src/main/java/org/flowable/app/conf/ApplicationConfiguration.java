@@ -14,15 +14,20 @@ package org.flowable.app.conf;
 
 import org.flowable.app.service.idm.RemoteIdmServiceImpl;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
 @PropertySources({
 	
-	@PropertySource("classpath:/META-INF/flowable-idm-app/flowable-idm-app.properties"),
-	@PropertySource(value = "classpath:flowable-idm-app.properties", ignoreResourceNotFound = true),
-	@PropertySource(value = "file:flowable-idm-app.properties", ignoreResourceNotFound = true),
+	@PropertySource("classpath:/META-INF/flowable-ui-app/flowable-ui-app.properties"),
+	@PropertySource(value = "classpath:flowable-ui-app.properties", ignoreResourceNotFound = true),
+	@PropertySource(value = "file:flowable-ui-app.properties", ignoreResourceNotFound = true),
 
 })
 @ComponentScan(basePackages = {

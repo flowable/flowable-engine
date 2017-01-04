@@ -2,8 +2,12 @@
     <head>  
         <title>BPMN 2.0 display</title>
         <link type="text/css" rel="stylesheet" href="display/jquery.qtip.min.css" />
+        <link type="text/css" rel="stylesheet" href="display/jquery.growl.css" />
+        <link type="text/css" rel="stylesheet" href="display/jquery-confirm.min.css" />
         <link type="text/css" rel="stylesheet" href="display/displaymodel.css" />
         <script type="text/javascript" src="display/jquery.qtip.min.js"></script>
+        <script type="text/javascript" src="display/jquery.growl.js"></script>
+        <script type="text/javascript" src="display/jquery-confirm.min.js"></script>
         <script type="text/javascript" src="display/raphael.js"></script>
         <script type="text/javascript" src="display/bpmn-draw.js"></script>
         <script type="text/javascript" src="display/bpmn-icons.js"></script>
@@ -51,6 +55,10 @@
          
             var elementsAdded = new Array();
             var elementsRemoved = new Array();
+            var startElement;
+            var startGlowElement;
+            var endElement;
+            var endGlowElement;
         	
         	function _showTip(htmlNode, element)
           	{
@@ -96,18 +104,15 @@
         	{
         	    var strokeColor = _bpmnGetColor(element, defaultColor);
         		var topBodyRect;
-        		if (type === "rect")
-        		{
+        		if (type === "rect") {
         			topBodyRect = paper.rect(element.x, element.y, element.width, element.height);
-        		}
-        		else if (type === "circle")
-        		{
+        			
+        		} else if (type === "circle") {
         			var x = element.x + (element.width / 2);
         			var y = element.y + (element.height / 2);
         			topBodyRect = paper.circle(x, y, 15);
-        		}
-        		else if (type === "rhombus")
-        		{
+        			
+        		} else if (type === "rhombus") {
         			topBodyRect = paper.path("M" + element.x + " " + (element.y + (element.height / 2)) + 
        					"L" + (element.x + (element.width / 2)) + " " + (element.y + element.height) + 
        					"L" + (element.x + element.width) + " " + (element.y + (element.height / 2)) +
@@ -117,14 +122,12 @@
         		
         		var opacity = 0;
         		var fillColor = "#ffffff";
-        		if ($.inArray(element.id, elementsAdded) >= 0)
-        		{
+        		if ($.inArray(element.id, elementsAdded) >= 0) {
         			opacity = 0.2;
             		fillColor = "green";
         		}
         		
-        		if ($.inArray(element.id, elementsRemoved) >= 0)
-        		{
+        		if ($.inArray(element.id, elementsRemoved) >= 0) {
         			opacity = 0.2;
             		fillColor = "red";
         		}
@@ -142,6 +145,69 @@
           		
           		topBodyRect.mouseout(function() {
           			paper.getById(element.id).attr({"stroke": strokeColor});
+          		});
+          		
+          		topBodyRect.click(function() {
+          			if (startElement == element) {
+          				startGlowElement.remove();
+          				startElement = undefined;
+          				
+          			} else if (endElement == element) {
+          				endGlowElement.remove();
+          				endElement = undefined;
+          				
+          			} else {
+          				if (startElement && !endElement) {
+							endGlowElement = topBodyRect.glow({'color': 'red'});
+							endElement = element;
+							
+							$.confirm({
+							    title: 'Change current activity?',
+							    content: 'Are you sure you want to move the current activity from ' + 
+							    	startElement.name + ' to ' + endElement.name,
+							    buttons: {
+							        confirm: function () {
+							            $.ajax({
+										    type: 'post',
+										    url: './app/rest/admin/process-instances/' + instanceId + '/change-state',
+										    contentType: 'application/json; charset=utf-8',
+										    data: JSON.stringify({
+										    	cancelActivityId: startElement.id,
+										    	startActivityId: endElement.id
+										    }),
+										    success: function() {
+										    	paper.clear();
+												_showProcessDiagram();
+										    }
+										});
+							        },
+							        cancel: function () {
+							            
+							        }
+							    }
+							});
+							
+							
+						} else {
+							if (startElement) {
+								startGlowElement.remove();
+	          					startElement = undefined;
+	          				}
+          					
+          					if (endElement) {
+	          					endGlowElement.remove();
+	          					endElement = undefined;
+	          				}
+          					
+          					if (element.current) {
+	          					startGlowElement = topBodyRect.glow({'color': 'blue'});
+								startElement = element;
+								
+							} else {
+								$.growl.warning({ message: 'You can only select an active activity as start element', location: 'tc', size: 'large' });
+							}
+						}
+					}
           		});
         	}
         	
@@ -167,75 +233,79 @@
                 }
         	}
         	
-        	var request;
-        	if(instanceId != null) {
-				request = $.ajax({
-				    type: 'get',
-				    url: './app/rest/admin/process-instances/' + instanceId + '/model-json?processDefinitionId=' + definitionId + '&nocaching=' + new Date().getTime()
-				});
-        	} else {
-				request = $.ajax({
-				    type: 'get',
-				    url: './app/rest/admin/process-definitions/' + definitionId + '/model-json?nocaching=' + new Date().getTime()
-				});
-        	}
-
-			request.success(function(data, textStatus, jqXHR) {
-				
-				if (!data.elements || data.elements.length == 0) return;
-				
-				INITIAL_CANVAS_WIDTH = data.diagramWidth + 20;
-				INITIAL_CANVAS_HEIGHT = data.diagramHeight + 50;
-				canvasWidth = INITIAL_CANVAS_WIDTH;
-				canvasHeight = INITIAL_CANVAS_HEIGHT;
-				viewBoxWidth = INITIAL_CANVAS_WIDTH;
-				viewBoxHeight = INITIAL_CANVAS_HEIGHT;
-				
-				var x = 0;
-				if ($(window).width() > canvasWidth)
-				{
-					x = ($(window).width() - canvasWidth) / 2 - (data.diagramBeginX / 2);
-				}
-				
-				$('#bpmnModel').width(INITIAL_CANVAS_WIDTH);
-				$('#bpmnModel').height(INITIAL_CANVAS_HEIGHT);
-				paper = Raphael(document.getElementById('bpmnModel'), canvasWidth, canvasHeight);
-				paper.setViewBox(0, 0, viewBoxWidth, viewBoxHeight, false);
-          		paper.renderfix();
-          		
-          		if (data.pools)
-          		{
-          			for (var i = 0; i < data.pools.length; i++)
+        	function _showProcessDiagram() {
+	        	var request;
+	        	if (instanceId != null) {
+					request = $.ajax({
+					    type: 'get',
+					    url: './app/rest/admin/process-instances/' + instanceId + '/model-json?processDefinitionId=' + definitionId + '&nocaching=' + new Date().getTime()
+					});
+	        	} else {
+					request = $.ajax({
+					    type: 'get',
+					    url: './app/rest/admin/process-definitions/' + definitionId + '/model-json?nocaching=' + new Date().getTime()
+					});
+	        	}
+	
+				request.success(function(data, textStatus, jqXHR) {
+					
+					if (!data.elements || data.elements.length == 0) return;
+					
+					INITIAL_CANVAS_WIDTH = data.diagramWidth + 20;
+					INITIAL_CANVAS_HEIGHT = data.diagramHeight + 50;
+					canvasWidth = INITIAL_CANVAS_WIDTH;
+					canvasHeight = INITIAL_CANVAS_HEIGHT;
+					viewBoxWidth = INITIAL_CANVAS_WIDTH;
+					viewBoxHeight = INITIAL_CANVAS_HEIGHT;
+					
+					var x = 0;
+					if ($(window).width() > canvasWidth)
+					{
+						x = ($(window).width() - canvasWidth) / 2 - (data.diagramBeginX / 2);
+					}
+					
+					$('#bpmnModel').width(INITIAL_CANVAS_WIDTH);
+					$('#bpmnModel').height(INITIAL_CANVAS_HEIGHT);
+					paper = Raphael(document.getElementById('bpmnModel'), canvasWidth, canvasHeight);
+					paper.setViewBox(0, 0, viewBoxWidth, viewBoxHeight, false);
+	          		paper.renderfix();
+	          		
+	          		if (data.pools)
+	          		{
+	          			for (var i = 0; i < data.pools.length; i++)
+					    {
+					    	var pool = data.pools[i];
+					    	_drawPool(pool);
+					    }
+	          		}
+	          		
+				    var modelElements = data.elements;
+				    for (var i = 0; i < modelElements.length; i++)
 				    {
-				    	var pool = data.pools[i];
-				    	_drawPool(pool);
+				    	var element = modelElements[i];
+				    	//try {
+				    		//console.log(element.type);
+				    		var drawFunction = eval("_draw" + element.type);
+				    		drawFunction(element);
+				    	//} catch(err) {console.log(err);}
 				    }
-          		}
-          		
-			    var modelElements = data.elements;
-			    for (var i = 0; i < modelElements.length; i++)
-			    {
-			    	var element = modelElements[i];
-			    	//try {
-			    		//console.log(element.type);
-			    		var drawFunction = eval("_draw" + element.type);
-			    		drawFunction(element);
-			    	//} catch(err) {console.log(err);}
-			    }
-			    
-			    if (data.flows)
-			    {
-				    for (var i = 0; i < data.flows.length; i++)
+				    
+				    if (data.flows)
 				    {
-				    	var flow = data.flows[i];
-				    	_drawFlow(flow);
+					    for (var i = 0; i < data.flows.length; i++)
+					    {
+					    	var flow = data.flows[i];
+					    	_drawFlow(flow);
+					    }
 				    }
-			    }
-			});
-
-			request.error(function(jqXHR, textStatus, errorThrown) {
-			    alert("error");
-			});
+				});
+	
+				request.error(function(jqXHR, textStatus, errorThrown) {
+				    alert("error");
+				});
+			}
+			
+			_showProcessDiagram();
 			
 		</script>
     </head>

@@ -50,7 +50,7 @@ public class DeployClasspathResourcesEventHandler implements SimulationEventHand
     DeploymentBuilder deploymentBuilder = SimulationRunContext.getRepositoryService().createDeployment();
 
     for (String resource : resources) {
-      log.debug("adding resource [{}] to repository", resource, SimulationRunContext.getRepositoryService());
+      log.debug("adding resource [{}] to repository {}", resource, SimulationRunContext.getRepositoryService());
       deploymentBuilder.addClasspathResource(resource);
     }
 

@@ -165,7 +165,7 @@ public class AppDefinitionPublishService {
             byte[] dmnXMLBytes = dmnXMLConverter.convertToXML(dmnDefinition);
             deployableAssets.put("dmn-" + decisionTableInfo.getKey() + ".dmn", dmnXMLBytes);
           } catch (Exception e) {
-            logger.error("Error converting decision table to XML " + decisionTableInfo.getName(), e);
+            logger.error("Error converting decision table to XML {}", decisionTableInfo.getName(), e);
             throw new InternalServerErrorException("Error converting decision table to XML " + decisionTableInfo.getName());
           }
         }
@@ -220,7 +220,7 @@ public class AppDefinitionPublishService {
       return appDefinition;
       
     } catch (Exception e) {
-      logger.error("Error deserializing app " + appDefinitionModel.getId(), e);
+      logger.error("Error deserializing app {}", appDefinitionModel.getId(), e);
       throw new InternalServerErrorException("Could not deserialize app definition");
     }
   }
@@ -263,7 +263,7 @@ public class AppDefinitionPublishService {
     String basicAuthUser = environment.getRequiredProperty("idm.admin.user");
     String basicAuthPassword = environment.getRequiredProperty("idm.admin.password");
 
-    if (deployApiUrl.endsWith("/") == false) {
+    if (!deployApiUrl.endsWith("/")) {
       deployApiUrl = deployApiUrl.concat("/");
     }
     deployApiUrl = deployApiUrl.concat(String.format("repository/deployments?deploymentKey=%s&deploymentName=%s", 

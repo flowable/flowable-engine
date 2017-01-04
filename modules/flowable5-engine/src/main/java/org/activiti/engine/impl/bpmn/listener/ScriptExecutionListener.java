@@ -25,11 +25,11 @@ public class ScriptExecutionListener implements ExecutionListener {
 
   private Expression script;
 
-	private Expression language = null;
+  private Expression language;
 
-	private Expression resultVariable = null;
+  private Expression resultVariable;
 
-	@Override
+  @Override
   public void notify(DelegateExecution execution) {
     
 		if (script == null) {

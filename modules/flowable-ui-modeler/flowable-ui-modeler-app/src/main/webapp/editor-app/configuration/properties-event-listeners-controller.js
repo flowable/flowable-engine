@@ -15,7 +15,7 @@
  * Execution listeners
  */
 
-angular.module('flowableModeler').controller('KisBpmEventListenersCtrl',
+angular.module('flowableModeler').controller('FlowableEventListenersCtrl',
     ['$scope', '$modal', '$timeout', '$translate', function ($scope, $modal, $timeout, $translate) {
 
         // Config for the modal window
@@ -30,7 +30,7 @@ angular.module('flowableModeler').controller('KisBpmEventListenersCtrl',
 
 //Need a separate controller for the modal window due to https://github.com/angular-ui/bootstrap/issues/259
 // Will be fixed in a newer version of Angular UI
-angular.module('flowableModeler').controller('KisBpmEventListenersPopupCtrl',
+angular.module('flowableModeler').controller('FlowableEventListenersPopupCtrl',
     ['$scope', '$q', '$translate', '$timeout', function ($scope, $q, $translate, $timeout) {
 
         // Put json representing form properties on scope

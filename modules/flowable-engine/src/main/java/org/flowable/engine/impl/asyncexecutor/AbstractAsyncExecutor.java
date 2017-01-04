@@ -44,7 +44,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
   protected int maxAsyncJobsDuePerAcquisition = 1;
   protected int defaultTimerJobAcquireWaitTimeInMillis = 10 * 1000;
   protected int defaultAsyncJobAcquireWaitTimeInMillis = 10 * 1000;
-  protected int defaultQueueSizeFullWaitTime = 0;
+  protected int defaultQueueSizeFullWaitTime;
 
   protected String lockOwner = UUID.randomUUID().toString();
   protected int timerLockTimeInMillis = 5 * 60 * 1000;
@@ -125,7 +125,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
   protected abstract void startAdditionalComponents();
   
   protected void executeTemporaryJobs() {
-    while (temporaryJobQueue.isEmpty() == false) {
+    while (!temporaryJobQueue.isEmpty()) {
       Job job = temporaryJobQueue.pop();
       executeAsyncJob(job);
     }
@@ -269,12 +269,12 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
   }
 
   public int getRetryWaitTimeInMillis() {
-        return retryWaitTimeInMillis;
-    }
+    return retryWaitTimeInMillis;
+  }
 
-    public void setRetryWaitTimeInMillis(int retryWaitTimeInMillis) {
-        this.retryWaitTimeInMillis = retryWaitTimeInMillis;
-    }
+  public void setRetryWaitTimeInMillis(int retryWaitTimeInMillis) {
+    this.retryWaitTimeInMillis = retryWaitTimeInMillis;
+  }
     
   public int getResetExpiredJobsInterval() {
     return resetExpiredJobsInterval;

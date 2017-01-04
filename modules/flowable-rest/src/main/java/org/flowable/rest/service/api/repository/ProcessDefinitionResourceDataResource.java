@@ -13,10 +13,11 @@
 
 package org.flowable.rest.service.api.repository;
 
-import javax.servlet.http.HttpServletResponse;
-
-import io.swagger.annotations.*;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * @author Frederik Heremans
  */
@@ -32,14 +35,14 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = { "Process Definitions" }, description = "Manage Process Definitions")
 public class ProcessDefinitionResourceDataResource extends BaseDeploymentResourceDataResource {
 
-  @ApiOperation(value = "Get a process definition resource content", tags = {"Process Definitions"})
+  @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/resourcedata", method = RequestMethod.GET)
   @ApiResponses(value = {
           @ApiResponse(code = 200, message = "Indicates both process definition and resource have been found and the resource data has been returned."),
           @ApiResponse(code = 404, message = "Indicates the requested process definition was not found or there is no resource with the given id present in the process definition. The status-description contains additional information.")
   })
-  @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/resourcedata", method = RequestMethod.GET)
-  public @ResponseBody
-  byte[] getProcessDefinitionResource(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId, HttpServletResponse response) {
+  @ApiOperation(value = "Get a process definition resource content", tags = {"Process Definitions"})
+  @ResponseBody
+  public byte[] getProcessDefinitionResource(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId, HttpServletResponse response) {
     ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
     return getDeploymentResourceData(processDefinition.getDeploymentId(), processDefinition.getResourceName(), response);
   }

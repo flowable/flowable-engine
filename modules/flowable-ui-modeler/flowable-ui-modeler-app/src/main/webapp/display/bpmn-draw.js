@@ -121,6 +121,26 @@ function _drawEventSubProcess(element)
  	});
 }
 
+function _drawAdhocSubProcess(element)
+{
+	var rect = paper.rect(element.x, element.y, element.width, element.height, 4);
+
+	var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
+	
+	rect.attr({"stroke-width": 1,
+		"stroke": strokeColor,
+		"fill": "white"
+ 	});
+ 	
+ 	paper.text(element.x + (element.width / 2), element.y + element.height - 8).attr({
+        "text-anchor" : "middle",
+        "font-family" : "Arial",
+        "font-size" : 20,
+        "text" : "~",
+        "fill" : "#373e48"
+  	});
+}
+
 function _drawStartEvent(element)
 {
 	var startEvent = _drawEvent(element, NORMAL_STROKE, 15);
@@ -156,12 +176,24 @@ function _drawEvent(element, strokeWidth, radius)
     if (customActivityBackgroundOpacity) {
         eventOpacity = customActivityBackgroundOpacity;
     }
-
-	circle.attr({"stroke-width": strokeWidth,
-		"stroke": strokeColor,
-		"fill": eventFillColor,
-        "fill-opacity": eventOpacity
- 	});
+    
+	if (element.interrupting === undefined || element.interrupting) {
+		circle.attr({
+		    "stroke-width": strokeWidth,
+			"stroke": strokeColor,
+			"fill": eventFillColor,
+	        "fill-opacity": eventOpacity
+	 	});
+	
+	} else {
+		circle.attr({
+		    "stroke-width": strokeWidth,
+			"stroke": strokeColor,
+			"stroke-dasharray": ".",
+			"fill": eventFillColor,
+	        "fill-opacity": eventOpacity
+	 	});
+	}
 
 	circle.id = element.id;
 	
@@ -185,10 +217,6 @@ function _drawServiceTask(element)
 	{
 		_drawMuleTaskIcon(paper, element.x + 4, element.y + 4);
 	}
-    else if (element.taskType === "alfresco_publish")
-    {
-        _drawAlfrescoPublishTaskIcon(paper, element.x + 4, element.y + 4);
-    }
     else if (element.taskType === "rest_call")
     {
         _drawRestCallTaskIcon(paper, element.x + 4, element.y + 4);
@@ -486,17 +514,38 @@ function _drawBoundaryEvent(element)
 	
 	var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
 
-	circle.attr({"stroke-width": 1,
-		"stroke": strokeColor,
-		"fill": "white"
- 	});
+ 	if (element.cancelActivity)  {
+		circle.attr({
+		    "stroke-width": 1,
+			"stroke": strokeColor,
+			"fill": "white"
+	 	});
+	 	
+	} else {
+		circle.attr({
+		    "stroke-width": 1,
+		    "stroke-dasharray": ".",
+			"stroke": strokeColor,
+			"fill": "white"
+	 	});
+	}
 	
 	var innerCircle = paper.circle(x, y, 12);
 	
-	innerCircle.attr({"stroke-width": 1,
-		"stroke": strokeColor,
-		"fill": "none"
- 	});
+	if (element.cancelActivity)  {
+		innerCircle.attr({"stroke-width": 1,
+			"stroke": strokeColor,
+			"fill": "none"
+	 	});
+	
+	} else {
+		innerCircle.attr({
+		    "stroke-width": 1,
+		    "stroke-dasharray": ".",
+			"stroke": strokeColor,
+			"fill": "none"
+	 	});
+	}
 	
 	_drawEventIcon(paper, element);
 	_addHoverLogic(element, "circle", MAIN_STROKE_COLOR);

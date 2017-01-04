@@ -255,12 +255,12 @@ public class DmnJsonConverterTest {
 
     List<DecisionRule> rules = dmnDefinition.getCurrentDecisionTable().getRules();
     Assert.assertNotNull(rules);
-    Assert.assertEquals(rules.size(), 1);
+    Assert.assertEquals(1, rules.size());
     Assert.assertNotNull(rules.get(0).getOutputEntries());
-    Assert.assertEquals(rules.get(0).getOutputEntries().size(), 3);
-    Assert.assertEquals(rules.get(0).getOutputEntries().get(0).getOutputClause().getId(), "outputExpression_14");
-    Assert.assertEquals(rules.get(0).getOutputEntries().get(1).getOutputClause().getId(), "outputExpression_13");
-    Assert.assertEquals(rules.get(0).getOutputEntries().get(2).getOutputClause().getId(), "outputExpression_15");
+    Assert.assertEquals(3, rules.get(0).getOutputEntries().size());
+    Assert.assertEquals("outputExpression_14", rules.get(0).getOutputEntries().get(0).getOutputClause().getId());
+    Assert.assertEquals("outputExpression_13", rules.get(0).getOutputEntries().get(1).getOutputClause().getId());
+    Assert.assertEquals("outputExpression_15", rules.get(0).getOutputEntries().get(2).getOutputClause().getId());
   }
 
   /* Helper methods */

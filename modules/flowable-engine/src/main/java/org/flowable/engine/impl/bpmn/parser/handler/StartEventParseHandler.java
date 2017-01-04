@@ -22,6 +22,7 @@ import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
+import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 
@@ -61,6 +62,11 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
           
           element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessSignalStartEventActivityBehavior(
               element, signalDefinition, signal));
+          
+        } else if (eventDefinition instanceof TimerEventDefinition) {
+          TimerEventDefinition timerEventDefinition = (TimerEventDefinition) eventDefinition;
+          element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessTimerStartEventActivityBehavior(
+              element, timerEventDefinition));
         
         } else if (eventDefinition instanceof ErrorEventDefinition) {
           element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessErrorStartEventActivityBehavior(element));

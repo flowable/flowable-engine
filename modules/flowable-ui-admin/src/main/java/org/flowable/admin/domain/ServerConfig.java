@@ -121,11 +121,7 @@ public class ServerConfig implements Serializable {
 
     ServerConfig config = (ServerConfig) o;
 
-    if (!id.equals(config.id)) {
-      return false;
-    }
-
-    return true;
+    return id.equals(config.id);
   }
 
   @Override

@@ -59,7 +59,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
   protected int queueSize = 100;
   
   /** Whether to unlock jobs that are owned by this executor (have the same lockOwner) at startup */
-  protected boolean unlockOwnedJobs = false;
+  protected boolean unlockOwnedJobs;
 
   /** The queue used for job execution work */
   protected BlockingQueue<Runnable> threadPoolQueue;
@@ -251,8 +251,13 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
   
   @Override
   public int getRemainingCapacity() {
-    return threadPoolQueue.remainingCapacity();
+    if (threadPoolQueue != null) {
+      return threadPoolQueue.remainingCapacity();
+    } else {
+      // return plenty of remaining capacity if there's no thread pool queue
+      return 99;
     }
+  }
 
   public void setQueueSize(int queueSize) {
     this.queueSize = queueSize;

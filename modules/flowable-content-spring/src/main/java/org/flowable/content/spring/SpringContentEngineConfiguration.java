@@ -37,7 +37,7 @@ public class SpringContentEngineConfiguration extends ContentEngineConfiguration
 
   protected PlatformTransactionManager transactionManager;
   protected ApplicationContext applicationContext;
-  protected Integer transactionSynchronizationAdapterOrder = null;
+  protected Integer transactionSynchronizationAdapterOrder;
 
   public SpringContentEngineConfiguration() {
     this.transactionsExternallyManaged = true;

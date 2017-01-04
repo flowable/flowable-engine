@@ -140,7 +140,7 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
     try {
       editorJson = objectMapper.writeValueAsString(updatedModel.getAppDefinition().getDefinition());
     } catch (Exception e) {
-      logger.error("Error while processing app definition json " + modelId, e);
+      logger.error("Error while processing app definition json {}", modelId, e);
       throw new InternalServerErrorException("App definition could not be saved " + modelId);
     }
 
@@ -173,7 +173,7 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
     try {
       appDefinition = objectMapper.readValue(model.getModelEditorJson(), AppDefinition.class);
     } catch (Exception e) {
-      logger.error("Error deserializing app " + model.getId(), e);
+      logger.error("Error deserializing app {}", model.getId(), e);
       throw new InternalServerErrorException("Could not deserialize app definition");
     }
 
@@ -197,7 +197,7 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
     try {
       appDefinition = objectMapper.readValue(model.getModelEditorJson(), AppDefinition.class);
     } catch (Exception e) {
-      logger.error("Error deserializing app " + model.getId(), e);
+      logger.error("Error deserializing app {}", model.getId(), e);
       throw new InternalServerErrorException("Could not deserialize app definition");
     }
     AppDefinitionRepresentation result = new AppDefinitionRepresentation(model);

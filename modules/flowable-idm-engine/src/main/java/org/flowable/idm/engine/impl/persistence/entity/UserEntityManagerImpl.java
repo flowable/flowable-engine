@@ -102,11 +102,8 @@ public class UserEntityManagerImpl extends AbstractEntityManager<UserEntity> imp
     if (userId != null) {
       user = findById(userId);
     }
-    
-    if ((user != null) && (password != null) && (password.equals(user.getPassword()))) {
-      return true;
-    }
-    return false;
+
+    return (user != null) && (password != null) && (password.equals(user.getPassword()));
   }
 
   public List<User> findUsersByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {

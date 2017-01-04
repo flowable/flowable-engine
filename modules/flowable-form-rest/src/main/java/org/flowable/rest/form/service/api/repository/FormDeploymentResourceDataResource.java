@@ -42,9 +42,8 @@ public class FormDeploymentResourceDataResource {
   protected FormRepositoryService formRepositoryService;
 
   @RequestMapping(value = "/form-repository/deployments/{deploymentId}/resourcedata/{resourceId}", method = RequestMethod.GET)
-  public @ResponseBody
-  byte[] getFormDeploymentResource(@PathVariable("deploymentId") String deploymentId, @PathVariable("resourceId") String resourceId, HttpServletResponse response) {
-
+  @ResponseBody
+  public byte[] getFormDeploymentResource(@PathVariable("deploymentId") String deploymentId, @PathVariable("resourceId") String resourceId, HttpServletResponse response) {
     if (deploymentId == null) {
       throw new FlowableIllegalArgumentException("No deployment id provided");
     }

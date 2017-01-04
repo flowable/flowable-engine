@@ -194,7 +194,7 @@ public interface ManagementService {
   void rescheduleTimeDateJob(String jobId, String timeDate);
   
   /**
-   * Reschedule a timer job with a time date.
+   * Reschedule a timer job with a time duration.
    * 
    * @param jobId
    *          id of the timer job to reschedule, cannot be null.
@@ -204,7 +204,7 @@ public interface ManagementService {
   void rescheduleTimeDurationJob(String jobId, String timeDuration);
   
   /**
-   * Reschedule a timer job with a time date.
+   * Reschedule a timer job with a time cycle.
    * 
    * @param jobId
    *          id of the timer job to reschedule, cannot be null.

@@ -22,15 +22,15 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public class IndentingXMLStreamWriter extends DelegatingXMLStreamWriter {
 
-  private final static Object SEEN_NOTHING = new Object();
-  private final static Object SEEN_ELEMENT = new Object();
-  private final static Object SEEN_DATA = new Object();
+  private static final Object SEEN_NOTHING = new Object();
+  private static final Object SEEN_ELEMENT = new Object();
+  private static final Object SEEN_DATA = new Object();
 
   private Object state = SEEN_NOTHING;
   private Stack<Object> stateStack = new Stack<Object>();
 
   private String indentStep = "  ";
-  private int depth = 0;
+  private int depth;
 
   public IndentingXMLStreamWriter(XMLStreamWriter writer) {
     super(writer);

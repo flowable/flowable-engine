@@ -665,12 +665,18 @@ public class BPMNLayout extends mxGraphLayout {
     /**
 		 * 
 		 */
-    protected double x, y, width, height, offsetX, offsetY;
+    protected double x;
+    protected double y;
+    protected double width;
+    protected double height;
+    protected double offsetX;
+    protected double offsetY;
 
     /**
 		 * 
 		 */
-    protected TreeNode child, next; // parent, sibling
+    protected TreeNode child;
+    protected TreeNode next; // parent, sibling
 
     /**
 		 * 
@@ -694,7 +700,10 @@ public class BPMNLayout extends mxGraphLayout {
     /**
 		 * 
 		 */
-    protected Polyline lowerHead, lowerTail, upperHead, upperTail;
+    protected Polyline lowerHead;
+    protected Polyline lowerTail;
+    protected Polyline upperHead;
+    protected Polyline upperTail;
 
   }
 
@@ -706,7 +715,8 @@ public class BPMNLayout extends mxGraphLayout {
     /**
 		 * 
 		 */
-    protected double dx, dy;
+    protected double dx;
+    protected double dy;
 
     /**
 		 * 

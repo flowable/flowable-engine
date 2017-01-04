@@ -288,12 +288,12 @@ public class BpmnDeployer implements Deployer {
           }
 
           String processId = process.getId();
-          if (isEqualToCurrentLocalizationValue(locale, processId, "name", name, infoNode) == false) {
+          if (!isEqualToCurrentLocalizationValue(locale, processId, "name", name, infoNode)) {
             dynamicBpmnService.changeLocalizationName(locale, processId, name, infoNode);
             localizationValuesChanged = true;
           }
           
-          if (documentation != null && isEqualToCurrentLocalizationValue(locale, processId, "description", documentation, infoNode) == false) {
+          if (documentation != null && !isEqualToCurrentLocalizationValue(locale, processId, "description", documentation, infoNode)) {
             dynamicBpmnService.changeLocalizationDescription(locale, processId, documentation, infoNode);
             localizationValuesChanged = true;
           }
@@ -342,12 +342,12 @@ public class BpmnDeployer implements Deployer {
               }
 
               String flowElementId = flowElement.getId();
-              if (isEqualToCurrentLocalizationValue(locale, flowElementId, "name", name, infoNode) == false) {
+              if (!isEqualToCurrentLocalizationValue(locale, flowElementId, "name", name, infoNode)) {
                 dynamicBpmnService.changeLocalizationName(locale, flowElementId, name, infoNode);
                 localizationValuesChanged = true;
               }
               
-              if (documentation != null && isEqualToCurrentLocalizationValue(locale, flowElementId, "description", documentation, infoNode) == false) {
+              if (documentation != null && !isEqualToCurrentLocalizationValue(locale, flowElementId, "description", documentation, infoNode)) {
                 dynamicBpmnService.changeLocalizationDescription(locale, flowElementId, documentation, infoNode);
                 localizationValuesChanged = true;
               }
@@ -374,7 +374,7 @@ public class BpmnDeployer implements Deployer {
   protected boolean isEqualToCurrentLocalizationValue(String language, String id, String propertyName, String propertyValue, ObjectNode infoNode) {
     boolean isEqual = false;
     JsonNode localizationNode = infoNode.path("localization").path(language).path(id).path(propertyName);
-    if (localizationNode.isMissingNode() == false && localizationNode.isNull() == false && localizationNode.asText().equals(propertyValue)) {
+    if (!localizationNode.isMissingNode() && !localizationNode.isNull() && localizationNode.asText().equals(propertyValue)) {
       isEqual = true;
     }
     return isEqual;
@@ -404,13 +404,13 @@ public class BpmnDeployer implements Deployer {
               }
             }
             
-            if (name != null && isEqualToCurrentLocalizationValue(locale, dataObject.getId(), DynamicBpmnConstants.LOCALIZATION_NAME, name, infoNode) == false) {
+            if (name != null && !isEqualToCurrentLocalizationValue(locale, dataObject.getId(), DynamicBpmnConstants.LOCALIZATION_NAME, name, infoNode)) {
               dynamicBpmnService.changeLocalizationName(locale, dataObject.getId(), name, infoNode);
               localizationValuesChanged = true;
             }
             
-            if (documentation != null && isEqualToCurrentLocalizationValue(locale, dataObject.getId(), 
-                DynamicBpmnConstants.LOCALIZATION_DESCRIPTION, documentation, infoNode) == false) {
+            if (documentation != null && !isEqualToCurrentLocalizationValue(locale, dataObject.getId(),
+                DynamicBpmnConstants.LOCALIZATION_DESCRIPTION, documentation, infoNode)) {
               
               dynamicBpmnService.changeLocalizationDescription(locale, dataObject.getId(), documentation, infoNode);
               localizationValuesChanged = true;

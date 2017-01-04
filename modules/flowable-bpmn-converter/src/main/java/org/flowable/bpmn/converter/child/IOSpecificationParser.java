@@ -34,14 +34,14 @@ public class IOSpecificationParser extends BaseChildElementParser {
 
   public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
 
-    if (parentElement instanceof Activity == false && parentElement instanceof Process == false)
+    if (!(parentElement instanceof Activity) && !(parentElement instanceof Process))
       return;
 
     IOSpecification ioSpecification = new IOSpecification();
     BpmnXMLUtil.addXMLLocation(ioSpecification, xtr);
     boolean readyWithIOSpecification = false;
     try {
-      while (readyWithIOSpecification == false && xtr.hasNext()) {
+      while (!readyWithIOSpecification && xtr.hasNext()) {
         xtr.next();
         if (xtr.isStartElement() && ELEMENT_DATA_INPUT.equalsIgnoreCase(xtr.getLocalName())) {
           DataSpec dataSpec = new DataSpec();

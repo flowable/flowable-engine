@@ -74,7 +74,7 @@ public class CommandContext {
   protected TransactionContext transactionContext;
   protected Map<Class< ? >, SessionFactory> sessionFactories;
   protected Map<Class< ? >, Session> sessions = new HashMap<Class< ? >, Session>();
-  protected Throwable exception = null;
+  protected Throwable exception;
   protected LinkedList<AtomicOperation> nextOperations = new LinkedList<AtomicOperation>();
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected FailedJobCommandFactory failedJobCommandFactory;
@@ -165,7 +165,7 @@ public class CommandContext {
               log.info("Error while closing command context", exception);
             } else if (exception instanceof ActivitiOptimisticLockingException) {
               // reduce log level, as normally we're not interested in logging this exception
-                log.debug("Optimistic locking exception : {}", exception);
+                log.debug("Optimistic locking exception : {}", exception.getMessage(), exception);
             } else {
               log.error("Error while closing command context", exception);
             }

@@ -79,7 +79,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
   protected String category;
   
-  protected boolean isIdentityLinksInitialized = false;
+  protected boolean isIdentityLinksInitialized;
   protected List<IdentityLinkEntity> taskIdentityLinkEntities = new ArrayList<IdentityLinkEntity>(); 
   
   protected String executionId;
@@ -178,7 +178,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
   @SuppressWarnings("rawtypes")
   public void complete(Map variablesMap, boolean localScope) {
   	
-  	if (getDelegationState() != null && getDelegationState().equals(DelegationState.PENDING)) {
+  	if (getDelegationState() != null && getDelegationState() == DelegationState.PENDING) {
   		throw new ActivitiException("A delegated task cannot be completed, but should be resolved instead.");
   	}
   	
@@ -379,7 +379,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
     List<IdentityLinkEntity> removedIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
     for (IdentityLinkEntity identityLinkEntity : this.getIdentityLinks()) {
       if (IdentityLinkType.CANDIDATE.equals(identityLinkEntity.getType()) && 
-          identityLinkIds.contains(identityLinkEntity.getId()) == false) {
+          !identityLinkIds.contains(identityLinkEntity.getId())) {
         
         if ((userId != null && userId.equals(identityLinkEntity.getUserId()))
           || (groupId != null && groupId.equals(identityLinkEntity.getGroupId()))) {

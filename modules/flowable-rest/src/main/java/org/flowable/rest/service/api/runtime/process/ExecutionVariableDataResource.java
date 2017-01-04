@@ -13,15 +13,11 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import io.swagger.annotations.*;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.runtime.Execution;
@@ -34,6 +30,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
 /**
  * @author Frederik Heremans
  */
@@ -41,16 +43,15 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = { "Executions" }, description = "Manage Executions")
 public class ExecutionVariableDataResource extends BaseExecutionVariableResource {
 
-  @ApiOperation(value = "Get the binary data for an execution", tags = {"Executions"},  nickname = "getExecutionVariableData")
+  @RequestMapping(value = "/runtime/executions/{executionId}/variables/{variableName}/data", method = RequestMethod.GET)
   @ApiResponses(value = {
-          @ApiResponse(code = 200, message =  "Indicates the execution was found and the requested variables are returned."),
+          @ApiResponse(code = 200, message = "Indicates the execution was found and the requested variables are returned."),
           @ApiResponse(code = 404, message = "Indicates the requested execution was not found or the task doesn’t have a variable with the given name (in the given scope). Status message provides additional information.")
   })
-  @RequestMapping(value = "/runtime/executions/{executionId}/variables/{variableName}/data", method = RequestMethod.GET)
-  public @ResponseBody
-  byte[] getVariableData(@ApiParam(name = "executionId") @PathVariable("executionId") String executionId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName, @RequestParam(value = "scope", required = false) String scope,
+  @ApiOperation(value = "Get the binary data for an execution", tags = {"Executions"}, nickname = "getExecutionVariableData")
+  @ResponseBody
+  public byte[] getVariableData(@ApiParam(name = "executionId") @PathVariable("executionId") String executionId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName, @RequestParam(value = "scope", required = false) String scope,
       HttpServletRequest request, HttpServletResponse response) {
-
     try {
       byte[] result = null;
 

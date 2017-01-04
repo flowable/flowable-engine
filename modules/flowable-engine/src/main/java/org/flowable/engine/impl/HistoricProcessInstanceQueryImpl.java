@@ -79,8 +79,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected String locale;
   protected boolean withLocalizationFallback;
   protected List<HistoricProcessInstanceQueryImpl> orQueryObjects = new ArrayList<HistoricProcessInstanceQueryImpl>();
-  protected HistoricProcessInstanceQueryImpl currentOrQueryObject = null;
-  protected boolean inOrStatement = false;
+  protected HistoricProcessInstanceQueryImpl currentOrQueryObject;
+  protected boolean inOrStatement;
   
   public HistoricProcessInstanceQueryImpl() {
   }
@@ -617,12 +617,12 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
       
       if (languageNode != null) {
         JsonNode languageNameNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_NAME);
-        if (languageNameNode != null && languageNameNode.isNull() == false) {
+        if (languageNameNode != null && !languageNameNode.isNull()) {
           processInstanceEntity.setLocalizedName(languageNameNode.asText());
         }
 
         JsonNode languageDescriptionNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_DESCRIPTION);
-        if (languageDescriptionNode != null && languageDescriptionNode.isNull() == false) {
+        if (languageDescriptionNode != null && !languageDescriptionNode.isNull()) {
           processInstanceEntity.setLocalizedDescription(languageDescriptionNode.asText());
         }
       }

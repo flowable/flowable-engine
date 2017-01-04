@@ -38,7 +38,7 @@ public class MapBusinessCalendarManagerTest extends TestCase {
     calendars.put("someKey", calendar);
     MapBusinessCalendarManager businessCalendarManager = new MapBusinessCalendarManager(calendars);
 
-    assertTrue(businessCalendarManager.getBusinessCalendar("someKey").equals(calendar));
+    assertEquals(calendar, businessCalendarManager.getBusinessCalendar("someKey"));
   }
 
   public void testInvalidCalendarNameRequest() {

@@ -29,7 +29,7 @@ import org.flowable.engine.impl.el.NoExecutionVariableScope;
 public class DelegateExpressionFlowableEventListener extends BaseDelegateEventListener {
 
   protected Expression expression;
-  protected boolean failOnException = false;
+  protected boolean failOnException;
 
   public DelegateExpressionFlowableEventListener(Expression expression, Class<?> entityClass) {
     this.expression = expression;

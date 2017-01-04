@@ -248,7 +248,7 @@ public class TableDataManager extends AbstractManager {
           for (int i = 0; i < resultSet.getMetaData().getColumnCount(); i++) {
             String columnName = resultSet.getMetaData().getColumnName(i+1);
             if ("TABLE_SCHEM".equalsIgnoreCase(columnName) || "TABLE_SCHEMA".equalsIgnoreCase(columnName)) {
-              if (schema.equalsIgnoreCase(resultSet.getString(resultSet.getMetaData().getColumnName(i+1))) == false) {
+              if (!schema.equalsIgnoreCase(resultSet.getString(resultSet.getMetaData().getColumnName(i+1)))) {
                 wrongSchema = true;
               }
               break;
@@ -256,7 +256,7 @@ public class TableDataManager extends AbstractManager {
           }
         }
         
-        if (wrongSchema == false) {
+        if (!wrongSchema) {
           String name = resultSet.getString("COLUMN_NAME").toUpperCase();
           String type = resultSet.getString("TYPE_NAME").toUpperCase();
           result.addColumnMetaData(name, type);

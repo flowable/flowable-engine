@@ -45,7 +45,7 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
   protected String script;
   protected String language;
   protected String resultVariable;
-  protected boolean storeScriptVariables = false; // https://activiti.atlassian.net/browse/ACT-1626
+  protected boolean storeScriptVariables; // https://activiti.atlassian.net/browse/ACT-1626
 
   public ScriptTaskActivityBehavior(String script, String language, String resultVariable) {
     this.script = script;
@@ -67,7 +67,7 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
       ObjectNode taskElementProperties = Context.getBpmnOverrideElementProperties(scriptTaskId, execution.getProcessDefinitionId());
       if (taskElementProperties != null && taskElementProperties.has(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT)) {
         String overrideScript = taskElementProperties.get(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT).asText();
-        if (StringUtils.isNotEmpty(overrideScript) && overrideScript.equals(script) == false) {
+        if (StringUtils.isNotEmpty(overrideScript) && !overrideScript.equals(script)) {
           script = overrideScript;
         }
       }

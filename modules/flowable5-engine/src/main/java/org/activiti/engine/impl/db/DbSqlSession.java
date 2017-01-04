@@ -546,7 +546,9 @@ public class DbSqlSession implements Session {
 
     if (log.isDebugEnabled()) {
       Collection<List<PersistentObject>> insertedObjectLists = insertedObjects.values();
-      int nrOfInserts = 0, nrOfUpdates = 0, nrOfDeletes = 0;
+      int nrOfInserts = 0;
+      int nrOfUpdates = 0;
+      int nrOfDeletes = 0;
       for (List<PersistentObject> insertedObjectList: insertedObjectLists) {
         for (PersistentObject insertedObject : insertedObjectList) {
           log.debug("  insert {}", insertedObject);

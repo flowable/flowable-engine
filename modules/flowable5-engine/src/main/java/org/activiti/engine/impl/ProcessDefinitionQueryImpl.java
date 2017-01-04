@@ -57,7 +57,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   protected Integer versionGte;
   protected Integer versionLt;
   protected Integer versionLte;
-  protected boolean latest = false;
+  protected boolean latest;
   protected SuspensionState suspensionState;
   protected String authorizationUserId;
   protected String procDefId;

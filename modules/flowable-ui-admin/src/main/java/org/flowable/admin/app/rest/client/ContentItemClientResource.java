@@ -17,6 +17,8 @@ import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.ContentItemService;
 import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.app.service.exception.BadRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,17 +33,20 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RestController
 public class ContentItemClientResource extends AbstractClientResource {
 
-    @Autowired
-    protected ContentItemService clientService;
+  private static final Logger logger = LoggerFactory.getLogger(ContentItemClientResource.class);
 
-    @RequestMapping(value = "/rest/admin/content-items/{contentItemId}", method = RequestMethod.GET, produces = "application/json")
-    public JsonNode getContentItem(@PathVariable String contentItemId) throws BadRequestException {
+  @Autowired
+  protected ContentItemService clientService;
 
-        ServerConfig serverConfig = retrieveServerConfig(EndpointType.CONTENT);
-        try {
-            return clientService.getContentItem(serverConfig, contentItemId);
-        } catch (FlowableServiceException e) {
-            throw new BadRequestException(e.getMessage());
-        }
+  @RequestMapping(value = "/rest/admin/content-items/{contentItemId}", method = RequestMethod.GET, produces = "application/json")
+  public JsonNode getContentItem(@PathVariable String contentItemId) throws BadRequestException {
+
+    ServerConfig serverConfig = retrieveServerConfig(EndpointType.CONTENT);
+    try {
+      return clientService.getContentItem(serverConfig, contentItemId);
+    } catch (FlowableServiceException e) {
+      logger.error("Error getting content item {}", contentItemId, e);
+      throw new BadRequestException(e.getMessage());
     }
+  }
 }

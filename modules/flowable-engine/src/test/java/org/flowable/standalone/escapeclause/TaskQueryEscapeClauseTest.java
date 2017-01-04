@@ -79,7 +79,6 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     repositoryService.deleteDeployment(deploymentTwoId, true);
   }
   
-  @Test
   public void testQueryByNameLike(){
     if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
         // nameLike
@@ -102,7 +101,6 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
   }
   
-  @Test
   public void testQueryByNameLikeIgnoreCase(){
     if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
         // nameLikeIgnoreCase
@@ -125,7 +123,6 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
   }
   
-  @Test
   public void testQueryByDescriptionLike(){
     if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
         // descriptionLike
@@ -148,7 +145,6 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
   }
   
-  @Test
   public void testQueryByDescriptionLikeIgnoreCase(){
     if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
         // descriptionLikeIgnoreCase
@@ -171,7 +167,6 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
   }
   
-  @Test
   public void testQueryByAssigneeLike(){
     if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
         // assigneeLike
@@ -196,7 +191,6 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
   }
   
-  @Test
   public void testQueryByAssigneeLikeIgnoreCase(){
     if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
         // assigneeLikeIgnoreCase
@@ -221,7 +215,6 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
   }
   
-  @Test
   public void testQueryByOwnerLike(){
     if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
         // taskOwnerLike
@@ -244,7 +237,6 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
   }
   
-  @Test
   public void testQueryByOwnerLikeIgnoreCase(){
     if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
         // taskOwnerLikeIgnoreCase
@@ -267,7 +259,6 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
   }
   
-  @Test
   public void testQueryByProcessInstanceBusinessKeyLike(){
     if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
         // processInstanceBusinessKeyLike
@@ -290,7 +281,6 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
   }
   
-  @Test
   public void testQueryByProcessInstanceBusinessKeyLikeIgnoreCase(){
     if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
         // processInstanceBusinessKeyLike
@@ -315,7 +305,6 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
   }
   
-  @Test
   public void testQueryByKeyLike(){
     if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
         // taskDefinitionKeyLike
@@ -334,7 +323,6 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
   }
   
-  @Test
   public void testQueryByProcessDefinitionKeyLike(){
     if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
         // processDefinitionKeyLike
@@ -353,7 +341,6 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
   }
   
-  @Test
   public void testQueryByProcessDefinitionKeyLikeIgnoreCase(){
     if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
         // processDefinitionKeyLikeIgnoreCase
@@ -372,7 +359,6 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
   }
   
-  @Test
   public void testQueryByProcessDefinitionNameLike(){
     if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
         // processDefinitionNameLike
@@ -398,7 +384,6 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
   }
   
-  @Test
   public void testQueryLikeByQueryVariableValue() {
     if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
         // taskVariableValueLike

@@ -33,26 +33,25 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RestController
 public class JobsClientResource extends AbstractClientResource {
 
-    private final Logger log = LoggerFactory.getLogger(JobsClientResource.class);
-    
-    @Autowired
-    protected JobService jobService;
+  private static final Logger logger = LoggerFactory.getLogger(JobsClientResource.class);
 
-    /**
-     * GET  /rest/admin/jobs -> Get a list of jobs.
-     */
-    @RequestMapping(value = "/rest/admin/jobs",
-            method = RequestMethod.GET,
-            produces = "application/json")
-    public JsonNode listJobs(HttpServletRequest request) {
-        log.debug("REST request to get a list of jobs");
-        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-        Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
-        
-        try {
-	        return jobService.listJobs(serverConfig, parameterMap);
-        } catch (FlowableServiceException e) {
-        	throw new BadRequestException(e.getMessage());
-        }
+  @Autowired
+  protected JobService jobService;
+
+  /**
+   * GET /rest/admin/jobs -> Get a list of jobs.
+   */
+  @RequestMapping(value = "/rest/admin/jobs", method = RequestMethod.GET, produces = "application/json")
+  public JsonNode listJobs(HttpServletRequest request) {
+    logger.debug("REST request to get a list of jobs");
+    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+    Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
+
+    try {
+      return jobService.listJobs(serverConfig, parameterMap);
+    } catch (FlowableServiceException e) {
+      logger.error("Error getting jobs", e);
+      throw new BadRequestException(e.getMessage());
     }
+  }
 }

@@ -424,7 +424,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    * The time (in milliseconds) the async job (both timer and async continuations) acquisition thread will 
    * wait when the queueu is full to execute the next query. By default set to 0 (for backwards compatibility)
    */
-  protected int asyncExecutorDefaultQueueSizeFullWaitTime = 0;
+  protected int asyncExecutorDefaultQueueSizeFullWaitTime;
 
   /**
    * When a job is acquired, it is locked so other async executors can't lock
@@ -551,7 +551,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    * hence the reason why it is disabled by default. If your platform allows 
    * the use of StaxSource during XML parsing, do enable it.
    */
-  protected boolean enableSafeBpmnXml = false;
+  protected boolean enableSafeBpmnXml;
   
   /**
    * The following settings will determine the amount of entities loaded at once when the engine 
@@ -584,7 +584,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected FlowableEventDispatcher eventDispatcher;
   
   // Event logging to database
-  protected boolean enableDatabaseEventLogging = false;
+  protected boolean enableDatabaseEventLogging;
   
   /**
    * Using field injection together with a delegate expression for a service
@@ -604,7 +604,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   protected int maxLengthStringVariableType = 4000;
   
-  protected boolean enableProcessDefinitionInfoCache = false;
+  protected boolean enableProcessDefinitionInfoCache;
   
   // Flowable 5 backwards compatibility handler
   protected Flowable5CompatibilityHandler flowable5CompatibilityHandler;
@@ -785,7 +785,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (jdbcMaxWaitTime > 0) {
           pooledDataSource.setPoolTimeToWait(jdbcMaxWaitTime);
         }
-        if (jdbcPingEnabled == true) {
+        if (jdbcPingEnabled) {
           pooledDataSource.setPoolPingEnabled(true);
           if (jdbcPingQuery != null) {
             pooledDataSource.setPoolPingQuery(jdbcPingQuery);

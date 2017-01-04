@@ -17,6 +17,8 @@ import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.TaskService;
 import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.app.service.exception.BadRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +37,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @RestController
 public class TaskClientResource extends AbstractClientResource {
+  
+  private final Logger logger = LoggerFactory.getLogger(TaskClientResource.class);
 	
 	@Autowired
 	protected TaskService clientService;
@@ -50,6 +54,7 @@ public class TaskClientResource extends AbstractClientResource {
 		try {
 			return clientService.getTask(serverConfig, taskId, runtime);
 		} catch (FlowableServiceException e) {
+		  logger.error("Error getting task {}", taskId);
 			throw new BadRequestException(e.getMessage());
 		}
 	}
@@ -61,6 +66,7 @@ public class TaskClientResource extends AbstractClientResource {
 		try {
 			clientService.deleteTask(serverConfig, taskId);
 		} catch (FlowableServiceException e) {
+		  logger.error("Error deleting task {}", taskId);
 			throw new BadRequestException(e.getMessage());
 		}
 	}
@@ -72,6 +78,7 @@ public class TaskClientResource extends AbstractClientResource {
 		try {
 			clientService.executeTaskAction(serverConfig, taskId, actionBody);
 		} catch (FlowableServiceException e) {
+		  logger.error("Error executing action on task {}", taskId);
 			throw new BadRequestException(e.getMessage());
 		}
 	}
@@ -83,6 +90,7 @@ public class TaskClientResource extends AbstractClientResource {
 		try {
 			clientService.updateTask(serverConfig, taskId, actionBody);
 		} catch (FlowableServiceException e) {
+		  logger.error("Error updating task {}", taskId);
 			throw new BadRequestException(e.getMessage());
 		}
 	}
@@ -93,6 +101,7 @@ public class TaskClientResource extends AbstractClientResource {
 		try {
 			return clientService.getSubTasks(serverConfig, taskId);
 		} catch (FlowableServiceException e) {
+		  logger.error("Error getting sub tasks {}", taskId);
 			throw new BadRequestException(e.getMessage());
 		}
 	}
@@ -113,6 +122,7 @@ public class TaskClientResource extends AbstractClientResource {
 		try {
 			return clientService.getIdentityLinks(serverConfig, taskId);
 		} catch (FlowableServiceException e) {
+		  logger.error("Error getting identity links for task {}", taskId);
 			throw new BadRequestException(e.getMessage());
 		}
 	}

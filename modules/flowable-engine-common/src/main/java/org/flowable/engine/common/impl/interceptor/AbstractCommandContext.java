@@ -95,7 +95,7 @@ public class AbstractCommandContext {
   protected void logException() {
     if (exception instanceof FlowableOptimisticLockingException) {
       // reduce log level, as normally we're not interested in logging this exception
-      log.debug("Optimistic locking exception : {}", exception);
+      log.debug("Optimistic locking exception : {}", exception.getMessage(), exception);
     } else {
       log.error("Error while closing command context", exception);
     }

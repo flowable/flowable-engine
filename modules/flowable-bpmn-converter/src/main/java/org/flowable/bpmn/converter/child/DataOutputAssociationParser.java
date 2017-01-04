@@ -31,7 +31,7 @@ public class DataOutputAssociationParser extends BaseChildElementParser {
 
   public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
 
-    if (parentElement instanceof Activity == false)
+    if (!(parentElement instanceof Activity))
       return;
 
     DataAssociation dataAssociation = new DataAssociation();

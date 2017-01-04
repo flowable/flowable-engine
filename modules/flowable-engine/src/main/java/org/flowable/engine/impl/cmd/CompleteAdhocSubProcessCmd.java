@@ -45,7 +45,7 @@ public class CompleteAdhocSubProcessCmd implements Command<Void>, Serializable {
       throw new FlowableObjectNotFoundException("No execution found for id '" + executionId + "'", ExecutionEntity.class);
     }
     
-    if (execution.getCurrentFlowElement() instanceof AdhocSubProcess == false) {
+    if (!(execution.getCurrentFlowElement() instanceof AdhocSubProcess)) {
       throw new FlowableException("The current flow element of the requested execution is not an ad-hoc sub process");
     }
 

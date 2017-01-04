@@ -31,7 +31,7 @@ public class JPAEntityVariableType implements VariableType, CacheableVariable {
   
   private JPAEntityMappings mappings;
   
-  private boolean forceCacheable = false;
+  private boolean forceCacheable;
   
   public JPAEntityVariableType() {
     mappings = new JPAEntityMappings();

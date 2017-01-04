@@ -198,7 +198,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
 
     if (nullHandlingOnOrder != null) {
 
-      if (nullHandlingOnOrder.equals(NullHandlingOnOrder.NULLS_FIRST)) {
+      if (nullHandlingOnOrder == NullHandlingOnOrder.NULLS_FIRST) {
 
         if (ProcessEngineConfigurationImpl.DATABASE_TYPE_H2.equals(databaseType) || ProcessEngineConfigurationImpl.DATABASE_TYPE_HSQL.equals(databaseType)
             || ProcessEngineConfigurationImpl.DATABASE_TYPE_POSTGRES.equals(databaseType) || ProcessEngineConfigurationImpl.DATABASE_TYPE_ORACLE.equals(databaseType)) {
@@ -211,7 +211,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
           orderBy = orderBy + defaultOrderByClause;
         }
 
-      } else if (nullHandlingOnOrder.equals(NullHandlingOnOrder.NULLS_LAST)) {
+      } else if (nullHandlingOnOrder == NullHandlingOnOrder.NULLS_LAST) {
 
         if (ProcessEngineConfigurationImpl.DATABASE_TYPE_H2.equals(databaseType) || ProcessEngineConfigurationImpl.DATABASE_TYPE_HSQL.equals(databaseType)
             || ProcessEngineConfigurationImpl.DATABASE_TYPE_POSTGRES.equals(databaseType) || ProcessEngineConfigurationImpl.DATABASE_TYPE_ORACLE.equals(databaseType)) {

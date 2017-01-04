@@ -168,16 +168,12 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
           List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(pi).list();
           Execution activityExecution = null;
           for (Execution execution : executions) {
-            if (execution.getProcessInstanceId().equals(execution.getId()) == false) {
+            if (!execution.getProcessInstanceId().equals(execution.getId())) {
               activityExecution = execution;
               break;
             }
           }
-          if (activityExecution != null) {
-            return "changed".equals(activityExecution.getActivityId());
-          } else {
-            return false;
-          }
+          return activityExecution != null && "changed".equals(activityExecution.getActivityId());
         } else {
           return false;
         }

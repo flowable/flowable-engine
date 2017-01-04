@@ -264,7 +264,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
     int nrOfModelsWithTenant = 3;
     for (int i = 0; i < nrOfModelsWithTenant; i++) {
       Model model = repositoryService.newModel();
-      model.setName(i + "");
+      model.setName(String.valueOf(i));
       model.setTenantId(TEST_TENANT_ID);
       repositoryService.saveModel(model);
     }
@@ -273,7 +273,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
     int nrOfModelsWithoutTenant = 5;
     for (int i = 0; i < nrOfModelsWithoutTenant; i++) {
       Model model = repositoryService.newModel();
-      model.setName(i + "");
+      model.setName(String.valueOf(i));
       repositoryService.saveModel(model);
     }
 
@@ -908,7 +908,9 @@ public class TenancyTest extends PluggableFlowableTestCase {
       assertEquals(3, processDefinitions.size());
       
       // Verify they have different tenant ids
-      int tenant1Count = 0, tenant2Count = 0, noTenantCount = 0 ;
+      int tenant1Count = 0;
+      int tenant2Count = 0;
+      int noTenantCount = 0 ;
       for (ProcessDefinition p : processDefinitions) {
         if (p.getTenantId() == null || p.getTenantId().equals(ProcessEngineConfiguration.NO_TENANT_ID)) {
           noTenantCount++;

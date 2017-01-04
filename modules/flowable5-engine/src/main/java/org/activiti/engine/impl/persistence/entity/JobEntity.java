@@ -31,8 +31,8 @@ public class JobEntity extends AbstractJobEntity {
 
   private static final long serialVersionUID = 1L;
 
-  protected String lockOwner = null;
-  protected Date lockExpirationTime = null;
+  protected String lockOwner;
+  protected Date lockExpirationTime;
   
   public JobEntity() {}
   

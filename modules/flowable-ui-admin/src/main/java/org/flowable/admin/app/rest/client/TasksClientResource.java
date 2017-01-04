@@ -17,6 +17,8 @@ import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.TaskService;
 import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.app.service.exception.BadRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +33,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @RestController
 public class TasksClientResource extends AbstractClientResource {
+  
+  private final Logger logger = LoggerFactory.getLogger(TasksClientResource.class);
 
 	@Autowired
 	protected TaskService clientService;
@@ -46,12 +50,10 @@ public class TasksClientResource extends AbstractClientResource {
 		try {
 			resultNode = clientService.listTasks(serverConfig, requestNode);
 		} catch (FlowableServiceException e) {
+		  logger.error("Error getting tasks", e);
 			throw new BadRequestException(e.getMessage());
 		}
 
-		if(resultNode == null) {
-			throw new BadRequestException("Empty result returned from activiti");
-		}
 		return resultNode;
 	}
 }

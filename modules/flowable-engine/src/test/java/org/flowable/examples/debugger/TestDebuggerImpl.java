@@ -18,7 +18,7 @@ import org.flowable.engine.runtime.Debugger;
 public class TestDebuggerImpl implements Debugger {
 
     private final FlowableEngineAgendaFactory agendaFactoryBean;
-    private Predicate isBreakPointPredicate = null;
+    private Predicate isBreakPointPredicate;
     private Agenda agendaCopy;
 
     private static ThreadLocal<Boolean> suppressBreakPoints = new ThreadLocal<>();

@@ -78,7 +78,7 @@ public class StartTimerEventRepeatWithEndExpressionTest extends PluggableFlowabl
     dueDateCalendar.set(2025, Calendar.DECEMBER, 11, 0, 0, 0);
 
     // check the due date is inside the 2 seconds range
-    assertEquals(true, Math.abs(dueDateCalendar.getTime().getTime() - jobs.get(0).getDuedate().getTime()) < 2000);
+    assertTrue(Math.abs(dueDateCalendar.getTime().getTime() - jobs.get(0).getDuedate().getTime()) < 2000);
 
     // No process instances
     List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
@@ -112,7 +112,7 @@ public class StartTimerEventRepeatWithEndExpressionTest extends PluggableFlowabl
     dueDateCalendar = Calendar.getInstance();
     dueDateCalendar.set(2025, Calendar.DECEMBER, 12, 0, 0, 0);
 
-    assertEquals(true, Math.abs(dueDateCalendar.getTime().getTime() - jobs.get(0).getDuedate().getTime()) < 2000);
+    assertTrue(Math.abs(dueDateCalendar.getTime().getTime() - jobs.get(0).getDuedate().getTime()) < 2000);
 
     // ADVANCE THE CLOCK SO THE END DATE WILL BE REACHED
     // 12 dec (last execution)
@@ -141,7 +141,7 @@ public class StartTimerEventRepeatWithEndExpressionTest extends PluggableFlowabl
     int timerFiredCount = 0;
     List<FlowableEvent> eventsReceived = listener.getEventsReceived();
     for (FlowableEvent eventReceived : eventsReceived) {
-      if (FlowableEngineEventType.TIMER_FIRED.equals(eventReceived.getType())) {
+      if (FlowableEngineEventType.TIMER_FIRED == eventReceived.getType()) {
         timerFiredCount++;
       }
     }
@@ -149,7 +149,7 @@ public class StartTimerEventRepeatWithEndExpressionTest extends PluggableFlowabl
     // count "entity created" events
     int eventCreatedCount = 0;
     for (FlowableEvent eventReceived : eventsReceived) {
-      if (FlowableEngineEventType.ENTITY_CREATED.equals(eventReceived.getType())) {
+      if (FlowableEngineEventType.ENTITY_CREATED == eventReceived.getType()) {
         eventCreatedCount++;
       }
     }
@@ -157,7 +157,7 @@ public class StartTimerEventRepeatWithEndExpressionTest extends PluggableFlowabl
     // count "entity deleted" events
     int eventDeletedCount = 0;
     for (FlowableEvent eventReceived : eventsReceived) {
-      if (FlowableEngineEventType.ENTITY_DELETED.equals(eventReceived.getType())) {
+      if (FlowableEngineEventType.ENTITY_DELETED == eventReceived.getType()) {
         eventDeletedCount++;
       }
     }

@@ -113,7 +113,7 @@ ORYX.Plugins.RenameShapes = Clazz.extend({
                 }
 
 				evtCoord.y += $("editor-header").clientHeight - $("canvasSection").scrollTop - 5;
-				if (KISBPM.HEADER_CONFIG.showAppTitle == false)
+				if (FLOWABLE.HEADER_CONFIG.showAppTitle == false)
 				{
 					evtCoord.y += 61;
 				}
@@ -151,8 +151,8 @@ ORYX.Plugins.RenameShapes = Clazz.extend({
 		textInput.style.left = (center.x < 10) ? 10 : center.x + 'px';
 		textInput.style.top = (center.y - 15) + 'px';
 		textInput.className = 'x-form-textarea x-form-field x_form_text_set_absolute';
-		textInput.value = shape.properties[propId];
-		this.oldValueText = shape.properties[propId];
+		textInput.value = shape.properties.get(propId);
+		this.oldValueText = shape.properties.get(propId);
 		document.getElementById('canvasSection').appendChild(textInput);
 		this.shownTextField = textInput;
 		

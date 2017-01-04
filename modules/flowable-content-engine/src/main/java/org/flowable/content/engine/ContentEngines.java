@@ -51,7 +51,7 @@ public abstract class ContentEngines {
    * Initializes all dmn engines that can be found on the classpath for resources <code>flowable.content.cfg.xml</code> and for resources <code>flowable-dmn-context.xml</code> (Spring style
    * configuration).
    */
-  public synchronized static void init() {
+  public static synchronized void init() {
     if (!isInitialized()) {
       if (contentEngines == null) {
         // Create new map to store content engines if current map is null
@@ -231,7 +231,7 @@ public abstract class ContentEngines {
   /**
    * closes all dmn engines. This method should be called when the server shuts down.
    */
-  public synchronized static void destroy() {
+  public static synchronized void destroy() {
     if (isInitialized()) {
       Map<String, ContentEngine> engines = new HashMap<String, ContentEngine>(contentEngines);
       contentEngines = new HashMap<String, ContentEngine>();

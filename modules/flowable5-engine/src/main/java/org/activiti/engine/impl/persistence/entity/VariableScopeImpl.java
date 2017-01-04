@@ -54,7 +54,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
   
   protected ELContext cachedElContext;
 
-  protected String id = null;
+  protected String id;
 
   protected abstract List<VariableInstanceEntity> loadVariableInstances();
   protected abstract VariableScopeImpl getParentVariableScope();
@@ -108,7 +108,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
       }
     }
   	
-  	if (fetchAllVariables == true) {
+  	if (fetchAllVariables) {
   		
   		// getVariables() will go up the execution hierarchy, no need to do it here
   		// also, the cached values will already be applied too 
@@ -154,7 +154,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
       }
     }
     
-    if (fetchAllVariables == true) {
+    if (fetchAllVariables) {
       
       // getVariables() will go up the execution hierarchy, no need to do it here
       // also, the cached values will already be applied too 
@@ -271,7 +271,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
       return usedVariablesCache.get(variableName);
     }
     
-    if (fetchAllVariables == true) {
+    if (fetchAllVariables) {
       
       ensureVariableInstancesInitialized();
       VariableInstanceEntity variableInstance = variableInstances.get(variableName);
@@ -343,7 +343,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
       return usedVariablesCache.get(variableName);
     }
     
-    if (fetchAllVariables == true) {
+    if (fetchAllVariables) {
       
       ensureVariableInstancesInitialized();
       
@@ -497,7 +497,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
       }
     }
   	
-  	if (fetchAllVariables == true) {
+  	if (fetchAllVariables) {
   		
 	    Map<String, Object> allVariables = getVariablesLocal();
 	    for (String variableName : variableNamesToFetch) {
@@ -531,7 +531,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
       }
     }
     
-    if (fetchAllVariables == true) {
+    if (fetchAllVariables) {
       
       Map<String, VariableInstance> allVariables = getVariableInstancesLocal();
       for (String variableName : variableNamesToFetch) {
@@ -653,7 +653,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
   protected void setVariable(String variableName, Object value, 
   		ExecutionEntity sourceActivityExecution, boolean fetchAllVariables) {
   	
-  	if (fetchAllVariables == true) {
+  	if (fetchAllVariables) {
   		
   		// If it's in the cache, it's more recent
   		if (usedVariablesCache.containsKey(variableName)) {
@@ -738,7 +738,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
   public Object setVariableLocal(String variableName, Object value, 
   		ExecutionEntity sourceActivityExecution, boolean fetchAllVariables) {
   	
-  	if (fetchAllVariables == true) {
+  	if (fetchAllVariables) {
   		
 	    // If it's in the cache, it's more recent
   		if (usedVariablesCache.containsKey(variableName)) {

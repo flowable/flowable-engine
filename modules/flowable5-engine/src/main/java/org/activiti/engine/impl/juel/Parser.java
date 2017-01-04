@@ -100,7 +100,7 @@ public class Parser {
 	/**
 	 * Provide limited support for syntax extensions.
 	 */
-	public static abstract class ExtensionHandler {
+    public abstract static class ExtensionHandler {
 		private final ExtensionPoint point;
 		
 		public ExtensionHandler(ExtensionPoint point) {

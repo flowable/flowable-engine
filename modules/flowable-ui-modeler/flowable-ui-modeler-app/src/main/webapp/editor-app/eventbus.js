@@ -10,10 +10,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var KISBPM = KISBPM || {};
+var FLOWABLE = FLOWABLE || {};
 
 /** Inspired by https://github.com/krasimir/EventBus/blob/master/src/EventBus.js */
-KISBPM.eventBus = {
+FLOWABLE.eventBus = {
 
     /** Event fired when the editor is loaded and ready */
     EVENT_TYPE_EDITOR_READY: 'event-type-editor-ready',
@@ -127,7 +127,7 @@ KISBPM.eventBus = {
     },
 
     dispatchOryxEvent: function(event, uiObject) {
-        KISBPM.eventBus.editor.handleEvents(event, uiObject);
+        FLOWABLE.eventBus.editor.handleEvents(event, uiObject);
     }
 
 };

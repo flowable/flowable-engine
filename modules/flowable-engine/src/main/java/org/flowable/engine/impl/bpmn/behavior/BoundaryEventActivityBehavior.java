@@ -139,7 +139,7 @@ public class BoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
     Collection<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByParentExecutionId(parentExecution.getId());
     if (CollectionUtil.isNotEmpty(childExecutions)) {
       for (ExecutionEntity childExecution : childExecutions) {
-        if (childExecution.getId().equals(notToDeleteExecution.getId()) == false) {
+        if (!childExecution.getId().equals(notToDeleteExecution.getId())) {
           deleteChildExecutions(childExecution, notToDeleteExecution, commandContext);
         }
       }

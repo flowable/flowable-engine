@@ -105,7 +105,7 @@ public class ContentItemDataResource extends ContentItemBaseResource {
   public ContentItemResponse saveContentItemData(@ApiParam(name = "contentItemId") @PathVariable("contentItemId") String contentItemId, 
       HttpServletRequest request, HttpServletResponse response) {
     
-    if (request instanceof MultipartHttpServletRequest == false) {
+    if (!(request instanceof MultipartHttpServletRequest)) {
       throw new FlowableException("Multipart request required to save content item data");
     }
     

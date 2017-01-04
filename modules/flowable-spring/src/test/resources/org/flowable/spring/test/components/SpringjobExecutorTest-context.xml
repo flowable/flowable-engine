@@ -25,10 +25,11 @@
         <property name="transactionManager" ref="transactionManager"/>
         <property name="databaseSchemaUpdate" value="true"/>
         <property name="asyncExecutor" ref="springAsyncExecutor"/>
-        <property name="asyncExecutorActivate" value="true"/>
+        <property name="asyncExecutorActivate" value="false"/>
         <property name="deploymentResources">
             <list>
                 <value>classpath:/org/flowable/spring/test/components/SpringTimersProcess.bpmn20.xml</value>
+                <value>classpath:/org/flowable/spring/test/components/SpringAsyncProcess.bpmn20.xml</value>
                 <value>classpath:/org/flowable/spring/test/components/SpringJobExecutorRollBack.bpmn20.xml</value>
             </list>
         </property>

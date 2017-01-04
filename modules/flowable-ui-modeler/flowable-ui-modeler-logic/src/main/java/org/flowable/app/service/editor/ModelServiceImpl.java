@@ -158,7 +158,7 @@ public class ModelServiceImpl implements ModelService {
     
     List<Model> models = modelRepository.findByKeyAndType(key, modelType);
     for (Model modelInfo : models) {
-      if (model == null || modelInfo.getId().equals(model.getId()) == false) {
+      if (model == null || !modelInfo.getId().equals(model.getId())) {
         modelKeyResponse.setKeyAlreadyExists(true);
         modelKeyResponse.setId(modelInfo.getId());
         modelKeyResponse.setName(modelInfo.getName());
@@ -281,7 +281,7 @@ public class ModelServiceImpl implements ModelService {
   protected Model internalSave(String name, String key, String description, String editorJson, boolean newVersion, 
       String newVersionComment, byte[] imageBytes, User updatedBy, Model modelObject) {
 
-    if (newVersion == false) {
+    if (!newVersion) {
 
       modelObject.setLastUpdated(new Date());
       modelObject.setLastUpdatedBy(updatedBy.getId());
@@ -411,7 +411,7 @@ public class ModelServiceImpl implements ModelService {
             }
           }
         } catch (Exception e) {
-          log.error("Could not deserialize app model json (id = " + latestModel.getId() + ")", e);
+          log.error("Could not deserialize app model json (id = {})", latestModel.getId(), e);
         }
       }
     }
@@ -439,7 +439,7 @@ public class ModelServiceImpl implements ModelService {
       bpmnModel = getBpmnModel(model, formMap, decisionTableMap);
 
     } catch (Exception e) {
-      log.error("Could not generate BPMN 2.0 model for " + model.getId(), e);
+      log.error("Could not generate BPMN 2.0 model for {}", model.getId(), e);
       throw new InternalServerErrorException("Could not generate BPMN 2.0 model");
     }
 
@@ -463,7 +463,7 @@ public class ModelServiceImpl implements ModelService {
       return bpmnJsonConverter.convertToBpmnModel(editorJsonNode, formKeyMap, decisionTableKeyMap);
       
     } catch (Exception e) {
-      log.error("Could not generate BPMN 2.0 model for " + model.getId(), e);
+      log.error("Could not generate BPMN 2.0 model for {}", model.getId(), e);
       throw new InternalServerErrorException("Could not generate BPMN 2.0 model");
     }
   }

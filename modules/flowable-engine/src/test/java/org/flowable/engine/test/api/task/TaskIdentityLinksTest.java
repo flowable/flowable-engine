@@ -213,7 +213,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
 
     IdentityLink identityLink = identityLinks.get(0);
     assertEquals("muppets", identityLink.getGroupId());
-    assertEquals(null, identityLink.getUserId());
+    assertNull(identityLink.getUserId());
     assertEquals(IdentityLinkType.CANDIDATE, identityLink.getType());
     assertEquals(taskId, identityLink.getTaskId());
 

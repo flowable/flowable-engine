@@ -155,7 +155,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         MultiInstanceLoopCharacteristics loopDef = activity.getLoopCharacteristics();
         if (StringUtils.isNotEmpty(loopDef.getLoopCardinality()) || StringUtils.isNotEmpty(loopDef.getInputDataItem()) || StringUtils.isNotEmpty(loopDef.getCompletionCondition())) {
 
-          if (loopDef.isSequential() == false) {
+          if (!loopDef.isSequential()) {
             propertiesNode.put(PROPERTY_MULTIINSTANCE_TYPE, "Parallel");
           } else {
             propertiesNode.put(PROPERTY_MULTIINSTANCE_TYPE, "Sequential");
@@ -311,7 +311,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         String multiInstanceCollection = getPropertyValueAsString(PROPERTY_MULTIINSTANCE_COLLECTION, elementNode);
         String multiInstanceCondition = getPropertyValueAsString(PROPERTY_MULTIINSTANCE_CONDITION, elementNode);
 
-        if (StringUtils.isNotEmpty(multiInstanceType) && "none".equalsIgnoreCase(multiInstanceType) == false) {
+        if (StringUtils.isNotEmpty(multiInstanceType) && !"none".equalsIgnoreCase(multiInstanceType)) {
 
           String multiInstanceVariable = getPropertyValueAsString(PROPERTY_MULTIINSTANCE_VARIABLE, elementNode);
 
@@ -529,15 +529,15 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
               if (enumValuesNode != null) {
                 List<FormValue> formValueList = new ArrayList<FormValue>();
                 for (JsonNode enumNode : enumValuesNode) {
-                  if (enumNode.get(PROPERTY_FORM_ENUM_VALUES_ID) != null && enumNode.get(PROPERTY_FORM_ENUM_VALUES_ID).isNull() == false && enumNode.get(PROPERTY_FORM_ENUM_VALUES_NAME) != null
-                      && enumNode.get(PROPERTY_FORM_ENUM_VALUES_NAME).isNull() == false) {
+                  if (enumNode.get(PROPERTY_FORM_ENUM_VALUES_ID) != null && !enumNode.get(PROPERTY_FORM_ENUM_VALUES_ID).isNull() && enumNode.get(PROPERTY_FORM_ENUM_VALUES_NAME) != null
+                      && !enumNode.get(PROPERTY_FORM_ENUM_VALUES_NAME).isNull()) {
 
                     FormValue formValue = new FormValue();
                     formValue.setId(enumNode.get(PROPERTY_FORM_ENUM_VALUES_ID).asText());
                     formValue.setName(enumNode.get(PROPERTY_FORM_ENUM_VALUES_NAME).asText());
                     formValueList.add(formValue);
 
-                  } else if (enumNode.get("value") != null && enumNode.get("value").isNull() == false) {
+                  } else if (enumNode.get("value") != null && !enumNode.get("value").isNull()) {
                     FormValue formValue = new FormValue();
                     formValue.setId(enumNode.get("value").asText());
                     formValue.setName(enumNode.get("value").asText());
@@ -612,7 +612,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
   protected String getValueAsString(String name, JsonNode objectNode) {
     String propertyValue = null;
     JsonNode propertyNode = objectNode.get(name);
-    if (propertyNode != null && propertyNode.isNull() == false) {
+    if (propertyNode != null && !propertyNode.isNull()) {
       propertyValue = propertyNode.asText();
     }
     return propertyValue;
@@ -621,7 +621,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
   protected boolean getValueAsBoolean(String name, JsonNode objectNode) {
     boolean propertyValue = false;
     JsonNode propertyNode = objectNode.get(name);
-    if (propertyNode != null && propertyNode.isNull() == false) {
+    if (propertyNode != null && !propertyNode.isNull()) {
       propertyValue = propertyNode.asBoolean();
     }
     return propertyValue;
@@ -632,7 +632,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
     JsonNode valuesNode = objectNode.get(name);
     if (valuesNode != null) {
       for (JsonNode valueNode : valuesNode) {
-        if (valueNode.get("value") != null && valueNode.get("value").isNull() == false) {
+        if (valueNode.get("value") != null && !valueNode.get("value").isNull()) {
           resultList.add(valueNode.get("value").asText());
         }
       }

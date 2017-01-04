@@ -13,11 +13,11 @@
 
 package org.flowable.rest.service.api.repository;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import io.swagger.annotations.*;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
@@ -31,6 +31,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * @author Frederik Heremans
  */
@@ -38,16 +41,16 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 @Api(tags = { "Models" }, description = "Manage Models")
 public class ModelSourceExtraResource extends BaseModelSourceResource {
 
-  @ApiOperation(value = "Get the extra editor source for a model", tags = {"Models"},
-          notes = "Response body contains the model’s raw editor source. The response’s content-type is set to application/octet-stream, regardless of the content of the source."
-  )
+  @RequestMapping(value = "/repository/models/{modelId}/source-extra", method = RequestMethod.GET)
   @ApiResponses(value = {
           @ApiResponse(code = 200, message = "Indicates the model was found and source is returned."),
           @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
   })
-  @RequestMapping(value = "/repository/models/{modelId}/source-extra", method = RequestMethod.GET)
-  protected @ResponseBody
-  byte[] getModelBytes(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletResponse response) {
+  @ApiOperation(value = "Get the extra editor source for a model", tags = {"Models"},
+          notes = "Response body contains the model’s raw editor source. The response’s content-type is set to application/octet-stream, regardless of the content of the source."
+  )
+  @ResponseBody
+  protected byte[] getModelBytes(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletResponse response) {
     byte[] editorSource = repositoryService.getModelEditorSourceExtra(modelId);
     if (editorSource == null) {
       throw new FlowableObjectNotFoundException("Model with id '" + modelId + "' does not have extra source available.", String.class);
@@ -68,7 +71,7 @@ public class ModelSourceExtraResource extends BaseModelSourceResource {
     if (model != null) {
       try {
 
-        if (request instanceof MultipartHttpServletRequest == false) {
+        if (!(request instanceof MultipartHttpServletRequest)) {
           throw new FlowableIllegalArgumentException("Multipart request is required");
         }
 

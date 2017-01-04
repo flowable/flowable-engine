@@ -54,8 +54,8 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
     assertFalse(responseNode.get("suspended").booleanValue());
     assertEquals("", responseNode.get("tenantId").textValue());
 
-    assertTrue(responseNode.get("url").asText().equals(url));
-    assertTrue(responseNode.get("processDefinitionUrl").asText().equals(buildUrl(RestUrls.URL_PROCESS_DEFINITION, processInstance.getProcessDefinitionId())));
+    assertEquals(responseNode.get("url").asText(), url);
+    assertEquals(responseNode.get("processDefinitionUrl").asText(), buildUrl(RestUrls.URL_PROCESS_DEFINITION, processInstance.getProcessDefinitionId()));
 
     // Check result after tenant has been changed
     managementService.executeCommand(new ChangeDeploymentTenantIdCmd(deploymentId, "myTenant"));

@@ -131,13 +131,13 @@ public class WebConfigurer implements ServletContextListener {
   
   protected ServletRegistration.Dynamic initSpringRestComponent(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext,
       String restContextRoot, Class<? extends WebMvcConfigurationSupport> webConfigClass) {
-    
-    log.debug("Configuring Spring Web application context - " + restContextRoot + " REST");
+
+    log.debug("Configuring Spring Web application context - {} REST", restContextRoot);
     AnnotationConfigWebApplicationContext dispatcherServletConfiguration = new AnnotationConfigWebApplicationContext();
     dispatcherServletConfiguration.setParent(rootContext);
     dispatcherServletConfiguration.register(webConfigClass);
 
-    log.debug("Registering Spring MVC Servlet - " + restContextRoot + " REST");
+    log.debug("Registering Spring MVC Servlet - {} REST", restContextRoot);
     ServletRegistration.Dynamic dispatcherServlet = servletContext.addServlet(restContextRoot + "-dispatcher", new DispatcherServlet(dispatcherServletConfiguration));
     dispatcherServlet.addMapping("/" + restContextRoot + "/*");
     dispatcherServlet.setLoadOnStartup(1);

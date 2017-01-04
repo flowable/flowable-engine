@@ -40,8 +40,8 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
       closeResponse(response);
 
       // Check URL's for the resource
-      assertTrue(responseNode.get("url").textValue().equals(buildUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), rawResourceName)));
-      assertTrue(responseNode.get("contentUrl").textValue().equals(buildUrl(RestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), rawResourceName)));
+      assertEquals(responseNode.get("url").textValue(), buildUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), rawResourceName));
+      assertEquals(responseNode.get("contentUrl").textValue(), buildUrl(RestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), rawResourceName));
       assertEquals("text/xml", responseNode.get("mediaType").textValue());
       assertEquals("processDefinition", responseNode.get("type").textValue());
 

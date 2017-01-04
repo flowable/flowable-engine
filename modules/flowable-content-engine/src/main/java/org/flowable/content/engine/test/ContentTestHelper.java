@@ -66,7 +66,7 @@ public abstract class ContentTestHelper {
     log.debug("verifying that db is clean after test");
     ContentService contentService = contentEngine.getContentEngineConfiguration().getContentService();
     List<ContentItem> items = contentService.createContentItemQuery().list();
-    if (items != null && items.isEmpty() == false) {
+    if (items != null && !items.isEmpty()) {
       throw new AssertionError("ContentItem is not empty");
     }
   }

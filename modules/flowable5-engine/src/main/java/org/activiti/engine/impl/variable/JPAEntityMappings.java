@@ -176,9 +176,9 @@ public class JPAEntityMappings {
     // Only java.sql.date and java.util.date require custom handling, the other types
     // can just use toString()
     if(value instanceof java.util.Date){
-      return "" + ((java.util.Date) value).getTime();
+      return String.valueOf(((java.util.Date) value).getTime());
     } else if(value instanceof java.sql.Date) {
-      return "" + ((java.sql.Date) value).getTime(); 
+      return String.valueOf(((java.sql.Date) value).getTime());
     } else if(value instanceof Long || value instanceof String || value instanceof Byte 
        || value instanceof Short || value instanceof Integer || value instanceof Float 
        || value instanceof Double || value instanceof Character || value instanceof BigDecimal 

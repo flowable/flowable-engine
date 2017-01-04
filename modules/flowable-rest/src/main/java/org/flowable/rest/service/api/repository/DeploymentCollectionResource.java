@@ -135,7 +135,7 @@ public class DeploymentCollectionResource {
                                              @ApiParam(name = "tenantId") @RequestParam(value = "tenantId", required = false) String tenantId,
                                               HttpServletRequest request, HttpServletResponse response) {
 
-    if (request instanceof MultipartHttpServletRequest == false) {
+    if (!(request instanceof MultipartHttpServletRequest)) {
       throw new FlowableIllegalArgumentException("Multipart request is required");
     }
 

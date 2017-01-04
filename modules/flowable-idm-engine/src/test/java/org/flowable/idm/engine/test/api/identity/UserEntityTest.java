@@ -33,8 +33,8 @@ public class UserEntityTest {
   @SuppressWarnings("serial")
   class TestableUserEntity extends UserEntityImpl {
 
-    private boolean hasSavePictureBeenCalled = false;
-    private boolean hasDeletePictureBeenCalled = false;
+    private boolean hasSavePictureBeenCalled;
+    private boolean hasDeletePictureBeenCalled;
 
     @Override
     protected void savePicture(Picture picture) {

@@ -161,7 +161,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
           continue;
         }
         
-        if (didWriteExtensionStartElement == false) {
+        if (!didWriteExtensionStartElement) {
           xtw.writeStartElement(ELEMENT_EXTENSIONS);
           didWriteExtensionStartElement = true;
         }
@@ -178,8 +178,8 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
 	  if (userTask.getCustomUserIdentityLinks().isEmpty() && userTask.getCustomGroupIdentityLinks().isEmpty()) {
 		  return didWriteExtensionStartElement;
 	  }
-	    
-  	if (didWriteExtensionStartElement == false) { 
+
+  	if (!didWriteExtensionStartElement) {
       xtw.writeStartElement(ELEMENT_EXTENSIONS);
       didWriteExtensionStartElement = true;
     }

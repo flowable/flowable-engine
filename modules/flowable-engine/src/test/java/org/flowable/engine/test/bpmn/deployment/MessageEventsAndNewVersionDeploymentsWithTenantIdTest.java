@@ -16,12 +16,9 @@ package org.flowable.engine.test.bpmn.deployment;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.history.HistoryLevel;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 
@@ -149,7 +146,7 @@ public class MessageEventsAndNewVersionDeploymentsWithTenantIdTest extends Plugg
     // Deploy two version of process definition, delete latest and check if all is good
     
     String deploymentId1 = deployStartMessageTestProcess();
-    List<EventSubscriptionEntity> eventSubscriptions = getAllEventSubscriptions();
+    List<EventSubscription> eventSubscriptions = getAllEventSubscriptions();
     assertEquals(1, eventSubscriptions.size());
 
     String deploymentId2 = deployStartMessageTestProcess();
@@ -207,7 +204,7 @@ public class MessageEventsAndNewVersionDeploymentsWithTenantIdTest extends Plugg
     assertEquals(2, runtimeService.createProcessInstanceQuery().count());
     assertEventSubscriptionsCount(1);
     
-    List<EventSubscriptionEntity> eventSubscriptions = getAllEventSubscriptions();
+    List<EventSubscription> eventSubscriptions = getAllEventSubscriptions();
     assertEquals(repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId3).singleResult().getId(), 
         eventSubscriptions.get(0).getProcessDefinitionId());
     
@@ -215,7 +212,9 @@ public class MessageEventsAndNewVersionDeploymentsWithTenantIdTest extends Plugg
   }
   
   public void testDeleteDeploymentWithStartMessageEvents1() {
-    String deploymentId1, deploymentId2, deploymentId3;
+    String deploymentId1;
+    String deploymentId2;
+    String deploymentId3;
     deploymentId1 = deployStartMessageTestProcess();
     deploymentId2 = deployProcessWithoutEvents();
     deploymentId3 = deployStartMessageTestProcess();
@@ -460,39 +459,33 @@ public class MessageEventsAndNewVersionDeploymentsWithTenantIdTest extends Plugg
   }
   
   private List<String> getExecutionIdsForMessageEventSubscription(final String messageName) {
-    return managementService.executeCommand(new Command<List<String>>() {
-      public List<String> execute(CommandContext commandContext) {
-        EventSubscriptionQueryImpl query = new EventSubscriptionQueryImpl(commandContext);
-        query.eventType("message");
-        query.eventName(messageName);
-        query.tenantId(TENANT_ID);
-        query.orderByCreated().desc();
-        List<EventSubscriptionEntity> eventSubscriptions = query.list();
-        
-        List<String> executionIds = new ArrayList<String>();
-        for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
-          executionIds.add(eventSubscription.getExecutionId());
-        }
-        return executionIds;
-      }
-    });
+    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery()
+        .eventType("message")
+        .eventName(messageName)
+        .tenantId(TENANT_ID)
+        .orderByCreateDate()
+        .desc()
+        .list();
+    
+    List<String> executionIds = new ArrayList<String>();
+    for (EventSubscription eventSubscription : eventSubscriptions) {
+      executionIds.add(eventSubscription.getExecutionId());
+    }
+    return executionIds;
   }
   
-  private List<EventSubscriptionEntity> getAllEventSubscriptions() {
-    return managementService.executeCommand(new Command<List<EventSubscriptionEntity>>() {
-      public List<EventSubscriptionEntity> execute(CommandContext commandContext) {
-        EventSubscriptionQueryImpl query = new EventSubscriptionQueryImpl(commandContext);
-        query.tenantId(TENANT_ID);
-        query.orderByCreated().desc();
-        
-        List<EventSubscriptionEntity> eventSubscriptionEntities = query.list();
-        for (EventSubscriptionEntity entity : eventSubscriptionEntities) {
-          assertEquals("message", entity.getEventType());
-          assertNotNull(entity.getProcessDefinitionId());
-        }
-        return eventSubscriptionEntities;
-      }
-    });
+  private List<EventSubscription> getAllEventSubscriptions() {
+    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery()
+        .tenantId(TENANT_ID)
+        .orderByCreateDate()
+        .desc()
+        .list();
+    
+    for (EventSubscription entity : eventSubscriptions) {
+      assertEquals("message", entity.getEventType());
+      assertNotNull(entity.getProcessDefinitionId());
+    }
+    return eventSubscriptions;
   }
   
   private void assertReceiveMessage(String messageName, int executionIdsCount) {

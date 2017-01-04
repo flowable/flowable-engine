@@ -103,12 +103,12 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
   protected boolean withoutTenantId;
   protected String locale;
   protected boolean withLocalizationFallback;
-  protected boolean includeTaskLocalVariables = false;
-  protected boolean includeProcessVariables = false;
+  protected boolean includeTaskLocalVariables;
+  protected boolean includeProcessVariables;
   protected Integer taskVariablesLimit;
   protected List<HistoricTaskInstanceQueryImpl> orQueryObjects = new ArrayList<HistoricTaskInstanceQueryImpl>();
-  protected HistoricTaskInstanceQueryImpl currentOrQueryObject = null;
-  protected boolean inOrStatement = false;
+  protected HistoricTaskInstanceQueryImpl currentOrQueryObject;
+  protected boolean inOrStatement;
 
   public HistoricTaskInstanceQueryImpl() {
   }
@@ -1125,12 +1125,12 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         ObjectNode languageNode = Context.getLocalizationElementProperties(locale, task.getTaskDefinitionKey(), processDefinitionId, withLocalizationFallback);
         if (languageNode != null) {
           JsonNode languageNameNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_NAME);
-          if (languageNameNode != null && languageNameNode.isNull() == false) {
+          if (languageNameNode != null && !languageNameNode.isNull()) {
             taskEntity.setLocalizedName(languageNameNode.asText());
           }
           
           JsonNode languageDescriptionNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_DESCRIPTION);
-          if (languageDescriptionNode != null && languageDescriptionNode.isNull() == false) {
+          if (languageDescriptionNode != null && !languageDescriptionNode.isNull()) {
             taskEntity.setLocalizedDescription(languageDescriptionNode.asText());
           }
         }

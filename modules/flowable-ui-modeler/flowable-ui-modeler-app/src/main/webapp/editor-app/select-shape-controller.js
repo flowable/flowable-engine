@@ -15,7 +15,7 @@
  * Controller for morph shape selection
  */
 
-angular.module('flowableModeler').controller('KisBpmShapeSelectionCtrl',
+angular.module('flowableModeler').controller('FlowableBpmShapeSelectionCtrl',
     [ '$rootScope', '$scope', '$timeout', '$translate', function($rootScope, $scope, $timeout, $translate) {
 
     $scope.currentSelectedMorph = undefined;

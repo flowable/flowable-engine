@@ -67,12 +67,12 @@ public class FlowableProcessInstanceQueryService {
 
     // Process definition
     JsonNode processDefinitionIdNode = requestNode.get("processDefinitionId");
-    if (processDefinitionIdNode != null && processDefinitionIdNode.isNull() == false) {
+    if (processDefinitionIdNode != null && !processDefinitionIdNode.isNull()) {
       instanceQuery.processDefinitionId(processDefinitionIdNode.asText());
     }
 
     JsonNode deploymentKeyNode = requestNode.get("deploymentKey");
-    if (deploymentKeyNode != null && deploymentKeyNode.isNull() == false) {
+    if (deploymentKeyNode != null && !deploymentKeyNode.isNull()) {
       // Results need to be filtered in an app-context. We need to fetch the deployment id for this app and use that in the query
       List<Deployment> deployments = repositoryService.createDeploymentQuery().deploymentKey(deploymentKeyNode.asText()).list();
 

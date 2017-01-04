@@ -39,8 +39,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class DmnJsonConverter {
 
-  public final static String MODEL_NAMESPACE = "http://activiti.com/dmn";
-  public final static String URI_JSON = "http://www.ecma-international.org/ecma-404/";
+  public static final String MODEL_NAMESPACE = "http://activiti.com/dmn";
+  public static final String URI_JSON = "http://www.ecma-international.org/ecma-404/";
 
   protected ObjectMapper objectMapper = new ObjectMapper();
 
@@ -167,7 +167,7 @@ public class DmnJsonConverter {
     // input expressions
     JsonNode inputExpressions = modelNode.get("inputExpressions");
 
-    if (inputExpressions != null && inputExpressions.isNull() == false) {
+    if (inputExpressions != null && !inputExpressions.isNull()) {
 
       for (JsonNode inputExpressionNode : inputExpressions) {
 
@@ -195,7 +195,7 @@ public class DmnJsonConverter {
     // output expressions
     JsonNode outputExpressions = modelNode.get("outputExpressions");
 
-    if (outputExpressions != null && outputExpressions.isNull() == false) {
+    if (outputExpressions != null && !outputExpressions.isNull()) {
 
       for (JsonNode outputExpressionNode : outputExpressions) {
 
@@ -218,7 +218,7 @@ public class DmnJsonConverter {
     // rules
     JsonNode rules = modelNode.get("rules");
 
-    if (rules != null && rules.isNull() == false) {
+    if (rules != null && !rules.isNull()) {
 
       int ruleCounter = 1;
 

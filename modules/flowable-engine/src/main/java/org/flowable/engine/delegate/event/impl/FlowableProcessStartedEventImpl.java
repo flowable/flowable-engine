@@ -33,7 +33,7 @@ public class FlowableProcessStartedEventImpl extends FlowableEntityWithVariables
     super(entity, variables, localScope, FlowableEngineEventType.PROCESS_STARTED);
     if (entity instanceof ExecutionEntity) {
       ExecutionEntity executionEntity = (ExecutionEntity) entity;
-      if (executionEntity.isProcessInstanceType() == false) {
+      if (!executionEntity.isProcessInstanceType()) {
         executionEntity = executionEntity.getParent();
       }
       

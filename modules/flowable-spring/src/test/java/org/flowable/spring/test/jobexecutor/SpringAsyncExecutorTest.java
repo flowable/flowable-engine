@@ -3,6 +3,7 @@ package org.flowable.spring.test.jobexecutor;
 import java.util.List;
 
 import org.flowable.engine.ManagementService;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -33,40 +34,99 @@ public class SpringAsyncExecutorTest extends SpringFlowableTestCase {
 
   @Autowired
   protected TaskService taskService;
+  
+  @Autowired
+  protected ProcessEngineConfiguration processEngineConfiguration;
 
   @Test
   public void testHappyJobExecutorPath() throws Exception {
-
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("process1");
     assertNotNull(instance);
-    waitForTasksToExpire();
+    
+    processEngineConfiguration.getAsyncExecutor().start();
+    
+    waitForTasksToExpire(instance, 0);
 
     List<Task> activeTasks = taskService.createTaskQuery().processInstanceId(instance.getId()).list();
     assertTrue(activeTasks.isEmpty());
+    
+    processEngineConfiguration.getAsyncExecutor().shutdown();
   }
 
   @Test
-  public void testRollbackJobExecutorPath() throws Exception {
+  public void testAsyncJobExecutorPath() throws Exception {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("asyncProcess");
+    assertNotNull(instance);
+    
+    processEngineConfiguration.getAsyncExecutor().start();
+    
+    waitForProcessInstanceToEnd(instance);
 
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(instance.getId())
+        .singleResult();
+    assertNull(processInstance);
+    
+    processEngineConfiguration.getAsyncExecutor().shutdown();
+  }
+  
+  @Test
+  public void testRollbackJobExecutorPath() throws Exception {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("errorProcess1");
     assertNotNull(instance);
-    waitForTasksToExpire();
+    
+    processEngineConfiguration.getAsyncExecutor().start();
+    
+    waitForTasksToExpire(instance, 1);
 
     List<Task> activeTasks = taskService.createTaskQuery().processInstanceId(instance.getId()).list();
     assertTrue(activeTasks.size() == 1);
+    
+    processEngineConfiguration.getAsyncExecutor().shutdown();
   }
 
-  private void waitForTasksToExpire() throws Exception {
+  protected void waitForTasksToExpire(ProcessInstance instance, int expectedTaskSize) throws Exception {
     boolean finished = false;
     int nrOfSleeps = 0;
     while (!finished) {
       long jobCount = managementService.createJobQuery().count();
       long timerCount = managementService.createTimerJobQuery().count();
       if (jobCount == 0 && timerCount == 0) {
-        finished = true;
+        List<Task> activeTasks = taskService.createTaskQuery().processInstanceId(instance.getId()).list();
+        if (activeTasks.size() == expectedTaskSize) {
+          finished = true;
+        } else {
+          Thread.sleep(500L);
+        }
+        
       } else if (nrOfSleeps < 20){
         nrOfSleeps++;
         Thread.sleep(500L);
+        
+      } else {
+        finished = true;
+      }
+    }
+  }
+  
+  protected void waitForProcessInstanceToEnd(ProcessInstance instance) throws Exception {
+    boolean finished = false;
+    int nrOfSleeps = 0;
+    while (!finished) {
+      long jobCount = managementService.createJobQuery().count();
+      long timerCount = managementService.createTimerJobQuery().count();
+      if (jobCount == 0 && timerCount == 0) {
+        long instancesFound = runtimeService.createProcessInstanceQuery().processInstanceId(instance.getId()).count();
+        if (instancesFound == 0) {
+          finished = true;
+        } else {
+          Thread.sleep(500L);
+        }
+        
+      } else if (nrOfSleeps < 20){
+        nrOfSleeps++;
+        Thread.sleep(500L);
+        
       } else {
         finished = true;
       }

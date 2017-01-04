@@ -22,7 +22,7 @@ import org.flowable.engine.impl.persistence.entity.JobEntity;
  */
 public class AsyncContinuationJobHandler implements JobHandler {
 
-  public final static String TYPE = "async-continuation";
+  public static final String TYPE = "async-continuation";
 
   public String getType() {
     return TYPE;

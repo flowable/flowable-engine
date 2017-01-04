@@ -101,7 +101,7 @@ flowableAdminApp.controller('DecisionTableDeploymentsController', ['$rootScope',
 /**\
  * Controller for the upload a model from the process Modeler.
  */
- flowableAdminApp.controller('UploadDeploymentCrtl',
+ flowableAdminApp.controller('UploadDeploymentCtrl',
     ['$scope', '$modalInstance', '$http', '$upload', function ($scope, $modalInstance, $http, $upload) {
 
     $scope.status = {loading: false};

@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("unchecked")
 public class BusinessProcessContext implements Context {
 
-  final static Logger logger = LoggerFactory.getLogger(BusinessProcessContext.class);
+  static final Logger logger = LoggerFactory.getLogger(BusinessProcessContext.class);
 
   private final BeanManager beanManager;
 

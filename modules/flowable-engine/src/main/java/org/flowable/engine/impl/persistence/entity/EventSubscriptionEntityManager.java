@@ -18,6 +18,7 @@ import org.flowable.bpmn.model.Signal;
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
+import org.flowable.engine.runtime.EventSubscription;
 
 /**
  * @author Joram Barrez
@@ -71,7 +72,7 @@ public interface EventSubscriptionEntityManager extends EntityManager<EventSubsc
   
   List<EventSubscriptionEntity> findEventSubscriptionsByTypeAndProcessDefinitionId(String type, String processDefinitionId, String tenantId);
   
-  List<EventSubscriptionEntity> findEventSubscriptionsByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl, Page page);
+  List<EventSubscription> findEventSubscriptionsByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl, Page page);
   
   long findEventSubscriptionCountByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl);
   

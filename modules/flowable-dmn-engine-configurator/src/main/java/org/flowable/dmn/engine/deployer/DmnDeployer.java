@@ -32,7 +32,7 @@ public class DmnDeployer implements Deployer {
 
   @Override
   public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
-    if (deployment.isNew() == false) return;
+    if (!deployment.isNew()) return;
     
     log.debug("DmnDeployer: processing deployment {}", deployment.getName());
 

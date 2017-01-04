@@ -12,11 +12,16 @@
  */
 package org.flowable.bpmn.converter.child;
 
-import javax.xml.stream.XMLStreamReader;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
-import org.flowable.bpmn.model.*;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.FormProperty;
+import org.flowable.bpmn.model.FormValue;
+import org.flowable.bpmn.model.StartEvent;
+import org.flowable.bpmn.model.UserTask;
+
+import javax.xml.stream.XMLStreamReader;
 
 /**
  * @author Tijs Rademakers
@@ -57,7 +62,7 @@ public class FormPropertyParser extends BaseChildElementParser {
 
     boolean readyWithFormProperty = false;
     try {
-      while (readyWithFormProperty == false && xtr.hasNext()) {
+      while (!readyWithFormProperty && xtr.hasNext()) {
         xtr.next();
         if (xtr.isStartElement() && ELEMENT_VALUE.equalsIgnoreCase(xtr.getLocalName())) {
           FormValue value = new FormValue();

@@ -25,7 +25,7 @@ public interface BpmnXMLConstants {
   public static final String TYPE_LANGUAGE_ATTRIBUTE = "typeLanguage";
   public static final String XPATH_NAMESPACE = "http://www.w3.org/1999/XPath";
   public static final String EXPRESSION_LANGUAGE_ATTRIBUTE = "expressionLanguage";
-  public static final String PROCESS_NAMESPACE = "http://www.activiti.org/test";
+  public static final String PROCESS_NAMESPACE = "http://www.flowable.org/test";
   public static final String TARGET_NAMESPACE_ATTRIBUTE = "targetNamespace";
   public static final String FLOWABLE_EXTENSIONS_NAMESPACE = "http://flowable.org/bpmn";
   public static final String FLOWABLE_EXTENSIONS_PREFIX = "flowable";

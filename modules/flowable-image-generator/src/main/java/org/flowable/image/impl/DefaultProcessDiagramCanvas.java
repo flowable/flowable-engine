@@ -94,8 +94,8 @@ public class DefaultProcessDiagramCanvas {
   protected static Color SUBPROCESS_BORDER_COLOR = new Color(0, 0, 0);
   
   // Fonts
-  protected static Font LABEL_FONT = null;
-  protected static Font ANNOTATION_FONT = null;
+  protected static Font LABEL_FONT;
+  protected static Font ANNOTATION_FONT;
   
   // Strokes
   protected static Stroke THICK_TASK_BORDER_STROKE = new BasicStroke(3.0f);
@@ -205,7 +205,7 @@ public class DefaultProcessDiagramCanvas {
     }
     
     this.g = processDiagram.createGraphics();
-    if ("png".equalsIgnoreCase(imageType) == false) {
+    if (!"png".equalsIgnoreCase(imageType)) {
       this.g.setBackground(new Color(255, 255, 255, 0));
       this.g.clearRect(0, 0, canvasWidth, canvasHeight);
     }
@@ -403,7 +403,7 @@ public class DefaultProcessDiagramCanvas {
     g.fill(outerCircle);
 
     g.setPaint(EVENT_BORDER_COLOR);
-    if (isInterrupting == false) 
+    if (!isInterrupting)
       g.setStroke(NON_INTERRUPTING_EVENT_STROKE);
     g.draw(outerCircle);
     g.setStroke(originalStroke);
@@ -503,7 +503,8 @@ public class DefaultProcessDiagramCanvas {
   }
 
   public void drawAssociation(int[] xPoints, int[] yPoints, AssociationDirection associationDirection, boolean highLighted, double scaleFactor) {
-    boolean conditional = false, isDefault = false;
+    boolean conditional = false;
+    boolean isDefault = false;
     drawConnection(xPoints, yPoints, conditional, isDefault, "association", associationDirection, highLighted, scaleFactor);
   }
 
@@ -544,11 +545,11 @@ public class DefaultProcessDiagramCanvas {
       drawConditionalSequenceFlowIndicator(line, scaleFactor);
     }
   
-    if (associationDirection.equals(AssociationDirection.ONE) || associationDirection.equals(AssociationDirection.BOTH)) {
+    if (associationDirection == AssociationDirection.ONE || associationDirection == AssociationDirection.BOTH) {
       Line2D.Double line = new Line2D.Double(xPoints[xPoints.length-2], yPoints[xPoints.length-2], xPoints[xPoints.length-1], yPoints[xPoints.length-1]);
       drawArrowHead(line, scaleFactor);
     }
-    if (associationDirection.equals(AssociationDirection.BOTH)) {
+    if (associationDirection == AssociationDirection.BOTH) {
       Line2D.Double line = new Line2D.Double(xPoints[1], yPoints[1], xPoints[0], yPoints[0]);
       drawArrowHead(line, scaleFactor);
     }
@@ -607,12 +608,16 @@ public class DefaultProcessDiagramCanvas {
   }
 
   public void drawDefaultSequenceFlowIndicator(Line2D.Double line, double scaleFactor) {
-    double length = DEFAULT_INDICATOR_WIDTH / scaleFactor, halfOfLength = length/2, f = 8;
+    double length = DEFAULT_INDICATOR_WIDTH / scaleFactor;
+    double halfOfLength = length/2;
+    double f = 8;
     Line2D.Double defaultIndicator = new Line2D.Double(-halfOfLength, 0, halfOfLength, 0);
 
     double angle = Math.atan2(line.y2 - line.y1, line.x2 - line.x1);
-    double dx = f * Math.cos(angle), dy = f * Math.sin(angle),
-	       x1 = line.x1 + dx, y1 = line.y1 + dy;
+    double dx = f * Math.cos(angle);
+    double dy = f * Math.sin(angle);
+    double x1 = line.x1 + dx;
+    double y1 = line.y1 + dy;
 
     AffineTransform transformation = new AffineTransform();
     transformation.setToIdentity();
@@ -1113,7 +1118,7 @@ public class DefaultProcessDiagramCanvas {
     int boxX = x + width/2 - boxWidth/2;
     int boxY = y + height/2 - boxHeight/2;
     
-    if (text != null && text.isEmpty() == false) {
+    if (text != null && !text.isEmpty()) {
       drawMultilineAnnotationText(text, boxX, boxY, boxWidth, boxHeight);
     }
 	  
@@ -1221,10 +1226,10 @@ public class DefaultProcessDiagramCanvas {
    * @return Shape
    */
   private static Shape createShape(SHAPE_TYPE shapeType, GraphicInfo graphicInfo) {
-    if (SHAPE_TYPE.Rectangle.equals(shapeType)) {
+    if (SHAPE_TYPE.Rectangle == shapeType) {
       // source is rectangle
       return new Rectangle2D.Double(graphicInfo.getX(), graphicInfo.getY(), graphicInfo.getWidth(), graphicInfo.getHeight());       
-    } else if (SHAPE_TYPE.Rhombus.equals(shapeType)) {
+    } else if (SHAPE_TYPE.Rhombus == shapeType) {
       // source is rhombus
       Path2D.Double rhombus = new Path2D.Double();
       rhombus.moveTo(graphicInfo.getX(), graphicInfo.getY() + graphicInfo.getHeight() / 2);
@@ -1234,7 +1239,7 @@ public class DefaultProcessDiagramCanvas {
       rhombus.lineTo(graphicInfo.getX(), graphicInfo.getY() + graphicInfo.getHeight() / 2);
       rhombus.closePath();
       return rhombus;
-    } else if (SHAPE_TYPE.Ellipse.equals(shapeType)) {
+    } else if (SHAPE_TYPE.Ellipse == shapeType) {
       // source is ellipse
       return new Ellipse2D.Double(graphicInfo.getX(), graphicInfo.getY(), graphicInfo.getWidth(), graphicInfo.getHeight());
     } else {

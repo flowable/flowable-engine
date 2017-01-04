@@ -94,6 +94,11 @@ public abstract class TestHelper {
         deploymentBuilder.addClasspathResource(resource);
       }
 
+      if (deploymentAnnotation.tenantId() != null
+          && deploymentAnnotation.tenantId().length() > 0) {
+        deploymentBuilder.tenantId(deploymentAnnotation.tenantId());
+      } 
+  
       deploymentId = deploymentBuilder.deploy().getId();
     }
 

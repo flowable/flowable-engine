@@ -15,10 +15,10 @@ package org.flowable.engine.test.bpmn.subprocess.transaction;
 
 import java.util.List;
 
-import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.history.HistoryLevel;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.EventSubscription;
+import org.flowable.engine.runtime.EventSubscriptionQuery;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -52,7 +52,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
     assertTrue(activeActivityIds.contains("afterSuccess"));
 
     // there is a compensate event subscription for the transaction under the process instance
-    EventSubscriptionEntity eventSubscriptionEntity = createEventSubscriptionQuery().eventType("compensate").activityId("tx").executionId(processInstance.getId()).singleResult();
+    EventSubscription eventSubscriptionEntity = createEventSubscriptionQuery().eventType("compensate").activityId("tx").executionId(processInstance.getId()).singleResult();
 
     // there is an event-scope execution associated with the event-subscription:
     assertNotNull(eventSubscriptionEntity.getConfiguration());
@@ -273,7 +273,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
 
     // there are now 5 instances of the transaction:
 
-    List<EventSubscriptionEntity> eventSubscriptionEntities = createEventSubscriptionQuery().eventType("compensate").list();
+    List<EventSubscription> eventSubscriptionEntities = createEventSubscriptionQuery().eventType("compensate").list();
 
     // there are 10 compensation event subscriptions
     assertEquals(10, eventSubscriptionEntities.size());
@@ -301,7 +301,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
 
     // there are now 5 instances of the transaction:
 
-    List<EventSubscriptionEntity> EventSubscriptionEntitys = createEventSubscriptionQuery().eventType("compensate").list();
+    List<EventSubscription> EventSubscriptionEntitys = createEventSubscriptionQuery().eventType("compensate").list();
 
     // there are 10 compensation event subscriptions
     assertEquals(10, EventSubscriptionEntitys.size());
@@ -360,8 +360,8 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
     }
   }
 
-  private EventSubscriptionQueryImpl createEventSubscriptionQuery() {
-    return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor());
+  private EventSubscriptionQuery createEventSubscriptionQuery() {
+    return runtimeService.createEventSubscriptionQuery();
   }
 
   @Deployment

@@ -73,7 +73,6 @@ angular.module('flowableModeler').service('FormBuilderService', ['$http', '$q', 
                     ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, 300, canvas.height / scale);
                     data.formImageBase64 = extra_canvas.toDataURL("image/png");
 
-                    delete Array.prototype.toJSON;
                     $http({method: 'PUT', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/form-models/' + $rootScope.currentForm.id, data: data}).
                         success(function (response, status, headers, config) {
 

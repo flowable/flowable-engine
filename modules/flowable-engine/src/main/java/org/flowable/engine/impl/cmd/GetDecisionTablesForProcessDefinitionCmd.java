@@ -57,7 +57,7 @@ public class GetDecisionTablesForProcessDefinitionCmd implements Command<List<De
       throw new FlowableObjectNotFoundException("Cannot find bpmn model for process definition id: " + processDefinitionId, BpmnModel.class);
     }
 
-    if (commandContext.getProcessEngineConfiguration().isDmnEngineInitialized() == false) {
+    if (!commandContext.getProcessEngineConfiguration().isDmnEngineInitialized()) {
       throw new FlowableException("DMN Engine is not initialized");
     } else {
       if (commandContext.getProcessEngineConfiguration().getDmnEngineRepositoryService() == null) {

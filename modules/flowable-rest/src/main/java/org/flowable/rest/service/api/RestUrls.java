@@ -42,6 +42,7 @@ public final class RestUrls {
   public static final String SEGMENT_EXECUTION_RESOURCE = "executions";
   public static final String SEGMENT_PROCESS_INSTANCE_RESOURCE = "process-instances";
   public static final String SEGMENT_VARIABLES = "variables";
+  public static final String SEGMENT_EVENT_SUBSCRIPTIONS = "event-subscriptions";
   public static final String SEGMENT_SUBTASKS = "subtasks";
   public static final String SEGMENT_IDENTITYLINKS = "identitylinks";
   public static final String SEGMENT_COMMENTS = "comments";
@@ -520,6 +521,16 @@ public final class RestUrls {
    */
   public static final String[] URL_DEADLETTER_JOB_COLLECTION = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_DEADLETTER_JOBS };
 
+  /**
+   * URL template for a single event subscription: <i>runtime/event-subscriptions/{0:eventSubscriptionId}</i>
+   */
+  public static final String[] URL_EVENT_SUBSCRIPTION = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_EVENT_SUBSCRIPTIONS, "{0}" };
+  
+  /**
+   * URL template for the collection of event subscriptions: <i>runtime/event-subscriptions</i>
+   */
+  public static final String[] URL_EVENT_SUBSCRIPTION_COLLECTION = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_EVENT_SUBSCRIPTIONS };
+  
   /**
    * URL template for the collection of properties: <i>management/properties</i>
    */

@@ -88,7 +88,7 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
     ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("expressionFieldInjectionWithSkipExpression", vars2);
     Execution execution2 = runtimeService.createExecutionQuery().processInstanceId(pi2.getId()).activityId("waitState").singleResult();
 
-    assertEquals(null, execution2);
+    assertNull(execution2);
   }
 
   @Deployment

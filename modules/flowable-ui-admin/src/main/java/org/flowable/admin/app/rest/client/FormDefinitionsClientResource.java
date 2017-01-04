@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.FormDefinitionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,24 +36,26 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RestController
 public class FormDefinitionsClientResource extends AbstractClientResource {
 
-    @Autowired
-    protected FormDefinitionService clientService;
+  private static final Logger logger = LoggerFactory.getLogger(FormDefinitionsClientResource.class);
 
-    /**
-     * GET a list of deployed form definitions.
-     */
-    @RequestMapping(value = "/rest/admin/form-definitions", method = RequestMethod.GET, produces = "application/json")
-    public JsonNode listFormDefinitions(HttpServletRequest request) {
-        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
-        Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
-        return clientService.listForms(serverConfig, parameterMap);
-    }
-    
-    /**
-     * GET process definition's list of deployed form definitions.
-     */
-    @RequestMapping(value = "/rest/admin/process-definition-form-definitions/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
-    public JsonNode getProcessDefinitionForms(@PathVariable String processDefinitionId, HttpServletRequest request) {
-        return clientService.getProcessDefinitionForms(retrieveServerConfig(EndpointType.PROCESS), processDefinitionId);
-    }
+  @Autowired
+  protected FormDefinitionService clientService;
+
+  /**
+   * GET a list of deployed form definitions.
+   */
+  @RequestMapping(value = "/rest/admin/form-definitions", method = RequestMethod.GET, produces = "application/json")
+  public JsonNode listFormDefinitions(HttpServletRequest request) {
+    ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+    Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
+    return clientService.listForms(serverConfig, parameterMap);
+  }
+
+  /**
+   * GET process definition's list of deployed form definitions.
+   */
+  @RequestMapping(value = "/rest/admin/process-definition-form-definitions/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
+  public JsonNode getProcessDefinitionForms(@PathVariable String processDefinitionId, HttpServletRequest request) {
+    return clientService.getProcessDefinitionForms(retrieveServerConfig(EndpointType.PROCESS), processDefinitionId);
+  }
 }

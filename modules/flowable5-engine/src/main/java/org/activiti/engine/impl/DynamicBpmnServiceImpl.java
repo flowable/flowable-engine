@@ -332,7 +332,7 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
     boolean exists = false;
     if (infoNode.get(BPMN_NODE) != null && infoNode.get(BPMN_NODE).get(id) != null && infoNode.get(BPMN_NODE).get(id).get(propertyName) != null) {
       JsonNode propNode = infoNode.get(BPMN_NODE).get(id).get(propertyName);
-      if (propNode.isNull() == false) {
+      if (!propNode.isNull()) {
         exists = true;
       }
     }
@@ -341,7 +341,7 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
   
   protected void setElementProperty(String id, String propertyName, String propertyValue, ObjectNode infoNode) {
     ObjectNode bpmnNode = createOrGetBpmnNode(infoNode);
-    if (bpmnNode.has(id) == false) {
+    if (!bpmnNode.has(id)) {
       bpmnNode.set(id, processEngineConfiguration.getObjectMapper().createObjectNode());
     }
     
@@ -350,7 +350,7 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
   
   protected void setElementProperty(String id, String propertyName, JsonNode propertyValue, ObjectNode infoNode) {
     ObjectNode bpmnNode = createOrGetBpmnNode(infoNode);
-    if (bpmnNode.has(id) == false) {
+    if (!bpmnNode.has(id)) {
       bpmnNode.set(id, processEngineConfiguration.getObjectMapper().createObjectNode());
     }
     
@@ -358,7 +358,7 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
   }
   
   protected ObjectNode createOrGetBpmnNode(ObjectNode infoNode) {
-    if (infoNode.has(BPMN_NODE) == false) {
+    if (!infoNode.has(BPMN_NODE)) {
       infoNode.set(BPMN_NODE, processEngineConfiguration.getObjectMapper().createObjectNode());
     }
     return (ObjectNode) infoNode.get(BPMN_NODE);
@@ -370,12 +370,12 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
   
   protected void setLocalizationProperty(String language, String id, String propertyName, String propertyValue, ObjectNode infoNode) {
     ObjectNode localizationNode = createOrGetLocalizationNode(infoNode);
-    if (localizationNode.has(language) == false) {
+    if (!localizationNode.has(language)) {
       localizationNode.set(language, processEngineConfiguration.getObjectMapper().createObjectNode());
     }
     
     ObjectNode languageNode = (ObjectNode) localizationNode.get(language);
-    if (languageNode.has(id) == false) {
+    if (!languageNode.has(id)) {
       languageNode.set(id, processEngineConfiguration.getObjectMapper().createObjectNode());
     }
     
@@ -383,7 +383,7 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
   }
   
   protected ObjectNode createOrGetLocalizationNode(ObjectNode infoNode) {
-    if (infoNode.has(LOCALIZATION_NODE) == false) {
+    if (!infoNode.has(LOCALIZATION_NODE)) {
       infoNode.set(LOCALIZATION_NODE, processEngineConfiguration.getObjectMapper().createObjectNode());
     }
     return (ObjectNode) infoNode.get(LOCALIZATION_NODE);

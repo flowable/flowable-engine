@@ -63,7 +63,7 @@ flowableAdminApp.controller('DeploymentController', ['$scope', '$rootScope', '$h
 		$scope.deleteDeployment = function() {
 		    var modalInstance = $modal.open({
                 templateUrl: 'views/confirm-popup.html',
-                controller: 'ConfirmPopupCrtl',
+                controller: 'ConfirmPopupCtrl',
                 resolve: {
                     model: function () {
                       return {

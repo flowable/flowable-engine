@@ -426,7 +426,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     runtimeService.trigger(execution.getId(), processVariables);
 
     Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
-    assertEquals(variables, processVariables);
+    assertEquals(processVariables, variables);
 
   }
 
@@ -1041,5 +1041,58 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     assertNull(processInstance.getStartUserId());
+  }
+  
+  @Deployment(resources = { "org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml" })
+  public void testSetCurrentActivityForSimpleProcess() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    taskService.complete(task.getId());
+    
+    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals("secondTask", task.getTaskDefinitionKey());
+    
+    runtimeService.createChangeActivityStateBuilder()
+      .processInstanceId(processInstance.getId())
+      .cancelActivityId("secondTask")
+      .startActivityId("firstTask")
+      .changeState();
+    
+    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals("firstTask", task.getTaskDefinitionKey());
+    
+    taskService.complete(task.getId());
+    
+    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals("secondTask", task.getTaskDefinitionKey());
+    taskService.complete(task.getId());
+  }
+  
+  @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcess.bpmn20.xml" })
+  public void testSetCurrentActivityForSubProcess() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    taskService.complete(task.getId());
+    
+    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals("subtask", task.getTaskDefinitionKey());
+    
+    runtimeService.createChangeActivityStateBuilder()
+      .processInstanceId(processInstance.getId())
+      .cancelActivityId("subtask")
+      .startActivityId("taskBefore")
+      .changeState();
+    
+    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals("taskBefore", task.getTaskDefinitionKey());
+    
+    List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+    assertEquals(2, executions.size());
+    
+    taskService.complete(task.getId());
+    
+    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals("subtask", task.getTaskDefinitionKey());
+    taskService.complete(task.getId());
   }
 }

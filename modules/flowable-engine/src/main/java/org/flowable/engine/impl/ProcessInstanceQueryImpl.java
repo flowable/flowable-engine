@@ -78,8 +78,8 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   protected boolean withoutTenantId;
   
   protected List<ProcessInstanceQueryImpl> orQueryObjects = new ArrayList<ProcessInstanceQueryImpl>();
-  protected ProcessInstanceQueryImpl currentOrQueryObject = null;
-  protected boolean inOrStatement = false;
+  protected ProcessInstanceQueryImpl currentOrQueryObject;
+  protected boolean inOrStatement;
 
   protected Date startedBefore;
   protected Date startedAfter;
@@ -661,12 +661,12 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
         ObjectNode languageNode = Context.getLocalizationElementProperties(locale, processInstanceExecution.getProcessDefinitionKey(), processDefinitionId, withLocalizationFallback);
         if (languageNode != null) {
           JsonNode languageNameNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_NAME);
-          if (languageNameNode != null && languageNameNode.isNull() == false) {
+          if (languageNameNode != null && !languageNameNode.isNull()) {
             processInstanceExecution.setLocalizedName(languageNameNode.asText());
           }
 
           JsonNode languageDescriptionNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_DESCRIPTION);
-          if (languageDescriptionNode != null && languageDescriptionNode.isNull() == false) {
+          if (languageDescriptionNode != null && !languageDescriptionNode.isNull()) {
             processInstanceExecution.setLocalizedDescription(languageDescriptionNode.asText());
           }
         }

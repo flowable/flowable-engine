@@ -27,6 +27,7 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
+import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
@@ -34,11 +35,15 @@ import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.asyncexecutor.JobManager;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
+import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
+import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 
@@ -211,13 +216,13 @@ public class ProcessInstanceHelper {
     List<SignalEventSubscriptionEntity> signalEventSubscriptions = new LinkedList<>();
     
     for (FlowElement flowElement : process.getFlowElements()) {
-      if (flowElement instanceof EventSubProcess == false) {
+      if (!(flowElement instanceof EventSubProcess)) {
         continue;
       }
       
       EventSubProcess eventSubProcess = (EventSubProcess) flowElement;
       for (FlowElement subElement : eventSubProcess.getFlowElements()) {
-        if (subElement instanceof StartEvent == false) {
+        if (!(subElement instanceof StartEvent)) {
           continue;
         }
           
@@ -233,9 +238,11 @@ public class ProcessInstanceHelper {
           if (bpmnModel.containsMessageId(messageEventDefinition.getMessageRef())) {
             messageEventDefinition.setMessageRef(bpmnModel.getMessage(messageEventDefinition.getMessageRef()).getName());
           }
+          
           ExecutionEntity messageExecution = commandContext.getExecutionEntityManager().createChildExecution(processInstance);
           messageExecution.setCurrentFlowElement(startEvent);
           messageExecution.setEventScope(true);
+          
           messageEventSubscriptions.add(commandContext.getEventSubscriptionEntityManager().insertMessageEvent(
               messageEventDefinition.getMessageRef(), messageExecution));
         
@@ -247,11 +254,29 @@ public class ProcessInstanceHelper {
             signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
             signalEventDefinition.setSignalRef(signal.getName());
           }
+          
           ExecutionEntity signalExecution = commandContext.getExecutionEntityManager().createChildExecution(processInstance);
           signalExecution.setCurrentFlowElement(startEvent);
           signalExecution.setEventScope(true);
+          
           signalEventSubscriptions.add(commandContext.getEventSubscriptionEntityManager().insertSignalEvent(
               signalEventDefinition.getSignalRef(), signal, signalExecution));
+        
+        } else if (eventDefinition instanceof TimerEventDefinition) {
+          TimerEventDefinition timerEventDefinition = (TimerEventDefinition) eventDefinition;
+          
+          ExecutionEntity timerExecution = commandContext.getExecutionEntityManager().createChildExecution(processInstance);
+          timerExecution.setCurrentFlowElement(startEvent);
+          timerExecution.setEventScope(true);
+          
+          JobManager jobManager = commandContext.getJobManager();
+          
+          TimerJobEntity timerJob = jobManager.createTimerJob(timerEventDefinition, false, timerExecution, TriggerTimerEventJobHandler.TYPE,
+              TimerEventHandler.createConfiguration(startEvent.getId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
+          
+          if (timerJob != null) {
+            jobManager.scheduleTimerJob(timerJob);
+          }
         }
       }
     }

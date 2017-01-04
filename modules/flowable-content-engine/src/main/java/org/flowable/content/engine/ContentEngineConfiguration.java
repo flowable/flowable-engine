@@ -396,10 +396,12 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration {
   // myBatis SqlSessionFactory
   // ////////////////////////////////////////////////
 
+  @Override
   public String pathToEngineDbProperties() {
     return "org/flowable/content/db/properties/" + databaseType + ".properties";
   }
 
+  @Override
   public InputStream getMyBatisXmlConfigurationStream() {
     return getResourceAsStream(DEFAULT_MYBATIS_MAPPING_FILE);
   }
@@ -407,6 +409,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration {
   // getters and setters
   // //////////////////////////////////////////////////////
 
+  @Override
   public String getEngineName() {
     return contentEngineName;
   }
@@ -416,86 +419,103 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration {
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setDatabaseType(String databaseType) {
     this.databaseType = databaseType;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setDataSource(DataSource dataSource) {
     this.dataSource = dataSource;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setJdbcDriver(String jdbcDriver) {
     this.jdbcDriver = jdbcDriver;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setJdbcUrl(String jdbcUrl) {
     this.jdbcUrl = jdbcUrl;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setJdbcUsername(String jdbcUsername) {
     this.jdbcUsername = jdbcUsername;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setJdbcPassword(String jdbcPassword) {
     this.jdbcPassword = jdbcPassword;
     return this;
   }
 
+ @Override
  public ContentEngineConfiguration setJdbcMaxActiveConnections(int jdbcMaxActiveConnections) {
     this.jdbcMaxActiveConnections = jdbcMaxActiveConnections;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setJdbcMaxIdleConnections(int jdbcMaxIdleConnections) {
     this.jdbcMaxIdleConnections = jdbcMaxIdleConnections;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setJdbcMaxCheckoutTime(int jdbcMaxCheckoutTime) {
     this.jdbcMaxCheckoutTime = jdbcMaxCheckoutTime;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setJdbcMaxWaitTime(int jdbcMaxWaitTime) {
     this.jdbcMaxWaitTime = jdbcMaxWaitTime;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setJdbcPingEnabled(boolean jdbcPingEnabled) {
     this.jdbcPingEnabled = jdbcPingEnabled;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setJdbcPingConnectionNotUsedFor(int jdbcPingConnectionNotUsedFor) {
     this.jdbcPingConnectionNotUsedFor = jdbcPingConnectionNotUsedFor;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setJdbcDefaultTransactionIsolationLevel(int jdbcDefaultTransactionIsolationLevel) {
     this.jdbcDefaultTransactionIsolationLevel = jdbcDefaultTransactionIsolationLevel;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setJdbcPingQuery(String jdbcPingQuery) {
     this.jdbcPingQuery = jdbcPingQuery;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setDataSourceJndiName(String dataSourceJndiName) {
     this.dataSourceJndiName = dataSourceJndiName;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setXmlEncoding(String xmlEncoding) {
     this.xmlEncoding = xmlEncoding;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setDefaultCommandConfig(CommandConfig defaultCommandConfig) {
     this.defaultCommandConfig = defaultCommandConfig;
     return this;
@@ -631,26 +651,31 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration {
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
     this.sqlSessionFactory = sqlSessionFactory;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setTransactionFactory(TransactionFactory transactionFactory) {
     this.transactionFactory = transactionFactory;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setCustomMybatisMappers(Set<Class<?>> customMybatisMappers) {
     this.customMybatisMappers = customMybatisMappers;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setCustomMybatisXMLMappers(Set<String> customMybatisXMLMappers) {
     this.customMybatisXMLMappers = customMybatisXMLMappers;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setCustomSessionFactories(List<SessionFactory> customSessionFactories) {
     this.customSessionFactories = customSessionFactories;
     return this;
@@ -665,31 +690,37 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration {
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setUsingRelationalDatabase(boolean usingRelationalDatabase) {
     this.usingRelationalDatabase = usingRelationalDatabase;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setDatabaseTablePrefix(String databaseTablePrefix) {
     this.databaseTablePrefix = databaseTablePrefix;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setDatabaseCatalog(String databaseCatalog) {
     this.databaseCatalog = databaseCatalog;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setDatabaseSchema(String databaseSchema) {
     this.databaseSchema = databaseSchema;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setTablePrefixIsSchema(boolean tablePrefixIsSchema) {
     this.tablePrefixIsSchema = tablePrefixIsSchema;
     return this;
   }
 
+  @Override
   public ContentEngineConfiguration setSessionFactories(Map<Class<?>, SessionFactory> sessionFactories) {
     this.sessionFactories = sessionFactories;
     return this;
@@ -706,15 +737,13 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration {
     return this;
   }
   
+  @Override
   public ContentEngineConfiguration setDatabaseSchemaUpdate(String databaseSchemaUpdate) {
     this.databaseSchemaUpdate = databaseSchemaUpdate;
     return this;
   }
-  
-  public Clock getClock() {
-    return clock;
-  }
 
+    @Override
   public ContentEngineConfiguration setClock(Clock clock) {
     this.clock = clock;
     return this;

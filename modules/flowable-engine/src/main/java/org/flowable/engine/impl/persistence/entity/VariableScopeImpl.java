@@ -107,7 +107,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
       }
     }
 
-    if (fetchAllVariables == true) {
+    if (fetchAllVariables) {
 
       // getVariables() will go up the execution hierarchy, no need to do
       // it here also, the cached values will already be applied too
@@ -153,7 +153,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
       }
     }
 
-    if (fetchAllVariables == true) {
+    if (fetchAllVariables) {
 
       // getVariables() will go up the execution hierarchy, no need to do it here
       // also, the cached values will already be applied too
@@ -269,7 +269,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
       return usedVariablesCache.get(variableName);
     }
     
-    if (fetchAllVariables == true) {
+    if (fetchAllVariables) {
       ensureVariableInstancesInitialized();
       VariableInstanceEntity variableInstance = variableInstances.get(variableName);
       if (variableInstance != null) {
@@ -336,7 +336,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
       return usedVariablesCache.get(variableName);
     }
     
-    if (fetchAllVariables == true) {
+    if (fetchAllVariables) {
 
       ensureVariableInstancesInitialized();
 
@@ -483,7 +483,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
       }
     }
 
-    if (fetchAllVariables == true) {
+    if (fetchAllVariables) {
 
       Map<String, Object> allVariables = getVariablesLocal();
       for (String variableName : variableNamesToFetch) {
@@ -517,7 +517,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
       }
     }
 
-    if (fetchAllVariables == true) {
+    if (fetchAllVariables) {
 
       Map<String, VariableInstance> allVariables = getVariableInstancesLocal();
       for (String variableName : variableNamesToFetch) {
@@ -637,7 +637,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
    */
   protected void setVariable(String variableName, Object value, ExecutionEntity sourceExecution, boolean fetchAllVariables) {
 
-    if (fetchAllVariables == true) {
+    if (fetchAllVariables) {
 
       // If it's in the cache, it's more recent
       if (usedVariablesCache.containsKey(variableName)) {
@@ -727,7 +727,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
   public Object setVariableLocal(String variableName, Object value, ExecutionEntity sourceActivityExecution, boolean fetchAllVariables) {
 
-    if (fetchAllVariables == true) {
+    if (fetchAllVariables) {
 
       // If it's in the cache, it's more recent
       if (usedVariablesCache.containsKey(variableName)) {

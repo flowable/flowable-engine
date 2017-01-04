@@ -564,8 +564,8 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
     
     runtimeService.deleteProcessInstance(processInstance.getId(), "testing instance deletion");
     
-    assertEquals("Task cancelled event has to be fired.", this.listener.getEventsReceived().get(0).getType(), FlowableEngineEventType.ACTIVITY_CANCELLED);
-    assertEquals("SubProcess cancelled event has to be fired.", this.listener.getEventsReceived().get(2).getType(), FlowableEngineEventType.PROCESS_CANCELLED);
+    assertEquals("Task cancelled event has to be fired.", FlowableEngineEventType.ACTIVITY_CANCELLED, this.listener.getEventsReceived().get(0).getType());
+    assertEquals("SubProcess cancelled event has to be fired.", FlowableEngineEventType.PROCESS_CANCELLED, this.listener.getEventsReceived().get(2).getType());
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     assertEquals(0, taskService.createTaskQuery().count());
   }
@@ -611,7 +611,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         // adding to the list.
         assertNotNull(((ExecutionEntity) ((FlowableEntityEvent) event).getEntity()).getId());
         eventsReceived.add(event);
-      } else if (FlowableEngineEventType.PROCESS_CANCELLED.equals(event.getType()) || FlowableEngineEventType.ACTIVITY_CANCELLED.equals(event.getType())) {
+      } else if (FlowableEngineEventType.PROCESS_CANCELLED == event.getType() || FlowableEngineEventType.ACTIVITY_CANCELLED == event.getType()) {
         eventsReceived.add(event);
       }
     }
@@ -628,7 +628,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
       List<FlowableEvent> filteredEvents = new ArrayList<FlowableEvent>();
       List<FlowableEvent> eventsReceived = listener.getEventsReceived();
       for (FlowableEvent eventReceived : eventsReceived) {
-        if (eventType.equals(eventReceived.getType())) {
+        if (eventType == eventReceived.getType()) {
           filteredEvents.add(eventReceived);
         }
       }

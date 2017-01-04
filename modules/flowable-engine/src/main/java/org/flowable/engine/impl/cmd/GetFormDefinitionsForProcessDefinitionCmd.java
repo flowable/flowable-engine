@@ -58,7 +58,7 @@ public class GetFormDefinitionsForProcessDefinitionCmd implements Command<List<F
       throw new FlowableObjectNotFoundException("Cannot find bpmn model for process definition id: " + processDefinitionId, BpmnModel.class);
     }
 
-    if (commandContext.getProcessEngineConfiguration().isFormEngineInitialized() == false) {
+    if (!(commandContext.getProcessEngineConfiguration().isFormEngineInitialized())) {
       throw new FlowableException("Form Engine is not initialized");
     } else {
       if (commandContext.getProcessEngineConfiguration().getFormEngineRepositoryService() == null) {

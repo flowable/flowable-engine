@@ -60,7 +60,7 @@ public class StartTimerEventRepeatCompatibilityTest extends TimerEventCompatibil
     dueDateCalendar.set(2025, Calendar.DECEMBER, 11, 0, 0, 0);
 
     // check the due date is inside the 2 seconds range
-    assertEquals(true, Math.abs(dueDateCalendar.getTime().getTime() - jobs.get(0).getDuedate().getTime()) < 2000);
+    assertTrue(Math.abs(dueDateCalendar.getTime().getTime() - jobs.get(0).getDuedate().getTime()) < 2000);
 
     // No process instances
     List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
@@ -96,7 +96,7 @@ public class StartTimerEventRepeatCompatibilityTest extends TimerEventCompatibil
     // (10'th repeat after 10 dec. => dueDate must have DueDate = 20 dec.)
     dueDateCalendar = Calendar.getInstance();
     dueDateCalendar.set(2025, Calendar.DECEMBER, 20, 0, 0, 0);
-    assertEquals(true, Math.abs(dueDateCalendar.getTime().getTime() - jobs.get(0).getDuedate().getTime()) < 2000);
+    assertTrue(Math.abs(dueDateCalendar.getTime().getTime() - jobs.get(0).getDuedate().getTime()) < 2000);
 
     // ADVANCE THE CLOCK SO that all 10 repeats to be executed (last execution)
     moveByMinutes(60 * 24);
@@ -126,7 +126,7 @@ public class StartTimerEventRepeatCompatibilityTest extends TimerEventCompatibil
     int timerFiredCount = 0;
     List<FlowableEvent> eventsReceived = listener.getEventsReceived();
     for (FlowableEvent eventReceived : eventsReceived) {
-      if (FlowableEngineEventType.TIMER_FIRED.equals(eventReceived.getType())) {
+      if (FlowableEngineEventType.TIMER_FIRED == eventReceived.getType()) {
         timerFiredCount++;
       }
     }
@@ -134,7 +134,7 @@ public class StartTimerEventRepeatCompatibilityTest extends TimerEventCompatibil
     // count "entity created" events
     int eventCreatedCount = 0;
     for (FlowableEvent eventReceived : eventsReceived) {
-      if (FlowableEngineEventType.ENTITY_CREATED.equals(eventReceived.getType())) {
+      if (FlowableEngineEventType.ENTITY_CREATED == eventReceived.getType()) {
         eventCreatedCount++;
       }
     }
@@ -142,7 +142,7 @@ public class StartTimerEventRepeatCompatibilityTest extends TimerEventCompatibil
     // count "entity deleted" events
     int eventDeletedCount = 0;
     for (FlowableEvent eventReceived : eventsReceived) {
-      if (FlowableEngineEventType.ENTITY_DELETED.equals(eventReceived.getType())) {
+      if (FlowableEngineEventType.ENTITY_DELETED == eventReceived.getType()) {
         eventDeletedCount++;
       }
     }

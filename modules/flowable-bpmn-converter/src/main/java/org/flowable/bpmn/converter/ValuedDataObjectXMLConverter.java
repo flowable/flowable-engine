@@ -29,7 +29,7 @@ public class ValuedDataObjectXMLConverter extends BaseBpmnXMLConverter {
 
   private final Pattern xmlChars = Pattern.compile("[<>&]");
   private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-  protected boolean didWriteExtensionStartElement = false;
+  protected boolean didWriteExtensionStartElement;
 
   public Class<? extends BaseElement> getBpmnElementType() {
     return ValuedDataObject.class;
@@ -119,7 +119,7 @@ public class ValuedDataObjectXMLConverter extends BaseBpmnXMLConverter {
 
     if (StringUtils.isNotEmpty(dataObject.getId()) && dataObject.getValue() != null) {
 
-      if (didWriteExtensionStartElement == false) {
+      if (!didWriteExtensionStartElement) {
         xtw.writeStartElement(ELEMENT_EXTENSIONS);
         didWriteExtensionStartElement = true;
       }

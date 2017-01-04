@@ -99,7 +99,7 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
     }
 
     for (IOParameter ioParameter : parameterList) {
-      if (didWriteExtensionStartElement == false) {
+      if (!didWriteExtensionStartElement) {
         xtw.writeStartElement(ELEMENT_EXTENSIONS);
         didWriteExtensionStartElement = true;
       }

@@ -55,7 +55,7 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
       try {
         processDefinition = repositoryService.getProcessDefinition(task.getProcessDefinitionId());
       } catch (FlowableException e) {
-        logger.error("Error getting process definition " + task.getProcessDefinitionId(), e);
+        logger.error("Error getting process definition {}", task.getProcessDefinitionId(), e);
       }
     }
 

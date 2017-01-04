@@ -21,6 +21,8 @@ import org.flowable.admin.service.engine.ProcessDefinitionService;
 import org.flowable.admin.service.engine.ProcessInstanceService;
 import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.app.service.exception.BadRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,52 +39,54 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @RestController
 public class ProcessDefinitionClientResource extends AbstractClientResource {
+  
+  private static final Logger logger = LoggerFactory.getLogger(ModelsClientResource.class);
 
   @Autowired
   protected ProcessDefinitionService clientService;
 
   @Autowired
-  private ProcessInstanceService processInstanceService;
+  protected ProcessInstanceService processInstanceService;
 
   @Autowired
-  private JobService jobService;
+  protected JobService jobService;
 
   @Autowired
   protected ObjectMapper objectMapper;
 
   /**
-   * GET /rest/authenticate -> check if the user is authenticated, and return
-   * its login.
+   * GET /rest/authenticate -> check if the user is authenticated, and return its login.
    */
   @RequestMapping(value = "/rest/admin/process-definitions/{definitionId}", method = RequestMethod.GET, produces = "application/json")
   public JsonNode getProcessDefinition(@PathVariable String definitionId) throws BadRequestException {
-
     ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
     try {
       return clientService.getProcessDefinition(serverConfig, definitionId);
     } catch (FlowableServiceException e) {
+      logger.error("Error getting process definition {}", definitionId, e);
       throw new BadRequestException(e.getMessage());
     }
   }
 
   @RequestMapping(value = "/rest/admin/process-definitions/{definitionId}", method = RequestMethod.PUT, produces = "application/json")
   public JsonNode updateProcessDefinitionCategory(@PathVariable String definitionId,
-                                                  @RequestBody ObjectNode updateBody) throws BadRequestException {
+      @RequestBody ObjectNode updateBody) throws BadRequestException {
 
     ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
     if (updateBody.has("category")) {
       try {
-
         String category = null;
         if (!updateBody.get("category").isNull()) {
           category = updateBody.get("category").asText();
         }
         return clientService.updateProcessDefinitionCategory(serverConfig, definitionId, category);
       } catch (FlowableServiceException e) {
-        e.printStackTrace();
+        logger.error("Error updating process definition category {}", definitionId, e);
         throw new BadRequestException(e.getMessage());
       }
+      
     } else {
+      logger.error("No required category found in request body");
       throw new BadRequestException("Category is required in body");
     }
   }
@@ -94,7 +98,9 @@ public class ProcessDefinitionClientResource extends AbstractClientResource {
       ObjectNode bodyNode = objectMapper.createObjectNode();
       bodyNode.put("processDefinitionId", definitionId);
       return processInstanceService.listProcesInstancesForProcessDefinition(bodyNode, serverConfig);
+      
     } catch (FlowableServiceException e) {
+      logger.error("Error getting process instances for process definition {}", definitionId, e);
       throw new BadRequestException(e.getMessage());
     }
   }
@@ -104,7 +110,9 @@ public class ProcessDefinitionClientResource extends AbstractClientResource {
     ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
     try {
       return jobService.listJobs(serverConfig, Collections.singletonMap("processDefinitionId", new String[]{definitionId}));
+    
     } catch (FlowableServiceException e) {
+      logger.error("Error getting jobs for process definition {}", definitionId, e);
       throw new BadRequestException(e.getMessage());
     }
   }

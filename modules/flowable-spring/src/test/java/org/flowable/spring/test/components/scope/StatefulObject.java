@@ -21,7 +21,7 @@ public class StatefulObject implements Serializable, InitializingBean {
   public static final long serialVersionUID = 1L;
 
   private String name;
-  private int visitedCount = 0;
+  private int visitedCount;
 
   private long customerId;
 
@@ -58,10 +58,7 @@ public class StatefulObject implements Serializable, InitializingBean {
 
     if (visitedCount != that.visitedCount)
       return false;
-    if (name != null ? !name.equals(that.name) : that.name != null)
-      return false;
-
-    return true;
+    return name != null ? name.equals(that.name) : that.name == null;
   }
 
   @Override

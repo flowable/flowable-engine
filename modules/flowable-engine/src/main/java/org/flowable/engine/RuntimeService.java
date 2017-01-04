@@ -27,7 +27,9 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.persistence.entity.VariableInstance;
+import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.DataObject;
+import org.flowable.engine.runtime.EventSubscriptionQuery;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ExecutionQuery;
 import org.flowable.engine.runtime.NativeExecutionQuery;
@@ -968,6 +970,11 @@ public interface RuntimeService {
    * creates a new {@link NativeProcessInstanceQuery} to query {@link ProcessInstance}s by SQL directly
    */
   NativeProcessInstanceQuery createNativeProcessInstanceQuery();
+  
+  /**
+   * Creates a new {@link EventSubscriptionQuery} instance, that can be used to query the event subscriptions.
+   */
+  EventSubscriptionQuery createEventSubscriptionQuery();
 
   // Process instance state //////////////////////////////////////////
 
@@ -1243,6 +1250,11 @@ public interface RuntimeService {
    *          id of the execution that has an ad-hoc sub process as current flow element
    */
   void completeAdhocSubProcess(String executionId);
+  
+  /** 
+   * Create a {@link ChangeActivityStateBuilder}, that allows to set various options for changing the state of a process instance.
+   */
+  ChangeActivityStateBuilder createChangeActivityStateBuilder();
 
   /** The all events related to the given Process Instance. */
   List<Event> getProcessInstanceEvents(String processInstanceId);

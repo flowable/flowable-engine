@@ -41,7 +41,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RequestMapping("/rest/admin/deployments")
 public class DeploymentsClientResource extends AbstractClientResource {
 
-  private final Logger log = LoggerFactory.getLogger(DeploymentsClientResource.class);
+  private static final Logger logger = LoggerFactory.getLogger(DeploymentsClientResource.class);
 
   @Autowired
   protected DeploymentService clientService;
@@ -51,7 +51,7 @@ public class DeploymentsClientResource extends AbstractClientResource {
    */
   @RequestMapping(method = RequestMethod.GET, produces = "application/json")
   public JsonNode listDeployments(HttpServletRequest request) {
-    log.debug("REST request to get a list of deployments");
+    logger.debug("REST request to get a list of deployments");
 
     JsonNode resultNode = null;
     ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
@@ -61,6 +61,7 @@ public class DeploymentsClientResource extends AbstractClientResource {
       resultNode = clientService.listDeployments(serverConfig, parameterMap);
 
     } catch (FlowableServiceException e) {
+      logger.error("Error getting deployments", e);
       throw new BadRequestException(e.getMessage());
     }
 
@@ -81,14 +82,17 @@ public class DeploymentsClientResource extends AbstractClientResource {
           return clientService.uploadDeployment(serverConfig, fileName, file.getInputStream());
 
         } else {
+          logger.error("Invalid filename {}", fileName);
           throw new BadRequestException("Invalid file name");
         }
 
       } catch (IOException e) {
+        logger.error("Error deploying file", e);
         throw new InternalServerErrorException("Could not deploy file: " + e.getMessage());
       }
 
     } else {
+      logger.error("No file found in POST request");
       throw new BadRequestException("No file found in POST body");
     }
   }

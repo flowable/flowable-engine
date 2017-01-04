@@ -34,10 +34,10 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         processVariablesInput.put("input1", 10);
         RuleEngineExecutionResult result = ruleService.executeDecisionByKey("decision", processVariablesInput);
         Assert.assertNotNull(result);
-        Assert.assertSame(result.getResultVariables().get("output1").getClass(), String.class);
-        Assert.assertEquals(result.getResultVariables().get("output1"), "test3");
-        Assert.assertSame(result.getResultVariables().get("output2").getClass(), Double.class);
-        Assert.assertEquals(result.getResultVariables().get("output2"), 3D);
+        Assert.assertSame(String.class, result.getResultVariables().get("output1").getClass());
+        Assert.assertEquals("test3", result.getResultVariables().get("output1"));
+        Assert.assertSame(Double.class, result.getResultVariables().get("output2").getClass());
+        Assert.assertEquals(3D, result.getResultVariables().get("output2"));
     }
 
     @Test
@@ -51,8 +51,8 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         processVariablesInput.put("input1", localDate.toDate());
         RuleEngineExecutionResult result = ruleService.executeDecisionByKey("decision", processVariablesInput);
         Assert.assertNotNull(result);
-        Assert.assertSame(result.getResultVariables().get("output1").getClass(), String.class);
-        Assert.assertEquals(result.getResultVariables().get("output1"), "test2");
+        Assert.assertSame(String.class, result.getResultVariables().get("output1").getClass());
+        Assert.assertEquals("test2", result.getResultVariables().get("output1"));
     }
 
     @Test
@@ -66,8 +66,8 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         processVariablesInput.put("input1", localDate.toDate());
         RuleEngineExecutionResult result = ruleService.executeDecisionByKey("decision", processVariablesInput);
         Assert.assertNotNull(result);
-        Assert.assertSame(result.getResultVariables().get("output1").getClass(), String.class);
-        Assert.assertEquals(result.getResultVariables().get("output1"), "test2");
+        Assert.assertSame(String.class, result.getResultVariables().get("output1").getClass());
+        Assert.assertEquals("test2", result.getResultVariables().get("output1"));
     }
 
     @Test
@@ -81,8 +81,8 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         processVariablesInput.put("input1", localDate.toDate());
         RuleEngineExecutionResult result = ruleService.executeDecisionByKey("decision", processVariablesInput);
         Assert.assertNotNull(result);
-        Assert.assertSame(result.getResultVariables().get("output1").getClass(), String.class);
-        Assert.assertEquals(result.getResultVariables().get("output1"), "test2");
+        Assert.assertSame(String.class, result.getResultVariables().get("output1").getClass());
+        Assert.assertEquals("test2", result.getResultVariables().get("output1"));
     }
 
     @Test
@@ -94,7 +94,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         RuleEngineExecutionResult result = ruleService.executeDecisionByKey("decision", processVariablesInput);
         Assert.assertNotNull(result);
         Assert.assertSame(String.class, result.getResultVariables().get("output1").getClass());
-        Assert.assertEquals(result.getResultVariables().get("output1"), "test1");
+        Assert.assertEquals("test1", result.getResultVariables().get("output1"));
     }
 
     @Test
@@ -108,7 +108,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         RuleEngineExecutionResult result = ruleService.executeDecisionByKey("decision", processVariablesInput);
         Assert.assertNotNull(result);
         Assert.assertSame(String.class, result.getResultVariables().get("output1").getClass());
-        Assert.assertEquals(result.getResultVariables().get("output1"), "test2");
+        Assert.assertEquals("test2", result.getResultVariables().get("output1"));
     }
 
     @Test
@@ -120,7 +120,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         RuleEngineExecutionResult result = ruleService.executeDecisionByKey("decision", processVariablesInput);
         Assert.assertNotNull(result);
         Assert.assertSame(Double.class, result.getResultVariables().get("output1").getClass());
-        Assert.assertEquals(result.getResultVariables().get("output1"), 5D);
+        Assert.assertEquals(5D, result.getResultVariables().get("output1"));
     }
 
     @Test
@@ -194,8 +194,8 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         processVariablesInput.put("input1", null);
         RuleEngineExecutionResult result = ruleService.executeDecisionByKey("decision", processVariablesInput);
         Assert.assertNotNull(result);
-        Assert.assertSame(result.getResultVariables().get("output1").getClass(), String.class);
-        Assert.assertEquals(result.getResultVariables().get("output1"), "test2");
+        Assert.assertSame(String.class, result.getResultVariables().get("output1").getClass());
+        Assert.assertEquals("test2", result.getResultVariables().get("output1"));
     }
 
     @Test
@@ -209,8 +209,8 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         processVariablesInput.put("date", localDate.toDate());
         RuleEngineExecutionResult result = ruleService.executeDecisionByKey("decision", processVariablesInput);
         Assert.assertNotNull(result);
-        Assert.assertSame(result.getResultVariables().get("output1").getClass(), String.class);
-        Assert.assertEquals(result.getResultVariables().get("output1"), "test2");
+        Assert.assertSame(String.class, result.getResultVariables().get("output1").getClass());
+        Assert.assertEquals("test2", result.getResultVariables().get("output1"));
     }
 
     @Test
@@ -222,8 +222,8 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         processVariablesInput.put("output1", 0);
         RuleEngineExecutionResult result = ruleService.executeDecisionByKey("decision", processVariablesInput);
         Assert.assertNotNull(result);
-        Assert.assertSame(result.getResultVariables().get("output1").getClass(), Double.class);
-        Assert.assertEquals(result.getResultVariables().get("output1"), 30D);
+        Assert.assertSame(Double.class, result.getResultVariables().get("output1").getClass());
+        Assert.assertEquals(30D, result.getResultVariables().get("output1"));
     }
 
     @Test
@@ -236,7 +236,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         
         RuleEngineExecutionResult result = ruleService.executeDecisionByKey("OrderCalculation", processVariablesInput);
         Assert.assertNotNull(result);
-        Assert.assertEquals(result.getResultVariables().get("totalordersum"), 100000D);
+        Assert.assertEquals(100000D, result.getResultVariables().get("totalordersum"));
     }
 
     @Test
@@ -250,7 +250,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         processVariablesInput.put("amountDue", null);
         RuleEngineExecutionResult result = ruleService.executeDecisionByKey("RiskAssessmentUpdated", processVariablesInput);
         Assert.assertNotNull(result);
-        Assert.assertEquals(result.getResultVariables().get("addedPerc"), 15D);
+        Assert.assertEquals(15D, result.getResultVariables().get("addedPerc"));
     }
 
     @Test

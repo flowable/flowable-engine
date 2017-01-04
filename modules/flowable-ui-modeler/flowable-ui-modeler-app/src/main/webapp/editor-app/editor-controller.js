@@ -39,9 +39,9 @@ angular.module('flowableModeler')
 
         var modelUrl;
         if ($routeParams.modelId) {
-            modelUrl = KISBPM.URL.getModel($routeParams.modelId);
+            modelUrl = FLOWABLE.URL.getModel($routeParams.modelId);
         } else {
-            modelUrl = KISBPM.URL.newModelInfo();
+            modelUrl = FLOWABLE.URL.newModelInfo();
         }
 
         $http({method: 'GET', url: modelUrl}).
@@ -155,25 +155,25 @@ angular.module('flowableModeler')
 
             $rootScope.formItems = undefined;
 
-            KISBPM.eventBus.editor = $rootScope.editor;
+            FLOWABLE.eventBus.editor = $rootScope.editor;
 
             var eventMappings = [
-                { oryxType : ORYX.CONFIG.EVENT_SELECTION_CHANGED, kisBpmType : KISBPM.eventBus.EVENT_TYPE_SELECTION_CHANGE },
-                { oryxType : ORYX.CONFIG.EVENT_DBLCLICK, kisBpmType : KISBPM.eventBus.EVENT_TYPE_DOUBLE_CLICK },
-                { oryxType : ORYX.CONFIG.EVENT_MOUSEOUT, kisBpmType : KISBPM.eventBus.EVENT_TYPE_MOUSE_OUT },
-                { oryxType : ORYX.CONFIG.EVENT_MOUSEOVER, kisBpmType : KISBPM.eventBus.EVENT_TYPE_MOUSE_OVER }
+                { oryxType : ORYX.CONFIG.EVENT_SELECTION_CHANGED, flowableType : FLOWABLE.eventBus.EVENT_TYPE_SELECTION_CHANGE },
+                { oryxType : ORYX.CONFIG.EVENT_DBLCLICK, flowableType : FLOWABLE.eventBus.EVENT_TYPE_DOUBLE_CLICK },
+                { oryxType : ORYX.CONFIG.EVENT_MOUSEOUT, flowableType : FLOWABLE.eventBus.EVENT_TYPE_MOUSE_OUT },
+                { oryxType : ORYX.CONFIG.EVENT_MOUSEOVER, flowableType : FLOWABLE.eventBus.EVENT_TYPE_MOUSE_OVER }
 
             ];
 
             eventMappings.forEach(function(eventMapping) {
                 $rootScope.editor.registerOnEvent(eventMapping.oryxType, function(event) {
-                    KISBPM.eventBus.dispatch(eventMapping.kisBpmType, event);
+                    FLOWABLE.eventBus.dispatch(eventMapping.flowableType, event);
                 });
             });
 
             // The Oryx canvas is ready (we know since we're in this promise callback) and the
             // event bus is ready. The editor is now ready for use
-            KISBPM.eventBus.dispatch(KISBPM.eventBus.EVENT_TYPE_EDITOR_READY, {type : KISBPM.eventBus.EVENT_TYPE_EDITOR_READY});
+            FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_EDITOR_READY, {type : FLOWABLE.eventBus.EVENT_TYPE_EDITOR_READY});
 
             // Show getting started if this is the first time (boolean true for use local storage)
             FLOWABLE_EDITOR_TOUR.gettingStarted($scope, $translate, $q, true);
@@ -349,7 +349,7 @@ angular.module('flowableModeler')
 }]);
 
 angular.module('flowableModeler')
-  .controller('EditorUnsavedChangesPopupCrtl', ['$rootScope', '$scope', '$http', '$location', '$window', function ($rootScope, $scope, $http, $location, $window) {
+  .controller('EditorUnsavedChangesPopupCtrl', ['$rootScope', '$scope', '$http', '$location', '$window', function ($rootScope, $scope, $http, $location, $window) {
 
     $scope.discard = function () {
       if ($scope.handleResponseFunction) {

@@ -30,7 +30,6 @@ import org.junit.Test;
 
 public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
 
-  @Test
   @Deployment
   public void testOneTaskProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -49,8 +48,8 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
       
       } else {
         childExecution = execution;
-        
-        assertTrue(execution.getId().equals(execution.getProcessInstanceId()) == false);
+
+        assertEquals(false, execution.getId().equals(execution.getProcessInstanceId()));
         assertEquals("theTask", execution.getActivityId());
       }
     }
@@ -83,7 +82,6 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
     }
   }
   
-  @Test
   @Deployment
   public void testOneNestedTaskProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneNestedTaskProcess");
@@ -102,8 +100,8 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
       
       } else {
         childExecution = execution;
-        
-        assertTrue(execution.getId().equals(execution.getProcessInstanceId()) == false);
+
+        assertEquals(false, execution.getId().equals(execution.getProcessInstanceId()));
         assertEquals("theTask1", execution.getActivityId());
       }
     }
@@ -134,7 +132,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
     assertEquals(2, executionList.size());
     
     task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertTrue(childExecution.getId().equals(task.getExecutionId()) == false);
+    assertEquals(false, childExecution.getId().equals(task.getExecutionId()));
     
     Execution finalTaskExecution = runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult();
     assertEquals("theTask2", finalTaskExecution.getActivityId());
@@ -190,7 +188,6 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
     }
   }
   
-  @Test
   @Deployment
   public void testSubProcessWithTimer() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessWithTimer");
@@ -209,8 +206,8 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
       
       } else {
         childExecution = execution;
-        
-        assertTrue(execution.getId().equals(execution.getProcessInstanceId()) == false);
+
+        assertEquals(false, execution.getId().equals(execution.getProcessInstanceId()));
         assertEquals("theTask1", execution.getActivityId());
       }
     }
@@ -241,7 +238,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
     assertEquals(2, executionList.size());
     
     task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertTrue(childExecution.getId().equals(task.getExecutionId()) == false);
+    assertEquals(false, childExecution.getId().equals(task.getExecutionId()));
     
     Execution finalTaskExecution = runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult();
     assertEquals("theTask2", finalTaskExecution.getActivityId());
@@ -297,7 +294,6 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
     }
   }
   
-  @Test
   @Deployment
   public void testSubProcessEvents() {
     SubProcessEventListener listener = new SubProcessEventListener();

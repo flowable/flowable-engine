@@ -35,7 +35,7 @@ public class EndpointUserProfileService extends AbstractEncryptingService {
                                           String serverAddress, Integer port,
                                           String userName, String password) {
         JsonNode jsonNode = getEndpointUserProfile(contextRoot, restRoot, serverAddress, port, userName, password);
-        if (jsonNode.has("tenantId") && jsonNode.get("tenantId").isNull() == false) {
+        if (jsonNode.has("tenantId") && !jsonNode.get("tenantId").isNull()) {
             JsonNode tenantIdNode = jsonNode.get("tenantId");
             return tenantIdNode.asText();
         }

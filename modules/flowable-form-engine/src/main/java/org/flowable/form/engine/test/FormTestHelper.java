@@ -132,7 +132,7 @@ public abstract class FormTestHelper {
     log.debug("verifying that db is clean after test");
     FormRepositoryService repositoryService = formEngine.getFormEngineConfiguration().getFormRepositoryService();
     List<FormDeployment> deployments = repositoryService.createDeploymentQuery().list();
-    if (deployments != null && deployments.isEmpty() == false) {
+    if (deployments != null && !deployments.isEmpty()) {
       throw new AssertionError("FormDeployments is not empty");
     }
   }

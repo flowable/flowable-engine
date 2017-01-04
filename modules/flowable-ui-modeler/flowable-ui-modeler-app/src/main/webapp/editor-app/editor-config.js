@@ -13,13 +13,13 @@
 
 'use strict';
 
-var KISBPM = KISBPM || {};
+var FLOWABLE = FLOWABLE || {};
 
-KISBPM.CONFIG = {
+FLOWABLE.UI_CONFIG = {
 		'showRemovedProperties' : false
 };
 
-KISBPM.HEADER_CONFIG = {
+FLOWABLE.HEADER_CONFIG = {
 		'showAppTitle' : true,
 		'showHeaderMenu' : true,
 		'showMainNavigation' : true,

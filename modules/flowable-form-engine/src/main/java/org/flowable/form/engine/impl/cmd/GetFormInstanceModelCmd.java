@@ -14,6 +14,7 @@ package org.flowable.form.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -142,9 +143,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
             String uploadValue = (String) variables.get(field.getId());
             if (uploadValue != null) {
               List<String> contentIds = new ArrayList<>();
-              for (String s : uploadValue.split(",")) {
-                contentIds.add(s);
-              }
+              Collections.addAll(contentIds, uploadValue.split(","));
               field.setValue(contentIds);
             }
           }
@@ -293,7 +292,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
           Iterator<String> fieldIdIterator = valuesNode.fieldNames();
           while (fieldIdIterator.hasNext()) {
             String fieldId = fieldIdIterator.next();
-            if (formInstancesMap.containsKey(fieldId) == false) {
+            if (!formInstancesMap.containsKey(fieldId)) {
   
               JsonNode valueNode = valuesNode.get(fieldId);
               formInstancesMap.put(fieldId, valueNode);
@@ -330,7 +329,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
       
       if (submittedNode.get("outcome") != null) {
         JsonNode outcomeNode = submittedNode.get("outcome");
-        if (outcomeNode.isNull() == false && StringUtils.isNotEmpty(outcomeNode.asText())) {
+        if (!outcomeNode.isNull() && StringUtils.isNotEmpty(outcomeNode.asText())) {
           formInstanceModel.setSelectedOutcome(outcomeNode.asText());
         }
       }

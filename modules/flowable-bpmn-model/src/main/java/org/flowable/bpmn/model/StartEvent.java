@@ -22,7 +22,7 @@ public class StartEvent extends Event {
 
   protected String initiator;
   protected String formKey;
-  protected boolean isInterrupting;
+  protected boolean isInterrupting = true;
   protected List<FormProperty> formProperties = new ArrayList<FormProperty>();
 
   public String getInitiator() {

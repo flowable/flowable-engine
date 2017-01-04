@@ -107,7 +107,7 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
       }
        
       // Finally, Throw the exception to indicate the ExecuteJobCmd failed
-      if (exception instanceof ActivitiException == false) {
+      if (!(exception instanceof ActivitiException)) {
         throw new ActivitiException("Job " + jobId + " failed", exception);
       } else {
         throw (ActivitiException) exception;

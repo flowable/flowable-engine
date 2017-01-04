@@ -135,7 +135,7 @@ public abstract class DmnTestHelper {
         log.debug("verifying that db is clean after test");
         DmnRepositoryService repositoryService = dmnEngine.getDmnEngineConfiguration().getDmnRepositoryService();
         List<DmnDeployment> deployments = repositoryService.createDeploymentQuery().list();
-        if (deployments != null && deployments.isEmpty() == false) {
+        if (deployments != null && !deployments.isEmpty()) {
             throw new AssertionError("DmnDeployments is not empty");
         }
     }

@@ -81,7 +81,7 @@ flowableAdminApp.controller('UsersController', ['$scope', '$rootScope', '$http',
 		$scope.deleteUser = function() {
 			var modalInstance = $modal.open({
 				templateUrl: 'views/user-delete-popup.html',
-				controller: 'DeleteUserModalInstanceCrtl',
+				controller: 'DeleteUserModalInstanceCtrl',
 				resolve: resolve
 			});
 
@@ -99,7 +99,7 @@ flowableAdminApp.controller('UsersController', ['$scope', '$rootScope', '$http',
 		$scope.editUser = function() {
 			var modalInstance = $modal.open({
 				templateUrl: 'views/user-edit-popup.html',
-				controller: 'EditUserModalInstanceCrtl',
+				controller: 'EditUserModalInstanceCtrl',
 				resolve: resolve
 			});
 
@@ -114,7 +114,7 @@ flowableAdminApp.controller('UsersController', ['$scope', '$rootScope', '$http',
 		$scope.changePassword = function() {
 			var modalInstance = $modal.open({
 				templateUrl: 'views/user-change-password-popup.html',
-				controller: 'ChangePasswordModalInstanceCrtl',
+				controller: 'ChangePasswordModalInstanceCtrl',
 				resolve: resolve
 			});
 
@@ -128,7 +128,7 @@ flowableAdminApp.controller('UsersController', ['$scope', '$rootScope', '$http',
 		$scope.newUser = function() {
 			var modalInstance = $modal.open({
 				templateUrl: 'views/user-new-popup.html',
-				controller: 'NewUserModalInstanceCrtl',
+				controller: 'NewUserModalInstanceCtrl',
 				resolve: resolve
 			});
 
@@ -141,7 +141,7 @@ flowableAdminApp.controller('UsersController', ['$scope', '$rootScope', '$http',
 		};
     }]);
 
-flowableAdminApp.controller('DeleteUserModalInstanceCrtl',
+flowableAdminApp.controller('DeleteUserModalInstanceCtrl',
     ['$scope', '$modalInstance', '$http', 'user', function ($scope, $modalInstance, $http, user) {
 
   $scope.user = user;
@@ -167,7 +167,7 @@ flowableAdminApp.controller('DeleteUserModalInstanceCrtl',
   };
 }]);
 
-flowableAdminApp.controller('EditUserModalInstanceCrtl',
+flowableAdminApp.controller('EditUserModalInstanceCtrl',
     ['$scope', '$modalInstance', '$http', 'user', function ($scope, $modalInstance, $http, user) {
 
   $scope.user = user;
@@ -202,7 +202,7 @@ flowableAdminApp.controller('EditUserModalInstanceCrtl',
   };
 }]);
 
-flowableAdminApp.controller('ChangePasswordModalInstanceCrtl',
+flowableAdminApp.controller('ChangePasswordModalInstanceCtrl',
     ['$scope', '$modalInstance', '$http', 'user', function ($scope, $modalInstance, $http, user) {
 
 	  $scope.user = user;
@@ -235,7 +235,7 @@ flowableAdminApp.controller('ChangePasswordModalInstanceCrtl',
 	  };
 	}]);
 
-flowableAdminApp.controller('NewUserModalInstanceCrtl',
+flowableAdminApp.controller('NewUserModalInstanceCtrl',
     ['$scope', '$modalInstance', '$http', function ($scope, $modalInstance, $http) {
 
   $scope.model = {

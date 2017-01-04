@@ -64,7 +64,7 @@ public class ModelImageService {
         return ImageGenerator.createByteArrayForImage(modelImage, "png");
       }
     } catch (Exception e) {
-      log.error("Error creating thumbnail image " + model.getId(), e);
+      log.error("Error creating thumbnail image {}", model.getId(), e);
     }
     return null;
   }

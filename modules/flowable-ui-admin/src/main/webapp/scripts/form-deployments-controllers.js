@@ -104,7 +104,7 @@ flowableAdminApp.controller('FormDeploymentsController', ['$rootScope', '$scope'
       $scope.uploadDeployment = function () {
           var modalInstance = $modal.open({
               templateUrl: 'views/upload-deployment.html',
-              controller: 'UploadDeploymentCrtl'
+              controller: 'UploadDeploymentCtrl'
           });
           modalInstance.result.then(function (result) {
               // Refresh page if closed successfully
@@ -122,7 +122,7 @@ flowableAdminApp.controller('FormDeploymentsController', ['$rootScope', '$scope'
 /**\
  * Controller for the upload a model from the process Modeler.
  */
- flowableAdminApp.controller('UploadDeploymentCrtl',
+ flowableAdminApp.controller('UploadDeploymentCtrl',
     ['$scope', '$modalInstance', '$http', '$upload', function ($scope, $modalInstance, $http, $upload) {
 
     $scope.status = {loading: false};

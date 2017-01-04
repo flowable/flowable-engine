@@ -33,7 +33,7 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
  */
 public class CompensationEventHandler implements EventHandler {
   
-  public final static String EVENT_HANDLER_TYPE = "compensate";
+  public static final String EVENT_HANDLER_TYPE = "compensate";
 
   public String getEventHandlerType() {
     return EVENT_HANDLER_TYPE;

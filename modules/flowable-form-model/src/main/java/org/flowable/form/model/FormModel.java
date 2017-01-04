@@ -117,7 +117,7 @@ public class FormModel implements Serializable {
     List<FormField> allFields = listAllFields();
     if (allFields != null) {
       for (FormField field : allFields) {
-        if (result.containsKey(field.getId()) == false || ("readonly".equals(field.getType()) == false && "readonly-text".equals(field.getType()) == false)) {
+        if (!result.containsKey(field.getId()) || (!"readonly".equals(field.getType()) && !"readonly-text".equals(field.getType()))) {
 
           result.put(field.getId(), field);
         }

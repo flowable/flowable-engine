@@ -35,8 +35,8 @@ public class CustomConfigRuntimeTest {
 
     public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000";
 
-    protected final static String ENGINE_CONFIG_1 = "custom1.flowable.dmn.cfg.xml";
-    protected final static String ENGINE_CONFIG_2 = "custom2.flowable.dmn.cfg.xml";
+    protected static final String ENGINE_CONFIG_1 = "custom1.flowable.dmn.cfg.xml";
+    protected static final String ENGINE_CONFIG_2 = "custom2.flowable.dmn.cfg.xml";
 
     @Rule
     public FlowableDmnRule activitiRule1 = new FlowableDmnRule(ENGINE_CONFIG_1);
@@ -59,8 +59,8 @@ public class CustomConfigRuntimeTest {
         processVariablesInput.put("input1", localDate.toDate());
         RuleEngineExecutionResult result = ruleService.executeDecisionByKey("decision", processVariablesInput);
         Assert.assertNotNull(result);
-        Assert.assertSame(result.getResultVariables().get("output1").getClass(), String.class);
-        Assert.assertEquals(result.getResultVariables().get("output1"), "test2");
+        Assert.assertSame(String.class, result.getResultVariables().get("output1").getClass());
+        Assert.assertEquals("test2", result.getResultVariables().get("output1"));
     }
 
     @Test

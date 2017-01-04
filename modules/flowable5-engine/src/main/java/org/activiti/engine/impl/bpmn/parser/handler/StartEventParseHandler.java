@@ -112,7 +112,7 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
 
     ScopeImpl scope = bpmnParse.getCurrentScope();
     Object triggeredByEvent = scope.getProperty("triggeredByEvent");
-    boolean isTriggeredByEvent = triggeredByEvent != null && ((Boolean) triggeredByEvent == true);
+    boolean isTriggeredByEvent = triggeredByEvent != null && ((Boolean) triggeredByEvent);
     
     if (isTriggeredByEvent) { // event subprocess
       

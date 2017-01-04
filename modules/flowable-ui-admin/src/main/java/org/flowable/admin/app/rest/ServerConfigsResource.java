@@ -34,26 +34,27 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * REST controller for managing the server configs.
  *
- * @author trademak
- * @author jbarrez
- * @author yvoswillens
+ * @author Tijs Rademakers
+ * @author Joram Barrez
+ * @author Yvo Swillens
  */
 @RestController
 public class ServerConfigsResource {
 
   @Autowired
-  private ServerConfigService serverConfigService;
+  protected ServerConfigService serverConfigService;
 
   @Autowired
   protected Environment env;
 
   @RequestMapping(value = "/rest/server-configs", method = RequestMethod.GET, produces = "application/json")
-  public @ResponseBody List<ServerConfigRepresentation> getServers() {
+  public List<ServerConfigRepresentation> getServers() {
     return serverConfigService.findAll();
   }
 
   @RequestMapping(value = "/rest/server-configs/default/{endpointTypeCode}", method = RequestMethod.GET, produces = "application/json")
   @ResponseStatus(value = HttpStatus.OK)
+  @ResponseBody
   public ServerConfigRepresentation getDefaultServerConfig(@PathVariable Integer endpointTypeCode) {
     EndpointType endpointType = EndpointType.valueOf(endpointTypeCode);
 
@@ -68,8 +69,7 @@ public class ServerConfigsResource {
 
   @RequestMapping(value = "/rest/server-configs/{serverId}", method = RequestMethod.PUT, produces = "application/json")
   @ResponseStatus(value = HttpStatus.OK)
-  public void updateServer(@PathVariable String serverId,
-      @RequestBody ServerConfigRepresentation configRepresentation) {
+  public void updateServer(@PathVariable String serverId, @RequestBody ServerConfigRepresentation configRepresentation) {
     ServerConfig config = serverConfigService.findOne(serverId);
 
     if (config == null) {

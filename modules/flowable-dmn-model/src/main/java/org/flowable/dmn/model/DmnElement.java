@@ -62,7 +62,7 @@ public abstract class DmnElement {
     public void addExtensionElement(DmnExtensionElement extensionElement) {
         if (extensionElement != null && extensionElement.getName() != null && !extensionElement.getName().trim().isEmpty()) {
           List<DmnExtensionElement> elementList = null;
-          if (this.extensionElements.containsKey(extensionElement.getName()) == false) {
+          if (!this.extensionElements.containsKey(extensionElement.getName())) {
             elementList = new ArrayList<DmnExtensionElement>();
             this.extensionElements.put(extensionElement.getName(), elementList);
           }
@@ -98,7 +98,7 @@ public abstract class DmnElement {
     public void addAttribute(DmnExtensionAttribute attribute) {
         if (attribute != null && attribute.getName() != null && !attribute.getName().trim().isEmpty()) {
             List<DmnExtensionAttribute> attributeList = null;
-            if (this.attributes.containsKey(attribute.getName()) == false) {
+            if (!this.attributes.containsKey(attribute.getName())) {
                 attributeList = new ArrayList<DmnExtensionAttribute>();
                 this.attributes.put(attribute.getName(), attributeList);
             }

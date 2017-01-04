@@ -72,24 +72,33 @@
   <sql id="selectEventSubscriptionByQueryCriteriaSql">
     from ${prefix}ACT_RU_EVENT_SUBSCR RES
     <where>
-      <if test="eventSubscriptionId != null">
-        RES.ID_ = #{eventSubscriptionId}
-      </if>
-      <if test="processInstanceId != null">
-        and RES.PROC_INST_ID_ = #{processInstanceId}
-      </if>
-      <if test="executionId != null">
-        and RES.EXECUTION_ID_ = #{executionId}
-      </if>
-      <if test="activityId != null">
-        and RES.ACTIVITY_ID_ = #{activityId}
+      <if test="id != null">
+        RES.ID_ = #{id}
       </if>
       <if test="eventType != null">
         and RES.EVENT_TYPE_ = #{eventType}
       </if>
       <if test="eventName != null">
         and RES.EVENT_NAME_ = #{eventName}
-      </if>  
+      </if>
+      <if test="executionId != null">
+        and RES.EXECUTION_ID_ = #{executionId}
+      </if>
+      <if test="processInstanceId != null">
+        and RES.PROC_INST_ID_ = #{processInstanceId}
+      </if>
+      <if test="processDefinitionId != null">
+        and RES.PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
+      <if test="activityId != null">
+        and RES.ACTIVITY_ID_ = #{activityId}
+      </if>
+      <if test="createdBefore != null">
+		and RES.CREATED_ &lt; #{createdBefore}
+	  </if>
+	  <if test="createdAfter != null">
+		and RES.CREATED_ &gt; #{createdAfter}
+	  </if> 
       <if test="tenantId != null">
         and RES.TENANT_ID_ = #{tenantId}
       </if>  

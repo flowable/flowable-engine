@@ -75,18 +75,18 @@ public class UserTaskConverterTest extends AbstractConverterTest {
     List<FlowableListener> listeners = userTask.getTaskListeners();
     assertEquals(3, listeners.size());
     FlowableListener listener = listeners.get(0);
-    assertTrue(ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(listener.getImplementationType()));
+    assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, listener.getImplementationType());
     assertEquals("org.test.TestClass", listener.getImplementation());
     assertEquals("create", listener.getEvent());
     assertEquals(2, listener.getFieldExtensions().size());
     assertEquals("testField", listener.getFieldExtensions().get(0).getFieldName());
     assertEquals("test", listener.getFieldExtensions().get(0).getStringValue());
     listener = listeners.get(1);
-    assertTrue(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equals(listener.getImplementationType()));
+    assertEquals(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION, listener.getImplementationType());
     assertEquals("${someExpression}", listener.getImplementation());
     assertEquals("assignment", listener.getEvent());
     listener = listeners.get(2);
-    assertTrue(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(listener.getImplementationType()));
+    assertEquals(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION, listener.getImplementationType());
     assertEquals("${someDelegateExpression}", listener.getImplementation());
     assertEquals("complete", listener.getEvent());
 
@@ -94,7 +94,7 @@ public class UserTaskConverterTest extends AbstractConverterTest {
     assertTrue(flowElement instanceof StartEvent);
 
     StartEvent startEvent = (StartEvent) flowElement;
-    assertTrue(startEvent.getOutgoingFlows().size() == 1);
+    assertEquals(1, startEvent.getOutgoingFlows().size());
 
     flowElement = model.getMainProcess().getFlowElement("flow1", true);
     assertTrue(flowElement instanceof SequenceFlow);

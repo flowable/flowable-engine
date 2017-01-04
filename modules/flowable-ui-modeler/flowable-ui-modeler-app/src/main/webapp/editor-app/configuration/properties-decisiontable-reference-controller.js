@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-angular.module('flowableModeler').controller('ActivitiDecisionTableReferenceCtrl',
+angular.module('flowableModeler').controller('FlowableDecisionTableReferenceCtrl',
     [ '$scope', '$modal', '$http', function($scope, $modal, $http) {
 	
      // Config for the modal window
@@ -24,7 +24,7 @@ angular.module('flowableModeler').controller('ActivitiDecisionTableReferenceCtrl
      _internalCreateModal(opts, $modal, $scope);
 }]);
  
-angular.module('flowableModeler').controller('ActivitiDecisionTableReferencePopupCtrl', ['$rootScope', '$scope', '$http', '$location',
+angular.module('flowableModeler').controller('FlowableDecisionTableReferencePopupCtrl', ['$rootScope', '$scope', '$http', '$location',
     function($rootScope, $scope, $http, $location) {
 
         $scope.state = {
@@ -125,7 +125,7 @@ angular.module('flowableModeler').controller('ActivitiDecisionTableReferencePopu
 	                    }
 	                    return str.join("&");
 	                },
-                    url: KISBPM.URL.putModel(modelMetaData.modelId)
+                    url: FLOWABLE.URL.putModel(modelMetaData.modelId)
                 })
 
                 .success(function(data, status, headers, config) {
@@ -228,7 +228,7 @@ angular.module('flowableModeler').controller('ActivitiDecisionTableReferencePopu
 	                    }
 	                    return str.join("&");
 	                },
-                    url: KISBPM.URL.putModel(modelMetaData.modelId)
+                    url: FLOWABLE.URL.putModel(modelMetaData.modelId)
                 })
 
                 .success(function(data, status, headers, config) {

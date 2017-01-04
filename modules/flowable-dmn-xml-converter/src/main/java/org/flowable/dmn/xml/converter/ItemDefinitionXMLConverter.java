@@ -41,7 +41,7 @@ public class ItemDefinitionXMLConverter extends BaseDmnXMLConverter {
 
         boolean readyWithItemDefinition = false;
         try {
-            while (readyWithItemDefinition == false && xtr.hasNext()) {
+            while (!readyWithItemDefinition && xtr.hasNext()) {
                 xtr.next();
                 if (xtr.isStartElement() && ELEMENT_TYPE_DEFINITION.equalsIgnoreCase(xtr.getLocalName())) {
                     itemDefinition.setTypeDefinition(xtr.getElementText());

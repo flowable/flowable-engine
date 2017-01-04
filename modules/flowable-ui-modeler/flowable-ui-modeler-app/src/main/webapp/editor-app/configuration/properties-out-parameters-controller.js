@@ -15,7 +15,7 @@
  * Input parameters for call activity
  */
 
-angular.module('flowableModeler').controller('KisBpmOutParametersCtrl',
+angular.module('flowableModeler').controller('FlowableOutParametersCtrl',
     ['$scope', '$modal', '$timeout', '$translate', function ($scope, $modal, $timeout, $translate) {
 
         // Config for the modal window
@@ -28,7 +28,7 @@ angular.module('flowableModeler').controller('KisBpmOutParametersCtrl',
         _internalCreateModal(opts, $modal, $scope);
     }]);
 
-angular.module('flowableModeler').controller('KisBpmOutParametersPopupCtrl',
+angular.module('flowableModeler').controller('FlowableOutParametersPopupCtrl',
     ['$scope', '$q', '$translate', '$timeout', function ($scope, $q, $translate, $timeout) {
 
         // Put json representing form properties on scope

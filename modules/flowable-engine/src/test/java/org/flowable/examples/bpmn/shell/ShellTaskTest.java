@@ -31,7 +31,7 @@ public class ShellTaskTest extends PluggableFlowableTestCase {
   }
 
   public void testOsDetection() throws Exception {
-    assertTrue(osType != OsType.UNKOWN);
+    assertNotSame(OsType.UNKOWN, osType);
   }
 
   @Deployment

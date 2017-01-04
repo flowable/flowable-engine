@@ -7,14 +7,6 @@ public class DataObject extends FlowElement {
 
   protected ItemDefinition itemSubjectRef;
 
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
   public ItemDefinition getItemSubjectRef() {
     return itemSubjectRef;
   }
@@ -23,6 +15,7 @@ public class DataObject extends FlowElement {
     this.itemSubjectRef = itemSubjectRef;
   }
 
+  @Override
   public DataObject clone() {
     DataObject clone = new DataObject();
     clone.setValues(this);

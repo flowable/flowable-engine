@@ -75,7 +75,7 @@ public class AppDefinitionImportService {
       InputStream is = file.getInputStream();
       String fileName = file.getOriginalFilename();
       Model appModel = modelService.getModel(appDefId);
-      if (appModel.getModelType().equals(Model.MODEL_TYPE_APP) == false) {
+      if (!appModel.getModelType().equals(Model.MODEL_TYPE_APP)) {
         throw new BadRequestException("No app definition found for id " + appDefId);
       }
 
@@ -160,7 +160,7 @@ public class AppDefinitionImportService {
     try {
       appDefinition = objectMapper.readValue(model.getModelEditorJson(), AppDefinition.class);
     } catch (Exception e) {
-      logger.error("Error deserializing app " + model.getId(), e);
+      logger.error("Error deserializing app {}", model.getId(), e);
       throw new InternalServerErrorException("Could not deserialize app definition");
     }
     AppDefinitionRepresentation result = new AppDefinitionRepresentation(model);
@@ -203,7 +203,7 @@ public class AppDefinitionImportService {
             } else if (zipEntryName.startsWith("decision-table-models/")) {
               decisionTableMap.put(modelFileName, json);
 
-            } else if (zipEntryName.contains("/") == false) {
+            } else if (!zipEntryName.contains("/")) {
               appDefinitionModel = createModelObject(json, Model.MODEL_TYPE_APP);
             }
           }
@@ -329,7 +329,7 @@ public class AppDefinitionImportService {
       try {
         bpmnModelNode = objectMapper.readTree(bpmnModelObject.getModelEditorJson());
       } catch (Exception e) {
-        logger.error("Error reading BPMN json for " + bpmnModelKey, e);
+        logger.error("Error reading BPMN json for {}", bpmnModelKey, e);
         throw new InternalServerErrorException("Error reading BPMN json for " + bpmnModelKey);
       }
       
@@ -387,7 +387,7 @@ public class AppDefinitionImportService {
     try {
       appDefinition = objectMapper.readValue(appDefinitionModel.getModelEditorJson(), AppDefinition.class);
     } catch (Exception e) {
-      logger.error("Error reading app definition " + appDefinitionModel.getName(), e);
+      logger.error("Error reading app definition {}", appDefinitionModel.getName(), e);
       throw new BadRequestException("Error reading app definition", e);
     }
     
@@ -433,7 +433,7 @@ public class AppDefinitionImportService {
       model.setKey(modelNode.get("key").asText());
       
       JsonNode descriptionNode = modelNode.get("description");
-      if (descriptionNode != null && descriptionNode.isNull() == false) {
+      if (descriptionNode != null && !descriptionNode.isNull()) {
         model.setDescription(descriptionNode.asText());
       }
       

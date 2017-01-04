@@ -15,7 +15,7 @@
  * String controller
  */
 
-angular.module('flowableModeler').controller('KisBpmStringPropertyCtrl', [ '$scope', function ($scope) {
+angular.module('flowableModeler').controller('FlowableStringPropertyCtrl', [ '$scope', function ($scope) {
 
 	$scope.shapeId = $scope.selectedShape.id;
 	$scope.valueFlushed = false;
@@ -52,7 +52,7 @@ angular.module('flowableModeler').controller('KisBpmStringPropertyCtrl', [ '$sco
  * Boolean controller
  */
 
-angular.module('flowableModeler').controller('KisBpmBooleanPropertyCtrl', ['$scope', function ($scope) {
+angular.module('flowableModeler').controller('FlowableBooleanPropertyCtrl', ['$scope', function ($scope) {
 
     $scope.changeValue = function() {
         if ($scope.property.key === 'oryx-defaultflow' && $scope.property.value) {
@@ -86,7 +86,7 @@ angular.module('flowableModeler').controller('KisBpmBooleanPropertyCtrl', ['$sco
  * Text controller
  */
 
-angular.module('flowableModeler').controller('KisBpmTextPropertyCtrl', [ '$scope', '$modal', function($scope, $modal) {
+angular.module('flowableModeler').controller('FlowableTextPropertyCtrl', [ '$scope', '$modal', function($scope, $modal) {
 
     var opts = {
         template:  'editor-app/configuration/properties/text-popup.html?version=' + Date.now(),
@@ -97,7 +97,7 @@ angular.module('flowableModeler').controller('KisBpmTextPropertyCtrl', [ '$scope
     _internalCreateModal(opts, $modal, $scope);
 }]);
 
-angular.module('flowableModeler').controller('KisBpmTextPropertyPopupCtrl', ['$scope', function($scope) {
+angular.module('flowableModeler').controller('FlowableTextPropertyPopupCtrl', ['$scope', function($scope) {
     
     $scope.save = function() {
         $scope.updatePropertyInModel($scope.property);

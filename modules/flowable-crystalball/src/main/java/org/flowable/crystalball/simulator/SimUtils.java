@@ -22,7 +22,7 @@ import java.util.Random;
 
 public class SimUtils {
   /** main random number generator */
-  private volatile static ThreadLocal<Random> randomGenerator = new ThreadLocal<Random>();
+  private static volatile ThreadLocal<Random> randomGenerator = new ThreadLocal<Random>();
 
   public static void setSeed(long seed) {
     randomGenerator.set(new Random(seed));

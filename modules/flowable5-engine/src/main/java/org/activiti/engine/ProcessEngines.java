@@ -64,7 +64,7 @@ public abstract class ProcessEngines {
   
   public static final String NAME_DEFAULT = "default";
   
-  protected static boolean isInitialized = false; 
+  protected static boolean isInitialized;
   protected static Map<String, ProcessEngine> processEngines = new HashMap<String, ProcessEngine>();
   protected static Map<String, ProcessEngineInfo> processEngineInfosByName = new HashMap<String, ProcessEngineInfo>();
   protected static Map<String, ProcessEngineInfo> processEngineInfosByResourceUrl = new HashMap<String, ProcessEngineInfo>();
@@ -73,7 +73,7 @@ public abstract class ProcessEngines {
   /** Initializes all process engines that can be found on the classpath for 
    * resources <code>flowable.cfg.xml</code> (plain Activiti style configuration)
    * and for resources <code>activiti-context.xml</code> (Spring style configuration). */
-  public synchronized static void init() {
+  public static synchronized void init() {
     if (!isInitialized()) {
       if(processEngines == null) {
         // Create new map to store process-engines if current map is null
@@ -245,7 +245,7 @@ public abstract class ProcessEngines {
   }
   
   /** closes all process engines.  This method should be called when the server shuts down. */
-  public synchronized static void destroy() {
+  public static synchronized void destroy() {
     if (isInitialized()) {
       Map<String, ProcessEngine> engines = new HashMap<String, ProcessEngine>(processEngines);
       processEngines = new HashMap<String, ProcessEngine>();

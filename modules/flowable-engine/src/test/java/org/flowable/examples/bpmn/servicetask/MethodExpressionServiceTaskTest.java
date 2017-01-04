@@ -39,7 +39,7 @@ public class MethodExpressionServiceTaskTest extends PluggableFlowableTestCase {
 
     ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("setServiceResultToProcessVariablesWithSkipExpression", variables2);
 
-    assertEquals(null, runtimeService.getVariable(pi2.getId(), "result"));
+    assertNull(runtimeService.getVariable(pi2.getId(), "result"));
 
   }
 }
