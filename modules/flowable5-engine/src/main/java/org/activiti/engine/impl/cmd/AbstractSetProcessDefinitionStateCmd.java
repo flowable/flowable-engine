@@ -14,6 +14,7 @@ package org.activiti.engine.impl.cmd;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -84,7 +85,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
     // If process definition is already provided (eg. when command is called through the DeployCmd) 
     // we don't need to do an extra database fetch and we can simply return it, wrapped in a list
     if (processDefinitionEntity != null) {
-      return Arrays.asList(processDefinitionEntity);
+      return Collections.singletonList(processDefinitionEntity);
     }
     
     // Validation of input parameters

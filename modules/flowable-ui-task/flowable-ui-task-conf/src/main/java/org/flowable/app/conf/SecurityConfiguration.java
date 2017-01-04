@@ -13,6 +13,7 @@
 package org.flowable.app.conf;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.flowable.app.filter.FlowableCookieFilter;
 import org.flowable.app.filter.FlowableCookieFilterCallback;
@@ -57,7 +58,7 @@ public class SecurityConfiguration {
 	@Bean
   public FlowableCookieFilter flowableCookieFilter() {
 	  FlowableCookieFilter filter = new FlowableCookieFilter();
-    filter.setRequiredPrivileges(Arrays.asList(DefaultPrivileges.ACCESS_TASK));
+    filter.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_TASK));
     return filter;
   }
 	
