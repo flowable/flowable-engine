@@ -16,6 +16,7 @@ package org.activiti.engine.impl.bpmn.behavior;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.activiti.engine.ActivitiException;
@@ -151,7 +152,7 @@ public class BpmnActivityBehavior implements Serializable {
 
       execution.inactivate();
       if (reusableExecutions == null || reusableExecutions.isEmpty()) {
-        execution.takeAll(transitionsToTake, Arrays.asList(execution));
+        execution.takeAll(transitionsToTake, Collections.singletonList(execution));
       } else {
         execution.takeAll(transitionsToTake, reusableExecutions);
       }

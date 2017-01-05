@@ -80,7 +80,7 @@ public class SpringAsyncExecutorTest extends SpringFlowableTestCase {
     waitForTasksToExpire(instance, 1);
 
     List<Task> activeTasks = taskService.createTaskQuery().processInstanceId(instance.getId()).list();
-    assertTrue(activeTasks.size() == 1);
+    assertEquals(1, activeTasks.size());
     
     processEngineConfiguration.getAsyncExecutor().shutdown();
   }

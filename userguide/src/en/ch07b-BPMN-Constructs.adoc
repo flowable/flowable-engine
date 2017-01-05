@@ -3636,10 +3636,6 @@ The following XML snippet shows an example of using the Email Task.
 
 ----
 
-with the following result:
-
-image::images/email.task.result.png[align="center"]
-
 
 [[bpmnMuleTask]]
 
@@ -3767,7 +3763,7 @@ public class SimpleCamelCallRoute extends RouteBuilder {
 
   @Override
   public void configure() throws Exception {
-    from("flowable:SimpleCamelCallProcess:simpleCall").to("log:org.flowable.camel.examples.SimpleCamelCall");
+    from("activiti:SimpleCamelCallProcess:simpleCall").to("log:org.flowable.camel.examples.SimpleCamelCall");
   }
 }
 ----
@@ -4983,14 +4979,14 @@ There is nothing special to the process definition of the subprocess. It could a
 
 Flowable executes processes in a transactional way which can be configured to suite your needs. Lets start by looking at how Flowable scopes transactions normally. If you trigger Flowable (i.e. start a process, complete a task, signal an execution), Flowable is going to advance in the process, until it reaches wait states on each active path of execution. More concretely speaking it performs a depth-first search through the process graph and returns if it has reached wait states on every branch of execution. A wait state is a task which is performed "later" which means that Flowable persists the current execution and waits to be triggered again. The trigger can either come from an external source for example if we have a user task or a receive message task, or from Flowable itself, if we have a timer event. This is illustrated in the following picture:
 
-image::images/activiti.async.example.no.async.PNG[align="center"]
+image::images/async.example.no.async.PNG[align="center"]
 
 We see a segment of a BPMN processes with a usertask, a service task and a timer event. Completing the usertask and validating the address is part of the same unit of work, so it should succeed or fail atomically. That means that if the service task throws an exception we want to rollback the current transaction, such that the execution tracks back to the user task and the user task is still present in the database. This is also the default behavior of Flowable. In (1) an application or client thread completes the task. In that same thread Flowable is now executing the service and advances until it reaches a wait state, in this case the timer event (2). Then it returns the control to the caller (3) potentially committing the transaction (if it was started by Flowable).
 
 
 In some cases this is not what we want. Sometimes we need custom control over transaction boundaries in a process, in order to be able to scope logical units of work. This is where asynchronous continuations come into play. Consider the following process (fragment):
 
-image::images/activiti.async.example.async.PNG[align="center"]
+image::images/async.example.async.PNG[align="center"]
 
 
 This time we are completing the user task, generating an invoice and then send that invoice to the customer. This time the generation of the invoice is not part of the same unit of work so we do not want to rollback the completion of the usertask if generating an invoice fails. So what we want Flowable to do is complete the user task (1), commit the transaction and return the control to the calling application. Then we want to generate the invoice asynchronously, in a background thread. This background thread is the Flowable job executor (actually a thread pool) which periodically polls the database for jobs. So behind the scenes, when we reach the "generate invoice" task, we are creating a job "message" for Flowable to continue the process later and persisting it into the database. This job is then picked up by the job executor and executed. We are also giving the local job executor a little hint that there is a new job, to improve performance.

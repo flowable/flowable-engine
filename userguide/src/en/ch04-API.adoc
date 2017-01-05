@@ -73,7 +73,7 @@ The base exception in Flowable is the +org.flowable.engine.FlowableException+, a
 /**
  * Called when the task is successfully executed.
  * @param taskId the id of the task to complete, cannot be null.
- * @throws ActivitiObjectNotFoundException when no task exists with the given id.
+ * @throws FlowableObjectNotFoundException when no task exists with the given id.
  */
  void complete(String taskId);
 ----
