@@ -70,7 +70,7 @@ For example:
 
 * Form property +room+ will be mapped to process variable +room+ as a String
 * Form property +duration+ will be mapped to process variable +duration+ as a java.lang.Long
-* Form property +speaker+ will be mapped to process variable +SpeakerName+.  It will only be available in the TaskFormData object.  If property speaker is submitted, an ActivitiException will be thrown. Analogue, with attribute +readable="false"+, a property can be excluded from the FormData, but still be processed in the submit.
+* Form property +speaker+ will be mapped to process variable +SpeakerName+.  It will only be available in the TaskFormData object.  If property speaker is submitted, an FlowableException will be thrown. Analogue, with attribute +readable="false"+, a property can be excluded from the FormData, but still be processed in the submit.
 
 * Form property +street+ will be mapped to Java bean property +street+ in process variable +address+ as a String.  And required="true" will throw an exception during the submit if the property is not provided.
 

@@ -28,7 +28,7 @@ Make sure the *"Contact all updates sites.."* checkbox is *checked*, because all
 
 * Create Flowable projects and diagrams.
 
-image::images/designer.create.activiti.project.png[align="center"]
+image::images/designer.create.flowable.project.png[align="center"]
 
 * The Flowable Designer creates a .bpmn file when creating a new Flowable diagram. When opened with the Flowable Diagram Editor view this will provide a graphical modeling canvas and palette. The same file can however be opened with an XML editor and it then shows the BPMN 2.0 XML elements of the process definition. So the Flowable Designer works with only one file for both the graphical diagram as well as the BPMN 2.0 XML. Note that in old releases, the .bpmn extension is not yet supported as deployment artifact for a process definition. Therefore the "create deployment artifacts" feature of the Flowable Designer generates a BAR file with a .bpmn20.xml file that contains the content of the .bpmn file. You can also do a quick file rename yourself. Also note that you can open a .bpmn20.xml file with the Flowable Diagram Editor view as well.
 
