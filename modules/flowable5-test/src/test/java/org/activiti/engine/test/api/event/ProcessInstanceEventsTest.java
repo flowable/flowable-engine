@@ -486,8 +486,8 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
     
     runtimeService.deleteProcessInstance(processInstance.getId(), "testing instance deletion");
     
-    assertEquals("Task cancelled event has to be fired.", listener.getEventsReceived().get(0).getType(), FlowableEngineEventType.ACTIVITY_CANCELLED);
-    assertEquals("SubProcess cancelled event has to be fired.", listener.getEventsReceived().get(2).getType(), FlowableEngineEventType.PROCESS_CANCELLED);
+    assertEquals("Task cancelled event has to be fired.", FlowableEngineEventType.ACTIVITY_CANCELLED, listener.getEventsReceived().get(0).getType());
+    assertEquals("SubProcess cancelled event has to be fired.", FlowableEngineEventType.PROCESS_CANCELLED, listener.getEventsReceived().get(2).getType());
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     assertEquals(0, taskService.createTaskQuery().count());
   }

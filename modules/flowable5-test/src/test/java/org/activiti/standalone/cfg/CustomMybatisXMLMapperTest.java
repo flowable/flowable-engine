@@ -20,7 +20,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
   public void testSelectOneTask() {
     // Create test data
     for (int i=0; i<4; i++) {
-      createTask(i + "", null, null, 0);
+      createTask(String.valueOf(i), null, null, 0);
     }
     
     final String taskId = createTask("4", null, null, 0);
@@ -51,7 +51,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
   public void testSelectTaskList() {
     // Create test data
     for (int i=0; i<5; i++) {
-      createTask(i + "", null, null, 0);
+      createTask(String.valueOf(i), null, null, 0);
     }
     
     org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl)
@@ -75,7 +75,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
   public void testSelectTasksByCustomQuery() {
     // Create test data
     for (int i=0; i<5; i++) {
-      createTask(i + "", null, null, 0);
+      createTask(String.valueOf(i), null, null, 0);
     }
     createTask("Owned task", "kermit", null, 0);
     
@@ -96,7 +96,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
   public void testSelectTaskByCustomQuery() {
     // Create test data
     for (int i=0; i<5; i++) {
-      createTask(i + "", null, null, 0);
+      createTask(String.valueOf(i), null, null, 0);
     }
     createTask("Owned task", "kermit", null, 0);
     
@@ -115,7 +115,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
   public void testCustomQueryListPage() {
     // Create test data
     for (int i=0; i<15; i++) {
-      createTask(i + "", null, null, 0);
+      createTask(String.valueOf(i), null, null, 0);
     }
     
     org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl)
@@ -134,7 +134,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
   public void testCustomQueryOrderBy() {
     // Create test data
     for (int i=0; i<5; i++) {
-      createTask(i + "", null, null, i*20);
+      createTask(String.valueOf(i), null, null, i*20);
     }
     
     org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl)
@@ -176,7 +176,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
     identityService.setAuthenticatedUserId("fozzie");
     
     for (int i=0; i<15; i++) {
-      taskService.createAttachment(null, createTask(i + "", null, null, 0), null, "attachmentName"+i, "", "http://activiti.org/"+i);
+      taskService.createAttachment(null, createTask(String.valueOf(i), null, null, 0), null, "attachmentName"+i, "", "http://activiti.org/"+i);
     }
     
     org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl)

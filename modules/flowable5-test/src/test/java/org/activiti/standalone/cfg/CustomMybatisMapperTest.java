@@ -22,7 +22,7 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
 		// Create test data
 		for (int i=0; i<5; i++) {
 			Task task = taskService.newTask();
-			task.setName(i + "");
+			task.setName(String.valueOf(i));
 			taskService.saveTask(task);
 		}
 		
@@ -62,7 +62,7 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
 		// Create test data
 		for (int i=0; i<5; i++) {
 			Task task = taskService.newTask();
-			task.setName(i + "");
+			task.setName(String.valueOf(i));
 			taskService.saveTask(task);
 			
 			taskService.setVariable(task.getId(), "myVar", Long.valueOf(task.getId()) * 2);

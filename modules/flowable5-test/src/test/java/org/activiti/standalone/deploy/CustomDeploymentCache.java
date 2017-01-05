@@ -61,11 +61,7 @@ public class CustomDeploymentCache implements DeploymentCache<ProcessDefinitionC
 
   @Override
   public boolean contains(String id) {
-    if (id.equals(id)) {
-      return true;
-    } else {
-      return false;
-    }
+    return id.equals(id);
   }
 
 }

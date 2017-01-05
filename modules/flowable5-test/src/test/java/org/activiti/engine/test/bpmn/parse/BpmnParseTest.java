@@ -135,9 +135,9 @@ public class BpmnParseTest extends PluggableFlowableTestCase {
     // Test that the conditions has been resolved
     for (PvmTransition transition : activity.getOutgoingTransitions()) {
       if (transition.getDestination().getId().equals("Task_2")) {
-        assertTrue(transition.getProperty("conditionText").equals("#{approved}"));
+        assertEquals("#{approved}", transition.getProperty("conditionText"));
       } else if (transition.getDestination().getId().equals("Task_3")) {
-        assertTrue(transition.getProperty("conditionText").equals("#{!approved}"));
+        assertEquals("#{!approved}", transition.getProperty("conditionText"));
       } else {
         fail("Something went wrong");
       }

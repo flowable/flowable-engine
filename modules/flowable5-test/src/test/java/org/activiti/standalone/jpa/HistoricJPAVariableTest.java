@@ -31,7 +31,7 @@ public class HistoricJPAVariableTest extends AbstractFlowableTestCase {
   private static EntityManagerFactory entityManagerFactory;
 
   private static FieldAccessJPAEntity simpleEntityFieldAccess;
-  private static boolean entitiesInitialized = false;
+  private static boolean entitiesInitialized;
 
   protected String processInstanceId;
 

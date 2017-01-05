@@ -67,7 +67,7 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
   private static FieldAccessJPAEntity entityToQuery;
   private static FieldAccessJPAEntity entityToUpdate;
   
-  private static boolean entitiesInitialized = false;
+  private static boolean entitiesInitialized;
 
   private static EntityManagerFactory entityManagerFactory;
   

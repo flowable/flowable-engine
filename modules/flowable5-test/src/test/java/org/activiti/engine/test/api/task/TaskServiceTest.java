@@ -1424,19 +1424,19 @@ public void testCompleteWithParametersTask2() {
     }
     
     try {
-      taskService.deleteTasks(Arrays.asList(task.getId()));
+      taskService.deleteTasks(Collections.singletonList(task.getId()));
     } catch(FlowableException ae) {
       assertEquals("The task cannot be deleted because is part of a running process", ae.getMessage());
     }
     
     try {
-      taskService.deleteTasks(Arrays.asList(task.getId()), true);
+      taskService.deleteTasks(Collections.singletonList(task.getId()), true);
     } catch(FlowableException ae) {
       assertEquals("The task cannot be deleted because is part of a running process", ae.getMessage());
     }
     
     try {
-      taskService.deleteTasks(Arrays.asList(task.getId()), "test");
+      taskService.deleteTasks(Collections.singletonList(task.getId()), "test");
     } catch(FlowableException ae) {
       assertEquals("The task cannot be deleted because is part of a running process", ae.getMessage());
     }

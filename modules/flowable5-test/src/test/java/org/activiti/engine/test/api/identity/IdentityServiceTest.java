@@ -256,7 +256,7 @@ public class IdentityServiceTest extends PluggableFlowableTestCase {
     identityService.createMembership(johndoe.getId(), sales.getId());
 
     List<Group> groups = identityService.createGroupQuery().groupMember(johndoe.getId()).list();
-    assertTrue(groups.size() == 1);
+    assertEquals(1, groups.size());
     assertEquals("sales", groups.get(0).getId());
 
     // Delete the membership and check members of sales group

@@ -1368,7 +1368,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
   @Deployment
   public void testChangingCollection() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("multi_users", Arrays.asList("testuser"));
+    vars.put("multi_users", Collections.singletonList("testuser"));
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("test_multi", vars);
     assertNotNull(instance);
     Task task = taskService.createTaskQuery().singleResult();

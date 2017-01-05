@@ -557,7 +557,10 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
     assertEquals(4, historicIdentityLinks.size());
     
     // Validate all links
-    boolean foundCandidateUser= false, foundCandidateGroup = false, foundAssignee = false, foundCustom = false;
+    boolean foundCandidateUser= false;
+    boolean foundCandidateGroup = false;
+    boolean foundAssignee = false;
+    boolean foundCustom = false;
     for(HistoricIdentityLink link : historicIdentityLinks) {
       assertEquals(task.getId(), link.getTaskId());
       if(link.getGroupId() != null) {

@@ -34,13 +34,13 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
     variables2.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
     variables2.put("skip", true);
     ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("setServiceResultToProcessVariablesWithSkipExpression", variables2);
-    assertEquals(null, runtimeService.getVariable(pi2.getId(), "result"));
+    assertNull(runtimeService.getVariable(pi2.getId(), "result"));
     
     Map<String,Object> variables3 = new HashMap<String, Object>();
     variables3.put("bean", new ValueBean("ok"));
     variables3.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
     ProcessInstance pi3 = runtimeService.startProcessInstanceByKey("setServiceResultToProcessVariablesWithSkipExpression", variables2);
-    assertEquals(null, runtimeService.getVariable(pi3.getId(), "result"));
+    assertNull(runtimeService.getVariable(pi3.getId(), "result"));
   }
   
   @Deployment

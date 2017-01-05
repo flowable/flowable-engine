@@ -17,7 +17,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +50,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
     WiserMessage message = messages.get(0);
     assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "flowable@localhost",
-        Arrays.asList("kermit@activiti.org"), null);
+            Collections.singletonList("kermit@activiti.org"), null);
     assertProcessEnded(procId);
   }
 
@@ -70,7 +69,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
     WiserMessage message = messages.get(0);
     assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "activiti@myTenant.com",
-        Arrays.asList("kermit@activiti.org"), null);
+            Collections.singletonList("kermit@activiti.org"), null);
     assertProcessEnded(procId);
 
     repositoryService.deleteDeployment(deployment.getId(), true);
@@ -90,7 +89,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
     WiserMessage message = messages.get(0);
     assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "flowable@localhost",
-        Arrays.asList("kermit@activiti.org"), null);
+            Collections.singletonList("kermit@activiti.org"), null);
     assertProcessEnded(procId);
 
     repositoryService.deleteDeployment(deployment.getId(), true);
@@ -137,7 +136,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
     WiserMessage message = messages.get(0);
     assertEmailSend(message, false, subject, "Hello " + recipientName + ", this is an e-mail",
-        sender, Arrays.asList(recipient), null);
+        sender, Collections.singletonList(recipient), null);
   }
 
   @Deployment
@@ -146,7 +145,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
     List<WiserMessage> messages = wiser.getMessages();
     assertEmailSend(messages.get(0), false, "Hello world", "This is the content", "flowable@localhost",
-        Arrays.asList("kermit@activiti.org"), Arrays.asList("fozzie@activiti.org"));
+            Collections.singletonList("kermit@activiti.org"), Collections.singletonList("fozzie@activiti.org"));
 
     // Bcc is not stored in the header (obviously)
     // so the only way to verify the bcc, is that there are three messages send.
@@ -159,7 +158,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
     List<WiserMessage> messages = wiser.getMessages();
     assertEquals(1, messages.size());
-    assertEmailSend(messages.get(0), true, "Test", "Mr. <b>Kermit</b>", "flowable@localhost", Arrays.asList("kermit@activiti.org"), null);
+    assertEmailSend(messages.get(0), true, "Test", "Mr. <b>Kermit</b>", "flowable@localhost", Collections.singletonList("kermit@activiti.org"), null);
   }
 
   @Deployment
@@ -171,7 +170,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
     List<WiserMessage> messages = wiser.getMessages();
     assertEquals(1, messages.size());
-    assertEmailSend(messages.get(0), true, "Test", "Mr. <b>Kermit</b>", "flowable@localhost", Arrays.asList("kermit@activiti.org"), null);
+    assertEmailSend(messages.get(0), true, "Test", "Mr. <b>Kermit</b>", "flowable@localhost", Collections.singletonList("kermit@activiti.org"), null);
   }
 
   @Deployment

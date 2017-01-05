@@ -74,13 +74,13 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
 		event = (FlowableVariableEvent) listener.getEventsReceived().get(0);
 		assertEquals(FlowableEngineEventType.VARIABLE_DELETED, event.getType());
         // process definition Id can't be recognized in  DB flush
-        assertEquals(null, event.getProcessDefinitionId());
+        assertNull(event.getProcessDefinitionId());
 		assertEquals(processInstance.getId(), event.getExecutionId());
 		assertEquals(processInstance.getId(), event.getProcessInstanceId());
 		assertNull(event.getTaskId());
 		assertEquals("testVariable", event.getVariableName());
         // deleted variable value is always null
-		assertEquals(null, event.getVariableValue());
+        assertNull(event.getVariableValue());
 		listener.clearEventsReceived();
 
 		// Create, update and delete multiple variables
@@ -246,13 +246,13 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
 		
 		event = (FlowableVariableEvent) listener.getEventsReceived().get(2);
 		assertEquals(FlowableEngineEventType.VARIABLE_DELETED, event.getType());
-		assertEquals(null, event.getProcessDefinitionId()); // process definition Id is set to null
+        assertNull(event.getProcessDefinitionId()); // process definition Id is set to null
 		assertEquals(processInstance.getId(), event.getExecutionId());
 		assertEquals(processInstance.getId(), event.getProcessInstanceId());
 		assertEquals(task.getId(), event.getTaskId());
 		assertEquals("testVariable", event.getVariableName());
-    // deleted values are always null
-		assertEquals(null, event.getVariableValue());
+        // deleted values are always null
+        assertNull(event.getVariableValue());
 		listener.clearEventsReceived();
 	}
 	
@@ -293,14 +293,14 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
 		// Check delete event
 		event = (FlowableVariableEvent) listener.getEventsReceived().get(2);
 		assertEquals(FlowableEngineEventType.VARIABLE_DELETED, event.getType());
-    // process definition Id can't be recognized in  DB flush
-		assertEquals(null, event.getProcessDefinitionId());
+        // process definition Id can't be recognized in  DB flush
+        assertNull(event.getProcessDefinitionId());
 		assertEquals(processInstance.getId(), event.getExecutionId());
 		assertEquals(processInstance.getId(), event.getProcessInstanceId());
 		assertEquals(task.getId(), event.getTaskId());
 		assertEquals("variable", event.getVariableName());
-    // deleted variable value is always null
-		assertEquals(null, event.getVariableValue());
+        // deleted variable value is always null
+        assertNull(event.getVariableValue());
 	}
 
 	@Override

@@ -114,7 +114,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
         }
       } else {
         for (EventSubscription subscription : newEventSubscriptions) {
-          assertTrue(subscription.getConfiguration().equals(processDefinition.getId()));         
+          assertEquals(subscription.getConfiguration(), processDefinition.getId());
         }
       }
     }

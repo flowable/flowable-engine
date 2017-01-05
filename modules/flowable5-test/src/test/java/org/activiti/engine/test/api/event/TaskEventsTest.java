@@ -169,7 +169,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
 		assertTrue(event.getEntity() instanceof org.activiti.engine.task.Task);
 		taskFromEvent = (org.activiti.engine.task.Task) event.getEntity();
 		assertEquals(task.getId(), taskFromEvent.getId());
-		assertEquals(null, taskFromEvent.getAssignee());
+        assertNull(taskFromEvent.getAssignee());
 		assertExecutionDetails(event, processInstance);
 		
 		event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
