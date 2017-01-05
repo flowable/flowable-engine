@@ -13,6 +13,9 @@
 
 package org.flowable.engine.test.bpmn.event.compensate;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
@@ -111,6 +114,41 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
     runtimeService.trigger(execution.getId());
     assertProcessEnded(processInstance.getId());
 
+  }
+
+  @Deployment(resources = {"org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.SubProcess1.bpmn20.xml",
+          "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.SubProcess2.bpmn20.xml",
+          "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensateTwoSubprocesses.bpmn20.xml" })
+  public void testCompensateTwoSubprocesses() {
+
+    Map<String, Object> initialVariables = new HashMap<String, Object>();
+    initialVariables.put("test", "begin");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess", initialVariables);
+
+    assertNotNull(processInstance);
+
+    // get task from first subprocess
+    Task task = taskService.createTaskQuery().singleResult();
+
+    Map<String, String> taskFormVariables = new HashMap<String, String>();
+    taskFormVariables.put("test", "begin");
+    formService.submitTaskFormData(task.getId(), new HashMap<String, String>());
+
+    // get task from second subprocess
+    task = taskService.createTaskQuery().singleResult();
+
+    formService.submitTaskFormData(task.getId(), new HashMap<String, String>());
+
+    // get first task from main process
+    task = taskService.createTaskQuery().singleResult();
+
+    Object testVariable2 = runtimeService.getVariable(processInstance.getId(), "test2");
+    assertNotNull(testVariable2);
+    assertEquals("compensated2", testVariable2.toString());
+
+    Object testVariable1 = runtimeService.getVariable(processInstance.getId(), "test1");
+    assertNotNull(testVariable1);
+    assertEquals("compensated1", testVariable1.toString());
   }
 
   @Deployment(resources = { "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testCallActivityCompensationHandler.bpmn20.xml",
