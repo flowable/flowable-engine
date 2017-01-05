@@ -215,7 +215,7 @@ public class BpmnParse implements BpmnXMLConstants {
 	           
 	          // Throw exception if there is any error
 	          if (errorBuilder.length() > 0) {
-	          	throw new ActivitiException("Errors while parsing:\n" + errorBuilder.toString());
+	          	throw new ActivitiException("Errors while parsing:\n" + errorBuilder);
 	          }
 	          
 	          // Write out warnings (if any)

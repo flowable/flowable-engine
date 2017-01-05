@@ -99,7 +99,7 @@ public class WorkflowUsersResource {
       // Using iterator to be able to remove without ConcurrentModExceptions
       Iterator<? extends User> userIt = matchingUsers.iterator();
       while (userIt.hasNext()) {
-        if (involvedUsers.contains(userIt.next().getId().toString())) {
+        if (involvedUsers.contains(userIt.next().getId())) {
           userIt.remove();
         }
       }

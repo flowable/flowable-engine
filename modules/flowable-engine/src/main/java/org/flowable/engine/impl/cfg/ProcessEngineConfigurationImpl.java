@@ -1650,7 +1650,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           for (Class<?> type : defaultBpmnParseHandler.getHandledTypes()) {
             supportedTypes.append(" ").append(type.getCanonicalName()).append(" ");
           }
-          throw new FlowableException("The default BPMN parse handlers should only support one type, but " + defaultBpmnParseHandler.getClass() + " supports " + supportedTypes.toString()
+          throw new FlowableException("The default BPMN parse handlers should only support one type, but " + defaultBpmnParseHandler.getClass() + " supports " + supportedTypes
               + ". This is likely a programmatic error");
         } else {
           Class<?> handledType = defaultBpmnParseHandler.getHandledTypes().iterator().next();

@@ -20,7 +20,6 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.junit.Assert;
-import org.junit.Test;
 
 /**
  * @author Joram Barrez
