@@ -17,6 +17,11 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.io.IOUtils;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -29,10 +34,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Yvo Swillens
  */
+@RestController
+@Api(tags = { "Form Deployments" }, description = "Manage Form Deployments")
 public class FormDeploymentResourceDataResource {
 
   @Autowired
@@ -41,9 +49,16 @@ public class FormDeploymentResourceDataResource {
   @Autowired
   protected FormRepositoryService formRepositoryService;
 
+  @ApiOperation(value = "Get a form deployment resource content", tags = {"Form Deployments"}, nickname = "getFormDeploymentResource",
+      notes = "The response body will contain the binary resource-content for the requested resource. The response content-type will be the same as the type returned in the resources mimeType property. Also, a content-disposition header is set, allowing browsers to download the file instead of displaying it.")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Indicates both form deployment and resource have been found and the resource data has been returned."),
+      @ApiResponse(code = 404, message = "Indicates the requested form deployment was not found or there is no resource with the given id present in the form deployment. The status-description contains additional information.")})
   @RequestMapping(value = "/form-repository/deployments/{deploymentId}/resourcedata/{resourceId}", method = RequestMethod.GET)
   @ResponseBody
-  public byte[] getFormDeploymentResource(@PathVariable("deploymentId") String deploymentId, @PathVariable("resourceId") String resourceId, HttpServletResponse response) {
+  public byte[] getFormDeploymentResource(@ApiParam(name = "deploymentId") @PathVariable("deploymentId") String deploymentId,
+                                          @ApiParam(name = "resourceId") @PathVariable("resourceId") String resourceId,
+                                          HttpServletResponse response) {
     if (deploymentId == null) {
       throw new FlowableIllegalArgumentException("No deployment id provided");
     }

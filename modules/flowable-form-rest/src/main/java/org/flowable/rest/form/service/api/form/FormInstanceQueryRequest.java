@@ -12,8 +12,6 @@
  */
 package org.flowable.rest.form.service.api.form;
 
-import java.util.Date;
-
 import org.flowable.rest.api.PaginateRequest;
 
 /**
@@ -23,12 +21,18 @@ public class FormInstanceQueryRequest extends PaginateRequest {
 
   private String id;
   private String formDefinitionId;
+  private String formDefinitionIdLike;
   private String taskId;
+  private String taskIdLike;
   private String processInstanceId;
+  private String processInstanceIdLike;
   private String processDefinitionId;
-  private Date submittedDate;
+  private String processDefinitionIdLike;
   private String submittedBy;
+  private String submittedByLike;
   private String tenantId;
+  private String tenantIdLike;
+  private Boolean withoutTenantId;
 
   public String getId() {
     return id;
@@ -46,12 +50,28 @@ public class FormInstanceQueryRequest extends PaginateRequest {
     this.formDefinitionId = formDefinitionId;
   }
 
+  public String getFormDefinitionIdLike() {
+    return formDefinitionIdLike;
+  }
+
+  public void setFormDefinitionIdLike(String formDefinitionIdLike) {
+    this.formDefinitionIdLike = formDefinitionIdLike;
+  }
+
   public String getTaskId() {
     return taskId;
   }
 
   public void setTaskId(String taskId) {
     this.taskId = taskId;
+  }
+
+  public String getTaskIdLike() {
+    return taskIdLike;
+  }
+
+  public void setTaskIdLike(String taskIdLike) {
+    this.taskIdLike = taskIdLike;
   }
 
   public String getProcessInstanceId() {
@@ -62,6 +82,14 @@ public class FormInstanceQueryRequest extends PaginateRequest {
     this.processInstanceId = processInstanceId;
   }
 
+  public String getProcessInstanceIdLike() {
+    return processInstanceIdLike;
+  }
+
+  public void setProcessInstanceIdLike(String processInstanceIdLike) {
+    this.processInstanceIdLike = processInstanceIdLike;
+  }
+
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
@@ -70,12 +98,12 @@ public class FormInstanceQueryRequest extends PaginateRequest {
     this.processDefinitionId = processDefinitionId;
   }
 
-  public Date getSubmittedDate() {
-    return submittedDate;
+  public String getProcessDefinitionIdLike() {
+    return processDefinitionIdLike;
   }
 
-  public void setSubmittedDate(Date submittedDate) {
-    this.submittedDate = submittedDate;
+  public void setProcessDefinitionIdLike(String processDefinitionIdLike) {
+    this.processDefinitionIdLike = processDefinitionIdLike;
   }
 
   public String getSubmittedBy() {
@@ -86,11 +114,35 @@ public class FormInstanceQueryRequest extends PaginateRequest {
     this.submittedBy = submittedBy;
   }
 
+  public String getSubmittedByLike() {
+    return submittedByLike;
+  }
+
+  public void setSubmittedByLike(String submittedByLike) {
+    this.submittedByLike = submittedByLike;
+  }
+
   public String getTenantId() {
     return tenantId;
   }
 
   public void setTenantId(String tenantId) {
     this.tenantId = tenantId;
+  }
+
+  public String getTenantIdLike() {
+    return tenantIdLike;
+  }
+
+  public void setTenantIdLike(String tenantIdLike) {
+    this.tenantIdLike = tenantIdLike;
+  }
+
+  public Boolean isWithoutTenantId() {
+    return withoutTenantId;
+  }
+
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
   }
 }

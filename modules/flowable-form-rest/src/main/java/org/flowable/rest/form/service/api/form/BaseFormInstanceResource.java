@@ -48,29 +48,41 @@ public class BaseFormInstanceResource {
     if (queryRequest.getFormDefinitionId() != null) {
       query.formDefinitionId(queryRequest.getFormDefinitionId());
     }
-
+    if (queryRequest.getFormDefinitionIdLike() != null) {
+      query.formDefinitionIdLike(queryRequest.getFormDefinitionIdLike());
+    }
     if (queryRequest.getTaskId() != null) {
       query.taskId(queryRequest.getTaskId());
     }
-
+    if (queryRequest.getTaskIdLike() != null) {
+      query.taskIdLike(queryRequest.getTaskIdLike());
+    }
     if (queryRequest.getProcessInstanceId() != null) {
       query.processInstanceId(queryRequest.getProcessInstanceId());
     }
-
+    if (queryRequest.getProcessInstanceIdLike() != null) {
+      query.processInstanceIdLike(queryRequest.getProcessInstanceIdLike());
+    }
     if (queryRequest.getProcessDefinitionId() != null) {
       query.processDefinitionId(queryRequest.getProcessDefinitionId());
     }
-
-    if (queryRequest.getSubmittedDate() != null) {
-      query.submittedDate(queryRequest.getSubmittedDate());
+    if (queryRequest.getProcessDefinitionIdLike() != null) {
+      query.processDefinitionIdLike(queryRequest.getProcessDefinitionIdLike());
     }
-
     if (queryRequest.getSubmittedBy() != null) {
       query.submittedBy(queryRequest.getSubmittedBy());
     }
-
+    if (queryRequest.getSubmittedByLike() != null) {
+      query.submittedByLike(queryRequest.getSubmittedByLike());
+    }
     if (queryRequest.getTenantId() != null) {
       query.deploymentTenantId(queryRequest.getTenantId());
+    }
+    if (queryRequest.getTenantIdLike() != null) {
+      query.deploymentTenantIdLike(queryRequest.getTenantIdLike());
+    }
+    if (Boolean.TRUE.equals(queryRequest.isWithoutTenantId())) {
+      query.deploymentWithoutTenantId();
     }
 
     return new FormInstancePaginateList(restResponseFactory).paginateList(requestParams, queryRequest, query, "submittedDate", allowedSortProperties);
