@@ -102,8 +102,8 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
       .processInstanceId(pi2.getId())
       .activityId("waitState")
       .singleResult();
-    
-    assertEquals(null, execution2);
+
+    assertNull(execution2);
   }
   
   @Deployment

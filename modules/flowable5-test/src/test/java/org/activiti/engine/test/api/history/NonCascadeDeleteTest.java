@@ -4,7 +4,6 @@ import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.task.Task;
-import org.junit.Test;
 
 public class NonCascadeDeleteTest extends PluggableFlowableTestCase {
 
@@ -21,7 +20,6 @@ public class NonCascadeDeleteTest extends PluggableFlowableTestCase {
   protected void tearDown() throws Exception {
 	  super.tearDown();
   }
-  @Test
   public void testHistoricProcessInstanceQuery(){
     deploymentId = repositoryService.createDeployment()
       .addClasspathResource("org/activiti/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
@@ -39,9 +37,9 @@ public class NonCascadeDeleteTest extends PluggableFlowableTestCase {
         repositoryService.deleteDeployment(deploymentId, false);
 
         HistoricProcessInstance processInstanceAfterDelete = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-        assertEquals(null, processInstanceAfterDelete.getProcessDefinitionKey());
-        assertEquals(null, processInstanceAfterDelete.getProcessDefinitionName());
-        assertEquals(null, processInstanceAfterDelete.getProcessDefinitionVersion());
+        assertNull(processInstanceAfterDelete.getProcessDefinitionKey());
+        assertNull(processInstanceAfterDelete.getProcessDefinitionName());
+        assertNull(processInstanceAfterDelete.getProcessDefinitionVersion());
         
         // clean
         historyService.deleteHistoricProcessInstance(processInstanceId);

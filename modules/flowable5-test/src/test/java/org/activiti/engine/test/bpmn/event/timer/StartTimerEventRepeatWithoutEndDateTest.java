@@ -79,7 +79,7 @@ public class StartTimerEventRepeatWithoutEndDateTest extends PluggableFlowableTe
     dueDateCalendar.set(2025, Calendar.DECEMBER, 11, 0, 0, 0);
 
     //check the due date is inside the 2 seconds range
-    assertEquals(true, Math.abs(dueDateCalendar.getTime().getTime() - jobs.get(0).getDuedate().getTime()) < 2000);
+    assertTrue(Math.abs(dueDateCalendar.getTime().getTime() - jobs.get(0).getDuedate().getTime()) < 2000);
 
     //No process instances
     List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
@@ -111,7 +111,7 @@ public class StartTimerEventRepeatWithoutEndDateTest extends PluggableFlowableTe
     // (10'th repeat after 10 dec. => dueDate must have DueDate = 20 dec.)
     dueDateCalendar = Calendar.getInstance();
     dueDateCalendar.set(2025, Calendar.DECEMBER, 20, 0, 0, 0);
-    assertEquals(true, Math.abs(dueDateCalendar.getTime().getTime() - jobs.get(0).getDuedate().getTime()) < 2000);
+    assertTrue(Math.abs(dueDateCalendar.getTime().getTime() - jobs.get(0).getDuedate().getTime()) < 2000);
 
     // ADVANCE THE CLOCK SO that all 10 repeats to be executed
     // (last execution)

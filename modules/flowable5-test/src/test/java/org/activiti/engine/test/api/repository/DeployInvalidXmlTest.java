@@ -115,7 +115,7 @@ public class DeployInvalidXmlTest extends PluggableFlowableTestCase {
   
   static class MyRunnable implements Runnable {
     
-    public boolean finished = false;
+    public boolean finished;
     
     protected RepositoryService repositoryService;
     

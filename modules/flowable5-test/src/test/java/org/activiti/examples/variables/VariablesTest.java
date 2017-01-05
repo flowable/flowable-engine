@@ -97,11 +97,11 @@ public class VariablesTest extends PluggableFlowableTestCase {
     assertEquals("coca-cola", variables.get("stringVar"));
     assertEquals(long2000StringBuilder.toString(), variables.get("longString2000chars"));
     assertEquals(now, variables.get("dateVar"));
-    assertEquals(null, variables.get("nullVar"));
+    assertNull(variables.get("nullVar"));
     assertEquals(serializable, variables.get("serializableVar"));
     assertTrue(Arrays.equals(bytes1, (byte[]) variables.get("bytesVar")));
     assertEquals(new CustomType(bytes2), variables.get("customVar1"));
-    assertEquals(null, variables.get("customVar2"));
+    assertNull(variables.get("customVar2"));
     assertEquals(11, variables.size());
 
     // Set all existing variables values to null
@@ -119,18 +119,18 @@ public class VariablesTest extends PluggableFlowableTestCase {
     runtimeService.setVariable(processInstance.getId(), "customVar2", null);
 
     variables = runtimeService.getVariables(processInstance.getId());
-    assertEquals(null, variables.get("longVar"));
-    assertEquals(null, variables.get("shortVar"));
-    assertEquals(null, variables.get("integerVar"));
-    assertEquals(null, variables.get("stringVar"));
-    assertEquals(null, variables.get("longString2000chars"));
-    assertEquals(null, variables.get("longString4000chars"));
-    assertEquals(null, variables.get("dateVar"));
-    assertEquals(null, variables.get("nullVar"));
-    assertEquals(null, variables.get("serializableVar"));
-    assertEquals(null, variables.get("bytesVar"));
-    assertEquals(null, variables.get("customVar1"));
-    assertEquals(null, variables.get("customVar2"));
+    assertNull(variables.get("longVar"));
+    assertNull(variables.get("shortVar"));
+    assertNull(variables.get("integerVar"));
+    assertNull(variables.get("stringVar"));
+    assertNull(variables.get("longString2000chars"));
+    assertNull(variables.get("longString4000chars"));
+    assertNull(variables.get("dateVar"));
+    assertNull(variables.get("nullVar"));
+    assertNull(variables.get("serializableVar"));
+    assertNull(variables.get("bytesVar"));
+    assertNull(variables.get("customVar1"));
+    assertNull(variables.get("customVar2"));
     assertEquals(12, variables.size());
 
     // Update existing variable values again, and add a new variable
@@ -156,7 +156,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     assertEquals(long2001StringBuilder.toString(), variables.get("longString2000chars"));
     assertEquals(long4001StringBuilder.toString(), variables.get("longString4000chars"));
     assertEquals(now, variables.get("dateVar"));
-    assertEquals(null, variables.get("nullVar"));
+    assertNull(variables.get("nullVar"));
     assertEquals(serializable, variables.get("serializableVar"));
     assertTrue(Arrays.equals(bytes1, (byte[]) variables.get("bytesVar")));
     assertEquals(new CustomType(bytes2), variables.get("customVar1"));
@@ -274,7 +274,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     assertEquals(1234, variables.get("integerVar"));
     assertEquals("coca-cola", variables.get("stringVar"));
     assertEquals(now, variables.get("dateVar"));
-    assertEquals(null, variables.get("nullVar"));
+    assertNull(variables.get("nullVar"));
     assertEquals(serializable, variables.get("serializableVar"));
     assertTrue(Arrays.equals(bytes, (byte[]) variables.get("bytesVar")));
     assertEquals(8, variables.size());

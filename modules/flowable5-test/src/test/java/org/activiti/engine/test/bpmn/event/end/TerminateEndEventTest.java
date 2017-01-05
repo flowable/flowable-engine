@@ -40,7 +40,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
-  public static int serviceTaskInvokedCount = 0;
+  public static int serviceTaskInvokedCount;
   
   @Override
   protected void setUp() throws Exception {
@@ -59,7 +59,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
     }
   }
 
-  public static int serviceTaskInvokedCount2 = 0;
+  public static int serviceTaskInvokedCount2;
 
   public static class CountDelegate2 implements JavaDelegate {
 
@@ -213,7 +213,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
     variables.put("input", 1);
     taskService.complete(task.getId(), variables);
 
-    assertTrue(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).count() == 0);
+    assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).count());
   }
 
   @Deployment

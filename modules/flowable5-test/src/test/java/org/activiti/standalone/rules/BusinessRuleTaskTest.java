@@ -26,11 +26,11 @@ public class BusinessRuleTaskTest extends PluggableFlowableTestCase {
   public void testBusinessRuleTask() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("customRule");
     assertEquals("test2", runtimeService.getVariable(processInstance.getId(), "test"));
-    
-    assertTrue(CustomBusinessRuleTask.ruleInputVariables.size() == 1);
+
+    assertEquals(1, CustomBusinessRuleTask.ruleInputVariables.size());
     assertEquals("order", CustomBusinessRuleTask.ruleInputVariables.get(0).getExpressionText());
-    
-    assertTrue(CustomBusinessRuleTask.ruleIds.size() == 2);
+
+    assertEquals(2, CustomBusinessRuleTask.ruleIds.size());
     assertEquals("rule1", CustomBusinessRuleTask.ruleIds.get(0).getExpressionText());
     assertEquals("rule2", CustomBusinessRuleTask.ruleIds.get(1).getExpressionText());
     

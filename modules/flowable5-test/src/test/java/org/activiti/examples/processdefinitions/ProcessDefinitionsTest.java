@@ -13,8 +13,8 @@
 package org.activiti.examples.processdefinitions;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -156,7 +156,7 @@ public class ProcessDefinitionsTest extends PluggableFlowableTestCase {
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).singleResult();
     assertEquals("This is a test", processDefinition.getDescription());
     
-    deleteDeployments(Arrays.asList(deploymentId));
+    deleteDeployments(Collections.singletonList(deploymentId));
   }
   
   private String deployProcessString(String processString) {

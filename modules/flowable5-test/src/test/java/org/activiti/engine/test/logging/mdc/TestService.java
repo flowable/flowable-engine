@@ -4,10 +4,10 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 
 public class TestService implements JavaDelegate{
-	static String processInstanceId = null;
-	static String processDefinitionId = null;
-	static String executionId = null;
-	static String businessKey = null;
+	static String processInstanceId;
+	static String processDefinitionId;
+	static String executionId;
+	static String businessKey;
 	
 
 	@Override

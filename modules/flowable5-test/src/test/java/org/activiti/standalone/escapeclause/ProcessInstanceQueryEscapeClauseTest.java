@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.junit.Test;
 
 public class ProcessInstanceQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
 
@@ -119,7 +118,6 @@ public class ProcessInstanceQueryEscapeClauseTest extends AbstractEscapeClauseTe
     assertEquals(processInstance2.getId(), runtimeService.createProcessInstanceQuery().or().processInstanceNameLikeIgnoreCase("%\\_%").processDefinitionId("undefined").singleResult().getId());
   }
   
-  @Test
   public void testQueryLikeByQueryVariableValue() {
     // queryVariableValue
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().variableValueLike("var1", "%\\%%").singleResult();
@@ -140,7 +138,6 @@ public class ProcessInstanceQueryEscapeClauseTest extends AbstractEscapeClauseTe
     assertEquals(processInstance2.getId(), processInstance.getId());
   }
   
-  @Test
   public void testQueryLikeByQueryVariableValueIgnoreCase() {
     // queryVariableValueIgnoreCase
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().variableValueLikeIgnoreCase("var1", "%\\%%").singleResult();

@@ -67,7 +67,7 @@ public class StandaloneTaskVariableEventsTest extends PluggableFlowableTestCase 
 			assertEquals(newTask.getId(), event.getTaskId());
 			assertEquals("testVariable", event.getVariableName());
       // deleted variable value is always null
-			assertEquals(null, event.getVariableValue());
+            assertNull(event.getVariableValue());
 		} finally {
 			
 			// Cleanup task and history to ensure a clean DB after test success/failure

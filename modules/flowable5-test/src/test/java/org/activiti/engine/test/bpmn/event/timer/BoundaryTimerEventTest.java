@@ -35,8 +35,8 @@ import org.flowable.engine.test.Deployment;
  */
 public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
   
-  private static boolean listenerExecutedStartEvent = false;
-  private static boolean listenerExecutedEndEvent = false;
+  private static boolean listenerExecutedStartEvent;
+  private static boolean listenerExecutedEndEvent;
   
   public static class MyExecutionListener implements ExecutionListener {
     private static final long serialVersionUID = 1L;

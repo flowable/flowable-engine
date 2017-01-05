@@ -11,10 +11,10 @@ public class RetryFailingDelegate implements JavaDelegate {
 
   public static final String EXCEPTION_MESSAGE = "Expected exception.";
   
-	public static boolean shallThrow = false;
+	public static boolean shallThrow;
 	public static List<Long> times;
 	 
-	static public void resetTimeList() {
+	public static void resetTimeList() {
 	  times = new ArrayList<Long>();
 	}
 

@@ -18,7 +18,6 @@ import java.util.Map;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.junit.Test;
 
 public class ExecutionQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
 
@@ -74,7 +73,6 @@ public class ExecutionQueryEscapeClauseTest extends AbstractEscapeClauseTestCase
     assertNotNull(execution);
   }
   
-  @Test
   public void testQueryLikeByQueryVariableValue() {
     Execution execution = runtimeService.createExecutionQuery().variableValueLike("var1", "%\\%%").singleResult();
     assertNotNull(execution);
@@ -85,7 +83,6 @@ public class ExecutionQueryEscapeClauseTest extends AbstractEscapeClauseTestCase
     assertEquals(processInstance2.getId(), execution.getId());
   }
   
-  @Test
   public void testQueryLikeIgnoreCaseByQueryVariableValue() {
     Execution execution = runtimeService.createExecutionQuery().variableValueLikeIgnoreCase("var1", "%\\%%").singleResult();
     assertNotNull(execution);
@@ -96,7 +93,6 @@ public class ExecutionQueryEscapeClauseTest extends AbstractEscapeClauseTestCase
     assertEquals(processInstance2.getId(), execution.getId());
   }
   
-  @Test
   public void testQueryLikeByQueryProcessVariableValue() {
     Execution execution = runtimeService.createExecutionQuery().onlyChildExecutions().processVariableValueLike("var1", "%\\%%").singleResult();
     assertNotNull(execution);
@@ -105,7 +101,6 @@ public class ExecutionQueryEscapeClauseTest extends AbstractEscapeClauseTestCase
     assertNotNull(execution);
   }
   
-  @Test
   public void testQueryLikeIgnoreCaseByQueryProcessVariableValue() {
     Execution execution = runtimeService.createExecutionQuery().onlyChildExecutions().processVariableValueLikeIgnoreCase("var1", "%\\%%").singleResult();
     assertNotNull(execution);

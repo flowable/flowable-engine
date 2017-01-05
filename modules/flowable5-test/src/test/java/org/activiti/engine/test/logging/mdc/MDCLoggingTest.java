@@ -14,7 +14,7 @@ import org.flowable.engine.test.Deployment;
 public class MDCLoggingTest extends PluggableFlowableTestCase {
 
 	MemoryLogAppender console = new MemoryLogAppender();
-	List<Appender> appenders = null;
+	List<Appender> appenders;
 
 	private void setCustomLogger() {
 		String PATTERN = "Modified Log *** ProcessDefinitionId=%X{mdcProcessDefinitionID} executionId=%X{mdcExecutionId} mdcProcessInstanceID=%X{mdcProcessInstanceID} mdcBusinessKey=%X{mdcBusinessKey} mdcTaskId=%X{mdcTaskId}  %m%n";

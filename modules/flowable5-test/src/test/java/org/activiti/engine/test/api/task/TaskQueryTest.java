@@ -2171,12 +2171,12 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
   public void testProcessInstanceIdIn() throws Exception {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-    final Task task = taskService.createTaskQuery().processInstanceIdIn(Arrays.asList(processInstance.getId())).singleResult();
+    final Task task = taskService.createTaskQuery().processInstanceIdIn(Collections.singletonList(processInstance.getId())).singleResult();
     assertNotNull(task);
     assertEquals("theTask", task.getTaskDefinitionKey());
     assertEquals(processInstance.getId(), task.getProcessInstanceId());
 
-    assertEquals(0, taskService.createTaskQuery().processInstanceIdIn(Arrays.asList("unexisting")).count());
+    assertEquals(0, taskService.createTaskQuery().processInstanceIdIn(Collections.singletonList("unexisting")).count());
   }
 
   @Deployment(resources={"org/activiti/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
@@ -2186,7 +2186,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     final Task task = taskService.createTaskQuery()
         .or()
         .taskId("invalid")
-        .processInstanceIdIn(Arrays.asList(processInstance.getId())).singleResult();
+        .processInstanceIdIn(Collections.singletonList(processInstance.getId())).singleResult();
     assertNotNull(task);
     assertEquals("theTask", task.getTaskDefinitionKey());
     assertEquals(processInstance.getId(), task.getProcessInstanceId());
@@ -2194,7 +2194,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     assertEquals(0, taskService.createTaskQuery()
         .or()
         .taskId("invalid")
-        .processInstanceIdIn(Arrays.asList("unexisting")).count());
+        .processInstanceIdIn(Collections.singletonList("unexisting")).count());
   }
 
   @Deployment(resources={"org/activiti/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})

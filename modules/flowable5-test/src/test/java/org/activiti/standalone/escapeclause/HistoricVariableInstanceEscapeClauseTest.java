@@ -20,7 +20,6 @@ import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
-import org.junit.Test;
 
 public class HistoricVariableInstanceEscapeClauseTest extends AbstractEscapeClauseTestCase {
 
@@ -76,7 +75,6 @@ public class HistoricVariableInstanceEscapeClauseTest extends AbstractEscapeClau
     repositoryService.deleteDeployment(deploymentTwoId, true);
   }
   
-  @Test
   public void testQueryByVariableNameLike(){
     if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
         HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().variableNameLike("%\\%%").singleResult();
@@ -91,7 +89,6 @@ public class HistoricVariableInstanceEscapeClauseTest extends AbstractEscapeClau
     }
   }
   
-  @Test
   public void testQueryLikeByQueryVariableValue() {
     if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
         HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().variableValueLike("var%", "%\\%%").singleResult();
@@ -104,7 +101,6 @@ public class HistoricVariableInstanceEscapeClauseTest extends AbstractEscapeClau
     }
   }
   
-  @Test
   public void testQueryLikeByQueryVariableValueIgnoreCase() {
     if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
         HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().variableValueLikeIgnoreCase("var%", "%\\%%").singleResult();

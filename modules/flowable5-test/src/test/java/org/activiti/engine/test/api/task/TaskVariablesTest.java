@@ -232,11 +232,11 @@ public class TaskVariablesTest extends PluggableFlowableTestCase {
     }
     
     List<VariableInstance> variableInstances = taskService.getVariableInstancesLocalByTaskIds(taskIds);
-    assertEquals(variableInstances.size(), 2);
-    assertEquals(variableInstances.get(0).getName(), "taskVar");
-    assertEquals(variableInstances.get(0).getValue() , "taskVar");
-    assertEquals(variableInstances.get(1).getName(), "taskVar");
-    assertEquals(variableInstances.get(1).getValue() , "taskVar");
+    assertEquals(2, variableInstances.size());
+    assertEquals("taskVar", variableInstances.get(0).getName());
+    assertEquals("taskVar", variableInstances.get(0).getValue());
+    assertEquals("taskVar", variableInstances.get(1).getName());
+    assertEquals("taskVar", variableInstances.get(1).getValue());
   }
   
   public static class MyVariable implements Serializable {

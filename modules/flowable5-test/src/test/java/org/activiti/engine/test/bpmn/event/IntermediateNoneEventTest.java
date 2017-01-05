@@ -20,7 +20,7 @@ import org.flowable.engine.test.Deployment;
 
 public class IntermediateNoneEventTest extends PluggableFlowableTestCase {
   
-  private static boolean listenerExcecuted = false;
+  private static boolean listenerExcecuted;
   
   public static class MyExecutionListener implements ExecutionListener {
     public void notify(DelegateExecution execution) {

@@ -72,7 +72,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
 
     processInstanceIds = new ArrayList<String>();
     for (int i = 0; i < PROCESS_DEFINITION_KEY_DEPLOY_COUNT; i++) {
-      processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, i + "").getId());
+      processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, String.valueOf(i)).getId());
     }
     processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_2, "1").getId());
   }

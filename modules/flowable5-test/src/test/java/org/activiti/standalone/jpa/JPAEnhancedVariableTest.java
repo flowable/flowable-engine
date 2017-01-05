@@ -151,12 +151,12 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
 
     Task task = getTask(instance);
     List list = (List) task.getProcessVariables().get("list1");
-    assertTrue(list.size() == 2);
+    assertEquals(2, list.size());
     assertTrue(list.get(0) instanceof FieldAccessJPAEntity);
     assertTrue(list.get(1) instanceof FieldAccessJPAEntity);
 
     list = (List) task.getProcessVariables().get("list2");
-    assertTrue(list.size() == 2);
+    assertEquals(2, list.size());
     assertTrue(list.get(0) instanceof PropertyAccessJPAEntity);
     assertTrue(list.get(1) instanceof PropertyAccessJPAEntity);
 
@@ -166,11 +166,11 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
 
     task = getTask(instance);
     list = (List) task.getProcessVariables().get("list");
-    assertTrue(list.size() == 2);
+    assertEquals(2, list.size());
     assertTrue(list.get(0) instanceof FieldAccessJPAEntity);
-    assertTrue(((FieldAccessJPAEntity)list.get(0)).getId().equals(1L));
+    assertEquals(1L, (long) ((FieldAccessJPAEntity) list.get(0)).getId());
     assertTrue(list.get(1) instanceof FieldAccessJPAEntity);
-    assertTrue(((FieldAccessJPAEntity)list.get(1)).getId().equals(2L));
+    assertEquals(2L, (long) ((FieldAccessJPAEntity) list.get(1)).getId());
 
     // shuffle list and start a new process
     params.putAll(Collections.singletonMap("list", Arrays.asList(fieldEntity2, fieldEntity)));
@@ -178,11 +178,11 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
 
     task = getTask(instance);
     list = (List) task.getProcessVariables().get("list");
-    assertTrue(list.size() == 2);
+    assertEquals(2, list.size());
     assertTrue(list.get(0) instanceof FieldAccessJPAEntity);
-    assertTrue(((FieldAccessJPAEntity)list.get(0)).getId().equals(2L));
+    assertEquals(2L, (long) ((FieldAccessJPAEntity) list.get(0)).getId());
     assertTrue(list.get(1) instanceof FieldAccessJPAEntity);
-    assertTrue(((FieldAccessJPAEntity)list.get(1)).getId().equals(1L));
+    assertEquals(1L, (long) ((FieldAccessJPAEntity) list.get(1)).getId());
 
     // start process with mixed jpa entities in list
     try {
