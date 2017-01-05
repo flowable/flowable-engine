@@ -14,6 +14,10 @@ package org.flowable.rest.form.service.api.form;
 
 import javax.servlet.http.HttpServletRequest;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormService;
@@ -23,10 +27,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Yvo Swillens
  */
+@RestController
+@Api(tags = { "Form Models" }, description = "Manage Form Models")
 public class FormModelWithVariablesResource {
 
   @Autowired
@@ -35,6 +42,12 @@ public class FormModelWithVariablesResource {
   @Autowired
   protected FormRestResponseFactory formRestResponseFactory;
 
+  @ApiOperation(value = "Get a populated form model", tags = {"Form Models"}, notes = "Provide variables needed to pre populated form fields " +
+      "and to render expression based form fields")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Indicates the form model was found and returned."),
+      @ApiResponse(code = 404, message = "Indicates the requested form model was not found.")
+  })
   @RequestMapping(value = "/form/model", method = RequestMethod.POST, produces = "application/json")
   public FormModelResponse getRuntimeFormDefinition(@RequestBody FormRequest formRequest, HttpServletRequest request) {
 

@@ -36,8 +36,30 @@
       var url = window.location.search.match(/url=([^&]+)/);
       if (url && url.length > 1) {
         url = decodeURIComponent(url[1]);
+        var api;
+        switch (url) {
+          case "specfile/process/flowable.json":
+              api = "process";
+              break;
+          case "specfile/dmn/flowable.json":
+              api = "dmn";
+              break;
+          case "specfile/form/flowable.json":
+              api = "form";
+              break;
+          case "specfile/content/flowable.json":
+              api = "content";
+              break;
+        }
+
+        if (!api) {
+            window.location.search = window.location.search.replace(url, "specfile/process/flowable.json");
+        }
+
+        $("#api-select").val(api);
       } else {
-        url = "specfile/flowable.json";
+        window.location.search=window.location.search + '?url=specfile/process/flowable.json';
+        return;
       }
 
       hljs.configure({
@@ -53,20 +75,15 @@
         dom_id: "swagger-ui-container",
         supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
         onComplete: function(swaggerApi, swaggerUi){
-          if(typeof initOAuth == "function") {
-            initOAuth({
-              clientId: "your-client-id",
-              clientSecret: "your-client-secret-if-required",
-              realm: "your-realms",
-              appName: "your-app-name",
-              scopeSeparator: " ",
-              additionalQueryStringParams: {}
-            });
-          }
-
-          if(window.SwaggerTranslator) {
+            if(window.SwaggerTranslator) {
             window.SwaggerTranslator.translate();
           }
+
+//          temp disabled; needed for basic auth on curl example
+//
+//          var basicAuth = new SwaggerClient.PasswordAuthorization('basic', 'kermit', 'kermit');
+//          swaggerUi.api.clientAuthorizations.add("basicAuth", basicAuth);
+
         },
         onFailure: function(data) {
           log("Unable to Load SwaggerUI");
@@ -84,7 +101,33 @@
           console.log.apply(console, arguments);
         }
       }
+
+      $( "#api-select" ).change(function() {
+          var specFile;
+          switch ($('#api-select :selected').val()) {
+              case "process":
+                  specFile = "specfile/process/flowable.json";
+                  break;
+              case "dmn":
+                  specFile = "specfile/dmn/flowable.json";
+                  break;
+              case "form":
+                  specFile = "specfile/form/flowable.json";
+                  break;
+              case "content":
+                  specFile = "specfile/content/flowable.json";
+                  break;
+          }
+
+          var url = window.location.search.match(/url=([^&]+)/);
+          if (url && url.length > 1) {
+              window.location.hash = "";
+              window.location.search = window.location.search.replace(url[1], specFile);
+          }
+      });
   });
+
+    //
   </script>
 </head>
 
@@ -92,11 +135,15 @@
 <div id='header'>
   <div class="swagger-ui-wrap">
     <a id="logo" href="http://swagger.io"><img class="logo__img" alt="swagger" height="30" width="30" src="images/logo_small.png" /><span class="logo__title">swagger</span></a>
-    <form id='api_selector'>
-      <div class='input'><input placeholder="http://example.com/api" id="input_baseUrl" name="baseUrl" type="text"/></div>
-      <div id='auth_container'></div>
-      <div class='input'><a id="explore" class="header__btn" href="#" data-sw-translate>Explore</a></div>
-    </form>
+      <div style="float: right; margin-top: 8px;">
+        API:
+        <select id="api-select" style="margin-left: 5px;">
+          <option value="process">Process</option>
+          <option value="dmn">DMN</option>
+          <option value="form">Form</option>
+          <option value="content">Content</option>
+        </select>
+      </div>
   </div>
 </div>
 

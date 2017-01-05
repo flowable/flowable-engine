@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.rest.service.api.engine.variable;
+package org.flowable.rest.variable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 
@@ -31,7 +31,7 @@ public class ShortRestVariableConverter implements RestVariableConverter {
   }
 
   @Override
-  public Object getVariableValue(RestVariable result) {
+  public Object getVariableValue(EngineRestVariable result) {
     if (result.getValue() != null) {
       if (!(result.getValue() instanceof Number)) {
         throw new FlowableIllegalArgumentException("Converter can only convert shorts");
@@ -42,7 +42,7 @@ public class ShortRestVariableConverter implements RestVariableConverter {
   }
 
   @Override
-  public void convertVariableValue(Object variableValue, RestVariable result) {
+  public void convertVariableValue(Object variableValue, EngineRestVariable result) {
     if (variableValue != null) {
       if (!(variableValue instanceof Short)) {
         throw new FlowableIllegalArgumentException("Converter can only convert shorts");

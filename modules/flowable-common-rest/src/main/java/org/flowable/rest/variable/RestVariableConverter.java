@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.rest.service.api.engine.variable;
+package org.flowable.rest.variable;
 
 /**
  * @author Frederik Heremans
@@ -29,12 +29,12 @@ public interface RestVariableConverter {
   Class<?> getVariableType();
 
   /**
-   * Extract the variable value to be used in the engine from the given {@link RestVariable}.
+   * Extract the variable value to be used in the engine from the given {@link EngineRestVariable}.
    */
-  Object getVariableValue(RestVariable result);
+  Object getVariableValue(EngineRestVariable result);
 
   /**
-   * Converts the given value and sets the converted value in the given {@link RestVariable}.
+   * Converts the given value and sets the converted value in the given {@link EngineRestVariable}.
    */
-  void convertVariableValue(Object variableValue, RestVariable result);
+  void convertVariableValue(Object variableValue, EngineRestVariable result);
 }

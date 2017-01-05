@@ -14,6 +14,11 @@ package org.flowable.rest.form.service.api.form;
 
 import javax.servlet.http.HttpServletRequest;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormService;
@@ -30,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
+@Api(tags = { "Form Instances" }, description = "Manage Form Instances")
 public class FormInstanceResource {
 
   @Autowired
@@ -38,11 +44,21 @@ public class FormInstanceResource {
   @Autowired
   protected FormRestResponseFactory formRestResponseFactory;
 
+  @ApiOperation(value = "Get a form instance", tags = {"Form Instances"}, nickname = "getFormInstance")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Indicates the form instance was found and returned."),
+      @ApiResponse(code = 404, message = "Indicates the requested form instance was not found.")
+  })
   @RequestMapping(value = "/form/form-instance/{formInstanceId}", method = RequestMethod.GET, produces = "application/json")
-  public FormInstanceResponse getFormInstance(@PathVariable String formInstanceId, HttpServletRequest request) {
+  public FormInstanceResponse getFormInstance(@ApiParam(name = "formInstanceId") @PathVariable String formInstanceId, HttpServletRequest request) {
     return formRestResponseFactory.createFormInstanceResponse(formService.createFormInstanceQuery().id(formInstanceId).singleResult());
   }
 
+  @ApiOperation(value = "Store a form instance", tags = {"Form Instances"}, nickname = "storeFormInstance", notes = "Provide either a FormDefinitionKey or a FormDefinitionId together with the other properties.")
+  @ApiResponses(value = {
+      @ApiResponse(code = 201, message = "Indicates the form instance was stored."),
+      @ApiResponse(code = 404, message = "Indicates the related form model was not found.")
+  })
   @RequestMapping(value = "/form/form-instance", method = RequestMethod.POST, produces = "application/json")
   public void storeFormInstance(@RequestBody FormRequest formRequest, HttpServletRequest request) {
 

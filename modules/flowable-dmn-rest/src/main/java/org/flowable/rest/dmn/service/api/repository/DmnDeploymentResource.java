@@ -14,6 +14,11 @@ package org.flowable.rest.dmn.service.api.repository;
 
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
@@ -29,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
+@Api(tags = { "Deployment" }, description = "Manage Decision Table Deployments")
 public class DmnDeploymentResource {
 
   @Autowired
@@ -37,8 +43,13 @@ public class DmnDeploymentResource {
   @Autowired
   protected DmnRepositoryService dmnRepositoryService;
 
+  @ApiOperation(value = "Get a decision table deployment", tags = {"Deployment"})
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Indicates the deployment was found and returned."),
+      @ApiResponse(code = 404, message = "Indicates the requested deployment was not found.")
+  })
   @RequestMapping(value = "/dmn-repository/deployments/{deploymentId}", method = RequestMethod.GET, produces = "application/json")
-  public DmnDeploymentResponse getDmnDeployment(@PathVariable String deploymentId) {
+  public DmnDeploymentResponse getDmnDeployment(@ApiParam(name = "deploymentId") @PathVariable String deploymentId) {
     DmnDeployment deployment = dmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
 
     if (deployment == null) {
@@ -48,8 +59,13 @@ public class DmnDeploymentResource {
     return dmnRestResponseFactory.createDmnDeploymentResponse(deployment);
   }
 
+  @ApiOperation(value = "Delete a decision table deployment", tags = {"Deployment"})
+  @ApiResponses(value = {
+      @ApiResponse(code = 204, message = "Indicates the deployment was found and has been deleted. Response-body is intentionally empty."),
+      @ApiResponse(code = 404, message = "Indicates the requested deployment was not found.")
+  })
   @RequestMapping(value = "/dmn-repository/deployments/{deploymentId}", method = RequestMethod.DELETE, produces = "application/json")
-  public void deleteDmnDeployment(@PathVariable String deploymentId, HttpServletResponse response) {
+  public void deleteDmnDeployment(@ApiParam(name = "deploymentId") @PathVariable String deploymentId, HttpServletResponse response) {
 
     dmnRepositoryService.deleteDeployment(deploymentId);
 

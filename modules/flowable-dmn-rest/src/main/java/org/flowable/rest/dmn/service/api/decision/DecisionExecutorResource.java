@@ -18,9 +18,15 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.flowable.dmn.api.RuleEngineExecutionResult;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.rest.variable.EngineRestVariable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,10 +37,15 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
+@Api(tags = { "Decision Executor" }, description = "Execute Decision Table")
 public class DecisionExecutorResource extends BaseDecisionExecutorResource {
 
-  @RequestMapping(value = "/rules/decision-executor", method = RequestMethod.POST, produces = "application/json")
-  public ExecuteDecisionResponse executeDecision(@RequestBody ExecuteDecisionRequest request, HttpServletRequest httpRequest, HttpServletResponse response) {
+  @ApiOperation(value = "Execute a Decision", tags = {"Decision Executor"})
+  @ApiResponses(value = {
+      @ApiResponse(code = 201, message = "Indicates the Decision has been executed")
+  })
+  @RequestMapping(value = "/dmn-rule/decision-executor", method = RequestMethod.POST, produces = "application/json")
+  public ExecuteDecisionResponse executeDecision(@ApiParam("request") @RequestBody ExecuteDecisionRequest request, HttpServletRequest httpRequest, HttpServletResponse response) {
 
     if (request.getDecisionKey() == null) {
       throw new FlowableIllegalArgumentException("Decision key is required.");
@@ -43,16 +54,16 @@ public class DecisionExecutorResource extends BaseDecisionExecutorResource {
     Map<String, Object> inputVariables = null;
     if (request.getInputVariables() != null) {
       inputVariables = new HashMap<String, Object>();
-      for (Map.Entry<String, Object> variable : request.getInputVariables().entrySet()) {
-        if (variable.getKey() == null) {
+      for (EngineRestVariable variable : request.getInputVariables()) {
+        if (variable.getName() == null) {
           throw new FlowableIllegalArgumentException("Variable name is required.");
         }
-        inputVariables.put(variable.getKey(), variable.getValue());
+        inputVariables.put(variable.getName(), dmnRestResponseFactory.getVariableValue(variable));
       }
     }
 
     try {
-      RuleEngineExecutionResult executionResult = executeDecisionByKeyAndTenantId(request.getDecisionKey(), request.getTenantId(), request.getInputVariables());
+      RuleEngineExecutionResult executionResult = executeDecisionByKeyAndTenantId(request.getDecisionKey(), request.getTenantId(), inputVariables);
 
       response.setStatus(HttpStatus.CREATED.value());
 

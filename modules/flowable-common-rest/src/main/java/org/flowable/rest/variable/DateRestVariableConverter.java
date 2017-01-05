@@ -11,43 +11,54 @@
  * limitations under the License.
  */
 
-package org.flowable.rest.service.api.engine.variable;
+package org.flowable.rest.variable;
+
+import java.text.ParseException;
+import java.util.Date;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 /**
  * @author Frederik Heremans
  */
-public class StringRestVariableConverter implements RestVariableConverter {
+public class DateRestVariableConverter implements RestVariableConverter {
+
+  protected ISO8601DateFormat isoFormatter = new ISO8601DateFormat();
 
   @Override
   public String getRestTypeName() {
-    return "string";
+    return "date";
   }
 
   @Override
   public Class<?> getVariableType() {
-    return String.class;
+    return Date.class;
   }
 
   @Override
-  public Object getVariableValue(RestVariable result) {
+  public Object getVariableValue(EngineRestVariable result) {
     if (result.getValue() != null) {
       if (!(result.getValue() instanceof String)) {
-        throw new FlowableIllegalArgumentException("Converter can only convert strings");
+        throw new FlowableIllegalArgumentException("Converter can only convert string to date");
       }
-      return (String) result.getValue();
+      try {
+        return isoFormatter.parse((String) result.getValue());
+      } catch (ParseException e) {
+        throw new FlowableIllegalArgumentException("The given variable value is not a date: '" + result.getValue() + "'", e);
+      }
     }
     return null;
   }
 
   @Override
-  public void convertVariableValue(Object variableValue, RestVariable result) {
+  public void convertVariableValue(Object variableValue, EngineRestVariable result) {
     if (variableValue != null) {
-      if (!(variableValue instanceof String)) {
-        throw new FlowableIllegalArgumentException("Converter can only convert strings");
+      if (!(variableValue instanceof Date)) {
+        throw new FlowableIllegalArgumentException("Converter can only convert booleans");
       }
-      result.setValue(variableValue);
+      result.setValue(isoFormatter.format(variableValue));
     } else {
       result.setValue(null);
     }

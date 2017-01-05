@@ -12,6 +12,9 @@
  */
 package org.flowable.rest.form.service.api.repository;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
+@Api(tags = { "Form Definitions" }, description = "Manage Form Definitions")
 public class FormModelResource {
 
   @Autowired
@@ -34,8 +38,9 @@ public class FormModelResource {
   @Autowired
   protected FormRepositoryService formRepositoryService;
 
+  @ApiOperation(value = "Get a process definition form model", tags = {"Form Definitions"}, nickname = "getModelResource")
   @RequestMapping(value = "/form-repository/form-definitions/{formDefinitionId}/model", method = RequestMethod.GET, produces = "application/json")
-  public FormModel getModelResource(@PathVariable String formDefinitionId) {
+  public FormModel getModelResource(@ApiParam(name = "formDefinitionId") @PathVariable String formDefinitionId) {
     FormModel formDefinition = formRepositoryService.getFormModelById(formDefinitionId);
 
     if (formDefinition == null) {

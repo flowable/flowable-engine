@@ -12,6 +12,10 @@
  */
 package org.flowable.rest.form.service.api.management;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.flowable.engine.common.EngineInfo;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.form.engine.FormEngine;
@@ -24,8 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
+@Api(tags = { "Engine" }, description = "Manage Form Engine")
 public class FormEngineResource {
 
+  @ApiOperation(value = "Get form engine info", tags = {"Engine"})
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message =  "Indicates the engine info is returned."),
+  })
   @RequestMapping(value = "/form-management/engine", method = RequestMethod.GET, produces = "application/json")
   public FormEngineInfoResponse getEngineInfo() {
     FormEngineInfoResponse response = new FormEngineInfoResponse();

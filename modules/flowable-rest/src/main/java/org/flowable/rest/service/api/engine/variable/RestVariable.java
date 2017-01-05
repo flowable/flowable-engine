@@ -15,42 +15,21 @@ package org.flowable.rest.service.api.engine.variable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.flowable.rest.variable.EngineRestVariable;
 
 /**
- * Pojo representing a variable used in REST-service which definies it's name, variable, scope and type.
+ * Pojo representing a variable used in REST-service which defines it's name, variable, scope and type.
  * 
  * @author Frederik Heremans
  */
-public class RestVariable {
+public class RestVariable extends EngineRestVariable {
 
   public enum RestVariableScope {
     LOCAL, GLOBAL
   }
 
-  private String name;
-  private String type;
   private RestVariableScope variableScope;
-  private Object value;
-  private String valueUrl;
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
-  }
 
   @JsonIgnore
   public RestVariableScope getVariableScope() {
@@ -59,14 +38,6 @@ public class RestVariable {
 
   public void setVariableScope(RestVariableScope variableScope) {
     this.variableScope = variableScope;
-  }
-
-  public Object getValue() {
-    return value;
-  }
-
-  public void setValue(Object value) {
-    this.value = value;
   }
 
   public String getScope() {
@@ -79,15 +50,6 @@ public class RestVariable {
 
   public void setScope(String scope) {
     setVariableScope(getScopeFromString(scope));
-  }
-
-  public void setValueUrl(String valueUrl) {
-    this.valueUrl = valueUrl;
-  }
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  public String getValueUrl() {
-    return valueUrl;
   }
 
   public static RestVariableScope getScopeFromString(String scope) {

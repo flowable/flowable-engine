@@ -57,7 +57,12 @@ public class DecisionExecutionAuditContainer {
   }
 
   protected Map<String, String> getVariablesTypeMap(Map<String, Object> variableValuesMap) {
-    Map<String, String> variablesTypesMap = new HashMap<String, String>();
+    Map<String, String> variablesTypesMap = new HashMap<>();
+
+    if (variableValuesMap == null || variableValuesMap.isEmpty()) {
+      return variablesTypesMap;
+    }
+
     for (String name : variableValuesMap.keySet()) {
       Object value = variableValuesMap.get(name);
       String type = null;
