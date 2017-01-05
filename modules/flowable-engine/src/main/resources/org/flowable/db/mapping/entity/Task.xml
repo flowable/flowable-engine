@@ -75,9 +75,9 @@
          #{task.tenantId, jdbcType=VARCHAR},
          #{task.formKey, jdbcType=VARCHAR},
          #{task.claimTime, jdbcType=TIMESTAMP},
-         #{isCountEnabled, jdbcType=BOOLEAN},
-		 #{variableCount, jdbcType=INTEGER},
-    	 #{identityLinkCount, jdbcType=INTEGER})
+         #{task.isCountEnabled, jdbcType=BOOLEAN},
+		 #{task.variableCount, jdbcType=INTEGER},
+    	 #{task.identityLinkCount, jdbcType=INTEGER})
     </foreach>
   </insert>
 
@@ -107,9 +107,9 @@
          #{task.tenantId, jdbcType=VARCHAR},
          #{task.formKey, jdbcType=VARCHAR},
          #{task.claimTime, jdbcType=TIMESTAMP},
-         #{isCountEnabled, jdbcType=BOOLEAN},
-		 #{variableCount, jdbcType=INTEGER},
-    	 #{identityLinkCount, jdbcType=INTEGER})
+         #{task.isCountEnabled, jdbcType=BOOLEAN},
+		 #{task.variableCount, jdbcType=INTEGER},
+    	 #{task.identityLinkCount, jdbcType=INTEGER})
     </foreach>
     SELECT * FROM dual
   </insert>
