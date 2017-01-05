@@ -32,8 +32,9 @@ Flowable runs on a JDK higher than or equal to version 7.  Go to link:$$http://w
 
 ==== IDE
 
-Flowable development can be done with the IDE of your choice. If you would like to use the Flowable Designer then you need Eclipse Kepler or Luna.
-Download the eclipse distribution of your choice from link:$$http://www.eclipse.org/downloads/$$[the Eclipse download page]. Unzip the downloaded file and then you should be able to start it with the eclipse file in the directory +eclipse+.
+Flowable development can be done with the IDE of your choice. If you would like to use the Flowable Designer then you need Eclipse Mars or Neon.
+Download the Eclipse distribution of your choice from link:$$http://www.eclipse.org/downloads/$$[the Eclipse download page]. Unzip the downloaded file and
+then you should be able to start it with the eclipse file in the directory +eclipse+.
 Further in this user guide, there is a section on <<eclipseDesignerInstallation,installing our eclipse designer plugin>>.
 
 
