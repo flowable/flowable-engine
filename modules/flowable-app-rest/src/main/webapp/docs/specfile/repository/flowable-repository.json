@@ -928,7 +928,7 @@
     }
   },
   "definitions" : {
-    "ActivitiListener" : {
+    "FlowableListener" : {
       "type" : "object",
       "properties" : {
         "id" : {
@@ -1586,7 +1586,7 @@
         "executionListeners" : {
           "type" : "array",
           "items" : {
-            "$ref" : "#/definitions/ActivitiListener"
+            "$ref" : "#/definitions/FlowableListener"
           }
         }
       }
@@ -2203,7 +2203,7 @@
         "executionListeners" : {
           "type" : "array",
           "items" : {
-            "$ref" : "#/definitions/ActivitiListener"
+            "$ref" : "#/definitions/FlowableListener"
           }
         },
         "lanes" : {
@@ -2473,7 +2473,7 @@
         "executionListeners" : {
           "type" : "array",
           "items" : {
-            "$ref" : "#/definitions/ActivitiListener"
+            "$ref" : "#/definitions/FlowableListener"
           }
         },
         "itemSubjectRef" : {

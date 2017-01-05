@@ -5660,7 +5660,7 @@ securityDefinitions:
   basicAuth:
     type: "basic"
 definitions:
-  ActivitiListener:
+  FlowableListener:
     type: "object"
     properties:
       id:
@@ -6291,7 +6291,7 @@ definitions:
       executionListeners:
         type: "array"
         items:
-          $ref: "#/definitions/ActivitiListener"
+          $ref: "#/definitions/FlowableListener"
   FormDataResponse:
     type: "object"
     properties:
@@ -7198,7 +7198,7 @@ definitions:
       executionListeners:
         type: "array"
         items:
-          $ref: "#/definitions/ActivitiListener"
+          $ref: "#/definitions/FlowableListener"
       lanes:
         type: "array"
         items:
@@ -7954,7 +7954,7 @@ definitions:
       executionListeners:
         type: "array"
         items:
-          $ref: "#/definitions/ActivitiListener"
+          $ref: "#/definitions/FlowableListener"
       itemSubjectRef:
         $ref: "#/definitions/ItemDefinition"
       value:
