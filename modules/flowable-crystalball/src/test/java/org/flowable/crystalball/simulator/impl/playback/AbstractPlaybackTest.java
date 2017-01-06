@@ -1,5 +1,3 @@
-package org.flowable.crystalball.simulator.impl.playback;
-
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +10,7 @@ package org.flowable.crystalball.simulator.impl.playback;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+package org.flowable.crystalball.simulator.impl.playback;
 
 import junit.framework.AssertionFailedError;
 import org.flowable.crystalball.simulator.SimpleEventCalendarFactory;
@@ -32,6 +30,8 @@ import org.flowable.crystalball.simulator.impl.SimulationProcessEngineFactory;
 import org.flowable.crystalball.simulator.impl.StartProcessByIdEventHandler;
 import org.flowable.crystalball.simulator.impl.clock.DefaultClockFactory;
 import org.flowable.crystalball.simulator.impl.clock.ThreadLocalClock;
+import org.flowable.crystalball.simulator.impl.playback.CheckStatus;
+import org.flowable.crystalball.simulator.impl.playback.PlaybackUserTaskCompleteEventHandler;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
