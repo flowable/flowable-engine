@@ -78,7 +78,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
     
     try {
       repositoryService.activateProcessDefinitionById(processDefinition.getId());
-      fail("Exception exprected");
+      fail("Exception expected");
     } catch (FlowableException e) {
       // expected
     }

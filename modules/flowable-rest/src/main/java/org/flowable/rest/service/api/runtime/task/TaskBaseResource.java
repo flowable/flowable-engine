@@ -452,7 +452,7 @@ public class TaskBaseResource {
   }
 
   /**
-   * Get valid task from request. Throws exception if task doen't exist or if task id is not provided.
+   * Get valid task from request. Throws exception if task doesn't exist or if task id is not provided.
    */
   protected Task getTaskFromRequest(String taskId) {
     Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
@@ -463,7 +463,7 @@ public class TaskBaseResource {
   }
 
   /**
-   * Get valid history task from request. Throws exception if task doen't exist or if task id is not provided.
+   * Get valid history task from request. Throws exception if task doesn't exist or if task id is not provided.
    */
   protected HistoricTaskInstance getHistoricTaskFromRequest(String taskId) {
     HistoricTaskInstance task = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();

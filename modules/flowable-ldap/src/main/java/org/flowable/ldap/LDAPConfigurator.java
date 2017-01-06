@@ -30,9 +30,9 @@ import org.flowable.ldap.LDAPGroupCache.LDAPGroupCacheListener;
  * A {@link ProcessEngineConfigurator} that integrates a LDAP system with the Flowable process engine. The LDAP system will be consulted primarily for getting user information and in particular for
  * fetching groups of a user.
  * 
- * This class is extensible and many methods can be overriden when the default behavior is not fitting your use case.
+ * This class is extensible and many methods can be overridden when the default behavior is not fitting your use case.
  * 
- * Check the docs (speficifally the setters) to see how this class can be tweaked.
+ * Check the docs (specifically the setters) to see how this class can be tweaked.
  * 
  * @author Joram Barrez
  */

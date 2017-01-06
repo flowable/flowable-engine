@@ -56,7 +56,7 @@ public class LdapGroupCacheTest extends LDAPTestCase {
     assertEquals(1, taskService.createTaskQuery().taskCandidateUser("kermit").count());
     assertEquals("kermit", cacheListener.getLastCacheHit());
 
-    // Foruth task is for fozzie -> cache miss + cache eviction of pepe
+    // Fourth task is for fozzie -> cache miss + cache eviction of pepe
     // (LRU)
     taskService.complete(taskService.createTaskQuery().singleResult().getId());
     assertEquals(1, taskService.createTaskQuery().taskCandidateUser("fozzie").count());
@@ -82,7 +82,7 @@ public class LdapGroupCacheTest extends LDAPTestCase {
     assertEquals("fozzie", cacheListener.getLastCacheMiss());
     assertEquals("pepe", cacheListener.getLastCacheEviction());
 
-    // Moving the clock forward two 45 minues should trigger cache eviction
+    // Moving the clock forward two 45 minutes should trigger cache eviction
     // (configured to 30 mins)
     processEngineConfiguration.getClock().setCurrentTime(new Date(now.getTime() + (45 * 60 * 1000)));
     assertEquals(0, taskService.createTaskQuery().taskCandidateUser("fozzie").count());

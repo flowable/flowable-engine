@@ -47,7 +47,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
 	}
 	
 	/**
-	 * Deploys the one task process woth the test tenand id.
+	 * Deploys the one task process with the test tenant id.
 	 * 
 	 * @return The process definition id of the deployed process definition.
 	 */
@@ -161,7 +161,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
 			runtimeService.startProcessInstanceById(processDefinitionId);
 		}
 		
-		// Start a number of process instance without tenantid
+		// Start a number of process instance without tenant id
 		String processDefinitionIdNoTenant = deployOneTaskTestProcess();
 		int nrOfProcessInstancesNoTenant = 8;
 		for (int i=0; i<nrOfProcessInstancesNoTenant; i++) {
@@ -534,7 +534,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
 		// Now, start process instances by process definition key (no tenant)
 		try {
 			runtimeService.startProcessInstanceByKey("oneTaskProcess");
-			fail(); // shouldnt happen, there is no process definition with that key that has no tenant, it has to give an exception as such!
+			fail(); // shouldn't happen, there is no process definition with that key that has no tenant, it has to give an exception as such!
 		} catch(Exception e) {
 		}
 		
@@ -558,7 +558,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
 		// Suspend process definition B
 		repositoryService.suspendProcessDefinitionByKey("oneTaskProcess", tenantB);
 		
-		// Shouldn't be able to start proc defs for tentant B
+		// Shouldn't be able to start proc defs for tenant B
 		try {
 			runtimeService.startProcessInstanceById(procDefIdB);
 		} catch (FlowableException e) {}
@@ -612,7 +612,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
 		assertEquals(3, taskService.createTaskQuery().taskName("My task").taskTenantId(TEST_TENANT_ID).count());
 		assertEquals(2, taskService.createTaskQuery().taskName("My task").taskWithoutTenantId().count());
 		
-		// Now, start 1 process instance that fires a signal event (not in tenant context), it should obly continue those without tenant
+		// Now, start 1 process instance that fires a signal event (not in tenant context), it should only continue those without tenant
 		runtimeService.startProcessInstanceByKey("testMtSignalFiring");
 		assertEquals(0, taskService.createTaskQuery().taskName("Task after signal").taskTenantId(TEST_TENANT_ID).count());
 		assertEquals(2, taskService.createTaskQuery().taskName("Task after signal").taskWithoutTenantId().count());

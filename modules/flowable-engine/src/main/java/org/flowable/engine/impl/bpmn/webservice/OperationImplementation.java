@@ -42,7 +42,7 @@ public interface OperationImplementation {
    * @param operation
    *          the operation that is interested on sending the message
    * @param overriddenEndpointAddresses
-   *          a not null map of overriden endpoint addresses. The key is the endpoint qualified name.
+   *          a not null map of overridden endpoint addresses. The key is the endpoint qualified name.
    * @return the resulting message
    */
   MessageInstance sendFor(MessageInstance message, Operation operation, ConcurrentMap<QName, URL> overriddenEndpointAddresses) throws Exception;

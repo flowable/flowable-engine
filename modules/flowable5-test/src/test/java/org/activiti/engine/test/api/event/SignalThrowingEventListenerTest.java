@@ -109,7 +109,7 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
 			ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSignal");
 			assertNotNull(processInstance);
 			
-			// Fetch the task and re-assig it to trigger the event-listener
+			// Fetch the task and re-assign it to trigger the event-listener
 			Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
 					.singleResult();
 			assertNotNull(task);

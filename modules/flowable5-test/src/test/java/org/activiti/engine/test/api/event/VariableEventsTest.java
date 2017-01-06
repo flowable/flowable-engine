@@ -100,7 +100,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
 		assertEquals(FlowableEngineEventType.VARIABLE_DELETED, listener.getEventsReceived().get(5).getType());
 		listener.clearEventsReceived();
 
-		// Delete inexistent variable should not dispatch event
+		// Delete nonexistent variable should not dispatch event
 		runtimeService.removeVariable(processInstance.getId(), "unexistingVariable");
 		assertTrue(listener.getEventsReceived().isEmpty());
 	}
@@ -188,7 +188,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
 		assertEquals("variable", event.getVariableName());
 		assertEquals(123, event.getVariableValue());
 		
-		// Check udpate event
+		// Check update event
 		event = (FlowableVariableEvent) listener.getEventsReceived().get(1);
 		assertEquals(FlowableEngineEventType.VARIABLE_UPDATED, event.getType());
 		assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
@@ -280,7 +280,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
 		assertEquals("variable", event.getVariableName());
 		assertEquals(123, event.getVariableValue());
 		
-		// Check udpate event
+		// Check update event
 		event = (FlowableVariableEvent) listener.getEventsReceived().get(1);
 		assertEquals(FlowableEngineEventType.VARIABLE_UPDATED, event.getType());
 		assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
