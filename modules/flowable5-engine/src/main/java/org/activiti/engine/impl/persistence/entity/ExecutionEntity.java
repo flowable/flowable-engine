@@ -57,8 +57,8 @@ import org.activiti.engine.impl.pvm.runtime.OutgoingExecution;
 import org.activiti.engine.impl.pvm.runtime.StartingExecution;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.runtime.Job;
@@ -1442,7 +1442,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
 
   protected void ensureEventSubscriptionsInitialized() {
-    if (eventSubscriptions == null) {
+    if (eventSubscriptions == null || eventSubscriptions.isEmpty()) {
       eventSubscriptions = Context.getCommandContext()
         .getEventSubscriptionEntityManager()
         .findEventSubscriptionsByExecution(id);
