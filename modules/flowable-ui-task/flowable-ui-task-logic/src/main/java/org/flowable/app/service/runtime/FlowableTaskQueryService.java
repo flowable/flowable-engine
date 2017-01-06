@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.app.model.common.RemoteGroup;
+import org.flowable.app.model.common.RemoteUser;
 import org.flowable.app.model.common.ResultListDataRepresentation;
 import org.flowable.app.model.common.UserRepresentation;
 import org.flowable.app.model.runtime.TaskRepresentation;
@@ -183,27 +185,41 @@ public class FlowableTaskQueryService {
     return result;
   }
 
-  private void handleProcessInstanceFiltering(User currentUser, TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode processInstanceIdNode) {
+  protected void handleProcessInstanceFiltering(User currentUser, TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode processInstanceIdNode) {
     String processInstanceId = processInstanceIdNode.asText();
     taskInfoQueryWrapper.getTaskInfoQuery().processInstanceId(processInstanceId);
   }
 
-  private void handleTextFiltering(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode textNode) {
+  protected void handleTextFiltering(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode textNode) {
     String text = textNode.asText();
-
-    // [4/9/2014] Used to be an or on description too, but doesn't work combined with the or query for an app.
-    // (Would need a change in Flowable)
     taskInfoQueryWrapper.getTaskInfoQuery().taskNameLikeIgnoreCase("%" + text + "%");
   }
 
-  private void handleAssignment(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode assignmentNode, User currentUser) {
+  protected void handleAssignment(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode assignmentNode, User currentUser) {
     String assignment = assignmentNode.asText();
     if (assignment.length() > 0) {
       String currentUserId = String.valueOf(currentUser.getId());
       if ("assignee".equals(assignment)) {
         taskInfoQueryWrapper.getTaskInfoQuery().taskAssignee(currentUserId);
+        
       } else if ("candidate".equals(assignment)) {
         taskInfoQueryWrapper.getTaskInfoQuery().taskCandidateUser(currentUserId);
+        
+        List<String> userGroupIds = new ArrayList<>();
+        if (currentUser instanceof RemoteUser) {
+          RemoteUser remoteUser = (RemoteUser) currentUser;
+          List<RemoteGroup> remoteGroups = remoteUser.getGroups();
+          if (remoteGroups != null) {
+            for (RemoteGroup remoteGroup : remoteGroups) {
+              userGroupIds.add(remoteGroup.getId());
+            }
+          }
+        }
+        
+        if (!userGroupIds.isEmpty()) {
+          taskInfoQueryWrapper.getTaskInfoQuery().taskCandidateGroupIn(userGroupIds);
+        }
+        
       } else if (assignment.startsWith("group_")) {
         String groupIdString = assignment.replace("group_", "");
         try {
@@ -212,18 +228,19 @@ public class FlowableTaskQueryService {
           throw new BadRequestException("Invalid group id");
         }
         taskInfoQueryWrapper.getTaskInfoQuery().taskCandidateGroup(groupIdString);
+        
       } else { // Default = involved
         taskInfoQueryWrapper.getTaskInfoQuery().taskInvolvedUser(currentUserId);
       }
     }
   }
 
-  private void handleProcessDefinition(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode processDefinitionIdNode) {
+  protected void handleProcessDefinition(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode processDefinitionIdNode) {
     String processDefinitionId = processDefinitionIdNode.asText();
     taskInfoQueryWrapper.getTaskInfoQuery().processDefinitionId(processDefinitionId);
   }
 
-  private void handleDueBefore(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode dueBeforeNode) {
+  protected void handleDueBefore(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode dueBeforeNode) {
     String date = dueBeforeNode.asText();
     try {
       Date d = iso8601DateFormat.parse(date);
@@ -234,7 +251,7 @@ public class FlowableTaskQueryService {
     }
   }
 
-  private void handleDueAfter(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode dueAfterNode) {
+  protected void handleDueAfter(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode dueAfterNode) {
     String date = dueAfterNode.asText();
     try {
       Date d = iso8601DateFormat.parse(date);
@@ -245,7 +262,7 @@ public class FlowableTaskQueryService {
     }
   }
 
-  private void handleSorting(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode sortNode) {
+  protected void handleSorting(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode sortNode) {
     String sort = sortNode.asText();
 
     if (SORT_CREATED_ASC.equals(sort)) {
@@ -262,7 +279,7 @@ public class FlowableTaskQueryService {
     }
   }
 
-  private void handleIncludeProcessInstance(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode includeProcessInstanceNode, List<? extends TaskInfo> tasks, Map<String, String> processInstanceNames) {
+  protected void handleIncludeProcessInstance(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode includeProcessInstanceNode, List<? extends TaskInfo> tasks, Map<String, String> processInstanceNames) {
     if (includeProcessInstanceNode.asBoolean() && CollectionUtils.isNotEmpty(tasks)) {
       Set<String> processInstanceIds = new HashSet<String>();
       for (TaskInfo task : tasks) {
