@@ -204,7 +204,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     assertEquals(2, runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("123").count());
   }
   
-  // some databases might react strange on having mutiple times null for the business key
+  // some databases might react strange on having multiple times null for the business key
   // when the unique constraint is {processDefinitionId, businessKey}
   @Deployment(resources={
     "org/activiti/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -865,7 +865,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
  public void testSignalEventReceivedNonExistingExecution() {
    try {
      runtimeService.signalEventReceived("alert", "nonexistingExecution");
-     fail("exeception expected");
+     fail("exception expected");
    }catch (FlowableObjectNotFoundException ae) {
      // this is good
      assertEquals(Execution.class, ae.getObjectClass());
@@ -875,7 +875,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
  public void testMessageEventReceivedNonExistingExecution() {
    try {
      runtimeService.messageEventReceived("alert", "nonexistingExecution");
-     fail("exeception expected");
+     fail("exception expected");
    }catch (FlowableObjectNotFoundException ae) {
      assertEquals(Execution.class, ae.getObjectClass());
    }
@@ -920,7 +920,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
    // Set name for unexisting process instance, should fail
    try {
      runtimeService.setProcessInstanceName("unexisting", null);
-     fail("Exception excpected");
+     fail("Exception expected");
    } catch(FlowableObjectNotFoundException aonfe) {
      assertEquals(ProcessInstance.class, aonfe.getObjectClass());
    }
@@ -933,7 +933,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
    runtimeService.suspendProcessInstanceById(processInstance.getId());
    try {
      runtimeService.setProcessInstanceName(processInstance.getId(), null);
-     fail("Exception excpected");
+     fail("Exception expected");
    } catch(FlowableException ae) {
      assertEquals("process instance " + processInstance.getId() + " is suspended, cannot set name", ae.getMessage());
    }

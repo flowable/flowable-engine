@@ -137,7 +137,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
       runtimeService.startProcessInstanceById(processDefinitionId);
     }
 
-    // Start a number of process instance without tenantit
+    // Start a number of process instance without tenantid
     String processDefinitionIdNoTenant = deployOneTaskTestProcess();
     int nrOfProcessInstancesNoTenant = 8;
     for (int i = 0; i < nrOfProcessInstancesNoTenant; i++) {
@@ -526,7 +526,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
     // Suspend process definition B
     repositoryService.suspendProcessDefinitionByKey("oneTaskProcess", tenantB);
 
-    // Shouldn't be able to start proc defs for tentant B
+    // Shouldn't be able to start proc defs for tenant B
     try {
       runtimeService.startProcessInstanceById(procDefIdB);
     } catch (FlowableException e) {

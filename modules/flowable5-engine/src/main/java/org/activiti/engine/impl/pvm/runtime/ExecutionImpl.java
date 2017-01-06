@@ -122,7 +122,7 @@ public class ExecutionImpl implements
   
   /** when execution structure is pruned during a takeAll, then 
    * the original execution has to be resolved to the replaced execution.
-   * @see {@link #takeAll(List, List)} {@link OutgoingExecution} */
+   * @see #takeAll(List, List) {@link OutgoingExecution} */
   protected ExecutionImpl replacedBy;
   
   // atomic operations ////////////////////////////////////////////////////////
@@ -364,9 +364,9 @@ public class ExecutionImpl implements
     return getProcessDefinition().getId();
   }
 
-  /** for setting the process definition, this setter must be used as subclasses can override */  
+  /* for setting the process definition, this setter must be used as subclasses can override */
 
-  /** must be called before memberfield processDefinition is used. 
+  /* must be called before memberfield processDefinition is used.
    * can be used by subclasses to provide processDefinition member field initialization. */
   protected void ensureProcessDefinitionInitialized() {
   }

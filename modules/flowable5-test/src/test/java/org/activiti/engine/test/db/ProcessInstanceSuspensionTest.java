@@ -76,14 +76,14 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
     clock.setCurrentCalendar(tomorrow);
     processEngineConfiguration.setClock(clock);
     
-    // Check if timer is eligable to be executed, when process in not yet suspended
+    // Check if timer is eligible to be executed, when process in not yet suspended
     List<Job> jobs = managementService.createTimerJobQuery().executable().processInstanceId(procInst.getId()).list();
     assertEquals(1, jobs.size());
     
     // Suspend process instance
     runtimeService.suspendProcessInstanceById(procInst.getId());
 
-    // Check if the timer is NOT aquired, even though the duedate is reached
+    // Check if the timer is NOT acquired, even though the duedate is reached
     jobs = managementService.createTimerJobQuery().executable().processInstanceId(procInst.getId()).list();
     assertEquals(0, jobs.size());
     

@@ -67,7 +67,7 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
 
         assertEquals(-1, webServiceMock.getCount());
 
-        // Expected fault catched with a boundary error event
+        // Expected fault caught with a boundary error event
 
         webServiceMock.setTo(Integer.MAX_VALUE);
         ProcessInstance processInstanceWithExpectedFault = runtimeService

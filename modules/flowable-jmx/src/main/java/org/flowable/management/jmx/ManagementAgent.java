@@ -17,10 +17,8 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 /**
- * Flowable JMX service agent
- */
-
-/**
+ *  Flowable JMX service agent
+ *
  * @author Saeid Mirzaei
  */
 public interface ManagementAgent {

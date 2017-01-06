@@ -12,12 +12,6 @@
  */
 package org.flowable.camel;
 
-/**
- * @author Saeid Mirzaei  
- * @author Maciej Próchniak
- * @author Arnold Schrijver
- */
-
 import java.util.Map;
 
 import org.apache.camel.Exchange;
@@ -32,6 +26,11 @@ import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 
+/**
+ * @author Saeid Mirzaei
+ * @author Maciej Próchniak
+ * @author Arnold Schrijver
+ */
 public class FlowableProducer extends DefaultProducer {
 
   protected IdentityService identityService;

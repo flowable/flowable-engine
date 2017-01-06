@@ -13,10 +13,6 @@
 
 package org.flowable.camel.examples.multiinstance;
 
-/**
- * @author Saeid Mirzaei  
- */
-
 import java.util.List;
 
 import org.apache.camel.CamelContext;
@@ -28,6 +24,9 @@ import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
+/**
+ * @author Saeid Mirzaei
+ */
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class MultiInstanceTest extends SpringFlowableTestCase {
 

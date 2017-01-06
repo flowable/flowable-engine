@@ -159,7 +159,7 @@ public class TaskVariableResource extends TaskVariableBaseResource {
     if (scope == RestVariableScope.LOCAL) {
       taskService.removeVariableLocal(task.getId(), variableName);
     } else {
-      // Safe to use executionId, as the hasVariableOnScope whould have
+      // Safe to use executionId, as the hasVariableOnScope would have
       // stopped a global-var update on standalone task
       runtimeService.removeVariable(task.getExecutionId(), variableName);
     }

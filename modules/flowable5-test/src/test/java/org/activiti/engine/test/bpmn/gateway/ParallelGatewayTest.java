@@ -120,7 +120,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
     assertEquals("Another task", tasks.get(0).getName());
     assertEquals("Some Task", tasks.get(1).getName());
     
-    // we complete the task from the parent process, the root execution is receycled, the task in the sub process is still there 
+    // we complete the task from the parent process, the root execution is recycled, the task in the sub process is still there
     taskService.complete(tasks.get(1).getId());
     tasks = query.list();
     assertEquals(1, tasks.size());

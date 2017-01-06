@@ -29,7 +29,7 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 
 /**
- * activity implementation of the BPMN 2.0 business rule task.
+ * Activity implementation of the BPMN 2.0 business rule task.
  * 
  * @author Tijs Rademakers
  * @author Joram Barrez

@@ -27,7 +27,7 @@ import org.flowable.engine.delegate.Expression;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * ActivityBehavior that evaluates an expression when executed. Optionally, it
+ * {@link ActivityBehavior} that evaluates an expression when executed. Optionally, it
  * sets the result of the expression as a variable on the execution.
  * 
  * @author Tom Baeyens

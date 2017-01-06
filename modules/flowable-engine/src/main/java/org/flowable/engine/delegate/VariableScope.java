@@ -235,7 +235,8 @@ public interface VariableScope {
   Object setVariableLocal(String variableName, Object value);
 
   /**
-   * Similar to {@link #setVariableLocal(String, Object, boolean)}, but the variable is set to this scope specifically. 
+   * Similar to {@link #setVariableLocal(String, Object, value)}, but with an extra flag to indicate whether
+   * all variables should be fetched while doing this or not.
    */
   Object setVariableLocal(String variableName, Object value, boolean fetchAllVariables);
 

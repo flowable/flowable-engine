@@ -52,7 +52,7 @@ public class MBeanInfoAssemblerTest {
     // mbean should be not null
     assertNull(mbeanInfoAssembler.getMBeanInfo(testMbean, testMbean, null));
 
-    // it should return something if at least one of the first paramaters
+    // it should return something if at least one of the first parameters
     // are
     // not null
     NotManagedMBean notManagedMbean = new NotManagedMBean();

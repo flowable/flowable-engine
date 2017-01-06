@@ -57,7 +57,8 @@ import org.flowable.engine.delegate.event.FlowableVariableEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** responsibilities:
+/**
+ * Responsibilities:
  *   - delayed flushing of inserts updates and deletes
  *   - optional dirty checking
  *   - db specific statement name mapping

@@ -426,7 +426,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
     // Path A : triggered at start + 10 seconds (18:50:11) (R2)
     // Path B: triggered at start + 5 seconds (18:50:06) (R3)
     // Path C: triggered at start + 15 seconds (18:50:16) (R1)
-    // path D: triggerd at 18:50:20 (Cron)
+    // path D: triggered at 18:50:20 (Cron)
     
     // Moving 7 seconds (18:50:08) should trigger one timer (the second start timer in the process diagram)
     Date newDate = new Date(startTime.getTime() + (7 * 1000));
@@ -443,7 +443,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
     // Path A : triggered at start + 10 seconds (18:50:11) (R2)
     // Path B: triggered at start + 2*5 seconds (18:50:11) (R2 - was R3) [CHANGED]
     // Path C: triggered at start + 15 seconds (18:50:16) (R1)
-    // path D: triggerd at 18:50:20 (Cron)
+    // path D: triggered at 18:50:20 (Cron)
     
     // Moving 4 seconds (18:50:12) should trigger both path A and B
     newDate = new Date(newDate.getTime() + (4 * 1000));
@@ -460,7 +460,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
     // Path A : triggered at start + 2*10 seconds (18:50:21) (R1 - was R2) [CHANGED]
     // Path B: triggered at start + 3*5 seconds (18:50:16) (R1 - was R2) [CHANGED]
     // Path C: triggered at start + 15 seconds (18:50:16) (R1)
-    // path D: triggerd at 18:50:20 (Cron)
+    // path D: triggered at 18:50:20 (Cron)
     
     // Moving 6 seconds (18:50:18) should trigger B and C
     newDate = new Date(newDate.getTime() + (6 * 1000));
@@ -477,7 +477,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
     // Path A : triggered at start + 2*10 seconds (18:50:21) (R1 - was R2) [CHANGED]
     // Path B: all repeats used up
     // Path C: all repeats used up
-    // path D: triggerd at 18:50:20 (Cron)
+    // path D: triggered at 18:50:20 (Cron)
     
     // Moving 10 seconds (18:50:28) should trigger A and D
     newDate = new Date(newDate.getTime() + (6 * 1000));
@@ -494,7 +494,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
     // Path A : all repeats used up
     // Path B: all repeats used up
     // Path C: all repeats used up
-    // path D: triggerd at 18:50:40 (Cron)
+    // path D: triggered at 18:50:40 (Cron)
     
     // Clean up
     repositoryService.deleteDeployment(deploymentId, true);

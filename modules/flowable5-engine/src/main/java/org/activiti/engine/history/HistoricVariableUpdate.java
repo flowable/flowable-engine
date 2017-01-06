@@ -13,9 +13,8 @@
 
 package org.activiti.engine.history;
 
-
-
-/** Update of a process variable.  This is only available if history 
+/**
+ * Update of a process variable.  This is only available if history
  * level is configured to FULL.
  * 
  * @author Tom Baeyens

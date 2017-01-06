@@ -18,14 +18,10 @@ import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.TaskListener;
 
 /**
+ * This is for test case UserTaskTest.testCompleteAfterParallelGateway
+ *
  * @author Saeid Mirzaei
  */
-
-/**
- * This is for test case UserTaskTest.testCompleteAfterParallelGateway
- * 
- */
-
 public class UserTaskTestCreateTaskListener implements TaskListener {
 
   private static final long serialVersionUID = 1L;

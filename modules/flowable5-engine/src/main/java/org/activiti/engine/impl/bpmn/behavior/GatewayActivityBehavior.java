@@ -17,7 +17,7 @@ import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 
 
 /**
- * super class for all gateway activity implementations.
+ * Super class for all gateway activity implementations.
  * 
  * @author Joram Barrez
  */

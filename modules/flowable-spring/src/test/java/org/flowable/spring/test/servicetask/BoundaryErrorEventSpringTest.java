@@ -21,7 +21,7 @@ import org.springframework.test.context.ContextConfiguration;
 /**
  * @author Angel Lopez Cima
  * @author Falko Menge
- * @see {https://activiti.atlassian.net/browse/ACT-1166}
+ * @see <a href="https://activiti.atlassian.net/browse/ACT-1166">https://activiti.atlassian.net/browse/ACT-1166</a>
  */
 @ContextConfiguration("classpath:org/flowable/spring/test/servicetask/serviceraskSpringTestCatchError-context.xml")
 public class BoundaryErrorEventSpringTest extends SpringFlowableTestCase {

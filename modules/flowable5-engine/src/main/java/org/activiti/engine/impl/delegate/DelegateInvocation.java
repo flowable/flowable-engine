@@ -27,7 +27,7 @@ public abstract class DelegateInvocation {
   protected Object[] invocationParameters;
 
   /**
-   * make the invocation proceed, performing the actual invocation of the user
+   * Make the invocation proceed, performing the actual invocation of the user
    * code.
    * 
    * @throws Exception

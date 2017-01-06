@@ -32,7 +32,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;
 
 /**
- * helper class for parsing ISO8601 duration format (also recurring) and computing next timer date
+ * Helper class for parsing ISO8601 duration format (also recurring) and computing next timer date.
  */
 public class DurationHelper {
   

@@ -1704,7 +1704,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     assertEquals(1, taskService.createTaskQuery().processVariableValueNotEquals("stringVar", "999").count());
     assertEquals(1, taskService.createTaskQuery().processVariableValueNotEquals("booleanVar", false).count());
     
-    // and query for the existing variable with NOT shoudl result in nothing found:
+    // and query for the existing variable with NOT should result in nothing found:
     assertEquals(0, taskService.createTaskQuery().processVariableValueNotEquals("longVar", 928374L).count());
     
     // Test value-only variable equals
@@ -1800,7 +1800,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     assertEquals(1, taskService.createTaskQuery().or().taskId("invalid").processVariableValueNotEquals("stringVar", "999").count());
     assertEquals(1, taskService.createTaskQuery().or().taskId("invalid").processVariableValueNotEquals("booleanVar", false).count());
     
-    // and query for the existing variable with NOT shoudl result in nothing found:
+    // and query for the existing variable with NOT should result in nothing found:
     assertEquals(0, taskService.createTaskQuery().processVariableValueNotEquals("longVar", 928374L).count());
     
     // Test value-only variable equals

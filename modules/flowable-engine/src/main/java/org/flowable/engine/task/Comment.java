@@ -18,9 +18,10 @@ import java.util.Date;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricData;
 
-/** User comments that form discussions around tasks.
+/**
+ * User comments that form discussions around tasks.
  * 
- * @see {@link TaskService#getTaskComments(String)}
+ * @see TaskService#getTaskComments(String)
  * @author Tom Baeyens
  * @author Joram Barrez
  */

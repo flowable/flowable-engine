@@ -20,11 +20,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author Saeid Mirzaei
- */
-
-/**
  * A class level annotation to mark the class as being managed in the JMX server.
+ *
+ * @author Saeid Mirzaei
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

@@ -170,7 +170,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     processEngineConfiguration.setClock(clock);
     waitForJobExecutorToProcessAllJobs(5000L, 50L);
 
-    // The inner subprocess should be destoyed, and the escalated task should be active
+    // The inner subprocess should be destroyed, and the escalated task should be active
     Task escalationTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
     assertEquals("Escalated task", escalationTask.getName());
     
@@ -213,7 +213,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     assertEquals("Task A", taskA.getName());
     assertEquals("Task B", taskB.getName());
     
-    // Completing both tasks, should destroiy the subprocess and activate the task after the subprocess
+    // Completing both tasks, should destroy the subprocess and activate the task after the subprocess
     taskService.complete(taskA.getId());
     taskService.complete(taskB.getId());
     Task taskAfterSubProcess = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
@@ -241,7 +241,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     managementService.moveTimerToExecutableJob(job.getId());
     managementService.executeJob(job.getId());
 
-    // The inner subprocess should be destoyed, and the tsk after the timer should be active
+    // The inner subprocess should be destroyed, and the tsk after the timer should be active
     Task taskAfterTimer = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
     assertEquals("Task after timer", taskAfterTimer.getName());
 
