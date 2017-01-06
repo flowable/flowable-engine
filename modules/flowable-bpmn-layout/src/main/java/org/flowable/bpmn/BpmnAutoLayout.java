@@ -236,7 +236,7 @@ public class BpmnAutoLayout {
       mxGeometry geometry = new mxGeometry(0.8, 1.0, eventSize, eventSize);
       geometry.setOffset(new mxPoint(-(eventSize / 2), -(eventSize / 2)));
       geometry.setRelative(true);
-      mxCell boundaryPort = new mxCell(null, geometry, "shape=ellipse;perimter=ellipsePerimeter");
+      mxCell boundaryPort = new mxCell(null, geometry, "shape=ellipse;perimeter=ellipsePerimeter");
       boundaryPort.setId("boundary-event-" + boundaryEvent.getId());
       boundaryPort.setVertex(true);
 
