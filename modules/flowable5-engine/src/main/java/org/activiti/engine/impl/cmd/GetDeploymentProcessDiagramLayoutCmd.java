@@ -28,6 +28,7 @@ import org.activiti.engine.repository.DiagramLayout;
  * provided by {@link GetDeploymentProcessDiagramCmd}.
  *
  * This command requires a process model and a diagram image to be deployed.
+ *
  * @author Falko Menge
  */
 public class GetDeploymentProcessDiagramLayoutCmd implements Command<DiagramLayout>, Serializable {

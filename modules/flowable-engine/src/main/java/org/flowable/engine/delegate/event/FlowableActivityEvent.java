@@ -16,7 +16,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
 
 /**
- * An {@link FlowableEvent} related to an activity within an execution;
+ * An {@link FlowableEvent} related to an activity within an execution.
  * 
  * @author Frederik Heremans
  * @author Joram Barrez

@@ -18,7 +18,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 
 /**
- * super class for all gateway activity implementations.
+ * Super class for all gateway activity implementations.
  * 
  * @author Joram Barrez
  */

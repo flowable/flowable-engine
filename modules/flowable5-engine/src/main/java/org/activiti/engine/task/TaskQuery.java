@@ -28,7 +28,7 @@ public interface TaskQuery extends TaskInfoQuery<TaskQuery, Task> {
   /** Only select tasks which don't have an assignee. */
   TaskQuery taskUnassigned();
   
-  /** @see {@link #taskUnassigned} */
+  /** @see #taskUnassigned */
   @Deprecated
   TaskQuery taskUnnassigned();
   

@@ -12,11 +12,8 @@
  */
 package org.activiti.engine.impl.bpmn.behavior;
 
-
-
-
 /**
- * implementation of the 'none start event': a start event that has no 
+ * Implementation of the 'none start event': a start event that has no
  * specific trigger but the programmatic one (processService.startProcessInstanceXXX()).
  * 
  * 

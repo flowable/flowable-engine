@@ -12,15 +12,14 @@
  */
 package org.flowable.camel.examples.ping;
 
-/**
- * @author Saeid Mirzaei  
- */
-
 import java.util.Map;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 
+/**
+ * @author Saeid Mirzaei
+ */
 public class SaveOutput implements JavaDelegate {
 
   @SuppressWarnings("unchecked")

@@ -20,7 +20,8 @@ import java.util.Map;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.runtime.ProcessInstance;
 
-/** A single execution of a whole process definition that is stored permanently.
+/**
+ * A single execution of a whole process definition that is stored permanently.
  * 
  * @author Christian Stettler
  */

@@ -15,9 +15,8 @@ package org.activiti.engine.history;
 
 import java.util.Date;
 
-
-
-/** Base class for all kinds of information that is related to 
+/**
+ * Base class for all kinds of information that is related to
  * either a {@link HistoricProcessInstance} or a {@link HistoricActivityInstance}.
  * 
  * @author Tom Baeyens

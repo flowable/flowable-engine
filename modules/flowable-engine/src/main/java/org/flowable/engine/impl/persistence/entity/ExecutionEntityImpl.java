@@ -119,7 +119,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
   protected int identityLinkCount;
 
   /**
-   * persisted reference to the processDefinition.
+   * Persisted reference to the processDefinition.
    * 
    * @see #processDefinition
    * @see #setProcessDefinition(ProcessDefinitionImpl)
@@ -128,12 +128,12 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
   protected String processDefinitionId;
 
   /**
-   * persisted reference to the process definition key.
+   * Persisted reference to the process definition key.
    */
   protected String processDefinitionKey;
 
   /**
-   * persisted reference to the process definition name.
+   * Persisted reference to the process definition name.
    */
   protected String processDefinitionName;
 
@@ -143,12 +143,12 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
   protected Integer processDefinitionVersion;
 
   /**
-   * persisted reference to the deployment id.
+   * Persisted reference to the deployment id.
    */
   protected String deploymentId;
 
   /**
-   * persisted reference to the current position in the diagram within the {@link #processDefinition}.
+   * Persisted reference to the current position in the diagram within the {@link #processDefinition}.
    * 
    * @see #activity
    * @see #setActivity(ActivityImpl)
@@ -162,19 +162,19 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
   protected String activityName;
 
   /**
-   * persisted reference to the process instance.
+   * Persisted reference to the process instance.
    * 
    * @see #getProcessInstance()
    */
   protected String processInstanceId;
 
   /**
-   * persisted reference to the business key.
+   * Persisted reference to the business key.
    */
   protected String businessKey;
 
   /**
-   * persisted reference to the parent of this execution.
+   * Persisted reference to the parent of this execution.
    * 
    * @see #getParent()
    * @see #setParentId(String)
@@ -182,9 +182,9 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
   protected String parentId;
 
   /**
-   * persisted reference to the super execution of this execution
+   * Persisted reference to the super execution of this execution
    * 
-   * @see {@link #getSuperExecution()}
+   * @see #getSuperExecution()
    * @see #setSuperExecution(ExecutionEntityImpl)
    */
   protected String superExecutionId;

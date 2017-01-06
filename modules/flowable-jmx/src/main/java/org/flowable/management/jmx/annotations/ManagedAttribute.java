@@ -20,11 +20,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author Saeid Mirzaei
- */
-
-/**
  * A method level annotation to mark the method as being a JMX attribute.
+ *
+ * @author Saeid Mirzaei
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

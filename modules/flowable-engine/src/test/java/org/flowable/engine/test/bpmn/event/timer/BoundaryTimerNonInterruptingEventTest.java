@@ -212,10 +212,10 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
     }
   }
 
-  @Deployment
-  /**
+  /*
    * see https://activiti.atlassian.net/browse/ACT-1173
    */
+  @Deployment
   public void testTimerOnEmbeddedSubprocess() {
     String id = runtimeService.startProcessInstanceByKey("nonInterruptingTimerOnEmbeddedSubprocess").getId();
 
@@ -240,10 +240,10 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
     assertProcessEnded(id);
   }
 
-  @Deployment
-  /**
+  /*
    * see https://activiti.atlassian.net/browse/ACT-1106
    */
+  @Deployment
   public void testReceiveTaskWithBoundaryTimer() {
     // Set the clock fixed
     HashMap<String, Object> variables = new HashMap<String, Object>();

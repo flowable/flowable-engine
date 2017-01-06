@@ -197,7 +197,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
     moveByMinutes(60);
     waitForJobExecutorToProcessAllJobs(2000, 100);
     
-    // a new job must be prepared because there are undefinite number of repeats 1 hour interval
+    // a new job must be prepared because there are indefinite number of repeats 1 hour interval
     assertEquals(1, managementService.createTimerJobQuery().processInstanceId(processInstanceId).count());
 
     Task task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
@@ -213,10 +213,10 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
     assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstanceId).count());
   }
   
-  @Deployment
-  /**
+  /*
    * see https://activiti.atlassian.net/browse/ACT-1173
    */
+  @Deployment
   public void testTimerOnEmbeddedSubprocess() {
     String id = runtimeService.startProcessInstanceByKey("nonInterruptingTimerOnEmbeddedSubprocess").getId();
     
@@ -240,11 +240,11 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
     
     assertProcessEnded(id);
   }
-  
-  @Deployment
-  /**
+
+  /*
    * see https://activiti.atlassian.net/browse/ACT-1106
    */
+  @Deployment
   public void testReceiveTaskWithBoundaryTimer(){
     // Set the clock fixed
     HashMap<String, Object> variables = new HashMap<String, Object>();

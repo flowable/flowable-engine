@@ -168,7 +168,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   
   /** when execution structure is pruned during a takeAll, then 
    * the original execution has to be resolved to the replaced execution.
-   * @see {@link #takeAll(List, List)} {@link OutgoingExecution} */
+   * @see #takeAll(List, List) {@link OutgoingExecution} */
   protected ExecutionEntity replacedBy;
   
   // atomic operations ////////////////////////////////////////////////////////
@@ -251,7 +251,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   /**
    * persisted reference to the super execution of this execution
    * 
-   * @see {@link #getSuperExecution()}
+   * @see #getSuperExecution()
    * @see #setSuperExecution(ExecutionEntity)
    */
   protected String superExecutionId;

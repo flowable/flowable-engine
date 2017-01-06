@@ -44,7 +44,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * activity implementation for the user task.
+ * Activity implementation for the user task.
  * 
  * @author Joram Barrez
  */

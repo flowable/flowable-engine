@@ -12,10 +12,6 @@
  */
 package org.flowable.camel.examples.ping;
 
-/**
- * @author Saeid Mirzaei  
- */
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +22,9 @@ import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
+/**
+ * @author Saeid Mirzaei
+ */
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class PingPongTest extends SpringFlowableTestCase {
 

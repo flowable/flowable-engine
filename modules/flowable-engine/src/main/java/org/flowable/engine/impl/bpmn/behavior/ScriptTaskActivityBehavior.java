@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * activity implementation of the BPMN 2.0 script task.
+ * Implementation of the BPMN 2.0 script task.
  * 
  * @author Joram Barrez
  * @author Christian Stettler
