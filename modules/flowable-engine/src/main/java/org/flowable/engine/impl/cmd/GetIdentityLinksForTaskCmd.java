@@ -13,10 +13,12 @@
 package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.persistence.CountingTaskEntity;
 import org.flowable.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.task.IdentityLink;
@@ -39,7 +41,13 @@ public class GetIdentityLinksForTaskCmd implements Command<List<IdentityLink>>, 
   public List<IdentityLink> execute(CommandContext commandContext) {
     TaskEntity task = commandContext.getTaskEntityManager().findById(taskId);
 
-    List<IdentityLink> identityLinks = (List) task.getIdentityLinks();
+    List<IdentityLink> identityLinks;
+    identityLinks = (List) task.getIdentityLinks();       
+    if (((CountingTaskEntity)task).getIdentityLinkCount() == 0){
+      identityLinks = new ArrayList<IdentityLink>();
+    }else{
+      identityLinks = (List) task.getIdentityLinks();
+    }
 
     // assignee is not part of identity links in the db.
     // so if there is one, we add it here.
@@ -67,7 +75,7 @@ public class GetIdentityLinksForTaskCmd implements Command<List<IdentityLink>>, 
       identityLinks.add(identityLink);
     }
 
-    return (List) task.getIdentityLinks();
+    return (List) identityLinks;
   }
 
 }
