@@ -50,9 +50,11 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
     super.insert(entity, fireCreateEvent);
     getHistoryManager().recordIdentityLinkCreated(entity);
     
-    if (entity.getTask() != null) {
+    if (entity.getTask() != null && isTaskRelatedEntityCountEnabledGlobally()) {
       CountingTaskEntity countingTaskEntity = (CountingTaskEntity) entity.getTask();
-      countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() + 1);
+      if (isTaskRelatedEntityCountEnabled(countingTaskEntity)){
+        countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() + 1);
+      }
     } else if (entity.getProcessInstanceId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
       CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(entity.getProcessInstanceId());
       if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
@@ -68,9 +70,11 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
       getHistoryManager().deleteHistoricIdentityLink(identityLink.getId());
     }
     
-    if (identityLink.getTask() != null) {
+    if (identityLink.getTask() != null && isTaskRelatedEntityCountEnabledGlobally()) {      
       CountingTaskEntity countingTaskEntity = (CountingTaskEntity) identityLink.getTask();
-      countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() - 1);
+      if (isTaskRelatedEntityCountEnabled(countingTaskEntity)){
+        countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() - 1);
+      }
     } else if (identityLink.getProcessInstanceId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
       CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(identityLink.getProcessInstanceId());
       if (isExecutionRelatedEntityCountEnabled(executionEntity)) {

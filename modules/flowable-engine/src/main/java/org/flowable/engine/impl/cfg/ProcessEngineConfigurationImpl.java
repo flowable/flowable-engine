@@ -147,6 +147,7 @@ import org.flowable.engine.impl.calendar.DurationBusinessCalendar;
 import org.flowable.engine.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.flowable.engine.impl.cmd.ValidateExecutionRelatedEntityCountCfgCmd;
+import org.flowable.engine.impl.cmd.ValidateTaskRelatedEntityCountCfgCmd;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.impl.db.DbSqlSessionFactory;
@@ -2047,6 +2048,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (performanceSettings.isValidateExecutionRelationshipCountConfigOnBoot()) {
       commandExecutor.execute(new ValidateExecutionRelatedEntityCountCfgCmd());
     }
+    
+    if (performanceSettings.isValidateTaskRelationshipCountConfigOnBoot()) {
+      commandExecutor.execute(new ValidateTaskRelatedEntityCountCfgCmd());
+    }
   }
 
   public Runnable getProcessEngineCloseRunnable() {
@@ -3018,6 +3023,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  public ProcessEngineConfigurationImpl setEnableTaskRelationshipCounts(boolean enableTaskRelationshipCounts) {
+    this.performanceSettings.setEnableTaskRelationshipCounts(enableTaskRelationshipCounts);
+    return this;
+  }
+  
   public PerformanceSettings getPerformanceSettings() {
     return performanceSettings;
   }

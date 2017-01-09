@@ -62,10 +62,11 @@ public class VariableInstanceEntityManagerImpl extends AbstractEntityManager<Var
   public void insert(VariableInstanceEntity entity, boolean fireCreateEvent) {
     super.insert(entity, fireCreateEvent);
 
-    if (entity.getTaskId() != null) {
-      // is local variable
+    if (entity.getTaskId() != null && isTaskRelatedEntityCountEnabledGlobally()) {
       CountingTaskEntity countingTaskEntity = (CountingTaskEntity) getTaskEntityManager().findById(entity.getTaskId());
-      countingTaskEntity.setVariableCount(countingTaskEntity.getVariableCount() + 1);
+      if (isTaskRelatedEntityCountEnabled(countingTaskEntity)){
+        countingTaskEntity.setVariableCount(countingTaskEntity.getVariableCount() + 1);
+      }
     } else if (entity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
       CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(entity.getExecutionId());
       if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
@@ -123,10 +124,11 @@ public class VariableInstanceEntityManagerImpl extends AbstractEntityManager<Var
     }
     entity.setDeleted(true);
     
-    if (entity.getTaskId() != null) {
-      // is local variable
+    if (entity.getTaskId() != null && isTaskRelatedEntityCountEnabledGlobally()) {
       CountingTaskEntity countingTaskEntity = (CountingTaskEntity) getTaskEntityManager().findById(entity.getTaskId());
-      countingTaskEntity.setVariableCount(countingTaskEntity.getVariableCount() - 1);
+      if (isTaskRelatedEntityCountEnabled(countingTaskEntity)){
+        countingTaskEntity.setVariableCount(countingTaskEntity.getVariableCount() - 1);
+      }
     } else if (entity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
       CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(entity.getExecutionId());
       if (isExecutionRelatedEntityCountEnabled(executionEntity)) {

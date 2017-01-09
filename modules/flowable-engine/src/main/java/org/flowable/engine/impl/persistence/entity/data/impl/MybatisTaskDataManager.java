@@ -135,4 +135,10 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
     getDbSqlSession().update("updateTaskTenantIdForDeployment", params);
   }
   
+  @Override
+  public void updateAllTaskRelatedEntityCountFlags(boolean newValue) {
+    getDbSqlSession().update("updateTaskRelatedEntityCountEnabled", newValue);
+  }
+  
+  
 }
