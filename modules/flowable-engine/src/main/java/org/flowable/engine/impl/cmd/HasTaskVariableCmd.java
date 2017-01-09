@@ -19,7 +19,6 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.CountingTaskEntity;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.task.Task;
 
@@ -55,9 +54,6 @@ public class HasTaskVariableCmd implements Command<Boolean>, Serializable {
     boolean hasVariable = false;
 
     if (isLocal) {
-      if (((CountingTaskEntity) task).getVariableCount() == 0) {
-        return false;
-      }
       hasVariable = task.hasVariableLocal(variableName);
     } else {
       hasVariable = task.hasVariable(variableName);
