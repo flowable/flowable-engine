@@ -26,6 +26,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
   
   protected boolean oldExecutionTreeFetchValue;
   protected boolean oldExecutionRelationshipCountValue;
+  protected boolean oldTaskRelationshipCountValue;
   protected boolean oldenableProcessDefinitionInfoCacheValue;
   protected CommandInterceptor oldFirstCommandInterceptor;
   protected DbSqlSessionFactory oldDbSqlSessionFactory;
@@ -38,11 +39,13 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     // Enable flags
     this.oldExecutionTreeFetchValue = processEngineConfiguration.getPerformanceSettings().isEnableEagerExecutionTreeFetching();
     this.oldExecutionRelationshipCountValue = processEngineConfiguration.getPerformanceSettings().isEnableExecutionRelationshipCounts();
+    this.oldTaskRelationshipCountValue = processEngineConfiguration.getPerformanceSettings().isEnableTaskRelationshipCounts();
     this.oldenableProcessDefinitionInfoCacheValue = processEngineConfiguration.isEnableProcessDefinitionInfoCache();
     oldHistoryLevel = ((DefaultHistoryManager) processEngineConfiguration.getHistoryManager()).getHistoryLevel();
 
     processEngineConfiguration.getPerformanceSettings().setEnableEagerExecutionTreeFetching(true);
     processEngineConfiguration.getPerformanceSettings().setEnableExecutionRelationshipCounts(true);
+    processEngineConfiguration.getPerformanceSettings().setEnableTaskRelationshipCounts(true);
     processEngineConfiguration.setEnableProcessDefinitionInfoCache(false);
     ((DefaultHistoryManager) processEngineConfiguration.getHistoryManager()).setHistoryLevel(HistoryLevel.AUDIT);
 
@@ -73,6 +76,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     
     processEngineConfiguration.getPerformanceSettings().setEnableEagerExecutionTreeFetching(oldExecutionTreeFetchValue);
     processEngineConfiguration.getPerformanceSettings().setEnableExecutionRelationshipCounts(oldExecutionRelationshipCountValue);
+    processEngineConfiguration.getPerformanceSettings().setEnableTaskRelationshipCounts(oldTaskRelationshipCountValue);
     processEngineConfiguration.setEnableProcessDefinitionInfoCache(oldenableProcessDefinitionInfoCacheValue);
     ((DefaultHistoryManager) processEngineConfiguration.getHistoryManager()).setHistoryLevel(oldHistoryLevel);
     
@@ -223,17 +227,13 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     assertNoDeletes("org.flowable.engine.impl.TaskQueryImpl");
     
     // Task Complete
-    
-    // TODO: implement counting for tasks similar to executions
-    
+   
     assertDatabaseSelects("CompleteTaskCmd", 
         "selectById org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl", 1L,
         "selectById org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityImpl", 1L,
         "selectById org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 1L,
         "selectUnfinishedHistoricActivityInstanceExecutionIdAndActivityId", 2L,
         "selectTasksByParentTaskId", 1L,
-        "selectIdentityLinksByTask", 1L,
-        "selectVariablesByTaskId", 1L,
         "selectExecutionsWithSameRootProcessInstanceId", 1L,
         "selectTasksByExecutionId", 1L
         );
@@ -270,9 +270,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
   protected void assertDatabaseSelects(String commandClass, Object ... expectedSelects) {
     CommandStats stats = getStats(commandClass);
-    if (expectedSelects.length / 2 != stats.getDbSelects().size()) {
-      Assert.fail("Unexpected number of database selects : " + stats.getDbSelects().size());
-    }
+
+    Assert.assertEquals("Unexpected number of database selects for "+commandClass+". ",expectedSelects.length / 2, stats.getDbSelects().size());
     
     for (int i=0; i<expectedSelects.length; i+=2) {
       String dbSelect = (String) expectedSelects[i];
