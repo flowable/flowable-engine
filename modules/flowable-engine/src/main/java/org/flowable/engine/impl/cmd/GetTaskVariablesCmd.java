@@ -15,14 +15,12 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.CountingTaskEntity;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.task.Task;
 
@@ -57,9 +55,6 @@ public class GetTaskVariablesCmd implements Command<Map<String, Object>>, Serial
     if (variableNames == null) {
 
       if (isLocal) {
-        if (((CountingTaskEntity) task).getVariableCount() == 0) {
-          return new HashMap<String, Object>();
-        }
         return task.getVariablesLocal();
       } else {
         return task.getVariables();
@@ -68,9 +63,6 @@ public class GetTaskVariablesCmd implements Command<Map<String, Object>>, Serial
     } else {
 
       if (isLocal) {
-        if (((CountingTaskEntity) task).getVariableCount() == 0) {
-          return new HashMap<String, Object>();
-        }
         return task.getVariablesLocal(variableNames, false);
       } else {
         return task.getVariables(variableNames, false);

@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.CountingTaskEntity;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.util.Flowable5Util;
 
@@ -34,9 +33,6 @@ public class RemoveTaskVariablesCmd extends NeedsActiveTaskCmd<Void> {
     }
     
     if (isLocal) {
-      if (((CountingTaskEntity) task).getVariableCount() == 0) {
-        return null;
-      }
       task.removeVariablesLocal(variableNames);
     } else {
       task.removeVariables(variableNames);
