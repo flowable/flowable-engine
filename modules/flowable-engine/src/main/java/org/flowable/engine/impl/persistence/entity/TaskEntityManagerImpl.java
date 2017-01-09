@@ -53,6 +53,9 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
   public TaskEntity create() {
     TaskEntity taskEntity = super.create();
     taskEntity.setCreateTime(getClock().getCurrentTime());
+    if (isTaskRelatedEntityCountEnabledGlobally()){
+      ((CountingTaskEntity)taskEntity).setCountEnabled(true);
+    }
     return taskEntity;
   }
   
@@ -195,11 +198,13 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         deleteTask((TaskEntity) subTask, deleteReason, cascade, cancel);
       }
       
-      if (((CountingTaskEntity) task).getIdentityLinkCount() > 0) {
+      boolean isTaskRelatedEntityCountEnabled = isTaskRelatedEntityCountEnabled(task);
+      
+      if (!isTaskRelatedEntityCountEnabled || (isTaskRelatedEntityCountEnabled && ((CountingTaskEntity) task).getIdentityLinkCount() > 0)) {
         getIdentityLinkEntityManager().deleteIdentityLinksByTaskId(taskId);
       }
 
-      if (((CountingTaskEntity) task).getVariableCount() > 0) {
+      if (!isTaskRelatedEntityCountEnabled || (isTaskRelatedEntityCountEnabled && ((CountingTaskEntity) task).getVariableCount() > 0)) {
         getVariableInstanceEntityManager().deleteVariableInstanceByTask(task);
       }
 

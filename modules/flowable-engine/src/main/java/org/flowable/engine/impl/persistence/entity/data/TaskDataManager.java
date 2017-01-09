@@ -42,5 +42,7 @@ public interface TaskDataManager extends DataManager<TaskEntity> {
   List<Task> findTasksByParentTaskId(String parentTaskId);
   
   void updateTaskTenantIdForDeployment(String deploymentId, String newTenantId);
+
+  void updateAllTaskRelatedEntityCountFlags(boolean newValue);
   
 }

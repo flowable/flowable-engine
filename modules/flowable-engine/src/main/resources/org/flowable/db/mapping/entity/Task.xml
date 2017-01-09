@@ -176,6 +176,12 @@
     )
   </update>
   
+    
+  <update id="updateTaskRelatedEntityCountEnabled" parameterType="boolean">
+    update ${prefix}ACT_RU_TASK 
+    set IS_COUNT_ENABLED_ = #{parameter, jdbcType=BOOLEAN}
+  </update>
+  
   <!-- TASK DELETE -->
   <delete id="deleteTask" parameterType="org.flowable.engine.impl.persistence.entity.TaskEntityImpl">
     delete from ${prefix}ACT_RU_TASK where ID_ = #{id} and REV_ = #{revision}
