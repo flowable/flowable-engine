@@ -13,11 +13,14 @@
 
 package org.flowable.rest.service.api.engine.variable;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 
 /**
  * @author Frederik Heremans
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class QueryVariable {
 
   private String name;
@@ -42,6 +45,10 @@ public class QueryVariable {
 
   public void setOperation(String operation) {
     this.operation = operation;
+  }
+
+  public String getOperation() {
+    return operation;
   }
 
   public Object getValue() {
