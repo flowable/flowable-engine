@@ -264,11 +264,7 @@ public class HistoricTaskInstanceBaseResource {
       switch (variable.getVariableOperation()) {
 
       case EQUALS:
-        if (nameLess) {
-          taskInstanceQuery.taskVariableValueEquals(actualValue);
-        } else {
-          taskInstanceQuery.taskVariableValueEquals(variable.getName(), actualValue);
-        }
+        taskInstanceQuery.taskVariableValueEquals(variable.getName(), actualValue);
         break;
 
       case EQUALS_IGNORE_CASE:
