@@ -81,7 +81,8 @@ public class DeleteIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
     } else if (IdentityLinkType.OWNER.equals(type)) {
       commandContext.getTaskEntityManager().changeTaskOwner(task, null);
     } else {
-        commandContext.getIdentityLinkEntityManager().deleteIdentityLink(task, userId, groupId, type);    
+        commandContext.getIdentityLinkEntityManager().deleteIdentityLink(task, userId, groupId, type);
+        task.forceUpdate();
     }
 
     commandContext.getHistoryManager().createIdentityLinkComment(taskId, userId, groupId, type, false);
