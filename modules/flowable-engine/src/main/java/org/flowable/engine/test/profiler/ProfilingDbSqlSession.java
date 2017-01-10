@@ -128,13 +128,13 @@ public class ProfilingDbSqlSession extends DbSqlSession {
   // UPDATES
 
   @Override
-  protected void flushUpdates() {
-    super.flushUpdates();
+  protected void flushUpdates() {    
     if (getCurrentCommandExecution() != null) {
       for (Entity persistentObject : updatedObjects) {
         getCurrentCommandExecution().addDbUpdate(persistentObject.getClass().getName());
       }
     }
+    super.flushUpdates();
   }
 
   // DELETES
