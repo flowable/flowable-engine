@@ -1,4 +1,5 @@
 package org.flowable.engine.test.cfg.executioncount;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,9 +12,9 @@ import org.flowable.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.task.Task;
-import org.flowable.engine.test.profiler.FlowableProfiler;
 import org.flowable.engine.test.profiler.CommandStats;
 import org.flowable.engine.test.profiler.ConsoleLogger;
+import org.flowable.engine.test.profiler.FlowableProfiler;
 import org.flowable.engine.test.profiler.ProfileSession;
 import org.flowable.engine.test.profiler.ProfilingDbSqlSessionFactory;
 import org.flowable.engine.test.profiler.TotalExecutionTimeCommandInterceptor;
@@ -246,6 +247,44 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     
   }
   
+  
+  public void testSetVariablesOneTaskProcess() {
+    // TODO: move to separate class
+    deployStartProcessInstanceAndProfile("process-usertask-01.bpmn20.xml", "process-usertask-01", false);
+    Task task = taskService.createTaskQuery().singleResult();
+
+    long variableCount = 3;
+
+    Map<String, Object> vars = createVariables(variableCount, "local");
+
+    taskService.setVariablesLocal(task.getId(), vars);
+
+    // remove existing variables
+    taskService.removeVariablesLocal(task.getId(), vars.keySet());
+
+    // try to remove when variable count is zero (nothing left to remove). DB should not be hit.
+    taskService.removeVariablesLocal(task.getId(), vars.keySet());
+    taskService.removeVariablesLocal(task.getId(), vars.keySet());
+
+    taskService.complete(task.getId());
+    stopProfiling();
+
+    assertExecutedCommands("StartProcessInstanceCmd", "org.flowable.engine.impl.TaskQueryImpl", "SetTaskVariablesCmd", "RemoveTaskVariablesCmd",
+            "CompleteTaskCmd");
+
+    assertDatabaseInserts("SetTaskVariablesCmd", "HistoricVariableInstanceEntityImpl-bulk-with-3", 1L, "VariableInstanceEntityImpl-bulk-with-3", 1L);
+
+    //only "variable" count number of delete statements have been executed
+    assertDatabaseDeletes("RemoveTaskVariablesCmd", "VariableInstanceEntityImpl", variableCount, "HistoricVariableInstanceEntityImpl", variableCount);
+  }
+
+  private Map<String, Object> createVariables(long count, String prefix) {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    for (int i = 0; i < count; i++) {
+      vars.put(prefix + "_var0" + i, prefix + "+values0" + i);
+    }
+    return vars;
+  }
   
   // ---------------------------------
   // HELPERS
