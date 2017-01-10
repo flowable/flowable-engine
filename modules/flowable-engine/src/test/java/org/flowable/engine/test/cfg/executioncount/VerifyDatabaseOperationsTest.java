@@ -240,7 +240,10 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         );
     assertDatabaseInserts("CompleteTaskCmd", 
         "HistoricActivityInstanceEntityImpl", 1L);
-    assertNoUpdates("CompleteTaskCmd");
+    assertDatabaseUpdates("CompleteTaskCmd", "org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityImpl", 1L,
+            "org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl", 2L,
+            "org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityImpl", 1L,
+            "org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl", 1L);
     assertDatabaseDeletes("CompleteTaskCmd", 
         "TaskEntityImpl", 1L,
         "ExecutionEntityImpl", 2L); // execution and processinstance
@@ -248,7 +251,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
   }
   
   
-  public void testSetVariablesOneTaskProcess() {
+  public void testRemoveTaskVariables() {
     // TODO: move to separate class
     deployStartProcessInstanceAndProfile("process-usertask-01.bpmn20.xml", "process-usertask-01", false);
     Task task = taskService.createTaskQuery().singleResult();
@@ -258,7 +261,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     Map<String, Object> vars = createVariables(variableCount, "local");
 
     taskService.setVariablesLocal(task.getId(), vars);
-
+    
+    vars.put("someRandomVariable", "someRandomValue");
     // remove existing variables
     taskService.removeVariablesLocal(task.getId(), vars.keySet());
 
@@ -274,10 +278,120 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
     assertDatabaseInserts("SetTaskVariablesCmd", "HistoricVariableInstanceEntityImpl-bulk-with-3", 1L, "VariableInstanceEntityImpl-bulk-with-3", 1L);
 
-    //only "variable" count number of delete statements have been executed
+    //check that only "variableCount" number of delete statements have been executed
     assertDatabaseDeletes("RemoveTaskVariablesCmd", "VariableInstanceEntityImpl", variableCount, "HistoricVariableInstanceEntityImpl", variableCount);
   }
+  
+  public void testClaimTask() {
+    // TODO: move to separate class
+    deployStartProcessInstanceAndProfile("process-usertask-01.bpmn20.xml", "process-usertask-01", false);
+    Task task = taskService.createTaskQuery().singleResult();
 
+    taskService.claim(task.getId(), "firstUser");
+    taskService.unclaim(task.getId());
+        
+    
+    taskService.complete(task.getId());
+    stopProfiling();
+
+    assertExecutedCommands("StartProcessInstanceCmd", "org.flowable.engine.impl.TaskQueryImpl", "ClaimTaskCmd" ,"CompleteTaskCmd");
+    
+    assertNoDeletes("ClaimTaskCmd");
+    assertDatabaseInserts("ClaimTaskCmd", "IdentityLinkEntityImpl", 1L, "HistoricIdentityLinkEntityImpl", 1L);    
+  }
+  
+  public void testTaskCandidateUsers() {
+    // TODO: move to separate class
+    deployStartProcessInstanceAndProfile("process-usertask-01.bpmn20.xml", "process-usertask-01", false);
+    Task task = taskService.createTaskQuery().singleResult();
+
+    taskService.addCandidateUser(task.getId(), "user01");
+    taskService.addCandidateUser(task.getId(), "user02");
+    
+    taskService.deleteCandidateUser(task.getId(), "user01");
+    taskService.deleteCandidateUser(task.getId(), "user02");
+    
+    
+    
+    //Try to remove candidate users that are no (longer) part of the identity links for the task
+    //Identity Link Count is zero. The DB should not be hit.
+    taskService.deleteCandidateUser(task.getId(), "user02");
+    taskService.deleteCandidateUser(task.getId(), "user03");
+    taskService.deleteCandidateUser(task.getId(), "user04");
+    
+    taskService.complete(task.getId());
+    stopProfiling();
+    
+    assertExecutedCommands("StartProcessInstanceCmd", "org.flowable.engine.impl.TaskQueryImpl", "AddIdentityLinkCmd", "DeleteIdentityLinkCmd",
+            "CompleteTaskCmd");
+    
+        
+    // Check "AddIdentityLinkCmd"
+    assertNoDeletes("AddIdentityLinkCmd");
+    assertDatabaseInserts("AddIdentityLinkCmd", "CommentEntityImpl", 2L, "HistoricIdentityLinkEntityImpl-bulk-with-2", 2L, "IdentityLinkEntityImpl-bulk-with-2",
+            2l);
+    assertDatabaseSelects("AddIdentityLinkCmd", "selectById org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 2L, "selectIdentityLinksByTask", 2L,
+            "selectExecutionsWithSameRootProcessInstanceId", 2L, "selectIdentityLinksByProcessInstance", 2L);
+    assertDatabaseUpdates("AddIdentityLinkCmd", "org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 2L,
+            "org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl", 2L);
+
+    // Check "DeleteIdentityLinkCmd"
+    // not sure if the HistoricIdentityLinkEntityImpl should be deleted
+    assertDatabaseDeletes("DeleteIdentityLinkCmd", "IdentityLinkEntityImpl", 2L, "HistoricIdentityLinkEntityImpl", 2L);
+    assertDatabaseInserts("DeleteIdentityLinkCmd", "CommentEntityImpl", 5L);
+    // TODO: some selects can be removed. No need to query the DB if the "identityLinkCount" is zero
+    assertDatabaseSelects("DeleteIdentityLinkCmd", "selectById org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 5L,
+            "selectIdentityLinkByTaskUserGroupAndType", 5L, "selectById org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityImpl", 2L,
+            "selectIdentityLinksByTask", 5L);
+    assertDatabaseUpdates("DeleteIdentityLinkCmd", "org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 5L);
+  }
+
+  public void testTaskCandidateGroups() {
+    // TODO: move to separate class
+    deployStartProcessInstanceAndProfile("process-usertask-01.bpmn20.xml", "process-usertask-01", false);
+    Task task = taskService.createTaskQuery().singleResult();
+
+    taskService.addCandidateGroup(task.getId(), "group01");
+    taskService.addCandidateGroup(task.getId(), "group02");   
+    
+    taskService.deleteCandidateGroup(task.getId(), "group01");
+    taskService.deleteCandidateGroup(task.getId(), "group02");
+    
+    
+    
+    //Try to remove candidate Groups that are no (longer) part of the identity links for the task
+    //Identity Link Count is zero. The DB should not be hit.
+    taskService.deleteCandidateGroup(task.getId(), "group02");
+    taskService.deleteCandidateGroup(task.getId(), "group03");
+    taskService.deleteCandidateGroup(task.getId(), "group04");
+    
+    
+    taskService.complete(task.getId());
+    stopProfiling();
+    
+    assertExecutedCommands("StartProcessInstanceCmd", "org.flowable.engine.impl.TaskQueryImpl", "AddIdentityLinkCmd", "DeleteIdentityLinkCmd",
+            "CompleteTaskCmd");
+    
+        
+    // Check "AddIdentityLinkCmd"
+    assertNoDeletes("AddIdentityLinkCmd");
+    assertDatabaseInserts("AddIdentityLinkCmd", "CommentEntityImpl", 2L, "IdentityLinkEntityImpl", 2L, "HistoricIdentityLinkEntityImpl",
+            2L);
+    assertDatabaseSelects("AddIdentityLinkCmd", "selectById org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 2L, "selectIdentityLinksByTask", 2L);
+    assertDatabaseUpdates("AddIdentityLinkCmd", "org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 2L);
+
+    // Check "DeleteIdentityLinkCmd"
+    // not sure if the HistoricIdentityLinkEntityImpl should be deleted
+    assertDatabaseDeletes("DeleteIdentityLinkCmd", "IdentityLinkEntityImpl", 2L, "HistoricIdentityLinkEntityImpl", 2L);
+    assertDatabaseInserts("DeleteIdentityLinkCmd", "CommentEntityImpl", 5L);
+    // TODO: some selects can be removed. No need to query the DB if the "identityLinkCount" is zero
+    assertDatabaseSelects("DeleteIdentityLinkCmd", "selectById org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 5L,
+            "selectIdentityLinkByTaskUserGroupAndType", 5L, "selectById org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityImpl", 2L,
+            "selectIdentityLinksByTask", 5L);
+    assertDatabaseUpdates("DeleteIdentityLinkCmd", "org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 5L);
+  }
+
+  
   private Map<String, Object> createVariables(long count, String prefix) {
     Map<String, Object> vars = new HashMap<String, Object>();
     for (int i = 0; i < count; i++) {
@@ -317,6 +431,18 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
       Long count = (Long) expectedSelects[i+1];
       
       Assert.assertEquals("Wrong select count for " + dbSelect, count, stats.getDbSelects().get(dbSelect));
+    }
+  }
+  
+  protected void assertDatabaseUpdates(String commandClass, Object... expectedUpdates) {
+    CommandStats stats = getStats(commandClass);
+    Assert.assertEquals("Unexpected number of database updates for " + commandClass + ". ", expectedUpdates.length / 2, stats.getDbUpdates().size());
+
+    for (int i = 0; i < expectedUpdates.length; i += 2) {
+      String dbUpdate = (String) expectedUpdates[i];
+      Long count = (Long) expectedUpdates[i + 1];
+
+      Assert.assertEquals("Wrong update count for " + dbUpdate, count, stats.getDbUpdates().get(dbUpdate));
     }
   }
 
