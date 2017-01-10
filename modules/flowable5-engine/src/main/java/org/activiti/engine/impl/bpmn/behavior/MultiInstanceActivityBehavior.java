@@ -247,8 +247,8 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
   protected void callCustomActivityStartListeners(ActivityExecution execution) {
     List<ExecutionListener> listeners = activity.getExecutionListeners(org.activiti.engine.impl.pvm.PvmEvent.EVENTNAME_START);
     
-    List<ExecutionListener> filteredExecutionListeners = new ArrayList<ExecutionListener>(listeners.size());
     if (listeners != null) {
+        List<ExecutionListener> filteredExecutionListeners = new ArrayList<ExecutionListener>(listeners.size());
 	    // Sad that we have to do this, but it's the only way I could find (which is also safe for backwards compatibility)
 	    
 	    for (ExecutionListener executionListener : listeners) {
