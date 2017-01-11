@@ -15,6 +15,7 @@ package org.flowable.engine.impl.util;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
@@ -93,9 +94,9 @@ public class ProcessDefinitionUtil {
     ProcessDefinitionEntityManager processDefinitionEntityManager = Context.getProcessEngineConfiguration().getProcessDefinitionEntityManager();
     ProcessDefinitionEntity processDefinition = processDefinitionEntityManager.findById(processDefinitionId);
     if (processDefinition == null) {
-      throw new FlowableException("No process definition found with id " + processDefinitionId);
+      throw new FlowableObjectNotFoundException("No process definition found with id " + processDefinitionId);
     }
-    
+
     return processDefinition;
   }
 }
