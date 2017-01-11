@@ -15,7 +15,7 @@ import com.fasterxml.uuid.impl.TimeBasedGenerator;
 public class StrongUuidGenerator implements IdGenerator {
 
   // different ProcessEngines on the same classloader share one generator.
-  protected static TimeBasedGenerator timeBasedGenerator;
+  protected static volatile TimeBasedGenerator timeBasedGenerator;
 
   public StrongUuidGenerator() {
     ensureGeneratorInitialized();
