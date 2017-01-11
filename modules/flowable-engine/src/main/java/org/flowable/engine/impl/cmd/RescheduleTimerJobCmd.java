@@ -35,7 +35,7 @@ public class RescheduleTimerJobCmd implements Command<Void>, Serializable {
 
   public RescheduleTimerJobCmd(String timerJobId, String timeDate, String timeDuration, String timeCycle, String endDate, String calendarName) {
     if (timerJobId == null) {
-      throw new FlowableIllegalArgumentException("The timer job id is mandatory, but '" + timerJobId + "' has been provided.");
+      throw new FlowableIllegalArgumentException("The timer job id is mandatory, but 'null' has been provided.");
     }
     
     int timeValues = Collections.frequency(Arrays.asList(timeDate, timeDuration, timeCycle), null);
