@@ -119,12 +119,13 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
       fireAssignmentEvents(taskEntity);
       
       if (taskEntity.getId() != null) {
-        getHistoryManager().recordTaskAssigneeChange(taskEntity.getId(), taskEntity.getAssignee());
+        recordTaskAssigneeChange(taskEntity);
         addAssigneeIdentityLinks(taskEntity);
         update(taskEntity);
       }
     }
   }
+
   
   @Override
   public void changeTaskOwner(TaskEntity taskEntity, String owner) {
@@ -133,7 +134,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
       taskEntity.setOwner(owner);
       
       if (taskEntity.getId() != null) {
-        getHistoryManager().recordTaskOwnerChange(taskEntity.getId(), taskEntity.getOwner());
+        recordTaskOwnerChange(taskEntity);
         addOwnerIdentityLink(taskEntity, taskEntity.getOwner());
         update(taskEntity);
       }
@@ -318,6 +319,28 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
 
   public void setTaskDataManager(TaskDataManager taskDataManager) {
     this.taskDataManager = taskDataManager;
+  }
+  
+  private void recordTaskAssigneeChange(TaskEntity taskEntity) {
+    getHistoryManager().recordTaskAssigneeChange(taskEntity.getId(), taskEntity.getAssignee());
+
+    IdentityLinkEntity identityLink = getCommandContext().getIdentityLinkEntityManager().create(); 
+    identityLink.setUserId(taskEntity.getAssignee());
+    identityLink.setType(IdentityLinkType.ASSIGNEE);
+    identityLink.setTaskId(taskEntity.getId());
+    
+    getHistoryManager().recordIdentityLinkCreated(identityLink);
+  }
+  
+  private void recordTaskOwnerChange(TaskEntity taskEntity) {
+    getHistoryManager().recordTaskOwnerChange(taskEntity.getId(), taskEntity.getOwner());
+    
+    IdentityLinkEntity identityLink = getCommandContext().getIdentityLinkEntityManager().create(); 
+    identityLink.setUserId(taskEntity.getAssignee());
+    identityLink.setType(IdentityLinkType.OWNER);
+    identityLink.setTaskId(taskEntity.getId());
+    
+    getHistoryManager().recordIdentityLinkCreated(identityLink);
   }
   
 }
