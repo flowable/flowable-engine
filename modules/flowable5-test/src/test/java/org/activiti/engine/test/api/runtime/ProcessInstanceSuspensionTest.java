@@ -230,7 +230,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
       fail();
     } catch (FlowableException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
     
     try {
@@ -238,7 +238,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
       fail();
     } catch (FlowableException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
     
     try {
@@ -246,7 +246,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
       fail();
     } catch (FlowableException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
     
     try {
@@ -254,7 +254,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
       fail();
     } catch (FlowableException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
     
     try {
@@ -262,7 +262,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
       fail();
     } catch (FlowableException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
     
     
@@ -271,7 +271,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
       fail();
     } catch (FlowableException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
     
     try {
@@ -279,7 +279,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
       fail();
     } catch (FlowableException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
     
     try {
@@ -287,7 +287,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
       fail();
     } catch (FlowableException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
     
     try {
@@ -295,7 +295,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
       fail();
     } catch (FlowableException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
     
     try {
@@ -303,7 +303,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
       fail();
     } catch (FlowableException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
     
     try {
@@ -311,7 +311,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
       fail();
     } catch (FlowableException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
     
     try {
@@ -319,7 +319,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
       fail();
     } catch (FlowableException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
     
     try {
@@ -327,7 +327,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
       fail();
     } catch (FlowableException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
     
     try {
@@ -335,7 +335,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
       fail();
     } catch (FlowableException e) {
       // This is expected
-      e.getMessage().contains("is suspended");
+      assertTrue(e.getMessage().contains("is suspended"));
     }
   }
   
