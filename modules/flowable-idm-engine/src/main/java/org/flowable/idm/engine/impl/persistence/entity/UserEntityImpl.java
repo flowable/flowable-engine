@@ -72,7 +72,7 @@ public class UserEntityImpl extends AbstractEntity implements UserEntity, Serial
   }
 
   protected void savePicture(Picture picture) {
-    if (pictureByteArrayRef != null) {
+    if (pictureByteArrayRef == null) {
       pictureByteArrayRef = new ByteArrayRef();
     }
     pictureByteArrayRef.setValue(picture.getMimeType(), picture.getBytes());
