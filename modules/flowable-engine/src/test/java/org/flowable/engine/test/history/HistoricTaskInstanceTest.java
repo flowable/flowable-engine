@@ -279,6 +279,44 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
   }
 
   @Deployment
+  public void testHistoricIdentityLinksForTaskOwner() throws Exception {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertNotNull(task);
+    
+    String taskId = task.getId();
+    taskService.setOwner(taskId, "kermit");
+    
+    // task is still active
+    List<HistoricIdentityLink> historicIdentityLinksForTask = historyService.getHistoricIdentityLinksForTask(task.getId());
+    assertEquals(1, historicIdentityLinksForTask.size());
+    
+    assertEquals("kermit" , historicIdentityLinksForTask.get(0).getUserId());
+    assertEquals(IdentityLinkType.OWNER, historicIdentityLinksForTask.get(0).getType());
+    
+    //change owner
+    taskService.setOwner(taskId, "gonzo");
+    historicIdentityLinksForTask = historyService.getHistoricIdentityLinksForTask(task.getId());
+    assertEquals(2, historicIdentityLinksForTask.size());
+    
+    taskService.setOwner(taskId, null);
+    historicIdentityLinksForTask = historyService.getHistoricIdentityLinksForTask(task.getId());
+    assertEquals(3, historicIdentityLinksForTask.size());
+    
+    taskService.complete(taskId);
+    historicIdentityLinksForTask = historyService.getHistoricIdentityLinksForTask(task.getId());
+    assertEquals(3, historicIdentityLinksForTask.size());
+    
+    Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertNotNull(secondTask);
+    
+    secondTask.setOwner("fozzie");
+    taskService.saveTask(secondTask);
+    historicIdentityLinksForTask = historyService.getHistoricIdentityLinksForTask(secondTask.getId());
+    assertEquals(1, historicIdentityLinksForTask.size());
+  }
+  
+  @Deployment
   public void testHistoricIdentityLinksOnTaskClaim() throws Exception {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTaskProcess");
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -358,7 +396,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
     assertNotNull(secondTask);
 
     String secondTaskId = secondTask.getId();
-    taskService.claim(secondTaskId, "newKid");
+    taskService.setAssignee(secondTaskId, "newKid");
 
     // 4 users now participated to the process
     historicIdentityLinksForProcess = historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId());
