@@ -173,7 +173,7 @@ public class DmnXMLUtil implements DmnXMLConstants {
     }
     
     public static boolean writeExtensionElements(DmnElement dmnElement, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
-        return didWriteExtensionStartElement = writeExtensionElements(dmnElement, didWriteExtensionStartElement, null, xtw);
+        return writeExtensionElements(dmnElement, didWriteExtensionStartElement, null, xtw);
     }
     
     public static boolean writeExtensionElements(DmnElement dmnElement, boolean didWriteExtensionStartElement, Map<String, String> namespaceMap, XMLStreamWriter xtw) throws Exception {
