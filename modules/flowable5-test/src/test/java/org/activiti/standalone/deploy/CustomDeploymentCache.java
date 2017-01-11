@@ -28,7 +28,7 @@ public class CustomDeploymentCache implements DeploymentCache<ProcessDefinitionC
   
   @Override
   public ProcessDefinitionCacheEntry get(String id) {
-    if (id.equals(id)) {
+    if (id.equals(this.id)) {
       return processDefinition;
     }
     return null;
@@ -42,7 +42,7 @@ public class CustomDeploymentCache implements DeploymentCache<ProcessDefinitionC
 
   @Override
   public void remove(String id) {
-    if (id.equals(id)) {
+    if (id.equals(this.id)) {
       this.id = null;
       this.processDefinition = null;
     }
@@ -61,7 +61,7 @@ public class CustomDeploymentCache implements DeploymentCache<ProcessDefinitionC
 
   @Override
   public boolean contains(String id) {
-    return id.equals(id);
+    return id.equals(this.id);
   }
 
 }
