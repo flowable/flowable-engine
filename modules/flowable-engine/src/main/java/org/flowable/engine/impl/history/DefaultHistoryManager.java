@@ -40,6 +40,7 @@ import org.flowable.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.engine.task.Event;
+import org.flowable.engine.task.IdentityLinkType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -459,6 +460,12 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
       HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(taskId);
       if (historicTaskInstance != null) {
         historicTaskInstance.setAssignee(assignee);
+        
+        HistoricIdentityLinkEntity historicIdentityLinkEntity = getHistoricIdentityLinkEntityManager().create();
+        historicIdentityLinkEntity.setTaskId(historicTaskInstance.getId());
+        historicIdentityLinkEntity.setType(IdentityLinkType.ASSIGNEE);
+        historicIdentityLinkEntity.setUserId(historicTaskInstance.getAssignee());
+        getHistoricIdentityLinkEntityManager().insert(historicIdentityLinkEntity, false);
       }
     }
   }
@@ -474,6 +481,12 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
       HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(taskId);
       if (historicTaskInstance != null) {
         historicTaskInstance.setOwner(owner);
+        
+        HistoricIdentityLinkEntity historicIdentityLinkEntity = getHistoricIdentityLinkEntityManager().create();
+        historicIdentityLinkEntity.setTaskId(historicTaskInstance.getId());
+        historicIdentityLinkEntity.setType(IdentityLinkType.OWNER);
+        historicIdentityLinkEntity.setUserId(historicTaskInstance.getOwner());
+        getHistoricIdentityLinkEntityManager().insert(historicIdentityLinkEntity, false);
       }
     }
   }
