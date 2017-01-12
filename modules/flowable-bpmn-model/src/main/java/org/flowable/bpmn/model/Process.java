@@ -291,6 +291,7 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
       if (type.isInstance(flowElement)) {
         foundFlowElements.add((FlowElementType) flowElement);
       }
+      
       if (flowElement instanceof SubProcess) {
         if (goIntoSubprocesses) {
           foundFlowElements.addAll(findFlowElementsInSubProcessOfType((SubProcess) flowElement, type));

@@ -98,8 +98,7 @@ public class BpmnAutoLayout {
     for (Process process : bpmnModel.getProcesses()) {
       layout(process);
 
-      // Operations that can only be done after all elements have received
-      // DI
+      // Operations that can only be done after all elements have received DI
       translateNestedSubprocesses(process);
     }
   }
@@ -109,7 +108,7 @@ public class BpmnAutoLayout {
     cellParent = graph.getDefaultParent();
     graph.getModel().beginUpdate();
 
- // Subprocesses are handled in a new instance of BpmnAutoLayout, hence they instantiations of new maps here.
+    // Subprocesses are handled in a new instance of BpmnAutoLayout, hence they instantiations of new maps here.
     
     handledFlowElements = new HashMap<String, FlowElement>();
     handledArtifacts = new HashMap<String, Artifact>();
@@ -207,8 +206,7 @@ public class BpmnAutoLayout {
   }
 
   protected void handleEvent(FlowElement flowElement) {
-    // Boundary events are an exception to the general way of drawing an
-    // event
+    // Boundary events are an exception to the general way of drawing an event
     if (flowElement instanceof BoundaryEvent) {
       boundaryEvents.add((BoundaryEvent) flowElement);
     } else {
@@ -371,10 +369,8 @@ public class BpmnAutoLayout {
       GraphicInfo subProcessGraphicInfo = createDiagramInterchangeInformation(handledFlowElements.get(flowElementId), (int) cellState.getX(), (int) cellState.getY(), (int) cellState.getWidth(),
           (int) cellState.getHeight());
 
-      // The DI for the elements of a subprocess are generated without
-      // knowledge of the rest of the graph
-      // So we must translate all it's elements with the x and y of the
-      // subprocess itself
+      // The DI for the elements of a subprocess are generated without knowledge of the rest of the graph
+      // So we must translate all it's elements with the x and y of the subprocess itself
       if (handledFlowElements.get(flowElementId) instanceof SubProcess) {
 
         // Always expanded when auto layouting
@@ -388,12 +384,9 @@ public class BpmnAutoLayout {
       Object edge = generatedSequenceFlowEdges.get(sequenceFlowId);
       List<mxPoint> points = graph.getView().getState(edge).getAbsolutePoints();
 
-      // JGraphX has this funny way of generating the outgoing sequence
-      // flow of a gateway
-      // Visually, we'd like them to originate from one of the corners of
-      // the rhombus,
-      // hence we force the starting point of the sequence flow to the
-      // closest rhombus corner point.
+      // JGraphX has this funny way of generating the outgoing sequence flow of a gateway
+      // Visually, we'd like them to originate from one of the corners of the rhombus,
+      // hence we force the starting point of the sequence flow to the closest rhombus corner point.
       FlowElement sourceElement = handledFlowElements.get(sequenceFlows.get(sequenceFlowId).getSourceRef());
       if (sourceElement instanceof Gateway && ((Gateway) sourceElement).getOutgoingFlows().size() > 1) {
         mxPoint startPoint = points.get(0);
@@ -510,8 +503,10 @@ public class BpmnAutoLayout {
    * This method is to be called after fully layouting one process, since ALL elements need to have x and y.
    */
   protected void translateNestedSubprocesses(Process process) {
-    for (SubProcess nestedSubProcess : process.findFlowElementsOfType(SubProcess.class, false)) {
-      translateNestedSubprocessElements(nestedSubProcess);
+    for (FlowElement flowElement : process.getFlowElements()) {
+      if (flowElement instanceof SubProcess) {
+        translateNestedSubprocessElements((SubProcess) flowElement);
+      }
     }
   }
 
@@ -530,6 +525,7 @@ public class BpmnAutoLayout {
           graphicInfo.setX(graphicInfo.getX() + subProcessX + subProcessMargin);
           graphicInfo.setY(graphicInfo.getY() + subProcessY + subProcessMargin);
         }
+        
       } else if (!(flowElement instanceof DataObject)) {
 
         // Regular element
@@ -605,8 +601,7 @@ public class BpmnAutoLayout {
   // We must extend the default hierarchical layout to tweak it a bit (see url
   // link) otherwise the layouting crashes.
   //
-  // Verify again with a later release if fixed (ie the mxHierarchicalLayout
-  // can be used directly)
+  // Verify again with a later release if fixed (ie the mxHierarchicalLayout can be used directly)
   static class CustomLayout extends mxHierarchicalLayout {
 
     public CustomLayout(mxGraph graph, int orientation) {

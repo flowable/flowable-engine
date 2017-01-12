@@ -231,12 +231,7 @@ public class PermissionService {
   public boolean canDeleteProcessInstance(User currentUser, HistoricProcessInstance processInstance) {
     boolean canDelete = false;
     if (processInstance.getStartUserId() != null) {
-      try {
-        Long starterId = Long.parseLong(processInstance.getStartUserId());
-        canDelete = starterId.equals(currentUser.getId());
-      } catch (NumberFormatException nfe) {
-        // Ignore illegal starter id value
-      }
+      canDelete = processInstance.getStartUserId().equals(currentUser.getId());
     }
 
     return canDelete;
