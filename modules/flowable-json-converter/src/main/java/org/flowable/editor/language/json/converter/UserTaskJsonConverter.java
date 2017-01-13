@@ -91,7 +91,7 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
             fillProperty("name", "assignee-field-info-name", assigneeNode, userTask);
 
           } else {
-            assigneeNode.put("id", Long.valueOf(userTask.getAssignee()));
+            assigneeNode.put("id", userTask.getAssignee());
             idmNode.set("assignee", assigneeNode);
             idmNode.put("type", "user");
 
@@ -149,7 +149,7 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
             idmNode.put("type", "users");
             for (String candidateUser : candidateUserIds) {
               ObjectNode candidateUserNode = objectMapper.createObjectNode();
-              candidateUserNode.put("id", Long.valueOf(candidateUser));
+              candidateUserNode.put("id", candidateUser);
               candidateUsersNode.add(candidateUserNode);
 
               fillProperty("externalId", "user-info-externalid-" + candidateUser, candidateUserNode, userTask);
