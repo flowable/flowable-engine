@@ -390,11 +390,9 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
     processVars.put("processVar", "processVar");
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variableScopeProcess", processVars);
     
-    Set<String> executionIds = new HashSet<String>();
     List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
     for (Execution execution : executions){
       if (!processInstance.getId().equals(execution.getId())){
-        executionIds.add(execution.getId());
         runtimeService.setVariableLocal(execution.getId(), "executionVar", "executionVar");
       }
     }
