@@ -207,7 +207,7 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
             idmNode.put("type", "groups");
             for (String candidateGroup : candidateGroupIds) {
               ObjectNode candidateGroupNode = objectMapper.createObjectNode();
-              candidateGroupNode.put("id", Long.valueOf(candidateGroup));
+              candidateGroupNode.put("id", candidateGroup);
               candidateGroupsNode.add(candidateGroupNode);
 
               fillProperty("externalId", "group-info-externalid-" + candidateGroup, candidateGroupNode, userTask);
