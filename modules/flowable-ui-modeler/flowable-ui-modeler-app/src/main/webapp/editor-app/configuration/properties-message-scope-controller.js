@@ -16,8 +16,8 @@ angular.module('flowableModeler').controller('ActivitiMessageRefCtrl', [ '$scope
     var messageDefinitionsProperty = undefined;
     var parent = $scope.selectedShape;
     while (parent !== null && parent !== undefined && messageDefinitionsProperty === undefined) {
-        if (parent.properties && parent.properties['oryx-messagedefinitions']) {
-            messageDefinitionsProperty = parent.properties['oryx-messagedefinitions'];
+        if (parent.properties && parent.properties.get('oryx-messagedefinitions')) {
+        	messageDefinitionsProperty = parent.properties.get('oryx-messagedefinitions');
         } else {
             parent = parent.parent;
         }

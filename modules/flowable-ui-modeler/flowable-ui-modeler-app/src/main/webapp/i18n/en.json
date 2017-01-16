@@ -752,7 +752,9 @@
 
     "PROPERTY.SEQUENCEFLOW.ORDER.EMPTY" : "No sequence flow order determined",
     "PROPERTY.SEQUENCEFLOW.ORDER.NOT.EMPTY" : "Sequence flow order set",
+    "PROPERTY.SEQUENCEFLOW.ORDER.NO.OUTGOING.SEQUENCEFLOW.FOUND" : "No outgoing sequence flow found.",
     "PROPERTY.SEQUENCEFLOW.ORDER.DESCRIPTION" : "Set the order in which the sequence flow need to be evaluated:",
+    "PROPERTY.SEQUENCEFLOW.ORDER.SEQUENCEFLOW.VALUE" : "Sequence flow to {{targetType}} {{targetTitle}}",
 
     "PROPERTY.SEQUENCEFLOW.CONDITION.TITLE" : "Sequence flow condition",
     "PROPERTY.SEQUENCEFLOW.CONDITION.STATIC" : "Condition expression",

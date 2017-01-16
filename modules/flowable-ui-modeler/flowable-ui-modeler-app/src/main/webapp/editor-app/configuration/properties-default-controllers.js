@@ -67,7 +67,7 @@ angular.module('flowableModeler').controller('FlowableBooleanPropertyCtrl', ['$s
                         // in case there are more flows, check if another flow is already defined as default
                         for (var i = 0; i < flows.length; i++) {
                             if (flows[i].resourceId != selectedShape.resourceId) {
-                                var defaultFlowProp = flows[i].properties['oryx-defaultflow'];
+                                var defaultFlowProp = flows[i].properties.get('oryx-defaultflow');
                                 if (defaultFlowProp) {
                                     flows[i].setProperty('oryx-defaultflow', false, true);
                                 }

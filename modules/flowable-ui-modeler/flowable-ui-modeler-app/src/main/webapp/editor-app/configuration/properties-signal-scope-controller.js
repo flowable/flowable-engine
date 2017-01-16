@@ -17,8 +17,8 @@ angular.module('flowableModeler').controller('ActivitiSignalRefCtrl', [ '$scope'
     var signalDefinitionsProperty = undefined;
     var parent = $scope.selectedShape;
     while (parent !== null && parent !== undefined && signalDefinitionsProperty === undefined) {
-        if (parent.properties && parent.properties['oryx-signaldefinitions']) {
-            signalDefinitionsProperty = parent.properties['oryx-signaldefinitions'];
+        if (parent.properties && parent.properties.get('oryx-signaldefinitions')) {
+            signalDefinitionsProperty = parent.properties.get('oryx-signaldefinitions');
         } else {
             parent = parent.parent;
         }
