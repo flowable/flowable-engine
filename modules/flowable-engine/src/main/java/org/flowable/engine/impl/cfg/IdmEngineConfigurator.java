@@ -49,6 +49,8 @@ public class IdmEngineConfigurator extends AbstractProcessEngineConfigurator {
       idmEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
       idmEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
       idmEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
+      idmEngineConfiguration.setDatabaseTablePrefix(processEngineConfiguration.getDatabaseTablePrefix());
+      idmEngineConfiguration.setDatabaseWildcardEscapeCharacter(processEngineConfiguration.getDatabaseWildcardEscapeCharacter());
       
       if (processEngineConfiguration.isTransactionsExternallyManaged()) {
        idmEngineConfiguration.setTransactionsExternallyManaged(true);

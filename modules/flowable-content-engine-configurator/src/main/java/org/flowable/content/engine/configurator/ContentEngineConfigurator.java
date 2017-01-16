@@ -51,6 +51,8 @@ public class ContentEngineConfigurator extends AbstractProcessEngineConfigurator
       contentEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
       contentEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
       contentEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
+      contentEngineConfiguration.setDatabaseTablePrefix(processEngineConfiguration.getDatabaseTablePrefix());
+      contentEngineConfiguration.setDatabaseWildcardEscapeCharacter(processEngineConfiguration.getDatabaseWildcardEscapeCharacter());
       
       if (processEngineConfiguration.isTransactionsExternallyManaged()) {
         contentEngineConfiguration.setTransactionsExternallyManaged(true);

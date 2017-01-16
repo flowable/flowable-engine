@@ -71,6 +71,8 @@ public class FormEngineConfigurator extends AbstractProcessEngineConfigurator {
       formEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
       formEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
       formEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
+      formEngineConfiguration.setDatabaseTablePrefix(processEngineConfiguration.getDatabaseTablePrefix());
+      formEngineConfiguration.setDatabaseWildcardEscapeCharacter(processEngineConfiguration.getDatabaseWildcardEscapeCharacter());
       
       if (processEngineConfiguration.isTransactionsExternallyManaged()) {
         formEngineConfiguration.setTransactionsExternallyManaged(true);

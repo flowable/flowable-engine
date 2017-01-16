@@ -69,6 +69,8 @@ public class DmnEngineConfigurator extends AbstractProcessEngineConfigurator {
       dmnEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
       dmnEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
       dmnEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
+      dmnEngineConfiguration.setDatabaseTablePrefix(processEngineConfiguration.getDatabaseTablePrefix());
+      dmnEngineConfiguration.setDatabaseWildcardEscapeCharacter(processEngineConfiguration.getDatabaseWildcardEscapeCharacter());
       
       if (processEngineConfiguration.isTransactionsExternallyManaged()) {
         dmnEngineConfiguration.setTransactionsExternallyManaged(true);
