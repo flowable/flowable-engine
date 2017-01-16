@@ -44,24 +44,24 @@ public class ServiceTaskConverterTest extends AbstractConverterTest {
 
     List<FieldExtension> fields = serviceTask.getFieldExtensions();
     assertEquals(2, fields.size());
-    FieldExtension field = (FieldExtension) fields.get(0);
+    FieldExtension field = fields.get(0);
     assertEquals("testField", field.getFieldName());
     assertEquals("test", field.getStringValue());
-    field = (FieldExtension) fields.get(1);
+    field = fields.get(1);
     assertEquals("testField2", field.getFieldName());
     assertEquals("${test}", field.getExpression());
 
     List<FlowableListener> listeners = serviceTask.getExecutionListeners();
     assertEquals(3, listeners.size());
-    FlowableListener listener = (FlowableListener) listeners.get(0);
+    FlowableListener listener = listeners.get(0);
     assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, listener.getImplementationType());
     assertEquals("org.test.TestClass", listener.getImplementation());
     assertEquals("start", listener.getEvent());
-    listener = (FlowableListener) listeners.get(1);
+    listener = listeners.get(1);
     assertEquals(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION, listener.getImplementationType());
     assertEquals("${testExpression}", listener.getImplementation());
     assertEquals("end", listener.getEvent());
-    listener = (FlowableListener) listeners.get(2);
+    listener = listeners.get(2);
     assertEquals(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION, listener.getImplementationType());
     assertEquals("${delegateExpression}", listener.getImplementation());
     assertEquals("start", listener.getEvent());

@@ -579,7 +579,7 @@ public class ModelServiceImpl implements ModelService {
     for (ModelRelation persistedModelRelation : persistedModelRelations) {
       if (!idsReferencedInJson.contains(persistedModelRelation.getModelId())) {
         // model used to be referenced, but not anymore. Delete it.
-        modelRelationRepository.delete((ModelRelation) persistedModelRelation);
+        modelRelationRepository.delete(persistedModelRelation);
       } else {
         alreadyPersistedModelIds.add(persistedModelRelation.getModelId());
       }

@@ -711,8 +711,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
   protected void ensureExecutionsInitialized() {
-    if (executions==null) {
-      this.executions = (List) Context
+    if (executions == null) {
+      this.executions = Context
         .getCommandContext()
         .getExecutionEntityManager()
         .findChildExecutionsByParentExecutionId(id);
@@ -1171,7 +1171,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
       task.setExecution(this.replacedBy);         
       
       // update the related local task variables
-      List<VariableInstanceEntity> variables = (List) commandContext
+      List<VariableInstanceEntity> variables = commandContext
         .getVariableInstanceEntityManager()
         .findVariableInstancesByTaskId(task.getId());
       
@@ -1210,7 +1210,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }
     
     // update the related process variables
-    List<VariableInstanceEntity> variables = (List) commandContext
+    List<VariableInstanceEntity> variables = commandContext
       .getVariableInstanceEntityManager()
       .findVariableInstancesByExecutionId(id);
     
@@ -1463,7 +1463,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   @SuppressWarnings({ "unchecked", "rawtypes" })
   protected void ensureJobsInitialized() {
     if (jobs == null) {    
-      jobs = (List) Context.getCommandContext()
+      jobs = Context.getCommandContext()
         .getJobEntityManager()
         .findJobsByExecutionId(id);
     }    
@@ -1489,7 +1489,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   @SuppressWarnings({ "unchecked", "rawtypes" })
   protected void ensureTimerJobsInitialized() {
     if (timerJobs == null) {    
-      timerJobs = (List) Context.getCommandContext()
+      timerJobs = Context.getCommandContext()
         .getTimerJobEntityManager()
         .findTimerJobsByExecutionId(id);
     }    
@@ -1516,8 +1516,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   
   @SuppressWarnings({ "unchecked", "rawtypes" })
   protected void ensureTasksInitialized() {
-    if(tasks == null) {    
-      tasks = (List)Context.getCommandContext()
+    if (tasks == null) {
+      tasks = Context.getCommandContext()
         .getTaskEntityManager()
         .findTasksByExecutionId(id);      
     }    

@@ -22,7 +22,6 @@ import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
-import org.flowable.engine.test.bpmn.event.timer.compatibility.TimerEventCompatibilityTest;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
