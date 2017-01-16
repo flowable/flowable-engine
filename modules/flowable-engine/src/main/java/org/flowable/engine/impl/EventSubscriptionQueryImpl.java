@@ -167,7 +167,7 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
   @SuppressWarnings({ "unchecked" })
   public List<EventSubscription> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return (List<EventSubscription>) commandContext.getEventSubscriptionEntityManager().findEventSubscriptionsByQueryCriteria(this, page);
+    return commandContext.getEventSubscriptionEntityManager().findEventSubscriptionsByQueryCriteria(this, page);
   }
 
   // getters //////////////////////////////////////////

@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.delegate.event.FlowableEntityWithVariablesEvent;
-import org.flowable.engine.impl.event.logger.handler.Fields;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntity;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;

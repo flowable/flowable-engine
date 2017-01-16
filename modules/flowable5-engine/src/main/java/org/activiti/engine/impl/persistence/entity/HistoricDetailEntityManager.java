@@ -53,8 +53,7 @@ public class HistoricDetailEntityManager extends AbstractManager {
 
   public void deleteHistoricDetailsByTaskId(String taskId) {
     if (getHistoryManager().isHistoryLevelAtLeast(HistoryLevel.FULL)) {
-      HistoricDetailQueryImpl detailsQuery = 
-        (HistoricDetailQueryImpl) new HistoricDetailQueryImpl().taskId(taskId);
+      HistoricDetailQueryImpl detailsQuery = new HistoricDetailQueryImpl().taskId(taskId);
       List<HistoricDetail> details = detailsQuery.list();
       for(HistoricDetail detail : details) {
         ((HistoricDetailEntity) detail).delete();

@@ -139,7 +139,7 @@ public class StartTimerEventRepeatWithEndExpressionTest extends PluggableFlowabl
     int timerFiredCount = 0;
     List<FlowableEvent> eventsReceived = listener.getEventsReceived();
     for (FlowableEvent eventReceived : eventsReceived) {
-      if (FlowableEngineEventType.TIMER_FIRED.equals(eventReceived.getType())) {
+      if (FlowableEngineEventType.TIMER_FIRED == eventReceived.getType()) {
         timerFiredCount++;
       }
     }
@@ -147,7 +147,7 @@ public class StartTimerEventRepeatWithEndExpressionTest extends PluggableFlowabl
     //count "entity created" events
     int eventCreatedCount = 0;
     for (FlowableEvent eventReceived : eventsReceived) {
-      if (FlowableEngineEventType.ENTITY_CREATED.equals(eventReceived.getType())) {
+      if (FlowableEngineEventType.ENTITY_CREATED == eventReceived.getType()) {
         eventCreatedCount++;
       }
     }
@@ -155,7 +155,7 @@ public class StartTimerEventRepeatWithEndExpressionTest extends PluggableFlowabl
     // count "entity deleted" events
     int eventDeletedCount = 0;
     for (FlowableEvent eventReceived : eventsReceived) {
-      if (FlowableEngineEventType.ENTITY_DELETED.equals(eventReceived.getType())) {
+      if (FlowableEngineEventType.ENTITY_DELETED == eventReceived.getType()) {
         eventDeletedCount++;
       }
     }

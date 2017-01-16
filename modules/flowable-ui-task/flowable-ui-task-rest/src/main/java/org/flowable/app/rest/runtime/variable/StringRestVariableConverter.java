@@ -39,7 +39,7 @@ public class StringRestVariableConverter implements RestVariableConverter {
       if(!(result.getValue() instanceof String)) {
         throw new FlowableIllegalArgumentException("Converter can only convert strings");
       }
-      return (String) result.getValue();
+      return result.getValue();
     }
     return null;
   }

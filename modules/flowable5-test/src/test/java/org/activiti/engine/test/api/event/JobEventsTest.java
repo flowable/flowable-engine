@@ -239,7 +239,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
     int timerCancelledCount = 0;
     List<FlowableEvent> eventsReceived = listener.getEventsReceived();
     for (FlowableEvent eventReceived : eventsReceived) {
-      if (eventType.equals(eventReceived.getType())) {
+      if (eventType == eventReceived.getType()) {
         timerCancelledCount++;
       }
     }
