@@ -45,7 +45,7 @@ activitiModule.controller('KisBpmSequenceFlowOrderPopupCtrl', ['$scope', '$trans
                 // We need the resourceId of a sequence flow, not the id because that will change with every editor load
                 outgoingSequenceFlow.push({
                     id : outgoingNodes[i].resourceId,
-                    targetTitle : targetActivity.properties['oryx-name'],
+                    targetTitle : targetActivity.properties.get('oryx-name'),
                     targetType : targetActivity.getStencil().title()
                 });
             }
