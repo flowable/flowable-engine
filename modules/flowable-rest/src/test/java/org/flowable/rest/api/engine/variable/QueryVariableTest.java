@@ -39,8 +39,8 @@ public class QueryVariableTest extends BaseSpringRestTestCase {
 
         // Reconstitute the QueryVariable
         QueryVariable newQueryVariable = objectMapper.convertValue(jsonNode, QueryVariable.class);
-        // Recheck the "operation"
-        assertEquals(QueryVariable.QueryVariableOperation.NOT_EQUALS, origQueryVariable.getVariableOperation());
-        assertEquals("notEquals", origQueryVariable.getOperation());
+        // Recheck the "operation" with the "new" variable
+        assertEquals(QueryVariable.QueryVariableOperation.NOT_EQUALS, newQueryVariable.getVariableOperation());
+        assertEquals("notEquals", newQueryVariable.getOperation());
     }
 }
