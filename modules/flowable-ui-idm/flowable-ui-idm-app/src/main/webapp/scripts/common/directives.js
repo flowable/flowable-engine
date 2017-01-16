@@ -412,7 +412,7 @@ flowableModule
         return {
             restrict: 'AEC',
             link: function(scope, element, attrs) {
-                element.on('hidden.bs.dropdown	', function () {
+                element.on('hidden.bs.dropdown', function () {
                     element.show(); // evil prototype.js has added display:none to it ...
                 })
             }
@@ -718,11 +718,11 @@ flowableModule.
             }
 
             if ($scope.ignoreContainer) {
-                $scope.popover = $popover($element, {template: appResourceRoot + '/views/common/popover/select-people-popover.html?'  +
+                $scope.popover = $popover($element, {template: appResourceRoot + 'views/common/popover/select-people-popover.html?'  +
                     Date.now(), placement: placement});
 
             } else {
-                $scope.popover = $popover($element, {template: appResourceRoot + '/views/common/popover/select-people-popover.html?'  +
+                $scope.popover = $popover($element, {template: appResourceRoot + 'views/common/popover/select-people-popover.html?'  +
                     Date.now(), placement: placement, container: 'body'});
             }
 
@@ -953,11 +953,11 @@ directive('selectGroupPopover', ['$rootScope', '$http', '$popover','appResourceR
         }
 
         if ($scope.ignoreContainer) {
-            $scope.popover = $popover($element, {template: appResourceRoot + '/views/common/popover/select--group-popover.html?' +
+            $scope.popover = $popover($element, {template: appResourceRoot + 'views/common/popover/select--group-popover.html?' +
                 Date.now(), placement: placement});
 
         } else {
-            $scope.popover = $popover($element, {template: appResourceRoot + '/views/common/popover/select-group-popover.html?' +
+            $scope.popover = $popover($element, {template: appResourceRoot + 'views/common/popover/select-group-popover.html?' +
                 Date.now(), placement: placement, container: 'body'});
         }
 

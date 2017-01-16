@@ -208,32 +208,6 @@
                     </div>
 
                     <div class="form-group clearfix"
-                         ng-show="popup.assignmentObject.type == 'idm' && (!popup.assignmentObject.assignmentSourceType || popup.assignmentObject.assignmentSourceType == 'search') && (assignmentOption.id == 'user' || assignmentOption.id == 'users')">
-                        <div class="col-xs-12">
-                            <div class="col-xs-4">
-                                <label>Email:</label>
-                            </div>
-                            <div class="col-xs-8">
-                                <form name="emailForm" class="form-group">
-                                    <div class="input-group">
-                                        <input name="assignmentEmailInput" class="form-control" type="email" placeholder="Enter an email address"
-                                               ng-model="popup.email"
-                                               field-focus="assignment.type == 'idm'"
-                                               custom-keys enter-pressed="confirmEmail()">
-                        <span class="input-group-btn">
-                            <button class="btn btn-sm" type="button"
-                                    ng-disabled="popup.email == null || popup.email == undefined || popup.email.length == 0 || emailForm.assignmentEmailInput.$error.email"
-                                    ng-click="confirmEmail()">Accept
-                            </button>
-                        </span>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="form-group clearfix"
                          ng-if="popup.assignmentObject.type == 'idm' && (!popup.assignmentObject.assignmentSourceType || popup.assignmentObject.assignmentSourceType == 'search') && assignmentOption.id == 'groups'">
                         <div class="col-xs-12">
                             <div class="col-xs-4">
