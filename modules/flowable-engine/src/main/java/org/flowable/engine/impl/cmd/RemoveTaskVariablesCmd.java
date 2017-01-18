@@ -50,6 +50,7 @@ public class RemoveTaskVariablesCmd extends NeedsActiveTaskCmd<Void> {
       task.removeVariables(variableNames);
     }
 
+    task.forceUpdate();
     return null;
   }
 

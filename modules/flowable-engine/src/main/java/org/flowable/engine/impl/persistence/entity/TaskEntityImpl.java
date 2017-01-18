@@ -30,6 +30,7 @@ import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.db.BulkDeleteable;
 import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.persistence.CountingTaskEntity;
 import org.flowable.engine.task.DelegationState;
 import org.flowable.engine.task.IdentityLink;
 import org.flowable.engine.task.IdentityLinkType;
@@ -40,7 +41,7 @@ import org.flowable.engine.task.IdentityLinkType;
  * @author Falko Menge
  * @author Tijs Rademakers
  */
-public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Serializable, BulkDeleteable {
+public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, CountingTaskEntity, Serializable, BulkDeleteable {
 
   public static final String DELETE_REASON_COMPLETED = "completed";
   public static final String DELETE_REASON_DELETED = "deleted";
@@ -81,6 +82,10 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Ser
 
   protected boolean isDeleted;
   protected boolean isCanceled;
+  
+  private boolean isCountEnabled;
+  private int variableCount;
+  private int identityLinkCount;
 
   protected String eventName;
   protected FlowableListener currentListener;
@@ -653,6 +658,36 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Ser
 
   public String toString() {
     return "Task[id=" + id + ", name=" + name + "]";
+  }
+
+  @Override
+  public boolean isCountEnabled() {
+    return isCountEnabled;
+  }
+
+  @Override
+  public void setCountEnabled(boolean isCountEnabled) {
+    this.isCountEnabled = isCountEnabled;
+  }
+
+  @Override
+  public void setVariableCount(int variableCount) {
+    this.variableCount = variableCount;
+  }
+
+  @Override
+  public int getVariableCount() {
+    return variableCount;
+  }
+
+  @Override
+  public void setIdentityLinkCount(int identityLinkCount) {
+    this.identityLinkCount = identityLinkCount;
+  }
+
+  @Override
+  public int getIdentityLinkCount() {
+    return identityLinkCount;
   }
 
 }

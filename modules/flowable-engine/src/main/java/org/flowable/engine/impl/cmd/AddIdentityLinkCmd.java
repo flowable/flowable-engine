@@ -80,8 +80,10 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
       commandContext.getTaskEntityManager().changeTaskOwner(task, identityId);
     } else if (IDENTITY_USER == identityIdType) {
       task.addUserIdentityLink(identityId, identityType);
-    } else if (IDENTITY_GROUP == identityIdType) {
+      task.forceUpdate(); //update identity link count
+    } else if (IDENTITY_GROUP == identityIdType) {      
       task.addGroupIdentityLink(identityId, identityType);
+      task.forceUpdate(); //update identity link count
     }
 
     boolean forceNullUserId = false;

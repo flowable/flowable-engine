@@ -25,6 +25,7 @@ import org.flowable.engine.delegate.event.FlowableVariableEvent;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
+import org.flowable.engine.impl.persistence.CountingTaskEntity;
 import org.flowable.engine.impl.persistence.entity.data.VariableInstanceDataManager;
 import org.flowable.engine.impl.variable.VariableType;
 
@@ -60,8 +61,13 @@ public class VariableInstanceEntityManagerImpl extends AbstractEntityManager<Var
   @Override
   public void insert(VariableInstanceEntity entity, boolean fireCreateEvent) {
     super.insert(entity, fireCreateEvent);
-    
-    if (entity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
+
+    if (entity.getTaskId() != null && isTaskRelatedEntityCountEnabledGlobally()) {
+      CountingTaskEntity countingTaskEntity = (CountingTaskEntity) getTaskEntityManager().findById(entity.getTaskId());
+      if (isTaskRelatedEntityCountEnabled(countingTaskEntity)){
+        countingTaskEntity.setVariableCount(countingTaskEntity.getVariableCount() + 1);
+      }
+    } else if (entity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
       CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(entity.getExecutionId());
       if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
         executionEntity.setVariableCount(executionEntity.getVariableCount() + 1);
@@ -118,7 +124,12 @@ public class VariableInstanceEntityManagerImpl extends AbstractEntityManager<Var
     }
     entity.setDeleted(true);
     
-    if (entity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
+    if (entity.getTaskId() != null && isTaskRelatedEntityCountEnabledGlobally()) {
+      CountingTaskEntity countingTaskEntity = (CountingTaskEntity) getTaskEntityManager().findById(entity.getTaskId());
+      if (isTaskRelatedEntityCountEnabled(countingTaskEntity)){
+        countingTaskEntity.setVariableCount(countingTaskEntity.getVariableCount() - 1);
+      }
+    } else if (entity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
       CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(entity.getExecutionId());
       if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
         executionEntity.setVariableCount(executionEntity.getVariableCount() - 1);
