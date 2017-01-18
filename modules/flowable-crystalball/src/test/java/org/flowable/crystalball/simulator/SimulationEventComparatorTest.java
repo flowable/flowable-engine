@@ -12,8 +12,6 @@
  */
 package org.flowable.crystalball.simulator;
 
-import org.flowable.crystalball.simulator.SimulationEvent;
-import org.flowable.crystalball.simulator.SimulationEventComparator;
 import org.junit.Test;
 
 import java.util.Comparator;

@@ -107,7 +107,7 @@ public class GetDataObjectsCmd implements Command<Map<String, DataObject>>, Seri
       
       for (Entry<String, VariableInstance> entry : variables.entrySet()) {
         String name = entry.getKey();
-        VariableInstance variableEntity = (VariableInstance) entry.getValue();
+        VariableInstance variableEntity = entry.getValue();
 
         ExecutionEntity executionEntity = commandContext.getExecutionEntityManager().findById(variableEntity.getExecutionId());
         while (!executionEntity.isScope()) {

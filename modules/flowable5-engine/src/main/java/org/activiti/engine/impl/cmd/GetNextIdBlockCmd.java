@@ -31,7 +31,7 @@ public class GetNextIdBlockCmd implements Command<IdBlock> {
   }
 
   public IdBlock execute(CommandContext commandContext) {
-    PropertyEntity property = (PropertyEntity) commandContext
+    PropertyEntity property = commandContext
       .getPropertyEntityManager()
       .findPropertyById("next.dbid");
     long oldValue = Long.parseLong(property.getValue());
