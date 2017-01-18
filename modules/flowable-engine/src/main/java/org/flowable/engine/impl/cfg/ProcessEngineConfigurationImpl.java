@@ -2052,10 +2052,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (performanceSettings.isValidateTaskRelationshipCountConfigOnBoot()) {
       commandExecutor.execute(new ValidateTaskRelatedEntityCountCfgCmd());
     }
-    
-    if (performanceSettings.isValidateTaskRelationshipCountConfigOnBoot()) {
-      commandExecutor.execute(new ValidateTaskRelatedEntityCountCfgCmd());
-    }
   }
 
   public Runnable getProcessEngineCloseRunnable() {

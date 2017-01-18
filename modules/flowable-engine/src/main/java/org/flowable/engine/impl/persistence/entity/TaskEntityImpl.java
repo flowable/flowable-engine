@@ -140,6 +140,9 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     if (claimTime != null) {
       persistentState.put("claimTime", this.claimTime);
     }
+    
+    persistentState.put("variableCount", this.variableCount);
+    persistentState.put("identityLinkCount", this.identityLinkCount);
 
     return persistentState;
   }

@@ -846,6 +846,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
     taskService.deleteGroupIdentityLink(currentTask.getId(), "group01", IdentityLinkType.PARTICIPANT);
     currentTask = taskService.createTaskQuery().singleResult();
     assertEquals(0, ((CountingTaskEntity) currentTask).getIdentityLinkCount());
+    
+    processEngineConfiguration.setEnableTaskRelationshipCounts(false);
   }
 
   public void testAddCandidateUserNullTaskId() {
@@ -1362,6 +1364,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
     taskService.removeVariableLocal(currentTask.getId(), "variable1");
     currentTask = taskService.createTaskQuery().singleResult();
     assertEquals(0, ((CountingTaskEntity) currentTask).getVariableCount());
+    
+    processEngineConfiguration.setEnableTaskRelationshipCounts(false);
   }
 
   public void testRemoveVariableLocalNullTaskId() {

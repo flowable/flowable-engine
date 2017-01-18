@@ -238,16 +238,15 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         "selectExecutionsWithSameRootProcessInstanceId", 1L,
         "selectTasksByExecutionId", 1L
         );
-    assertDatabaseInserts("CompleteTaskCmd", 
-        "HistoricActivityInstanceEntityImpl", 1L);
+    
+    assertDatabaseInserts("CompleteTaskCmd", "HistoricActivityInstanceEntityImpl", 1L);
+    
     assertDatabaseUpdates("CompleteTaskCmd", "org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityImpl", 1L,
             "org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl", 2L,
             "org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityImpl", 1L,
             "org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl", 1L);
-    assertDatabaseDeletes("CompleteTaskCmd", 
-        "TaskEntityImpl", 1L,
-        "ExecutionEntityImpl", 2L); // execution and processinstance
     
+    assertDatabaseDeletes("CompleteTaskCmd", "TaskEntityImpl", 1L, "ExecutionEntityImpl", 2L); // execution and processinstance
   }
   
   
@@ -343,7 +342,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     assertDatabaseSelects("DeleteIdentityLinkCmd", "selectById org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 5L,
             "selectIdentityLinkByTaskUserGroupAndType", 5L, "selectById org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityImpl", 2L,
             "selectIdentityLinksByTask", 5L);
-    assertDatabaseUpdates("DeleteIdentityLinkCmd", "org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 5L);
+    assertDatabaseUpdates("DeleteIdentityLinkCmd", "org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 2L);
   }
 
   public void testTaskCandidateGroups() {
@@ -388,7 +387,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     assertDatabaseSelects("DeleteIdentityLinkCmd", "selectById org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 5L,
             "selectIdentityLinkByTaskUserGroupAndType", 5L, "selectById org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityImpl", 2L,
             "selectIdentityLinksByTask", 5L);
-    assertDatabaseUpdates("DeleteIdentityLinkCmd", "org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 5L);
+    assertDatabaseUpdates("DeleteIdentityLinkCmd", "org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 2L);
   }
 
   

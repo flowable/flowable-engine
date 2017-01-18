@@ -60,7 +60,9 @@ public class StandaloneTaskTest extends PluggableFlowableTestCase {
     // Retrieve task list for gonzo
     tasks = taskService.createTaskQuery().taskCandidateUser("gonzo").list();
     assertEquals(1, tasks.size());
-    assertEquals("testTask", tasks.get(0).getName());
+    
+    task = tasks.get(0);
+    assertEquals("testTask", task.getName());
 
     task.setName("Update name");
     taskService.saveTask(task);
