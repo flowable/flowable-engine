@@ -100,7 +100,7 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
 		for (int i=0; i<5; i++) {
 			Map<String, Object> result = results.get(i);
 			Long id = Long.valueOf((String) result.get("TASKID"));
-			Long variableValue = (Long) result.get("VARIABLEVALUE");
+			Long variableValue = ((Number) result.get("VARIABLEVALUE")).longValue();
 			assertEquals(id * 2, variableValue.longValue());
 		}
 		

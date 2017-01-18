@@ -96,9 +96,7 @@ public class AdvancedCycleBusinessCalendar extends CycleBusinessCalendar {
     String timeZone = getValueFrom("DSTZONE", duedateDescription);
     String version = getValueFrom("VER", duedateDescription);
 
-    // START is a legacy value that is no longer used, but may still exist
-    // in
-    // deployed job schedules
+    // START is a legacy value that is no longer used, but may still exist in deployed job schedules
     // Could be used in the future as a start date for a CRON job
     // String startDate = getValueFrom("START", duedateDescription);
 
