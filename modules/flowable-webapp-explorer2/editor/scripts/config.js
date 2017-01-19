@@ -177,7 +177,13 @@ ORYX.CONFIG.EVENT_CANVAS_SCROLL = 			"canvas.scroll";
 	
 ORYX.CONFIG.EVENT_SHOW_PROPERTYWINDOW =		"propertywindow.show";
 ORYX.CONFIG.EVENT_ABOUT_TO_SAVE = "file.aboutToSave";
-	
+
+//extra events
+ORYX.CONFIG.EVENT_EDITOR_INIT_COMPLETED = "editor.init.completed";
+
+//actions events that are fired when a button or key was pressed after completing the initial logic.
+ORYX.CONFIG.ACTION_DELETE_COMPLETED = 'delete.action.completed';
+
 	/* Selection Shapes Highlights */
 ORYX.CONFIG.SELECTION_HIGHLIGHT_SIZE =				5;
 ORYX.CONFIG.SELECTION_HIGHLIGHT_COLOR =				"#4444FF";

@@ -55,6 +55,24 @@
                     </ul>
 			     </div>
 		      </div>
+			  <div id="process-treeview-wrapper" ng-controller="ProcessNavigatorController">
+				  <div class="process-treeview-header">
+					  Process Navigator
+				  </div>
+				  <div class="process-treeview-body" ng-show="isEditorReady">
+					  <div class="process-treeview-process-title" title="{{treeview.id}}" ng-class="{'current-process': treeview.current}" >
+						  Process: {{treeview.name}}
+						  <img ng-show="!treeview.current" ng-src="editor-app/images/pencil.png" class="pull-right" ng-click="edit(treeview.id)" />
+					  </div>
+					  <ul class="process-treeview-list" ng-if="treeview.children">
+						  <li ng-repeat="child in treeview.children" ng-include="'editor-app/partials/process-tree-list.html?version=4'">
+						  </li>
+					  </ul>
+					  <div ng-if="!treeview.children || treeview.children.length == 0" style="padding-left: 5px;">
+						  No structural elements used.
+					  </div>
+				  </div>
+			  </div>
 	      </div>
 	      <div id="canvasHelpWrapper" class="col-xs-9">
 	      	<div class="canvas-wrapper" id="canvasSection" 
@@ -78,6 +96,9 @@
             	     style="display:none">
             	    <img src="editor-app/images/wrench.png"/>
             	</div>
+				<div class="Oryx_button" id="edit-button" style="display:none" ng-click="editShape()">
+					<img src="editor-app/images/pencil.png"/>
+				</div>
             	<div class="Oryx_button"
             		 ng-repeat="item in quickMenuItems"
 	                 id="{{item.id}}"

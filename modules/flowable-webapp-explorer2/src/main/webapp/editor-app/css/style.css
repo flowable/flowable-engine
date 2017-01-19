@@ -59,6 +59,7 @@
     height: 36px;
     min-width: 36px;
 }
+
 .editor-toolbar .btn.btn-inverse.pressed {
 	background-color: #287d92;
 	color: #174753;
@@ -102,29 +103,29 @@
 	margin: 0px 15px 0px 0px;
 }
 
-
 .stencil-group > li {
 	list-style: none;
 	list-style-position: outside;
 	margin: 0px 0px 5px 15px;
 	background-color: #ffffff;
 	font-family: Arial, Regular;
-	font-size: 17px;
+	font-size: 14px;
 	color: #323437;
 }
 
 .stencil-group > li > span {
 	margin-left: 5px;
-	padding-top:5px;
+	padding-top: 5px;
 	padding-bottom: 5px;
 	display: block;
 	cursor: pointer;
 }
 
 .stencil-group > li > span > i {
-	font-size: 12px;	
+	font-size: 12px;
 	line-height: 17px;
 }
+
 .stencil-group > li > ul {
 	list-style: none;
 	list-style-position: inside;
@@ -137,6 +138,7 @@
 .stencil-group.collapsed > li {
 	color: #000000;
 }
+
 .stencil-group.collapsed > li > ul {
 	max-height: 0px;
 	padding-top: 0;
@@ -148,22 +150,21 @@
 }
 
 .stencil-item {
-    cursor: pointer;
-    padding: 5px;
+	cursor: pointer;
+	padding: 5px;
 }
 
 .root-stencil-item {
-    margin: 0 0 0 15px;
-    font-family: Arial, Regular;
-    font-size: 17px;
+	margin: 0 0 0 15px;
+	font-family: Arial, Regular;
+	font-size: 14px;
 }
 
 .ui-draggable.stencil-item.stencil-item-dragged {
-    display: block;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+	display: block;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
-
 
 /* Modeling Canvas
 -------------------------------- */
@@ -183,9 +184,9 @@ div.canvas-wrapper {
 	height: 17px;
 	width: 17px;
 	text-align: center;
-	-webkit-border-radius:3px;
-	-moz-border-radius:3px;
-	border-radius:3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
 }
 
 #canvas-grow-N.canvas_resize_indicator, #canvas-shrink-S.canvas_resize_indicator {
@@ -220,24 +221,24 @@ div.canvas-wrapper {
 	font-size: 10pt;
 }
 
-
 div.propertySection {
 	height: 250px;
-    background-color: #e8edf1;
+	background-color: #e8edf1;
 	margin-bottom: 0px;
 }
 
 .selected-item-title {
-    font-size: 25px;
-    font-weight: bold;
-    padding: 8px 0 8px 8px;
-    border-bottom: 1px solid #a4acb9;
-    cursor: pointer;
+	font-size: 25px;
+	font-weight: bold;
+	padding: 8px 0 8px 8px;
+	border-bottom: 1px solid #a4acb9;
+	cursor: pointer;
 }
 
 .selected-item-title a {
 	display: block;
 	color: #1a1a1a;
+	padding-left: 30px;
 }
 
 .selected-item-title .glyphicon {
@@ -267,7 +268,7 @@ div.propertySection {
 }
 
 .selected-item-body .property-row:hover {
-	background-color: #d7dfe6;	
+	background-color: #d7dfe6;
 }
 
 .selected-item-body {
@@ -277,7 +278,7 @@ div.propertySection {
 }
 
 .selected-item-body > div {
-	overflow: hidden;	
+	overflow: hidden;
 	margin: 5px 20px;
 }
 
@@ -285,7 +286,7 @@ div.propertySection {
 	display: block;
 	float: left;
 	margin: 2px 2%;
-	padding: 0;	
+	padding: 0;
 	min-height: 25px;
 }
 
@@ -327,41 +328,40 @@ div.propertySection {
 	margin: 2px 0;
 	padding: 0px 5px;
 	width: 100%;
-    outline: none;
-    border:none !important;
-    box-shadow:none !important;
+	outline: none;
+	border: none !important;
+	box-shadow: none !important;
 }
 
 .default-grid {
-    border: 1px solid rgb(212,212,212);
-    width: 100%;
-    height: 300px;
-    margin-bottom: 10px;
+	border: 1px solid rgb(212, 212, 212);
+	width: 100%;
+	height: 300px;
+	margin-bottom: 10px;
 }
 
 .kis-listener-grid {
-    border: 1px solid rgb(212,212,212);
-    width: 100%;
-    height: 200px;
-    margin-bottom: 10px;
+	border: 1px solid rgb(212, 212, 212);
+	width: 100%;
+	height: 200px;
+	margin-bottom: 10px;
 }
 
 .kis-field-grid {
-    border: 1px solid rgb(212,212,212);
-    width: 100%;
-    height: 150px;
-    margin-bottom: 10px;
+	border: 1px solid rgb(212, 212, 212);
+	width: 100%;
+	height: 150px;
+	margin-bottom: 10px;
 }
 
 .saving-text {
-    display: table;
-    margin: 0 auto;
-    padding: 20px 0 0px 0;
+	display: table;
+	margin: 0 auto;
+	padding: 20px 0 0px 0;
 }
 
-
 .form-property-checkbox {
-    margin:0;
+	margin: 0;
 }
 
 /* Oryx overrides
@@ -372,13 +372,13 @@ ul.x-menu-list {
 	width: 200px;
 	background-color: #FFFFFF;
 	border: 1px solid #E1E2E5;
-	-webkit-border-radius:3px;
-	-moz-border-radius:3px;
-	border-radius:3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
 	padding: 3px;
 }
 
-img.x-menu-item-icon  {
+img.x-menu-item-icon {
 	width: auto;
 	height: auto;
 	margin-right: 5px;
@@ -401,7 +401,7 @@ li.x-menu-list-item.x-menu-item-active a {
 }
 
 .sequence-flow-order-element {
-    margin: 12px 0 12px 0;
+	margin: 12px 0 12px 0;
 }
 
 /* Editor icon font */
@@ -436,42 +436,100 @@ li.x-menu-list-item.x-menu-item-active a {
 .editor-icon-paste:before {
 	content: 'e';
 }
+
 .editor-icon-delete:before {
 	content: 'f';
 }
+
 .editor-icon-redo:before {
 	content: 'h';
 }
+
 .editor-icon-undo:before {
 	content: 'g';
 }
+
 .editor-icon-same-size:before {
 	content: 'i';
 }
+
 .editor-icon-zoom-in:before {
 	content: 'k';
 }
+
 .editor-icon-zoom-out:before {
 	content: 'l';
 }
+
 .editor-icon-zoom-actual:before {
 	content: 'm';
 }
+
 .editor-icon-zoom-fit:before {
 	content: 'j';
 }
+
 .editor-icon-bendpoint-add:before {
 	content: 'n';
 }
+
 .editor-icon-bendpoint-remove:before {
 	content: 'o';
 }
+
 .editor-icon-align-horizontal:before {
 	content: 'p';
 }
+
 .editor-icon-align-vertical:before {
 	content: 'q';
 }
+
 .editor-icon-close:before {
-    content: "X";
+	content: "X";
+}
+
+#process-treeview-wrapper{
+	height: 200px;
+	background: #f3f3f3;
+	border-right: 1px solid #bbbbbb;
+	overflow-y: auto;
+}
+
+.process-treeview-header{
+	background: #36a7c4;
+	color: white;
+	border: 1px solid #bbbbbb;
+	padding: 2px;
+	padding-left: 5px;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.process-treeview-process-title{
+	padding: 5px;
+	font-weight: bold;
+}
+
+.process-treeview{
+	margin-top: 5px;
+}
+
+.process-treeview-list{
+	padding: 0 10px;
+	list-style-type: none;
+}
+
+.process-treeview-list-item:hover{
+	cursor: pointer;
+	font-weight: bolder;
+	font-style: italic;
+}
+
+.process-treeview-body{
+
+}
+
+.current-process{
+	border: 1px solid green;
 }

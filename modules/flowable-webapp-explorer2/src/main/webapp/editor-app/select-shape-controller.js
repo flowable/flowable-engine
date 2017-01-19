@@ -21,7 +21,7 @@
  * Controller for morph shape selection
  */
 
-activitiModule.controller('KisBpmShapeSelectionCtrl', [ '$rootScope', '$scope', '$timeout', '$translate', function($rootScope, $scope, $timeout, $translate) {
+activitiModule.controller('KisBpmShapeSelectionCtrl', [ '$rootScope', '$scope', '$timeout', '$translate','editorManager', function($rootScope, $scope, $timeout, $translate,editorManager) {
 
     $scope.selectedMorphShapes = [];
     
@@ -270,7 +270,7 @@ activitiModule.controller('KisBpmShapeSelectionCtrl', [ '$rootScope', '$scope', 
     		});
     		
         	var stencil = undefined;
-        	var stencilSets = $scope.editor.getStencilSets().values();
+        	var stencilSets = editorManager.getStencilSets().values();
         	
         	var stencilId = $scope.selectedMorphShapes[0].id;
         	if ($scope.selectedMorphShapes[0].genericTaskId)
@@ -295,8 +295,8 @@ activitiModule.controller('KisBpmShapeSelectionCtrl', [ '$rootScope', '$scope', 
         	if (!stencil) return;
         	
     		// Create and execute command (for undo/redo)			
-    		var command = new MorphTo($scope.currentSelectedShape, stencil, $scope.editor);
-    		$scope.editor.executeCommands([command]);
+    		var command = new MorphTo($scope.currentSelectedShape, stencil, editorManager.getEditor());
+    		editorManager.executeCommands([command]);
         }
 
         $scope.close();

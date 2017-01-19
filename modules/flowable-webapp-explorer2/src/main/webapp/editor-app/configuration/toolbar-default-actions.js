@@ -54,14 +54,14 @@ KISBPM.TOOLBAR = {
                 }
                 
                 // Update and refresh the canvas
-                services.$scope.editor.handleEvents({
+                services.editorManager.handleEvents({
                     type: ORYX.CONFIG.EVENT_UNDO_ROLLBACK,
                     commands: lastCommands
                 });
                 
                 // Update
-                services.$scope.editor.getCanvas().update();
-                services.$scope.editor.updateSelection();
+                services.editorManager.getCanvas().update();
+                services.editorManager.updateSelection();
             }
             
             var toggleUndo = false;
@@ -115,14 +115,14 @@ KISBPM.TOOLBAR = {
                 });
 
                 // Update and refresh the canvas
-                services.$scope.editor.handleEvents({
+                services.editorManager.handleEvents({
                     type: ORYX.CONFIG.EVENT_UNDO_EXECUTE,
                     commands: lastCommands
                 });
 
                 // Update
-                services.$scope.editor.getCanvas().update();
-                services.$scope.editor.updateSelection();
+                services.editorManager.getCanvas().update();
+                services.editorManager.updateSelection();
             }
 
             var toggleUndo = false;
@@ -153,7 +153,7 @@ KISBPM.TOOLBAR = {
         },
 
         cut: function (services) {
-            KISBPM.TOOLBAR.ACTIONS._getOryxEditPlugin(services.$scope).editCut();
+            KISBPM.TOOLBAR.ACTIONS._getOryxEditPlugin(services).editCut();
             for (var i = 0; i < services.$scope.items.length; i++) {
                 var item = services.$scope.items[i];
                 if (item.action === 'KISBPM.TOOLBAR.ACTIONS.paste') {
@@ -165,7 +165,7 @@ KISBPM.TOOLBAR = {
         },
 
         copy: function (services) {
-            KISBPM.TOOLBAR.ACTIONS._getOryxEditPlugin(services.$scope).editCopy();
+            KISBPM.TOOLBAR.ACTIONS._getOryxEditPlugin(services).editCopy();
             for (var i = 0; i < services.$scope.items.length; i++) {
                 var item = services.$scope.items[i];
                 if (item.action === 'KISBPM.TOOLBAR.ACTIONS.paste') {
@@ -177,16 +177,16 @@ KISBPM.TOOLBAR = {
         },
 
         paste: function (services) {
-            KISBPM.TOOLBAR.ACTIONS._getOryxEditPlugin(services.$scope).editPaste();
+            KISBPM.TOOLBAR.ACTIONS._getOryxEditPlugin(services).editPaste();
         },
 
         deleteItem: function (services) {
-            KISBPM.TOOLBAR.ACTIONS._getOryxEditPlugin(services.$scope).editDelete();
+            KISBPM.TOOLBAR.ACTIONS._getOryxEditPlugin(services).editDelete();
         },
 
         addBendPoint: function (services) {
 
-            var dockerPlugin = KISBPM.TOOLBAR.ACTIONS._getOryxDockerPlugin(services.$scope);
+            var dockerPlugin = KISBPM.TOOLBAR.ACTIONS._getOryxDockerPlugin(services);
 
             var enableAdd = !dockerPlugin.enabledAdd();
             dockerPlugin.setEnableAdd(enableAdd);
@@ -203,7 +203,7 @@ KISBPM.TOOLBAR = {
 
         removeBendPoint: function (services) {
 
-            var dockerPlugin = KISBPM.TOOLBAR.ACTIONS._getOryxDockerPlugin(services.$scope);
+            var dockerPlugin = KISBPM.TOOLBAR.ACTIONS._getOryxDockerPlugin(services);
 
             var enableRemove = !dockerPlugin.enabledRemove();
             dockerPlugin.setEnableRemove(enableRemove);
@@ -225,39 +225,41 @@ KISBPM.TOOLBAR = {
          * It's important to reuse the same EditPlugin while the same scope is active,
          * as the clipboard is stored for the whole lifetime of the scope.
          */
-        _getOryxEditPlugin: function ($scope) {
+        _getOryxEditPlugin: function (services) {
+            var $scope = services.$scope;
+            var editorManager = services.editorManager;
             if ($scope.oryxEditPlugin === undefined || $scope.oryxEditPlugin === null) {
-                $scope.oryxEditPlugin = new ORYX.Plugins.Edit($scope.editor);
+                $scope.oryxEditPlugin = new ORYX.Plugins.Edit(editorManager.getEditor());
             }
             return $scope.oryxEditPlugin;
         },
 
         zoomIn: function (services) {
-            KISBPM.TOOLBAR.ACTIONS._getOryxViewPlugin(services.$scope).zoom([1.0 + ORYX.CONFIG.ZOOM_OFFSET]);
+            KISBPM.TOOLBAR.ACTIONS._getOryxViewPlugin(services).zoom([1.0 + ORYX.CONFIG.ZOOM_OFFSET]);
         },
 
         zoomOut: function (services) {
-            KISBPM.TOOLBAR.ACTIONS._getOryxViewPlugin(services.$scope).zoom([1.0 - ORYX.CONFIG.ZOOM_OFFSET]);
+            KISBPM.TOOLBAR.ACTIONS._getOryxViewPlugin(services).zoom([1.0 - ORYX.CONFIG.ZOOM_OFFSET]);
         },
         
         zoomActual: function (services) {
-            KISBPM.TOOLBAR.ACTIONS._getOryxViewPlugin(services.$scope).setAFixZoomLevel(1);
+            KISBPM.TOOLBAR.ACTIONS._getOryxViewPlugin(services).setAFixZoomLevel(1);
         },
         
         zoomFit: function (services) {
-        	KISBPM.TOOLBAR.ACTIONS._getOryxViewPlugin(services.$scope).zoomFitToModel();
+        	KISBPM.TOOLBAR.ACTIONS._getOryxViewPlugin(services).zoomFitToModel();
         },
         
         alignVertical: function (services) {
-        	KISBPM.TOOLBAR.ACTIONS._getOryxArrangmentPlugin(services.$scope).alignShapes([ORYX.CONFIG.EDITOR_ALIGN_MIDDLE]);
+        	KISBPM.TOOLBAR.ACTIONS._getOryxArrangmentPlugin(services).alignShapes([ORYX.CONFIG.EDITOR_ALIGN_MIDDLE]);
         },
         
         alignHorizontal: function (services) {
-        	KISBPM.TOOLBAR.ACTIONS._getOryxArrangmentPlugin(services.$scope).alignShapes([ORYX.CONFIG.EDITOR_ALIGN_CENTER]);
+        	KISBPM.TOOLBAR.ACTIONS._getOryxArrangmentPlugin(services).alignShapes([ORYX.CONFIG.EDITOR_ALIGN_CENTER]);
         },
         
         sameSize: function (services) {
-        	KISBPM.TOOLBAR.ACTIONS._getOryxArrangmentPlugin(services.$scope).alignShapes([ORYX.CONFIG.EDITOR_ALIGN_SIZE]);
+        	KISBPM.TOOLBAR.ACTIONS._getOryxArrangmentPlugin(services).alignShapes([ORYX.CONFIG.EDITOR_ALIGN_SIZE]);
         },
         
         closeEditor: function(services) {
@@ -268,23 +270,29 @@ KISBPM.TOOLBAR = {
          * Helper method: fetches the Oryx View plugin from the provided scope,
          * if not on the scope, it is created and put on the scope for further use.
          */
-        _getOryxViewPlugin: function ($scope) {
+        _getOryxViewPlugin: function (services) {
+            var $scope = services.$scope;
+            var editorManager = services.editorManager;
             if ($scope.oryxViewPlugin === undefined || $scope.oryxViewPlugin === null) {
-                $scope.oryxViewPlugin = new ORYX.Plugins.View($scope.editor);
+                $scope.oryxViewPlugin = new ORYX.Plugins.View(editorManager.getEditor());
             }
             return $scope.oryxViewPlugin;
         },
         
-        _getOryxArrangmentPlugin: function ($scope) {
+        _getOryxArrangmentPlugin: function (services) {
+            var $scope = services.$scope;
+            var editorManager = services.editorManager;
             if ($scope.oryxArrangmentPlugin === undefined || $scope.oryxArrangmentPlugin === null) {
-                $scope.oryxArrangmentPlugin = new ORYX.Plugins.Arrangement($scope.editor);
+                $scope.oryxArrangmentPlugin = new ORYX.Plugins.Arrangement(editorManager.getEditor());
             }
             return $scope.oryxArrangmentPlugin;
         },
 
-        _getOryxDockerPlugin: function ($scope) {
+        _getOryxDockerPlugin: function (services) {
+            var $scope = services.$scope;
+            var editorManager = services.editorManager;
             if ($scope.oryxDockerPlugin === undefined || $scope.oryxDockerPlugin === null) {
-                $scope.oryxDockerPlugin = new ORYX.Plugins.AddDocker($scope.editor);
+                $scope.oryxDockerPlugin = new ORYX.Plugins.AddDocker(editorManager.getEditor());
             }
             return $scope.oryxDockerPlugin;
         }
@@ -292,10 +300,10 @@ KISBPM.TOOLBAR = {
 };
 
 /** Custom controller for the save dialog */
-activitiModule.controller('SaveModelCtrl',[ '$rootScope', '$scope', '$http', '$route', '$location',
-    function ($rootScope, $scope, $http, $route, $location) {
+activitiModule.controller('SaveModelCtrl',[ '$rootScope', '$scope', '$http', '$route', '$location','editorManager',
+    function ($rootScope, $scope, $http, $route, $location,editorManager) {
 
-    var modelMetaData = $scope.editor.getModelMetaData();
+    var modelMetaData = editorManager.getModelMetaData();
 
     var description = '';
     if (modelMetaData.description) {
@@ -306,15 +314,6 @@ activitiModule.controller('SaveModelCtrl',[ '$rootScope', '$scope', '$http', '$r
             'description' : description};
     
     $scope.saveDialog = saveDialog;
-    
-    var json = $scope.editor.getJSON();
-    json = JSON.stringify(json);
-
-    var params = {
-        modeltype: modelMetaData.model.modelType,
-        json_xml: json,
-        name: 'model'
-    };
 
     $scope.status = {
         loading: false
@@ -343,16 +342,15 @@ activitiModule.controller('SaveModelCtrl',[ '$rootScope', '$scope', '$http', '$r
         modelMetaData.name = $scope.saveDialog.name;
         modelMetaData.description = $scope.saveDialog.description;
 
-        var json = $scope.editor.getJSON();
-        json = JSON.stringify(json);
-        
-        var selection = $scope.editor.getSelection();
-        $scope.editor.setSelection([]);
+        var json = editorManager.saveAsJson();
+
+        var selection = editorManager.getSelection();
+        editorManager.setSelection([]);
         
         // Get the serialized svg image source
-        var svgClone = $scope.editor.getCanvas().getSVGRepresentation(true);
-        $scope.editor.setSelection(selection);
-        if ($scope.editor.getCanvas().properties["oryx-showstripableelements"] === false) {
+        var svgClone = editorManager.getCanvas().getSVGRepresentation(true);
+        editorManager.setSelection(selection);
+        if (editorManager.getCanvas().properties["oryx-showstripableelements"] === false) {
             var stripOutArray = jQuery(svgClone).find(".stripable-element");
             for (var i = stripOutArray.length - 1; i >= 0; i--) {
             	stripOutArray[i].remove();
@@ -369,7 +367,7 @@ activitiModule.controller('SaveModelCtrl',[ '$rootScope', '$scope', '$http', '$r
         var svgDOM = DataManager.serialize(svgClone);
 
         var params = {
-            json_xml: json,
+            json_xml: editorManager.saveAsJson(),
             svg_xml: svgDOM,
             name: $scope.saveDialog.name,
             description: $scope.saveDialog.description
@@ -394,7 +392,7 @@ activitiModule.controller('SaveModelCtrl',[ '$rootScope', '$scope', '$http', '$r
             url: KISBPM.URL.putModel(modelMetaData.modelId)})
             .then(function (response) {
                 var data = response.data;
-                $scope.editor.handleEvents({
+                editorManager.handleEvents({
                     type: ORYX.CONFIG.EVENT_SAVED
                 });
                 $scope.modelData.name = $scope.saveDialog.name;

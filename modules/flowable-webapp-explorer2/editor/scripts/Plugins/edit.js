@@ -448,6 +448,8 @@ ORYX.Plugins.Edit.DeleteCommand = ORYX.Core.Command.extend({
         this.facade.setSelection([]);
         this.facade.getCanvas().update();		
 		this.facade.updateSelection();
+
+        this.facade.handleEvents({type: ORYX.CONFIG.ACTION_DELETE_COMPLETED});
         
     },
     rollback: function(){

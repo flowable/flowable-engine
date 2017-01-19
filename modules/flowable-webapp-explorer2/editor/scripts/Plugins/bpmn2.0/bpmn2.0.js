@@ -1403,4 +1403,6 @@ new function(){
 		
 	ORYX.Plugins.BPMN2_0 = ORYX.Plugins.AbstractPlugin.extend(ORYX.Plugins.BPMN2_0);
 	
-}()	
+}();
+
+//end of bpmn2.0.js

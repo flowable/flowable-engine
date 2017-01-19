@@ -1944,7 +1944,13 @@ ORYX.CONFIG.EVENT_CANVAS_SCROLL = 			"canvas.scroll";
 	
 ORYX.CONFIG.EVENT_SHOW_PROPERTYWINDOW =		"propertywindow.show";
 ORYX.CONFIG.EVENT_ABOUT_TO_SAVE = "file.aboutToSave";
-	
+
+//extra events
+ORYX.CONFIG.EVENT_EDITOR_INIT_COMPLETED = "editor.init.completed";
+
+//actions events that are fired when a button or key was pressed after completing the initial logic.
+ORYX.CONFIG.ACTION_DELETE_COMPLETED = 'delete.action.completed';
+
 	/* Selection Shapes Highlights */
 ORYX.CONFIG.SELECTION_HIGHLIGHT_SIZE =				5;
 ORYX.CONFIG.SELECTION_HIGHLIGHT_COLOR =				"#4444FF";
@@ -2145,157 +2151,135 @@ ORYX = Object.extend(ORYX, {
 		init();
 	},
 	
-	_loadPlugins: function() {
+	_loadPlugins: function(plugins) {
+			// get plugins.xml content
+			var resultXml = jQuery.parseXML(plugins); //jquery parser
 
-		// load plugin configuration file.
-		var source = ORYX.CONFIG.PLUGINS_CONFIG;
+			// TODO: Describe how properties are handled.
+			// Get the globale Properties
+			var globalProperties = [];
+			var preferences = $A(resultXml.getElementsByTagName("properties"));
+			preferences.each( function(p) {
 
-		ORYX.Log.debug("Loading plugin configuration from '%0'.", source);
-	
-		new Ajax.Request(source, {
-			asynchronous: false,
-			method: 'get',
-			onSuccess: function(result) {
+				var props = $A(p.childNodes);
+				props.each( function(prop) {
+					var property = new Hash();
 
-				/*
-				 * This is the method that is being called when the plugin
-				 * configuration was successfully loaded from the server. The
-				 * file has to be processed and the contents need to be
-				 * considered for further plugin requireation.
-				 */
-				
-				ORYX.Log.info("Plugin configuration file loaded.");
-		
-				// get plugins.xml content
-				var resultXml = result.responseXML;
-				
-				// TODO: Describe how properties are handled.
-				// Get the globale Properties
-				var globalProperties = [];
-				var preferences = $A(resultXml.getElementsByTagName("properties"));
-				preferences.each( function(p) {
-
-					var props = $A(p.childNodes);
-					props.each( function(prop) {
-						var property = new Hash(); 
-						
-						// get all attributes from the node and set to global properties
-						var attributes = $A(prop.attributes)
-						attributes.each(function(attr) {
-                            property.set(attr.nodeName, attr.nodeValue);
-                        });
-						if(attributes.length > 0) {
-							globalProperties.push(property)
-						};
+					// get all attributes from the node and set to global properties
+					var attributes = $A(prop.attributes)
+					attributes.each(function(attr) {
+						property.set(attr.nodeName, attr.nodeValue);
 					});
+					if(attributes.length > 0) {
+						globalProperties.push(property)
+					};
+				});
+			});
+
+
+			// TODO Why are we using XML if we don't respect structure anyway?
+			// for each plugin element in the configuration..
+			var plugin = resultXml.getElementsByTagName("plugin");
+			$A(plugin).each( function(node) {
+
+				// get all element's attributes.
+				// TODO: What about: var pluginData = $H(node.attributes) !?
+				var pluginData = new Hash();
+				$A(node.attributes).each( function(attr){
+					pluginData.set(attr.nodeName,attr.nodeValue);
 				});
 
-				
-				// TODO Why are we using XML if we don't respect structure anyway?
-				// for each plugin element in the configuration..
-				var plugin = resultXml.getElementsByTagName("plugin");
-				$A(plugin).each( function(node) {
-					
-					// get all element's attributes.
-					// TODO: What about: var pluginData = $H(node.attributes) !?
-					var pluginData = new Hash();
-					$A(node.attributes).each( function(attr){
-						pluginData.set(attr.nodeName,attr.nodeValue);
+				// ensure there's a name attribute.
+				if(!pluginData.get('name')) {
+					ORYX.Log.error("A plugin is not providing a name. Ingnoring this plugin.");
+					return;
+				}
+
+				// ensure there's a source attribute.
+				if(!pluginData.get('source')) {
+					ORYX.Log.error("Plugin with name '%0' doesn't provide a source attribute.", pluginData.get('name'));
+					return;
+				}
+
+				// Get all private Properties
+				var propertyNodes = node.getElementsByTagName("property");
+				var properties = [];
+				$A(propertyNodes).each(function(prop) {
+					var property = new Hash();
+
+					// Get all Attributes from the Node
+					var attributes = $A(prop.attributes)
+					attributes.each(function(attr){
+						property.set(attr.nodeName,attr.nodeValue);
 					});
-					
-					// ensure there's a name attribute.
-					if(!pluginData.get('name')) {
-						ORYX.Log.error("A plugin is not providing a name. Ingnoring this plugin.");
-						return;
-					}
 
-					// ensure there's a source attribute.
-					if(!pluginData.get('source')) {
-						ORYX.Log.error("Plugin with name '%0' doesn't provide a source attribute.", pluginData.get('name'));
-						return;
-					}
-					
-					// Get all private Properties
-					var propertyNodes = node.getElementsByTagName("property");
-					var properties = [];
-					$A(propertyNodes).each(function(prop) {
-						var property = new Hash(); 
-						
-						// Get all Attributes from the Node			
-						var attributes = $A(prop.attributes)
-						attributes.each(function(attr){
-							property.set(attr.nodeName,attr.nodeValue);
-						});
+					if(attributes.length > 0) {
+						properties.push(property)
+					};
 
-						if(attributes.length > 0) {
-							properties.push(property)
-						};
-					
-					});
-					
-					// Set all Global-Properties to the Properties
-					properties = properties.concat(globalProperties);
-					
-					// Set Properties to Plugin-Data
-					pluginData.set('properties',properties);
-					
-					// Get the RequieredNodes
-					var requireNodes = node.getElementsByTagName("requires");
-					var requires;
-					$A(requireNodes).each(function(req) {			
-						var namespace = $A(req.attributes).find(function(attr){ return attr.name == "namespace"})
-						if( namespace && namespace.nodeValue ){
-							if( !requires ){
-								requires = {namespaces:[]}
-							}
-						
-							requires.namespaces.push(namespace.nodeValue)
-						} 
-					});					
-					
-					// Set Requires to the Plugin-Data, if there is one
-					if( requires ){
-						pluginData.set('requires',requires);
-					}
-
-
-					// Get the RequieredNodes
-					var notUsesInNodes = node.getElementsByTagName("notUsesIn");
-					var notUsesIn;
-					$A(notUsesInNodes).each(function(not) {			
-						var namespace = $A(not.attributes).find(function(attr){ return attr.name == "namespace"})
-						if( namespace && namespace.nodeValue ){
-							if( !notUsesIn ){
-								notUsesIn = {namespaces:[]}
-							}
-						
-							notUsesIn.namespaces.push(namespace.nodeValue)
-						} 
-					});					
-					
-					// Set Requires to the Plugin-Data, if there is one
-					if( notUsesIn ){
-						pluginData.set('notUsesIn',notUsesIn);
-					}		
-					
-								
-					var url = ORYX.PATH + ORYX.CONFIG.PLUGINS_FOLDER + pluginData.get('source');
-		
-					ORYX.Log.debug("Requireing '%0'", url);
-		
-					// Add the Script-Tag to the Site
-					//Kickstart.require(url);
-		
-					ORYX.Log.info("Plugin '%0' successfully loaded.", pluginData.get('name'));
-		
-					// Add the Plugin-Data to all available Plugins
-					ORYX.availablePlugins.push(pluginData);
-		
 				});
+
+				// Set all Global-Properties to the Properties
+				properties = properties.concat(globalProperties);
+
+				// Set Properties to Plugin-Data
+				pluginData.set('properties',properties);
+
+				// Get the RequieredNodes
+				var requireNodes = node.getElementsByTagName("requires");
+				var requires;
+				$A(requireNodes).each(function(req) {
+					var namespace = $A(req.attributes).find(function(attr){ return attr.name == "namespace"})
+					if( namespace && namespace.nodeValue ){
+						if( !requires ){
+							requires = {namespaces:[]}
+						}
+
+						requires.namespaces.push(namespace.nodeValue)
+					}
+				});
+
+				// Set Requires to the Plugin-Data, if there is one
+				if( requires ){
+					pluginData.set('requires',requires);
+				}
+
+
+				// Get the RequieredNodes
+				var notUsesInNodes = node.getElementsByTagName("notUsesIn");
+				var notUsesIn;
+				$A(notUsesInNodes).each(function(not) {
+					var namespace = $A(not.attributes).find(function(attr){ return attr.name == "namespace"})
+					if( namespace && namespace.nodeValue ){
+						if( !notUsesIn ){
+							notUsesIn = {namespaces:[]}
+						}
+
+						notUsesIn.namespaces.push(namespace.nodeValue)
+					}
+				});
+
+				// Set Requires to the Plugin-Data, if there is one
+				if( notUsesIn ){
+					pluginData.set('notUsesIn',notUsesIn);
+				}
+
+
+				var url = ORYX.PATH + ORYX.CONFIG.PLUGINS_FOLDER + pluginData.get('source');
+
+				ORYX.Log.debug("Requireing '%0'", url);
+
+				// Add the Script-Tag to the Site
+				//Kickstart.require(url);
+
+				ORYX.Log.info("Plugin '%0' successfully loaded.", pluginData.get('name'));
+
+				// Add the Plugin-Data to all available Plugins
+				ORYX.availablePlugins.push(pluginData);
+
+			});
 		
-			},
-			onFailure:this._loadPluginsOnFails
-		});
+
 
 	},
 
@@ -5608,23 +5592,6 @@ ORYX.Core.StencilSet.Stencil = {
 		this._view;
 		this._properties = new Hash();
 
-		// check stencil consistency and set defaults.
-		/*with(this._jsonStencil) {
-			
-			if(!type) throw "Stencil does not provide type.";
-			if((type != "edge") && (type != "node"))
-				throw "Stencil type must be 'edge' or 'node'.";
-			if(!id || id == "") throw "Stencil does not provide valid id.";
-			if(!title || title == "")
-				throw "Stencil does not provide title";
-			if(!description) { description = ""; };
-			if(!groups) { groups = []; }
-			if(!roles) { roles = []; }
-
-			// add id of stencil to its roles
-			roles.push(id);
-		}*/
-		
 		//init all JSON values
 		if(!this._jsonStencil.type || !(this._jsonStencil.type === "edge" || this._jsonStencil.type === "node")) {
 			throw "ORYX.Core.StencilSet.Stencil(construct): Type is not defined.";
@@ -5689,7 +5656,8 @@ ORYX.Core.StencilSet.Stencil = {
 				this._view = xml.documentElement;
 				
 			} else {
-				throw "ORYX.Core.StencilSet.Stencil(_loadSVGOnSuccess): The response is not a SVG document."
+				console.log("Invalid svg view found: " + xml);
+				throw "ORYX.Core.StencilSet.Stencil(_loadSVGOnSuccess): The response is not a valid SVG document."
 			}
 		} else {
 			new Ajax.Request(
@@ -7932,49 +7900,13 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
      * @param source {URL} A reference to the stencil set specification.
      *
      */
-    construct: function(source, modelMetaData, editorId){
-        arguments.callee.$.construct.apply(this, arguments);
-        
-        if (!source) {
-            throw "ORYX.Core.StencilSet.StencilSet(construct): Parameter 'source' is not defined.";
-        }
-        
-        if (source.endsWith("/")) {
-            source = source.substr(0, source.length - 1);
-        }
-		
+    construct: function(baseUrl,data) {
 		this._extensions = new Hash();
-        
-        this._source = source;
-        this._baseUrl = source.substring(0, source.lastIndexOf("/") + 1);
-        
+        this._baseUrl = baseUrl;
         this._jsonObject = {};
-        
         this._stencils = new Hash();
-		this._availableStencils = new Hash();
-        
-		if(ORYX.CONFIG.BACKEND_SWITCH) {
-			this._baseUrl = "editor/stencilsets/bpmn2.0/";
-			this._source = "stencilsets/bpmn2.0/bpmn2.0.json";
-			
-			new Ajax.Request(ACTIVITI.CONFIG.contextRoot + '/editor/stencilset?version=' + Date.now(), {
-	            asynchronous: false,
-	            method: 'get',
-	            onSuccess: this._init.bind(this),
-	            onFailure: this._cancelInit.bind(this)
-	        });
-			
-		} else {
-			new Ajax.Request(source, {
-	            asynchronous: false,
-	            method: 'get',
-	            onSuccess: this._init.bind(this),
-	            onFailure: this._cancelInit.bind(this)
-	        });
-		}
-        
-        if (this.errornous) 
-            throw "Loading stencil set " + source + " failed.";
+        this._availableStencils = new Hash();
+        this._init(data);
     },
     
     /**
@@ -8262,7 +8194,7 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
     __handleStencilset: function(response){
 
 		//removed eval call seemed overkill.
-       this._jsonObject = response.responseJSON;
+       this._jsonObject = response;
         
         // assert it was parsed.
         if (!this._jsonObject) {
@@ -8367,7 +8299,7 @@ ORYX.Core.StencilSet._rulesByEditorInstance = new Hash();
  * 					the editor with the editorId.
  */
 ORYX.Core.StencilSet.stencilSets = function(editorId) {
-	var stencilSetNSs = ORYX.Core.StencilSet._StencilSetNSByEditorInstance[editorId];
+	var stencilSetNSs = ORYX.Core.StencilSet._StencilSetNSByEditorInstance.get(editorId);
 	var stencilSets = new Hash();
 	if(stencilSetNSs) {
 		stencilSetNSs.each(function(stencilSetNS) {
@@ -8395,7 +8327,7 @@ ORYX.Core.StencilSet.stencilSet = function(namespace) {
 	var splitted = namespace.split("#", 1);
 	if(splitted.length === 1) {
 		ORYX.Log.trace("Getting stencil set %0", splitted[0]);
-		return ORYX.Core.StencilSet._stencilSetsByNamespace[splitted[0] + "#"];
+		return ORYX.Core.StencilSet._stencilSetsByNamespace.get(splitted[0] + "#");
 	} else {
 		return undefined;
 	}
@@ -8430,10 +8362,10 @@ ORYX.Core.StencilSet.stencil = function(id) {
  * 									specified by its editor id.
  */
 ORYX.Core.StencilSet.rules = function(editorId) {
-	if(!ORYX.Core.StencilSet._rulesByEditorInstance[editorId]) {
-		ORYX.Core.StencilSet._rulesByEditorInstance[editorId] = new ORYX.Core.StencilSet.Rules();
+	if(!ORYX.Core.StencilSet._rulesByEditorInstance.get(editorId)) {
+		ORYX.Core.StencilSet._rulesByEditorInstance.set(editorId,new ORYX.Core.StencilSet.Rules());
 	}
-	return ORYX.Core.StencilSet._rulesByEditorInstance[editorId];
+	return ORYX.Core.StencilSet._rulesByEditorInstance.get(editorId);
 };
 
 /**
@@ -8445,39 +8377,30 @@ ORYX.Core.StencilSet.rules = function(editorId) {
  * It also stores which editor instance loads the stencil set and 
  * initializes the Rules object for the editor instance.
  */
-ORYX.Core.StencilSet.loadStencilSet = function(url, modelMetaData, editorId) {
+ORYX.Core.StencilSet.loadStencilSet = function(url,stencilSet,editorId) {
 	
-	// Alfresco: disable cache, because stencil sets are now flexible
-	
-	//var stencilSet = ORYX.Core.StencilSet._stencilSetsByUrl[url];
+	//store stencil set
+	ORYX.Core.StencilSet._stencilSetsByNamespace.set(stencilSet.namespace(),stencilSet);
+		
+	//store stencil set by url
+	ORYX.Core.StencilSet._stencilSetsByUrl.set(url,stencilSet);
 
-	//if(!stencilSet) {
-		//load stencil set
-		stencilSet = new ORYX.Core.StencilSet.StencilSet(url, modelMetaData, editorId);
-		
-		//store stencil set
-		ORYX.Core.StencilSet._stencilSetsByNamespace[stencilSet.namespace()] = stencilSet;
-		
-		//store stencil set by url
-		ORYX.Core.StencilSet._stencilSetsByUrl[url] = stencilSet;
-	//}
-	
 	var namespace = stencilSet.namespace();
 	
 	//store which editorInstance loads the stencil set
-	if(ORYX.Core.StencilSet._StencilSetNSByEditorInstance[editorId]) {
-		ORYX.Core.StencilSet._StencilSetNSByEditorInstance[editorId].push(namespace);
+	if(ORYX.Core.StencilSet._StencilSetNSByEditorInstance.get(editorId)) {
+		ORYX.Core.StencilSet._StencilSetNSByEditorInstance.get(editorId).push(namespace);
 	} else {
-		ORYX.Core.StencilSet._StencilSetNSByEditorInstance[editorId] = [namespace];
+		ORYX.Core.StencilSet._StencilSetNSByEditorInstance.set(editorId,[namespace]);
 	}
 
 	//store the rules for the editor instance
-	if(ORYX.Core.StencilSet._rulesByEditorInstance[editorId]) {
-		ORYX.Core.StencilSet._rulesByEditorInstance[editorId].initializeRules(stencilSet);
+	if(ORYX.Core.StencilSet._rulesByEditorInstance.get(editorId)) {
+		ORYX.Core.StencilSet._rulesByEditorInstance.get(editorId).initializeRules(stencilSet);
 	} else {
 		var rules = new ORYX.Core.StencilSet.Rules();
 		rules.initializeRules(stencilSet);
-		ORYX.Core.StencilSet._rulesByEditorInstance[editorId] = rules;
+		ORYX.Core.StencilSet._rulesByEditorInstance.set(editorId,rules);
 	}
 };
 
@@ -10193,8 +10116,7 @@ ORYX.Core.Canvas = ORYX.Core.AbstractShape.extend({
                     
 
         // prepare deserialisation parameter
-        shapes.each(
-            function(shape){
+        shapes.each(function(shape){
             	var properties = [];
                 for(field in shape.json.properties){
                     properties.push({
@@ -10591,9 +10513,6 @@ ORYX.Editor = {
 		
 		//meta data about the model for the signavio warehouse
 		//directory, new, name, description, revision, model (the model data)
-		
-		this.modelMetaData = config;
-		
 		var model = config;
 		
 		this.id = model.modelId;
@@ -10616,13 +10535,13 @@ ORYX.Editor = {
 		this._initEventListener();
 
 		// Load particular stencilset
-		if(ORYX.CONFIG.BACKEND_SWITCH) {
-			var ssUrl = (model.stencilset.namespace||model.stencilset.url).replace("#", "%23");
-        	ORYX.Core.StencilSet.loadStencilSet(ssUrl, this.modelMetaData, this.id);
-		} else {
-			var ssUrl = model.stencilset.url;
-        	ORYX.Core.StencilSet.loadStencilSet(ssUrl, this.modelMetaData, this.id);
-		}
+		// if(ORYX.CONFIG.BACKEND_SWITCH) {
+		// 	var ssUrl = (model.stencilset.namespace||model.stencilset.url).replace("#", "%23");
+		//ORYX.Core.StencilSet.loadStencilSet(ssUrl, this.modelMetaData, this.id);
+		// } else {
+		// 	var ssUrl = model.stencilset.url;
+        	// ORYX.Core.StencilSet.loadStencilSet(ssUrl, this.modelMetaData, this.id);
+		// }
 
 		// CREATES the canvas
 		this._createCanvas(model.stencil ? model.stencil.id : null, model.properties);
@@ -10651,7 +10570,9 @@ ORYX.Editor = {
             this.getCanvas().update();
 			loadContentFinished = true;
 			initFinished();
+			this.handleEvents({type: ORYX.CONFIG.EVENT_EDITOR_INIT_COMPLETED})
 		}.bind(this), 200);
+
 	},
 	
 	_finishedLoading: function() {
@@ -11282,7 +11203,9 @@ ORYX.Editor = {
 		// Force to update the selection
 		this.selection = [null];
 		this.setSelection([]);
-		
+
+		console.log("Loaded by Serialized");
+
         return shapes;
     },
 	
@@ -17555,6 +17478,8 @@ ORYX.Plugins.Edit.DeleteCommand = ORYX.Core.Command.extend({
         this.facade.setSelection([]);
         this.facade.getCanvas().update();		
 		this.facade.updateSelection();
+
+        this.facade.handleEvents({type: ORYX.CONFIG.ACTION_DELETE_COMPLETED});
         
     },
     rollback: function(){
@@ -23953,4 +23878,6 @@ new function(){
 		
 	ORYX.Plugins.BPMN2_0 = ORYX.Plugins.AbstractPlugin.extend(ORYX.Plugins.BPMN2_0);
 	
-}()	
+}();
+
+//end of bpmn2.0.js

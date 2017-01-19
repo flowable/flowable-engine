@@ -425,8 +425,7 @@ ORYX.Core.Canvas = ORYX.Core.AbstractShape.extend({
                     
 
         // prepare deserialisation parameter
-        shapes.each(
-            function(shape){
+        shapes.each(function(shape){
             	var properties = [];
                 for(field in shape.json.properties){
                     properties.push({
