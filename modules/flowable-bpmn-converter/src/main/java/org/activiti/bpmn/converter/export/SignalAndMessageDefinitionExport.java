@@ -50,7 +50,7 @@ public class SignalAndMessageDefinitionExport implements BpmnXMLConstants {
       xtw.writeAttribute(ATTRIBUTE_ID, signal.getId());
       xtw.writeAttribute(ATTRIBUTE_NAME, signal.getName());
       if (signal.getScope() != null) {
-        xtw.writeAttribute(ACTIVITI_EXTENSIONS_NAMESPACE, ATTRIBUTE_SCOPE, signal.getScope());
+        xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_SCOPE, signal.getScope());
       }
       xtw.writeEndElement();
     }
