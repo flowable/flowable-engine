@@ -18,62 +18,62 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.activiti.bpmn.constants.BpmnXMLConstants;
 import org.activiti.bpmn.converter.util.BpmnXMLUtil;
-import org.activiti.bpmn.model.EventSubProcess;
+import org.activiti.bpmn.model.*;
 import org.activiti.bpmn.model.Process;
-import org.activiti.bpmn.model.SubProcess;
-import org.activiti.bpmn.model.Transaction;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Tijs Rademakers
  */
 public class SubProcessParser implements BpmnXMLConstants {
-  
-  public void parse(XMLStreamReader xtr, List<SubProcess> activeSubProcessList, Process activeProcess) {
-  	SubProcess subProcess = null;
-  	if (ELEMENT_TRANSACTION.equalsIgnoreCase(xtr.getLocalName())) {
-  	  subProcess = new Transaction();
-  	} else if (ATTRIBUTE_VALUE_TRUE.equalsIgnoreCase(xtr.getAttributeValue(null, ATTRIBUTE_TRIGGERED_BY))) {
+
+	public void parse(XMLStreamReader xtr, List<SubProcess> activeSubProcessList, Process activeProcess) {
+		SubProcess subProcess = null;
+		if (ELEMENT_TRANSACTION.equalsIgnoreCase(xtr.getLocalName())) {
+			subProcess = new Transaction();
+		} else if (ATTRIBUTE_VALUE_TRUE.equalsIgnoreCase(xtr.getAttributeValue(null, ATTRIBUTE_TRIGGERED_BY))) {
 			subProcess = new EventSubProcess();
+		} else if (ATTRIBUTE_VALUE_TRUE.equalsIgnoreCase(xtr.getAttributeValue(null, "collapsed"))) {
+			subProcess = new CollapsedSubProcess();
 		} else {
 			subProcess = new SubProcess();
 		}
-  	BpmnXMLUtil.addXMLLocation(subProcess, xtr);
+		BpmnXMLUtil.addXMLLocation(subProcess, xtr);
 		activeSubProcessList.add(subProcess);
-		
+
 		subProcess.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
 		subProcess.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
-    
-		boolean async = false;
-    String asyncString = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_ACTIVITY_ASYNCHRONOUS, xtr);
-    if (ATTRIBUTE_VALUE_TRUE.equalsIgnoreCase(asyncString)) {
-      async = true;
-    }
-    
-    boolean notExclusive = false;
-    String exclusiveString = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_ACTIVITY_EXCLUSIVE, xtr);
-    if (ATTRIBUTE_VALUE_FALSE.equalsIgnoreCase(exclusiveString)) {
-      notExclusive = true;
-    }
 
-    boolean forCompensation = false;
-    String compensationString = xtr.getAttributeValue(null, ATTRIBUTE_ACTIVITY_ISFORCOMPENSATION);
-    if (ATTRIBUTE_VALUE_TRUE.equalsIgnoreCase(compensationString)) {
-      forCompensation = true;
-    }
-		
+		boolean async = false;
+		String asyncString = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_ACTIVITY_ASYNCHRONOUS, xtr);
+		if (ATTRIBUTE_VALUE_TRUE.equalsIgnoreCase(asyncString)) {
+			async = true;
+		}
+
+		boolean notExclusive = false;
+		String exclusiveString = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_ACTIVITY_EXCLUSIVE, xtr);
+		if (ATTRIBUTE_VALUE_FALSE.equalsIgnoreCase(exclusiveString)) {
+			notExclusive = true;
+		}
+
+		boolean forCompensation = false;
+		String compensationString = xtr.getAttributeValue(null, ATTRIBUTE_ACTIVITY_ISFORCOMPENSATION);
+		if (ATTRIBUTE_VALUE_TRUE.equalsIgnoreCase(compensationString)) {
+			forCompensation = true;
+		}
+
 		subProcess.setAsynchronous(async);
 		subProcess.setNotExclusive(notExclusive);
-    subProcess.setForCompensation(forCompensation);
-    if(StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_DEFAULT))) {
-      subProcess.setDefaultFlow(xtr.getAttributeValue(null, ATTRIBUTE_DEFAULT));
-    }
-    
-    if(activeSubProcessList.size() > 1) {
-      activeSubProcessList.get(activeSubProcessList.size() - 2).addFlowElement(subProcess);
-      
-    } else {
-      activeProcess.addFlowElement(subProcess);
-    }
-  }
+		subProcess.setForCompensation(forCompensation);
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_DEFAULT))) {
+			subProcess.setDefaultFlow(xtr.getAttributeValue(null, ATTRIBUTE_DEFAULT));
+		}
+
+		if (activeSubProcessList.size() > 1) {
+			activeSubProcessList.get(activeSubProcessList.size() - 2).addFlowElement(subProcess);
+
+		} else {
+			activeProcess.addFlowElement(subProcess);
+		}
+	}
 }

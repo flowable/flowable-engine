@@ -114,6 +114,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         // scope constructs
         SubProcessJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
         EventSubProcessJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
+        CollapsedSubProcessJsonConverter.fillTypes(convertersToBpmnMap,convertersToJsonMap);
 
         // catch events
         CatchEventJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
@@ -742,15 +743,22 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                 if (STENCIL_SEQUENCE_FLOW.equals(stencilId) == false) {
 
                     GraphicInfo graphicInfo = new GraphicInfo();
-
                     JsonNode boundsNode = jsonChildNode.get(EDITOR_BOUNDS);
                     ObjectNode upperLeftNode = (ObjectNode) boundsNode.get(EDITOR_BOUNDS_UPPER_LEFT);
-                    graphicInfo.setX(upperLeftNode.get(EDITOR_BOUNDS_X).asDouble() + parentX);
-                    graphicInfo.setY(upperLeftNode.get(EDITOR_BOUNDS_Y).asDouble() + parentY);
-
                     ObjectNode lowerRightNode = (ObjectNode) boundsNode.get(EDITOR_BOUNDS_LOWER_RIGHT);
-                    graphicInfo.setWidth(lowerRightNode.get(EDITOR_BOUNDS_X).asDouble() - graphicInfo.getX() + parentX);
-                    graphicInfo.setHeight(lowerRightNode.get(EDITOR_BOUNDS_Y).asDouble() - graphicInfo.getY() + parentY);
+
+                    //a lane is a childshape of a pool but the bounds of the lane are the correct x,y
+                    if("BPMNDiagram".equals(stencilId)){
+                        graphicInfo.setX(upperLeftNode.get(EDITOR_BOUNDS_X).asDouble());
+                        graphicInfo.setY(upperLeftNode.get(EDITOR_BOUNDS_Y).asDouble());
+                        graphicInfo.setWidth(lowerRightNode.get(EDITOR_BOUNDS_X).asDouble()-graphicInfo.getX());
+                        graphicInfo.setHeight(lowerRightNode.get(EDITOR_BOUNDS_Y).asDouble()-graphicInfo.getY());
+                    }else{
+                        graphicInfo.setX(upperLeftNode.get(EDITOR_BOUNDS_X).asDouble() + parentX);
+                        graphicInfo.setY(upperLeftNode.get(EDITOR_BOUNDS_Y).asDouble() + parentY);
+                        graphicInfo.setWidth(lowerRightNode.get(EDITOR_BOUNDS_X).asDouble() - graphicInfo.getX() + parentX);
+                        graphicInfo.setHeight(lowerRightNode.get(EDITOR_BOUNDS_Y).asDouble() - graphicInfo.getY() + parentY);
+                    }
 
                     String childShapeId = jsonChildNode.get(EDITOR_SHAPE_ID).asText();
                     bpmnModel.addGraphicInfo(BpmnJsonConverterUtil.getElementId(jsonChildNode), graphicInfo);
@@ -780,7 +788,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
                 ObjectNode childNode = (ObjectNode) jsonChildNode;
                 String stencilId = BpmnJsonConverterUtil.getStencilId(childNode);
-                if (STENCIL_SUB_PROCESS.equals(stencilId)) {
+                if (STENCIL_SUB_PROCESS.equals(stencilId) || STENCIL_COLLAPSED_SUB_PROCESS.equals(stencilId) || "BPMNDiagram".equals(stencilId)) {
                     filterAllEdges(childNode, edgeMap, sourceAndTargetMap, shapeMap, sourceRefMap);
 
                 } else if (STENCIL_SEQUENCE_FLOW.equals(stencilId) || STENCIL_ASSOCIATION.equals(stencilId)) {

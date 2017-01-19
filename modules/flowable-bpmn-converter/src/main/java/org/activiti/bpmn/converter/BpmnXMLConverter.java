@@ -69,27 +69,8 @@ import org.activiti.bpmn.converter.parser.SubProcessParser;
 import org.activiti.bpmn.converter.util.BpmnXMLUtil;
 import org.activiti.bpmn.converter.util.InputStreamProvider;
 import org.activiti.bpmn.exceptions.XMLException;
-import org.activiti.bpmn.model.Activity;
-import org.activiti.bpmn.model.Artifact;
-import org.activiti.bpmn.model.Association;
-import org.activiti.bpmn.model.BaseElement;
-import org.activiti.bpmn.model.BooleanDataObject;
-import org.activiti.bpmn.model.BoundaryEvent;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.DateDataObject;
-import org.activiti.bpmn.model.DoubleDataObject;
-import org.activiti.bpmn.model.EventSubProcess;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.FlowNode;
-import org.activiti.bpmn.model.IntegerDataObject;
-import org.activiti.bpmn.model.LongDataObject;
-import org.activiti.bpmn.model.Pool;
+import org.activiti.bpmn.model.*;
 import org.activiti.bpmn.model.Process;
-import org.activiti.bpmn.model.SequenceFlow;
-import org.activiti.bpmn.model.StringDataObject;
-import org.activiti.bpmn.model.SubProcess;
-import org.activiti.bpmn.model.TextAnnotation;
-import org.activiti.bpmn.model.Transaction;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -576,7 +557,12 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
           }
         }
       }
-      
+
+      //TODO: there is an indicator in the graphic info field?
+      if(subProcess instanceof CollapsedSubProcess){
+      	xtw.writeAttribute("activiti:collapsed","true");
+	  }
+
       if (StringUtils.isNotEmpty(subProcess.getDocumentation())) {
 
         xtw.writeStartElement(ELEMENT_DOCUMENTATION);
