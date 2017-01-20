@@ -103,6 +103,7 @@ create table ACT_RU_JOB (
     REPEAT_ nvarchar(255),
     HANDLER_TYPE_ nvarchar(255),
     HANDLER_CFG_ nvarchar(4000),
+    ADV_HANDLER_CFG_ID_ nvarchar(64),
     TENANT_ID_ nvarchar(255) default '',
     primary key (ID_)
 );
@@ -124,6 +125,7 @@ create table ACT_RU_TIMER_JOB (
     REPEAT_ nvarchar(255),
     HANDLER_TYPE_ nvarchar(255),
     HANDLER_CFG_ nvarchar(4000),
+    ADV_HANDLER_CFG_ID_ nvarchar(64),
     TENANT_ID_ nvarchar(255) default '',
     primary key (ID_)
 );
@@ -143,6 +145,7 @@ create table ACT_RU_SUSPENDED_JOB (
     REPEAT_ nvarchar(255),
     HANDLER_TYPE_ nvarchar(255),
     HANDLER_CFG_ nvarchar(4000),
+    ADV_HANDLER_CFG_ID_ nvarchar(64),
     TENANT_ID_ nvarchar(255) default '',
     primary key (ID_)
 );
@@ -161,6 +164,7 @@ create table ACT_RU_DEADLETTER_JOB (
     REPEAT_ nvarchar(255),
     HANDLER_TYPE_ nvarchar(255),
     HANDLER_CFG_ nvarchar(4000),
+    ADV_HANDLER_CFG_ID_ nvarchar(64),
     TENANT_ID_ nvarchar(255) default '',
     primary key (ID_)
 );

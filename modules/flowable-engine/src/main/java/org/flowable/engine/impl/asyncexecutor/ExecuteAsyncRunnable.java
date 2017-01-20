@@ -109,10 +109,6 @@ public class ExecuteAsyncRunnable implements Runnable {
 
     } catch (Throwable exception) {
       handleFailedJob(exception);
-
-      // Finally, Throw the exception to indicate the ExecuteAsyncJobCmd failed
-      String message = "Job " + jobId + " failed";
-      log.error(message, exception);
     }
   }
   
@@ -174,10 +170,23 @@ public class ExecuteAsyncRunnable implements Runnable {
   }
 
   protected void handleFailedJob(final Throwable exception) {
+    AsyncRunnableExecutionExceptionHandler exceptionHandler = processEngineConfiguration.getAsyncRunnableExecutionExceptionHandler();
+    if (exceptionHandler != null && exceptionHandler.handleException(processEngineConfiguration, job, exception)) {
+      return;
+    }
+    defaultHandleFailedJob(exception);
+  }
+
+  protected void defaultHandleFailedJob(final Throwable exception) {
     processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
 
       @Override
       public Void execute(CommandContext commandContext) {
+        
+        if (log.isErrorEnabled()) {
+          log.error("Job " + jobId + " failed", exception);
+        }
+        
         if (job.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, job.getProcessDefinitionId())) {
           Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
           compatibilityHandler.handleFailedJob(job, exception);

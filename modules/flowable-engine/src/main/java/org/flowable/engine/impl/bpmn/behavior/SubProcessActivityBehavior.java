@@ -35,24 +35,17 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior {
 
   private static final long serialVersionUID = 1L;
+  
+  protected boolean isOnlyNoneStartEventAllowed;
+  
+  public SubProcessActivityBehavior() {
+    this.isOnlyNoneStartEventAllowed = true;
+  }
 
   public void execute(DelegateExecution execution) {
     SubProcess subProcess = getSubProcessFromExecution(execution);
 
-    FlowElement startElement = null;
-    if (CollectionUtil.isNotEmpty(subProcess.getFlowElements())) {
-      for (FlowElement subElement : subProcess.getFlowElements()) {
-        if (subElement instanceof StartEvent) {
-          StartEvent startEvent = (StartEvent) subElement;
-
-          // start none event
-          if (CollectionUtil.isEmpty(startEvent.getEventDefinitions())) {
-            startElement = startEvent;
-            break;
-          }
-        }
-      }
-    }
+    FlowElement startElement = getStartElement(subProcess);
 
     if (startElement == null) {
       throw new FlowableException("No initial activity found for subprocess " + subProcess.getId());
@@ -82,6 +75,24 @@ public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior {
       throw new FlowableException("Programmatic error: sub process behaviour can only be applied" + " to a SubProcess instance, but got an instance of " + flowElement);
     }
     return subProcess;
+  }
+  
+  protected FlowElement getStartElement(SubProcess subProcess) {
+    if (CollectionUtil.isNotEmpty(subProcess.getFlowElements())) {
+      for (FlowElement subElement : subProcess.getFlowElements()) {
+        if (subElement instanceof StartEvent) {
+          StartEvent startEvent = (StartEvent) subElement;
+          if (isOnlyNoneStartEventAllowed) {
+            if (CollectionUtil.isEmpty(startEvent.getEventDefinitions())) {
+              return startEvent;
+            }
+          } else {
+            return startEvent;
+          }
+        }
+      }
+    }
+    return null;
   }
 
   protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {

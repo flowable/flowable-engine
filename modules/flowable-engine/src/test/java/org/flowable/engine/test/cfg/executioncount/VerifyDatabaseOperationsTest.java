@@ -233,7 +233,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         "selectById org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl", 1L,
         "selectById org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityImpl", 1L,
         "selectById org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 1L,
-        "selectUnfinishedHistoricActivityInstanceExecutionIdAndActivityId", 2L,
+        "selectUnfinishedHistoricActivityInstanceExecutionIdAndActivityId", 1L,
         "selectTasksByParentTaskId", 1L,
         "selectExecutionsWithSameRootProcessInstanceId", 1L,
         "selectTasksByExecutionId", 1L

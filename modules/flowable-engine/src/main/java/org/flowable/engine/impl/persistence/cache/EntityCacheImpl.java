@@ -108,6 +108,7 @@ public class EntityCacheImpl implements EntityCache {
     return Collections.emptyList();
   }
   
+  @Override
   public Map<Class<?>, Map<String, CachedEntity>> getAllCachedEntities() {
     return cachedObjects;
   }

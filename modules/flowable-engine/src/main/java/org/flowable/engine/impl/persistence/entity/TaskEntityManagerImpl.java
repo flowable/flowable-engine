@@ -86,8 +86,6 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
       taskEntity.setExecutionId(execution.getId());
       taskEntity.setProcessInstanceId(execution.getProcessInstanceId());
       taskEntity.setProcessDefinitionId(execution.getProcessDefinitionId());
-      
-      getHistoryManager().recordTaskExecutionIdChange(taskEntity.getId(), taskEntity.getExecutionId());
     }
     
     insert(taskEntity, true);
@@ -105,7 +103,6 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     }
     
     getHistoryManager().recordTaskCreated(taskEntity, execution);
-    getHistoryManager().recordTaskId(taskEntity);
     if (taskEntity.getFormKey() != null) {
       getHistoryManager().recordTaskFormKeyChange(taskEntity.getId(), taskEntity.getFormKey());
     }
@@ -119,7 +116,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
       fireAssignmentEvents(taskEntity);
       
       if (taskEntity.getId() != null) {
-        getHistoryManager().recordTaskAssigneeChange(taskEntity.getId(), taskEntity.getAssignee());
+        getHistoryManager().recordTaskAssigneeChange(taskEntity, taskEntity.getAssignee());
         addAssigneeIdentityLinks(taskEntity);
         update(taskEntity);
       }
@@ -143,7 +140,6 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
   protected void fireAssignmentEvents(TaskEntity taskEntity) {
     getProcessEngineConfiguration().getListenerNotificationHelper()
       .executeTaskListeners(taskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
-    getHistoryManager().recordTaskAssignment(taskEntity);
 
     if (getEventDispatcher().isEnabled()) {
       getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, taskEntity));
@@ -151,7 +147,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
 
   }
 
-  private void addAssigneeIdentityLinks(TaskEntity taskEntity) {
+  protected void addAssigneeIdentityLinks(TaskEntity taskEntity) {
     if (taskEntity.getAssignee() != null && taskEntity.getProcessInstance() != null) {
       getIdentityLinkEntityManager().involveUser(taskEntity.getProcessInstance(), taskEntity.getAssignee(), IdentityLinkType.PARTICIPANT);
     }

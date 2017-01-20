@@ -24,6 +24,8 @@ import org.flowable.engine.impl.HistoricProcessInstanceQueryImpl;
  */
 public interface HistoricProcessInstanceEntityManager extends EntityManager<HistoricProcessInstanceEntity> {
   
+  HistoricProcessInstanceEntity create();
+  
   HistoricProcessInstanceEntity create(ExecutionEntity processInstanceExecutionEntity);
 
   long findHistoricProcessInstanceCountByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery);

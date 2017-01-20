@@ -125,10 +125,8 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
         if (task.getProcessInstanceId() != null) {
           commandContext.getIdentityLinkEntityManager().involveUser(task.getProcessInstance(), task.getAssignee(), IdentityLinkType.PARTICIPANT);
         }
-        commandContext.getHistoryManager().recordTaskAssigneeChange(task.getId(), task.getAssignee());
-
+        commandContext.getHistoryManager().recordTaskAssigneeChange(task, task.getAssignee());
         commandContext.getProcessEngineConfiguration().getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_ASSIGNMENT);
-        commandContext.getHistoryManager().recordTaskAssignment(task);
 
         if (commandContext.getEventDispatcher().isEnabled()) {
           commandContext.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, task));

@@ -159,6 +159,7 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
     super.delete(jobEntity);
 
     deleteExceptionByteArrayRef(jobEntity);
+    deleteAdvancedJobHandlerConfigurationByteArrayRef(jobEntity);
     removeExecutionLink(jobEntity);
     
     if (jobEntity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
@@ -195,6 +196,13 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
     ByteArrayRef exceptionByteArrayRef = jobEntity.getExceptionByteArrayRef();
     if (exceptionByteArrayRef != null) {
       exceptionByteArrayRef.delete();
+    }
+  }
+  
+  protected void deleteAdvancedJobHandlerConfigurationByteArrayRef(TimerJobEntity jobEntity) {
+    ByteArrayRef configurationByteArrayRef = jobEntity.getAdvancedJobHandlerConfigurationByteArrayRef();
+    if (configurationByteArrayRef != null) {
+      configurationByteArrayRef.delete();
     }
   }
   

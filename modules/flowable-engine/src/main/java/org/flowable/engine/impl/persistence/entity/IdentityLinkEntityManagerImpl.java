@@ -67,7 +67,7 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
   public void deleteIdentityLink(IdentityLinkEntity identityLink, boolean cascadeHistory) {
     delete(identityLink, false);
     if (cascadeHistory) {
-      getHistoryManager().deleteHistoricIdentityLink(identityLink.getId());
+      getHistoricIdentityLinkEntityManager().delete(identityLink.getId());
     }
     
     if (identityLink.getTask() != null && isTaskRelatedEntityCountEnabledGlobally()) {      

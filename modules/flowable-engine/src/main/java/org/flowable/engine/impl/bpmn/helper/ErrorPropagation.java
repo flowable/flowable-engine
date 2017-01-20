@@ -203,7 +203,7 @@ public class ErrorPropagation {
       }
       
       ExecutionEntity eventSubProcessExecution = executionEntityManager.createChildExecution(parentExecution);
-      eventSubProcessExecution.setCurrentFlowElement(event);
+      eventSubProcessExecution.setCurrentFlowElement(event.getSubProcess() != null ? event.getSubProcess() : event);
       Context.getAgenda().planContinueProcessOperation(eventSubProcessExecution);
       
     } else {

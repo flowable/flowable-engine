@@ -109,7 +109,10 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
         executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_END);
       }
       
-      commandContext.getHistoryManager().recordActivityEnd(execution, null);
+      if (!flowNode.getOutgoingFlows().isEmpty()) {
+        // If no sequence flow: will be handled by the deletion of executions
+        commandContext.getHistoryManager().recordActivityEnd(execution, null);
+      }
       
       if (!(execution.getCurrentFlowElement() instanceof SubProcess)) {
         Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(

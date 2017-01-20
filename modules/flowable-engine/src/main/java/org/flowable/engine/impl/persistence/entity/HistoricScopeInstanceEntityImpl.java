@@ -38,7 +38,9 @@ public abstract class HistoricScopeInstanceEntityImpl extends AbstractEntityNoRe
     if (this.endTime == null) {
       this.deleteReason = deleteReason;
       this.endTime = Context.getProcessEngineConfiguration().getClock().getCurrentTime();
-      this.durationInMillis = endTime.getTime() - startTime.getTime();
+      if (endTime != null && startTime != null) {
+        this.durationInMillis = endTime.getTime() - startTime.getTime();
+      }
     }
   }
 

@@ -81,22 +81,12 @@ public interface HistoryManager {
   void recordTaskCreated(TaskEntity task, ExecutionEntity execution);
 
   /**
-   * Record the assignment of task, if activity history is enabled.
-   */
-  void recordTaskAssignment(TaskEntity task);
-
-  /**
    * record task instance claim time, if audit history is enabled
    *
    * @param task
    */
 
   void recordTaskClaim(TaskEntity task);
-
-  /**
-   * Record the id of a the task associated with a historic activity, if activity history is enabled.
-   */
-  void recordTaskId(TaskEntity task);
 
   /**
    * Record task as ended, if audit history is enabled.
@@ -106,7 +96,7 @@ public interface HistoryManager {
   /**
    * Record task assignee change, if audit history is enabled.
    */
-  void recordTaskAssigneeChange(String taskId, String assignee);
+  void recordTaskAssigneeChange(TaskEntity task, String assignee);
 
   /**
    * Record task owner change, if audit history is enabled.
@@ -147,11 +137,6 @@ public interface HistoryManager {
    * Record task parent task id change, if audit history is enabled.
    */
   void recordTaskParentTaskIdChange(String taskId, String parentTaskId);
-
-  /**
-   * Record task execution id change, if audit history is enabled.
-   */
-  void recordTaskExecutionIdChange(String taskId, String executionId);
 
   /**
    * Record task definition key change, if audit history is enabled.
@@ -233,8 +218,6 @@ public interface HistoryManager {
    * Record the creation of a new {@link IdentityLink}, if audit history is enabled.
    */
   void recordIdentityLinkCreated(IdentityLinkEntity identityLink);
-
-  void deleteHistoricIdentityLink(String id);
 
   void updateProcessBusinessKeyInHistory(ExecutionEntity processInstance);
 

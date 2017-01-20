@@ -128,6 +128,7 @@ public class JobEntityManagerImpl extends AbstractEntityManager<JobEntity> imple
     super.delete(jobEntity);
 
     deleteExceptionByteArrayRef(jobEntity);
+    deleteAdvancedJobHandlerConfigurationByteArrayRef(jobEntity);
 
     removeExecutionLink(jobEntity);
     
@@ -169,6 +170,13 @@ public class JobEntityManagerImpl extends AbstractEntityManager<JobEntity> imple
     ByteArrayRef exceptionByteArrayRef = jobEntity.getExceptionByteArrayRef();
     if (exceptionByteArrayRef != null) {
       exceptionByteArrayRef.delete();
+    }
+  }
+  
+  protected void deleteAdvancedJobHandlerConfigurationByteArrayRef(JobEntity jobEntity) {
+    ByteArrayRef configurationByteArrayRef = jobEntity.getAdvancedJobHandlerConfigurationByteArrayRef();
+    if (configurationByteArrayRef != null) {
+      configurationByteArrayRef.delete();
     }
   }
 

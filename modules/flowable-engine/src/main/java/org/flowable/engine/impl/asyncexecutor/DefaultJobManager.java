@@ -265,14 +265,15 @@ public class DefaultJobManager implements JobManager {
     // when doing lots of exclusive jobs for the same process instance)
     if (job instanceof JobEntity) {
       JobEntity jobEntity = (JobEntity) job;
-      processEngineConfiguration.getJobEntityManager().delete(jobEntity.getId());
       
       JobEntity newJobEntity = processEngineConfiguration.getJobEntityManager().create();
       copyJobInfo(newJobEntity, jobEntity);
       newJobEntity.setId(null); // We want a new id to be assigned to this job
       newJobEntity.setLockExpirationTime(null);
       newJobEntity.setLockOwner(null);
+      
       processEngineConfiguration.getJobEntityManager().insert(newJobEntity);
+      processEngineConfiguration.getJobEntityManager().delete(jobEntity.getId());
       
       // We're not calling triggerExecutorIfNeeded here after the insert. The unacquire happened
       // for a reason (eg queue full or exclusive lock failure). No need to try it immediately again,
@@ -525,6 +526,9 @@ public class DefaultJobManager implements JobManager {
     copyToJob.setExecutionId(copyFromJob.getExecutionId());
     copyToJob.setId(copyFromJob.getId());
     copyToJob.setJobHandlerConfiguration(copyFromJob.getJobHandlerConfiguration());
+    if (copyFromJob.getAdvancedJobHandlerConfigurationByteArrayRef() != null) {
+      copyToJob.setAdvancedJobHandlerConfigurationBytes(copyFromJob.getAdvancedJobHandlerConfigurationByteArrayRef().getBytes());
+    }
     copyToJob.setJobHandlerType(copyFromJob.getJobHandlerType());
     copyToJob.setJobType(copyFromJob.getJobType());
     copyToJob.setExceptionMessage(copyFromJob.getExceptionMessage());

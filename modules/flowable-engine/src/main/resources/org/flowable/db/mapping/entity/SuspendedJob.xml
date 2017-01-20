@@ -17,6 +17,7 @@
 		<result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
         <result property="jobHandlerType" column="HANDLER_TYPE_" jdbcType="VARCHAR" />
         <result property="jobHandlerConfiguration" column="HANDLER_CFG_" jdbcType="VARCHAR" />
+        <result property="advancedJobHandlerConfigurationByteArrayRef" column="ADV_HANDLER_CFG_ID_" typeHandler="ByteArrayRefTypeHandler" />
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
         <result property="duedate" column="DUEDATE_" jdbcType="TIMESTAMP" />
         <result property="repeat" column="REPEAT_" jdbcType="VARCHAR" />
@@ -60,6 +61,7 @@
             REPEAT_,
             HANDLER_TYPE_,
             HANDLER_CFG_,
+            ADV_HANDLER_CFG_ID_,
             TENANT_ID_)
     values (#{id, jdbcType=VARCHAR},
     		#{revision, jdbcType=INTEGER},
@@ -75,6 +77,7 @@
             #{repeat, jdbcType=VARCHAR},
             #{jobHandlerType, jdbcType=VARCHAR},
             #{jobHandlerConfiguration, jdbcType=VARCHAR},
+            #{advancedJobHandlerConfigurationByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
             #{tenantId, jdbcType=VARCHAR}
     )
   	</insert>
@@ -95,6 +98,7 @@
             REPEAT_,
             HANDLER_TYPE_,
             HANDLER_CFG_,
+            ADV_HANDLER_CFG_ID_,
             TENANT_ID_) VALUES 
 	    <foreach collection="list" item="job" index="index" separator=","> 
 	        (#{job.id, jdbcType=VARCHAR},
@@ -111,6 +115,7 @@
 	         #{job.repeat, jdbcType=VARCHAR},
 	         #{job.jobHandlerType, jdbcType=VARCHAR},
 	         #{job.jobHandlerConfiguration, jdbcType=VARCHAR},
+	         #{job.advancedJobHandlerConfigurationByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
 	         #{job.tenantId, jdbcType=VARCHAR})
 	    </foreach>
   	</insert>
@@ -133,6 +138,7 @@
             REPEAT_,
             HANDLER_TYPE_,
             HANDLER_CFG_,
+            ADV_HANDLER_CFG_ID_,
             TENANT_ID_) VALUES 
           (#{job.id, jdbcType=VARCHAR},
            #{job.revision, jdbcType=INTEGER},
@@ -148,6 +154,7 @@
            #{job.repeat, jdbcType=VARCHAR},
            #{job.jobHandlerType, jdbcType=VARCHAR},
            #{job.jobHandlerConfiguration, jdbcType=VARCHAR},
+           #{job.advancedJobHandlerConfigurationByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
            #{job.tenantId, jdbcType=VARCHAR})
     </foreach>
     SELECT * FROM dual

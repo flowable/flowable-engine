@@ -13,55 +13,13 @@
 
 package org.flowable.engine.impl.bpmn.behavior;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.flowable.bpmn.model.EventSubProcess;
-import org.flowable.bpmn.model.StartEvent;
-import org.flowable.bpmn.model.ValuedDataObject;
-import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-
 /**
  * Implementation of the BPMN 2.0 event subprocess start event.
  * 
  * @author Tijs Rademakers
  */
-public class EventSubProcessErrorStartEventActivityBehavior extends AbstractBpmnActivityBehavior {
+public class EventSubProcessErrorStartEventActivityBehavior extends FlowNodeActivityBehavior {
 
   private static final long serialVersionUID = 1L;
 
-  public void execute(DelegateExecution execution) {
-    StartEvent startEvent = (StartEvent) execution.getCurrentFlowElement();
-    EventSubProcess eventSubProcess = (EventSubProcess) startEvent.getSubProcess();
-    ExecutionEntity executionEntity = (ExecutionEntity) execution;
-    
-    executionEntity.setCurrentFlowElement(eventSubProcess);
-    executionEntity.setEventScope(false);
-    executionEntity.setScope(true);
-
-    // initialize the template-defined data objects as variables
-    Map<String, Object> dataObjectVars = processDataObjects(eventSubProcess.getDataObjects());
-    if (dataObjectVars != null) {
-      executionEntity.setVariablesLocal(dataObjectVars);
-    }
-
-    ExecutionEntity startSubProcessExecution = Context.getCommandContext()
-        .getExecutionEntityManager().createChildExecution(executionEntity); 
-    startSubProcessExecution.setCurrentFlowElement(startEvent);
-    Context.getAgenda().planTakeOutgoingSequenceFlowsOperation(startSubProcessExecution, true);
-  }
-
-  protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {
-    Map<String, Object> variablesMap = new HashMap<String, Object>();
-    // convert data objects to process variables
-    if (dataObjects != null) {
-      for (ValuedDataObject dataObject : dataObjects) {
-        variablesMap.put(dataObject.getName(), dataObject.getValue());
-      }
-    }
-    return variablesMap;
-  }
 }

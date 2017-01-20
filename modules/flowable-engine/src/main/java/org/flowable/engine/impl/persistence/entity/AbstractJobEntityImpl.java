@@ -50,6 +50,7 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
 
   protected String jobHandlerType;
   protected String jobHandlerConfiguration;
+  protected ByteArrayRef advancedJobHandlerConfigurationByteArrayRef;
   
   protected ByteArrayRef exceptionByteArrayRef;
   protected String exceptionMessage;
@@ -65,6 +66,10 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
     
     if (exceptionByteArrayRef != null) {
       persistentState.put("exceptionByteArrayId", exceptionByteArrayRef.getId());
+    }
+    
+    if (advancedJobHandlerConfigurationByteArrayRef != null) {
+      persistentState.put("advancedJobHandlerConfigurationByteArrayRef", advancedJobHandlerConfigurationByteArrayRef.getId());
     }
     
     return persistentState;
@@ -164,6 +169,42 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
 
   public void setJobHandlerConfiguration(String jobHandlerConfiguration) {
     this.jobHandlerConfiguration = jobHandlerConfiguration;
+  }
+
+  public ByteArrayRef getAdvancedJobHandlerConfigurationByteArrayRef() {
+    return advancedJobHandlerConfigurationByteArrayRef;
+  }
+  
+  public String getAdvancedJobHandlerConfiguration() {
+    if (advancedJobHandlerConfigurationByteArrayRef == null) {
+      return null;
+    }
+    
+    byte[] bytes = advancedJobHandlerConfigurationByteArrayRef.getBytes();
+    if (bytes == null) {
+      return null;
+    }
+    
+    try {
+      return new String(bytes, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      throw new FlowableException("UTF-8 is not a supported encoding");
+    }
+  }
+
+  public void setAdvancedJobHandlerConfiguration(String jobHandlerConfiguration) {
+    if (advancedJobHandlerConfigurationByteArrayRef == null) {
+      advancedJobHandlerConfigurationByteArrayRef = new ByteArrayRef();
+    }
+    advancedJobHandlerConfigurationByteArrayRef.setValue("cfg", getUtf8Bytes(jobHandlerConfiguration));
+  }
+  
+  @Override
+  public void setAdvancedJobHandlerConfigurationBytes(byte[] bytes) {
+    if (advancedJobHandlerConfigurationByteArrayRef == null) {
+      advancedJobHandlerConfigurationByteArrayRef = new ByteArrayRef();
+    }
+    advancedJobHandlerConfigurationByteArrayRef.setValue("cfg", bytes);
   }
 
   public String getJobType() {

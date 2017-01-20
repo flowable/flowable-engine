@@ -21,6 +21,7 @@ import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EventGateway;
+import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.ExclusiveGateway;
 import org.flowable.bpmn.model.InclusiveGateway;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
@@ -52,6 +53,7 @@ import org.flowable.engine.impl.bpmn.behavior.CallActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.EventSubProcessActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessErrorStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessMessageStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessSignalStartEventActivityBehavior;
@@ -165,6 +167,8 @@ public interface ActivityBehaviorFactory {
   public abstract ParallelMultiInstanceBehavior createParallelMultiInstanceBehavior(Activity activity, AbstractBpmnActivityBehavior innerActivityBehavior);
 
   public abstract SubProcessActivityBehavior createSubprocessActivityBehavior(SubProcess subProcess);
+  
+  public abstract EventSubProcessActivityBehavior createEventSubprocessActivityBehavior(EventSubProcess eventSubProcess);
   
   public abstract EventSubProcessErrorStartEventActivityBehavior createEventSubProcessErrorStartEventActivityBehavior(StartEvent startEvent);
   

@@ -89,6 +89,7 @@ import org.flowable.engine.impl.agenda.DefaultFlowableEngineAgendaFactory;
 import org.flowable.engine.impl.app.AppDeployer;
 import org.flowable.engine.impl.app.AppResourceConverterImpl;
 import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.engine.impl.asyncexecutor.AsyncRunnableExecutionExceptionHandler;
 import org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.engine.impl.asyncexecutor.DefaultJobManager;
 import org.flowable.engine.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
@@ -170,6 +171,13 @@ import org.flowable.engine.impl.form.StringFormType;
 import org.flowable.engine.impl.history.DefaultHistoryManager;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.history.HistoryManager;
+import org.flowable.engine.impl.history.async.AsyncHistoryJobHandler;
+import org.flowable.engine.impl.history.async.AsyncHistoryJobProducer;
+import org.flowable.engine.impl.history.async.AsyncHistoryManager;
+import org.flowable.engine.impl.history.async.AsyncHistorySession;
+import org.flowable.engine.impl.history.async.AsyncHistorySessionFactory;
+import org.flowable.engine.impl.history.async.DefaultAsyncHistoryJobProducer;
+import org.flowable.engine.impl.history.async.UnacquireAsyncHistoryJobExceptionHandler;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.interceptor.CommandContextFactory;
 import org.flowable.engine.impl.interceptor.CommandContextInterceptor;
@@ -466,6 +474,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // History Manager
 
   protected HistoryManager historyManager;
+  
+  protected boolean isAsyncHistoryEnabled;
+  protected boolean isAsyncHistoryJsonGzipCompressionEnabled = true;
+  protected AsyncHistoryJobProducer asyncHistoryJobProducer;
 
   // Job Manager
 
@@ -517,6 +529,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected List<JobHandler> customJobHandlers;
   protected Map<String, JobHandler> jobHandlers;
+  protected AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler;
 
   // HELPERS //////////////////////////////////////////////////////////////////
   protected ProcessInstanceHelper processInstanceHelper;
@@ -1280,7 +1293,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void initHistoryManager() {
     if (historyManager == null) {
-      historyManager = new DefaultHistoryManager(this, historyLevel);
+      if (isAsyncHistoryEnabled) {
+        historyManager = new AsyncHistoryManager(this, historyLevel);
+      } else {
+        historyManager = new DefaultHistoryManager(this, historyLevel);
+      }
     }
   }
 
@@ -1302,6 +1319,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
       if (usingRelationalDatabase) {
         initDbSqlSessionFactory();
+      }
+      
+      if (isAsyncHistoryEnabled) {
+        initAsyncHistorySessionFactory();
       }
 
       addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
@@ -1333,6 +1354,21 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public DbSqlSessionFactory createDbSqlSessionFactory() {
     return new DbSqlSessionFactory();
+  }
+  
+  public void initAsyncHistorySessionFactory() {
+    AsyncHistorySessionFactory asyncHistorySessionFactory = new AsyncHistorySessionFactory();
+    if (asyncHistoryJobProducer == null) {
+      initDefaultAsyncHistoryJobProducer();
+    }
+    asyncHistorySessionFactory.setAsyncHistoryJobProducer(asyncHistoryJobProducer);
+    sessionFactories.put(AsyncHistorySession.class, asyncHistorySessionFactory);
+  }
+
+  protected void initDefaultAsyncHistoryJobProducer() {
+    DefaultAsyncHistoryJobProducer producer = new DefaultAsyncHistoryJobProducer();
+    producer.setJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
+    asyncHistoryJobProducer = producer;
   }
 
   public void initConfigurators() {
@@ -1693,6 +1729,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     ProcessEventJobHandler processEventJobHandler = new ProcessEventJobHandler();
     jobHandlers.put(processEventJobHandler.getType(), processEventJobHandler);
+    
+    if (isAsyncHistoryEnabled) {
+      initAsyncHistoryJobHandler();
+    }
 
     // if we have custom job handlers, register them
     if (getCustomJobHandlers() != null) {
@@ -1700,6 +1740,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         jobHandlers.put(customJobHandler.getType(), customJobHandler);
       }
     }
+  }
+  
+  protected void initAsyncHistoryJobHandler() {
+    AsyncHistoryJobHandler asyncHistoryJobHandler = new AsyncHistoryJobHandler();
+    asyncHistoryJobHandler.setJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
+    jobHandlers.put(asyncHistoryJobHandler.getType(), asyncHistoryJobHandler);
+    
+    asyncRunnableExecutionExceptionHandler = new UnacquireAsyncHistoryJobExceptionHandler();
   }
 
   // async executor
@@ -3511,6 +3559,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public void setCandidateManager(CandidateManager candidateManager) {
     this.candidateManager = candidateManager;
   }
+  
+  public AsyncRunnableExecutionExceptionHandler getAsyncRunnableExecutionExceptionHandler() {
+    return asyncRunnableExecutionExceptionHandler;
+  }
+
+  public ProcessEngineConfigurationImpl setAsyncRunnableExecutionExceptionHandler(
+      AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler) {
+    this.asyncRunnableExecutionExceptionHandler = asyncRunnableExecutionExceptionHandler;
+    return this;
+  }
 
   public HistoryManager getHistoryManager() {
     return historyManager;
@@ -3518,6 +3576,34 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setHistoryManager(HistoryManager historyManager) {
     this.historyManager = historyManager;
+    return this;
+  }
+  
+  public boolean isAsyncHistoryEnabled() {
+    return isAsyncHistoryEnabled;
+  }
+
+  public ProcessEngineConfigurationImpl setAsyncHistoryEnabled(boolean isAsyncHistoryEnabled) {
+    this.isAsyncHistoryEnabled = isAsyncHistoryEnabled;
+    return this;
+  }
+
+  public boolean isAsyncHistoryJsonGzipCompressionEnabled() {
+    return isAsyncHistoryJsonGzipCompressionEnabled;
+  }
+
+  public ProcessEngineConfigurationImpl setAsyncHistoryJsonGzipCompressionEnabled(
+      boolean isAsyncHistoryJsonGzipCompressionEnabled) {
+    this.isAsyncHistoryJsonGzipCompressionEnabled = isAsyncHistoryJsonGzipCompressionEnabled;
+    return this;
+  }
+  
+  public AsyncHistoryJobProducer getAsyncHistoryJobProducer() {
+    return asyncHistoryJobProducer;
+  }
+
+  public ProcessEngineConfigurationImpl setAsyncHistoryJobProducer(AsyncHistoryJobProducer asyncHistoryJobProducer) {
+    this.asyncHistoryJobProducer = asyncHistoryJobProducer;
     return this;
   }
 

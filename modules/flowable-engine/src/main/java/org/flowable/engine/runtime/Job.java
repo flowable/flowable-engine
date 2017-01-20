@@ -92,5 +92,5 @@ public interface Job {
    * Get the job configuration.
    */
   String getJobHandlerConfiguration();
-
+  
 }

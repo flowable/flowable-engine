@@ -337,6 +337,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
 
     StartEvent startEvent = new StartEvent();
     startEvent.setId("start");
+    startEvent.setName("The start");
     process.addFlowElement(startEvent);
 
     UserTask userTask = new UserTask();
@@ -346,6 +347,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
     process.addFlowElement(userTask);
 
     EndEvent endEvent = new EndEvent();
+    endEvent.setName("The end");
     endEvent.setId("theEnd");
     process.addFlowElement(endEvent);
 
