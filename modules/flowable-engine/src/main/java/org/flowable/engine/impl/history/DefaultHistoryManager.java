@@ -465,6 +465,8 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
         historicIdentityLinkEntity.setTaskId(historicTaskInstance.getId());
         historicIdentityLinkEntity.setType(IdentityLinkType.ASSIGNEE);
         historicIdentityLinkEntity.setUserId(historicTaskInstance.getAssignee());
+        Date time = getClock().getCurrentTime();
+        historicIdentityLinkEntity.setCreateTime(time);
         getHistoricIdentityLinkEntityManager().insert(historicIdentityLinkEntity, false);
       }
     }
@@ -486,6 +488,8 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
         historicIdentityLinkEntity.setTaskId(historicTaskInstance.getId());
         historicIdentityLinkEntity.setType(IdentityLinkType.OWNER);
         historicIdentityLinkEntity.setUserId(historicTaskInstance.getOwner());
+        Date time = getClock().getCurrentTime();
+        historicIdentityLinkEntity.setCreateTime(time);
         getHistoricIdentityLinkEntityManager().insert(historicIdentityLinkEntity, false);
       }
     }
