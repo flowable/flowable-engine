@@ -332,8 +332,8 @@ public class DefaultProcessDiagramCanvas {
     g.setPaint(originalPaint);
     if (image != null) {
       // calculate coordinates to center image
-      int imageX = (int) Math.round(graphicInfo.getX() + (graphicInfo.getWidth() / 2) - (image.getWidth() / 2 * scaleFactor));
-      int imageY = (int) Math.round(graphicInfo.getY() + (graphicInfo.getHeight() / 2) - (image.getHeight() / 2 * scaleFactor));  
+      int imageX = (int) Math.round(graphicInfo.getX() + (graphicInfo.getWidth() / 2) - (image.getWidth() / (2 * scaleFactor)));
+      int imageY = (int) Math.round(graphicInfo.getY() + (graphicInfo.getHeight() / 2) - (image.getHeight() / (2 * scaleFactor)));  
       g.drawImage(image, imageX, imageY,
           (int) (image.getWidth() / scaleFactor), (int) (image.getHeight() / scaleFactor), null);
     }
@@ -387,7 +387,7 @@ public class DefaultProcessDiagramCanvas {
     // event circles
     Ellipse2D outerCircle = new Ellipse2D.Double(graphicInfo.getX(), graphicInfo.getY(), 
         graphicInfo.getWidth(), graphicInfo.getHeight());
-    int innerCircleSize = (int) (4 / scaleFactor);
+    int innerCircleSize = (int) (2 / scaleFactor);
     if (innerCircleSize == 0) {
       innerCircleSize = 1;
     }
@@ -412,8 +412,8 @@ public class DefaultProcessDiagramCanvas {
 
     if (image != null) {
       // calculate coordinates to center image
-      int imageX = (int) (graphicInfo.getX() + (graphicInfo.getWidth() / 2) - (image.getWidth() / 2 * scaleFactor));
-      int imageY = (int) (graphicInfo.getY() + (graphicInfo.getHeight() / 2) - (image.getHeight() / 2 * scaleFactor));  
+      int imageX = (int) (graphicInfo.getX() + (graphicInfo.getWidth() / 2) - (image.getWidth() / (2 * scaleFactor)));
+      int imageY = (int) (graphicInfo.getY() + (graphicInfo.getHeight() / 2) - (image.getHeight() / (2 * scaleFactor)));  
       if (scaleFactor == 1.0 && "timer".equals(eventType)) {
         // move image one pixel to center timer image
         imageX++;
@@ -662,17 +662,17 @@ public class DefaultProcessDiagramCanvas {
   }
 
   public void drawTask(BufferedImage icon, String name, GraphicInfo graphicInfo, double scaleFactor) {
-    drawTask(name, graphicInfo);
+    drawTask(name, graphicInfo, scaleFactor);
     g.drawImage(icon, (int) (graphicInfo.getX() + ICON_PADDING / scaleFactor), 
         (int) (graphicInfo.getY() + ICON_PADDING / scaleFactor), 
         (int) (icon.getWidth() / scaleFactor), (int) (icon.getHeight() / scaleFactor), null);
   }
 
-  public void drawTask(String name, GraphicInfo graphicInfo) {
-    drawTask(name, graphicInfo, false);
+  public void drawTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
+    drawTask(name, graphicInfo, false, scaleFactor);
   }
   
-  public void drawPoolOrLane(String name, GraphicInfo graphicInfo) {
+  public void drawPoolOrLane(String name, GraphicInfo graphicInfo, double scaleFactor) {
     int x = (int) graphicInfo.getX();
     int y = (int) graphicInfo.getY();
     int width = (int) graphicInfo.getWidth();
@@ -680,7 +680,7 @@ public class DefaultProcessDiagramCanvas {
     g.drawRect(x, y, width, height);
     
     // Add the name as text, vertical
-    if(name != null && name.length() > 0) {
+    if (scaleFactor == 1.0 && name != null && name.length() > 0) {
       // Include some padding
       int availableTextSpace = height - 6;
 
@@ -701,7 +701,7 @@ public class DefaultProcessDiagramCanvas {
     }
   }
 
-  protected void drawTask(String name, GraphicInfo graphicInfo, boolean thickBorder) {
+  protected void drawTask(String name, GraphicInfo graphicInfo, boolean thickBorder, double scaleFactor) {
     Paint originalPaint = g.getPaint();
     int x = (int) graphicInfo.getX();
     int y = (int) graphicInfo.getY();
@@ -731,7 +731,7 @@ public class DefaultProcessDiagramCanvas {
 
     g.setPaint(originalPaint);
     // text
-    if (name != null && name.length() > 0) {
+    if (scaleFactor == 1.0 && name != null && name.length() > 0) {
       int boxWidth = width - (2 * TEXT_PADDING);
       int boxHeight = height - 16 - ICON_PADDING - ICON_PADDING - MARKER_WIDTH - 2 - 2;
       int boxX = x + width/2 - boxWidth/2;
@@ -863,7 +863,7 @@ public class DefaultProcessDiagramCanvas {
     drawTask(MULE_TASK_IMAGE, name, graphicInfo, scaleFactor);
   }
 
-  public void drawExpandedSubProcess(String name, GraphicInfo graphicInfo, Boolean isTriggeredByEvent, double scaleFactor) {
+  public void drawExpandedSubProcess(String name, GraphicInfo graphicInfo, boolean isTriggeredByEvent, double scaleFactor) {
     RoundRectangle2D rect = new RoundRectangle2D.Double(graphicInfo.getX(), graphicInfo.getY(), 
         graphicInfo.getWidth(), graphicInfo.getHeight(), 8, 8);
     
@@ -888,17 +888,17 @@ public class DefaultProcessDiagramCanvas {
     }
   }
 
-  public void drawCollapsedSubProcess(String name, GraphicInfo graphicInfo, Boolean isTriggeredByEvent) {
-    drawCollapsedTask(name, graphicInfo, false);
+  public void drawCollapsedSubProcess(String name, GraphicInfo graphicInfo, Boolean isTriggeredByEvent, double scaleFactor) {
+    drawCollapsedTask(name, graphicInfo, false, scaleFactor);
   }
 
-  public void drawCollapsedCallActivity(String name, GraphicInfo graphicInfo) {
-    drawCollapsedTask(name, graphicInfo, true);
+  public void drawCollapsedCallActivity(String name, GraphicInfo graphicInfo, double scaleFactor) {
+    drawCollapsedTask(name, graphicInfo, true, scaleFactor);
   }
 
-  protected void drawCollapsedTask(String name, GraphicInfo graphicInfo, boolean thickBorder) {
+  protected void drawCollapsedTask(String name, GraphicInfo graphicInfo, boolean thickBorder, double scaleFactor) {
     // The collapsed marker is now visualized separately
-    drawTask(name, graphicInfo, thickBorder);
+    drawTask(name, graphicInfo, thickBorder, scaleFactor);
   }
 
   public void drawCollapsedMarker(int x, int y, int width, int height) {
@@ -1086,7 +1086,7 @@ public class DefaultProcessDiagramCanvas {
     g.setStroke(originalStroke);
   }
 
-  public void drawTextAnnotation(String text, GraphicInfo graphicInfo) {
+  public void drawTextAnnotation(String text, GraphicInfo graphicInfo, double scaleFactor) {
     int x = (int) graphicInfo.getX();
     int y = (int) graphicInfo.getY();
     int width = (int) graphicInfo.getWidth();
@@ -1118,7 +1118,7 @@ public class DefaultProcessDiagramCanvas {
     int boxX = x + width/2 - boxWidth/2;
     int boxY = y + height/2 - boxHeight/2;
     
-    if (text != null && !text.isEmpty()) {
+    if (scaleFactor == 1.0 && text != null && !text.isEmpty()) {
       drawMultilineAnnotationText(text, boxX, boxY, boxWidth, boxHeight);
     }
 	  
@@ -1127,11 +1127,12 @@ public class DefaultProcessDiagramCanvas {
     g.setStroke(originalStroke);
   }
   
-  public void drawLabel(String text, GraphicInfo graphicInfo){
+  public void drawLabel(String text, GraphicInfo graphicInfo) {
 	  drawLabel(text, graphicInfo, true);
   }
-  public void drawLabel(String text, GraphicInfo graphicInfo, boolean centered){
-	float interline = 1.0f;
+  
+  public void drawLabel(String text, GraphicInfo graphicInfo, boolean centered) {
+    float interline = 1.0f;
 	
     // text
     if (text != null && text.length()>0) {
