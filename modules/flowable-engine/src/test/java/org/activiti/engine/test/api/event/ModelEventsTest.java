@@ -12,9 +12,9 @@
  */
 package org.activiti.engine.test.api.event;
 
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti.engine.repository.Model;
 
@@ -40,10 +40,10 @@ public class ModelEventsTest extends PluggableActivitiTestCase {
 
       // Check create event
       assertEquals(2, listener.getEventsReceived().size());
-      assertEquals(ActivitiEventType.ENTITY_CREATED, listener.getEventsReceived().get(0).getType());
+      assertEquals(ActivitiEngineEventType.ENTITY_CREATED, listener.getEventsReceived().get(0).getType());
       assertEquals(model.getId(), ((Model) ((ActivitiEntityEvent) listener.getEventsReceived().get(0)).getEntity()).getId());
 
-      assertEquals(ActivitiEventType.ENTITY_INITIALIZED, listener.getEventsReceived().get(1).getType());
+      assertEquals(ActivitiEngineEventType.ENTITY_INITIALIZED, listener.getEventsReceived().get(1).getType());
       assertEquals(model.getId(), ((Model) ((ActivitiEntityEvent) listener.getEventsReceived().get(1)).getEntity()).getId());
       listener.clearEventsReceived();
 
@@ -52,7 +52,7 @@ public class ModelEventsTest extends PluggableActivitiTestCase {
       model.setName("Updated");
       repositoryService.saveModel(model);
       assertEquals(1, listener.getEventsReceived().size());
-      assertEquals(ActivitiEventType.ENTITY_UPDATED, listener.getEventsReceived().get(0).getType());
+      assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, listener.getEventsReceived().get(0).getType());
       assertEquals(model.getId(), ((Model) ((ActivitiEntityEvent) listener.getEventsReceived().get(0)).getEntity()).getId());
       listener.clearEventsReceived();
 
@@ -60,14 +60,14 @@ public class ModelEventsTest extends PluggableActivitiTestCase {
       repositoryService.addModelEditorSource(model.getId(), "test".getBytes());
       repositoryService.addModelEditorSourceExtra(model.getId(), "test extra".getBytes());
       assertEquals(2, listener.getEventsReceived().size());
-      assertEquals(ActivitiEventType.ENTITY_UPDATED, listener.getEventsReceived().get(0).getType());
-      assertEquals(ActivitiEventType.ENTITY_UPDATED, listener.getEventsReceived().get(1).getType());
+      assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, listener.getEventsReceived().get(0).getType());
+      assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, listener.getEventsReceived().get(1).getType());
       listener.clearEventsReceived();
 
       // Delete model events
       repositoryService.deleteModel(model.getId());
       assertEquals(1, listener.getEventsReceived().size());
-      assertEquals(ActivitiEventType.ENTITY_DELETED, listener.getEventsReceived().get(0).getType());
+      assertEquals(ActivitiEngineEventType.ENTITY_DELETED, listener.getEventsReceived().get(0).getType());
       assertEquals(model.getId(), ((Model) ((ActivitiEntityEvent) listener.getEventsReceived().get(0)).getEntity()).getId());
       listener.clearEventsReceived();
 

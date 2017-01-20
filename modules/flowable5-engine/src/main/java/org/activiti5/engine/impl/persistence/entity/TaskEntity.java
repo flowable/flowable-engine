@@ -27,7 +27,7 @@ import org.activiti.bpmn.model.ActivitiListener;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.delegate.TaskListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti5.engine.ActivitiException;
@@ -136,9 +136,9 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
     
     if(commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
     	commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_CREATED, this));
+    			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_CREATED, this));
     	commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_INITIALIZED, this));
+    			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_INITIALIZED, this));
     }
   }
   
@@ -162,7 +162,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
     
     if(commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
     	commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_UPDATED, this));
+    			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_UPDATED, this));
     }
   }
   
@@ -190,7 +190,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
     
     if(Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
     	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    	    ActivitiEventBuilder.createEntityWithVariablesEvent(ActivitiEventType.TASK_COMPLETED, this, variablesMap, localScope));
+    	    ActivitiEventBuilder.createEntityWithVariablesEvent(ActivitiEngineEventType.TASK_COMPLETED, this, variablesMap, localScope));
     }
  
     Context
@@ -296,7 +296,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
     // Dispatch event, if needed
     if(Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
   		Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-  				ActivitiEventBuilder.createVariableEvent(ActivitiEventType.VARIABLE_CREATED, variableName, value, result.getType(), result.getTaskId(), 
+  				ActivitiEventBuilder.createVariableEvent(ActivitiEngineEventType.VARIABLE_CREATED, variableName, value, result.getType(), result.getTaskId(), 
   						result.getExecutionId(), getProcessInstanceId(), getProcessDefinitionId()));
     }
     return result;
@@ -310,7 +310,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
     // Dispatch event, if needed
     if(Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
     	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createVariableEvent(ActivitiEventType.VARIABLE_UPDATED, variableInstance.getName(), value, variableInstance.getType(), 
+    			ActivitiEventBuilder.createVariableEvent(ActivitiEngineEventType.VARIABLE_UPDATED, variableInstance.getName(), value, variableInstance.getType(), 
     					variableInstance.getTaskId(), variableInstance.getExecutionId(), getProcessInstanceId(), getProcessDefinitionId()));
     }
   }
@@ -556,12 +556,12 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
       if(commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       	if(dispatchAssignmentEvent) {
       		commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-      				ActivitiEventBuilder.createEntityEvent(ActivitiEventType.TASK_ASSIGNED, this));
+      				ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.TASK_ASSIGNED, this));
       	}
       	
       	if(dispatchUpdateEvent) {
       		commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-      				ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_UPDATED, this));
+      				ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_UPDATED, this));
       	}
       }
     }
@@ -601,7 +601,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
       if(dispatchUpdateEvent && commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       	if(dispatchUpdateEvent) {
       		commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-      				ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_UPDATED, this));
+      				ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_UPDATED, this));
       	}
       }
     }
@@ -628,7 +628,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
        if(dispatchUpdateEvent && commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
        	if(dispatchUpdateEvent) {
        		commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-       				ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_UPDATED, this));
+       				ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_UPDATED, this));
        	}
        }
      }
@@ -654,7 +654,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
       if(dispatchUpdateEvent && commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       	if(dispatchUpdateEvent) {
       		commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-      				ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_UPDATED, this));
+      				ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_UPDATED, this));
       	}
       }
     }

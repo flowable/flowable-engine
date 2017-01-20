@@ -13,10 +13,10 @@
 
 package org.activiti.engine.impl.jobexecutor;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.interceptor.Command;
-import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandContextCloseListener;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
@@ -53,7 +53,7 @@ public class FailedJobListener implements CommandContextCloseListener {
   public void closed(CommandContext context) {
     if (context.getEventDispatcher().isEnabled()) {
       context.getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEventType.JOB_EXECUTION_SUCCESS, job));
+          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.JOB_EXECUTION_SUCCESS, job));
     }
   }
 
@@ -61,7 +61,7 @@ public class FailedJobListener implements CommandContextCloseListener {
   public void closeFailure(CommandContext commandContext) {
     if (commandContext.getEventDispatcher().isEnabled()) {
       commandContext.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityExceptionEvent(
-        ActivitiEventType.JOB_EXECUTION_FAILURE, job, commandContext.getException()));
+        ActivitiEngineEventType.JOB_EXECUTION_FAILURE, job, commandContext.getException()));
     }
     
     CommandConfig commandConfig = commandExecutor.getDefaultConfig().transactionRequiresNew();

@@ -17,13 +17,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.common.impl.cfg.TransactionPropagation;
+import org.activiti.engine.common.impl.cfg.TransactionState;
+import org.activiti.engine.common.impl.interceptor.AbstractCommandContext;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.cfg.TransactionContext;
 import org.activiti.engine.impl.cfg.TransactionListener;
-import org.activiti.engine.impl.cfg.TransactionPropagation;
-import org.activiti.engine.impl.cfg.TransactionState;
 import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.interceptor.Command;
-import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.apache.ibatis.session.SqlSession;
@@ -32,16 +33,19 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Tom Baeyens
+ * @author Joram Barrez
  */
 public class StandaloneMybatisTransactionContext implements TransactionContext {
 
   private static Logger log = LoggerFactory.getLogger(StandaloneMybatisTransactionContext.class);
 
   protected CommandContext commandContext;
+  protected DbSqlSession dbSqlSession;
   protected Map<TransactionState, List<TransactionListener>> stateTransactionListeners;
 
-  public StandaloneMybatisTransactionContext(CommandContext commandContext) {
-    this.commandContext = commandContext;
+  public StandaloneMybatisTransactionContext(AbstractCommandContext commandContext) {
+    this.commandContext = (CommandContext) commandContext;
+    this.dbSqlSession = this.commandContext.getDbSqlSession();
   }
 
   public void addTransactionListener(TransactionState transactionState, TransactionListener transactionListener) {
@@ -62,7 +66,7 @@ public class StandaloneMybatisTransactionContext implements TransactionContext {
     fireTransactionEvent(TransactionState.COMMITTING, false);
     
     log.debug("committing the ibatis sql session...");
-    getDbSqlSession().commit();
+    dbSqlSession.commit();
     log.debug("firing event committed...");
     fireTransactionEvent(TransactionState.COMMITTED, true);
     
@@ -109,10 +113,6 @@ public class StandaloneMybatisTransactionContext implements TransactionContext {
     }
   }
 
-  protected DbSqlSession getDbSqlSession() {
-    return commandContext.getDbSqlSession();
-  }
-
   public void rollback() {
     try {
       try {
@@ -124,7 +124,7 @@ public class StandaloneMybatisTransactionContext implements TransactionContext {
         commandContext.exception(exception);
       } finally {
         log.debug("rolling back ibatis sql session...");
-        getDbSqlSession().rollback();
+        dbSqlSession.rollback();
       }
 
     } catch (Throwable exception) {

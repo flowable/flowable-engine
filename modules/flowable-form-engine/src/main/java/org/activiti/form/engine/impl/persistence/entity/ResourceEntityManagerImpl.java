@@ -15,8 +15,8 @@ package org.activiti.form.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 import org.activiti.form.engine.FormEngineConfiguration;
-import org.activiti.form.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.form.engine.impl.persistence.entity.data.ResourceDataManager;
 
 /**

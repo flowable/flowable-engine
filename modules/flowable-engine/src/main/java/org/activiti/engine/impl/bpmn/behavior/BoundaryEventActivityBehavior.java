@@ -15,14 +15,14 @@ package org.activiti.engine.impl.bpmn.behavior;
 import java.util.Collection;
 
 import org.activiti.bpmn.model.CallActivity;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.util.CollectionUtil;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.history.DeleteReason;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntityManager;
-import org.activiti.engine.impl.util.CollectionUtil;
 
 /**
  * @author Joram Barrez
@@ -150,7 +150,7 @@ public class BoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
       ExecutionEntity subProcessExecution = executionEntityManager.findSubProcessInstanceBySuperExecutionId(parentExecution.getId());
       if (subProcessExecution != null) {
         executionEntityManager.deleteProcessInstanceExecutionEntity(subProcessExecution.getId(), 
-            subProcessExecution.getCurrentActivityId(), deleteReason, true, false, true);
+            subProcessExecution.getCurrentActivityId(), deleteReason, true, true);
       }
     }
     

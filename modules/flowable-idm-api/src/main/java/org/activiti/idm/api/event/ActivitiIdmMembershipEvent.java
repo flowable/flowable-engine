@@ -12,12 +12,14 @@
  */
 package org.activiti.idm.api.event;
 
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+
 /**
  * An event related to group memberships.
  * 
  * @author Tijs Rademakers
  */
-public interface ActivitiIdmMembershipEvent extends ActivitiIdmEvent {
+public interface ActivitiIdmMembershipEvent extends ActivitiEvent {
 
   /**
    * @return related user. Returns null, if not related to a single user but rather to all members of the group.

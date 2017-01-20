@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 import org.activiti.idm.engine.IdmEngineConfiguration;
-import org.activiti.idm.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.IdentityInfoDataManager;
 
 /**

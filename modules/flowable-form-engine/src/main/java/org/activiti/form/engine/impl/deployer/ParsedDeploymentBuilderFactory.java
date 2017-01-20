@@ -12,22 +12,22 @@
  */
 package org.activiti.form.engine.impl.deployer;
 
-import org.activiti.form.engine.impl.parser.FormParseFactory;
+import org.activiti.form.engine.impl.parser.FormDefinitionParseFactory;
 import org.activiti.form.engine.impl.persistence.entity.FormDeploymentEntity;
 
 public class ParsedDeploymentBuilderFactory {
 
-  protected FormParseFactory formParseFactory;
+  protected FormDefinitionParseFactory formParseFactory;
 
   public ParsedDeploymentBuilder getBuilderForDeployment(FormDeploymentEntity deployment) {
     return new ParsedDeploymentBuilder(deployment, formParseFactory);
   }
   
-  public FormParseFactory getFormParseFactory() {
+  public FormDefinitionParseFactory getFormParseFactory() {
     return formParseFactory;
   }
 
-  public void setFormParseFactory(FormParseFactory formParseFactory) {
+  public void setFormParseFactory(FormDefinitionParseFactory formParseFactory) {
     this.formParseFactory = formParseFactory;
   }
   

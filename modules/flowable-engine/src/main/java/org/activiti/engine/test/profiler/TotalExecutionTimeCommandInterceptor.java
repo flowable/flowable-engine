@@ -1,8 +1,8 @@
 package org.activiti.engine.test.profiler;
 
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.AbstractCommandInterceptor;
 import org.activiti.engine.impl.interceptor.Command;
-import org.activiti.engine.impl.interceptor.CommandConfig;
 
 /**
  * @author Joram Barrez

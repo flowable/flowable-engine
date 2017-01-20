@@ -25,8 +25,8 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricDetail;
 import org.activiti.engine.history.HistoricFormProperty;
@@ -1347,7 +1347,8 @@ public class FullHistoryTest extends ResourceActivitiTestCase {
 
   // Test for https://activiti.atlassian.net/browse/ACT-2186
   @Deployment(resources = { "org/activiti/engine/test/api/oneTaskProcess.bpmn20.xml" })
-  public void testHistoricVariableRemovedWhenRuntimeVariableIsRemoved() {
+  public void testHistoricVariableRemovedWhenRuntimeVariableIsRemoved()
+      throws Exception {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("var1", "Hello");
     vars.put("var2", "World");
@@ -1371,6 +1372,7 @@ public class FullHistoryTest extends ResourceActivitiTestCase {
     }
 
     // Remove one variable
+    Thread.sleep(750);
     runtimeService.removeVariable(processInstance.getId(), "var2");
 
     // Verify runtime

@@ -14,8 +14,9 @@ package org.activiti5.engine.impl.bpmn.helper;
 
 import java.util.List;
 
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.activiti.engine.impl.delegate.event.ActivitiEngineEvent;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.impl.context.Context;
@@ -36,9 +37,10 @@ public class SignalThrowingEventListener extends BaseDelegateEventListener {
 
 	@Override
 	public void onEvent(ActivitiEvent event) {
-		if (isValidEvent(event)) {
+	  if (isValidEvent(event) && event instanceof ActivitiEngineEvent) {
+      ActivitiEngineEvent engineEvent = (ActivitiEngineEvent) event;
 
-			if (event.getProcessInstanceId() == null && processInstanceScope) {
+			if (engineEvent.getProcessInstanceId() == null && processInstanceScope) {
 				throw new ActivitiIllegalArgumentException(
 				    "Cannot throw process-instance scoped signal, since the dispatched event is not part of an ongoing process instance");
 			}
@@ -47,12 +49,12 @@ public class SignalThrowingEventListener extends BaseDelegateEventListener {
 			List<SignalEventSubscriptionEntity> subscriptionEntities = null;
 			if (processInstanceScope) {
 				subscriptionEntities = commandContext.getEventSubscriptionEntityManager()
-				    .findSignalEventSubscriptionsByProcessInstanceAndEventName(event.getProcessInstanceId(), signalName);
+				    .findSignalEventSubscriptionsByProcessInstanceAndEventName(engineEvent.getProcessInstanceId(), signalName);
 			} else {
 				String tenantId = null;
-				if (event.getProcessDefinitionId() != null) {
+				if (engineEvent.getProcessDefinitionId() != null) {
 					ProcessDefinition processDefinition = commandContext.getProcessEngineConfiguration()
-							.getDeploymentManager().findDeployedProcessDefinitionById(event.getProcessDefinitionId());
+							.getDeploymentManager().findDeployedProcessDefinitionById(engineEvent.getProcessDefinitionId());
 					tenantId = processDefinition.getTenantId();
 				}
 				subscriptionEntities = commandContext.getEventSubscriptionEntityManager()

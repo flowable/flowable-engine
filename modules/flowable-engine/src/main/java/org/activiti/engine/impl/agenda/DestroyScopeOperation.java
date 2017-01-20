@@ -2,7 +2,7 @@ package org.activiti.engine.impl.agenda;
 
 import java.util.Collection;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.DeadLetterJobEntity;
 import org.activiti.engine.impl.persistence.entity.DeadLetterJobEntityManager;

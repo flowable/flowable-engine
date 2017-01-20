@@ -1,8 +1,8 @@
 package org.activiti.spring;
 
+import org.activiti.engine.common.impl.util.DefaultClockImpl;
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.engine.impl.calendar.*;
-import org.activiti.engine.impl.util.DefaultClockImpl;
-import org.activiti.engine.runtime.Clock;
 
 /**
  * Creates an advanced cycle business calendar manager (ACBCM). The ACBCM can handle daylight savings changes when the scheduled time zone is different than the server time zone.

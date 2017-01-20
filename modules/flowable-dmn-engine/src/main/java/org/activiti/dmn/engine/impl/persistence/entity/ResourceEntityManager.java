@@ -14,6 +14,8 @@ package org.activiti.dmn.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.activiti.engine.common.impl.persistence.entity.EntityManager;
+
 /**
  * @author Joram Barrez
  */

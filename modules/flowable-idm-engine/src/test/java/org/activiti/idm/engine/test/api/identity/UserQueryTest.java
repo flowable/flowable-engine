@@ -15,10 +15,10 @@ package org.activiti.idm.engine.test.api.identity;
 
 import java.util.List;
 
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.idm.api.User;
 import org.activiti.idm.api.UserQuery;
-import org.activiti.idm.engine.ActivitiIdmException;
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
 import org.activiti.idm.engine.impl.persistence.entity.UserEntity;
 import org.activiti.idm.engine.test.PluggableActivitiIdmTestCase;
 
@@ -81,7 +81,7 @@ public class UserQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createUserQuery().userId(null).singleResult();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -100,7 +100,7 @@ public class UserQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createUserQuery().userFirstName(null).singleResult();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -119,7 +119,7 @@ public class UserQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createUserQuery().userFirstNameLike(null).singleResult();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -138,7 +138,7 @@ public class UserQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createUserQuery().userLastName(null).singleResult();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -168,7 +168,7 @@ public class UserQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createUserQuery().userLastNameLike(null).singleResult();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -184,7 +184,7 @@ public class UserQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createUserQuery().userEmail(null).singleResult();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -203,7 +203,7 @@ public class UserQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createUserQuery().userEmailLike(null).singleResult();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -232,13 +232,13 @@ public class UserQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createUserQuery().orderByUserId().list();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
 
     try {
       idmIdentityService.createUserQuery().orderByUserId().orderByUserEmail().list();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -260,7 +260,7 @@ public class UserQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createUserQuery().memberOfGroup(null).list();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -281,7 +281,7 @@ public class UserQueryTest extends PluggableActivitiIdmTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ActivitiIdmException e) {
+    } catch (ActivitiException e) {
     }
   }
 

@@ -13,12 +13,13 @@
 
 package org.activiti.engine.test.bpmn.subprocess.adhoc;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.activiti.bpmn.model.FlowNode;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
@@ -54,6 +55,43 @@ public class AdhocSubProcessTest extends PluggableActivitiTestCase {
     assertEquals(2, enabledActivities.size());
     
     runtimeService.completeAdhocSubProcess(execution.getId());
+    
+    Task afterTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+    assertEquals("After task", afterTask.getName());
+    
+    taskService.complete(afterTask.getId());
+    
+    assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
+  }
+  
+  @Deployment
+  public void testSimpleAdhocSubProcessViaExecution() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess");
+    List<Execution> executions = runtimeService.getAdhocSubProcessExecutions(pi.getId());
+    assertEquals(1, executions.size());
+    
+    List<FlowNode> enabledActivities = runtimeService.getEnabledActivitiesFromAdhocSubProcess(executions.get(0).getId());
+    assertEquals(2, enabledActivities.size());
+    
+    Execution newTaskExecution = runtimeService.executeActivityInAdhocSubProcess(executions.get(0).getId(), "subProcessTask");
+    assertNotNull(newTaskExecution);
+    assertNotNull(newTaskExecution.getId());
+    
+    Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("subProcessTask").singleResult();
+    assertEquals("Task in subprocess", subProcessTask.getName());
+
+    taskService.complete(subProcessTask.getId());
+    
+    executions = runtimeService.getAdhocSubProcessExecutions(pi.getId());
+    assertEquals(1, executions.size());
+    
+    enabledActivities = runtimeService.getEnabledActivitiesFromAdhocSubProcess(executions.get(0).getId());
+    assertEquals(2, enabledActivities.size());
+    
+    runtimeService.completeAdhocSubProcess(executions.get(0).getId());
+    
+    executions = runtimeService.getAdhocSubProcessExecutions(pi.getId());
+    assertEquals(0, executions.size());
     
     Task afterTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
     assertEquals("After task", afterTask.getName());
@@ -109,10 +147,15 @@ public class AdhocSubProcessTest extends PluggableActivitiTestCase {
           .list();
       
       assertEquals(3, historicTasks.size());
-      assertEquals("subProcessTask", historicTasks.get(0).getTaskDefinitionKey());
-      assertEquals("subProcessTask2", historicTasks.get(1).getTaskDefinitionKey());
-      assertEquals("afterTask", historicTasks.get(2).getTaskDefinitionKey());
-      
+      // only check for existence and assume that the SQL processing has ordered the values correctly
+      // see https://github.com/flowable/flowable-engine/issues/8
+      ArrayList tasks = new ArrayList(3);
+      tasks.add(historicTasks.get(0).getTaskDefinitionKey());
+      tasks.add(historicTasks.get(1).getTaskDefinitionKey());
+      tasks.add(historicTasks.get(2).getTaskDefinitionKey());
+      assertTrue(tasks.contains("subProcessTask"));
+      assertTrue(tasks.contains("subProcessTask2"));
+      assertTrue(tasks.contains("afterTask"));
     }
     
     assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());

@@ -12,11 +12,11 @@
  */
 package org.activiti.dmn.engine.impl.cmd;
 
-import org.activiti.dmn.engine.ActivitiDmnIllegalArgumentException;
-import org.activiti.dmn.engine.ActivitiDmnObjectNotFoundException;
 import org.activiti.dmn.engine.impl.interceptor.Command;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
 import org.activiti.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 
 /**
  * @author Tijs Rademakers
@@ -34,13 +34,13 @@ public class SetDeploymentCategoryCmd implements Command<Void> {
   public Void execute(CommandContext commandContext) {
 
     if (deploymentId == null) {
-      throw new ActivitiDmnIllegalArgumentException("Deployment id is null");
+      throw new ActivitiIllegalArgumentException("Deployment id is null");
     }
 
     DmnDeploymentEntity deployment = commandContext.getDeploymentEntityManager().findById(deploymentId);
 
     if (deployment == null) {
-      throw new ActivitiDmnObjectNotFoundException("No deployment found for id = '" + deploymentId + "'");
+      throw new ActivitiObjectNotFoundException("No deployment found for id = '" + deploymentId + "'");
     }
 
     // Update category

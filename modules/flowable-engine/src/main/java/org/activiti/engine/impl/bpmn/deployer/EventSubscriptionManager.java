@@ -23,7 +23,8 @@ import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.Signal;
 import org.activiti.bpmn.model.SignalEventDefinition;
 import org.activiti.bpmn.model.StartEvent;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.util.CollectionUtil;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.event.MessageEventHandler;
 import org.activiti.engine.impl.event.SignalEventHandler;
@@ -33,7 +34,6 @@ import org.activiti.engine.impl.persistence.entity.EventSubscriptionEntityManage
 import org.activiti.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
-import org.activiti.engine.impl.util.CollectionUtil;
 
 /**
  * Manages event subscriptions for newly-deployed process definitions and their previous versions.

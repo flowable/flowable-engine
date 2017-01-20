@@ -12,14 +12,15 @@
  */
 package org.activiti.engine.impl.cfg.standalone;
 
+import org.activiti.engine.common.impl.cfg.TransactionContextFactory;
 import org.activiti.engine.impl.cfg.TransactionContext;
-import org.activiti.engine.impl.cfg.TransactionContextFactory;
+import org.activiti.engine.impl.cfg.TransactionListener;
 import org.activiti.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Tom Baeyens
  */
-public class StandaloneMybatisTransactionContextFactory implements TransactionContextFactory {
+public class StandaloneMybatisTransactionContextFactory implements TransactionContextFactory<TransactionListener, CommandContext> {
 
   public TransactionContext openTransactionContext(CommandContext commandContext) {
     return new StandaloneMybatisTransactionContext(commandContext);

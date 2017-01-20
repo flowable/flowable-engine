@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,15 +13,24 @@
 
 package org.activiti.engine.impl.context;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Stack;
+
+import org.activiti.engine.FlowableEngineAgenda;
+import org.activiti.engine.common.impl.transaction.TransactionContextHolder;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
-import org.activiti.engine.ActivitiAgenda;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.cfg.TransactionContext;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.deploy.ProcessDefinitionInfoCacheObject;
 
-import java.util.*;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tom Baeyens
@@ -32,15 +41,14 @@ public class Context {
 
   protected static ThreadLocal<Stack<CommandContext>> commandContextThreadLocal = new ThreadLocal<Stack<CommandContext>>();
   protected static ThreadLocal<Stack<ProcessEngineConfigurationImpl>> processEngineConfigurationStackThreadLocal = new ThreadLocal<Stack<ProcessEngineConfigurationImpl>>();
-  protected static ThreadLocal<Stack<TransactionContext>> transactionContextThreadLocal = new ThreadLocal<Stack<TransactionContext>>();
   protected static ThreadLocal<Map<String, ObjectNode>> bpmnOverrideContextThreadLocal = new ThreadLocal<Map<String, ObjectNode>>();
-
+  
   protected static ThreadLocal<Activiti5CompatibilityHandler> activiti5CompatibilityHandlerThreadLocal = new ThreadLocal<Activiti5CompatibilityHandler>();
   // Fallback handler is only set by the v5 CommandContextInterceptor
   protected static ThreadLocal<Activiti5CompatibilityHandler> fallbackActiviti5CompatibilityHandlerThreadLocal = new ThreadLocal<Activiti5CompatibilityHandler>();
-
+  
   protected static ResourceBundle.Control resourceBundleControl = new ResourceBundleControl();
-
+  
   public static CommandContext getCommandContext() {
     Stack<CommandContext> stack = getStack(commandContextThreadLocal);
     if (stack.isEmpty()) {
@@ -49,7 +57,7 @@ public class Context {
     return stack.peek();
   }
 
-  public static ActivitiAgenda getAgenda() {
+  public static FlowableEngineAgenda getAgenda() {
     return getCommandContext().getAgenda();
   }
 
@@ -76,23 +84,19 @@ public class Context {
   public static void removeProcessEngineConfiguration() {
     getStack(processEngineConfigurationStackThreadLocal).pop();
   }
-
+  
   public static TransactionContext getTransactionContext() {
-    Stack<TransactionContext> stack = getStack(transactionContextThreadLocal);
-    if (stack.isEmpty()) {
-      return null;
-    }
-    return stack.peek();
+    return (TransactionContext) TransactionContextHolder.getTransactionContext();
   }
-
+  
   public static void setTransactionContext(TransactionContext transactionContext) {
-    getStack(transactionContextThreadLocal).push(transactionContext);
+    TransactionContextHolder.setTransactionContext(transactionContext);
   }
-
+  
   public static void removeTransactionContext() {
-    getStack(transactionContextThreadLocal).pop();
+    TransactionContextHolder.removeTransactionContext();
   }
-
+  
   protected static <T> Stack<T> getStack(ThreadLocal<Stack<T>> threadLocal) {
     Stack<T> stack = threadLocal.get();
     if (stack == null) {
@@ -110,7 +114,7 @@ public class Context {
     }
     return elementProperties;
   }
-
+  
   public static ObjectNode getLocalizationElementProperties(String language, String id, String processDefinitionId, boolean useFallback) {
     ObjectNode definitionInfoNode = getProcessDefinitionInfoNode(processDefinitionId);
     ObjectNode localizationProperties = null;
@@ -118,14 +122,14 @@ public class Context {
       if (useFallback == false) {
         localizationProperties = getProcessEngineConfiguration().getDynamicBpmnService().getLocalizationElementProperties(
             language, id, definitionInfoNode);
-
+        
       } else {
         HashSet<Locale> candidateLocales = new LinkedHashSet<Locale>();
         candidateLocales.addAll(resourceBundleControl.getCandidateLocales(id, Locale.forLanguageTag(language)));
         for (Locale locale : candidateLocales) {
           localizationProperties = getProcessEngineConfiguration().getDynamicBpmnService().getLocalizationElementProperties(
               locale.toLanguageTag(), id, definitionInfoNode);
-
+          
           if (localizationProperties != null) {
             break;
           }
@@ -134,24 +138,24 @@ public class Context {
     }
     return localizationProperties;
   }
-
+  
   public static void removeBpmnOverrideContext() {
     bpmnOverrideContextThreadLocal.remove();
   }
-
+  
   protected static ObjectNode getProcessDefinitionInfoNode(String processDefinitionId) {
     Map<String, ObjectNode> bpmnOverrideMap = getBpmnOverrideContext();
     if (bpmnOverrideMap.containsKey(processDefinitionId) == false) {
       ProcessDefinitionInfoCacheObject cacheObject = getProcessEngineConfiguration().getDeploymentManager()
           .getProcessDefinitionInfoCache()
           .get(processDefinitionId);
-
+      
       addBpmnOverrideElement(processDefinitionId, cacheObject.getInfoNode());
     }
-
+    
     return getBpmnOverrideContext().get(processDefinitionId);
   }
-
+  
   protected static Map<String, ObjectNode> getBpmnOverrideContext() {
     Map<String, ObjectNode> bpmnOverrideMap = bpmnOverrideContextThreadLocal.get();
     if (bpmnOverrideMap == null) {
@@ -159,7 +163,7 @@ public class Context {
     }
     return bpmnOverrideMap;
   }
-
+  
   protected static void addBpmnOverrideElement(String id, ObjectNode infoNode) {
     Map<String, ObjectNode> bpmnOverrideMap = bpmnOverrideContextThreadLocal.get();
     if (bpmnOverrideMap == null) {
@@ -168,7 +172,7 @@ public class Context {
     }
     bpmnOverrideMap.put(id, infoNode);
   }
-
+  
   public static Activiti5CompatibilityHandler getActiviti5CompatibilityHandler() {
     return activiti5CompatibilityHandlerThreadLocal.get();
   }
@@ -180,7 +184,7 @@ public class Context {
   public static void removeActiviti5CompatibilityHandler() {
     activiti5CompatibilityHandlerThreadLocal.remove();
   }
-
+  
   public static Activiti5CompatibilityHandler getFallbackActiviti5CompatibilityHandler() {
     return fallbackActiviti5CompatibilityHandlerThreadLocal.get();
   }
@@ -192,7 +196,7 @@ public class Context {
   public static void removeFallbackActiviti5CompatibilityHandler() {
     fallbackActiviti5CompatibilityHandlerThreadLocal.remove();
   }
-
+  
   public static class ResourceBundleControl extends ResourceBundle.Control {
     @Override
     public List<Locale> getCandidateLocales(String baseName, Locale locale) {

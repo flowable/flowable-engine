@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.impl.persistence.cache;
 
-import org.activiti.engine.impl.persistence.entity.Entity;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
 
 /**
  * @author Joram Barrez

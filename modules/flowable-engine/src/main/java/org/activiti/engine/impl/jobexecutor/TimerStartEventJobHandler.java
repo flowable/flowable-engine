@@ -13,8 +13,8 @@
 package org.activiti.engine.impl.jobexecutor;
 
 import org.activiti.bpmn.model.FlowElement;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.cmd.StartProcessInstanceCmd;
 import org.activiti.engine.impl.interceptor.CommandContext;
@@ -48,7 +48,7 @@ public class TimerStartEventJobHandler extends TimerEventHandler implements JobH
       if (!processDefinitionEntity.isSuspended()) {
         
         if (commandContext.getEventDispatcher().isEnabled()) {
-          commandContext.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.TIMER_FIRED, job));
+          commandContext.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.TIMER_FIRED, job));
         }
         
         // Find initial flow element matching the signal start event

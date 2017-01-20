@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.BoundaryEvent;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.history.DeleteReason;
 import org.activiti.engine.impl.bpmn.helper.ScopeUtil;

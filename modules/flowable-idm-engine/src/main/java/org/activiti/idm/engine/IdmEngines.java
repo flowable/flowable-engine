@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -27,7 +28,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
+import org.activiti.engine.common.EngineInfo;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.util.IoUtil;
+import org.activiti.idm.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,18 +43,19 @@ public abstract class IdmEngines {
 
   protected static boolean isInitialized;
   protected static Map<String, IdmEngine> idmEngines = new HashMap<String, IdmEngine>();
-  protected static Map<String, IdmEngineInfo> idmEngineInfosByName = new HashMap<String, IdmEngineInfo>();
-  protected static Map<String, IdmEngineInfo> idmEngineInfosByResourceUrl = new HashMap<String, IdmEngineInfo>();
-  protected static List<IdmEngineInfo> idmEngineInfos = new ArrayList<IdmEngineInfo>();
+  protected static Map<String, EngineInfo> idmEngineInfosByName = new HashMap<String, EngineInfo>();
+  protected static Map<String, EngineInfo> idmEngineInfosByResourceUrl = new HashMap<String, EngineInfo>();
+  protected static List<EngineInfo> idmEngineInfos = new ArrayList<EngineInfo>();
 
   /**
-   * Initializes all dmn engines that can be found on the classpath for resources <code>activiti.dmn.cfg.xml</code> and for resources <code>activiti-dmn-context.xml</code> (Spring style
+   * Initializes all idm engines that can be found on the classpath for resources <code>activiti.idm.cfg.xml</code> and for resources
+   * <code>activiti-idm-context.xml</code> (Spring style
    * configuration).
    */
   public synchronized static void init() {
     if (!isInitialized()) {
       if (idmEngines == null) {
-        // Create new map to store dmn engines if current map is null
+        // Create new map to store idm engines if current map is null
         idmEngines = new HashMap<String, IdmEngine>();
       }
       ClassLoader classLoader = IdmEngines.class.getClassLoader();
@@ -58,7 +63,7 @@ public abstract class IdmEngines {
       try {
         resources = classLoader.getResources("activiti.idm.cfg.xml");
       } catch (IOException e) {
-        throw new ActivitiIdmException("problem retrieving activiti.idm.cfg.xml resources on the classpath: " + System.getProperty("java.class.path"), e);
+        throw new ActivitiException("problem retrieving activiti.idm.cfg.xml resources on the classpath: " + System.getProperty("java.class.path"), e);
       }
 
       // Remove duplicated configuration URL's using set. Some
@@ -70,40 +75,63 @@ public abstract class IdmEngines {
       for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext();) {
         URL resource = iterator.next();
         log.info("Initializing idm engine using configuration '{}'", resource.toString());
-        initFormEngineFromResource(resource);
+        initIdmEngineFromResource(resource);
       }
 
-      /*
-       * try { resources = classLoader.getResources("activiti-form-context.xml"); } catch (IOException e) { throw new ActivitiDmnException(
-       * "problem retrieving activiti-dmn-context.xml resources on the classpath: " + System.getProperty("java.class.path"), e); } while (resources.hasMoreElements()) { URL resource =
-       * resources.nextElement(); log.info("Initializing dmn engine using Spring configuration '{}'", resource.toString()); initDmnEngineFromSpringResource(resource); }
-       */
+      try { 
+        resources = classLoader.getResources("activiti-idm-context.xml"); 
+      } catch (IOException e) { 
+        throw new ActivitiException("problem retrieving activiti-idm-context.xml resources on the classpath: " + System.getProperty("java.class.path"), e); 
+      } 
+      
+      while (resources.hasMoreElements()) { 
+        URL resource = resources.nextElement(); 
+        log.info("Initializing idm engine using Spring configuration '{}'", resource.toString());
+        initIdmEngineFromSpringResource(resource); 
+      }
 
       setInitialized(true);
     } else {
       log.info("Idm engines already initialized");
     }
   }
+  
+  protected static void initIdmEngineFromSpringResource(URL resource) {
+    try {
+      Class<?> springConfigurationHelperClass = ReflectUtil.loadClass("org.activiti.idm.spring.SpringIdmConfigurationHelper");
+      Method method = springConfigurationHelperClass.getDeclaredMethod("buildDmnEngine", new Class<?>[] { URL.class });
+      IdmEngine idmEngine = (IdmEngine) method.invoke(null, new Object[] { resource });
+
+      String idmEngineName = idmEngine.getName();
+      EngineInfo idmEngineInfo = new EngineInfo(idmEngineName, resource.toString(), null);
+      idmEngineInfosByName.put(idmEngineName, idmEngineInfo);
+      idmEngineInfosByResourceUrl.put(resource.toString(), idmEngineInfo);
+
+    } catch (Exception e) {
+      throw new ActivitiException("couldn't initialize idm engine from spring configuration resource " + resource.toString() + ": " + e.getMessage(), e);
+    }
+  }
 
   /**
-   * Registers the given dmn engine. No {@link IdmEngineInfo} will be available for this dmn engine. An engine that is registered will be closed when the {@link IdmEngines#destroy()} is called.
+   * Registers the given idm engine. No {@link IdmEngineInfo} will be available for this idm engine. An engine that is registered will be closed when the
+   * {@link IdmEngines#destroy()} is called.
    */
   public static void registerIdmEngine(IdmEngine idmEngine) {
     idmEngines.put(idmEngine.getName(), idmEngine);
   }
 
   /**
-   * Unregisters the given dmn engine.
+   * Unregisters the given idm engine.
    */
   public static void unregister(IdmEngine idmEngine) {
     idmEngines.remove(idmEngine.getName());
   }
 
-  private static IdmEngineInfo initFormEngineFromResource(URL resourceUrl) {
-    IdmEngineInfo idmEngineInfo = idmEngineInfosByResourceUrl.get(resourceUrl.toString());
-    // if there is an existing dmn engine info
+  private static EngineInfo initIdmEngineFromResource(URL resourceUrl) {
+    EngineInfo idmEngineInfo = idmEngineInfosByResourceUrl.get(resourceUrl.toString());
+    // if there is an existing idm engine info
     if (idmEngineInfo != null) {
-      // remove that dmn engine from the member fields
+      // remove that idm engine from the member fields
       idmEngineInfos.remove(idmEngineInfo);
       if (idmEngineInfo.getException() == null) {
         String idmEngineName = idmEngineInfo.getName();
@@ -119,12 +147,12 @@ public abstract class IdmEngines {
       IdmEngine idmEngine = buildIdmEngine(resourceUrl);
       String idmEngineName = idmEngine.getName();
       log.info("initialised idm engine {}", idmEngineName);
-      idmEngineInfo = new IdmEngineInfo(idmEngineName, resourceUrlString, null);
+      idmEngineInfo = new EngineInfo(idmEngineName, resourceUrlString, null);
       idmEngines.put(idmEngineName, idmEngine);
       idmEngineInfosByName.put(idmEngineName, idmEngineInfo);
     } catch (Throwable e) {
       log.error("Exception while initializing idm engine: {}", e.getMessage(), e);
-      idmEngineInfo = new IdmEngineInfo(null, resourceUrlString, getExceptionString(e));
+      idmEngineInfo = new EngineInfo(null, resourceUrlString, getExceptionString(e));
     }
     idmEngineInfosByResourceUrl.put(resourceUrlString, idmEngineInfo);
     idmEngineInfos.add(idmEngineInfo);
@@ -146,14 +174,14 @@ public abstract class IdmEngines {
       return idmEngineConfiguration.buildIdmEngine();
 
     } catch (IOException e) {
-      throw new ActivitiIdmException("couldn't open resource stream: " + e.getMessage(), e);
+      throw new ActivitiException("couldn't open resource stream: " + e.getMessage(), e);
     } finally {
-      IOUtils.closeQuietly(inputStream);
+      IoUtil.closeSilently(inputStream);
     }
   }
 
   /** Get initialization results. */
-  public static List<IdmEngineInfo> getIdmEngineInfos() {
+  public static List<EngineInfo> getIdmEngineInfos() {
     return idmEngineInfos;
   }
 
@@ -161,7 +189,7 @@ public abstract class IdmEngines {
    * Get initialization results. Only info will we available for form engines which were added in the {@link IdmEngines#init()}. No {@link IdmEngineInfo} is available for engines which were
    * registered programmatically.
    */
-  public static IdmEngineInfo getIdmEngineInfo(String idmEngineName) {
+  public static EngineInfo getIdmEngineInfo(String idmEngineName) {
     return idmEngineInfosByName.get(idmEngineName);
   }
 
@@ -170,10 +198,10 @@ public abstract class IdmEngines {
   }
 
   /**
-   * obtain a dmn engine by name.
+   * obtain a idm engine by name.
    * 
-   * @param dmnEngineName
-   *          is the name of the dmn engine or null for the default dmn engine.
+   * @param idmEngineName
+   *          is the name of the idm engine or null for the default idm engine.
    */
   public static IdmEngine getIdmEngine(String idmEngineName) {
     if (!isInitialized()) {
@@ -183,26 +211,26 @@ public abstract class IdmEngines {
   }
 
   /**
-   * retries to initialize a dmn engine that previously failed.
+   * retries to initialize a idm engine that previously failed.
    */
-  public static IdmEngineInfo retry(String resourceUrl) {
+  public static EngineInfo retry(String resourceUrl) {
     log.debug("retying initializing of resource {}", resourceUrl);
     try {
-      return initFormEngineFromResource(new URL(resourceUrl));
+      return initIdmEngineFromResource(new URL(resourceUrl));
     } catch (MalformedURLException e) {
-      throw new ActivitiIdmException("invalid url: " + resourceUrl, e);
+      throw new ActivitiException("invalid url: " + resourceUrl, e);
     }
   }
 
   /**
-   * provides access to dmn engine to application clients in a managed server environment.
+   * provides access to idm engine to application clients in a managed server environment.
    */
   public static Map<String, IdmEngine> getIdmEngines() {
     return idmEngines;
   }
 
   /**
-   * closes all dmn engines. This method should be called when the server shuts down.
+   * closes all idm engines. This method should be called when the server shuts down.
    */
   public synchronized static void destroy() {
     if (isInitialized()) {

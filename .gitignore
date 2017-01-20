@@ -11,4 +11,5 @@ target
 /userguide/src/en/index.html
 migration.html
 /modules/**/bin
-modules/flowable-ui/flowable-app/data
+modules/flowable-ui-task/flowable-ui-task-app/data
+modules/flowable-webapp-rest2/src/main/webapp/docs

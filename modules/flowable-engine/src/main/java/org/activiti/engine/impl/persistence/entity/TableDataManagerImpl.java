@@ -23,7 +23,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.management.TableMetaData;
+import org.activiti.engine.common.api.management.TablePage;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricDetail;
 import org.activiti.engine.history.HistoricFormProperty;
@@ -35,8 +38,6 @@ import org.activiti.engine.impl.TablePageQueryImpl;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.persistence.AbstractManager;
-import org.activiti.engine.management.TableMetaData;
-import org.activiti.engine.management.TablePage;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -202,7 +203,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
 
   protected long getTableCount(String tableName) {
     log.debug("selecting table count for {}", tableName);
-    Long count = (Long) getDbSqlSession().selectOne("selectTableCount", Collections.singletonMap("tableName", tableName));
+    Long count = (Long) getDbSqlSession().selectOne("org.activiti.engine.impl.TablePageMap.selectTableCount", Collections.singletonMap("tableName", tableName));
     return count;
   }
 
@@ -213,7 +214,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
     TablePage tablePage = new TablePage();
 
     @SuppressWarnings("rawtypes")
-    List tableData = getDbSqlSession().getSqlSession().selectList("selectTableData", tablePageQuery, new RowBounds(firstResult, maxResults));
+    List tableData = getDbSqlSession().getSqlSession().selectList("org.activiti.engine.impl.TablePageMap.selectTableData", tablePageQuery, new RowBounds(firstResult, maxResults));
 
     tablePage.setTableName(tablePageQuery.getTableName());
     tablePage.setTotal(getTableCount(tablePageQuery.getTableName()));

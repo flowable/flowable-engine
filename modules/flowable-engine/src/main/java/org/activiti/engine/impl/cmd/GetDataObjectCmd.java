@@ -17,9 +17,9 @@ import java.io.Serializable;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.ValuedDataObject;
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.DynamicBpmnConstants;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
 import org.activiti.engine.impl.DataObjectImpl;
 import org.activiti.engine.impl.context.Context;
@@ -120,7 +120,7 @@ public class GetDataObjectCmd implements Command<DataObject>, Serializable {
         ObjectNode languageNode = Context.getLocalizationElementProperties(locale, foundDataObject.getId(), 
             execution.getProcessDefinitionId(), withLocalizationFallback);
         
-        if (variableEntity != null && languageNode != null) {
+        if (languageNode != null) {
           JsonNode nameNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_NAME);
           if (nameNode != null) {
             localizedName = nameNode.asText();

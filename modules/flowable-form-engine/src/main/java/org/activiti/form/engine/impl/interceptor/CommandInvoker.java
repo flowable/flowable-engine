@@ -12,6 +12,7 @@
  */
 package org.activiti.form.engine.impl.interceptor;
 
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.form.engine.impl.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

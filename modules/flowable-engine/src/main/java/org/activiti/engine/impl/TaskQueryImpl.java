@@ -16,10 +16,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.DynamicBpmnConstants;
-import org.activiti.engine.IdentityService;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.impl.Page;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
@@ -28,7 +28,6 @@ import org.activiti.engine.impl.variable.VariableTypes;
 import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
-import org.activiti.idm.api.Group;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -110,6 +109,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
   protected boolean orActive;
   protected List<TaskQueryImpl> orQueryObjects = new ArrayList<TaskQueryImpl>();
   protected TaskQueryImpl currentOrQueryObject = null;
+  
+  private List<String> cachedCandidateGroups;
   
   public TaskQueryImpl() {
   }
@@ -1097,7 +1098,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
   public Integer getTaskVariablesLimit() {
     return taskVariablesLimit;
   }
-
+  
   public List<String> getCandidateGroups() {
     if (candidateGroup != null) {
       List<String> candidateGroupList = new ArrayList<String>(1);
@@ -1108,22 +1109,22 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
       return candidateGroups;
     
     } else if (candidateUser != null) {
-      return getGroupsForCandidateUser(candidateUser);
+      if (cachedCandidateGroups == null) {
+        cachedCandidateGroups = getGroupsForCandidateUser(candidateUser);
+      }
+      return cachedCandidateGroups;
       
     } else if (userIdForCandidateAndAssignee != null) {
-      return getGroupsForCandidateUser(userIdForCandidateAndAssignee);
+      if (cachedCandidateGroups == null) {
+        return getGroupsForCandidateUser(userIdForCandidateAndAssignee);
+      }
+      return cachedCandidateGroups;
     }
     return null;
   }
 
   protected List<String> getGroupsForCandidateUser(String candidateUser) {
-    IdentityService identityService = Context.getProcessEngineConfiguration().getIdentityService();
-    List<Group> groups = identityService.createGroupQuery().groupMember(candidateUser).list();
-    List<String> groupIds = new ArrayList<String>();
-    for (Group group : groups) {
-      groupIds.add(group.getId());
-    }
-    return groupIds;
+    return Context.getProcessEngineConfiguration().getCandidateManager().getGroupsForCandidateUser(candidateUser);
   }
 
   protected void ensureVariablesInitialized() {
@@ -1553,6 +1554,24 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
   public boolean isOrActive() {
     return orActive;
+  }
+  
+  @Override
+  public List<Task> list() {
+    cachedCandidateGroups = null;
+    return super.list();
+  }
+  
+  @Override
+  public List<Task> listPage(int firstResult, int maxResults) {
+    cachedCandidateGroups = null;
+    return super.listPage(firstResult, maxResults);
+  }
+  
+  @Override
+  public long count() {
+    cachedCandidateGroups = null;
+    return super.count();
   }
 
 }

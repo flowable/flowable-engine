@@ -18,7 +18,9 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import io.swagger.annotations.*;
+
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
 import org.activiti.rest.service.api.RestUrls;
@@ -32,10 +34,21 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Frederik Heremans
  */
 @RestController
+@Api(tags = { "Tasks" }, description = "Manage Tasks")
 public class TaskIdentityLinkFamilyResource extends TaskBaseResource {
 
+  @ApiOperation(value = "Get all identitylinks for a task for either groups or users", tags = {"Tasks"},
+          notes="## Get all identitylinks for a task URL\n\n"
+                  + " ```\n GET runtime/tasks/{taskId}/identitylinks/users\n" + "GET runtime/tasks/{taskId}/identitylinks/groups  ```"
+                  + "\n\n\n"
+                  + "Returns only identity links targetting either users or groups. Response body and status-codes are exactly the same as when getting the full list of identity links for a task."
+  )
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message =  "Indicates the task was found and the requested identity links are returned."),
+          @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
+  })
   @RequestMapping(value = "/runtime/tasks/{taskId}/identitylinks/{family}", method = RequestMethod.GET, produces = "application/json")
-  public List<RestIdentityLink> getIdentityLinksForFamily(@PathVariable("taskId") String taskId, @PathVariable("family") String family, HttpServletRequest request) {
+  public List<RestIdentityLink> getIdentityLinksForFamily(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "family") @PathVariable("family") String family, HttpServletRequest request) {
 
     Task task = getTaskFromRequest(taskId);
 

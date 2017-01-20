@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.form.FormData;
 import org.activiti.engine.impl.persistence.entity.VariableInstance;
 import org.activiti.engine.task.IdentityLink;
@@ -413,7 +413,7 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
 	@Override
-  public void addEventListener(ActivitiEventListener listenerToAdd, ActivitiEventType... types) {
+  public void addEventListener(ActivitiEventListener listenerToAdd, ActivitiEngineEventType... types) {
 		commandExecutor.execute(new AddEventListenerCommand(listenerToAdd, types));
   }
 

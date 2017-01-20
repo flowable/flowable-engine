@@ -28,6 +28,14 @@
 		</dependency>
 		<dependency>
 			<groupId>org.flowable</groupId>
+			<artifactId>flowable-engine-common-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-engine-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flowable</groupId>
 			<artifactId>flowable-idm-api</artifactId>
 		</dependency>
 		<dependency>
@@ -45,6 +53,10 @@
 		<dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-form-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-content-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -520,7 +532,7 @@
 											file="${basedir}/../../qa/spring/${database}/activiti.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset
-												filtersfile="${user.home}/.flowable/jdbc/build.${database}.properties" />
+												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${database}.properties" />
 										</copy>
 									</tasks>
 								</configuration>
@@ -590,7 +602,7 @@
 										<copy file="${basedir}/../../qa/jta/${database}/activiti.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset
-												filtersfile="${user.home}/.flowable/jdbc/build.${database}.properties" />
+												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${database}.properties" />
 										</copy>
 									</tasks>
 								</configuration>
@@ -704,7 +716,7 @@
 										<copy file="${basedir}/../../qa/db/historyfull.activiti.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset
-												filtersfile="${user.home}/.flowable/jdbc/build.${database}.properties" />
+												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${database}.properties" />
 										</copy>
 										<rename src="target/test-classes/historyfull.activiti.cfg.xml"
 											dest="target/test-classes/activiti.cfg.xml" />
@@ -771,7 +783,7 @@
 											file="${basedir}/../../qa/db/historyfull-with-schema.activiti.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset
-												filtersfile="${user.home}/.flowable/jdbc/build.${databasewithschema}.properties" />
+												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasewithschema}.properties" />
 										</copy>
 										<rename
 											src="target/test-classes/historyfull-with-schema.activiti.cfg.xml"

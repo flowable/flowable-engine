@@ -16,7 +16,8 @@ package org.activiti.engine.impl;
 import java.util.List;
 import java.util.Set;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.impl.Page;
 import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.history.HistoricVariableInstanceQuery;
 import org.activiti.engine.impl.context.Context;
@@ -225,7 +226,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
       for (HistoricVariableInstance historicVariableInstance : historicVariableInstances) {
         if (historicVariableInstance instanceof HistoricVariableInstanceEntity) {
           HistoricVariableInstanceEntity variableEntity = (HistoricVariableInstanceEntity) historicVariableInstance;
-          if (variableEntity != null && variableEntity.getVariableType() != null) {
+          if (variableEntity.getVariableType() != null) {
             variableEntity.getValue();
 
             // make sure JPA entities are cached for later retrieval

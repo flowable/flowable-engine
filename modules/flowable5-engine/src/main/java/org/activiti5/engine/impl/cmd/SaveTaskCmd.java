@@ -14,7 +14,7 @@ package org.activiti5.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.impl.context.Context;
@@ -49,13 +49,13 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
       // completely different.
       if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
         Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEventType.TASK_CREATED, task));
+          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.TASK_CREATED, task));
         
         if (task.getAssignee() != null) {
 	        // The assignment event is normally fired when calling setAssignee. However, this
 	        // doesn't work for standalone tasks as the commandcontext is not availble.
 	        Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-	            ActivitiEventBuilder.createEntityEvent(ActivitiEventType.TASK_ASSIGNED, task));
+	            ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.TASK_ASSIGNED, task));
         }
       }
     } else {

@@ -87,11 +87,11 @@
     select * from ${prefix}ACT_HI_IDENTITYLINK where ID_ = #{id, jdbcType=VARCHAR}
   </select>
   
-  <select id="selectHistoricIdentityLinksByTask" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="historicIdentityLinkResultMap">
+  <select id="selectHistoricIdentityLinksByTask" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="historicIdentityLinkResultMap">
     select * from ${prefix}ACT_HI_IDENTITYLINK where TASK_ID_ = #{parameter}
   </select>
   
-  <select id="selectHistoricIdentityLinksByProcessInstance" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="historicIdentityLinkResultMap">
+  <select id="selectHistoricIdentityLinksByProcessInstance" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="historicIdentityLinkResultMap">
     select * from ${prefix}ACT_HI_IDENTITYLINK where PROC_INST_ID_ = #{parameter}
   </select>
   
@@ -99,7 +99,7 @@
     select * from ${prefix}ACT_HI_IDENTITYLINK
   </select>
   
-  <select id="selectHistoricIdentityLinkByTaskUserGroupAndType" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="historicIdentityLinkResultMap">
+  <select id="selectHistoricIdentityLinkByTaskUserGroupAndType" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="historicIdentityLinkResultMap">
     select * 
     from ${prefix}ACT_HI_IDENTITYLINK 
     where TASK_ID_ = #{parameter.taskId}

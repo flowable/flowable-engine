@@ -15,10 +15,10 @@ package org.activiti.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
 import org.activiti.engine.delegate.TaskListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.impl.interceptor.Command;
@@ -58,7 +58,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
       commandContext.getTaskEntityManager().insert(task, null);
 
       if (commandContext.getEventDispatcher().isEnabled()) {
-        commandContext.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.TASK_CREATED, task));
+        commandContext.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.TASK_CREATED, task));
       }
 
     } else {
@@ -131,7 +131,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
         commandContext.getHistoryManager().recordTaskAssignment(task);
 
         if (commandContext.getEventDispatcher().isEnabled()) {
-          commandContext.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.TASK_ASSIGNED, task));
+          commandContext.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.TASK_ASSIGNED, task));
         }
 
       }

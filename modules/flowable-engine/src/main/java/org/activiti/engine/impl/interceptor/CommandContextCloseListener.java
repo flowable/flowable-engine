@@ -1,5 +1,7 @@
 package org.activiti.engine.impl.interceptor;
 
+import org.activiti.engine.common.impl.interceptor.BaseCommandContextCloseListener;
+import org.activiti.engine.common.impl.interceptor.Session;
 import org.activiti.engine.impl.cfg.TransactionContext;
 
 /**
@@ -7,7 +9,7 @@ import org.activiti.engine.impl.cfg.TransactionContext;
  * 
  * @author Joram Barrez
  */
-public interface CommandContextCloseListener {
+public interface CommandContextCloseListener extends BaseCommandContextCloseListener<CommandContext> {
 
   /**
    * Called when the {@link CommandContext} is being closed, but no 'close logic' has been executed.

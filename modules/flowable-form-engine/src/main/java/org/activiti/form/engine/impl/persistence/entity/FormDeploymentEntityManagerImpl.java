@@ -16,12 +16,12 @@ package org.activiti.form.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.form.api.Form;
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
+import org.activiti.form.api.FormDefinition;
 import org.activiti.form.api.FormDeployment;
 import org.activiti.form.engine.FormEngineConfiguration;
 import org.activiti.form.engine.impl.FormDeploymentQueryImpl;
-import org.activiti.form.engine.impl.Page;
-import org.activiti.form.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.form.engine.impl.persistence.entity.data.FormDeploymentDataManager;
 
 /**
@@ -44,7 +44,12 @@ public class FormDeploymentEntityManagerImpl extends AbstractEntityManager<FormD
   
   @Override
   public void insert(FormDeploymentEntity deployment) {
-    super.insert(deployment);
+    insert(deployment, true);
+  }
+  
+  @Override
+  public void insert(FormDeploymentEntity deployment, boolean fireEvent) {
+    super.insert(deployment, fireEvent);
 
     for (ResourceEntity resource : deployment.getResources().values()) {
       resource.setDeploymentId(deployment.getId());
@@ -60,15 +65,15 @@ public class FormDeploymentEntityManagerImpl extends AbstractEntityManager<FormD
   }
   
   protected void deleteDecisionTablesForDeployment(String deploymentId) {
-    getFormEntityManager().deleteFormsByDeploymentId(deploymentId);
+    getFormDefinitionEntityManager().deleteFormDefinitionsByDeploymentId(deploymentId);
   }
   
-  protected FormEntity findLatestForm(Form form) {
-    FormEntity latestForm = null;
-    if (form.getTenantId() != null && !FormEngineConfiguration.NO_TENANT_ID.equals(form.getTenantId())) {
-      latestForm = getFormEntityManager().findLatestFormByKeyAndTenantId(form.getKey(), form.getTenantId());
+  protected FormDefinitionEntity findLatestFormDefinition(FormDefinition formDefinition) {
+    FormDefinitionEntity latestForm = null;
+    if (formDefinition.getTenantId() != null && !FormEngineConfiguration.NO_TENANT_ID.equals(formDefinition.getTenantId())) {
+      latestForm = getFormDefinitionEntityManager().findLatestFormDefinitionByKeyAndTenantId(formDefinition.getKey(), formDefinition.getTenantId());
     } else {
-      latestForm = getFormEntityManager().findLatestFormByKey(form.getKey());
+      latestForm = getFormDefinitionEntityManager().findLatestFormDefinitionByKey(formDefinition.getKey());
     }
     return latestForm;
   }

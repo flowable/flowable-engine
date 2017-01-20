@@ -12,249 +12,93 @@
  */
 package org.activiti.engine.impl.interceptor;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiOptimisticLockingException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+
 import org.activiti.engine.ActivitiTaskAlreadyClaimedException;
+import org.activiti.engine.FlowableEngineAgenda;
 import org.activiti.engine.JobNotFoundException;
-import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.ActivitiAgenda;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
+import org.activiti.engine.common.impl.interceptor.AbstractCommandContext;
+import org.activiti.engine.common.impl.interceptor.BaseCommandContextCloseListener;
 import org.activiti.engine.impl.asyncexecutor.JobManager;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.history.HistoryManager;
 import org.activiti.engine.impl.jobexecutor.FailedJobCommandFactory;
 import org.activiti.engine.impl.persistence.cache.EntityCache;
-import org.activiti.engine.impl.persistence.entity.*;
-import org.activiti.engine.logging.LogMDC;
+import org.activiti.engine.impl.persistence.entity.AttachmentEntityManager;
+import org.activiti.engine.impl.persistence.entity.ByteArrayEntityManager;
+import org.activiti.engine.impl.persistence.entity.CommentEntityManager;
+import org.activiti.engine.impl.persistence.entity.DeadLetterJobEntityManager;
+import org.activiti.engine.impl.persistence.entity.DeploymentEntityManager;
+import org.activiti.engine.impl.persistence.entity.EventLogEntryEntityManager;
+import org.activiti.engine.impl.persistence.entity.EventSubscriptionEntityManager;
+import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.activiti.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.activiti.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
+import org.activiti.engine.impl.persistence.entity.HistoricDetailEntityManager;
+import org.activiti.engine.impl.persistence.entity.HistoricIdentityLinkEntityManager;
+import org.activiti.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
+import org.activiti.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
+import org.activiti.engine.impl.persistence.entity.HistoricVariableInstanceEntityManager;
+import org.activiti.engine.impl.persistence.entity.IdentityLinkEntityManager;
+import org.activiti.engine.impl.persistence.entity.JobEntityManager;
+import org.activiti.engine.impl.persistence.entity.ModelEntityManager;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManager;
+import org.activiti.engine.impl.persistence.entity.PropertyEntityManager;
+import org.activiti.engine.impl.persistence.entity.ResourceEntityManager;
+import org.activiti.engine.impl.persistence.entity.SuspendedJobEntityManager;
+import org.activiti.engine.impl.persistence.entity.TableDataManager;
+import org.activiti.engine.impl.persistence.entity.TaskEntityManager;
+import org.activiti.engine.impl.persistence.entity.TimerJobEntityManager;
+import org.activiti.engine.impl.persistence.entity.VariableInstanceEntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 /**
  * @author Tom Baeyens
  * @author Agim Emruli
  * @author Joram Barrez
  */
-public class CommandContext {
+public class CommandContext extends AbstractCommandContext {
 
   private static Logger log = LoggerFactory.getLogger(CommandContext.class);
 
-  protected Command<?> command;
-  protected Map<Class<?>, SessionFactory> sessionFactories;
-  protected Map<Class<?>, Session> sessions = new HashMap<Class<?>, Session>();
-  protected Throwable exception;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected FailedJobCommandFactory failedJobCommandFactory;
-  protected List<CommandContextCloseListener> closeListeners;
-  protected Map<String, Object> attributes; // General-purpose storing of anything during the lifetime of a command context
-  protected boolean reused;
-
-  protected ActivitiAgenda agenda;
+  
+  protected FlowableEngineAgenda agenda;
   protected Map<String, ExecutionEntity> involvedExecutions = new HashMap<String, ExecutionEntity>(1); // The executions involved with the command
   protected LinkedList<Object> resultStack = new LinkedList<Object>(); // needs to be a stack, as JavaDelegates can do api calls again
 
   public CommandContext(Command<?> command, ProcessEngineConfigurationImpl processEngineConfiguration) {
-    this.command = command;
+    super(command);
     this.processEngineConfiguration = processEngineConfiguration;
     this.failedJobCommandFactory = processEngineConfiguration.getFailedJobCommandFactory();
     this.sessionFactories = processEngineConfiguration.getSessionFactories();
-    this.agenda = processEngineConfiguration.createAgenda();
-  }
-
-  public void close() {
-
-    // The intention of this method is that all resources are closed properly, even if exceptions occur
-    // in close or flush methods of the sessions or the transaction context.
-
-    try {
-      try {
-        try {
-          executeCloseListenersClosing();
-          if (exception == null) {
-            flushSessions();
-          }
-        } catch (Throwable exception) {
-          exception(exception);
-        } finally {
-
-          try {
-            if (exception == null) {
-              executeCloseListenersAfterSessionFlushed();
-            }
-          } catch (Throwable exception) {
-            exception(exception);
-          }
-
-          if (exception != null) {
-            logException();
-            executeCloseListenersCloseFailure();
-          } else {
-            executeCloseListenersClosed();
-          }
-
-        }
-      } catch (Throwable exception) {
-        // Catch exceptions during rollback
-        exception(exception);
-      } finally {
-        // Sessions need to be closed, regardless of exceptions/commit/rollback
-        closeSessions();
-      }
-    } catch (Throwable exception) {
-      // Catch exceptions during session closing
-      exception(exception);
-    }
-
-    if (exception != null) {
-      rethrowExceptionIfNeeded();
-    }
+    this.agenda = processEngineConfiguration.getAgendaFactory().createAgenda(this);
   }
 
   protected void logException() {
     if (exception instanceof JobNotFoundException || exception instanceof ActivitiTaskAlreadyClaimedException) {
       // reduce log level, because this may have been caused because of job deletion due to cancelActiviti="true"
       log.info("Error while closing command context", exception);
-    } else if (exception instanceof ActivitiOptimisticLockingException) {
-      // reduce log level, as normally we're not interested in logging this exception
-      log.debug("Optimistic locking exception : " + exception);
     } else {
-      log.error("Error while closing command context", exception);
+      super.logException();
     }
   }
-
-  protected void rethrowExceptionIfNeeded() throws Error {
-    if (exception instanceof Error) {
-      throw (Error) exception;
-    } else if (exception instanceof RuntimeException) {
-      throw (RuntimeException) exception;
-    } else {
-      throw new ActivitiException("exception while executing command " + command, exception);
-    }
-  }
-
+  
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public void addCloseListener(CommandContextCloseListener commandContextCloseListener) {
     if (closeListeners == null) {
-      closeListeners = new ArrayList<CommandContextCloseListener>(1);
+      closeListeners = new ArrayList<BaseCommandContextCloseListener<AbstractCommandContext>>(1);
     }
-    closeListeners.add(commandContextCloseListener);
-  }
-
-  public List<CommandContextCloseListener> getCloseListeners() {
-    return closeListeners;
-  }
-
-  protected void executeCloseListenersClosing() {
-    if (closeListeners != null) {
-      try {
-        for (CommandContextCloseListener listener : closeListeners) {
-          listener.closing(this);
-        }
-      } catch (Throwable exception) {
-        exception(exception);
-      }
-    }
-  }
-
-  protected void executeCloseListenersAfterSessionFlushed() {
-    if (closeListeners != null) {
-      try {
-        for (CommandContextCloseListener listener : closeListeners) {
-          listener.afterSessionsFlush(this);
-        }
-      } catch (Throwable exception) {
-        exception(exception);
-      }
-    }
-  }
-
-  protected void executeCloseListenersClosed() {
-    if (closeListeners != null) {
-      try {
-        for (CommandContextCloseListener listener : closeListeners) {
-          listener.closed(this);
-        }
-      } catch (Throwable exception) {
-        exception(exception);
-      }
-    }
-  }
-
-  protected void executeCloseListenersCloseFailure() {
-    if (closeListeners != null) {
-      try {
-        for (CommandContextCloseListener listener : closeListeners) {
-          listener.closeFailure(this);
-        }
-      } catch (Throwable exception) {
-        exception(exception);
-      }
-    }
-  }
-
-  protected void flushSessions() {
-    for (Session session : sessions.values()) {
-      session.flush();
-    }
-  }
-
-  protected void closeSessions() {
-    for (Session session : sessions.values()) {
-      try {
-        session.close();
-      } catch (Throwable exception) {
-        exception(exception);
-      }
-    }
-  }
-
-  /**
-   * Stores the provided exception on this {@link CommandContext} instance.
-   * That exception will be rethrown at the end of closing the {@link CommandContext} instance.
-   *
-   * If there is already an exception being stored, a 'masked exception' message will be logged.
-   */
-  public void exception(Throwable exception) {
-    if (this.exception == null) {
-      this.exception = exception;
-
-    } else {
-      log.error("masked exception in command context. for root cause, see below as it will be rethrown later.", exception);
-      LogMDC.clear();
-    }
-  }
-
-  public void addAttribute(String key, Object value) {
-    if (attributes == null) {
-      attributes = new HashMap<String, Object>(1);
-    }
-    attributes.put(key, value);
-  }
-
-  public Object getAttribute(String key) {
-    if (attributes != null) {
-      return attributes.get(key);
-    }
-    return null;
-  }
-
-  @SuppressWarnings({ "unchecked" })
-  public <T> T getSession(Class<T> sessionClass) {
-    Session session = sessions.get(sessionClass);
-    if (session == null) {
-      SessionFactory sessionFactory = sessionFactories.get(sessionClass);
-      if (sessionFactory == null) {
-        throw new ActivitiException("no session factory configured for " + sessionClass.getName());
-      }
-      session = sessionFactory.openSession(this);
-      sessions.put(sessionClass, session);
-    }
-
-    return (T) session;
-  }
-
-  public Map<Class<?>, SessionFactory> getSessionFactories() {
-    return sessionFactories;
+    closeListeners.add((BaseCommandContextCloseListener) commandContextCloseListener);
   }
 
   public DbSqlSession getDbSqlSession() {
@@ -284,7 +128,7 @@ public class CommandContext {
   public ModelEntityManager getModelEntityManager() {
     return processEngineConfiguration.getModelEntityManager();
   }
-
+  
   public ProcessDefinitionInfoEntityManager getProcessDefinitionInfoEntityManager() {
     return processEngineConfiguration.getProcessDefinitionInfoEntityManager();
   }
@@ -336,15 +180,15 @@ public class CommandContext {
   public JobEntityManager getJobEntityManager() {
     return processEngineConfiguration.getJobEntityManager();
   }
-
+  
   public TimerJobEntityManager getTimerJobEntityManager() {
     return processEngineConfiguration.getTimerJobEntityManager();
   }
-
+  
   public SuspendedJobEntityManager getSuspendedJobEntityManager() {
     return processEngineConfiguration.getSuspendedJobEntityManager();
   }
-
+  
   public DeadLetterJobEntityManager getDeadLetterJobEntityManager() {
     return processEngineConfiguration.getDeadLetterJobEntityManager();
   }
@@ -372,7 +216,7 @@ public class CommandContext {
   public HistoryManager getHistoryManager() {
     return processEngineConfiguration.getHistoryManager();
   }
-
+  
   public JobManager getJobManager() {
     return processEngineConfiguration.getJobManager();
   }
@@ -396,18 +240,6 @@ public class CommandContext {
   // getters and setters
   // //////////////////////////////////////////////////////
 
-  public Command<?> getCommand() {
-    return command;
-  }
-
-  public Map<Class<?>, Session> getSessions() {
-    return sessions;
-  }
-
-  public Throwable getException() {
-    return exception;
-  }
-
   public FailedJobCommandFactory getFailedJobCommandFactory() {
     return failedJobCommandFactory;
   }
@@ -420,7 +252,7 @@ public class CommandContext {
     return processEngineConfiguration.getEventDispatcher();
   }
 
-  public ActivitiAgenda getAgenda() {
+  public FlowableEngineAgenda getAgenda() {
     return agenda;
   }
 
@@ -431,13 +263,4 @@ public class CommandContext {
   public void setResult(Object result) {
     resultStack.add(result);
   }
-
-  public boolean isReused() {
-    return reused;
-  }
-
-  public void setReused(boolean reused) {
-    this.reused = reused;
-  }
-
 }

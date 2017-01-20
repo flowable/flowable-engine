@@ -18,7 +18,6 @@ import java.io.UnsupportedEncodingException;
 
 import org.activiti.dmn.api.DmnDeployment;
 import org.activiti.dmn.api.DmnDeploymentBuilder;
-import org.activiti.dmn.engine.ActivitiDmnException;
 import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.impl.DmnRepositoryServiceImpl;
 import org.activiti.dmn.engine.impl.context.Context;
@@ -27,6 +26,7 @@ import org.activiti.dmn.engine.impl.persistence.entity.ResourceEntity;
 import org.activiti.dmn.engine.impl.persistence.entity.ResourceEntityManager;
 import org.activiti.dmn.model.DmnDefinition;
 import org.activiti.dmn.xml.converter.DmnXMLConverter;
+import org.activiti.engine.common.api.ActivitiException;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -53,18 +53,18 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
 
   public DmnDeploymentBuilder addInputStream(String resourceName, InputStream inputStream) {
     if (inputStream == null) {
-      throw new ActivitiDmnException("inputStream for resource '" + resourceName + "' is null");
+      throw new ActivitiException("inputStream for resource '" + resourceName + "' is null");
     }
 
     byte[] bytes = null;
     try {
       bytes = IOUtils.toByteArray(inputStream);
     } catch (Exception e) {
-      throw new ActivitiDmnException("could not get byte array from resource '" + resourceName + "'");
+      throw new ActivitiException("could not get byte array from resource '" + resourceName + "'");
     }
 
     if (bytes == null) {
-      throw new ActivitiDmnException("byte array for resource '" + resourceName + "' is null");
+      throw new ActivitiException("byte array for resource '" + resourceName + "' is null");
     }
 
     ResourceEntity resource = resourceEntityManager.create();
@@ -77,14 +77,14 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
   public DmnDeploymentBuilder addClasspathResource(String resource) {
     InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource);
     if (inputStream == null) {
-      throw new ActivitiDmnException("resource '" + resource + "' not found");
+      throw new ActivitiException("resource '" + resource + "' not found");
     }
     return addInputStream(resource, inputStream);
   }
 
   public DmnDeploymentBuilder addString(String resourceName, String text) {
     if (text == null) {
-      throw new ActivitiDmnException("text is null");
+      throw new ActivitiException("text is null");
     }
 
     ResourceEntity resource = resourceEntityManager.create();
@@ -92,7 +92,7 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
     try {
       resource.setBytes(text.getBytes(DEFAULT_ENCODING));
     } catch (UnsupportedEncodingException e) {
-      throw new ActivitiDmnException("Unable to get process bytes.", e);
+      throw new ActivitiException("Unable to get process bytes.", e);
     }
     deployment.addResource(resource);
     return this;
@@ -100,7 +100,7 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
 
   public DmnDeploymentBuilder addDmnBytes(String resourceName, byte[] dmnBytes) {
     if (dmnBytes == null) {
-      throw new ActivitiDmnException("dmn bytes is null");
+      throw new ActivitiException("dmn bytes is null");
     }
 
     ResourceEntity resource = resourceEntityManager.create();
@@ -116,7 +116,7 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
       String dmn20Xml = new String(dmnXMLConverter.convertToXML(dmnDefinition), "UTF-8");
       addString(resourceName, dmn20Xml);
     } catch (UnsupportedEncodingException e) {
-      throw new ActivitiDmnException("Error while transforming DMN model to xml: not UTF-8 encoded", e);
+      throw new ActivitiException("Error while transforming DMN model to xml: not UTF-8 encoded", e);
     }
     return this;
   }
@@ -143,6 +143,11 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
   
   public DmnDeploymentBuilder parentDeploymentId(String parentDeploymentId) {
     deployment.setParentDeploymentId(parentDeploymentId);
+    return this;
+  }
+  
+  public DmnDeploymentBuilder enableDuplicateFiltering() {
+    isDuplicateFilterEnabled = true;
     return this;
   }
 

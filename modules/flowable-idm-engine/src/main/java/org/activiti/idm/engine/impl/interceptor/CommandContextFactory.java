@@ -20,20 +20,20 @@ import org.activiti.idm.engine.IdmEngineConfiguration;
  */
 public class CommandContextFactory {
 
-  protected IdmEngineConfiguration dmnEngineConfiguration;
+  protected IdmEngineConfiguration idmEngineConfiguration;
 
   public CommandContext createCommandContext(Command<?> cmd) {
-    return new CommandContext(cmd, dmnEngineConfiguration);
+    return new CommandContext(cmd, idmEngineConfiguration);
   }
 
   // getters and setters
   // //////////////////////////////////////////////////////
 
-  public IdmEngineConfiguration getDmnEngineConfiguration() {
-    return dmnEngineConfiguration;
+  public IdmEngineConfiguration getIdmEngineConfiguration() {
+    return idmEngineConfiguration;
   }
 
-  public void setDmnEngineConfiguration(IdmEngineConfiguration dmnEngineConfiguration) {
-    this.dmnEngineConfiguration = dmnEngineConfiguration;
+  public void setIdmEngineConfiguration(IdmEngineConfiguration idmEngineConfiguration) {
+    this.idmEngineConfiguration = idmEngineConfiguration;
   }
 }

@@ -19,14 +19,14 @@ import java.util.List;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.StartEvent;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.util.IoUtil;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
-import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.impl.util.ReflectUtil;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.test.Deployment;
@@ -179,6 +179,22 @@ public class BpmnDeploymentTest extends PluggableActivitiTestCase {
     for (org.activiti.engine.repository.Deployment deployment : deploymentList) {
       repositoryService.deleteDeployment(deployment.getId());
     }
+  }
+  
+  @Deployment
+  public void testStartFormKey() {
+    String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
+    List<String> deploymentResources = repositoryService.getDeploymentResourceNames(deploymentId);
+
+    // verify bpmn file name
+    assertEquals(1, deploymentResources.size());
+    String bpmnResourceName = "org/activiti/engine/test/bpmn/deployment/BpmnDeploymentTest.testStartFormKey.bpmn20.xml";
+    assertEquals(bpmnResourceName, deploymentResources.get(0));
+
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    assertEquals(bpmnResourceName, processDefinition.getResourceName());
+    assertNull(processDefinition.getDiagramResourceName());
+    assertTrue(processDefinition.hasStartFormKey());
   }
 
   public void testDiagramCreationDisabled() {

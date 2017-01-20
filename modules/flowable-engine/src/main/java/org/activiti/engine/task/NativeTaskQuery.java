@@ -1,6 +1,6 @@
 package org.activiti.engine.task;
 
-import org.activiti.engine.query.NativeQuery;
+import org.activiti.engine.common.api.query.NativeQuery;
 
 /**
  * Allows querying of {@link Task}s via native (SQL) queries

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="edoras vis" exporterVersion="DEVELOPER"
+             targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+  <message id="message1" name="cancel"/>
+  <process id="messageOnCallActivity" isExecutable="true" name="message boundary event">
+    <startEvent id="startevent1"/>
+
+    <callActivity id="callActivity1" calledElement="calledProcessId"/>
+    
+    <endEvent id="noneevent1"/>
+    
+    <boundaryEvent attachedToRef="callActivity1" id="cancelBoundaryEvent">
+      <messageEventDefinition messageRef="message1" />
+    </boundaryEvent>
+    <userTask id="task1" name="User Task1">
+    </userTask>
+
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="callActivity1"/>
+    
+    <sequenceFlow id="flow2" sourceRef="cancelBoundaryEvent" targetRef="task1"/>
+    
+    <sequenceFlow id="flow3" sourceRef="task1" targetRef="noneevent1"/>
+    
+    <sequenceFlow id="flow4" sourceRef="callActivity1" targetRef="task1"/>
+    
+  </process>
+</definitions>

@@ -12,8 +12,8 @@
  */
 package org.activiti5.engine.impl.cmd;
 
-import org.activiti.engine.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 import org.activiti5.engine.impl.interceptor.Command;
 import org.activiti5.engine.impl.interceptor.CommandContext;
@@ -26,9 +26,9 @@ import org.activiti5.engine.impl.interceptor.CommandContext;
 public class AddEventListenerCommand implements Command<Void> {
 	
 	protected ActivitiEventListener listener;
-	protected ActivitiEventType[] types;
+	protected ActivitiEngineEventType[] types;
 	
-	public AddEventListenerCommand(ActivitiEventListener listener, ActivitiEventType[] types) {
+	public AddEventListenerCommand(ActivitiEventListener listener, ActivitiEngineEventType[] types) {
 	  this.listener = listener;
 	  this.types = types;
   }

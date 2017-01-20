@@ -13,10 +13,15 @@
 
 package org.activiti.rest.service.api.management;
 
-import org.activiti.engine.ActivitiException;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngineInfo;
 import org.activiti.engine.ProcessEngines;
+import org.activiti.engine.common.EngineInfo;
+import org.activiti.engine.common.api.ActivitiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,18 +32,23 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Tijs Rademakers
  */
 @RestController
+@Api(tags = { "Engine" }, description = "Manage Engine")
 public class ProcessEngineResource {
 
   @Autowired
   @Qualifier("processEngine")
   protected ProcessEngine engine;
 
+  @ApiOperation(value = "Get engine info", tags = {"Engine"})
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message =  "Indicates the engine info is returned."),
+  })
   @RequestMapping(value = "/management/engine", method = RequestMethod.GET, produces = "application/json")
   public ProcessEngineInfoResponse getEngineInfo() {
     ProcessEngineInfoResponse response = new ProcessEngineInfoResponse();
 
     try {
-      ProcessEngineInfo engineInfo = ProcessEngines.getProcessEngineInfo(engine.getName());
+      EngineInfo engineInfo = ProcessEngines.getProcessEngineInfo(engine.getName());
       if (engineInfo != null) {
         response.setName(engineInfo.getName());
         response.setResourceUrl(engineInfo.getResourceUrl());

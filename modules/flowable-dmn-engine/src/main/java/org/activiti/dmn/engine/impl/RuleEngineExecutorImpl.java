@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.dmn.api.RuleEngineExecutionResult;
-import org.activiti.dmn.engine.ActivitiDmnException;
 import org.activiti.dmn.engine.ActivitiDmnExpressionException;
 import org.activiti.dmn.engine.RuleEngineExecutor;
 import org.activiti.dmn.engine.impl.mvel.ExecutionVariableFactory;
@@ -33,6 +32,7 @@ import org.activiti.dmn.model.HitPolicy;
 import org.activiti.dmn.model.LiteralExpression;
 import org.activiti.dmn.model.RuleInputClauseContainer;
 import org.activiti.dmn.model.RuleOutputClauseContainer;
+import org.activiti.engine.common.api.ActivitiException;
 import org.apache.commons.lang3.StringUtils;
 import org.mvel2.integration.PropertyHandler;
 import org.slf4j.Logger;
@@ -89,7 +89,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
     }
 
     if (executionContext == null) {
-      throw new ActivitiDmnException("no execution context available");
+      throw new ActivitiException("no execution context available");
     }
 
     logger.debug("Start table evaluation: " + decisionTable.getId());
@@ -114,7 +114,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         ruleRowCounter++;
       }
 
-    } catch (ActivitiDmnException ade) {
+    } catch (ActivitiException ade) {
       logger.error("decision table execution failed", ade);
       executionContext.getAuditContainer().setFailed();
       executionContext.getAuditContainer().setExceptionMessage(getExceptionMessage(ade));
@@ -141,7 +141,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
       List<ValidRuleOutputEntries> validOutputEntriesStack) {
 
     if (rule == null) {
-      throw new ActivitiDmnException("rule cannot be null");
+      throw new ActivitiException("rule cannot be null");
     }
 
     logger.debug("Start rule evaluation");
@@ -179,7 +179,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         executionContext.getAuditContainer().addInputEntry(ruleRowIndex, conditionContainer.getInputEntry().getId(), 
             getExceptionMessage(adee), conditionResult);
         
-      } catch (ActivitiDmnException ade) {
+      } catch (ActivitiException ade) {
 
         // add failed audit entry and rethrow
         executionContext.getAuditContainer().addInputEntry(ruleRowIndex, conditionContainer.getInputEntry().getId(), 
@@ -191,7 +191,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         // add failed audit entry and rethrow
         executionContext.getAuditContainer().addInputEntry(ruleRowIndex, conditionContainer.getInputEntry().getId(), 
             getExceptionMessage(e), null);
-        throw new ActivitiDmnException(getExceptionMessage(e), e);
+        throw new ActivitiException(getExceptionMessage(e), e);
       }
 
       // exit evaluation loop if a condition is evaluated false
@@ -259,7 +259,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
       } else {
         logger.warn("Could not create conclusion result");
       }
-    } catch (ActivitiDmnException ade) {
+    } catch (ActivitiException ade) {
 
       // add failed audit entry and rethrow
       executionContext.getAuditContainer().addOutputEntry(ruleRowIndex, outputEntryExpression.getId(), getExceptionMessage(ade), executionVariable);
@@ -269,7 +269,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
 
       // add failed audit entry and rethrow
       executionContext.getAuditContainer().addOutputEntry(ruleRowIndex, outputEntryExpression.getId(), getExceptionMessage(e), executionVariable);
-      throw new ActivitiDmnException(getExceptionMessage(e), e);
+      throw new ActivitiException(getExceptionMessage(e), e);
     }
   }
 

@@ -3,12 +3,12 @@ package org.activiti.engine.test.api.tenant;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.util.CollectionUtil;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
-import org.activiti.engine.impl.util.CollectionUtil;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ProcessDefinition;

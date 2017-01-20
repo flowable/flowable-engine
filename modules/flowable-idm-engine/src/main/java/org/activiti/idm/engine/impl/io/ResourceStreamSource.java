@@ -15,7 +15,8 @@ package org.activiti.idm.engine.impl.io;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 
-import org.activiti.idm.engine.ActivitiIdmException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.util.io.StreamSource;
 
 
 /**
@@ -32,7 +33,7 @@ public class ResourceStreamSource implements StreamSource {
   public InputStream getInputStream() {
     InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource);
     if (inputStream == null) {
-      throw new ActivitiIdmException("resource '"+resource+"' doesn't exist");
+      throw new ActivitiException("resource '"+resource+"' doesn't exist");
     }
     return new BufferedInputStream(inputStream);
   }

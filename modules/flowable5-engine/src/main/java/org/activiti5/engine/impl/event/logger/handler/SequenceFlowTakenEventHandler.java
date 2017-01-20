@@ -29,7 +29,8 @@ public class SequenceFlowTakenEventHandler extends AbstractDatabaseEventLoggerEv
 		putInMapIfNotNull(data, Fields.TARGET_ACTIVITY_TYPE, sequenceFlowTakenEvent.getTargetActivityType());
 		putInMapIfNotNull(data, Fields.TARGET_ACTIVITY_BEHAVIOR_CLASS, sequenceFlowTakenEvent.getTargetActivityBehaviorClass());
 		
-		return createEventLogEntry(event.getProcessDefinitionId(), event.getProcessInstanceId(), event.getExecutionId(), null, data);
+		return createEventLogEntry(sequenceFlowTakenEvent.getProcessDefinitionId(), sequenceFlowTakenEvent.getProcessInstanceId(), 
+		    sequenceFlowTakenEvent.getExecutionId(), null, data);
 	}
 
 }

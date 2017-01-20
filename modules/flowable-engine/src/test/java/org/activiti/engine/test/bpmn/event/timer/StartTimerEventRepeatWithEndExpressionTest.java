@@ -16,11 +16,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.impl.util.DefaultClockImpl;
+import org.activiti.engine.common.runtime.Clock;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
-import org.activiti.engine.impl.util.DefaultClockImpl;
-import org.activiti.engine.runtime.Clock;
 import org.activiti.engine.runtime.Job;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
@@ -141,7 +141,7 @@ public class StartTimerEventRepeatWithEndExpressionTest extends PluggableActivit
     int timerFiredCount = 0;
     List<ActivitiEvent> eventsReceived = listener.getEventsReceived();
     for (ActivitiEvent eventReceived : eventsReceived) {
-      if (ActivitiEventType.TIMER_FIRED.equals(eventReceived.getType())) {
+      if (ActivitiEngineEventType.TIMER_FIRED.equals(eventReceived.getType())) {
         timerFiredCount++;
       }
     }
@@ -149,7 +149,7 @@ public class StartTimerEventRepeatWithEndExpressionTest extends PluggableActivit
     // count "entity created" events
     int eventCreatedCount = 0;
     for (ActivitiEvent eventReceived : eventsReceived) {
-      if (ActivitiEventType.ENTITY_CREATED.equals(eventReceived.getType())) {
+      if (ActivitiEngineEventType.ENTITY_CREATED.equals(eventReceived.getType())) {
         eventCreatedCount++;
       }
     }
@@ -157,7 +157,7 @@ public class StartTimerEventRepeatWithEndExpressionTest extends PluggableActivit
     // count "entity deleted" events
     int eventDeletedCount = 0;
     for (ActivitiEvent eventReceived : eventsReceived) {
-      if (ActivitiEventType.ENTITY_DELETED.equals(eventReceived.getType())) {
+      if (ActivitiEngineEventType.ENTITY_DELETED.equals(eventReceived.getType())) {
         eventDeletedCount++;
       }
     }

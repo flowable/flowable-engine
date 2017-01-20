@@ -16,9 +16,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
+import org.activiti.engine.impl.delegate.event.ActivitiEngineEntityEvent;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -47,18 +48,18 @@ public class TaskEventsTest extends PluggableActivitiTestCase {
 
     // Check create event
     assertEquals(3, listener.getEventsReceived().size());
-    ActivitiEntityEvent event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-    assertEquals(ActivitiEventType.ENTITY_CREATED, event.getType());
+    ActivitiEngineEntityEvent event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+    assertEquals(ActivitiEngineEventType.ENTITY_CREATED, event.getType());
     assertTrue(event.getEntity() instanceof Task);
     Task taskFromEvent = (Task) event.getEntity();
     assertEquals(task.getId(), taskFromEvent.getId());
     assertExecutionDetails(event, processInstance);
 
-    event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
-    assertEquals(ActivitiEventType.ENTITY_INITIALIZED, event.getType());
+    event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
+    assertEquals(ActivitiEngineEventType.ENTITY_INITIALIZED, event.getType());
 
-    event = (ActivitiEntityEvent) listener.getEventsReceived().get(2);
-    assertEquals(ActivitiEventType.TASK_CREATED, event.getType());
+    event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(2);
+    assertEquals(ActivitiEngineEventType.TASK_CREATED, event.getType());
     assertTrue(event.getEntity() instanceof Task);
     taskFromEvent = (Task) event.getEntity();
     assertEquals(task.getId(), taskFromEvent.getId());
@@ -69,22 +70,22 @@ public class TaskEventsTest extends PluggableActivitiTestCase {
     // Update duedate, owner and priority should trigger update-event
     taskService.setDueDate(task.getId(), new Date());
     assertEquals(1, listener.getEventsReceived().size());
-    event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
+    event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
     assertExecutionDetails(event, processInstance);
-    assertEquals(ActivitiEventType.ENTITY_UPDATED, event.getType());
+    assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, event.getType());
     listener.clearEventsReceived();
 
     taskService.setPriority(task.getId(), 12);
     assertEquals(1, listener.getEventsReceived().size());
-    event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-    assertEquals(ActivitiEventType.ENTITY_UPDATED, event.getType());
+    event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+    assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, event.getType());
     assertExecutionDetails(event, processInstance);
     listener.clearEventsReceived();
 
     taskService.setOwner(task.getId(), "kermit");
     assertEquals(1, listener.getEventsReceived().size());
-    event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-    assertEquals(ActivitiEventType.ENTITY_UPDATED, event.getType());
+    event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+    assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, event.getType());
     assertExecutionDetails(event, processInstance);
     listener.clearEventsReceived();
 
@@ -96,21 +97,21 @@ public class TaskEventsTest extends PluggableActivitiTestCase {
     taskService.saveTask(task);
 
     assertEquals(1, listener.getEventsReceived().size());
-    event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-    assertEquals(ActivitiEventType.ENTITY_UPDATED, event.getType());
+    event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+    assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, event.getType());
     assertExecutionDetails(event, processInstance);
     listener.clearEventsReceived();
 
     // Check delete-event on complete
     taskService.complete(task.getId());
     assertEquals(2, listener.getEventsReceived().size());
-    event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-    assertEquals(ActivitiEventType.TASK_COMPLETED, event.getType());
+    event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+    assertEquals(ActivitiEngineEventType.TASK_COMPLETED, event.getType());
     assertExecutionDetails(event, processInstance);
     TaskEntity taskEntity = (TaskEntity) event.getEntity();
     assertNotNull(taskEntity.getDueDate());
-    event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
-    assertEquals(ActivitiEventType.ENTITY_DELETED, event.getType());
+    event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
+    assertEquals(ActivitiEngineEventType.ENTITY_DELETED, event.getType());
     assertExecutionDetails(event, processInstance);
   }
 
@@ -126,16 +127,16 @@ public class TaskEventsTest extends PluggableActivitiTestCase {
     // Set assignee through API
     taskService.setAssignee(task.getId(), "kermit");
     assertEquals(2, listener.getEventsReceived().size());
-    ActivitiEntityEvent event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-    assertEquals(ActivitiEventType.TASK_ASSIGNED, event.getType());
+    ActivitiEngineEntityEvent event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+    assertEquals(ActivitiEngineEventType.TASK_ASSIGNED, event.getType());
     assertTrue(event.getEntity() instanceof Task);
     Task taskFromEvent = (Task) event.getEntity();
     assertEquals(task.getId(), taskFromEvent.getId());
     assertEquals("kermit", taskFromEvent.getAssignee());
     assertExecutionDetails(event, processInstance);
 
-    event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
-    assertEquals(ActivitiEventType.ENTITY_UPDATED, event.getType());
+    event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
+    assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, event.getType());
     assertTrue(event.getEntity() instanceof Task);
     assertExecutionDetails(event, processInstance);
     listener.clearEventsReceived();
@@ -146,16 +147,16 @@ public class TaskEventsTest extends PluggableActivitiTestCase {
     taskService.saveTask(task);
 
     assertEquals(2, listener.getEventsReceived().size());
-    event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-    assertEquals(ActivitiEventType.TASK_ASSIGNED, event.getType());
+    event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+    assertEquals(ActivitiEngineEventType.TASK_ASSIGNED, event.getType());
     assertTrue(event.getEntity() instanceof Task);
     taskFromEvent = (Task) event.getEntity();
     assertEquals(task.getId(), taskFromEvent.getId());
     assertEquals("newAssignee", taskFromEvent.getAssignee());
     assertExecutionDetails(event, processInstance);
 
-    event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
-    assertEquals(ActivitiEventType.ENTITY_UPDATED, event.getType());
+    event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
+    assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, event.getType());
     assertTrue(event.getEntity() instanceof Task);
     assertExecutionDetails(event, processInstance);
     listener.clearEventsReceived();
@@ -163,16 +164,16 @@ public class TaskEventsTest extends PluggableActivitiTestCase {
     // Unclaim
     taskService.unclaim(task.getId());
     assertEquals(2, listener.getEventsReceived().size());
-    event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-    assertEquals(ActivitiEventType.TASK_ASSIGNED, event.getType());
+    event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+    assertEquals(ActivitiEngineEventType.TASK_ASSIGNED, event.getType());
     assertTrue(event.getEntity() instanceof Task);
     taskFromEvent = (Task) event.getEntity();
     assertEquals(task.getId(), taskFromEvent.getId());
     assertEquals(null, taskFromEvent.getAssignee());
     assertExecutionDetails(event, processInstance);
 
-    event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
-    assertEquals(ActivitiEventType.ENTITY_UPDATED, event.getType());
+    event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
+    assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, event.getType());
     assertTrue(event.getEntity() instanceof Task);
     assertExecutionDetails(event, processInstance);
     listener.clearEventsReceived();
@@ -194,8 +195,8 @@ public class TaskEventsTest extends PluggableActivitiTestCase {
     runtimeService.deleteProcessInstance(processInstance.getId(), "testing task delete events");
 
     assertEquals(1, listener.getEventsReceived().size());
-    ActivitiEntityEvent event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-    assertEquals(ActivitiEventType.ENTITY_DELETED, event.getType());
+    ActivitiEngineEntityEvent event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+    assertEquals(ActivitiEngineEventType.ENTITY_DELETED, event.getType());
     assertTrue(event.getEntity() instanceof Task);
     Task taskFromEvent = (Task) event.getEntity();
     assertEquals(task.getId(), taskFromEvent.getId());
@@ -212,8 +213,8 @@ public class TaskEventsTest extends PluggableActivitiTestCase {
       taskService.deleteTask(task.getId());
 
       assertEquals(1, listener.getEventsReceived().size());
-      event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-      assertEquals(ActivitiEventType.ENTITY_DELETED, event.getType());
+      event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+      assertEquals(ActivitiEngineEventType.ENTITY_DELETED, event.getType());
       assertTrue(event.getEntity() instanceof Task);
       taskFromEvent = (Task) event.getEntity();
       assertEquals(task.getId(), taskFromEvent.getId());
@@ -259,15 +260,15 @@ public class TaskEventsTest extends PluggableActivitiTestCase {
       taskService.complete(task.getId(), taskParams, true);
 
       ActivitiEntityEvent event = (ActivitiEntityEvent) tlistener.getEventsReceived().get(0);
-      assertEquals(ActivitiEventType.ENTITY_CREATED, event.getType());
+      assertEquals(ActivitiEngineEventType.ENTITY_CREATED, event.getType());
       assertTrue(event.getEntity() instanceof Task);
 
       event = (ActivitiEntityEvent) tlistener.getEventsReceived().get(1);
-      assertEquals(ActivitiEventType.ENTITY_INITIALIZED, event.getType());
+      assertEquals(ActivitiEngineEventType.ENTITY_INITIALIZED, event.getType());
       assertTrue(event.getEntity() instanceof Task);
 
       event = (ActivitiEntityEvent) tlistener.getEventsReceived().get(2);
-      assertEquals(ActivitiEventType.TASK_CREATED, event.getType());
+      assertEquals(ActivitiEngineEventType.TASK_CREATED, event.getType());
       assertTrue(event.getEntity() instanceof Task);
       Task taskFromEvent = tlistener.getTasks().get(2);
       assertEquals(task.getId(), taskFromEvent.getId());
@@ -299,8 +300,8 @@ public class TaskEventsTest extends PluggableActivitiTestCase {
 
       assertEquals(3, listener.getEventsReceived().size());
 
-      ActivitiEntityEvent event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-      assertEquals(ActivitiEventType.ENTITY_CREATED, event.getType());
+      ActivitiEngineEntityEvent event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+      assertEquals(ActivitiEngineEventType.ENTITY_CREATED, event.getType());
       assertTrue(event.getEntity() instanceof Task);
       Task taskFromEvent = (Task) event.getEntity();
       assertEquals(task.getId(), taskFromEvent.getId());
@@ -308,18 +309,18 @@ public class TaskEventsTest extends PluggableActivitiTestCase {
       assertNull(event.getProcessInstanceId());
       assertNull(event.getExecutionId());
 
-      event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
-      assertEquals(ActivitiEventType.ENTITY_INITIALIZED, event.getType());
+      event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
+      assertEquals(ActivitiEngineEventType.ENTITY_INITIALIZED, event.getType());
 
-      event = (ActivitiEntityEvent) listener.getEventsReceived().get(2);
-      assertEquals(ActivitiEventType.TASK_CREATED, event.getType());
+      event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(2);
+      assertEquals(ActivitiEngineEventType.TASK_CREATED, event.getType());
       listener.clearEventsReceived();
 
       // Update task
       taskService.setOwner(task.getId(), "owner");
       assertEquals(1, listener.getEventsReceived().size());
-      event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-      assertEquals(ActivitiEventType.ENTITY_UPDATED, event.getType());
+      event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+      assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, event.getType());
       assertTrue(event.getEntity() instanceof Task);
       taskFromEvent = (Task) event.getEntity();
       assertEquals(task.getId(), taskFromEvent.getId());
@@ -332,8 +333,8 @@ public class TaskEventsTest extends PluggableActivitiTestCase {
       // Assign task
       taskService.setAssignee(task.getId(), "kermit");
       assertEquals(2, listener.getEventsReceived().size());
-      event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-      assertEquals(ActivitiEventType.TASK_ASSIGNED, event.getType());
+      event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+      assertEquals(ActivitiEngineEventType.TASK_ASSIGNED, event.getType());
       assertTrue(event.getEntity() instanceof Task);
       taskFromEvent = (Task) event.getEntity();
       assertEquals(task.getId(), taskFromEvent.getId());
@@ -341,8 +342,8 @@ public class TaskEventsTest extends PluggableActivitiTestCase {
       assertNull(event.getProcessDefinitionId());
       assertNull(event.getProcessInstanceId());
       assertNull(event.getExecutionId());
-      event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
-      assertEquals(ActivitiEventType.ENTITY_UPDATED, event.getType());
+      event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
+      assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, event.getType());
       assertTrue(event.getEntity() instanceof Task);
       taskFromEvent = (Task) event.getEntity();
       assertEquals(task.getId(), taskFromEvent.getId());
@@ -354,8 +355,8 @@ public class TaskEventsTest extends PluggableActivitiTestCase {
       // Complete task
       taskService.complete(task.getId());
       assertEquals(2, listener.getEventsReceived().size());
-      event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-      assertEquals(ActivitiEventType.TASK_COMPLETED, event.getType());
+      event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+      assertEquals(ActivitiEngineEventType.TASK_COMPLETED, event.getType());
       assertTrue(event.getEntity() instanceof Task);
       taskFromEvent = (Task) event.getEntity();
       assertEquals(task.getId(), taskFromEvent.getId());
@@ -363,8 +364,8 @@ public class TaskEventsTest extends PluggableActivitiTestCase {
       assertNull(event.getProcessInstanceId());
       assertNull(event.getExecutionId());
 
-      event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
-      assertEquals(ActivitiEventType.ENTITY_DELETED, event.getType());
+      event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
+      assertEquals(ActivitiEngineEventType.ENTITY_DELETED, event.getType());
       assertTrue(event.getEntity() instanceof Task);
       taskFromEvent = (Task) event.getEntity();
       assertEquals(task.getId(), taskFromEvent.getId());
@@ -386,7 +387,7 @@ public class TaskEventsTest extends PluggableActivitiTestCase {
     }
   }
 
-  protected void assertExecutionDetails(ActivitiEvent event, ProcessInstance processInstance) {
+  protected void assertExecutionDetails(ActivitiEngineEntityEvent event, ProcessInstance processInstance) {
     assertEquals(processInstance.getId(), event.getProcessInstanceId());
     assertNotNull(event.getExecutionId());
     assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());

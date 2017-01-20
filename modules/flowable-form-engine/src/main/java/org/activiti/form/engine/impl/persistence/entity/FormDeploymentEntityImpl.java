@@ -20,17 +20,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
 import org.activiti.form.engine.FormEngineConfiguration;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class FormDeploymentEntityImpl implements FormDeploymentEntity, Serializable {
+public class FormDeploymentEntityImpl extends AbstractEntityNoRevision implements FormDeploymentEntity, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  protected String id;
   protected String name;
   protected String category;
   protected String tenantId = FormEngineConfiguration.NO_TENANT_ID;
@@ -94,14 +94,6 @@ public class FormDeploymentEntityImpl implements FormDeploymentEntity, Serializa
   }
 
   // getters and setters ////////////////////////////////////////////////////////
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
 
   public String getName() {
     return name;

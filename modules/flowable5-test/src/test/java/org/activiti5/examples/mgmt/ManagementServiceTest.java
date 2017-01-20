@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.activiti.engine.ManagementService;
-import org.activiti.engine.management.TableMetaData;
+import org.activiti.engine.common.api.management.TableMetaData;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 
 /**

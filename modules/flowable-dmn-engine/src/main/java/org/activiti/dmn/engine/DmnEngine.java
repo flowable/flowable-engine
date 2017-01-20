@@ -12,6 +12,7 @@
  */
 package org.activiti.dmn.engine;
 
+import org.activiti.dmn.api.DmnManagementService;
 import org.activiti.dmn.api.DmnRepositoryService;
 import org.activiti.dmn.api.DmnRuleService;
 
@@ -20,7 +21,7 @@ public interface DmnEngine {
     /**
      * the version of the activiti library
      */
-    public static String VERSION = "1.0.0.0"; // Note the extra .x at the end. To cater for snapshot releases with different database changes
+    public static String VERSION = "6.0.0.0"; // Note the extra .x at the end. To cater for snapshot releases with different database changes
 
     /**
      * The name as specified in 'process-engine-name' in the activiti.cfg.xml configuration file. The default name for a process engine is 'default
@@ -29,6 +30,8 @@ public interface DmnEngine {
 
     void close();
 
+    DmnManagementService getDmnManagementService();
+    
     DmnRepositoryService getDmnRepositoryService();
 
     DmnRuleService getDmnRuleService();

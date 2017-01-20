@@ -12,7 +12,7 @@
  */
 package org.activiti5.engine.impl.pvm.runtime;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.delegate.ActivityBehavior;
 import org.activiti5.engine.ActivitiActivityExecutionException;
 import org.activiti5.engine.ActivitiException;
@@ -49,7 +49,7 @@ public class AtomicOperationActivityExecute implements AtomicOperation {
     try {
     	if(Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-      			ActivitiEventBuilder.createActivityEvent(ActivitiEventType.ACTIVITY_STARTED, 
+      			ActivitiEventBuilder.createActivityEvent(ActivitiEngineEventType.ACTIVITY_STARTED, 
       					execution.getActivity().getId(),
       					(String) execution.getActivity().getProperty("name"),
       					execution.getId(), 

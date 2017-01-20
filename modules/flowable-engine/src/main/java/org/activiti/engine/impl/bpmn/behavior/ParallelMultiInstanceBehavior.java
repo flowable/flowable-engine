@@ -23,7 +23,8 @@ import org.activiti.bpmn.model.CompensateEventDefinition;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.Transaction;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.impl.util.CollectionUtil;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.impl.bpmn.helper.ScopeUtil;
 import org.activiti.engine.impl.context.Context;
@@ -31,7 +32,6 @@ import org.activiti.engine.impl.delegate.ActivityBehavior;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntityManager;
-import org.activiti.engine.impl.util.CollectionUtil;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -198,7 +198,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
                     && callActivityExecutionIds.contains(childExecution.getSuperExecutionId())) {
                   
                   executionEntityManager.deleteProcessInstanceExecutionEntity(childExecution.getId(), activity.getId(), 
-                      "call activity completion condition met", true, false, true);
+                      "call activity completion condition met", true, false);
                 }
               }
               

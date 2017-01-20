@@ -16,8 +16,8 @@ package org.activiti.engine.impl.bpmn.behavior;
 import java.io.Serializable;
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
@@ -59,14 +59,14 @@ public class BpmnActivityBehavior implements Serializable {
       List<JobEntity> jobs = activityExecution.getJobs();
       for (JobEntity job : jobs) {
         if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-          Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.JOB_CANCELED, job));
+          Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.JOB_CANCELED, job));
         }
       }
       
       List<TimerJobEntity> timerJobs = activityExecution.getTimerJobs();
       for (TimerJobEntity job : timerJobs) {
         if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-          Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.JOB_CANCELED, job));
+          Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.JOB_CANCELED, job));
         }
       }
     }

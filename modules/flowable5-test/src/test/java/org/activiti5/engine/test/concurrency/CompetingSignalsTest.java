@@ -13,7 +13,7 @@
 
 package org.activiti5.engine.test.concurrency;
 
-import org.activiti.engine.ActivitiOptimisticLockingException;
+import org.activiti.engine.common.api.ActivitiOptimisticLockingException;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.impl.RuntimeServiceImpl;
 import org.activiti.engine.impl.cfg.CommandExecutorImpl;

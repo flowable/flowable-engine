@@ -6,8 +6,8 @@ package org.activiti.standalone.cfg;
 import java.util.List;
 
 import org.activiti.engine.ManagementService;
+import org.activiti.engine.common.impl.Page;
 import org.activiti.engine.impl.AbstractQuery;
-import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.TaskQueryProperty;
 import org.activiti.engine.impl.interceptor.CommandContext;
 

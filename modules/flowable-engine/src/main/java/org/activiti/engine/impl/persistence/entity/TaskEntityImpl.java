@@ -23,9 +23,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.activiti.bpmn.model.ActivitiListener;
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.db.BulkDeleteable;
@@ -80,6 +80,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Ser
   protected String formKey;
 
   protected boolean isDeleted;
+  protected boolean isCanceled;
 
   protected String eventName;
   protected ActivitiListener currentActivitiListener;
@@ -177,7 +178,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Ser
           .getProcessEngineConfiguration()
           .getEventDispatcher()
           .dispatchEvent(
-              ActivitiEventBuilder.createVariableEvent(ActivitiEventType.VARIABLE_CREATED, variableName, value, result.getType(), result.getTaskId(), result.getExecutionId(), getProcessInstanceId(),
+              ActivitiEventBuilder.createVariableEvent(ActivitiEngineEventType.VARIABLE_CREATED, variableName, value, result.getType(), result.getTaskId(), result.getExecutionId(), getProcessInstanceId(),
                   getProcessDefinitionId()));
     }
     return result;
@@ -193,7 +194,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Ser
           .getProcessEngineConfiguration()
           .getEventDispatcher()
           .dispatchEvent(
-              ActivitiEventBuilder.createVariableEvent(ActivitiEventType.VARIABLE_UPDATED, variableInstance.getName(), value, variableInstance.getType(), variableInstance.getTaskId(),
+              ActivitiEventBuilder.createVariableEvent(ActivitiEngineEventType.VARIABLE_UPDATED, variableInstance.getName(), value, variableInstance.getType(), variableInstance.getTaskId(),
                   variableInstance.getExecutionId(), getProcessInstanceId(), getProcessDefinitionId()));
     }
   }
@@ -514,6 +515,14 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Ser
 
   public void setDeleted(boolean isDeleted) {
     this.isDeleted = isDeleted;
+  }
+  
+  public boolean isCanceled() {
+    return isCanceled;
+  }
+
+  public void setCanceled(boolean isCanceled) {
+    this.isCanceled = isCanceled;
   }
 
   public String getParentTaskId() {

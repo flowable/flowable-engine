@@ -12,8 +12,8 @@
  */
 package org.activiti.standalone.event;
 
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventImpl;
 import org.activiti.engine.impl.test.ResourceActivitiTestCase;
 import org.activiti.engine.test.api.event.TestActivitiEventListener;
@@ -38,7 +38,7 @@ public class TypedEventListenersConfigurationTest extends ResourceActivitiTestCa
     listener.clearEventsReceived();
 
     // Dispath a custom event
-    ActivitiEvent event = new ActivitiEventImpl(ActivitiEventType.CUSTOM);
+    ActivitiEvent event = new ActivitiEventImpl(ActivitiEngineEventType.CUSTOM);
     processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
 
     assertEquals(1, listener.getEventsReceived().size());
@@ -46,18 +46,18 @@ public class TypedEventListenersConfigurationTest extends ResourceActivitiTestCa
     listener.clearEventsReceived();
 
     // Dispatch another event the listener is registered for
-    event = new ActivitiEventImpl(ActivitiEventType.ENTITY_DELETED);
+    event = new ActivitiEventImpl(ActivitiEngineEventType.ENTITY_DELETED);
     processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
-    event = new ActivitiEventImpl(ActivitiEventType.ENTITY_UPDATED);
+    event = new ActivitiEventImpl(ActivitiEngineEventType.ENTITY_UPDATED);
     processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
 
     assertEquals(2, listener.getEventsReceived().size());
-    assertEquals(ActivitiEventType.ENTITY_DELETED, listener.getEventsReceived().get(0).getType());
-    assertEquals(ActivitiEventType.ENTITY_UPDATED, listener.getEventsReceived().get(1).getType());
+    assertEquals(ActivitiEngineEventType.ENTITY_DELETED, listener.getEventsReceived().get(0).getType());
+    assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, listener.getEventsReceived().get(1).getType());
     listener.clearEventsReceived();
 
     // Dispatch an event that is NOT part of the types configured
-    event = new ActivitiEventImpl(ActivitiEventType.ENTITY_CREATED);
+    event = new ActivitiEventImpl(ActivitiEngineEventType.ENTITY_CREATED);
     processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
     assertTrue(listener.getEventsReceived().isEmpty());
   }

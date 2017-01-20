@@ -16,9 +16,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.activiti.engine.common.impl.persistence.entity.Entity;
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.db.DbSqlSession;
-import org.activiti.idm.engine.impl.db.Entity;
 import org.activiti.idm.engine.impl.persistence.AbstractManager;
 
 /**
@@ -27,8 +28,8 @@ import org.activiti.idm.engine.impl.persistence.AbstractManager;
  */
 public abstract class AbstractDataManager<EntityImpl extends Entity> extends AbstractManager implements DataManager<EntityImpl> {
   
-  public AbstractDataManager(IdmEngineConfiguration dmnEngineConfiguration) {
-    super(dmnEngineConfiguration);
+  public AbstractDataManager(IdmEngineConfiguration idmEngineConfiguration) {
+    super(idmEngineConfiguration);
   }
 
   public abstract Class<? extends EntityImpl> getManagedEntityClass();

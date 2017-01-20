@@ -12,7 +12,7 @@
  */
 package org.activiti.editor.form.converter;
 
-import org.activiti.form.model.FormDefinition;
+import org.activiti.form.model.FormModel;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -23,9 +23,9 @@ public class FormJsonConverter {
 
   protected ObjectMapper objectMapper = new ObjectMapper();
 
-  public FormDefinition convertToForm(String modelJson, String modelId, int modelVersion) {
+  public FormModel convertToFormModel(String modelJson, String modelId, int modelVersion) {
     try {
-      FormDefinition definition = objectMapper.readValue(modelJson, FormDefinition.class);
+      FormModel definition = objectMapper.readValue(modelJson, FormModel.class);
       definition.setId(modelId);
       definition.setVersion(modelVersion);
   
@@ -35,7 +35,7 @@ public class FormJsonConverter {
     }
   }
 
-  public String convertToJson(FormDefinition definition) {
+  public String convertToJson(FormModel definition) {
     try {
       return objectMapper.writeValueAsString(definition);
     } catch (Exception e) {

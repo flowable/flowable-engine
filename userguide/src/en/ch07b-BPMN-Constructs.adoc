@@ -552,7 +552,7 @@ When *deploying* a process definition with one or more message start events, the
 
 * The name of the message start event must be unique across a given process definition. A process definition must not have multiple message start events with the same name. Flowable throws an exception upon deployment of a process definition such that two or more message start events reference the same message	of if two or more message start events reference messages with the same message name.
 * The name of the message start event must be unique across all deployed process definitions. Flowable throws an exception upon deployment of a process definition such that one or more message start events reference a message with the same name as a message start event already deployed by a different process definition.
-* Process versioning: Upon deployment of a new version of a process definition, the message subscriptions of the previous version are cancelled. This is also true for message events that are not present in the new version.
+* Process versioning: Upon deployment of a new version of a process definition, the start message subscriptions of the previous version are removed.
 
 When *starting* a process instance, a message start event can be triggered using the following methods on the ++RuntimeService++:
 
@@ -4896,6 +4896,13 @@ You can pass process variables to the sub process and vice versa. The data is co
 </callActivity>
 ----
 
+You can pass all process variables to the sub process by setting the option inheritVariables to true.
+
+[source,xml,linenums]
+----
+<callActivity id="callSubProcess" calledElement="checkCreditProcess" activiti:inheritVariables="true"/>
+----
+
 We use a Flowable Extension as a shortcut for the BPMN standard elements called __dataInputAssociation__ and __dataOutputAssociation__, which only work if you declare process variables in the BPMN 2.0 standard way.
 
 It is possible to use expressions here as well:
@@ -4919,7 +4926,7 @@ The callActivity element also supports setting the business key on the started s
 </callActivity>
 ----
 
-Defining the 'inheritBusinessKey' attribute with a value of true will set the business key value on the subprocess to the value of the business key as defined in the calling process. 
+Defining the 'inheritBusinessKey' attribute with a value of true will set the business key value on the subprocess to the value of the business key as defined in the calling process.
 
 ----
 <callActivity id="callSubProcess" calledElement="checkCreditProcess" activiti:inheritBusinessKey="true">

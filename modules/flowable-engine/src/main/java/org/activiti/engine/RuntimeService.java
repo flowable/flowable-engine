@@ -18,11 +18,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.activiti.bpmn.model.FlowNode;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
 import org.activiti.engine.delegate.VariableScope;
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.persistence.entity.VariableInstance;
 import org.activiti.engine.runtime.DataObject;
 import org.activiti.engine.runtime.Execution;
@@ -35,6 +38,7 @@ import org.activiti.engine.runtime.ProcessInstanceQuery;
 import org.activiti.engine.task.Event;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.IdentityLinkType;
+import org.activiti.form.model.FormModel;
 
 /**
  * 
@@ -183,6 +187,11 @@ public interface RuntimeService {
   ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, Map<String, Object> variables);
 
   /**
+   * 
+   */
+  ProcessInstance startProcessInstanceWithForm(String processDefinitionId, String outcome, Map<String, Object> variables, String processInstanceName);
+  
+  /**
    * <p>
    * Signals the process engine that a message is received and starts a new {@link ProcessInstance}.
    * </p>
@@ -288,6 +297,11 @@ public interface RuntimeService {
    */
   ProcessInstance startProcessInstanceByMessageAndTenantId(String messageName, String businessKey, Map<String, Object> processVariables, String tenantId);
 
+  /**
+   * 
+   */
+  FormModel getStartFormModel(String processDefinitionId, String processInstanceId);
+  
   /**
    * Delete an existing runtime process instance.
    * 
@@ -1158,7 +1172,7 @@ public interface RuntimeService {
    * @param types
    *          types of events the listener should be notified for
    */
-  void addEventListener(ActivitiEventListener listenerToAdd, ActivitiEventType... types);
+  void addEventListener(ActivitiEventListener listenerToAdd, ActivitiEngineEventType... types);
 
   /**
    * Removes the given listener from this dispatcher. The listener will no longer be notified, regardless of the type(s) it was registered for in the first place.
@@ -1192,6 +1206,15 @@ public interface RuntimeService {
    *           when the given process instance does not exist.
    */
   void setProcessInstanceName(String processInstanceId, String name);
+  
+  /**
+   * Gets executions with an adhoc sub process as current flow element
+   * 
+   * @param processInstanceId
+   *          id of the process instance that is used to search for child executions
+   * @return a list of executions 
+   */
+  List<Execution> getAdhocSubProcessExecutions(String processInstanceId);
   
   /**
    * Gets enabled activities from ad-hoc sub process

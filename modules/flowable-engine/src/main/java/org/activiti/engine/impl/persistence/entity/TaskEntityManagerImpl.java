@@ -16,15 +16,15 @@ package org.activiti.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
 import org.activiti.engine.delegate.TaskListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.TaskQueryImpl;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.persistence.CountingExecutionEntity;
-import org.activiti.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.engine.impl.persistence.entity.data.TaskDataManager;
 import org.activiti.engine.impl.util.Activiti5Util;
 import org.activiti.engine.task.IdentityLinkType;
@@ -96,7 +96,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     if (getEventDispatcher().isEnabled()) {
       if (taskEntity.getAssignee() != null) {
         getEventDispatcher().dispatchEvent(
-            ActivitiEventBuilder.createEntityEvent(ActivitiEventType.TASK_ASSIGNED, taskEntity));
+            ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.TASK_ASSIGNED, taskEntity));
       }
     }
     
@@ -142,7 +142,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     getHistoryManager().recordTaskAssignment(taskEntity);
 
     if (getEventDispatcher().isEnabled()) {
-      getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.TASK_ASSIGNED, taskEntity));
+      getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.TASK_ASSIGNED, taskEntity));
     }
 
   }
@@ -168,7 +168,8 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     List<TaskEntity> tasks = findTasksByProcessInstanceId(processInstanceId);
 
     for (TaskEntity task : tasks) {
-      if (getEventDispatcher().isEnabled()) {
+      if (getEventDispatcher().isEnabled() && task.isCanceled() == false) {
+        task.setCanceled(true);
         getEventDispatcher().dispatchEvent(
               ActivitiEventBuilder.createActivityCancelledEvent(task.getExecution().getActivityId(), task.getName(), 
                   task.getExecutionId(), task.getProcessInstanceId(),
@@ -183,7 +184,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
   public void deleteTask(TaskEntity task, String deleteReason, boolean cascade, boolean cancel) {
     if (!task.isDeleted()) {
       getProcessEngineConfiguration().getListenerNotificationHelper()
-        .executeTaskListeners(task, TaskListener.EVENTNAME_DELETE);
+          .executeTaskListeners(task, TaskListener.EVENTNAME_DELETE);
       task.setDeleted(true);
 
       String taskId = task.getId();
@@ -205,7 +206,8 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
       delete(task, false);
 
       if (getEventDispatcher().isEnabled()) {
-        if (cancel) {
+        if (cancel && task.isCanceled() == false) {
+          task.setCanceled(true);
           getEventDispatcher().dispatchEvent(
                   ActivitiEventBuilder.createActivityCancelledEvent(task.getExecution() != null ? task.getExecution().getActivityId() : null, 
                       task.getName(), task.getExecutionId(), 
@@ -215,7 +217,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
                       deleteReason));
         }
         
-        getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_DELETED, task));
+        getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_DELETED, task));
       }
     }
   }

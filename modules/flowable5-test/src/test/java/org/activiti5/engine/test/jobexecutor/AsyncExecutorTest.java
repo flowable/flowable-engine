@@ -22,14 +22,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.activiti.engine.repository.DeploymentProperties;
-import org.activiti.engine.runtime.Clock;
 import org.activiti.engine.runtime.Job;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti5.engine.impl.test.JobTestHelper;

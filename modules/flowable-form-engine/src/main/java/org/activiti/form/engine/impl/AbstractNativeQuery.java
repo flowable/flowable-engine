@@ -17,8 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.form.api.NativeQuery;
-import org.activiti.form.engine.ActivitiFormException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.query.NativeQuery;
 import org.activiti.form.engine.impl.context.Context;
 import org.activiti.form.engine.impl.interceptor.Command;
 import org.activiti.form.engine.impl.interceptor.CommandContext;
@@ -160,7 +160,7 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> implem
     if (results.size() == 1) {
       return results.get(0);
     } else if (results.size() > 1) {
-      throw new ActivitiFormException("Query return " + results.size() + " results instead of max 1");
+      throw new ActivitiException("Query return " + results.size() + " results instead of max 1");
     }
     return null;
   }

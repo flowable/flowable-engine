@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.impl.transformer;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 
 /**
  * A Transformer is responsible of transforming an object into a different object

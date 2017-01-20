@@ -12,22 +12,23 @@
  */
 package org.activiti.idm.engine.impl.persistence.entity;
 
-import org.activiti.idm.api.event.ActivitiIdmEventDispatcher;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
+import org.activiti.engine.common.impl.db.HasRevision;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
+import org.activiti.engine.common.impl.persistence.entity.EntityManager;
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 import org.activiti.idm.api.event.ActivitiIdmEventType;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.delegate.event.impl.ActivitiIdmEventBuilder;
-import org.activiti.idm.engine.impl.db.Entity;
-import org.activiti.idm.engine.impl.db.HasRevision;
 import org.activiti.idm.engine.impl.persistence.AbstractManager;
-import org.activiti.idm.engine.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Joram Barrez
  */
 public abstract class AbstractEntityManager<EntityImpl extends Entity> extends AbstractManager implements EntityManager<EntityImpl> {
 
-  public AbstractEntityManager(IdmEngineConfiguration dmnEngineConfiguration) {
-    super(dmnEngineConfiguration);
+  public AbstractEntityManager(IdmEngineConfiguration idmEngineConfiguration) {
+    super(idmEngineConfiguration);
   }
   
   /*
@@ -57,7 +58,7 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
     
     getDataManager().insert(entity);
 
-    ActivitiIdmEventDispatcher eventDispatcher = getEventDispatcher();
+    ActivitiEventDispatcher eventDispatcher = getEventDispatcher();
     if (fireCreateEvent && eventDispatcher.isEnabled()) {
       eventDispatcher.dispatchEvent(ActivitiIdmEventBuilder.createEntityEvent(ActivitiIdmEventType.ENTITY_CREATED, entity));
       eventDispatcher.dispatchEvent(ActivitiIdmEventBuilder.createEntityEvent(ActivitiIdmEventType.ENTITY_INITIALIZED, entity));
@@ -66,9 +67,14 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
   
   @Override
   public EntityImpl update(EntityImpl entity) {
+    return update(entity, true);
+  }
+  
+  @Override
+  public EntityImpl update(EntityImpl entity, boolean fireUpdateEvent) {
     EntityImpl updatedEntity = getDataManager().update(entity);
     
-    if (getEventDispatcher().isEnabled()) {
+    if (fireUpdateEvent && getEventDispatcher().isEnabled()) {
       getEventDispatcher().dispatchEvent(ActivitiIdmEventBuilder.createEntityEvent(ActivitiIdmEventType.ENTITY_UPDATED, entity));
     }
     
@@ -83,9 +89,14 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
   
   @Override
   public void delete(EntityImpl entity) {
+    delete(entity, true);
+  }
+
+  @Override
+  public void delete(EntityImpl entity, boolean fireDeleteEvent) {
     getDataManager().delete(entity);
     
-    if (getEventDispatcher().isEnabled()) {
+    if (fireDeleteEvent && getEventDispatcher().isEnabled()) {
       getEventDispatcher().dispatchEvent(ActivitiIdmEventBuilder.createEntityEvent(ActivitiIdmEventType.ENTITY_DELETED, entity));
     }
   }

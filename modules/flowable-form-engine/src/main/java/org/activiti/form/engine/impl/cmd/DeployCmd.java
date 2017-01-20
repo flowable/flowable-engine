@@ -15,6 +15,7 @@ package org.activiti.form.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,6 +66,13 @@ public class DeployCmd<T> implements Command<FormDeployment>, Serializable {
       FormDeploymentEntity existingDeployment = null;
       if (!existingDeployments.isEmpty()) {
         existingDeployment = (FormDeploymentEntity) existingDeployments.get(0);
+        
+        Map<String, ResourceEntity> resourceMap = new HashMap<String, ResourceEntity>();
+        List<ResourceEntity> resourceList = commandContext.getResourceEntityManager().findResourcesByDeploymentId(existingDeployment.getId());
+        for (ResourceEntity resourceEntity : resourceList) {
+          resourceMap.put(resourceEntity.getName(), resourceEntity);
+        }
+        existingDeployment.setResources(resourceMap);
       }
 
       if ((existingDeployment != null) && !deploymentsDiffer(deployment, existingDeployment)) {
@@ -95,8 +103,9 @@ public class DeployCmd<T> implements Command<FormDeployment>, Serializable {
     for (String resourceName : resources.keySet()) {
       ResourceEntity savedResource = savedResources.get(resourceName);
 
-      if (savedResource == null)
+      if (savedResource == null) {
         return true;
+      }
 
       ResourceEntity resource = resources.get(resourceName);
 

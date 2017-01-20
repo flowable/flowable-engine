@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.xml.namespace.QName;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.delegate.BpmnError;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.interceptor.Fault;

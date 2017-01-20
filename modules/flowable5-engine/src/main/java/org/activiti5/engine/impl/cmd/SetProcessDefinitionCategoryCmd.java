@@ -12,7 +12,7 @@
  */
 package org.activiti5.engine.impl.cmd;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.persistence.deploy.DeploymentCache;
 import org.activiti.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -62,7 +62,7 @@ public class SetProcessDefinitionCategoryCmd implements Command<Void> {
     
     if (commandContext.getEventDispatcher().isEnabled()) {
       commandContext.getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_UPDATED, processDefinition));
+    			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_UPDATED, processDefinition));
     }
     
     return null;

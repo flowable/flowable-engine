@@ -22,7 +22,7 @@ import org.activiti.bpmn.model.EndEvent;
 import org.activiti.bpmn.model.EventDefinition;
 import org.activiti.bpmn.model.TerminateEventDefinition;
 import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti5.engine.history.HistoricActivityInstance;
 import org.activiti5.engine.impl.HistoricActivityInstanceQueryImpl;
@@ -219,7 +219,7 @@ private static final long serialVersionUID = 1L;
       ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
       if (config != null && config.getEventDispatcher().isEnabled()) {
         config.getEventDispatcher().dispatchEvent(
-            ActivitiEventBuilder.createEntityEvent(ActivitiEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
+            ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
       }
     }
     

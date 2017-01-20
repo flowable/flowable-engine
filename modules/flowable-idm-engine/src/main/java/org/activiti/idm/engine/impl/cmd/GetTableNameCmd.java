@@ -2,7 +2,7 @@ package org.activiti.idm.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.idm.engine.impl.interceptor.Command;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 
@@ -18,7 +18,7 @@ public class GetTableNameCmd implements Command<String>, Serializable {
 
   public String execute(CommandContext commandContext) {
     if (entityClass == null) {
-      throw new ActivitiIdmIllegalArgumentException("entityClass is null");
+      throw new ActivitiIllegalArgumentException("entityClass is null");
     }
     return commandContext.getTableDataManager().getTableName(entityClass, true);
   }

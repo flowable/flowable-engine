@@ -17,7 +17,7 @@ import java.text.MessageFormat;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -52,10 +52,12 @@ public class RestUrlBuilder {
 
   /** Uses baseUrl as the base URL */
   public static RestUrlBuilder usingBaseUrl(String baseUrl) {
-    if (baseUrl == null)
+    if (baseUrl == null) {
       throw new ActivitiIllegalArgumentException("baseUrl can not be null");
-    if (baseUrl.endsWith("/"))
+    }
+    if (baseUrl.endsWith("/")) {
       baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+    }
     return new RestUrlBuilder(baseUrl);
   }
 

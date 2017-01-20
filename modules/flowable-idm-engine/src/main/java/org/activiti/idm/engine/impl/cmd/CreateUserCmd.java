@@ -15,8 +15,8 @@ package org.activiti.idm.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.idm.api.User;
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
 import org.activiti.idm.engine.impl.interceptor.Command;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 
@@ -31,7 +31,7 @@ public class CreateUserCmd implements Command<User>, Serializable {
 
   public CreateUserCmd(String userId) {
     if (userId == null) {
-      throw new ActivitiIdmIllegalArgumentException("userId is null");
+      throw new ActivitiIllegalArgumentException("userId is null");
     }
     this.userId = userId;
   }

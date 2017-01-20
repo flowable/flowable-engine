@@ -15,13 +15,13 @@ package org.activiti.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.JobQueryImpl;
-import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.persistence.CountingExecutionEntity;
-import org.activiti.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.engine.impl.persistence.entity.data.JobDataManager;
 import org.activiti.engine.runtime.Job;
 import org.slf4j.Logger;
@@ -133,7 +133,7 @@ public class JobEntityManagerImpl extends AbstractEntityManager<JobEntity> imple
     
     // Send event
     if (getEventDispatcher().isEnabled()) {
-      getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_DELETED, this));
+      getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_DELETED, this));
     }
   }
   

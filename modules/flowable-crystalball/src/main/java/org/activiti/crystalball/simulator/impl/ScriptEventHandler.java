@@ -3,7 +3,7 @@ package org.activiti.crystalball.simulator.impl;
 import org.activiti.crystalball.simulator.SimulationEvent;
 import org.activiti.crystalball.simulator.SimulationEventHandler;
 import org.activiti.crystalball.simulator.SimulationRunContext;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.delegate.VariableScope;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.scripting.ScriptingEngines;

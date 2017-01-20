@@ -15,9 +15,9 @@ package org.activiti5.camel.exception;
 
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.test.JobTestHelper;
 import org.activiti.engine.runtime.Job;
 import org.activiti.engine.test.Deployment;

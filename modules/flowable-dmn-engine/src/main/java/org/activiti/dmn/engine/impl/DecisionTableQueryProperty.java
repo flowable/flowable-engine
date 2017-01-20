@@ -16,7 +16,7 @@ package org.activiti.dmn.engine.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.dmn.api.QueryProperty;
+import org.activiti.engine.common.api.query.QueryProperty;
 
 /**
  * Contains the possible properties that can be used in a {@link ProcessDefinitionQuery}.

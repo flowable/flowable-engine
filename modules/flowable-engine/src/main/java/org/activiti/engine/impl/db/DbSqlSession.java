@@ -35,11 +35,18 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiOptimisticLockingException;
-import org.activiti.engine.ActivitiWrongDbException;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiOptimisticLockingException;
+import org.activiti.engine.common.api.ActivitiWrongDbException;
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.db.HasRevision;
+import org.activiti.engine.common.impl.db.ListQueryParameterObject;
+import org.activiti.engine.common.impl.interceptor.Session;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
+import org.activiti.engine.common.impl.transaction.ConnectionHolder;
+import org.activiti.engine.common.impl.util.IoUtil;
 import org.activiti.engine.impl.DeploymentQueryImpl;
 import org.activiti.engine.impl.ExecutionQueryImpl;
 import org.activiti.engine.impl.HistoricActivityInstanceQueryImpl;
@@ -49,20 +56,17 @@ import org.activiti.engine.impl.HistoricTaskInstanceQueryImpl;
 import org.activiti.engine.impl.HistoricVariableInstanceQueryImpl;
 import org.activiti.engine.impl.JobQueryImpl;
 import org.activiti.engine.impl.ModelQueryImpl;
-import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.ProcessDefinitionQueryImpl;
 import org.activiti.engine.impl.ProcessInstanceQueryImpl;
 import org.activiti.engine.impl.TaskQueryImpl;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.db.upgrade.DbUpgradeStep;
-import org.activiti.engine.impl.interceptor.Session;
 import org.activiti.engine.impl.persistence.cache.CachedEntity;
 import org.activiti.engine.impl.persistence.cache.EntityCache;
-import org.activiti.engine.impl.persistence.entity.Entity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.PropertyEntity;
-import org.activiti.engine.impl.util.IoUtil;
+import org.activiti.engine.impl.persistence.entity.PropertyEntityImpl;
 import org.activiti.engine.impl.util.ReflectUtil;
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
@@ -115,6 +119,7 @@ public class DbSqlSession implements Session {
     ACTIVITI_VERSIONS.add(new ActivitiVersion("5.20.0.1"));
     ACTIVITI_VERSIONS.add(new ActivitiVersion("5.20.0.2"));
     ACTIVITI_VERSIONS.add(new ActivitiVersion("5.21.0.0"));
+    ACTIVITI_VERSIONS.add(new ActivitiVersion("5.22.0.0"));
     
     /*
      * Version 5.18.0.1 is the latest v5 version in the list here, although if you would look at the v5 code,
@@ -783,7 +788,7 @@ public class DbSqlSession implements Session {
   }
 
   public void rollback() {
-    sqlSession.rollback();
+    sqlSession.rollback(true);
   }
 
   // schema operations
@@ -833,7 +838,7 @@ public class DbSqlSession implements Session {
   }
 
   protected String getDbVersion() {
-    String selectSchemaVersionStatement = dbSqlSessionFactory.mapStatement("selectDbSchemaVersion");
+    String selectSchemaVersionStatement = dbSqlSessionFactory.mapStatement("org.activiti.engine.impl.persistence.entity.PropertyEntityImpl.selectDbSchemaVersion");
     return (String) sqlSession.selectOne(selectSchemaVersionStatement);
   }
 
@@ -887,7 +892,7 @@ public class DbSqlSession implements Session {
 
     if (isEngineTablePresent()) {
 
-      PropertyEntity dbVersionProperty = selectById(PropertyEntity.class, "schema.version");
+      PropertyEntity dbVersionProperty = selectById(PropertyEntityImpl.class, "schema.version");
       String dbVersion = dbVersionProperty.getValue();
 
       // Determine index in the sequence of Activiti releases

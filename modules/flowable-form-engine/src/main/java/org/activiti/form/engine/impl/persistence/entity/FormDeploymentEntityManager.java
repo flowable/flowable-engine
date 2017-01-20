@@ -15,9 +15,10 @@ package org.activiti.form.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.persistence.entity.EntityManager;
 import org.activiti.form.api.FormDeployment;
 import org.activiti.form.engine.impl.FormDeploymentQueryImpl;
-import org.activiti.form.engine.impl.Page;
 
 /**
  * @author Tijs Rademakers

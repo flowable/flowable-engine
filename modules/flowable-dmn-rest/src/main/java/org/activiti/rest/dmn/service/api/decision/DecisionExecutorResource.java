@@ -19,8 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.dmn.api.RuleEngineExecutionResult;
-import org.activiti.dmn.engine.ActivitiDmnIllegalArgumentException;
-import org.activiti.dmn.engine.ActivitiDmnObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,7 +37,7 @@ public class DecisionExecutorResource extends BaseDecisionExecutorResource {
   public ExecuteDecisionResponse executeDecision(@RequestBody ExecuteDecisionRequest request, HttpServletRequest httpRequest, HttpServletResponse response) {
 
     if (request.getDecisionKey() == null) {
-      throw new ActivitiDmnIllegalArgumentException("Decision key is required.");
+      throw new ActivitiIllegalArgumentException("Decision key is required.");
     }
 
     Map<String, Object> inputVariables = null;
@@ -45,7 +45,7 @@ public class DecisionExecutorResource extends BaseDecisionExecutorResource {
       inputVariables = new HashMap<String, Object>();
       for (Map.Entry<String, Object> variable : request.getInputVariables().entrySet()) {
         if (variable.getKey() == null) {
-          throw new ActivitiDmnIllegalArgumentException("Variable name is required.");
+          throw new ActivitiIllegalArgumentException("Variable name is required.");
         }
         inputVariables.put(variable.getKey(), variable.getValue());
       }
@@ -59,8 +59,8 @@ public class DecisionExecutorResource extends BaseDecisionExecutorResource {
       return dmnRestResponseFactory.createExecuteDecisionResponse(executionResult);
 
       // TODO: add audit trail info
-    } catch (ActivitiDmnObjectNotFoundException aonfe) {
-      throw new ActivitiDmnIllegalArgumentException(aonfe.getMessage(), aonfe);
+    } catch (ActivitiObjectNotFoundException aonfe) {
+      throw new ActivitiIllegalArgumentException(aonfe.getMessage(), aonfe);
     }
   }
 }

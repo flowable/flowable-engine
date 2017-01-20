@@ -14,11 +14,11 @@ package org.activiti.dmn.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.activiti.dmn.engine.ActivitiDmnIllegalArgumentException;
 import org.activiti.dmn.engine.impl.interceptor.Command;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
 import org.activiti.dmn.engine.impl.util.DecisionTableUtil;
 import org.activiti.dmn.model.DmnDefinition;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 
 /**
  * @author Joram Barrez
@@ -35,7 +35,7 @@ public class GetDmnDefinitionCmd implements Command<DmnDefinition>, Serializable
 
   public DmnDefinition execute(CommandContext commandContext) {
     if (decisionTableId == null) {
-      throw new ActivitiDmnIllegalArgumentException("decisionTableId is null");
+      throw new ActivitiIllegalArgumentException("decisionTableId is null");
     }
 
     return DecisionTableUtil.getDmnDefinition(decisionTableId);

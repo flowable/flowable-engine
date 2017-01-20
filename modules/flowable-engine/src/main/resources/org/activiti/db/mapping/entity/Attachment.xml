@@ -117,14 +117,14 @@
     where ID_ = #{id,jdbcType=VARCHAR}
   </select>
   
-  <select id="selectAttachmentsByTaskId" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="attachmentResultMap">
+  <select id="selectAttachmentsByTaskId" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="attachmentResultMap">
     select *
     from ${prefix}ACT_HI_ATTACHMENT
     where TASK_ID_ = #{parameter,jdbcType=VARCHAR}
     order by TIME_ desc
   </select>
   
-  <select id="selectAttachmentsByProcessInstanceId" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="attachmentResultMap">
+  <select id="selectAttachmentsByProcessInstanceId" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="attachmentResultMap">
     select *
     from ${prefix}ACT_HI_ATTACHMENT
     where PROC_INST_ID_ = #{parameter,jdbcType=VARCHAR}

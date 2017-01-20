@@ -14,9 +14,9 @@ package org.activiti5.engine.test.api.event;
 
 import java.io.ByteArrayInputStream;
 
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
+import org.activiti.engine.impl.delegate.event.ActivitiEngineEntityEvent;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.task.Attachment;
 import org.activiti.engine.task.Task;
@@ -45,30 +45,30 @@ public class StandaloneAttachmentEventsTest extends PluggableActivitiTestCase {
 				// Create link-attachment
 				Attachment attachment = taskService.createAttachment("test", task.getId(), null, "attachment name", "description", "http://activiti.org");
 				assertEquals(2, listener.getEventsReceived().size());
-				ActivitiEntityEvent event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-				assertEquals(ActivitiEventType.ENTITY_CREATED, event.getType());
+				ActivitiEngineEntityEvent event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+				assertEquals(ActivitiEngineEventType.ENTITY_CREATED, event.getType());
 				assertNull(event.getProcessInstanceId());
 				assertNull(event.getExecutionId());
 				assertNull(event.getProcessDefinitionId());
 				Attachment attachmentFromEvent = (Attachment) event.getEntity();
 				assertEquals(attachment.getId(), attachmentFromEvent.getId());
-				event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
-				assertEquals(ActivitiEventType.ENTITY_INITIALIZED, event.getType());
+				event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
+				assertEquals(ActivitiEngineEventType.ENTITY_INITIALIZED, event.getType());
 				listener.clearEventsReceived();
 				
 				// Create binary attachment
 				attachment = taskService.createAttachment("test", task.getId(), null, "attachment name", "description", new ByteArrayInputStream("test".getBytes()));
 				assertEquals(2, listener.getEventsReceived().size());
-				event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-				assertEquals(ActivitiEventType.ENTITY_CREATED, event.getType());
+				event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+				assertEquals(ActivitiEngineEventType.ENTITY_CREATED, event.getType());
 				assertNull(event.getProcessInstanceId());
 				assertNull(event.getExecutionId());
 				assertNull(event.getProcessDefinitionId());
 				attachmentFromEvent = (Attachment) event.getEntity();
 				assertEquals(attachment.getId(), attachmentFromEvent.getId());
 				
-				event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
-				assertEquals(ActivitiEventType.ENTITY_INITIALIZED, event.getType());
+				event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
+				assertEquals(ActivitiEngineEventType.ENTITY_INITIALIZED, event.getType());
 				listener.clearEventsReceived();
 				
 				// Update attachment
@@ -77,8 +77,8 @@ public class StandaloneAttachmentEventsTest extends PluggableActivitiTestCase {
 				taskService.saveAttachment(attachment);
 				
 				assertEquals(1, listener.getEventsReceived().size());
-				event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-				assertEquals(ActivitiEventType.ENTITY_UPDATED, event.getType());
+				event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+				assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, event.getType());
 				assertNull(event.getProcessInstanceId());
 				assertNull(event.getExecutionId());
 				assertNull(event.getProcessDefinitionId());
@@ -90,8 +90,8 @@ public class StandaloneAttachmentEventsTest extends PluggableActivitiTestCase {
 				// Finally, delete attachment
 				taskService.deleteAttachment(attachment.getId());
 				assertEquals(1, listener.getEventsReceived().size());
-				event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-				assertEquals(ActivitiEventType.ENTITY_DELETED, event.getType());
+				event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+				assertEquals(ActivitiEngineEventType.ENTITY_DELETED, event.getType());
 				assertNull(event.getProcessInstanceId());
 				assertNull(event.getExecutionId());
 				assertNull(event.getProcessDefinitionId());
@@ -124,8 +124,8 @@ public class StandaloneAttachmentEventsTest extends PluggableActivitiTestCase {
 				historyService.deleteHistoricTaskInstance(task.getId());
 				
 				assertEquals(1, listener.getEventsReceived().size());
-				ActivitiEntityEvent event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-				assertEquals(ActivitiEventType.ENTITY_DELETED, event.getType());
+				ActivitiEngineEntityEvent event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+				assertEquals(ActivitiEngineEventType.ENTITY_DELETED, event.getType());
 				assertNull(event.getProcessInstanceId());
 				assertNull(event.getExecutionId());
 				assertNull(event.getProcessDefinitionId());

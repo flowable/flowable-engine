@@ -12,6 +12,10 @@
  */
 package org.activiti.engine.delegate.event;
 
+import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+
 /**
  * Base event listener that can be used when implementing an {@link ActivitiEventListener} to get notified when an entity is created, updated, deleted or if another entity-related event occurs.
  * 
@@ -51,13 +55,13 @@ public class BaseEntityEventListener implements ActivitiEventListener {
   public final void onEvent(ActivitiEvent event) {
     if (isValidEvent(event)) {
       // Check if this event
-      if (event.getType() == ActivitiEventType.ENTITY_CREATED) {
+      if (event.getType() == ActivitiEngineEventType.ENTITY_CREATED) {
         onCreate(event);
-      } else if (event.getType() == ActivitiEventType.ENTITY_INITIALIZED) {
+      } else if (event.getType() == ActivitiEngineEventType.ENTITY_INITIALIZED) {
         onInitialized(event);
-      } else if (event.getType() == ActivitiEventType.ENTITY_DELETED) {
+      } else if (event.getType() == ActivitiEngineEventType.ENTITY_DELETED) {
         onDelete(event);
-      } else if (event.getType() == ActivitiEventType.ENTITY_UPDATED) {
+      } else if (event.getType() == ActivitiEngineEventType.ENTITY_UPDATED) {
         onUpdate(event);
       } else {
         // Entity-specific event

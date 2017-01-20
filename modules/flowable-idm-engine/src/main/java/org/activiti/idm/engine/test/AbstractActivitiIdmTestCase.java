@@ -17,13 +17,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.idm.api.IdmIdentityService;
 import org.activiti.idm.api.IdmManagementService;
 import org.activiti.idm.engine.IdmEngine;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.db.DbSqlSession;
 import org.activiti.idm.engine.impl.interceptor.Command;
-import org.activiti.idm.engine.impl.interceptor.CommandConfig;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 import org.activiti.idm.engine.impl.interceptor.CommandExecutor;
 import org.junit.Assert;

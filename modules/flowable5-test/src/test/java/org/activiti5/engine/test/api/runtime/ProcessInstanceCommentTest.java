@@ -14,7 +14,7 @@ package org.activiti5.engine.test.api.runtime;
 
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;

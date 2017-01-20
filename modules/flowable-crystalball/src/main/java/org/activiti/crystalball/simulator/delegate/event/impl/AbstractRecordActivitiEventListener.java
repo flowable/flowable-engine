@@ -15,8 +15,8 @@ package org.activiti.crystalball.simulator.delegate.event.impl;
 
 import org.activiti.crystalball.simulator.SimulationEvent;
 import org.activiti.crystalball.simulator.delegate.event.Function;
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -12,9 +12,9 @@
  */
 package org.activiti5.engine.test.api.event;
 
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
+import org.activiti.engine.impl.delegate.event.ActivitiEngineEntityEvent;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
@@ -45,23 +45,23 @@ public class CommentEventsTest extends PluggableActivitiTestCase {
 			// Create link-comment
 			Comment comment = taskService.addComment(task.getId(), task.getProcessInstanceId(), "comment");
 			assertEquals(2, listener.getEventsReceived().size());
-			ActivitiEntityEvent event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(ActivitiEventType.ENTITY_CREATED, event.getType());
+			ActivitiEngineEntityEvent event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+			assertEquals(ActivitiEngineEventType.ENTITY_CREATED, event.getType());
 			assertEquals(processInstance.getId(), event.getProcessInstanceId());
 			assertEquals(processInstance.getId(), event.getExecutionId());
 			assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
 			org.activiti5.engine.task.Comment commentFromEvent = (org.activiti5.engine.task.Comment) event.getEntity();
 			assertEquals(comment.getId(), commentFromEvent.getId());
 			
-			event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
-			assertEquals(ActivitiEventType.ENTITY_INITIALIZED, event.getType());
+			event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(1);
+			assertEquals(ActivitiEngineEventType.ENTITY_INITIALIZED, event.getType());
 			listener.clearEventsReceived();
 			
 			// Finally, delete comment
 			taskService.deleteComment(comment.getId());
 			assertEquals(1, listener.getEventsReceived().size());
-			event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(ActivitiEventType.ENTITY_DELETED, event.getType());
+			event = (ActivitiEngineEntityEvent) listener.getEventsReceived().get(0);
+			assertEquals(ActivitiEngineEventType.ENTITY_DELETED, event.getType());
 			assertEquals(processInstance.getId(), event.getProcessInstanceId());
 			assertEquals(processInstance.getId(), event.getExecutionId());
 			assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());

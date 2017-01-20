@@ -39,7 +39,7 @@
     </constructor-arg>
   </bean>
 
-  <bean id="clock" class="org.activiti.engine.impl.util.DefaultClockImpl"/>
+  <bean id="clock" class="org.activiti.engine.common.impl.util.DefaultClockImpl"/>
 
   <bean id="eventCalendar" class="org.activiti.crystalball.simulator.SimpleEventCalendarFactory">
     <constructor-arg name="clockReader" ref="clock"/>

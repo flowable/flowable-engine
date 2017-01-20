@@ -13,9 +13,11 @@
 
 package org.activiti.rest.service.api.management;
 
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import io.swagger.annotations.*;
+
 import org.activiti.engine.ManagementService;
-import org.activiti.engine.management.TableMetaData;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.management.TableMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,13 +28,19 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Frederik Heremans
  */
 @RestController
+@Api(tags = { "Database tables" }, description = "Manage Database tables")
 public class TableColumnsResource {
 
   @Autowired
   protected ManagementService managementService;
 
+  @ApiOperation(value = "Get column info for a single table", tags = {"Database tables"})
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates the table exists and the table column info is returned."),
+          @ApiResponse(code = 404, message = "Indicates the requested table does not exist.")
+  })
   @RequestMapping(value = "/management/tables/{tableName}/columns", method = RequestMethod.GET, produces = "application/json")
-  public TableMetaData getTableMetaData(@PathVariable String tableName) {
+  public TableMetaData getTableMetaData(@ApiParam(name = "tableName") @PathVariable String tableName) {
     TableMetaData response = managementService.getTableMetaData(tableName);
 
     if (response == null) {

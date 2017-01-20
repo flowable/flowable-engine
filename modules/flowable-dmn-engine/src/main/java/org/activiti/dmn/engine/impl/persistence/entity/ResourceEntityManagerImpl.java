@@ -16,8 +16,8 @@ package org.activiti.dmn.engine.impl.persistence.entity;
 import java.util.List;
 
 import org.activiti.dmn.engine.DmnEngineConfiguration;
-import org.activiti.dmn.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.dmn.engine.impl.persistence.entity.data.ResourceDataManager;
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Tom Baeyens

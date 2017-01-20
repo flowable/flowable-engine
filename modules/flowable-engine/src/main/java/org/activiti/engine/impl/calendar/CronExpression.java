@@ -31,7 +31,7 @@ import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
-import org.activiti.engine.runtime.ClockReader;
+import org.activiti.engine.common.runtime.ClockReader;
 
 /**
  * Provides a parser and evaluator for unix-like cron expressions. Cron expressions provide the ability to specify complex time combinations such as &quot;At 8:00am every Monday through Friday&quot;

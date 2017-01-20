@@ -71,14 +71,14 @@
     select * from ${prefix}ACT_ID_GROUP where ID_ = #{id, jdbcType=VARCHAR}
   </select>
     
-  <select id="selectGroupsByUserId" parameterType="org.activiti.idm.engine.impl.db.ListQueryParameterObject" resultMap="groupResultMap">
+  <select id="selectGroupsByUserId" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="groupResultMap">
     select g.*
     from ${prefix}ACT_ID_GROUP g, ${prefix}ACT_ID_MEMBERSHIP membership
     where g.ID_ = membership.GROUP_ID_
       and membership.USER_ID_ = #{parameter}
   </select>
 
-  <select id="selectGroupsByUserIdAndGroupType" parameterType="org.activiti.idm.engine.impl.db.ListQueryParameterObject" resultMap="groupResultMap">
+  <select id="selectGroupsByUserIdAndGroupType" parameterType="org.activiti.engine.common.impl.db.ListQueryParameterObject" resultMap="groupResultMap">
     select g.*
     from ${prefix}ACT_ID_GROUP g, ${prefix}ACT_ID_MEMBERSHIP membership
     where g.ID_ = membership.GROUP_ID_
@@ -146,6 +146,14 @@
 
   <select id="selectGroupCountByNativeQuery" parameterType="java.util.Map" resultType="long">
     ${sql}
+  </select>
+  
+  <select id="selectGroupsWithPrivilegeId" parameterType="string" resultMap="groupResultMap">
+    select RES.* from ${prefix}ACT_ID_GROUP RES
+    inner join ${prefix}ACT_ID_PRIV_MAPPING MAPPING on MAPPING.GROUP_ID_ = RES.ID_
+    inner join ${prefix}ACT_ID_PRIV PRIV on PRIV.ID_ = MAPPING.PRIV_ID_
+    where PRIV.ID_ = #{parameter}
+    order by RES.NAME_
   </select>
   
 </mapper>

@@ -14,7 +14,7 @@ package org.activiti.engine.impl.cfg;
 
 import javax.transaction.TransactionManager;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.cfg.jta.JtaTransactionContextFactory;
 import org.activiti.engine.impl.interceptor.CommandInterceptor;
 import org.activiti.engine.impl.interceptor.JtaTransactionInterceptor;

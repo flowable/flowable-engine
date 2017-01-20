@@ -3,7 +3,7 @@ package org.activiti.engine.impl.agenda;
 import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.FlowNode;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.delegate.ActivityBehavior;
 import org.activiti.engine.impl.delegate.TriggerableActivityBehavior;
 import org.activiti.engine.impl.interceptor.CommandContext;

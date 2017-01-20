@@ -13,10 +13,10 @@
 package org.activiti.standalone.validation;
 
 import org.activiti.bpmn.exceptions.XMLException;
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngines;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.activiti.engine.repository.Deployment;
 import org.junit.After;
@@ -36,7 +36,7 @@ public class DisabledSchemaValidationTest {
   @Before
   public void setup() {
     this.processEngine = new StandaloneInMemProcessEngineConfiguration()
-      .setProcessEngineName(this.getClass().getName())
+      .setEngineName(this.getClass().getName())
       .setJdbcUrl("jdbc:h2:mem:activiti-process-validation;DB_CLOSE_DELAY=1000")
       .buildProcessEngine();
     this.repositoryService = processEngine.getRepositoryService();

@@ -17,6 +17,9 @@
 		<activiti.artifact>
 			org.activiti.dmn.engine
 		</activiti.artifact>
+		<activiti.osgi.import.additional>
+			org.springframework*;resolution:=optional,
+		</activiti.osgi.import.additional>
 	</properties>
 
     <dependencies>
@@ -31,6 +34,14 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-dmn-xml-converter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-engine-common-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-engine-common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -218,7 +229,7 @@
 										<copy file="${basedir}/../../qa/db/activiti.dmn.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset
-												filtersfile="${user.home}/.activiti/jdbc/build.activiti6.${databasedmn}.properties" />
+												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasedmn}.properties" />
 										</copy>
 									</tasks>
 								</configuration>
@@ -270,7 +281,7 @@
 										<copy file="${basedir}/../../qa/db/schema/activiti.dmn.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset
-												filtersfile="${user.home}/.activiti/jdbc/build.activiti6.${databasewithschemadmn}.properties" />
+												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasewithschemadmn}.properties" />
 										</copy>
 									</tasks>
 								</configuration>

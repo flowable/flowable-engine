@@ -12,7 +12,6 @@
  */
 package org.activiti.dmn.engine.impl.util;
 
-import org.activiti.dmn.engine.ActivitiDmnException;
 import org.activiti.dmn.engine.impl.context.Context;
 import org.activiti.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
 import org.activiti.dmn.engine.impl.persistence.deploy.DeploymentManager;
@@ -20,6 +19,7 @@ import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
 import org.activiti.dmn.model.Decision;
 import org.activiti.dmn.model.DmnDefinition;
+import org.activiti.engine.common.api.ActivitiException;
 
 /**
  * A utility class that hides the complexity of {@link DecisionTableEntity} and {@link Decision} lookup. 
@@ -75,7 +75,7 @@ public class DecisionTableUtil {
     DecisionTableEntityManager decisionTableEntityManager = Context.getDmnEngineConfiguration().getDecisionTableEntityManager();
     DecisionTableEntity decisionTable = decisionTableEntityManager.findById(decisionTableId);
     if (decisionTable == null) {
-      throw new ActivitiDmnException("No decision table found with id " + decisionTableId);
+      throw new ActivitiException("No decision table found with id " + decisionTableId);
     }
     
     return decisionTable;

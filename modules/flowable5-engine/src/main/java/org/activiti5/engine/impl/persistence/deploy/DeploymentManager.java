@@ -19,8 +19,9 @@ import java.util.Map;
 
 import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
+import org.activiti.engine.common.impl.util.io.BytesStreamSource;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.persistence.deploy.DeploymentCache;
 import org.activiti.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -34,7 +35,6 @@ import org.activiti5.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti5.engine.impl.persistence.entity.DeploymentEntityManager;
 import org.activiti5.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti5.engine.impl.persistence.entity.ResourceEntity;
-import org.activiti5.engine.impl.util.io.BytesStreamSource;
 import org.activiti5.engine.repository.Deployment;
 
 
@@ -219,7 +219,7 @@ public class DeploymentManager {
       // Since all process definitions are deleted by a single query, we should dispatch the events in this loop
       if (eventDispatcher.isEnabled()) {
       	eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(
-      			ActivitiEventType.ENTITY_DELETED, processDefinition));
+      			ActivitiEngineEventType.ENTITY_DELETED, processDefinition));
       }
     }
     
@@ -229,7 +229,7 @@ public class DeploymentManager {
     // Since we use a delete by query, delete-events are not automatically dispatched
     if (eventDispatcher.isEnabled()) {
     	eventDispatcher.dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_DELETED, deployment));
+    			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_DELETED, deployment));
     }
     
     for (ProcessDefinition processDefinition : processDefinitions) {

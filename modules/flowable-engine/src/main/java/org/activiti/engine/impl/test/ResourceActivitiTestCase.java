@@ -43,6 +43,7 @@ public abstract class ResourceActivitiTestCase extends AbstractActivitiTestCase 
     super.closeDownProcessEngine();
     ProcessEngines.unregister(processEngine);
     processEngine = null;
+    nullifyServices();
   }
 
   @Override
@@ -50,7 +51,7 @@ public abstract class ResourceActivitiTestCase extends AbstractActivitiTestCase 
     ProcessEngineConfiguration config = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource(activitiConfigurationResource);
     if (processEngineName != null) {
       logger.info("Initializing process engine with name '" + processEngineName + "'");
-      config.setProcessEngineName(processEngineName);
+      config.setEngineName(processEngineName);
     }
     additionalConfiguration(config);
     processEngine = config.buildProcessEngine();

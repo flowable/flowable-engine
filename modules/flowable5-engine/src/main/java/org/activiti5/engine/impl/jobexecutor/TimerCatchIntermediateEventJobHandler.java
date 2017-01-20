@@ -12,7 +12,7 @@
  */
 package org.activiti5.engine.impl.jobexecutor;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.runtime.Job;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.delegate.event.impl.ActivitiEventBuilder;
@@ -47,7 +47,7 @@ public class TimerCatchIntermediateEventJobHandler extends TimerEventHandler imp
     try {
       if (commandContext.getEventDispatcher().isEnabled()) {
         commandContext.getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(ActivitiEventType.TIMER_FIRED, job));
+          ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.TIMER_FIRED, job));
       }
 
       if(!execution.getActivity().getId().equals(intermediateEventActivity.getId())) {

@@ -19,9 +19,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.activiti.dmn.api.DecisionTableQuery;
 import org.activiti.dmn.api.DmnRepositoryService;
-import org.activiti.dmn.api.QueryProperty;
 import org.activiti.dmn.engine.impl.DecisionTableQueryProperty;
-import org.activiti.rest.dmn.common.DataResponse;
+import org.activiti.engine.common.api.query.QueryProperty;
+import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.dmn.service.api.DmnRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;

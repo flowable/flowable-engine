@@ -13,8 +13,8 @@
 
 package org.activiti.rest.service.api.identity;
 
-import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.IdentityService;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.idm.api.User;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;

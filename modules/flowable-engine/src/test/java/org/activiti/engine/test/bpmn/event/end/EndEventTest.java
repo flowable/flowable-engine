@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.test.bpmn.event.end;
 
-import org.activiti.engine.ActivitiOptimisticLockingException;
+import org.activiti.engine.common.api.ActivitiOptimisticLockingException;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;

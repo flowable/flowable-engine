@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet id="1" author="flowable">
+
+        <createTable tableName="ACT_ADM_SERVER_CONFIG">
+            <column name="ID_" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="NAME_" type="varchar(50)" />
+            <column name="DESCRIPTION_" type="varchar(255)" />
+            <column name="SERVER_ADDRESS_" type="varchar(100)" />
+            <column name="PORT_" type="integer" />
+            <column name="CONTEXT_ROOT_" type="varchar(100)" />
+            <column name="REST_ROOT_" type="varchar(100)" />
+            <column name="USER_NAME_" type="varchar(100)" />
+            <column name="PASSWORD_" type="varchar(100)" />
+            <column name="ENDPOINT_TYPE_" type="int" />
+            <column name="TENANT_ID_" type="varchar(50)" />
+        </createTable>
+
+	</changeSet>
+
+</databaseChangeLog>

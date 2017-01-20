@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.common.impl.Page;
 import org.activiti.engine.impl.EventSubscriptionQueryImpl;
-import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.persistence.CachedEntityMatcher;
 import org.activiti.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;

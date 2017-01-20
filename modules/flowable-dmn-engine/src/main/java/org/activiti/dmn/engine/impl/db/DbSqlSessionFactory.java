@@ -18,11 +18,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.activiti.dmn.engine.ActivitiDmnException;
-import org.activiti.dmn.engine.impl.cfg.IdGenerator;
-import org.activiti.dmn.engine.impl.interceptor.CommandContext;
-import org.activiti.dmn.engine.impl.interceptor.Session;
-import org.activiti.dmn.engine.impl.interceptor.SessionFactory;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.cfg.IdGenerator;
+import org.activiti.engine.common.impl.interceptor.AbstractCommandContext;
+import org.activiti.engine.common.impl.interceptor.Session;
+import org.activiti.engine.common.impl.interceptor.SessionFactory;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 /**
@@ -57,20 +58,20 @@ public class DbSqlSessionFactory implements SessionFactory {
     return DbSqlSession.class;
   }
 
-  public Session openSession(CommandContext commandContext) {
+  public Session openSession(AbstractCommandContext commandContext) {
     DbSqlSession dbSqlSession = new DbSqlSession(this);
     if (getDatabaseSchema() != null && getDatabaseSchema().length() > 0) {
       try {
         dbSqlSession.getSqlSession().getConnection().setSchema(getDatabaseSchema());
       } catch (SQLException e) {
-        throw new ActivitiDmnException("Could not set database schema on connection", e);
+        throw new ActivitiException("Could not set database schema on connection", e);
       }
     }
     if (getDatabaseCatalog() != null && getDatabaseCatalog().length() > 0) {
       try {
         dbSqlSession.getSqlSession().getConnection().setCatalog(getDatabaseCatalog());
       } catch (SQLException e) {
-        throw new ActivitiDmnException("Could not set database catalog on connection", e);
+        throw new ActivitiException("Could not set database catalog on connection", e);
       }
     }
     return dbSqlSession;

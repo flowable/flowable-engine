@@ -15,8 +15,8 @@ package org.activiti.idm.engine.impl.persistence.entity;
 
 import java.util.Map;
 
-import org.activiti.idm.engine.impl.db.Entity;
-import org.activiti.idm.engine.impl.db.HasRevision;
+import org.activiti.engine.common.impl.db.HasRevision;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
 
 /**
  * @author Tom Baeyens

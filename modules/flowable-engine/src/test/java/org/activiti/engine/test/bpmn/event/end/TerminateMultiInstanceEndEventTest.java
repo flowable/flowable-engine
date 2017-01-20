@@ -14,8 +14,8 @@ package org.activiti.engine.test.bpmn.event.end;
 
 import java.util.List;
 
+import org.activiti.engine.common.impl.util.CollectionUtil;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
-import org.activiti.engine.impl.util.CollectionUtil;
 import org.activiti.engine.runtime.Job;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;

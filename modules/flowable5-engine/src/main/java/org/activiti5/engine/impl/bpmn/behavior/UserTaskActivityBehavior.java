@@ -25,7 +25,7 @@ import org.activiti.engine.DynamicBpmnConstants;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.delegate.TaskListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.calendar.BusinessCalendar;
 import org.activiti5.engine.ActivitiException;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
@@ -216,7 +216,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
     // All properties set, now firing 'create' events
     if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-        ActivitiEventBuilder.createEntityEvent(ActivitiEventType.TASK_CREATED, task));
+        ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.TASK_CREATED, task));
     }
 
     if (skipUserTask) {

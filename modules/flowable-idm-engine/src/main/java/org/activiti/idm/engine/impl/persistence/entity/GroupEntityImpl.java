@@ -16,6 +16,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.activiti.engine.common.impl.persistence.entity.AbstractEntity;
+
 /**
  * @author Tom Baeyens
  */

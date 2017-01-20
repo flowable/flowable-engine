@@ -16,8 +16,8 @@ import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -160,50 +160,6 @@ public class AsyncExecutorTest {
 
       // Clean up
       cleanup(processEngine);
-
-    }
-
-  }
-
-  @Test
-  public void testAsyncScriptExecutionOnTwoEngines() {
-
-    ProcessEngine firstProcessEngine = null;
-    ProcessEngine secondProcessEngine = null;
-
-    try {
-
-      // Deploy
-      firstProcessEngine = createProcessEngine(false);
-      Date now = setClockToCurrentTime(firstProcessEngine);
-      deploy(firstProcessEngine, "AsyncExecutorTest.testAsyncScriptExecution.bpmn20.xml");
-
-      // Start process instance. Nothing should happen
-      firstProcessEngine.getRuntimeService().startProcessInstanceByKey("asyncScript");
-      Assert.assertEquals(0, firstProcessEngine.getTaskService().createTaskQuery().taskName("Task after script").count());
-      Assert.assertEquals(1, firstProcessEngine.getManagementService().createJobQuery().count());
-
-      // Start second engine, with async executor enabled
-      secondProcessEngine = createProcessEngine(true, now); // Same timestamp as first engine
-      Assert.assertEquals(0, firstProcessEngine.getTaskService().createTaskQuery().taskName("Task after script").count());
-      Assert.assertEquals(1, firstProcessEngine.getManagementService().createJobQuery().count());
-
-      // Move the clock 1 second. Should be executed now by second engine
-      addSecondsToCurrentTime(secondProcessEngine, 1);
-      waitForAllJobsBeingExecuted(secondProcessEngine, 10000L);
-
-      // Verify if all is as expected
-      Assert.assertEquals(1, firstProcessEngine.getTaskService().createTaskQuery().taskName("Task after script").count());
-      Assert.assertEquals(0, firstProcessEngine.getManagementService().createJobQuery().count());
-
-      Assert.assertEquals(0, getAsyncExecutorJobCount(firstProcessEngine));
-      Assert.assertEquals(1, getAsyncExecutorJobCount(secondProcessEngine));
-
-    } finally {
-
-      // Clean up
-      cleanup(firstProcessEngine);
-      cleanup(secondProcessEngine);
 
     }
 

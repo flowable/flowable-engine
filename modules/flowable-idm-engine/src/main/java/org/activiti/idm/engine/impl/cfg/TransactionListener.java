@@ -12,12 +12,13 @@
  */
 package org.activiti.idm.engine.impl.cfg;
 
+import org.activiti.engine.common.impl.cfg.BaseTransactionListener;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Tijs Rademakers
  */
-public interface TransactionListener {
+public interface TransactionListener extends BaseTransactionListener<CommandContext> {
 
   void execute(CommandContext commandContext);
 }

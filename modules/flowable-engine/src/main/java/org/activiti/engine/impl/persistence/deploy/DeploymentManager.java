@@ -17,12 +17,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.app.AppModel;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
-import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.ProcessDefinitionQueryImpl;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -44,6 +45,7 @@ public class DeploymentManager {
 
   protected DeploymentCache<ProcessDefinitionCacheEntry> processDefinitionCache;
   protected ProcessDefinitionInfoCache processDefinitionInfoCache;
+  protected DeploymentCache<Object> appResourceCache;
   protected DeploymentCache<Object> knowledgeBaseCache; // Needs to be object to avoid an import to Drools in this core class
   protected List<Deployer> deployers;
   
@@ -137,6 +139,46 @@ public class DeploymentManager {
     }
     return cachedProcessDefinition;
   }
+  
+  public Object getAppResourceObject(String deploymentId) {
+    Object appResourceObject = appResourceCache.get(deploymentId);
+    
+    if (appResourceObject == null) {
+      boolean appResourcePresent = false;
+      List<String> deploymentResourceNames = getDeploymentEntityManager().getDeploymentResourceNames(deploymentId);
+      for (String deploymentResourceName : deploymentResourceNames) {
+        if (deploymentResourceName.endsWith(".app")) {
+          appResourcePresent = true;
+          break;
+        }
+      }
+      
+      if (appResourcePresent) {
+        DeploymentEntity deployment = deploymentEntityManager.findById(deploymentId);
+        deployment.setNew(false);
+        deploy(deployment, null);
+      
+      } else {
+        throw new ActivitiException("No .app resource found for deployment '" + deploymentId + "'");
+      }
+      
+      appResourceObject = appResourceCache.get(deploymentId);
+      if (appResourceObject == null) {
+        throw new ActivitiException("deployment '" + deploymentId + "' didn't put an app resource in the cache");
+      }
+    }
+    
+    return appResourceObject;
+  }
+  
+  public AppModel getAppResourceModel(String deploymentId) {
+    Object appResourceObject = getAppResourceObject(deploymentId);
+    if (appResourceObject instanceof AppModel == false) {
+      throw new ActivitiException("App resource is not of type AppModel");
+    }
+    
+    return (AppModel) appResourceObject;
+  }
 
   public void removeDeployment(String deploymentId, boolean cascade) {
 
@@ -160,7 +202,7 @@ public class DeploymentManager {
 
       // Since all process definitions are deleted by a single query, we should dispatch the events in this loop
       if (eventDispatcher.isEnabled()) {
-        eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_DELETED, processDefinition));
+        eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_DELETED, processDefinition));
       }
     }
 
@@ -169,12 +211,16 @@ public class DeploymentManager {
 
     // Since we use a delete by query, delete-events are not automatically dispatched
     if (eventDispatcher.isEnabled()) {
-      eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_DELETED, deployment));
+      eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_DELETED, deployment));
     }
 
     for (ProcessDefinition processDefinition : processDefinitions) {
       processDefinitionCache.remove(processDefinition.getId());
+      processDefinitionInfoCache.remove(processDefinition.getId());
     }
+    
+    appResourceCache.remove(deploymentId);
+    knowledgeBaseCache.remove(deploymentId);
   }
 
   // getters and setters
@@ -210,6 +256,14 @@ public class DeploymentManager {
 
   public void setKnowledgeBaseCache(DeploymentCache<Object> knowledgeBaseCache) {
     this.knowledgeBaseCache = knowledgeBaseCache;
+  }
+  
+  public DeploymentCache<Object> getAppResourceCache() {
+    return appResourceCache;
+  }
+
+  public void setAppResourceCache(DeploymentCache<Object> appResourceCache) {
+    this.appResourceCache = appResourceCache;
   }
   
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {

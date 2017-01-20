@@ -16,7 +16,9 @@ package org.activiti.rest.service.api.runtime.task;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import io.swagger.annotations.*;
+
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.task.Attachment;
 import org.activiti.engine.task.Comment;
@@ -32,10 +34,16 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Frederik Heremans
  */
 @RestController
+@Api(tags = { "Tasks" }, description = "Manage Tasks")
 public class TaskAttachmentResource extends TaskBaseResource {
 
+  @ApiOperation(value = "Get an attachment on a task", tags = {"Tasks"})
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates the task and attachment were found and the attachment is returned."),
+          @ApiResponse(code = 404, message = "Indicates the requested task was not found or the tasks doesn’t have a attachment with the given ID.")
+  })
   @RequestMapping(value = "/runtime/tasks/{taskId}/attachments/{attachmentId}", method = RequestMethod.GET, produces = "application/json")
-  public AttachmentResponse getAttachment(@PathVariable("taskId") String taskId, @PathVariable("attachmentId") String attachmentId, HttpServletRequest request) {
+  public AttachmentResponse getAttachment(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "attachmentId") @PathVariable("attachmentId") String attachmentId, HttpServletRequest request) {
 
     HistoricTaskInstance task = getHistoricTaskFromRequest(taskId);
 
@@ -47,8 +55,13 @@ public class TaskAttachmentResource extends TaskBaseResource {
     return restResponseFactory.createAttachmentResponse(attachment);
   }
 
+  @ApiOperation(value = "Delete an attachment on a task", tags = {"Tasks"})
+  @ApiResponses(value = {
+          @ApiResponse(code = 204, message = "Indicates the task and attachment were found and the attachment is deleted. Response body is left empty intentionally."),
+          @ApiResponse(code = 404, message = "Indicates the requested task was not found or the tasks doesn’t have a attachment with the given ID.")
+  })
   @RequestMapping(value = "/runtime/tasks/{taskId}/attachments/{attachmentId}", method = RequestMethod.DELETE)
-  public void deleteAttachment(@PathVariable("taskId") String taskId, @PathVariable("attachmentId") String attachmentId, HttpServletResponse response) {
+  public void deleteAttachment(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "attachmentId") @PathVariable("attachmentId") String attachmentId, HttpServletResponse response) {
 
     Task task = getTaskFromRequest(taskId);
 

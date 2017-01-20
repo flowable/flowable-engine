@@ -33,8 +33,8 @@ import org.activiti.cdi.impl.util.ActivitiServices;
 import org.activiti.cdi.impl.util.BeanManagerLookup;
 import org.activiti.cdi.impl.util.ProgrammaticBeanLookup;
 import org.activiti.cdi.spi.ProcessEngineLookup;
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.common.api.ActivitiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,6 +1,6 @@
 package org.activiti.engine.history;
 
-import org.activiti.engine.query.NativeQuery;
+import org.activiti.engine.common.api.query.NativeQuery;
 
 /**
  * Allows querying of {@link HistoricActivityInstanceQuery}s via native (SQL) queries

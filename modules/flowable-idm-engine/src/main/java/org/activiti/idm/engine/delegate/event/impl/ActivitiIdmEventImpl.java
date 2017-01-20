@@ -12,16 +12,16 @@
  */
 package org.activiti.idm.engine.delegate.event.impl;
 
-import org.activiti.idm.api.event.ActivitiIdmEvent;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
 import org.activiti.idm.api.event.ActivitiIdmEventType;
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
 
 /**
  * Base class for all {@link ActivitiIdmEvent} implementations.
  * 
  * @author Tijs Rademakers
  */
-public class ActivitiIdmEventImpl implements ActivitiIdmEvent {
+public class ActivitiIdmEventImpl implements ActivitiEvent {
 
   protected ActivitiIdmEventType type;
 
@@ -30,7 +30,7 @@ public class ActivitiIdmEventImpl implements ActivitiIdmEvent {
    */
   public ActivitiIdmEventImpl(ActivitiIdmEventType type) {
     if (type == null) {
-      throw new ActivitiIdmIllegalArgumentException("type is null");
+      throw new ActivitiIllegalArgumentException("type is null");
     }
     this.type = type;
   }

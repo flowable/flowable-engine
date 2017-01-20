@@ -15,10 +15,10 @@ package org.activiti.idm.engine.impl.persistence.entity.data.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.common.impl.Page;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.GroupQueryImpl;
-import org.activiti.idm.engine.impl.Page;
 import org.activiti.idm.engine.impl.persistence.entity.GroupEntity;
 import org.activiti.idm.engine.impl.persistence.entity.GroupEntityImpl;
 import org.activiti.idm.engine.impl.persistence.entity.data.AbstractDataManager;
@@ -55,6 +55,12 @@ public class MybatisGroupDataManager extends AbstractDataManager<GroupEntity> im
   @SuppressWarnings("unchecked")
   public List<Group> findGroupsByUser(String userId) {
     return getDbSqlSession().selectList("selectGroupsByUserId", userId);
+  }
+  
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<Group> findGroupsByPrivilegeId(String privilegeId) {
+    return getDbSqlSession().selectList("selectGroupsWithPrivilegeId", privilegeId);
   }
 
   @SuppressWarnings("unchecked")

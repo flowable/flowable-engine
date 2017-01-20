@@ -15,8 +15,8 @@ package org.activiti.idm.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.idm.api.Group;
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
 import org.activiti.idm.engine.impl.interceptor.Command;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 
@@ -31,7 +31,7 @@ public class CreateGroupCmd implements Command<Group>, Serializable {
 
   public CreateGroupCmd(String groupId) {
     if (groupId == null) {
-      throw new ActivitiIdmIllegalArgumentException("groupId is null");
+      throw new ActivitiIllegalArgumentException("groupId is null");
     }
     this.groupId = groupId;
   }

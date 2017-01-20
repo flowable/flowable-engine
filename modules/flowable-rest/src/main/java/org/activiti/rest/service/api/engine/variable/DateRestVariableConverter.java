@@ -16,7 +16,7 @@ package org.activiti.rest.service.api.engine.variable;
 import java.text.ParseException;
 import java.util.Date;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 

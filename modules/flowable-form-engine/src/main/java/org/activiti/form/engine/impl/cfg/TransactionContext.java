@@ -12,10 +12,14 @@
  */
 package org.activiti.form.engine.impl.cfg;
 
+import org.activiti.engine.common.impl.cfg.BaseTransactionContext;
+import org.activiti.engine.common.impl.cfg.TransactionState;
+import org.activiti.form.engine.impl.interceptor.CommandContext;
+
 /**
  * @author Tijs Rademakers
  */
-public interface TransactionContext {
+public interface TransactionContext extends BaseTransactionContext<TransactionListener, CommandContext> {
 
   void commit();
 

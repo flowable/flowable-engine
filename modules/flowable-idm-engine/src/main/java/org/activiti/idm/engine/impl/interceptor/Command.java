@@ -12,10 +12,12 @@
  */
 package org.activiti.idm.engine.impl.interceptor;
 
+import org.activiti.engine.common.impl.interceptor.BaseCommand;
+
 /**
  * @author Tijs Rademakers
  */
-public interface Command<T> {
+public interface Command<T> extends BaseCommand<T, CommandContext> {
 
   T execute(CommandContext commandContext);
 

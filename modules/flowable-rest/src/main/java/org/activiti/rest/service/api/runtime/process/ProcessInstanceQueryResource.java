@@ -17,7 +17,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.activiti.rest.common.api.DataResponse;
+import io.swagger.annotations.*;
+import org.activiti.rest.api.DataResponse;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,10 +29,18 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Frederik Heremans
  */
 @RestController
+@Api(tags = { "Process Instances" }, description = "Manage Process Instances")
 public class ProcessInstanceQueryResource extends BaseProcessInstanceResource {
 
+  @ApiOperation(value = "Query process instances", tags = { "Process Instances" }, notes = "The request body can contain all possible filters that can be used in the List process instances URL query. On top of these, it’s possible to provide an array of variables to include in the query, with their format described here.\n"
+          + "\n" + "The general paging and sorting query-parameters can be used for this URL.")
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates request was successful and the process-instances are returned"),
+          @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
+  })
   @RequestMapping(value = "/query/process-instances", method = RequestMethod.POST, produces = "application/json")
-  public DataResponse queryProcessInstances(@RequestBody ProcessInstanceQueryRequest queryRequest, @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+  public DataResponse queryProcessInstances(@RequestBody ProcessInstanceQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams,
+          HttpServletRequest request) {
 
     return getQueryResponse(queryRequest, allRequestParams);
   }

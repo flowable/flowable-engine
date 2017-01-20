@@ -13,10 +13,11 @@ import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.Gateway;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.SubProcess;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.util.CollectionUtil;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.Condition;
 import org.activiti.engine.impl.bpmn.helper.SkipExpressionUtil;
@@ -25,7 +26,6 @@ import org.activiti.engine.impl.el.UelExpressionCondition;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntityManager;
-import org.activiti.engine.impl.util.CollectionUtil;
 import org.activiti.engine.impl.util.condition.ConditionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +101,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
       
       if (!(execution.getCurrentFlowElement() instanceof SubProcess)) {
         Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-            ActivitiEventBuilder.createActivityEvent(ActivitiEventType.ACTIVITY_COMPLETED, flowNode.getId(), flowNode.getName(),
+            ActivitiEventBuilder.createActivityEvent(ActivitiEngineEventType.ACTIVITY_COMPLETED, flowNode.getId(), flowNode.getName(),
                 execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
       }
       

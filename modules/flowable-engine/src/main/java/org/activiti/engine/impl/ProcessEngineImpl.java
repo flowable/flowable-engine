@@ -14,6 +14,9 @@ package org.activiti.engine.impl;
 
 import java.util.Map;
 
+import org.activiti.content.api.ContentService;
+import org.activiti.dmn.api.DmnRepositoryService;
+import org.activiti.dmn.api.DmnRuleService;
 import org.activiti.engine.DynamicBpmnService;
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
@@ -24,14 +27,17 @@ import org.activiti.engine.ProcessEngines;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.impl.cfg.TransactionContextFactory;
+import org.activiti.engine.common.impl.interceptor.SessionFactory;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.cfg.TransactionContextFactory;
+import org.activiti.engine.impl.cfg.TransactionListener;
+import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
-import org.activiti.engine.impl.interceptor.SessionFactory;
 import org.activiti.form.api.FormRepositoryService;
+import org.activiti.idm.api.IdmIdentityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,15 +59,19 @@ public class ProcessEngineImpl implements ProcessEngine {
   protected DynamicBpmnService dynamicBpmnService;
   protected FormRepositoryService formEngineRepositoryService;
   protected org.activiti.form.api.FormService formEngineFormService;
+  protected DmnRepositoryService dmnRepositoryService;
+  protected DmnRuleService dmnRuleService;
+  protected IdmIdentityService idmIdentityService;
+  protected ContentService contentService;
   protected AsyncExecutor asyncExecutor;
   protected CommandExecutor commandExecutor;
   protected Map<Class<?>, SessionFactory> sessionFactories;
-  protected TransactionContextFactory transactionContextFactory;
+  protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
   public ProcessEngineImpl(ProcessEngineConfigurationImpl processEngineConfiguration) {
     this.processEngineConfiguration = processEngineConfiguration;
-    this.name = processEngineConfiguration.getProcessEngineName();
+    this.name = processEngineConfiguration.getEngineName();
     this.repositoryService = processEngineConfiguration.getRepositoryService();
     this.runtimeService = processEngineConfiguration.getRuntimeService();
     this.historicDataService = processEngineConfiguration.getHistoryService();
@@ -76,6 +86,10 @@ public class ProcessEngineImpl implements ProcessEngine {
     this.transactionContextFactory = processEngineConfiguration.getTransactionContextFactory();
     this.formEngineRepositoryService = processEngineConfiguration.getFormEngineRepositoryService();
     this.formEngineFormService = processEngineConfiguration.getFormEngineFormService();
+    this.dmnRepositoryService = processEngineConfiguration.getDmnEngineRepositoryService();
+    this.dmnRuleService = processEngineConfiguration.getDmnEngineRuleService();
+    this.idmIdentityService = processEngineConfiguration.getIdmIdentityService();
+    this.contentService = processEngineConfiguration.getContentService();
 
     if (processEngineConfiguration.isUsingRelationalDatabase() && processEngineConfiguration.getDatabaseSchemaUpdate() != null) {
       commandExecutor.execute(processEngineConfiguration.getSchemaCommandConfig(), new SchemaOperationsProcessEngineBuild());
@@ -88,16 +102,16 @@ public class ProcessEngineImpl implements ProcessEngine {
     }
 
     ProcessEngines.registerProcessEngine(this);
+    
+    if (processEngineConfiguration.getProcessEngineLifecycleListener() != null) {
+      processEngineConfiguration.getProcessEngineLifecycleListener().onProcessEngineBuilt(this);
+    }
+    
+    processEngineConfiguration.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createGlobalEvent(ActivitiEngineEventType.ENGINE_CREATED));
 
     if (asyncExecutor != null && asyncExecutor.isAutoActivate()) {
       asyncExecutor.start();
     }
-
-    if (processEngineConfiguration.getProcessEngineLifecycleListener() != null) {
-      processEngineConfiguration.getProcessEngineLifecycleListener().onProcessEngineBuilt(this);
-    }
-
-    processEngineConfiguration.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createGlobalEvent(ActivitiEventType.ENGINE_CREATED));
   }
 
   public void close() {
@@ -105,14 +119,17 @@ public class ProcessEngineImpl implements ProcessEngine {
     if (asyncExecutor != null && asyncExecutor.isActive()) {
       asyncExecutor.shutdown();
     }
-
-    commandExecutor.execute(processEngineConfiguration.getSchemaCommandConfig(), new SchemaOperationProcessEngineClose());
+    
+    Runnable closeRunnable = processEngineConfiguration.getProcessEngineCloseRunnable();
+    if (closeRunnable != null) {
+      closeRunnable.run();
+    }
 
     if (processEngineConfiguration.getProcessEngineLifecycleListener() != null) {
       processEngineConfiguration.getProcessEngineLifecycleListener().onProcessEngineClosed(this);
     }
     
-    processEngineConfiguration.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createGlobalEvent(ActivitiEventType.ENGINE_CLOSED));
+    processEngineConfiguration.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createGlobalEvent(ActivitiEngineEventType.ENGINE_CLOSED));
   }
 
   // getters and setters
@@ -164,5 +181,21 @@ public class ProcessEngineImpl implements ProcessEngine {
   
   public org.activiti.form.api.FormService getFormEngineFormService() {
     return formEngineFormService;
+  }
+  
+  public DmnRepositoryService getDmnRepositoryService() {
+    return dmnRepositoryService;
+  }
+  
+  public DmnRuleService getDmnRuleService() {
+    return dmnRuleService;
+  }
+  
+  public IdmIdentityService getIdmIdentityService() {
+    return idmIdentityService;
+  }
+  
+  public ContentService getContentService() {
+    return contentService;
   }
 }

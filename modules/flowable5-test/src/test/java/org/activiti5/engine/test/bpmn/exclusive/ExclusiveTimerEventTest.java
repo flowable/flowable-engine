@@ -14,7 +14,7 @@ package org.activiti5.engine.test.bpmn.exclusive;
 
 import java.util.Date;
 
-import org.activiti.engine.runtime.Clock;
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.runtime.TimerJobQuery;
 import org.activiti.engine.test.Deployment;

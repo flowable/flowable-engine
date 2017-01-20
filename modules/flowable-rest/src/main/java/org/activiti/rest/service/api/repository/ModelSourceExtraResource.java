@@ -16,9 +16,11 @@ package org.activiti.rest.service.api.repository;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import io.swagger.annotations.*;
+
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.engine.repository.Model;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,11 +35,19 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
  * @author Frederik Heremans
  */
 @RestController
+@Api(tags = { "Models" }, description = "Manage Models")
 public class ModelSourceExtraResource extends BaseModelSourceResource {
 
+  @ApiOperation(value = "Get the extra editor source for a model", tags = {"Models"},
+          notes = "Response body contains the model’s raw editor source. The response’s content-type is set to application/octet-stream, regardless of the content of the source."
+  )
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates the model was found and source is returned."),
+          @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
+  })
   @RequestMapping(value = "/repository/models/{modelId}/source-extra", method = RequestMethod.GET)
   protected @ResponseBody
-  byte[] getModelBytes(@PathVariable String modelId, HttpServletResponse response) {
+  byte[] getModelBytes(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletResponse response) {
     byte[] editorSource = repositoryService.getModelEditorSourceExtra(modelId);
     if (editorSource == null) {
       throw new ActivitiObjectNotFoundException("Model with id '" + modelId + "' does not have extra source available.", String.class);
@@ -46,8 +56,14 @@ public class ModelSourceExtraResource extends BaseModelSourceResource {
     return editorSource;
   }
 
+  @ApiOperation(value = "Set the extra editor source for a model", tags = {"Models"}, consumes = "multipart/form-data",
+          notes = "Response body contains the model’s raw editor source. The response’s content-type is set to application/octet-stream, regardless of the content of the source.")
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates the model was found and the extra source has been updated."),
+          @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
+  })
   @RequestMapping(value = "/repository/models/{modelId}/source-extra", method = RequestMethod.PUT)
-  protected void setModelSource(@PathVariable String modelId, HttpServletRequest request, HttpServletResponse response) {
+  protected void setModelSource(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletRequest request, HttpServletResponse response) {
     Model model = getModelFromRequest(modelId);
     if (model != null) {
       try {

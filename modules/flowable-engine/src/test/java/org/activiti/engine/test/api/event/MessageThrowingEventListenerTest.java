@@ -12,9 +12,9 @@
  */
 package org.activiti.engine.test.api.event;
 
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.bpmn.helper.MessageThrowingEventListener;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -35,7 +35,7 @@ public class MessageThrowingEventListenerTest extends PluggableActivitiTestCase 
       listener = new MessageThrowingEventListener();
       listener.setMessageName("Message");
 
-      processEngineConfiguration.getEventDispatcher().addEventListener(listener, ActivitiEventType.TASK_ASSIGNED);
+      processEngineConfiguration.getEventDispatcher().addEventListener(listener, ActivitiEngineEventType.TASK_ASSIGNED);
 
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testMessage");
       assertNotNull(processInstance);
@@ -87,7 +87,7 @@ public class MessageThrowingEventListenerTest extends PluggableActivitiTestCase 
       listener = new MessageThrowingEventListener();
       listener.setMessageName("Message");
 
-      processEngineConfiguration.getEventDispatcher().addEventListener(listener, ActivitiEventType.TASK_ASSIGNED);
+      processEngineConfiguration.getEventDispatcher().addEventListener(listener, ActivitiEngineEventType.TASK_ASSIGNED);
 
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testMessage");
       assertNotNull(processInstance);

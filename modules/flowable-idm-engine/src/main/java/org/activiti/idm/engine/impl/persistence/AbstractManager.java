@@ -13,7 +13,7 @@
 
 package org.activiti.idm.engine.impl.persistence;
 
-import org.activiti.idm.api.event.ActivitiIdmEventDispatcher;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.context.Context;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
@@ -54,7 +54,7 @@ public abstract class AbstractManager {
     return getIdmEngineConfiguration().getCommandExecutor();
   }
   
-  protected ActivitiIdmEventDispatcher getEventDispatcher() {
+  protected ActivitiEventDispatcher getEventDispatcher() {
     return getIdmEngineConfiguration().getEventDispatcher();
   }
 

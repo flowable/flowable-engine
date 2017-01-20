@@ -15,6 +15,8 @@ package org.activiti.idm.api;
 
 import java.util.List;
 
+import org.activiti.engine.common.api.query.Query;
+
 /**
  * Allows programmatic querying of {@link User}
  * 

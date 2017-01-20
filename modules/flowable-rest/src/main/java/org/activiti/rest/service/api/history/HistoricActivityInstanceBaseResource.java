@@ -17,10 +17,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.activiti.engine.HistoryService;
+import org.activiti.engine.common.api.query.QueryProperty;
 import org.activiti.engine.history.HistoricActivityInstanceQuery;
 import org.activiti.engine.impl.HistoricActivityInstanceQueryProperty;
-import org.activiti.engine.query.QueryProperty;
-import org.activiti.rest.common.api.DataResponse;
+import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 

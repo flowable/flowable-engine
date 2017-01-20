@@ -4,8 +4,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.runtime.ClockReader;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.runtime.ClockReader;
 
 /**
  * Resolves a due date taking into account the specified time zone.

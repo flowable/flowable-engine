@@ -12,6 +12,7 @@
  */
 package org.activiti.form.engine.impl;
 
+import org.activiti.form.api.FormManagementService;
 import org.activiti.form.api.FormRepositoryService;
 import org.activiti.form.api.FormService;
 import org.activiti.form.engine.FormEngine;
@@ -28,13 +29,15 @@ public class FormEngineImpl implements FormEngine {
   private static Logger log = LoggerFactory.getLogger(FormEngineImpl.class);
 
   protected String name;
+  protected FormManagementService managementService;
   protected FormRepositoryService repositoryService;
   protected FormService formService;
   protected FormEngineConfiguration engineConfiguration;
 
   public FormEngineImpl(FormEngineConfiguration engineConfiguration) {
     this.engineConfiguration = engineConfiguration;
-    this.name = engineConfiguration.getFormEngineName();
+    this.name = engineConfiguration.getEngineName();
+    this.managementService = engineConfiguration.getFormManagementService();
     this.repositoryService = engineConfiguration.getFormRepositoryService();
     this.formService = engineConfiguration.getFormService();
 
@@ -56,6 +59,10 @@ public class FormEngineImpl implements FormEngine {
 
   public String getName() {
     return name;
+  }
+  
+  public FormManagementService getFormManagementService() {
+    return managementService;
   }
 
   public FormRepositoryService getFormRepositoryService() {

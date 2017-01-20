@@ -12,9 +12,9 @@
  */
 package org.activiti.engine.test.api.event;
 
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti.engine.repository.Deployment;
 
@@ -42,12 +42,12 @@ public class DeploymentEventsTest extends PluggableActivitiTestCase {
       assertTrue(listener.getEventsReceived().get(0) instanceof ActivitiEntityEvent);
 
       ActivitiEntityEvent event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-      assertEquals(ActivitiEventType.ENTITY_CREATED, event.getType());
+      assertEquals(ActivitiEngineEventType.ENTITY_CREATED, event.getType());
       assertEquals(deployment.getId(), ((Deployment) event.getEntity()).getId());
 
       assertTrue(listener.getEventsReceived().get(1) instanceof ActivitiEntityEvent);
       event = (ActivitiEntityEvent) listener.getEventsReceived().get(1);
-      assertEquals(ActivitiEventType.ENTITY_INITIALIZED, event.getType());
+      assertEquals(ActivitiEngineEventType.ENTITY_INITIALIZED, event.getType());
       assertEquals(deployment.getId(), ((Deployment) event.getEntity()).getId());
 
       listener.clearEventsReceived();
@@ -58,7 +58,7 @@ public class DeploymentEventsTest extends PluggableActivitiTestCase {
       assertTrue(listener.getEventsReceived().get(0) instanceof ActivitiEntityEvent);
 
       event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-      assertEquals(ActivitiEventType.ENTITY_UPDATED, event.getType());
+      assertEquals(ActivitiEngineEventType.ENTITY_UPDATED, event.getType());
       assertEquals(deployment.getId(), ((Deployment) event.getEntity()).getId());
       assertEquals("test", ((Deployment) event.getEntity()).getCategory());
       listener.clearEventsReceived();
@@ -69,7 +69,7 @@ public class DeploymentEventsTest extends PluggableActivitiTestCase {
       assertTrue(listener.getEventsReceived().get(0) instanceof ActivitiEntityEvent);
 
       event = (ActivitiEntityEvent) listener.getEventsReceived().get(0);
-      assertEquals(ActivitiEventType.ENTITY_DELETED, event.getType());
+      assertEquals(ActivitiEngineEventType.ENTITY_DELETED, event.getType());
       assertEquals(deployment.getId(), ((Deployment) event.getEntity()).getId());
       listener.clearEventsReceived();
 

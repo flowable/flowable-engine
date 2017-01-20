@@ -12,12 +12,12 @@
  */
 package org.activiti.dmn.engine.impl.cmd;
 
-import org.activiti.dmn.engine.ActivitiDmnIllegalArgumentException;
-import org.activiti.dmn.engine.ActivitiDmnObjectNotFoundException;
 import org.activiti.dmn.engine.impl.interceptor.Command;
 import org.activiti.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
 import org.activiti.dmn.engine.impl.persistence.deploy.DeploymentCache;
 import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntity;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 
 /**
  * @author Joram Barrez
@@ -35,13 +35,13 @@ public class SetDecisionTableCategoryCmd implements Command<Void> {
   public Void execute(org.activiti.dmn.engine.impl.interceptor.CommandContext commandContext) {
 
     if (decisionTableId == null) {
-      throw new ActivitiDmnIllegalArgumentException("Decision table id is null");
+      throw new ActivitiIllegalArgumentException("Decision table id is null");
     }
 
     DecisionTableEntity decisionTable = commandContext.getDecisionTableEntityManager().findById(decisionTableId);
 
     if (decisionTable == null) {
-      throw new ActivitiDmnObjectNotFoundException("No decision table found for id = '" + decisionTableId + "'");
+      throw new ActivitiObjectNotFoundException("No decision table found for id = '" + decisionTableId + "'");
     }
 
     // Update category

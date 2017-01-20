@@ -18,8 +18,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.persistence.entity.AbstractEntity;
 import org.activiti.engine.impl.db.BulkDeleteable;
 import org.apache.commons.lang3.StringUtils;
 

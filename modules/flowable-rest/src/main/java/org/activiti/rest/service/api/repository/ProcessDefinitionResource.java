@@ -14,10 +14,10 @@
 package org.activiti.rest.service.api.repository;
 
 import java.util.Date;
-
 import javax.servlet.http.HttpServletRequest;
+import io.swagger.annotations.*;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.rest.exception.ActivitiConflictException;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,17 +30,44 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Frederik Heremans
  */
 @RestController
+@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions")
 public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
 
+  @ApiOperation(value = "Get a process definition", tags = {"Process Definitions"})
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates request was successful and the process-definitions are returned"),
+          @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
+  })
   @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
-  public ProcessDefinitionResponse getProcessDefinition(@PathVariable String processDefinitionId, HttpServletRequest request) {
+  public ProcessDefinitionResponse getProcessDefinition(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId, HttpServletRequest request) {
     ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
 
     return restResponseFactory.createProcessDefinitionResponse(processDefinition);
   }
 
+  //FIXME Unique endpoint but with multiple actions
+  @ApiOperation(value = "Execute actions for a process definition (Update category, Suspend or Activate)", tags = {"Process Definitions"},
+          notes="## Update category for a process definition\n\n"
+          + " ```JSON\n" + "{\n" + "  \"category\" : \"updatedcategory\"\n" + "} ```"
+          + "\n\n\n"
+          + "## Suspend a process definition\n\n"
+          + "```JSON\n {\n" + "  \"action\" : \"suspend\",\n" + "  \"includeProcessInstances\" : \"false\",\n" + "  \"date\" : \"2013-04-15T00:42:12Z\"\n" + "} ```"
+          + "\n\n\n"
+          + "## Activate a process definition\n\n"
+          + "```JSON\n {\n" + "  \"action\" : \"activate\",\n" + "  \"includeProcessInstances\" : \"true\",\n" + "  \"date\" : \"2013-04-15T00:42:12Z\"\n" + "} ```"
+          + ""
+  )
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates action has been executed for the specified process. (category altered, activate or suspend)"),
+          @ApiResponse(code = 400, message = "Indicates no category was defined in the request body."),
+          @ApiResponse(code = 404, message = "Indicates the requested process definition was not found."),
+          @ApiResponse(code = 409, message = "Indicates the requested process definition is already suspended or active.")
+  })
   @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}", method = RequestMethod.PUT, produces = "application/json")
-  public ProcessDefinitionResponse executeProcessDefinitionAction(@PathVariable String processDefinitionId, @RequestBody ProcessDefinitionActionRequest actionRequest, HttpServletRequest request) {
+  public ProcessDefinitionResponse executeProcessDefinitionAction(
+          @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
+          @ApiParam(required = true) @RequestBody ProcessDefinitionActionRequest actionRequest,
+          HttpServletRequest request) {
 
     if (actionRequest == null) {
       throw new ActivitiIllegalArgumentException("No action found in request body.");

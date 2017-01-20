@@ -15,7 +15,7 @@ package org.activiti.engine.runtime;
 
 import java.util.Date;
 
-import org.activiti.engine.query.Query;
+import org.activiti.engine.common.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link Job}s.

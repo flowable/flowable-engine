@@ -14,9 +14,9 @@ package org.activiti.crystalball.simulator.delegate.event.impl;
  */
 
 import org.activiti.crystalball.simulator.SimulationEvent;
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -43,7 +43,7 @@ public class ProcessInstanceCreateTransformer extends Activiti2SimulationEventFu
 
   @Override
   public SimulationEvent apply(ActivitiEvent event) {
-    if (ActivitiEventType.ENTITY_INITIALIZED.equals(event.getType()) && (event instanceof ActivitiEntityEvent) && ((ActivitiEntityEvent) event).getEntity() instanceof ProcessInstance
+    if (ActivitiEngineEventType.ENTITY_INITIALIZED.equals(event.getType()) && (event instanceof ActivitiEntityEvent) && ((ActivitiEntityEvent) event).getEntity() instanceof ProcessInstance
         && ((ExecutionEntity) ((ActivitiEntityEvent) event).getEntity()).isProcessInstanceType()) {
 
       ProcessInstance processInstance = (ProcessInstance) ((ActivitiEntityEvent) event).getEntity();

@@ -16,10 +16,11 @@ package org.activiti.idm.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.persistence.entity.EntityManager;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.GroupQuery;
 import org.activiti.idm.engine.impl.GroupQueryImpl;
-import org.activiti.idm.engine.impl.Page;
 
 /**
  * @author Joram Barrez
@@ -42,4 +43,6 @@ public interface GroupEntityManager extends EntityManager<GroupEntity> {
 
   boolean isNewGroup(Group group);
 
+  List<Group> findGroupsByPrivilegeId(String privilegeId);
+  
 }

@@ -15,13 +15,13 @@ package org.activiti.dmn.engine.impl.deployer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.activiti.dmn.engine.impl.cfg.IdGenerator;
 import org.activiti.dmn.engine.impl.context.Context;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
 import org.activiti.dmn.engine.impl.persistence.deploy.Deployer;
 import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
 import org.activiti.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
+import org.activiti.engine.common.impl.cfg.IdGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

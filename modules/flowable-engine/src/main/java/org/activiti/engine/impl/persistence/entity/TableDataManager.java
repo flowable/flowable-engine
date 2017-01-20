@@ -15,9 +15,9 @@ package org.activiti.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.common.api.management.TableMetaData;
+import org.activiti.engine.common.api.management.TablePage;
 import org.activiti.engine.impl.TablePageQueryImpl;
-import org.activiti.engine.management.TableMetaData;
-import org.activiti.engine.management.TablePage;
 
 /**
  * @author Joram Barrez

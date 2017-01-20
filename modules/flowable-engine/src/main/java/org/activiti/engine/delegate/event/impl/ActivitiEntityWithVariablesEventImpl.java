@@ -14,12 +14,12 @@ package org.activiti.engine.delegate.event.impl;
 
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.ActivitiEntityWithVariablesEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.impl.delegate.event.ActivitiEngineEntityEvent;
 
 /**
- * Base class for all {@link ActivitiEntityEvent} implementations, related to entities with variables.
+ * Base class for all {@link ActivitiEngineEntityEvent} implementations, related to entities with variables.
  * 
  * @author Tijs Rademakers
  */
@@ -29,7 +29,7 @@ public class ActivitiEntityWithVariablesEventImpl extends ActivitiEntityEventImp
   protected Map variables;
   protected boolean localScope;
 
-  public ActivitiEntityWithVariablesEventImpl(Object entity, Map variables, boolean localScope, ActivitiEventType type) {
+  public ActivitiEntityWithVariablesEventImpl(Object entity, Map variables, boolean localScope, ActivitiEngineEventType type) {
     super(entity, type);
 
     this.variables = variables;

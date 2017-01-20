@@ -23,15 +23,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.management.TableMetaData;
+import org.activiti.engine.common.api.management.TablePage;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
 import org.activiti.idm.api.Group;
+import org.activiti.idm.api.Privilege;
+import org.activiti.idm.api.Token;
 import org.activiti.idm.api.User;
-import org.activiti.idm.api.management.IdmTableMetaData;
-import org.activiti.idm.api.management.IdmTablePage;
-import org.activiti.idm.engine.ActivitiIdmException;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.impl.TablePageQueryImpl;
 import org.activiti.idm.engine.impl.db.DbSqlSession;
-import org.activiti.idm.engine.impl.db.Entity;
 import org.activiti.idm.engine.impl.persistence.AbstractManager;
 import org.apache.ibatis.session.RowBounds;
 import org.slf4j.Logger;
@@ -59,6 +61,8 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
     entityToTableNameMap.put(MembershipEntity.class, "ACT_ID_MEMBERSHIP");
     entityToTableNameMap.put(UserEntity.class, "ACT_ID_USER");
     entityToTableNameMap.put(IdentityInfoEntity.class, "ACT_ID_INFO");
+    entityToTableNameMap.put(TokenEntity.class, "ACT_ID_TOKEN");
+    entityToTableNameMap.put(PrivilegeEntity.class, "ACT_ID_PRIV");
     
     // general
     entityToTableNameMap.put(PropertyEntity.class, "ACT_ID_PROPERTY");
@@ -66,6 +70,8 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
     
     apiTypeToTableNameMap.put(Group.class, "ACT_ID_GROUP");
     apiTypeToTableNameMap.put(User.class, "ACT_ID_USER");
+    apiTypeToTableNameMap.put(Token.class, "ACT_ID_TOKEN");
+    apiTypeToTableNameMap.put(Privilege.class, "ACT_ID_PRIV");
   }
   
   protected DbSqlSession getDbSqlSession() {
@@ -81,7 +87,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
       }
       log.debug("Number of rows per activiti table: {}", tableCount);
     } catch (Exception e) {
-      throw new ActivitiIdmException("couldn't get table counts", e);
+      throw new ActivitiException("couldn't get table counts", e);
     }
     return tableCount;
   }
@@ -130,22 +136,22 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
         tables.close();
       }
     } catch (Exception e) {
-      throw new ActivitiIdmException("couldn't get activiti table names using metadata: " + e.getMessage(), e);
+      throw new ActivitiException("couldn't get activiti table names using metadata: " + e.getMessage(), e);
     }
     return tableNames;
   }
 
   protected long getTableCount(String tableName) {
     log.debug("selecting table count for {}", tableName);
-    Long count = (Long) getDbSqlSession().selectOne("selectTableCount", Collections.singletonMap("tableName", tableName));
+    Long count = (Long) getDbSqlSession().selectOne("org.activiti.idm.engine.impl.TablePageMap.selectTableCount", Collections.singletonMap("tableName", tableName));
     return count;
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public IdmTablePage getTablePage(TablePageQueryImpl tablePageQuery, int firstResult, int maxResults) {
+  public TablePage getTablePage(TablePageQueryImpl tablePageQuery, int firstResult, int maxResults) {
 
-    IdmTablePage tablePage = new IdmTablePage();
+    TablePage tablePage = new TablePage();
 
     @SuppressWarnings("rawtypes")
     List tableData = getDbSqlSession().getSqlSession().selectList("selectTableData", tablePageQuery, new RowBounds(firstResult, maxResults));
@@ -176,8 +182,8 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
   }
 
   @Override
-  public IdmTableMetaData getTableMetaData(String tableName) {
-    IdmTableMetaData result = new IdmTableMetaData();
+  public TableMetaData getTableMetaData(String tableName) {
+    TableMetaData result = new TableMetaData();
     try {
       result.setTableName(tableName);
       DatabaseMetaData metaData = getDbSqlSession().getSqlSession().getConnection().getMetaData();
@@ -223,7 +229,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
       }
 
     } catch (SQLException e) {
-      throw new ActivitiIdmException("Could not retrieve database metadata: " + e.getMessage());
+      throw new ActivitiException("Could not retrieve database metadata: " + e.getMessage());
     }
 
     if (result.getColumnNames().isEmpty()) {

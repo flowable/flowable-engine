@@ -14,10 +14,14 @@ package org.activiti.idm.api;
 
 import java.util.List;
 
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+
 /**
  * Service to manage {@link User}s and {@link Group}s.
  * 
  * @author Tom Baeyens
+ * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public interface IdmIdentityService {
 
@@ -45,7 +49,7 @@ public interface IdmIdentityService {
   UserQuery createUserQuery();
 
   /**
-   * Returns a new {@link org.activiti.engine.query.NativeQuery} for tasks.
+   * Returns a new {@link org.activiti.engine.common.api.query.NativeQuery} for tasks.
    */
   NativeUserQuery createNativeUserQuery();
 
@@ -69,7 +73,7 @@ public interface IdmIdentityService {
   GroupQuery createGroupQuery();
 
   /**
-   * Returns a new {@link org.activiti.engine.query.NativeQuery} for tasks.
+   * Returns a new {@link org.activiti.engine.common.api.query.NativeQuery} for tasks.
    */
   NativeGroupQuery createNativeGroupQuery();
 
@@ -134,6 +138,38 @@ public interface IdmIdentityService {
    * @returns null if the user doesn't have a picture.
    */
   Picture getUserPicture(String userId);
+  
+  /**
+   * Creates a new token. The token is transient and must be saved using {@link #saveToken(Token)}.
+   * 
+   * @param tokenId
+   *          id for the new token, cannot be null.
+   */
+  Token newToken(String id);
+  
+  /**
+   * Saves the token. If the token already existed, the token is updated.
+   * 
+   * @param token
+   *          token to save, cannot be null.
+   */
+  void saveToken(Token token);
+  
+  /**
+   * @param tokenId
+   *          id of token to delete, cannot be null. When an id is passed for an unexisting token, this operation is ignored.
+   */
+  void deleteToken(String tokenId);
+  
+  /**
+   * Creates a {@link TokenQuery} that allows to programmatically query the tokens.
+   */
+  TokenQuery createTokenQuery();
+
+  /**
+   * Returns a new {@link org.activiti.idm.engine.query.NativeQuery} for tokens.
+   */
+  NativeTokenQuery createNativeTokenQuery();
 
   /** Generic extensibility key-value pairs associated with a user */
   void setUserInfo(String userId, String key, String value);
@@ -148,4 +184,52 @@ public interface IdmIdentityService {
    * Delete an entry of the generic extensibility key-value pairs associated with a user
    */
   void deleteUserInfo(String userId, String key);
+  
+  /**
+   * Creates a new {@link Privilege} with the provided name.
+   * @throws ActivitiIllegalArgumentException if privilegeName is null. 
+   */
+  Privilege createPrivilege(String privilegeName);
+  
+  /**
+   * Assigns a privilege to a user.
+   */
+  void addUserPrivilegeMapping(String privilegeId, String userId);
+  
+  /**
+   * Removes a privilege for a user.
+   */
+  void deleteUserPrivilegeMapping(String privilegeId, String userId);
+  
+  /**
+   * Assigns a privilege to a group.
+   */
+  void addGroupPrivilegeMapping(String privilegeId, String groupId);
+  
+  /**
+   * Delete a privilege for a group.
+   */
+  void deleteGroupPrivilegeMapping(String privilegeId, String groupId);
+  
+  /**
+   * Deletes the privilege with the given id.
+   * Note that this also removes all user/group mappings for this privilege.
+   */
+  void deletePrivilege(String privilegeId);
+  
+  /**
+   * Returns all {@link User} instances that have a particular privilege. 
+   */
+  List<User> getUsersWithPrivilege(String privilegeId);
+  
+  /**
+   * Returns all {@link Group} instances that have a particular privilege. 
+   */
+  List<Group> getGroupsWithPrivilege(String privilegeId);
+  
+  /**
+   * Creates a {@link PrivilegeQuery} that allows to programmatically query privileges. 
+   */
+  PrivilegeQuery createPrivilegeQuery();
+  
 }

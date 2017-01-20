@@ -15,9 +15,9 @@ package org.activiti.engine.test.api.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 
 /**
  * @author Joram Barrez
@@ -40,10 +40,10 @@ public class TestHistoricActivityEventListener implements ActivitiEventListener 
 	
 	@Override
 	public void onEvent(ActivitiEvent event) {
-		if (event.getType().equals(ActivitiEventType.HISTORIC_PROCESS_INSTANCE_CREATED)
-				|| event.getType().equals(ActivitiEventType.HISTORIC_PROCESS_INSTANCE_ENDED)
-				|| event.getType().equals(ActivitiEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED)
-			  || event.getType().equals(ActivitiEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED)) {
+		if (event.getType().equals(ActivitiEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED)
+				|| event.getType().equals(ActivitiEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED)
+				|| event.getType().equals(ActivitiEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED)
+			  || event.getType().equals(ActivitiEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED)) {
 					eventsReceived.add(event);
 				}
 	}

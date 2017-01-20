@@ -19,7 +19,7 @@ import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.history.DeleteReason;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -72,7 +72,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
       ExecutionEntityManager executionEntityManager) {
     
     ExecutionEntity scopeExecutionEntity = executionEntityManager.findFirstScope((ExecutionEntity) execution);
-    sendProcessInstanceCancelledEvent(scopeExecutionEntity, execution.getCurrentFlowElement());
+    sendProcessInstanceCompletedEvent(scopeExecutionEntity, execution.getCurrentFlowElement());
 
     // If the scope is the process instance, we can just terminate it all
     // Special treatment is needed when the terminated activity is a subprocess (embedded/callactivity/..)
@@ -116,11 +116,11 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
 
         MultiInstanceActivityBehavior multiInstanceBehavior = (MultiInstanceActivityBehavior) callActivity.getBehavior();
         multiInstanceBehavior.leave(callActivityExecution);
-        executionEntityManager.deleteProcessInstanceExecutionEntity(scopeExecutionEntity.getId(), execution.getCurrentFlowElement().getId(), "terminate end event", false, false, true);
+        executionEntityManager.deleteProcessInstanceExecutionEntity(scopeExecutionEntity.getId(), execution.getCurrentFlowElement().getId(), "terminate end event", false, false);
 
       } else {
 
-        executionEntityManager.deleteProcessInstanceExecutionEntity(scopeExecutionEntity.getId(), execution.getCurrentFlowElement().getId(), "terminate end event", false, false, true);
+        executionEntityManager.deleteProcessInstanceExecutionEntity(scopeExecutionEntity.getId(), execution.getCurrentFlowElement().getId(), "terminate end event", false, false);
         ExecutionEntity superExecutionEntity = executionEntityManager.findById(scopeExecutionEntity.getSuperExecutionId());
         commandContext.getAgenda().planTakeOutgoingSequenceFlowsOperation(superExecutionEntity, true);
 
@@ -145,7 +145,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
       ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
       if (config != null && config.getEventDispatcher().isEnabled()) {
         config.getEventDispatcher().dispatchEvent(
-            ActivitiEventBuilder.createEntityEvent(ActivitiEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
+            ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
       }
     }
     
@@ -179,14 +179,13 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
     executionEntityManager.deleteExecutionAndRelatedData(rootExecutionEntity, deleteReason, false);
   }
 
-  protected void sendProcessInstanceCancelledEvent(DelegateExecution execution, FlowElement terminateEndEvent) {
+  protected void sendProcessInstanceCompletedEvent(DelegateExecution execution, FlowElement terminateEndEvent) {
     if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       if ((execution.isProcessInstanceType() && execution.getSuperExecutionId() == null) ||
           (execution.getParentId() == null && execution.getSuperExecutionId() != null)) {
         
         Context.getProcessEngineConfiguration().getEventDispatcher()
-            .dispatchEvent(ActivitiEventBuilder.createCancelledEvent(execution.getId(), execution.getProcessInstanceId(), 
-                execution.getProcessDefinitionId(), execution.getCurrentFlowElement()));
+            .dispatchEvent(ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT, execution));
       }
     }
 

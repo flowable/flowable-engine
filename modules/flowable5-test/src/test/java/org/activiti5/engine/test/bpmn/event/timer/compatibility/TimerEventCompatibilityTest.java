@@ -14,7 +14,7 @@ package org.activiti5.engine.test.bpmn.event.timer.compatibility;
 
 import java.util.Date;
 
-import org.activiti.engine.runtime.Clock;
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti5.engine.impl.test.PluggableActivitiTestCase;
 
 public abstract class TimerEventCompatibilityTest extends PluggableActivitiTestCase {

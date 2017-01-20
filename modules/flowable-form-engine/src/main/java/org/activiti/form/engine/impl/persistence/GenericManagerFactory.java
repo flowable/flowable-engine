@@ -13,10 +13,10 @@
 
 package org.activiti.form.engine.impl.persistence;
 
-import org.activiti.form.engine.ActivitiFormException;
-import org.activiti.form.engine.impl.interceptor.CommandContext;
-import org.activiti.form.engine.impl.interceptor.Session;
-import org.activiti.form.engine.impl.interceptor.SessionFactory;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.interceptor.AbstractCommandContext;
+import org.activiti.engine.common.impl.interceptor.Session;
+import org.activiti.engine.common.impl.interceptor.SessionFactory;
 
 /**
  * @author Tijs Rademakers
@@ -40,11 +40,11 @@ public class GenericManagerFactory implements SessionFactory {
     return typeClass;
   }
 
-  public Session openSession(CommandContext commandContext) {
+  public Session openSession(AbstractCommandContext commandContext) {
     try {
       return implementationClass.newInstance();
     } catch (Exception e) {
-      throw new ActivitiFormException("couldn't instantiate " + implementationClass.getName() + ": " + e.getMessage(), e);
+      throw new ActivitiException("couldn't instantiate " + implementationClass.getName() + ": " + e.getMessage(), e);
     }
   }
 }

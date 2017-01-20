@@ -23,15 +23,20 @@ import org.activiti.crystalball.simulator.delegate.event.impl.UserTaskCompleteTr
 import org.activiti.crystalball.simulator.impl.*;
 import org.activiti.crystalball.simulator.impl.clock.DefaultClockFactory;
 import org.activiti.crystalball.simulator.impl.clock.ThreadLocalClock;
-import org.activiti.engine.*;
-import org.activiti.engine.delegate.event.ActivitiEvent;
+import org.activiti.engine.HistoryService;
+import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.ProcessEngines;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.common.*;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.impl.util.DefaultClockImpl;
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.impl.ProcessEngineImpl;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.el.NoExecutionVariableScope;
-import org.activiti.engine.impl.util.DefaultClockImpl;
 import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.Clock;
 import org.junit.Test;
 
 import java.util.ArrayList;

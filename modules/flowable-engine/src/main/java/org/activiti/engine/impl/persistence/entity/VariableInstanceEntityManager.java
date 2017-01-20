@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.activiti.engine.common.impl.persistence.entity.EntityManager;
 import org.activiti.engine.impl.variable.VariableType;
 
 /**

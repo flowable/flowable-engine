@@ -17,8 +17,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.common.impl.persistence.entity.Entity;
 import org.activiti.form.api.FormDeployment;
-import org.activiti.form.engine.impl.db.Entity;
 
 /**
  * @author Tijs Rademakers

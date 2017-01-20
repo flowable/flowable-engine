@@ -13,7 +13,7 @@
 package org.activiti.engine.delegate.event.impl;
 
 import org.activiti.engine.delegate.event.ActivitiActivityEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 
 /**
  * Implementation of an {@link ActivitiActivityEvent}.
@@ -28,7 +28,7 @@ public class ActivitiActivityEventImpl extends ActivitiEventImpl implements Acti
   protected String activityType;
   protected String behaviorClass;
 
-  public ActivitiActivityEventImpl(ActivitiEventType type) {
+  public ActivitiActivityEventImpl(ActivitiEngineEventType type) {
     super(type);
   }
 

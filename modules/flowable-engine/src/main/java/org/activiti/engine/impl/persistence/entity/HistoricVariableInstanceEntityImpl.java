@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 
+import org.activiti.engine.common.impl.persistence.entity.AbstractEntity;
 import org.activiti.engine.impl.db.BulkDeleteable;
 import org.activiti.engine.impl.variable.VariableType;
 import org.apache.commons.lang3.StringUtils;

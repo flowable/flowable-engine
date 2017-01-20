@@ -33,7 +33,7 @@ import org.activiti.bpmn.model.ValuedDataObject;
 import org.activiti.engine.DynamicBpmnConstants;
 import org.activiti.engine.compatibility.Activiti5CompatibilityHandler;
 import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.activiti.engine.runtime.Job;
 import org.activiti5.engine.ActivitiException;
@@ -225,7 +225,7 @@ public class BpmnDeployer implements Deployer {
         
         if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
         	commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-        			ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_CREATED, processDefinition));
+        			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_CREATED, processDefinition));
         }
 
         removeObsoleteTimers(processDefinition);
@@ -242,7 +242,7 @@ public class BpmnDeployer implements Deployer {
 
         if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
         	commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-        			ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_INITIALIZED, processDefinition));
+        			ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.ENTITY_INITIALIZED, processDefinition));
         }
 
         scheduleTimers(timers);

@@ -22,9 +22,9 @@ import java.util.Map;
 
 import org.activiti.bpmn.model.ActivitiListener;
 import org.activiti.bpmn.model.FlowElement;
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
@@ -539,7 +539,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
           .getProcessEngineConfiguration()
           .getEventDispatcher()
           .dispatchEvent(
-              ActivitiEventBuilder.createVariableEvent(ActivitiEventType.VARIABLE_CREATED, variableName, value, result.getType(), result.getTaskId(), result.getExecutionId(), getProcessInstanceId(),
+              ActivitiEventBuilder.createVariableEvent(ActivitiEngineEventType.VARIABLE_CREATED, variableName, value, result.getType(), result.getTaskId(), result.getExecutionId(), getProcessInstanceId(),
                   getProcessDefinitionId()));
     }
     return result;
@@ -555,7 +555,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
           .getProcessEngineConfiguration()
           .getEventDispatcher()
           .dispatchEvent(
-              ActivitiEventBuilder.createVariableEvent(ActivitiEventType.VARIABLE_UPDATED, variableInstance.getName(), value, variableInstance.getType(), variableInstance.getTaskId(),
+              ActivitiEventBuilder.createVariableEvent(ActivitiEngineEventType.VARIABLE_UPDATED, variableInstance.getName(), value, variableInstance.getType(), variableInstance.getTaskId(),
                   variableInstance.getExecutionId(), getProcessInstanceId(), getProcessDefinitionId()));
     }
   }

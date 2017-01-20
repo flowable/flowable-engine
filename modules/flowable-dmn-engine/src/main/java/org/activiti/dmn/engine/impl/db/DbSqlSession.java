@@ -17,10 +17,12 @@ import java.sql.Connection;
 import java.util.Collections;
 import java.util.List;
 
-import org.activiti.dmn.engine.ActivitiDmnException;
-import org.activiti.dmn.engine.ActivitiDmnOptimisticLockingException;
-import org.activiti.dmn.engine.impl.Page;
-import org.activiti.dmn.engine.impl.interceptor.Session;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiOptimisticLockingException;
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.db.ListQueryParameterObject;
+import org.activiti.engine.common.impl.interceptor.Session;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +34,8 @@ import org.slf4j.LoggerFactory;
 public class DbSqlSession implements Session {
 
   private static final Logger log = LoggerFactory.getLogger(DbSqlSession.class);
+  
+  public static String[] JDBC_METADATA_TABLE_TYPES = { "TABLE" };
 
   protected SqlSession sqlSession;
   protected DbSqlSessionFactory dbSqlSessionFactory;
@@ -63,7 +67,7 @@ public class DbSqlSession implements Session {
     insertStatement = dbSqlSessionFactory.mapStatement(insertStatement);
 
     if (insertStatement==null) {
-      throw new ActivitiDmnException("no insert statement for " + entity.getClass() + " in the ibatis mapping files");
+      throw new ActivitiException("no insert statement for " + entity.getClass() + " in the ibatis mapping files");
     }
     
     log.debug("inserting: {}", entity);
@@ -78,13 +82,13 @@ public class DbSqlSession implements Session {
     updateStatement = dbSqlSessionFactory.mapStatement(updateStatement);
 
     if (updateStatement == null) {
-      throw new ActivitiDmnException("no update statement for " + entity.getClass() + " in the ibatis mapping files");
+      throw new ActivitiException("no update statement for " + entity.getClass() + " in the ibatis mapping files");
     }
 
     log.debug("updating: {}", entity);
     int updatedRecords = sqlSession.update(updateStatement, entity);
     if (updatedRecords == 0) {
-      throw new ActivitiDmnOptimisticLockingException(entity + " was updated by another transaction concurrently");
+      throw new ActivitiOptimisticLockingException(entity + " was updated by another transaction concurrently");
     }
   }
 
@@ -104,7 +108,7 @@ public class DbSqlSession implements Session {
     String deleteStatement = dbSqlSessionFactory.getDeleteStatement(entity.getClass());
     deleteStatement = dbSqlSessionFactory.mapStatement(deleteStatement);
     if (deleteStatement == null) {
-      throw new ActivitiDmnException("no delete statement for " + entity.getClass() + " in the ibatis mapping files");
+      throw new ActivitiException("no delete statement for " + entity.getClass() + " in the ibatis mapping files");
     }
 
     sqlSession.delete(deleteStatement, entity);

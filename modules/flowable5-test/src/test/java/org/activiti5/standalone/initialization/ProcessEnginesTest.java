@@ -15,8 +15,8 @@ package org.activiti5.standalone.initialization;
 import java.util.List;
 
 import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngineInfo;
 import org.activiti.engine.ProcessEngines;
+import org.activiti.engine.common.EngineInfo;
 import org.activiti5.engine.impl.test.PvmTestCase;
 
 /**
@@ -37,10 +37,10 @@ public class ProcessEnginesTest extends PvmTestCase {
 
   public void testProcessEngineInfo() {
 
-    List<ProcessEngineInfo> processEngineInfos = ProcessEngines.getProcessEngineInfos();
+    List<EngineInfo> processEngineInfos = ProcessEngines.getProcessEngineInfos();
     assertEquals(1, processEngineInfos.size());
 
-    ProcessEngineInfo processEngineInfo = processEngineInfos.get(0);
+    EngineInfo processEngineInfo = processEngineInfos.get(0);
     assertNull(processEngineInfo.getException());
     assertNotNull(processEngineInfo.getName());
     assertNotNull(processEngineInfo.getResourceUrl());

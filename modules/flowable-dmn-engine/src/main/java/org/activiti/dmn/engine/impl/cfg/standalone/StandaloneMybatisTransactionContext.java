@@ -19,13 +19,13 @@ import java.util.Map;
 
 import org.activiti.dmn.engine.impl.cfg.TransactionContext;
 import org.activiti.dmn.engine.impl.cfg.TransactionListener;
-import org.activiti.dmn.engine.impl.cfg.TransactionPropagation;
-import org.activiti.dmn.engine.impl.cfg.TransactionState;
 import org.activiti.dmn.engine.impl.db.DbSqlSession;
 import org.activiti.dmn.engine.impl.interceptor.Command;
-import org.activiti.dmn.engine.impl.interceptor.CommandConfig;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
 import org.activiti.dmn.engine.impl.interceptor.CommandExecutor;
+import org.activiti.engine.common.impl.cfg.TransactionPropagation;
+import org.activiti.engine.common.impl.cfg.TransactionState;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

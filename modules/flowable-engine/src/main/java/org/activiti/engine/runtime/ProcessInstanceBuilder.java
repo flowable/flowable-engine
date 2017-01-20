@@ -14,8 +14,8 @@ package org.activiti.engine.runtime;
 
 import java.util.Map;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 
 /**
  * Helper for starting new ProcessInstance.

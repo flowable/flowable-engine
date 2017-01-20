@@ -16,11 +16,11 @@ package org.activiti.idm.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.idm.api.Group;
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.persistence.entity.EntityManager;
 import org.activiti.idm.api.Picture;
 import org.activiti.idm.api.User;
 import org.activiti.idm.api.UserQuery;
-import org.activiti.idm.engine.impl.Page;
 import org.activiti.idm.engine.impl.UserQueryImpl;
 
 /**
@@ -35,8 +35,6 @@ public interface UserEntityManager extends EntityManager<UserEntity> {
   List<User> findUserByQueryCriteria(UserQueryImpl query, Page page);
 
   long findUserCountByQueryCriteria(UserQueryImpl query);
-
-  List<Group> findGroupsByUser(String userId);
 
   UserQuery createNewUserQuery();
 
@@ -53,5 +51,7 @@ public interface UserEntityManager extends EntityManager<UserEntity> {
   void setUserPicture(User user, Picture picture);
   
   void deletePicture(User user);
+  
+  List<User> findUsersByPrivilegeId(String privilegeId);
 
 }

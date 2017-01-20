@@ -1,0 +1,60 @@
+<!-- LIST PAGE -->
+<div class="container" id="list-container">
+    <div class="row">
+        <div class="col-md-9">
+            <div class="component" ng-show="contentItem">
+                <div class="title">
+                    <div class="pull-right">
+                        <a ng-click="returnToList()" class="action">&larr; {{'GENERAL.ACTION.RETURN-TO-LIST' | translate}}</a>
+                    </div>
+                    <h2>{{contentItem.name &amp;&amp; contentItem.name +" - " || ""}}{{contentItem.id}}</h2>
+                </div>
+
+                <div class="property-wrapper">
+                    <table>
+                        <tr class="property">
+                            <td class="property-name" translate="CONTENT-ITEM.HEADER.ID"></td>
+                            <td>{{contentItem.id}}</td>
+                            <td class="property-name" translate="CONTENT-ITEM.HEADER.TASK-ID"></td>
+                            <td ng-if="contentItem.taskId"><a ng-href="#/task/{{contentItem.taskId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{contentItem.taskId}}</a></td>
+                            <td ng-if="!contentItem.taskId">{{contentItem.taskId | empty}}</td>
+                        </tr>
+                        <tr class="property">
+                        	<td class="property-name" translate="CONTENT-ITEM.HEADER.PROCESS-INSTANCE-ID"></td>
+                            <td ng-if="contentItem.processInstanceId"><a ng-href="#/process-instance/{{contentItem.processInstanceId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{contentItem.processInstanceId}}</a></td>
+                            <td ng-if="!contentItem.processInstanceId">{{contentItem.processInstanceId | empty}}</td>
+                            <td class="property-name" translate="CONTENT-ITEM.HEADER.CREATED-ON"></td>
+                            <td>{{contentItem.created | dateformat}}</td>
+                        </tr>
+                        <tr class="property">
+                            <td class="property-name" translate="CONTENT-ITEM.HEADER.CREATED-BY"></td>
+                            <td user="contentItem.createdBy"></td>
+                            <td class="property-name" translate="CONTENT-ITEM.HEADER.LAST-MODIFIED-ON"></td>
+                            <td>{{contentItem.lastModified | dateformat}}</td>
+                        </tr>
+                        <tr class="property">
+                            <td class="property-name" translate="CONTENT-ITEM.HEADER.LAST-MODIFIED-BY"></td>
+                            <td user="contentItem.lastModifiedBy"></td>
+                            <td class="property-name" translate="CONTENT-ITEM.HEADER.CONTENT-STORE-ID"></td>
+                            <td>{{contentItem.contentStoreId}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="component tip-left">
+                <div class="title">
+                    <h2 translate="GENERAL.TITLE.ACTIONS"></h2>
+                </div>
+                <ul class="list-group">
+                    <li>
+                        <button type="button" class="btn btn-sm btn-default" ng-click="showContentItem()">
+                            <i class="glyphicon glyphicon-zoom-in"></i>{{'CONTENT-ITEM.ACTION.SHOW-CONTENT-ITEM' | translate}}
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

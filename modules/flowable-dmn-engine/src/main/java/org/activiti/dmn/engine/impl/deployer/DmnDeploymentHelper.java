@@ -17,13 +17,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.activiti.dmn.engine.ActivitiDmnException;
-import org.activiti.dmn.engine.ActivitiDmnIllegalArgumentException;
 import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.impl.context.Context;
 import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
 import org.activiti.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -42,7 +42,7 @@ public class DmnDeploymentHelper  {
     Set<String> keySet = new LinkedHashSet<String>();
     for (DecisionTableEntity decisionTable : decisionTables) {
       if (keySet.contains(decisionTable.getKey())) {
-        throw new ActivitiDmnException(
+        throw new ActivitiException(
             "The deployment contains decision tables with the same key (decision id attribute), this is not allowed");
       }
       keySet.add(decisionTable.getKey());
@@ -108,7 +108,7 @@ public class DmnDeploymentHelper  {
   public DecisionTableEntity getPersistedInstanceOfDecisionTable(DecisionTableEntity decisionTable) {
     String deploymentId = decisionTable.getDeploymentId();
     if (StringUtils.isEmpty(decisionTable.getDeploymentId())) {
-      throw new ActivitiDmnIllegalArgumentException("Provided process definition must have a deployment id.");
+      throw new ActivitiIllegalArgumentException("Provided process definition must have a deployment id.");
     }
 
     DecisionTableEntityManager decisionTableEntityManager = Context.getCommandContext().getDmnEngineConfiguration().getDecisionTableEntityManager();

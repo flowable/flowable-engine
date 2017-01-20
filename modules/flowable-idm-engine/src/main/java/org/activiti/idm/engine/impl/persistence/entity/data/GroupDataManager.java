@@ -15,9 +15,10 @@ package org.activiti.idm.engine.impl.persistence.entity.data;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.engine.impl.GroupQueryImpl;
-import org.activiti.idm.engine.impl.Page;
 import org.activiti.idm.engine.impl.persistence.entity.GroupEntity;
 
 /**
@@ -30,6 +31,8 @@ public interface GroupDataManager extends DataManager<GroupEntity> {
   long findGroupCountByQueryCriteria(GroupQueryImpl query);
 
   List<Group> findGroupsByUser(String userId);
+  
+  List<Group> findGroupsByPrivilegeId(String privilegeId);
 
   List<Group> findGroupsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
 

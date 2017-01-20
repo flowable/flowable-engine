@@ -15,8 +15,8 @@ package org.activiti.idm.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.idm.api.management.IdmTableMetaData;
-import org.activiti.idm.api.management.IdmTablePage;
+import org.activiti.engine.common.api.management.TableMetaData;
+import org.activiti.engine.common.api.management.TablePage;
 import org.activiti.idm.engine.impl.TablePageQueryImpl;
 
 /**
@@ -28,10 +28,10 @@ public interface TableDataManager {
 
   List<String> getTablesPresentInDatabase();
 
-  IdmTablePage getTablePage(TablePageQueryImpl tablePageQuery, int firstResult, int maxResults);
+  TablePage getTablePage(TablePageQueryImpl tablePageQuery, int firstResult, int maxResults);
 
   String getTableName(Class<?> entityClass, boolean withPrefix);
 
-  IdmTableMetaData getTableMetaData(String tableName);
+  TableMetaData getTableMetaData(String tableName);
 
 }

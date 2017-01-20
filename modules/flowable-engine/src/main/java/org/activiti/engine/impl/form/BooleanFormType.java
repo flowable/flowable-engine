@@ -13,7 +13,7 @@
 
 package org.activiti.engine.impl.form;
 
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.form.AbstractFormType;
 
 /**

@@ -20,9 +20,11 @@ import java.io.ObjectOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import io.swagger.annotations.*;
+
 import org.activiti.engine.HistoryService;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -39,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Tijs Rademakers
  */
 @RestController
+@Api(tags = { "History" }, description = "Manage History")
 public class HistoricProcessInstanceVariableDataResource {
 
   @Autowired
@@ -47,9 +50,14 @@ public class HistoricProcessInstanceVariableDataResource {
   @Autowired
   protected HistoryService historyService;
 
+  @ApiOperation(value = "Get the binary data for a historic process instance variable", tags = { "History" },  nickname = "getHistoricProcessInstanceVariableData",
+          notes = "The response body contains the binary value of the variable. When the variable is of type binary, the content-type of the response is set to application/octet-stream, regardless of the content of the variable or the request accept-type header. In case of serializable, application/x-java-serialized-object is used as content-type.")
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Indicates the process instance was found and the requested variable data is returned."),
+          @ApiResponse(code = 404, message = "Indicates the requested process instance was not found or the process instance doesn’t have a variable with the given name or the variable doesn’t have a binary stream available. Status message provides additional information.") })
   @RequestMapping(value = "/history/historic-process-instances/{processInstanceId}/variables/{variableName}/data", method = RequestMethod.GET)
   public @ResponseBody
-  byte[] getVariableData(@PathVariable("processInstanceId") String processInstanceId, @PathVariable("variableName") String variableName, HttpServletRequest request, HttpServletResponse response) {
+  byte[] getVariableData(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName, HttpServletRequest request, HttpServletResponse response) {
 
     try {
       byte[] result = null;

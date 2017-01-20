@@ -14,28 +14,44 @@ package org.activiti.idm.engine.impl;
 
 import java.util.List;
 
+import org.activiti.idm.api.Privilege;
+import org.activiti.idm.api.PrivilegeQuery;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.GroupQuery;
 import org.activiti.idm.api.IdmIdentityService;
 import org.activiti.idm.api.NativeGroupQuery;
+import org.activiti.idm.api.NativeTokenQuery;
 import org.activiti.idm.api.NativeUserQuery;
 import org.activiti.idm.api.Picture;
+import org.activiti.idm.api.Token;
+import org.activiti.idm.api.TokenQuery;
 import org.activiti.idm.api.User;
 import org.activiti.idm.api.UserQuery;
+import org.activiti.idm.engine.impl.cmd.AddPrivilegeMappingCmd;
 import org.activiti.idm.engine.impl.cmd.CheckPassword;
+import org.activiti.idm.engine.impl.cmd.CreatePrivilegeCmd;
+import org.activiti.idm.engine.impl.cmd.CreatePrivilegeQueryCmd;
 import org.activiti.idm.engine.impl.cmd.CreateGroupCmd;
 import org.activiti.idm.engine.impl.cmd.CreateGroupQueryCmd;
 import org.activiti.idm.engine.impl.cmd.CreateMembershipCmd;
+import org.activiti.idm.engine.impl.cmd.CreateTokenCmd;
+import org.activiti.idm.engine.impl.cmd.CreateTokenQueryCmd;
 import org.activiti.idm.engine.impl.cmd.CreateUserCmd;
 import org.activiti.idm.engine.impl.cmd.CreateUserQueryCmd;
+import org.activiti.idm.engine.impl.cmd.DeletePrivilegeCmd;
+import org.activiti.idm.engine.impl.cmd.DeletePrivilegeMappingCmd;
 import org.activiti.idm.engine.impl.cmd.DeleteGroupCmd;
 import org.activiti.idm.engine.impl.cmd.DeleteMembershipCmd;
+import org.activiti.idm.engine.impl.cmd.DeleteTokenCmd;
 import org.activiti.idm.engine.impl.cmd.DeleteUserCmd;
 import org.activiti.idm.engine.impl.cmd.DeleteUserInfoCmd;
+import org.activiti.idm.engine.impl.cmd.GetGroupsWithPrivilegeCmd;
 import org.activiti.idm.engine.impl.cmd.GetUserInfoCmd;
 import org.activiti.idm.engine.impl.cmd.GetUserInfoKeysCmd;
 import org.activiti.idm.engine.impl.cmd.GetUserPictureCmd;
+import org.activiti.idm.engine.impl.cmd.GetUsersWithPrivilegeCmd;
 import org.activiti.idm.engine.impl.cmd.SaveGroupCmd;
+import org.activiti.idm.engine.impl.cmd.SaveTokenCmd;
 import org.activiti.idm.engine.impl.cmd.SaveUserCmd;
 import org.activiti.idm.engine.impl.cmd.SetUserInfoCmd;
 import org.activiti.idm.engine.impl.cmd.SetUserPictureCmd;
@@ -99,6 +115,26 @@ public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentitySe
   public void deleteUser(String userId) {
     commandExecutor.execute(new DeleteUserCmd(userId));
   }
+  
+  public Token newToken(String tokenId) {
+    return commandExecutor.execute(new CreateTokenCmd(tokenId));
+  }
+  
+  public void saveToken(Token token) {
+    commandExecutor.execute(new SaveTokenCmd(token));
+  }
+  
+  public void deleteToken(String tokenId) {
+    commandExecutor.execute(new DeleteTokenCmd(tokenId));
+  }
+  
+  public TokenQuery createTokenQuery() {
+    return commandExecutor.execute(new CreateTokenQueryCmd());
+  }
+
+  public NativeTokenQuery createNativeTokenQuery() {
+    return new NativeTokenQueryImpl(commandExecutor);
+  }
 
   public void setUserPicture(String userId, Picture picture) {
     commandExecutor.execute(new SetUserPictureCmd(userId, picture));
@@ -123,4 +159,50 @@ public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentitySe
   public void deleteUserInfo(String userId, String key) {
     commandExecutor.execute(new DeleteUserInfoCmd(userId, key));
   }
+
+  @Override
+  public Privilege createPrivilege(String name) {
+    return commandExecutor.execute(new CreatePrivilegeCmd(name));
+  }
+  
+  @Override
+  public void addUserPrivilegeMapping(String privilegeId, String userId) {
+    commandExecutor.execute(new AddPrivilegeMappingCmd(privilegeId, userId, null));
+  }
+  
+  @Override
+  public void deleteUserPrivilegeMapping(String privilegeId, String userId) {
+    commandExecutor.execute(new DeletePrivilegeMappingCmd(privilegeId, userId, null));
+  }
+  
+  @Override
+  public void addGroupPrivilegeMapping(String privilegeId, String groupId) {
+    commandExecutor.execute(new AddPrivilegeMappingCmd(privilegeId, null, groupId));
+  }
+  
+  @Override
+  public void deleteGroupPrivilegeMapping(String privilegeId, String groupId) {
+    commandExecutor.execute(new DeletePrivilegeMappingCmd(privilegeId, null, groupId));
+  }
+  
+  @Override
+  public void deletePrivilege(String id) {
+    commandExecutor.execute(new DeletePrivilegeCmd(id));
+  }
+
+  @Override
+  public PrivilegeQuery createPrivilegeQuery() {
+    return commandExecutor.execute(new CreatePrivilegeQueryCmd());
+  }
+  
+  @Override
+  public List<Group> getGroupsWithPrivilege(String name) {
+    return commandExecutor.execute(new GetGroupsWithPrivilegeCmd(name));
+  }
+  
+  @Override
+  public List<User> getUsersWithPrivilege(String name) {
+    return commandExecutor.execute(new GetUsersWithPrivilegeCmd(name));
+  }
+  
 }

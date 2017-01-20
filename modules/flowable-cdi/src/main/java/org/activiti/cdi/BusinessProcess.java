@@ -24,11 +24,11 @@ import javax.inject.Named;
 
 import org.activiti.cdi.annotation.BusinessProcessScoped;
 import org.activiti.cdi.impl.context.ContextAssociationManager;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.Execution;

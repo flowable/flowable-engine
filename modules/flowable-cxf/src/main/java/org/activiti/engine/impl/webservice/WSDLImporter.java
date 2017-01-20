@@ -36,7 +36,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.activiti.bpmn.model.Import;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.bpmn.data.SimpleStructureDefinition;
 import org.activiti.engine.impl.bpmn.data.StructureDefinition;
 import org.activiti.engine.impl.bpmn.parser.XMLImporter;

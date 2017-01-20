@@ -13,15 +13,15 @@
 
 package org.activiti.spring;
 
-import org.activiti.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.impl.interceptor.Session;
-import org.activiti.engine.impl.interceptor.SessionFactory;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+
+import org.activiti.engine.common.impl.interceptor.AbstractCommandContext;
+import org.activiti.engine.common.impl.interceptor.Session;
+import org.activiti.engine.common.impl.interceptor.SessionFactory;
 import org.activiti.engine.impl.variable.EntityManagerSession;
 import org.activiti.engine.impl.variable.EntityManagerSessionImpl;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 
 /**
  * Session Factory for {@link EntityManagerSession}.
@@ -47,7 +47,7 @@ public class SpringEntityManagerSessionFactory implements SessionFactory {
     return EntityManagerFactory.class;
   }
 
-  public Session openSession(CommandContext commandContext) {
+  public Session openSession(AbstractCommandContext commandContext) {
     EntityManager entityManager = EntityManagerFactoryUtils.getTransactionalEntityManager(entityManagerFactory);
     if (entityManager == null) {
       return new EntityManagerSessionImpl(entityManagerFactory, handleTransactions, closeEntityManager);

@@ -17,6 +17,7 @@ import org.activiti.dmn.api.DmnRuleService;
 import org.activiti.dmn.engine.DmnEngine;
 import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration;
+import org.activiti.engine.common.AbstractEngineConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,10 +27,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ActivitiDmnEngineConfiguration {
 
-  @Bean
   public DmnEngine ruleEngine() {
     DmnEngineConfiguration dmnEngineConfiguration = new StandaloneInMemDmnEngineConfiguration();
+    dmnEngineConfiguration.setDatabaseSchemaUpdate(AbstractEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
     return dmnEngineConfiguration.buildDmnEngine();
+  }
+
+  @Bean
+  public DmnEngineConfiguration dmnEngineConfiguration() {
+    return ruleEngine().getDmnEngineConfiguration();
   }
 
   @Bean

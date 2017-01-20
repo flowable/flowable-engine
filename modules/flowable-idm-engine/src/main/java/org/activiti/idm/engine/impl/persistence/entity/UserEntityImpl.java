@@ -16,8 +16,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.activiti.engine.common.impl.db.HasRevision;
+import org.activiti.engine.common.impl.persistence.entity.AbstractEntity;
 import org.activiti.idm.api.Picture;
-import org.activiti.idm.engine.impl.db.HasRevision;
 
 /**
  * @author Tom Baeyens

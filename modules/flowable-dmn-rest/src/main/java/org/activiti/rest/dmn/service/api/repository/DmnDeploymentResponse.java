@@ -13,12 +13,11 @@
 package org.activiti.rest.dmn.service.api.repository;
 
 import org.activiti.dmn.api.DmnDeployment;
-import org.activiti.rest.dmn.common.DateToStringSerializer;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.activiti.rest.util.DateToStringSerializer;
 
 import java.util.Date;
-
 
 /**
  * @author Yvo Swillens
@@ -31,6 +30,7 @@ public class DmnDeploymentResponse {
   protected Date deploymentTime;
   protected String category;
   protected String url;
+  protected String parentDeploymentId;
   protected String tenantId;
 
   public DmnDeploymentResponse(DmnDeployment deployment, String url) {
@@ -38,6 +38,7 @@ public class DmnDeploymentResponse {
     setName(deployment.getName());
     setDeploymentTime(deployment.getDeploymentTime());
     setCategory(deployment.getCategory());
+    setParentDeploymentId(deployment.getParentDeploymentId());
     setTenantId(deployment.getTenantId());
     setUrl(url);
   }
@@ -80,6 +81,14 @@ public class DmnDeploymentResponse {
 
   public void setUrl(String url) {
     this.url = url;
+  }
+
+  public String getParentDeploymentId() {
+    return parentDeploymentId;
+  }
+
+  public void setParentDeploymentId(String parentDeploymentId) {
+    this.parentDeploymentId = parentDeploymentId;
   }
 
   public String getTenantId() {

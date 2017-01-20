@@ -13,8 +13,8 @@
 package org.activiti.idm.engine.configurator;
 
 import org.activiti.engine.cfg.AbstractProcessEngineConfigurator;
+import org.activiti.engine.common.api.ActivitiException;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.idm.engine.ActivitiIdmException;
 import org.activiti.idm.engine.IdmEngine;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 
@@ -37,7 +37,7 @@ public class IdmEngineConfigurator extends AbstractProcessEngineConfigurator {
   protected synchronized void initIdmEngine() {
     if (idmEngine == null) {
       if (idmEngineConfiguration == null) {
-        throw new ActivitiIdmException("IdmEngineConfiguration is required");
+        throw new ActivitiException("IdmEngineConfiguration is required");
       }
       
       idmEngine = idmEngineConfiguration.buildIdmEngine();

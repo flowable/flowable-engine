@@ -13,7 +13,12 @@
 
 package org.activiti.idm.engine.test;
 
-import org.activiti.idm.engine.ActivitiIdmException;
+import java.util.List;
+
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.idm.api.Group;
+import org.activiti.idm.api.Privilege;
+import org.activiti.idm.api.User;
 import org.activiti.idm.engine.IdmEngine;
 import org.activiti.idm.engine.IdmEngines;
 import org.slf4j.Logger;
@@ -43,12 +48,46 @@ public abstract class PluggableActivitiIdmTestCase extends AbstractActivitiIdmTe
 
       cachedIdmEngine = IdmEngines.getDefaultIdmEngine();
       if (cachedIdmEngine == null) {
-        throw new ActivitiIdmException("no default idm engine available");
+        throw new ActivitiException("no default idm engine available");
       }
     }
     
     idmEngine = cachedIdmEngine;
     idmEngineConfiguration = idmEngine.getIdmEngineConfiguration();
+  }
+  
+  protected Group createGroup(String id, String name, String type) {
+    Group group = idmIdentityService.newGroup(id);
+    group.setName(name);
+    group.setType(type);
+    idmIdentityService.saveGroup(group);
+    return group;
+  }
+  
+  protected void clearAllUsersAndGroups() {
+    
+    // Privileges
+    List<Privilege> privileges = idmIdentityService.createPrivilegeQuery().list();
+    for (Privilege privilege : privileges) {
+      idmIdentityService.deletePrivilege(privilege.getId());
+    }
+    
+    // Groups
+    List<Group> groups = idmIdentityService.createGroupQuery().list();
+    for (Group group : groups) {
+      List<User> members = idmIdentityService.createUserQuery().memberOfGroup(group.getId()).list();
+      for (User member : members) {
+        idmIdentityService.deleteMembership(member.getId(), group.getId());
+      }
+      idmIdentityService.deleteGroup(group.getId());
+    }
+    
+    // Users
+    List<User> users = idmIdentityService.createUserQuery().list();
+    for (User user : users) {
+      idmIdentityService.deleteUser(user.getId());
+    }
+    
   }
   
 }

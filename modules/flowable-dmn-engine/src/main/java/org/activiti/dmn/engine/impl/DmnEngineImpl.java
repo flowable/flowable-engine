@@ -12,6 +12,7 @@
  */
 package org.activiti.dmn.engine.impl;
 
+import org.activiti.dmn.api.DmnManagementService;
 import org.activiti.dmn.api.DmnRepositoryService;
 import org.activiti.dmn.api.DmnRuleService;
 import org.activiti.dmn.engine.DmnEngine;
@@ -25,48 +26,54 @@ import org.slf4j.LoggerFactory;
  */
 public class DmnEngineImpl implements DmnEngine {
 
-    private static Logger log = LoggerFactory.getLogger(DmnEngineImpl.class);
+  private static Logger log = LoggerFactory.getLogger(DmnEngineImpl.class);
 
-    protected String name;
-    protected DmnRepositoryService dmnRepositoryService;
-    protected DmnRuleService dmnRuleService;
-    protected DmnEngineConfiguration dmnEngineConfiguration;
+  protected String name;
+  protected DmnManagementService dmnManagementService;
+  protected DmnRepositoryService dmnRepositoryService;
+  protected DmnRuleService dmnRuleService;
+  protected DmnEngineConfiguration dmnEngineConfiguration;
 
-    public DmnEngineImpl(DmnEngineConfiguration dmnEngineConfiguration) {
-        this.dmnEngineConfiguration = dmnEngineConfiguration;
-        this.name = dmnEngineConfiguration.getDmnEngineName();
-        this.dmnRepositoryService = dmnEngineConfiguration.getDmnRepositoryService();
-        this.dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
+  public DmnEngineImpl(DmnEngineConfiguration dmnEngineConfiguration) {
+    this.dmnEngineConfiguration = dmnEngineConfiguration;
+    this.name = dmnEngineConfiguration.getEngineName();
+    this.dmnManagementService = dmnEngineConfiguration.getDmnManagementService();
+    this.dmnRepositoryService = dmnEngineConfiguration.getDmnRepositoryService();
+    this.dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
 
-        if (name == null) {
-            log.info("default activiti DmnEngine created");
-        } else {
-            log.info("DmnEngine {} created", name);
-        }
-
-        DmnEngines.registerDmnEngine(this);
+    if (name == null) {
+      log.info("default activiti DmnEngine created");
+    } else {
+      log.info("DmnEngine {} created", name);
     }
 
-    public void close() {
-        DmnEngines.unregister(this);
-    }
+    DmnEngines.registerDmnEngine(this);
+  }
 
-    // getters and setters
-    // //////////////////////////////////////////////////////
+  public void close() {
+    DmnEngines.unregister(this);
+  }
 
-    public String getName() {
-        return name;
-    }
+  // getters and setters
+  // //////////////////////////////////////////////////////
 
-    public DmnRepositoryService getDmnRepositoryService() {
-        return dmnRepositoryService;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public DmnRuleService getDmnRuleService() {
-        return dmnRuleService;
-    }
+  public DmnManagementService getDmnManagementService() {
+    return dmnManagementService;
+  }
 
-    public DmnEngineConfiguration getDmnEngineConfiguration() {
-        return dmnEngineConfiguration;
-    }
+  public DmnRepositoryService getDmnRepositoryService() {
+    return dmnRepositoryService;
+  }
+
+  public DmnRuleService getDmnRuleService() {
+    return dmnRuleService;
+  }
+
+  public DmnEngineConfiguration getDmnEngineConfiguration() {
+    return dmnEngineConfiguration;
+  }
 }

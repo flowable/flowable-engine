@@ -16,10 +16,10 @@ package org.activiti.dmn.engine.impl.cmd;
 import java.io.InputStream;
 import java.io.Serializable;
 
-import org.activiti.dmn.engine.ActivitiDmnIllegalArgumentException;
 import org.activiti.dmn.engine.impl.interceptor.Command;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
 import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntity;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 
 /**
  * Gives access to a deployed decision table model, e.g., a DMN XML file, through a stream of bytes.
@@ -33,7 +33,7 @@ public class GetDeploymentDmnResourceCmd implements Command<InputStream>, Serial
 
   public GetDeploymentDmnResourceCmd(String decisionTableId) {
     if (decisionTableId == null || decisionTableId.length() < 1) {
-      throw new ActivitiDmnIllegalArgumentException("The decision table id is mandatory, but '" + decisionTableId + "' has been provided.");
+      throw new ActivitiIllegalArgumentException("The decision table id is mandatory, but '" + decisionTableId + "' has been provided.");
     }
     this.decisionTableId = decisionTableId;
   }

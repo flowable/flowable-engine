@@ -12,12 +12,15 @@
  */
 package org.activiti.engine.delegate.event;
 
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.impl.delegate.event.ActivitiEngineEvent;
+
 /**
  * An {@link ActivitiEvent} that indicates a certain sequence flow has been taken.
  * 
  * @author Frederik Heremans
  */
-public interface ActivitiSequenceFlowTakenEvent extends ActivitiEvent {
+public interface ActivitiSequenceFlowTakenEvent extends ActivitiEngineEvent {
 
   String getId();
 

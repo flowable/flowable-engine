@@ -12,13 +12,16 @@
  */
 package org.activiti.engine.delegate.event;
 
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.impl.delegate.event.ActivitiEngineEvent;
+
 /**
  * An {@link ActivitiEvent} related to an activity within an execution;
  * 
  * @author Frederik Heremans
  * @author Joram Barrez
  */
-public interface ActivitiActivityEvent extends ActivitiEvent {
+public interface ActivitiActivityEvent extends ActivitiEngineEvent {
 
   /**
    * @return the id of the activity this event is related to. This corresponds to an id defined in the process definition.

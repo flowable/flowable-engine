@@ -1,0 +1,1378 @@
+---
+swagger: "2.0"
+info:
+  description: "# flowable / flowəb(ə)l /\r\n\r\n- a compact and highly efficient\
+    \ workflow and Business Process Management (BPM) platform for developers, system\
+    \ admins and business users.\r\n- a lightning fast, tried and tested BPMN 2 process\
+    \ engine written in Java. It is Apache 2.0 licensed open source, with a committed\
+    \ community.\r\n- can run embedded in a Java application, or as a service on a\
+    \ server, a cluster, and in the cloud. It integrates perfectly with Spring. With\
+    \ a rich Java and REST API, it is the ideal engine for orchestrating human or\
+    \ system activities."
+  version: "v1"
+  title: "Flowable Runtime REST API"
+  contact:
+    name: "Flowable"
+    url: "http://www.flowable.org/"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost:8080"
+basePath: "/flowable-rest/service"
+tags:
+- name: "Executions"
+- name: "Process Instances"
+schemes:
+- "http"
+- "https"
+paths:
+  /query/executions:
+    post:
+      tags:
+      - "Executions"
+      summary: "Query executions"
+      description: "The request body can contain all possible filters that can be\
+        \ used in the List executions URL query. On top of these, it’s possible to\
+        \ provide an array of variables and processInstanceVariables to include in\
+        \ the query, with their format described here.\n\nThe general paging and sorting\
+        \ query-parameters can be used for this URL."
+      operationId: "queryExecutions"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/ExecutionQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the executions are returned."
+          schema:
+            $ref: "#/definitions/DataResponse"
+        404:
+          description: "Indicates a parameter was passed in the wrong format . The\
+            \ status-message contains additional information."
+  /query/process-instances:
+    post:
+      tags:
+      - "Process Instances"
+      summary: "Query process instances"
+      description: "The request body can contain all possible filters that can be\
+        \ used in the List process instances URL query. On top of these, it’s possible\
+        \ to provide an array of variables to include in the query, with their format\
+        \ described here.\n\nThe general paging and sorting query-parameters can be\
+        \ used for this URL."
+      operationId: "queryProcessInstances"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/ProcessInstanceQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the process-instances\
+            \ are returned"
+          schema:
+            $ref: "#/definitions/DataResponse"
+        400:
+          description: "Indicates a parameter was passed in the wrong format . The\
+            \ status-message contains additional information."
+  /runtime/executions:
+    get:
+      tags:
+      - "Executions"
+      summary: "List of executions"
+      description: ""
+      operationId: "getExecutions"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "query"
+        description: "Only return models with the given version."
+        required: false
+        type: "string"
+      - name: "activityId"
+        in: "query"
+        description: "Only return executions with the given activity id."
+        required: false
+        type: "string"
+      - name: "processDefinitionKey"
+        in: "query"
+        description: "Only return process instances with the given process definition\
+          \ key."
+        required: false
+        type: "string"
+      - name: "processDefinitionId"
+        in: "query"
+        description: "Only return process instances with the given process definition\
+          \ id."
+        required: false
+        type: "string"
+      - name: "processInstanceId"
+        in: "query"
+        description: "Only return executions which are part of the process instance\
+          \ with the given id."
+        required: false
+        type: "string"
+      - name: "messageEventSubscriptionName"
+        in: "query"
+        description: "Only return executions which are subscribed to a message with\
+          \ the given name."
+        required: false
+        type: "string"
+      - name: "signalEventSubscriptionName"
+        in: "query"
+        description: "Only return executions which are subscribed to a signal with\
+          \ the given name."
+        required: false
+        type: "string"
+      - name: "parentId"
+        in: "query"
+        description: "Only return executions which are a direct child of the given\
+          \ execution."
+        required: false
+        type: "string"
+      - name: "tenantId"
+        in: "query"
+        description: "Only return process instances with the given tenantId."
+        required: false
+        type: "string"
+      - name: "tenantIdLike"
+        in: "query"
+        description: "Only return process instances with a tenantId like the given\
+          \ value."
+        required: false
+        type: "string"
+      - name: "withoutTenantId"
+        in: "query"
+        description: "If true, only returns process instances without a tenantId set.\
+          \ If false, the withoutTenantId parameter is ignored."
+        required: false
+        type: "boolean"
+      - name: "sort"
+        in: "query"
+        description: "Property to sort on, to be used together with the order."
+        required: false
+        type: "string"
+        enum:
+        - "processInstanceId"
+        - "processDefinitionId"
+        - "processDefinitionKey"
+        - "tenantId"
+      responses:
+        200:
+          description: "Indicates request was successful and the executions are returned"
+          schema:
+            $ref: "#/definitions/DataResponse"
+        404:
+          description: "Indicates a parameter was passed in the wrong format . The\
+            \ status-message contains additional information."
+    put:
+      tags:
+      - "Executions"
+      summary: "Query Executions"
+      description: ""
+      operationId: "executeExecutionAction"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/ExecutionActionRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the executions are returned"
+        404:
+          description: "Indicates a parameter was passed in the wrong format . The\
+            \ status-message contains additional information."
+  /runtime/executions/{executionId}:
+    get:
+      tags:
+      - "Executions"
+      summary: "Get an execution"
+      description: ""
+      operationId: "getExecution"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the execution was found and returned."
+          schema:
+            $ref: "#/definitions/ExecutionResponse"
+        404:
+          description: "Indicates the execution was not found."
+    put:
+      tags:
+      - "Executions"
+      summary: "Execute an action on an execution"
+      description: "## Request body (signal an execution):\n\n ```JSON\n{\n  \"action\"\
+        :\"signal\"\n} ```\n\n\nBoth a variables and transientVariables property is\
+        \ accepted with following structure ```JSON\n{\n  \"action\":\"signal\",\n\
+        \  \"variables\" : [\n    {\n      \"name\": \"myVar\",\n      \"value\":\
+        \ \"someValue\"\n    }\n  ]\n}```\n\n\n## Request body (signal event received\
+        \ for execution)\n\n ```JSON\n{\n  \"action\":\"signal\"\n} ```\n\n\nNotifies\
+        \ the execution that a signal event has been received, requires a signalName\
+        \ parameter. Optional variables can be passed that are set on the execution\
+        \ before the action is executed.## Request body (signal event received for\
+        \ execution)\n\n ```JSON\n{\n  \"action\":\"messageEventReceived\",\n  \"\
+        messageName\":\"myMessage\"\n  \"variables\": [  ]\n} ```\n\n\n"
+      operationId: "performExecutionAction"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/ExecutionActionRequest"
+      responses:
+        200:
+          description: "Indicates the execution was found and the action is performed."
+          schema:
+            $ref: "#/definitions/ExecutionResponse"
+        204:
+          description: "Indicates the execution was found, the action was performed\
+            \ and the action caused the execution to end."
+        400:
+          description: "Indicates an illegal action was requested, required parameters\
+            \ are missing in the request body or illegal variables are passed in.\
+            \ Status description contains additional information about the error."
+        404:
+          description: "Indicates the execution was not found."
+  /runtime/executions/{executionId}/activities:
+    get:
+      tags:
+      - "Executions"
+      summary: "Get active activities in an execution"
+      description: "Returns all activities which are active in the execution and in\
+        \ all child-executions (and their children, recursively), if any."
+      operationId: "getActiveActivities"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the execution was found and activities are returned."
+          schema:
+            type: "array"
+            items:
+              type: "string"
+        404:
+          description: "Indicates the execution was not found."
+  /runtime/executions/{executionId}/variables:
+    get:
+      tags:
+      - "Executions"
+      summary: "List of variables for an execution"
+      description: ""
+      operationId: "listExecutionVariables"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "scope"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the execution was found and variables are returned."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/RestVariable"
+        404:
+          description: "Indicates the requested execution was not found."
+    post:
+      tags:
+      - "Executions"
+      summary: "Create variables on an execution"
+      description: ""
+      operationId: "createExecutionVariable"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "object"
+        201:
+          description: "Indicates the execution was found and variable is created/updated."
+        400:
+          description: "Indicates the request body is incomplete or contains illegal\
+            \ values. The status description contains additional information about\
+            \ the error."
+        404:
+          description: "Indicates the requested execution was not found."
+        409:
+          description: "Indicates the execution was found but already contains a variable\
+            \ with the given name. Use the update-method instead."
+    put:
+      tags:
+      - "Executions"
+      summary: "Update variables on an execution"
+      description: ""
+      operationId: "createOrUpdateExecutionVariable"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "object"
+        201:
+          description: "Indicates the execution was found and variable is created/updated."
+        400:
+          description: "Indicates the request body is incomplete or contains illegal\
+            \ values. The status description contains additional information about\
+            \ the error."
+        404:
+          description: "Indicates the requested execution was not found."
+    delete:
+      tags:
+      - "Executions"
+      summary: "Delete all variables for an execution"
+      description: ""
+      operationId: "deleteLocalVariables"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "Indicates the execution was found and variables have been\
+            \ deleted."
+        404:
+          description: "Indicates the requested execution was not found."
+  /runtime/executions/{executionId}/variables/{variableName}:
+    get:
+      tags:
+      - "Executions"
+      summary: "Get a variable for an execution"
+      description: ""
+      operationId: "getExecutionVariable"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "variableName"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "scope"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Indicates both the execution and variable were found and variable\
+            \ is returned."
+          schema:
+            $ref: "#/definitions/RestVariable"
+        400:
+          description: "Indicates the request body is incomplete or contains illegal\
+            \ values. The status description contains additional information about\
+            \ the error."
+        404:
+          description: "Indicates the requested execution was not found or the execution\
+            \ does not have a variable with the given name in the requested scope\
+            \ (in case scope-query parameter was omitted, variable doesn’t exist in\
+            \ local and global scope). Status description contains additional information\
+            \ about the error."
+    put:
+      tags:
+      - "Executions"
+      summary: "Update a variable on an execution"
+      description: ""
+      operationId: "updateExecutionVariable"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "variableName"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates both the process instance and variable were found\
+            \ and variable is updated."
+          schema:
+            $ref: "#/definitions/RestVariable"
+        404:
+          description: "Indicates the requested process instance was not found or\
+            \ the process instance does not have a variable with the given name. Status\
+            \ description contains additional information about the error."
+    delete:
+      tags:
+      - "Executions"
+      summary: "Delete a variable for an execution"
+      description: ""
+      operationId: "deletedExecutionVariable"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "variableName"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "scope"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        204:
+          description: "Indicates both the execution and variable were found and variable\
+            \ has been deleted."
+        404:
+          description: "Indicates the requested execution was not found or the execution\
+            \ does not have a variable with the given name in the requested scope.\
+            \ Status description contains additional information about the error."
+  /runtime/executions/{executionId}/variables/{variableName}/data:
+    get:
+      tags:
+      - "Executions"
+      summary: "Get the binary data for an execution"
+      description: ""
+      operationId: "getExecutionVariableData"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "variableName"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "scope"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the execution was found and the requested variables\
+            \ are returned."
+          schema:
+            type: "array"
+            items:
+              type: "string"
+              format: "byte"
+        404:
+          description: "Indicates the requested execution was not found or the task\
+            \ doesn’t have a variable with the given name (in the given scope). Status\
+            \ message provides additional information."
+  /runtime/process-instances:
+    get:
+      tags:
+      - "Process Instances"
+      summary: "List of process instances"
+      description: ""
+      operationId: "getProcessInstances"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "query"
+        description: "Only return models with the given version."
+        required: false
+        type: "string"
+      - name: "processDefinitionKey"
+        in: "query"
+        description: "Only return process instances with the given process definition\
+          \ key."
+        required: false
+        type: "string"
+      - name: "processDefinitionId"
+        in: "query"
+        description: "Only return process instances with the given process definition\
+          \ id."
+        required: false
+        type: "string"
+      - name: "businessKey"
+        in: "query"
+        description: "Only return process instances with the given businessKey."
+        required: false
+        type: "string"
+      - name: "involvedUser"
+        in: "query"
+        description: "Only return process instances in which the given user is involved."
+        required: false
+        type: "string"
+      - name: "suspended"
+        in: "query"
+        description: "If true, only return process instance which are suspended. If\
+          \ false, only return process instances which are not suspended (active)."
+        required: false
+        type: "boolean"
+      - name: "superProcessInstanceId"
+        in: "query"
+        description: "Only return process instances which have the given super process-instance\
+          \ id (for processes that have a call-activities)."
+        required: false
+        type: "string"
+      - name: "subProcessInstanceId"
+        in: "query"
+        description: "Only return process instances which have the given sub process-instance\
+          \ id (for processes started as a call-activity)."
+        required: false
+        type: "string"
+      - name: "excludeSubprocesses"
+        in: "query"
+        description: "Return only process instances which aren’t sub processes."
+        required: false
+        type: "boolean"
+      - name: "includeProcessVariables"
+        in: "query"
+        description: "Indication to include process variables in the result."
+        required: false
+        type: "boolean"
+      - name: "tenantId"
+        in: "query"
+        description: "Only return process instances with the given tenantId."
+        required: false
+        type: "string"
+      - name: "tenantIdLike"
+        in: "query"
+        description: "Only return process instances with a tenantId like the given\
+          \ value."
+        required: false
+        type: "string"
+      - name: "withoutTenantId"
+        in: "query"
+        description: "If true, only returns process instances without a tenantId set.\
+          \ If false, the withoutTenantId parameter is ignored."
+        required: false
+        type: "boolean"
+      - name: "sort"
+        in: "query"
+        description: "Property to sort on, to be used together with the order."
+        required: false
+        type: "string"
+        enum:
+        - "id"
+        - "processDefinitionId"
+        - "tenantId"
+        - "processDefinitionKey"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/DataResponse"
+        204:
+          description: "Indicates request was successful and the process-instances\
+            \ are returned"
+        404:
+          description: "Indicates a parameter was passed in the wrong format . The\
+            \ status-message contains additional information."
+    post:
+      tags:
+      - "Process Instances"
+      summary: "Start a process instance"
+      description: "## Request body (start by process definition id)\n\n```JSON\n\
+        \ {\n   \"processDefinitionId\":\"oneTaskProcess:1:158\",\n   \"businessKey\"\
+        :\"myBusinessKey\",\n   \"variables\": [\n      {\n        \"name\":\"myVar\"\
+        ,\n        \"value\":\"This is a variable\",\n      }\n   ]\n}```\n\n## Request\
+        \ body (start by process definition key)\n\n```JSON\n {\n   \"processDefinitionKey\"\
+        :\"oneTaskProcess\",\n   \"businessKey\":\"myBusinessKey\",\n   \"tenantId\"\
+        : \"tenant1\",\n   \"variables\": [\n      {\n        \"name\":\"myVar\",\n\
+        \        \"value\":\"This is a variable\",\n      }\n   ]\n}```\n\n## Request\
+        \ body (start by message)\n\n```JSON\n{\n   \"message\":\"newOrderMessage\"\
+        ,\n   \"businessKey\":\"myBusinessKey\",\n   \"tenantId\": \"tenant1\",\n\
+        \   \"variables\": [\n      {\n        \"name\":\"myVar\",\n        \"value\"\
+        :\"This is a variable\",\n      }\n   ]\n}```\n\nNote that also a *transientVariables*\
+        \ property is accepted as part of this json, that follows the same structure\
+        \ as the *variables* property.\n\nOnly one of *processDefinitionId*, *processDefinitionKey*\
+        \ or *message* can be used in the request body. Parameters *businessKey*,\
+        \ *variables* and *tenantId* are optional. If tenantId is omitted, the default\
+        \ tenant will be used. More information about the variable format can be found\
+        \ in the REST variables section. Note that the variable-scope that is supplied\
+        \ is ignored, process-variables are always local."
+      operationId: "createProcessInstance"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/ProcessInstanceCreateRequest"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ProcessInstanceResponse"
+        201:
+          description: "Indicates the process instance was created."
+        400:
+          description: "Indicates either the process-definition was not found (based\
+            \ on id or key), no process is started by sending the given message or\
+            \ an invalid variable has been passed. Status description contains additional\
+            \ information about the error."
+  /runtime/process-instances/{processInstanceId}:
+    get:
+      tags:
+      - "Process Instances"
+      summary: "Get a process instance"
+      description: ""
+      operationId: "getProcessInstance"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the process instance was found and returned."
+          schema:
+            $ref: "#/definitions/ProcessInstanceResponse"
+        404:
+          description: "Indicates the requested process instance was not found."
+    put:
+      tags:
+      - "Process Instances"
+      summary: "Activate or suspend a process instance"
+      description: "## Activate a process instance\n\n ```JSON\n{\n  \"action\" :\
+        \ \"suspend\"\n} ```\n\n\n## Suspend a process instance\n\n ```JSON\n{\n \
+        \ \"action\" : \"activate\"\n} ```\n\n\n"
+      operationId: "performProcessInstanceAction"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/ProcessInstanceActionRequest"
+      responses:
+        200:
+          description: "Indicates the process instance was found and action was executed."
+          schema:
+            $ref: "#/definitions/ProcessInstanceResponse"
+        400:
+          description: "\t\nIndicates an invalid action was supplied."
+        404:
+          description: "Indicates the requested process instance was not found."
+        409:
+          description: "Indicates the requested process instance action cannot be\
+            \ executed since the process-instance is already activated/suspended."
+    delete:
+      tags:
+      - "Process Instances"
+      summary: "Delete a process instance"
+      description: ""
+      operationId: "deleteProcessInstance"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "deleteReason"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        204:
+          description: "Indicates the process instance was found and deleted. Response\
+            \ body is left empty intentionally."
+        404:
+          description: "Indicates the requested process instance was not found."
+  /runtime/process-instances/{processInstanceId}/diagram:
+    get:
+      tags:
+      - "Process Instances"
+      summary: "Get diagram for a process instance"
+      description: ""
+      operationId: "getProcessInstanceDiagram"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the process instance was found and the diagram was\
+            \ returned."
+          schema:
+            type: "array"
+            items:
+              type: "string"
+              format: "byte"
+        400:
+          description: "Indicates the requested process instance was not found but\
+            \ the process doesn’t contain any graphical information (BPMN:DI) and\
+            \ no diagram can be created."
+        404:
+          description: "Indicates the requested process instance was not found."
+  /runtime/process-instances/{processInstanceId}/identitylinks:
+    get:
+      tags:
+      - "Process Instances"
+      summary: "Get involved people for process instance"
+      description: "Note that the groupId in Response Body will always be null, as\
+        \ it’s only possible to involve users with a process-instance."
+      operationId: "listProcessInstanceIdentityLinks"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the process instance was found and links are returned."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/RestIdentityLink"
+        404:
+          description: "Indicates the requested process instance was not found."
+    post:
+      tags:
+      - "Process Instances"
+      summary: "Add an involved user to a process instance"
+      description: "Note that the groupId in Response Body will always be null, as\
+        \ it’s only possible to involve users with a process-instance."
+      operationId: "createProcessInstanceIdentityLinks"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/RestIdentityLink"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/RestIdentityLink"
+        201:
+          description: "Indicates the process instance was found and the link is created."
+        400:
+          description: "Indicates the requested body did not contain a userId or a\
+            \ type."
+        404:
+          description: "Indicates the requested process instance was not found."
+  /runtime/process-instances/{processInstanceId}/identitylinks/users/{identityId}/{type}:
+    get:
+      tags:
+      - "Process Instances"
+      summary: "Get a specific involved people from process instance"
+      description: ""
+      operationId: "getProcessInstanceIdentityLinks"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "identityId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "type"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the process instance was found and the specified\
+            \ link is retrieved."
+          schema:
+            $ref: "#/definitions/RestIdentityLink"
+        404:
+          description: "Indicates the requested process instance was not found or\
+            \ the link to delete doesn’t exist. The response status contains additional\
+            \ information about the error."
+    delete:
+      tags:
+      - "Process Instances"
+      summary: "Remove an involved user to from process instance"
+      description: ""
+      operationId: "deleteProcessInstanceIdentityLinks"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "identityId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "type"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "Indicates the process instance was found and the link has\
+            \ been deleted. Response body is left empty intentionally."
+        404:
+          description: "Indicates the requested process instance was not found or\
+            \ the link to delete doesn’t exist. The response status contains additional\
+            \ information about the error."
+  /runtime/process-instances/{processInstanceId}/variables:
+    get:
+      tags:
+      - "Process Instances"
+      summary: "List of variables for a process instance"
+      description: "In case the variable is a binary variable or serializable, the\
+        \ valueUrl points to an URL to fetch the raw value. If it’s a plain variable,\
+        \ the value is present in the response. Note that only local scoped variables\
+        \ are returned, as there is no global scope for process-instance variables."
+      operationId: "getVariables"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "scope"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the process instance was found and variables are\
+            \ returned."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/RestVariable"
+        400:
+          description: "Indicates the requested process instance was not found."
+    post:
+      tags:
+      - "Process Instances"
+      summary: "Create variables or new binary variable on a process instance"
+      description: "## Update multiples variables\n\n ```JSON\n[\n   {\n      \"name\"\
+        :\"intProcVar\"\n      \"type\":\"integer\"\n      \"value\":123\n   },\n\n\
+        \   ...\n] ```\n\n\n Any number of variables can be passed into the request\
+        \ body array. More information about the variable format can be found in the\
+        \ REST variables section. Note that scope is ignored, only local variables\
+        \ can be set in a process instance.\n\n\nThe request should be of type multipart/form-data.\
+        \ There should be a single file-part included with the binary value of the\
+        \ variable. On top of that, the following additional form-fields can be present:\n\
+        \nname: Required name of the variable.\n\ntype: Type of variable that is created.\
+        \ If omitted, binary is assumed and the binary data in the request will be\
+        \ stored as an array of bytes."
+      operationId: "createProcessInstanceVariable"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "object"
+        201:
+          description: "Indicates the process instance was found and variable is created."
+        400:
+          description: "Indicates the request body is incomplete or contains illegal\
+            \ values. The status description contains additional information about\
+            \ the error."
+        404:
+          description: "Indicates the requested process instance was not found."
+        409:
+          description: "Indicates the process instance was found but already contains\
+            \ a variable with the given name (only thrown when POST method is used).\
+            \ Use the update-method instead."
+    put:
+      tags:
+      - "Process Instances"
+      summary: "Update a single or binary variable or multiple variables on a process\
+        \ instance"
+      description: "## Update multiples variables\n\n ```JSON\n[\n   {\n      \"name\"\
+        :\"intProcVar\"\n      \"type\":\"integer\"\n      \"value\":123\n   },\n\n\
+        \   ...\n] ```\n\n\n Any number of variables can be passed into the request\
+        \ body array. More information about the variable format can be found in the\
+        \ REST variables section. Note that scope is ignored, only local variables\
+        \ can be set in a process instance.\n\n\n## Update a single variable\n\n```JSON\n\
+        \ {\n    \"name\":\"intProcVar\"\n    \"type\":\"integer\"\n    \"value\"\
+        :123\n } ```\n\n\n##  Update an existing binary variable\n\n\n\n\nThe request\
+        \ should be of type multipart/form-data. There should be a single file-part\
+        \ included with the binary value of the variable. On top of that, the following\
+        \ additional form-fields can be present:\n\nname: Required name of the variable.\n\
+        \ntype: Type of variable that is created. If omitted, binary is assumed and\
+        \ the binary data in the request will be stored as an array of bytes."
+      operationId: "createOrUpdateProcessVariable"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "object"
+        201:
+          description: "Indicates the process instance was found and variable is created."
+        400:
+          description: "Indicates the request body is incomplete or contains illegal\
+            \ values. The status description contains additional information about\
+            \ the error."
+        404:
+          description: "Indicates the requested process instance was not found."
+        415:
+          description: "Indicates the serializable data contains an object for which\
+            \ no class is present in the JVM running the Flowable engine and therefore\
+            \ cannot be deserialized."
+    delete:
+      tags:
+      - "Process Instances"
+      summary: "Delete all variables"
+      description: ""
+      operationId: "deleteLocalProcessVariable"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "Indicates variables were found and have been deleted. Response-body\
+            \ is intentionally empty."
+        404:
+          description: "Indicates the requested process instance was not found."
+  /runtime/process-instances/{processInstanceId}/variables/{variableName}:
+    get:
+      tags:
+      - "Process Instances"
+      summary: "Get a variable for a process instance"
+      description: ""
+      operationId: "getProcessInstanceVariable"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "variableName"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "scope"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Indicates both the process instance and variable were found\
+            \ and variable is returned."
+          schema:
+            $ref: "#/definitions/RestVariable"
+        404:
+          description: "Indicates the requested process instance was not found or\
+            \ the process instance does not have a variable with the given name. Status\
+            \ description contains additional information about the error."
+    put:
+      tags:
+      - "Process Instances"
+      summary: "Update a single variable on a process instance"
+      description: ""
+      operationId: "updateProcessInstanceVariable"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "variableName"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates both the process instance and variable were found\
+            \ and variable is updated."
+          schema:
+            $ref: "#/definitions/RestVariable"
+        404:
+          description: "Indicates the requested process instance was not found or\
+            \ the process instance does not have a variable with the given name. Status\
+            \ description contains additional information about the error."
+    delete:
+      tags:
+      - "Process Instances"
+      summary: "Delete a variable"
+      description: ""
+      operationId: "deleteProcessInstanceVariable"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "variableName"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "scope"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        204:
+          description: "Indicates the variable was found and has been deleted. Response-body\
+            \ is intentionally empty."
+        404:
+          description: "Indicates the requested variable was not found."
+  /runtime/process-instances/{processInstanceId}/variables/{variableName}/data:
+    get:
+      tags:
+      - "Process Instances"
+      summary: "Get the binary data for a variable"
+      description: ""
+      operationId: "getProcessInstanceVariableData"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "variableName"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "scope"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the process instance was found and the requested\
+            \ variables are returned."
+          schema:
+            type: "array"
+            items:
+              type: "string"
+              format: "byte"
+        404:
+          description: "Indicates the requested task was not found or the task doesn’\
+            t have a variable with the given name (in the given scope). Status message\
+            \ provides additional information."
+securityDefinitions:
+  basicAuth:
+    type: "basic"
+definitions:
+  DataResponse:
+    type: "object"
+    properties:
+      data:
+        type: "object"
+      total:
+        type: "integer"
+        format: "int64"
+      start:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      size:
+        type: "integer"
+        format: "int32"
+  ExecutionActionRequest:
+    type: "object"
+    properties:
+      action:
+        type: "string"
+        description: "Action to perform"
+      signalName:
+        type: "string"
+      messageName:
+        type: "string"
+      variables:
+        type: "array"
+        items:
+          $ref: "#/definitions/RestVariable"
+      transientVariables:
+        type: "array"
+        items:
+          $ref: "#/definitions/RestVariable"
+  ExecutionQueryRequest:
+    type: "object"
+    properties:
+      start:
+        type: "integer"
+        format: "int32"
+      size:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      id:
+        type: "string"
+      activityId:
+        type: "string"
+      parentId:
+        type: "string"
+      processInstanceId:
+        type: "string"
+      processBusinessKey:
+        type: "string"
+      processDefinitionId:
+        type: "string"
+      processDefinitionKey:
+        type: "string"
+      signalEventSubscriptionName:
+        type: "string"
+      messageEventSubscriptionName:
+        type: "string"
+      variables:
+        type: "array"
+        items:
+          $ref: "#/definitions/QueryVariable"
+      processInstanceVariables:
+        type: "array"
+        items:
+          $ref: "#/definitions/QueryVariable"
+      tenantId:
+        type: "string"
+      tenantIdLike:
+        type: "string"
+      withoutTenantId:
+        type: "boolean"
+        default: false
+  ExecutionResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      url:
+        type: "string"
+      parentId:
+        type: "string"
+      parentUrl:
+        type: "string"
+      superExecutionId:
+        type: "string"
+      superExecutionUrl:
+        type: "string"
+      processInstanceId:
+        type: "string"
+      processInstanceUrl:
+        type: "string"
+      suspended:
+        type: "boolean"
+        default: false
+      activityId:
+        type: "string"
+      tenantId:
+        type: "string"
+  ProcessInstanceActionRequest:
+    type: "object"
+    properties:
+      action:
+        type: "string"
+        description: "Action to perform"
+  ProcessInstanceCreateRequest:
+    type: "object"
+    properties:
+      processDefinitionId:
+        type: "string"
+      processDefinitionKey:
+        type: "string"
+      message:
+        type: "string"
+      businessKey:
+        type: "string"
+      variables:
+        type: "array"
+        items:
+          $ref: "#/definitions/RestVariable"
+      transientVariables:
+        type: "array"
+        items:
+          $ref: "#/definitions/RestVariable"
+      tenantId:
+        type: "string"
+      returnVariables:
+        type: "boolean"
+        default: false
+  ProcessInstanceQueryRequest:
+    type: "object"
+    properties:
+      start:
+        type: "integer"
+        format: "int32"
+      size:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      processInstanceId:
+        type: "string"
+      processBusinessKey:
+        type: "string"
+      processDefinitionId:
+        type: "string"
+      processDefinitionKey:
+        type: "string"
+      superProcessInstanceId:
+        type: "string"
+      subProcessInstanceId:
+        type: "string"
+      excludeSubprocesses:
+        type: "boolean"
+        default: false
+      involvedUser:
+        type: "string"
+      suspended:
+        type: "boolean"
+        default: false
+      includeProcessVariables:
+        type: "boolean"
+        default: false
+      variables:
+        type: "array"
+        items:
+          $ref: "#/definitions/QueryVariable"
+      tenantId:
+        type: "string"
+      tenantIdLike:
+        type: "string"
+      withoutTenantId:
+        type: "boolean"
+        default: false
+  ProcessInstanceResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      url:
+        type: "string"
+      businessKey:
+        type: "string"
+      suspended:
+        type: "boolean"
+        default: false
+      ended:
+        type: "boolean"
+        default: false
+      processDefinitionId:
+        type: "string"
+      processDefinitionUrl:
+        type: "string"
+      activityId:
+        type: "string"
+      variables:
+        type: "array"
+        items:
+          $ref: "#/definitions/RestVariable"
+      tenantId:
+        type: "string"
+      completed:
+        type: "boolean"
+        default: false
+  QueryVariable:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      value:
+        type: "object"
+      type:
+        type: "string"
+      variableOperation:
+        type: "string"
+        enum:
+        - "EQUALS"
+        - "NOT_EQUALS"
+        - "EQUALS_IGNORE_CASE"
+        - "NOT_EQUALS_IGNORE_CASE"
+        - "LIKE"
+        - "LIKE_IGNORE_CASE"
+        - "GREATER_THAN"
+        - "GREATER_THAN_OR_EQUALS"
+        - "LESS_THAN"
+        - "LESS_THAN_OR_EQUALS"
+  RestIdentityLink:
+    type: "object"
+    properties:
+      url:
+        type: "string"
+      user:
+        type: "string"
+      group:
+        type: "string"
+      type:
+        type: "string"
+  RestVariable:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      type:
+        type: "string"
+      value:
+        type: "object"
+      valueUrl:
+        type: "string"
+      scope:
+        type: "string"

@@ -14,8 +14,8 @@ package org.activiti.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionInfoEntity;
@@ -57,13 +57,11 @@ public class SaveProcessDefinitionInfoCmd implements Command<Void>, Serializable
       commandContext.getProcessDefinitionInfoEntityManager().insertProcessDefinitionInfo(definitionInfoEntity);
     }
     
-    if (infoNode != null) {
-      try {
-        ObjectWriter writer = commandContext.getProcessEngineConfiguration().getObjectMapper().writer();
-        commandContext.getProcessDefinitionInfoEntityManager().updateInfoJson(definitionInfoEntity.getId(), writer.writeValueAsBytes(infoNode));
-      } catch (Exception e) {
-        throw new ActivitiException("Unable to serialize info node " + infoNode);
-      }
+    try {
+      ObjectWriter writer = commandContext.getProcessEngineConfiguration().getObjectMapper().writer();
+      commandContext.getProcessDefinitionInfoEntityManager().updateInfoJson(definitionInfoEntity.getId(), writer.writeValueAsBytes(infoNode));
+    } catch (Exception e) {
+      throw new ActivitiException("Unable to serialize info node " + infoNode);
     }
     
     return null;

@@ -27,17 +27,19 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.activiti.idm.engine.ActivitiIdmException;
-import org.activiti.idm.engine.ActivitiIdmOptimisticLockingException;
-import org.activiti.idm.engine.ActivitiIdmWrongDbException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiOptimisticLockingException;
+import org.activiti.engine.common.api.ActivitiWrongDbException;
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.db.ListQueryParameterObject;
+import org.activiti.engine.common.impl.interceptor.Session;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
+import org.activiti.engine.common.impl.util.IoUtil;
 import org.activiti.idm.engine.IdmEngine;
 import org.activiti.idm.engine.IdmEngineConfiguration;
-import org.activiti.idm.engine.impl.Page;
 import org.activiti.idm.engine.impl.context.Context;
 import org.activiti.idm.engine.impl.db.upgrade.DbUpgradeStep;
-import org.activiti.idm.engine.impl.interceptor.Session;
 import org.activiti.idm.engine.impl.persistence.entity.PropertyEntity;
-import org.activiti.idm.engine.impl.util.IoUtil;
 import org.activiti.idm.engine.impl.util.ReflectUtil;
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
@@ -58,7 +60,7 @@ public class DbSqlSession implements Session {
   static {
 
     /* Previous */
-
+    ACTIVITI_IDM_VERSIONS.add(new ActivitiIdmVersion("0"));
     
     /* Current */
     ACTIVITI_IDM_VERSIONS.add(new ActivitiIdmVersion(IdmEngine.VERSION));
@@ -96,7 +98,7 @@ public class DbSqlSession implements Session {
     insertStatement = dbSqlSessionFactory.mapStatement(insertStatement);
 
     if (insertStatement==null) {
-      throw new ActivitiIdmException("no insert statement for " + entity.getClass() + " in the ibatis mapping files");
+      throw new ActivitiException("no insert statement for " + entity.getClass() + " in the ibatis mapping files");
     }
     
     log.debug("inserting: {}", entity);
@@ -111,13 +113,13 @@ public class DbSqlSession implements Session {
     updateStatement = dbSqlSessionFactory.mapStatement(updateStatement);
 
     if (updateStatement == null) {
-      throw new ActivitiIdmException("no update statement for " + entity.getClass() + " in the ibatis mapping files");
+      throw new ActivitiException("no update statement for " + entity.getClass() + " in the ibatis mapping files");
     }
 
     log.debug("updating: {}", entity);
     int updatedRecords = sqlSession.update(updateStatement, entity);
     if (updatedRecords == 0) {
-      throw new ActivitiIdmOptimisticLockingException(entity + " was updated by another transaction concurrently");
+      throw new ActivitiOptimisticLockingException(entity + " was updated by another transaction concurrently");
     }
   }
 
@@ -137,7 +139,7 @@ public class DbSqlSession implements Session {
     String deleteStatement = dbSqlSessionFactory.getDeleteStatement(entity.getClass());
     deleteStatement = dbSqlSessionFactory.mapStatement(deleteStatement);
     if (deleteStatement == null) {
-      throw new ActivitiIdmException("no delete statement for " + entity.getClass() + " in the ibatis mapping files");
+      throw new ActivitiException("no delete statement for " + entity.getClass() + " in the ibatis mapping files");
     }
 
     sqlSession.delete(deleteStatement, entity);
@@ -246,27 +248,27 @@ public class DbSqlSession implements Session {
     try {
       String dbVersion = getDbVersion();
       if (!IdmEngine.VERSION.equals(dbVersion)) {
-        throw new ActivitiIdmWrongDbException(IdmEngine.VERSION, dbVersion);
+        throw new ActivitiWrongDbException(IdmEngine.VERSION, dbVersion);
       }
 
       String errorMessage = null;
-      if (!isIdmTablePresent()) {
+      if (!isIdmPropertyTablePresent()) {
         errorMessage = addMissingComponent(errorMessage, "engine");
       }
 
       if (errorMessage != null) {
-        throw new ActivitiIdmException("Activiti IDM database problem: " + errorMessage);
+        throw new ActivitiException("Activiti IDM database problem: " + errorMessage);
       }
 
     } catch (Exception e) {
       if (isMissingTablesException(e)) {
-        throw new ActivitiIdmException(
+        throw new ActivitiException(
             "no activiti tables in db. set <property name=\"databaseSchemaUpdate\" to value=\"true\" or value=\"create-drop\" (use create-drop for testing only!) in bean processEngineConfiguration in activiti.cfg.xml for automatic schema creation", e);
       } else {
         if (e instanceof RuntimeException) {
           throw (RuntimeException) e;
         } else {
-          throw new ActivitiIdmException("couldn't get db schema version", e);
+          throw new ActivitiException("couldn't get db schema version", e);
         }
       }
     }
@@ -282,18 +284,25 @@ public class DbSqlSession implements Session {
   }
 
   protected String getDbVersion() {
-    String selectSchemaVersionStatement = dbSqlSessionFactory.mapStatement("selectDbSchemaVersion");
+    String selectSchemaVersionStatement = dbSqlSessionFactory.mapStatement("org.activiti.idm.engine.impl.persistence.entity.PropertyEntityImpl.selectDbSchemaVersion");
     return (String) sqlSession.selectOne(selectSchemaVersionStatement);
   }
 
   public void dbSchemaCreate() {
-    if (isIdmTablePresent()) {
+    if (isIdmPropertyTablePresent()) {
       String dbVersion = getDbVersion();
       if (!IdmEngine.VERSION.equals(dbVersion)) {
-        throw new ActivitiIdmWrongDbException(IdmEngine.VERSION, dbVersion);
+        throw new ActivitiWrongDbException(IdmEngine.VERSION, dbVersion);
       }
     } else {
-      dbSchemaCreateIdmEngine();
+      // User and Group tables can already have been created by the process engine in an earlier version
+      if (isIdmGroupTablePresent()) {
+        // Engine upgrade
+        dbSchemaUpgrade("engine", 0);
+        
+      } else {
+        dbSchemaCreateIdmEngine();
+      }
     }
   }
 
@@ -315,7 +324,7 @@ public class DbSqlSession implements Session {
     boolean isUpgradeNeeded = false;
     int matchingVersionIndex = -1;
 
-    if (isIdmTablePresent()) {
+    if (isIdmPropertyTablePresent()) {
 
       PropertyEntity dbVersionProperty = selectById(PropertyEntity.class, "schema.version");
       String dbVersion = dbVersionProperty.getValue();
@@ -325,7 +334,7 @@ public class DbSqlSession implements Session {
 
       // Exception when no match was found: unknown/unsupported version
       if (matchingVersionIndex < 0) {
-        throw new ActivitiIdmException("Could not update Activiti database schema: unknown version from database: '" + dbVersion + "'");
+        throw new ActivitiException("Could not update Activiti database schema: unknown version from database: '" + dbVersion + "'");
       }
 
       isUpgradeNeeded = (matchingVersionIndex != (ACTIVITI_IDM_VERSIONS.size() - 1));
@@ -333,15 +342,7 @@ public class DbSqlSession implements Session {
       if (isUpgradeNeeded) {
         dbVersionProperty.setValue(IdmEngine.VERSION);
 
-        PropertyEntity dbHistoryProperty;
-        if ("5.0".equals(dbVersion)) {
-          dbHistoryProperty = Context.getCommandContext().getPropertyEntityManager().create();
-          dbHistoryProperty.setName("schema.history");
-          dbHistoryProperty.setValue("create(5.0)");
-          insert(dbHistoryProperty);
-        } else {
-          dbHistoryProperty = selectById(PropertyEntity.class, "schema.history");
-        }
+        PropertyEntity dbHistoryProperty = selectById(PropertyEntity.class, "schema.history");
 
         // Set upgrade history
         String dbHistoryValue = dbHistoryProperty.getValue() + " upgrade(" + dbVersion + "->" + IdmEngine.VERSION + ")";
@@ -349,11 +350,19 @@ public class DbSqlSession implements Session {
 
         // Engine upgrade
         dbSchemaUpgrade("engine", matchingVersionIndex);
-        feedback = "upgraded Activiti IDM from " + dbVersion + " to " + IdmEngine.VERSION;
+        feedback = "upgraded Flowable IDM from " + dbVersion + " to " + IdmEngine.VERSION;
       }
 
     } else {
-      dbSchemaCreate();
+      // User and Group tables can already have been created by the process engine in an earlier version
+      if (isIdmGroupTablePresent()) {
+        // Engine upgrade
+        dbSchemaUpgrade("engine", 0);
+        feedback = "upgraded Flowable IDM to " + IdmEngine.VERSION;
+        
+      } else {
+        dbSchemaCreate();
+      }
     }
 
     return feedback;
@@ -376,8 +385,12 @@ public class DbSqlSession implements Session {
     return matchingVersionIndex;
   }
 
-  public boolean isIdmTablePresent() {
+  public boolean isIdmPropertyTablePresent() {
     return isTablePresent("ACT_ID_PROPERTY");
+  }
+  
+  public boolean isIdmGroupTablePresent() {
+    return isTablePresent("ACT_ID_GROUP");
   }
 
   public boolean isTablePresent(String tableName) {
@@ -429,7 +442,7 @@ public class DbSqlSession implements Session {
       }
 
     } catch (Exception e) {
-      throw new ActivitiIdmException("couldn't check if tables are already present using metadata: " + e.getMessage(), e);
+      throw new ActivitiException("couldn't check if tables are already present using metadata: " + e.getMessage(), e);
     }
   }
 
@@ -449,7 +462,7 @@ public class DbSqlSession implements Session {
     int engineMinorVersion = Integer.valueOf(cleanEngineVersionSplitted[1]);
 
     if ((dbMajorVersion > engineMajorVersion) || ((dbMajorVersion <= engineMajorVersion) && (dbMinorVersion > engineMinorVersion))) {
-      throw new ActivitiIdmException("Version of activiti idm database (" + versionInDatabase + ") is more recent than the engine (" + IdmEngine.VERSION + ")");
+      throw new ActivitiException("Version of activiti idm database (" + versionInDatabase + ") is more recent than the engine (" + IdmEngine.VERSION + ")");
     } else if (cleanDbVersion.compareTo(cleanEngineVersion) == 0) {
       // Versions don't match exactly, possibly snapshot is being used
       log.warn("IDM Engine-version is the same, but not an exact match: {} vs. {}. Not performing database-upgrade.", versionInDatabase, IdmEngine.VERSION);
@@ -461,7 +474,7 @@ public class DbSqlSession implements Session {
   protected String getCleanVersion(String versionString) {
     Matcher matcher = CLEAN_VERSION_REGEX.matcher(versionString);
     if (!matcher.find()) {
-      throw new ActivitiIdmException("Illegal format for version: " + versionString);
+      throw new ActivitiException("Illegal format for version: " + versionString);
     }
 
     String cleanString = matcher.group();
@@ -470,7 +483,7 @@ public class DbSqlSession implements Session {
                                        // really a number
       return cleanString;
     } catch (NumberFormatException nfe) {
-      throw new ActivitiIdmException("Illegal format for version: " + versionString);
+      throw new ActivitiException("Illegal format for version: " + versionString);
     }
   }
 
@@ -513,7 +526,7 @@ public class DbSqlSession implements Session {
         if (isOptional) {
           log.info("no schema resource {} for {}", resourceName, operation);
         } else {
-          throw new ActivitiIdmException("resource '" + resourceName + "' is not available");
+          throw new ActivitiException("resource '" + resourceName + "' is not available");
         }
       } else {
         executeSchemaResource(operation, component, resourceName, inputStream);
@@ -566,14 +579,14 @@ public class DbSqlSession implements Session {
           DbUpgradeStep dbUpgradeStep = null;
           try {
             dbUpgradeStep = (DbUpgradeStep) ReflectUtil.instantiate(upgradestepClassName);
-          } catch (ActivitiIdmException e) {
-            throw new ActivitiIdmException("database update java class '" + upgradestepClassName + "' can't be instantiated: " + e.getMessage(), e);
+          } catch (ActivitiException e) {
+            throw new ActivitiException("database update java class '" + upgradestepClassName + "' can't be instantiated: " + e.getMessage(), e);
           }
           try {
             log.debug("executing upgrade step java class {}", upgradestepClassName);
             dbUpgradeStep.execute(this);
           } catch (Exception e) {
-            throw new ActivitiIdmException("error while executing database update java class '" + upgradestepClassName + "': " + e.getMessage(), e);
+            throw new ActivitiException("error while executing database update java class '" + upgradestepClassName + "': " + e.getMessage(), e);
           }
 
         } else if (line.length() > 0) {
@@ -620,7 +633,7 @@ public class DbSqlSession implements Session {
       log.debug("activiti db schema {} for component {} successful", operation, component);
 
     } catch (Exception e) {
-      throw new ActivitiIdmException("couldn't " + operation + " db schema: " + exceptionSqlStatement, e);
+      throw new ActivitiException("couldn't " + operation + " db schema: " + exceptionSqlStatement, e);
     }
   }
 

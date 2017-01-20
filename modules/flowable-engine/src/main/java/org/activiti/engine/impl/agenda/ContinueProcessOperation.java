@@ -10,16 +10,16 @@ import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.SubProcess;
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.util.CollectionUtil;
 import org.activiti.engine.delegate.ExecutionListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.delegate.ActivityBehavior;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
-import org.activiti.engine.impl.util.CollectionUtil;
 import org.activiti.engine.impl.util.ProcessDefinitionUtil;
 import org.activiti.engine.logging.LogMDC;
 import org.activiti.engine.runtime.Job;
@@ -178,7 +178,7 @@ public class ContinueProcessOperation extends AbstractOperation {
     
     if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createActivityEvent(ActivitiEventType.ACTIVITY_STARTED, flowNode.getId(), flowNode.getName(), execution.getId(),
+          ActivitiEventBuilder.createActivityEvent(ActivitiEngineEventType.ACTIVITY_STARTED, flowNode.getId(), flowNode.getName(), execution.getId(),
               execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
     }
     
@@ -208,7 +208,7 @@ public class ContinueProcessOperation extends AbstractOperation {
       Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
         ActivitiEventBuilder.createSequenceFlowTakenEvent(
             (ExecutionEntity) execution,
-            ActivitiEventType.SEQUENCEFLOW_TAKEN, 
+            ActivitiEngineEventType.SEQUENCEFLOW_TAKEN, 
             sequenceFlow.getId(),
             sourceFlowElement != null ? sourceFlowElement.getId() : null, 
             sourceFlowElement != null ? (String) sourceFlowElement.getName() : null, 

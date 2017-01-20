@@ -20,11 +20,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.activiti.bpmn.model.FlowNode;
-import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.form.FormData;
 import org.activiti.engine.impl.cmd.ActivateProcessInstanceCmd;
 import org.activiti.engine.impl.cmd.AddEventListenerCommand;
@@ -35,6 +35,7 @@ import org.activiti.engine.impl.cmd.DeleteProcessInstanceCmd;
 import org.activiti.engine.impl.cmd.DispatchEventCommand;
 import org.activiti.engine.impl.cmd.ExecuteActivityForAdhocSubProcessCmd;
 import org.activiti.engine.impl.cmd.FindActiveActivityIdsCmd;
+import org.activiti.engine.impl.cmd.GetActiveAdhocSubProcessesCmd;
 import org.activiti.engine.impl.cmd.GetDataObjectCmd;
 import org.activiti.engine.impl.cmd.GetDataObjectsCmd;
 import org.activiti.engine.impl.cmd.GetEnabledActivitiesForAdhocSubProcessCmd;
@@ -46,6 +47,7 @@ import org.activiti.engine.impl.cmd.GetExecutionsVariablesCmd;
 import org.activiti.engine.impl.cmd.GetIdentityLinksForProcessInstanceCmd;
 import org.activiti.engine.impl.cmd.GetProcessInstanceEventsCmd;
 import org.activiti.engine.impl.cmd.GetStartFormCmd;
+import org.activiti.engine.impl.cmd.GetStartFormModelCmd;
 import org.activiti.engine.impl.cmd.HasExecutionVariableCmd;
 import org.activiti.engine.impl.cmd.MessageEventReceivedCmd;
 import org.activiti.engine.impl.cmd.RemoveEventListenerCommand;
@@ -56,6 +58,7 @@ import org.activiti.engine.impl.cmd.SetProcessInstanceNameCmd;
 import org.activiti.engine.impl.cmd.SignalEventReceivedCmd;
 import org.activiti.engine.impl.cmd.StartProcessInstanceByMessageCmd;
 import org.activiti.engine.impl.cmd.StartProcessInstanceCmd;
+import org.activiti.engine.impl.cmd.StartProcessInstanceWithFormCmd;
 import org.activiti.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.activiti.engine.impl.cmd.TriggerCmd;
 import org.activiti.engine.impl.persistence.entity.VariableInstance;
@@ -71,6 +74,7 @@ import org.activiti.engine.runtime.ProcessInstanceQuery;
 import org.activiti.engine.task.Event;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.IdentityLinkType;
+import org.activiti.form.model.FormModel;
 
 /**
  * @author Tom Baeyens
@@ -124,6 +128,14 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
 
   public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, Map<String, Object> variables) {
     return commandExecutor.execute(new StartProcessInstanceCmd<ProcessInstance>(null, processDefinitionId, businessKey, variables));
+  }
+  
+  public ProcessInstance startProcessInstanceWithForm(String processDefinitionId, String outcome, Map<String, Object> variables, String processInstanceName) {
+    return commandExecutor.execute(new StartProcessInstanceWithFormCmd(processDefinitionId, outcome, variables, processInstanceName));
+  }
+  
+  public FormModel getStartFormModel(String processDefinitionId, String processInstanceId) {
+    return commandExecutor.execute(new GetStartFormModelCmd(processDefinitionId, processInstanceId));
   }
 
   public void deleteProcessInstance(String processInstanceId, String deleteReason) {
@@ -484,7 +496,7 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   @Override
-  public void addEventListener(ActivitiEventListener listenerToAdd, ActivitiEventType... types) {
+  public void addEventListener(ActivitiEventListener listenerToAdd, ActivitiEngineEventType... types) {
     commandExecutor.execute(new AddEventListenerCommand(listenerToAdd, types));
   }
 
@@ -506,6 +518,11 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   @Override
   public List<Event> getProcessInstanceEvents(String processInstanceId) {
     return commandExecutor.execute(new GetProcessInstanceEventsCmd(processInstanceId));
+  }
+  
+  @Override
+  public List<Execution> getAdhocSubProcessExecutions(String processInstanceId) {
+    return commandExecutor.execute(new GetActiveAdhocSubProcessesCmd(processInstanceId));
   }
   
   @Override

@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.delegate.event.ActivitiEntityEvent;
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
-import org.activiti.engine.runtime.Clock;
+import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
+import org.activiti.engine.common.runtime.Clock;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.impl.context.Context;
 import org.activiti5.engine.impl.event.logger.handler.ActivityCompensatedEventHandler;
 import org.activiti5.engine.impl.event.logger.handler.ActivityCompletedEventHandler;
@@ -48,8 +48,8 @@ public class EventLogger implements ActivitiEventListener {
 	protected ObjectMapper objectMapper;
 	
 	// Mapping of type -> handler
-	protected Map<ActivitiEventType, Class<? extends EventLoggerEventHandler>> eventHandlers 
-		= new HashMap<ActivitiEventType, Class<? extends EventLoggerEventHandler>>();
+	protected Map<ActivitiEngineEventType, Class<? extends EventLoggerEventHandler>> eventHandlers 
+		= new HashMap<ActivitiEngineEventType, Class<? extends EventLoggerEventHandler>>();
 	
 	// Listeners for new events
 	protected List<EventLoggerListener> listeners;
@@ -68,22 +68,22 @@ public class EventLogger implements ActivitiEventListener {
 		
 		// Initialization of all event handlers
 		
-		addEventHandler(ActivitiEventType.TASK_CREATED, TaskCreatedEventHandler.class);
-		addEventHandler(ActivitiEventType.TASK_COMPLETED, TaskCompletedEventHandler.class);
-		addEventHandler(ActivitiEventType.TASK_ASSIGNED, TaskAssignedEventHandler.class);
+		addEventHandler(ActivitiEngineEventType.TASK_CREATED, TaskCreatedEventHandler.class);
+		addEventHandler(ActivitiEngineEventType.TASK_COMPLETED, TaskCompletedEventHandler.class);
+		addEventHandler(ActivitiEngineEventType.TASK_ASSIGNED, TaskAssignedEventHandler.class);
 		
-		addEventHandler(ActivitiEventType.SEQUENCEFLOW_TAKEN, SequenceFlowTakenEventHandler.class);
+		addEventHandler(ActivitiEngineEventType.SEQUENCEFLOW_TAKEN, SequenceFlowTakenEventHandler.class);
 		
-		addEventHandler(ActivitiEventType.ACTIVITY_COMPLETED, ActivityCompletedEventHandler.class);
-		addEventHandler(ActivitiEventType.ACTIVITY_STARTED, ActivityStartedEventHandler.class);
-		addEventHandler(ActivitiEventType.ACTIVITY_SIGNALED, ActivitySignaledEventHandler.class);
-		addEventHandler(ActivitiEventType.ACTIVITY_MESSAGE_RECEIVED, ActivityMessageEventHandler.class);
-		addEventHandler(ActivitiEventType.ACTIVITY_COMPENSATE, ActivityCompensatedEventHandler.class);
-		addEventHandler(ActivitiEventType.ACTIVITY_ERROR_RECEIVED, ActivityErrorReceivedEventHandler.class);
+		addEventHandler(ActivitiEngineEventType.ACTIVITY_COMPLETED, ActivityCompletedEventHandler.class);
+		addEventHandler(ActivitiEngineEventType.ACTIVITY_STARTED, ActivityStartedEventHandler.class);
+		addEventHandler(ActivitiEngineEventType.ACTIVITY_SIGNALED, ActivitySignaledEventHandler.class);
+		addEventHandler(ActivitiEngineEventType.ACTIVITY_MESSAGE_RECEIVED, ActivityMessageEventHandler.class);
+		addEventHandler(ActivitiEngineEventType.ACTIVITY_COMPENSATE, ActivityCompensatedEventHandler.class);
+		addEventHandler(ActivitiEngineEventType.ACTIVITY_ERROR_RECEIVED, ActivityErrorReceivedEventHandler.class);
 		
-		addEventHandler(ActivitiEventType.VARIABLE_CREATED, VariableCreatedEventHandler.class);
-		addEventHandler(ActivitiEventType.VARIABLE_DELETED, VariableDeletedEventHandler.class);
-		addEventHandler(ActivitiEventType.VARIABLE_UPDATED, VariableUpdatedEventHandler.class);
+		addEventHandler(ActivitiEngineEventType.VARIABLE_CREATED, VariableCreatedEventHandler.class);
+		addEventHandler(ActivitiEngineEventType.VARIABLE_DELETED, VariableDeletedEventHandler.class);
+		addEventHandler(ActivitiEngineEventType.VARIABLE_UPDATED, VariableUpdatedEventHandler.class);
 	}
 	
 	@Override
@@ -132,7 +132,7 @@ public class EventLogger implements ActivitiEventListener {
 	protected EventLoggerEventHandler getEventHandler(ActivitiEvent event) {
 
 		Class<? extends EventLoggerEventHandler> eventHandlerClass = null;
-		if (event.getType().equals(ActivitiEventType.ENTITY_INITIALIZED)) {
+		if (event.getType().equals(ActivitiEngineEventType.ENTITY_INITIALIZED)) {
 			Object entity = ((ActivitiEntityEvent) event).getEntity();
 			if (entity instanceof ExecutionEntity) {
 				ExecutionEntity executionEntity = (ExecutionEntity) entity;
@@ -140,7 +140,7 @@ public class EventLogger implements ActivitiEventListener {
 					eventHandlerClass = ProcessInstanceStartedEventHandler.class;
 				}
 			}
-		} else if (event.getType().equals(ActivitiEventType.ENTITY_DELETED)) {
+		} else if (event.getType().equals(ActivitiEngineEventType.ENTITY_DELETED)) {
 			Object entity = ((ActivitiEntityEvent) event).getEntity();
 			if (entity instanceof ExecutionEntity) {
 				ExecutionEntity executionEntity = (ExecutionEntity) entity;
@@ -179,7 +179,7 @@ public class EventLogger implements ActivitiEventListener {
 		return false;
   }
 	
-	public void addEventHandler(ActivitiEventType eventType, Class<? extends EventLoggerEventHandler> eventHandlerClass) {
+	public void addEventHandler(ActivitiEngineEventType eventType, Class<? extends EventLoggerEventHandler> eventHandlerClass) {
 		eventHandlers.put(eventType, eventHandlerClass);
 	}
 	

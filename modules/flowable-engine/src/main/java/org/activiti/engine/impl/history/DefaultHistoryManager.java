@@ -20,10 +20,10 @@ import java.util.Map;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.SequenceFlow;
-import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
+import org.activiti.engine.common.impl.cfg.IdGenerator;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
-import org.activiti.engine.impl.cfg.IdGenerator;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.engine.impl.persistence.AbstractManager;
@@ -109,7 +109,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
         ActivitiEventDispatcher activitiEventDispatcher = getEventDispatcher();
         if (activitiEventDispatcher != null && activitiEventDispatcher.isEnabled()) {
           activitiEventDispatcher.dispatchEvent(
-              ActivitiEventBuilder.createEntityEvent(ActivitiEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
+              ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
         }
         
       }
@@ -145,7 +145,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
       ActivitiEventDispatcher activitiEventDispatcher = getEventDispatcher();
       if (activitiEventDispatcher != null && activitiEventDispatcher.isEnabled()) {
         activitiEventDispatcher.dispatchEvent(
-            ActivitiEventBuilder.createEntityEvent(ActivitiEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
+            ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
       }
 
     }
@@ -173,7 +173,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
       ActivitiEventDispatcher activitiEventDispatcher = getEventDispatcher();
       if (activitiEventDispatcher != null && activitiEventDispatcher.isEnabled()) {
         activitiEventDispatcher.dispatchEvent(
-            ActivitiEventBuilder.createEntityEvent(ActivitiEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
+            ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
       }
 
       HistoricActivityInstanceEntity activitiyInstance = findActivityInstance(parentExecution, false, true);
@@ -212,7 +212,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
         ActivitiEventDispatcher activitiEventDispatcher = getEventDispatcher();
         if (activitiEventDispatcher != null && activitiEventDispatcher.isEnabled()) {
           activitiEventDispatcher.dispatchEvent(
-              ActivitiEventBuilder.createEntityEvent(ActivitiEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstanceEntity));
+              ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstanceEntity));
         }
         
       }
@@ -235,7 +235,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
         ActivitiEventDispatcher activitiEventDispatcher = getEventDispatcher();
         if (activitiEventDispatcher != null && activitiEventDispatcher.isEnabled()) {
           activitiEventDispatcher.dispatchEvent(
-              ActivitiEventBuilder.createEntityEvent(ActivitiEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
+              ActivitiEventBuilder.createEntityEvent(ActivitiEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
         }
       }
     }
@@ -297,8 +297,7 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
       }
     }
     
-    if (createOnNotFound 
-        && activityId != null
+    if (createOnNotFound
         && ( (execution.getCurrentFlowElement() != null && execution.getCurrentFlowElement() instanceof FlowNode) || execution.getCurrentFlowElement() == null)) {
       return createHistoricActivityInstanceEntity(execution);
     }

@@ -48,6 +48,10 @@
   </build>
 
   <dependencies>
+  	<dependency>
+      <groupId>org.flowable</groupId>
+      <artifactId>flowable-engine-common</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.flowable</groupId>
       <artifactId>flowable-engine</artifactId>

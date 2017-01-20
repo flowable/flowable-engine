@@ -15,9 +15,9 @@ package org.activiti.engine.impl.cfg.jta;
 
 import javax.transaction.TransactionManager;
 
+import org.activiti.engine.common.impl.cfg.TransactionContextFactory;
+import org.activiti.engine.common.impl.interceptor.AbstractCommandContext;
 import org.activiti.engine.impl.cfg.TransactionContext;
-import org.activiti.engine.impl.cfg.TransactionContextFactory;
-import org.activiti.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Daniel Meyer
@@ -30,7 +30,7 @@ public class JtaTransactionContextFactory implements TransactionContextFactory {
     this.transactionManager = transactionManager;
   }
 
-  public TransactionContext openTransactionContext(CommandContext commandContext) {
+  public TransactionContext openTransactionContext(AbstractCommandContext commandContext) {
     return new JtaTransactionContext(transactionManager);
   }
 

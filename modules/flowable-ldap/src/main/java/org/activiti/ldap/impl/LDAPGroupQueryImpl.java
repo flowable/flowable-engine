@@ -21,11 +21,11 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.impl.Page;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.engine.impl.GroupQueryImpl;
-import org.activiti.idm.engine.impl.Page;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 import org.activiti.idm.engine.impl.persistence.entity.GroupEntity;
 import org.activiti.idm.engine.impl.persistence.entity.GroupEntityImpl;

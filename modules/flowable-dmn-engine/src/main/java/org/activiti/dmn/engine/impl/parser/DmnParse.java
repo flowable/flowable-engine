@@ -18,14 +18,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.dmn.engine.ActivitiDmnException;
 import org.activiti.dmn.engine.DmnEngineConfiguration;
 import org.activiti.dmn.engine.impl.context.Context;
-import org.activiti.dmn.engine.impl.io.InputStreamSource;
 import org.activiti.dmn.engine.impl.io.ResourceStreamSource;
-import org.activiti.dmn.engine.impl.io.StreamSource;
-import org.activiti.dmn.engine.impl.io.StringStreamSource;
-import org.activiti.dmn.engine.impl.io.UrlStreamSource;
 import org.activiti.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.activiti.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.activiti.dmn.model.Decision;
@@ -33,6 +28,11 @@ import org.activiti.dmn.model.DmnDefinition;
 import org.activiti.dmn.xml.constants.DmnXMLConstants;
 import org.activiti.dmn.xml.converter.DmnXMLConverter;
 import org.activiti.dmn.xml.exception.DmnXMLException;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.impl.util.io.InputStreamSource;
+import org.activiti.engine.common.impl.util.io.StreamSource;
+import org.activiti.engine.common.impl.util.io.StringStreamSource;
+import org.activiti.engine.common.impl.util.io.UrlStreamSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,12 +96,12 @@ public class DmnParse implements DmnXMLConstants {
       }
 
     } catch (Exception e) {
-      if (e instanceof ActivitiDmnException) {
-        throw (ActivitiDmnException) e;
+      if (e instanceof ActivitiException) {
+        throw (ActivitiException) e;
       } else if (e instanceof DmnXMLException) {
         throw (DmnXMLException) e;
       } else {
-        throw new ActivitiDmnException("Error parsing XML", e);
+        throw new ActivitiException("Error parsing XML", e);
       }
     }
 
@@ -133,7 +133,7 @@ public class DmnParse implements DmnXMLConstants {
     try {
       return sourceUrl(new URL(url));
     } catch (MalformedURLException e) {
-      throw new ActivitiDmnException("malformed url: " + url, e);
+      throw new ActivitiException("malformed url: " + url, e);
     }
   }
 
@@ -155,7 +155,7 @@ public class DmnParse implements DmnXMLConstants {
 
   protected void setStreamSource(StreamSource streamSource) {
     if (this.streamSource != null) {
-      throw new ActivitiDmnException("invalid: multiple sources " + this.streamSource + " and " + streamSource);
+      throw new ActivitiException("invalid: multiple sources " + this.streamSource + " and " + streamSource);
     }
     this.streamSource = streamSource;
   }

@@ -22,11 +22,11 @@ import org.activiti.dmn.api.DmnDeployment;
 import org.activiti.dmn.api.DmnDeploymentBuilder;
 import org.activiti.dmn.api.DmnDeploymentQuery;
 import org.activiti.dmn.api.DmnRepositoryService;
-import org.activiti.dmn.api.QueryProperty;
-import org.activiti.dmn.engine.ActivitiDmnException;
-import org.activiti.dmn.engine.ActivitiDmnIllegalArgumentException;
 import org.activiti.dmn.engine.impl.DeploymentQueryProperty;
-import org.activiti.rest.dmn.common.DataResponse;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.query.QueryProperty;
+import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.dmn.service.api.DmnRestResponseFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,7 +89,7 @@ public class DmnDeploymentCollectionResource {
       }
     }
 
-    DataResponse response = new DmnDeploymentsDmnPaginateList(dmnRestResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
+    DataResponse response = new DmnDeploymentsPaginateList(dmnRestResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
     return response;
   }
 
@@ -97,13 +97,13 @@ public class DmnDeploymentCollectionResource {
   public DmnDeploymentResponse uploadDeployment(@RequestParam(value = "tenantId", required = false) String tenantId, HttpServletRequest request, HttpServletResponse response) {
 
     if (request instanceof MultipartHttpServletRequest == false) {
-      throw new ActivitiDmnIllegalArgumentException("Multipart request is required");
+      throw new ActivitiIllegalArgumentException("Multipart request is required");
     }
 
     MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
 
     if (multipartRequest.getFileMap().size() == 0) {
-      throw new ActivitiDmnIllegalArgumentException("Multipart request with file content is required");
+      throw new ActivitiIllegalArgumentException("Multipart request with file content is required");
     }
 
     MultipartFile file = multipartRequest.getFileMap().values().iterator().next();
@@ -118,7 +118,7 @@ public class DmnDeploymentCollectionResource {
       if (fileName.endsWith(".dmn") || fileName.endsWith(".xml")) {
         deploymentBuilder.addInputStream(fileName, file.getInputStream());
       } else {
-        throw new ActivitiDmnIllegalArgumentException("File must be of type .xml or .dmn");
+        throw new ActivitiIllegalArgumentException("File must be of type .xml or .dmn");
       }
       deploymentBuilder.name(fileName);
 
@@ -133,10 +133,10 @@ public class DmnDeploymentCollectionResource {
       return dmnRestResponseFactory.createDmnDeploymentResponse(deployment);
 
     } catch (Exception e) {
-      if (e instanceof ActivitiDmnException) {
-        throw (ActivitiDmnException) e;
+      if (e instanceof ActivitiException) {
+        throw (ActivitiException) e;
       }
-      throw new ActivitiDmnException(e.getMessage(), e);
+      throw new ActivitiException(e.getMessage(), e);
     }
   }
 }

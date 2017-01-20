@@ -12,8 +12,8 @@
  */
 package org.activiti5.engine.delegate.event.impl;
 
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti5.engine.ActivitiIllegalArgumentException;
 
 /**
@@ -23,7 +23,7 @@ import org.activiti5.engine.ActivitiIllegalArgumentException;
  */
 public class ActivitiEventImpl implements ActivitiEvent {
 
-	protected ActivitiEventType type;
+	protected ActivitiEngineEventType type;
 	protected String executionId;
 	protected String processInstanceId;
 	protected String processDefinitionId;
@@ -31,14 +31,14 @@ public class ActivitiEventImpl implements ActivitiEvent {
 	/**
 	 * Creates a new event implementation, not part of an execution context.
 	 */
-	public ActivitiEventImpl(ActivitiEventType type) {
+	public ActivitiEventImpl(ActivitiEngineEventType type) {
 		this(type, null, null, null);
 	}
 
 	/**
 	 * Creates a new event implementation, part of an execution context.
 	 */
-	public ActivitiEventImpl(ActivitiEventType type, String executionId, String processInstanceId,
+	public ActivitiEventImpl(ActivitiEngineEventType type, String executionId, String processInstanceId,
       String processDefinitionId) {
 		if(type == null) {
 			throw new ActivitiIllegalArgumentException("type is null");
@@ -49,11 +49,11 @@ public class ActivitiEventImpl implements ActivitiEvent {
 	  this.processDefinitionId = processDefinitionId;
   }
 
-	public ActivitiEventType getType() {
+	public ActivitiEngineEventType getType() {
 		return type;
 	}
 
-	public void setType(ActivitiEventType type) {
+	public void setType(ActivitiEngineEventType type) {
 		this.type = type;
 	}
 	

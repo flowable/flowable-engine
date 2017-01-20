@@ -3,23 +3,10 @@ package org.activiti.engine.test.bpmn.event.timer.compatibility;
 import java.util.Calendar;
 import java.util.List;
 
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventType;
-import org.activiti.engine.impl.util.DefaultClockImpl;
-import org.activiti.engine.runtime.Clock;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.impl.util.DefaultClockImpl;
+import org.activiti.engine.common.runtime.Clock;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.runtime.Job;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
@@ -139,7 +126,7 @@ public class StartTimerEventRepeatCompatibilityTest extends TimerEventCompatibil
     int timerFiredCount = 0;
     List<ActivitiEvent> eventsReceived = listener.getEventsReceived();
     for (ActivitiEvent eventReceived : eventsReceived) {
-      if (ActivitiEventType.TIMER_FIRED.equals(eventReceived.getType())) {
+      if (ActivitiEngineEventType.TIMER_FIRED.equals(eventReceived.getType())) {
         timerFiredCount++;
       }
     }
@@ -147,7 +134,7 @@ public class StartTimerEventRepeatCompatibilityTest extends TimerEventCompatibil
     // count "entity created" events
     int eventCreatedCount = 0;
     for (ActivitiEvent eventReceived : eventsReceived) {
-      if (ActivitiEventType.ENTITY_CREATED.equals(eventReceived.getType())) {
+      if (ActivitiEngineEventType.ENTITY_CREATED.equals(eventReceived.getType())) {
         eventCreatedCount++;
       }
     }
@@ -155,7 +142,7 @@ public class StartTimerEventRepeatCompatibilityTest extends TimerEventCompatibil
     // count "entity deleted" events
     int eventDeletedCount = 0;
     for (ActivitiEvent eventReceived : eventsReceived) {
-      if (ActivitiEventType.ENTITY_DELETED.equals(eventReceived.getType())) {
+      if (ActivitiEngineEventType.ENTITY_DELETED.equals(eventReceived.getType())) {
         eventDeletedCount++;
       }
     }

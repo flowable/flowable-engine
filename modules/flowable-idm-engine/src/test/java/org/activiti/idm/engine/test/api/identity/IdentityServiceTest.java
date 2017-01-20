@@ -14,14 +14,16 @@
 package org.activiti.idm.engine.test.api.identity;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiOptimisticLockingException;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.Picture;
+import org.activiti.idm.api.Token;
 import org.activiti.idm.api.User;
-import org.activiti.idm.engine.ActivitiIdmException;
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
-import org.activiti.idm.engine.ActivitiIdmOptimisticLockingException;
 import org.activiti.idm.engine.test.PluggableActivitiIdmTestCase;
 
 /**
@@ -184,7 +186,7 @@ public class IdentityServiceTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.saveGroup(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIdmIllegalArgumentException ae) {
+    } catch (ActivitiIllegalArgumentException ae) {
       assertTextPresent("group is null", ae.getMessage());
     }
   }
@@ -193,7 +195,7 @@ public class IdentityServiceTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.saveUser(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIdmIllegalArgumentException ae) {
+    } catch (ActivitiIllegalArgumentException ae) {
       assertTextPresent("user is null", ae.getMessage());
     }
   }
@@ -202,7 +204,7 @@ public class IdentityServiceTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createGroupQuery().groupId(null).singleResult();
       fail("ActivitiException expected");
-    } catch (ActivitiIdmIllegalArgumentException ae) {
+    } catch (ActivitiIllegalArgumentException ae) {
       assertTextPresent("id is null", ae.getMessage());
     }
   }
@@ -211,14 +213,14 @@ public class IdentityServiceTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createMembership(null, "group");
       fail("ActivitiException expected");
-    } catch (ActivitiIdmIllegalArgumentException ae) {
+    } catch (ActivitiIllegalArgumentException ae) {
       assertTextPresent("userId is null", ae.getMessage());
     }
 
     try {
       idmIdentityService.createMembership("userId", null);
       fail("ActivitiException expected");
-    } catch (ActivitiIdmException ae) {
+    } catch (ActivitiException ae) {
       assertTextPresent("groupId is null", ae.getMessage());
     }
   }
@@ -227,7 +229,7 @@ public class IdentityServiceTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createGroupQuery().groupMember(null).singleResult();
       fail("ActivitiException expected");
-    } catch (ActivitiIdmIllegalArgumentException ae) {
+    } catch (ActivitiIllegalArgumentException ae) {
       assertTextPresent("userId is null", ae.getMessage());
     }
   }
@@ -242,7 +244,7 @@ public class IdentityServiceTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.deleteGroup(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIdmIllegalArgumentException ae) {
+    } catch (ActivitiIllegalArgumentException ae) {
       assertTextPresent("groupId is null", ae.getMessage());
     }
   }
@@ -303,14 +305,14 @@ public class IdentityServiceTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.deleteMembership(null, "group");
       fail("ActivitiException expected");
-    } catch (ActivitiIdmIllegalArgumentException ae) {
+    } catch (ActivitiIllegalArgumentException ae) {
       assertTextPresent("userId is null", ae.getMessage());
     }
 
     try {
       idmIdentityService.deleteMembership("user", null);
       fail("ActivitiException expected");
-    } catch (ActivitiIdmException ae) {
+    } catch (ActivitiException ae) {
       assertTextPresent("groupId is null", ae.getMessage());
     }
   }
@@ -319,7 +321,7 @@ public class IdentityServiceTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.deleteUser(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIdmIllegalArgumentException ae) {
+    } catch (ActivitiIllegalArgumentException ae) {
       assertTextPresent("userId is null", ae.getMessage());
     }
   }
@@ -352,7 +354,7 @@ public class IdentityServiceTest extends PluggableActivitiIdmTestCase {
       idmIdentityService.saveUser(user2);
 
       fail("Expected an exception");
-    } catch (ActivitiIdmOptimisticLockingException e) {
+    } catch (ActivitiOptimisticLockingException e) {
       // Expected an exception
     }
 
@@ -375,11 +377,57 @@ public class IdentityServiceTest extends PluggableActivitiIdmTestCase {
       idmIdentityService.saveGroup(group2);
 
       fail("Expected an exception");
-    } catch (ActivitiIdmOptimisticLockingException e) {
+    } catch (ActivitiOptimisticLockingException e) {
       // Expected an exception
     }
 
     idmIdentityService.deleteGroup(group.getId());
+  }
+  
+  public void testNewToken() {
+    Token token = idmIdentityService.newToken("myToken");
+    token.setIpAddress("127.0.0.1");
+    token.setTokenValue("myValue");
+    token.setTokenDate(new Date());
+    
+    idmIdentityService.saveToken(token);
+    
+    Token token1 = idmIdentityService.createTokenQuery().singleResult();
+    assertEquals("myToken", token1.getId());
+    assertEquals("myValue", token1.getTokenValue());
+    assertEquals("127.0.0.1", token1.getIpAddress());
+    assertNull(token1.getUserAgent());
+    
+    token1.setUserAgent("myAgent");
+    idmIdentityService.saveToken(token1);
+    
+    token1 = idmIdentityService.createTokenQuery().singleResult();
+    assertEquals("myAgent", token1.getUserAgent());
+    
+    idmIdentityService.deleteToken(token1.getId());
+  }
+  
+  public void testTokenOptimisticLockingException() {
+    Token token = idmIdentityService.newToken("myToken");
+    idmIdentityService.saveToken(token);
+
+    Token token1 = idmIdentityService.createTokenQuery().singleResult();
+    Token token2 = idmIdentityService.createTokenQuery().singleResult();
+
+    token1.setUserAgent("name one");
+    idmIdentityService.saveToken(token1);
+
+    try {
+
+      token2.setUserAgent("name two");
+      idmIdentityService.saveToken(token2);
+
+      fail("Expected an exception");
+    } catch (ActivitiOptimisticLockingException e) {
+      // Expected an exception
+    }
+
+    idmIdentityService.deleteToken(token.getId());
   }
 
 }

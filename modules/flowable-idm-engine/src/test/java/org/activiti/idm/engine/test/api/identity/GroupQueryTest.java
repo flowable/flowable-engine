@@ -15,10 +15,10 @@ package org.activiti.idm.engine.test.api.identity;
 
 import java.util.List;
 
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.GroupQuery;
-import org.activiti.idm.engine.ActivitiIdmException;
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
 import org.activiti.idm.engine.impl.persistence.entity.GroupEntity;
 import org.activiti.idm.engine.test.PluggableActivitiIdmTestCase;
 
@@ -52,14 +52,6 @@ public class GroupQueryTest extends PluggableActivitiIdmTestCase {
 
   }
 
-  private Group createGroup(String id, String name, String type) {
-    Group group = idmIdentityService.newGroup(id);
-    group.setName(name);
-    group.setType(type);
-    idmIdentityService.saveGroup(group);
-    return group;
-  }
-
   @Override
   protected void tearDown() throws Exception {
     idmIdentityService.deleteUser("kermit");
@@ -86,7 +78,7 @@ public class GroupQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createGroupQuery().groupId(null).list();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -105,7 +97,7 @@ public class GroupQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createGroupQuery().groupName(null).list();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -127,7 +119,7 @@ public class GroupQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createGroupQuery().groupNameLike(null).list();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -146,7 +138,7 @@ public class GroupQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createGroupQuery().groupType(null).list();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -178,7 +170,7 @@ public class GroupQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createGroupQuery().groupMember(null).list();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -213,13 +205,13 @@ public class GroupQueryTest extends PluggableActivitiIdmTestCase {
     try {
       idmIdentityService.createGroupQuery().orderByGroupId().list();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
 
     try {
       idmIdentityService.createGroupQuery().orderByGroupId().orderByGroupName().list();
       fail();
-    } catch (ActivitiIdmIllegalArgumentException e) {
+    } catch (ActivitiIllegalArgumentException e) {
     }
   }
 
@@ -240,7 +232,7 @@ public class GroupQueryTest extends PluggableActivitiIdmTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ActivitiIdmException e) {
+    } catch (ActivitiException e) {
     }
   }
 

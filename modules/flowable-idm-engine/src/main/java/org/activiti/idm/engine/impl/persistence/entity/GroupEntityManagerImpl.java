@@ -16,14 +16,14 @@ package org.activiti.idm.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.common.impl.Page;
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.GroupQuery;
 import org.activiti.idm.api.event.ActivitiIdmEventType;
 import org.activiti.idm.engine.IdmEngineConfiguration;
 import org.activiti.idm.engine.delegate.event.impl.ActivitiIdmEventBuilder;
 import org.activiti.idm.engine.impl.GroupQueryImpl;
-import org.activiti.idm.engine.impl.Page;
-import org.activiti.idm.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.GroupDataManager;
 
 /**
@@ -93,6 +93,11 @@ public class GroupEntityManagerImpl extends AbstractEntityManager<GroupEntity> i
   @Override
   public boolean isNewGroup(Group group) {
     return ((GroupEntity) group).getRevision() == 0;
+  }
+  
+  @Override
+  public List<Group> findGroupsByPrivilegeId(String privilegeId) {
+    return groupDataManager.findGroupsByPrivilegeId(privilegeId);
   }
 
   public GroupDataManager getGroupDataManager() {

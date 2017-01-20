@@ -17,12 +17,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventListener;
 import org.activiti.engine.delegate.VariableScope;
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.impl.persistence.entity.VariableInstance;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti5.engine.runtime.Execution;
@@ -1063,7 +1063,7 @@ public interface RuntimeService {
    * @param types
    *          types of events the listener should be notified for
    */
-  void addEventListener(ActivitiEventListener listenerToAdd, ActivitiEventType... types);
+  void addEventListener(ActivitiEventListener listenerToAdd, ActivitiEngineEventType... types);
 
   /**
    * Removes the given listener from this dispatcher. The listener will no

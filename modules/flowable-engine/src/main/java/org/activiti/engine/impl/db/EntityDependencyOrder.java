@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.activiti.engine.common.impl.persistence.entity.Entity;
 import org.activiti.engine.impl.persistence.entity.AttachmentEntityImpl;
 import org.activiti.engine.impl.persistence.entity.ByteArrayEntityImpl;
 import org.activiti.engine.impl.persistence.entity.CommentEntityImpl;
 import org.activiti.engine.impl.persistence.entity.CompensateEventSubscriptionEntityImpl;
 import org.activiti.engine.impl.persistence.entity.DeadLetterJobEntityImpl;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntityImpl;
-import org.activiti.engine.impl.persistence.entity.Entity;
 import org.activiti.engine.impl.persistence.entity.EventLogEntryEntityImpl;
 import org.activiti.engine.impl.persistence.entity.EventSubscriptionEntityImpl;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntityImpl;

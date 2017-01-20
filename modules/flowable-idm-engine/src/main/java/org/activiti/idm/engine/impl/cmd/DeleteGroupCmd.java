@@ -14,7 +14,7 @@ package org.activiti.idm.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
 import org.activiti.idm.engine.impl.interceptor.Command;
 import org.activiti.idm.engine.impl.interceptor.CommandContext;
 
@@ -32,7 +32,7 @@ public class DeleteGroupCmd implements Command<Void>, Serializable {
 
   public Void execute(CommandContext commandContext) {
     if (groupId == null) {
-      throw new ActivitiIdmIllegalArgumentException("groupId is null");
+      throw new ActivitiIllegalArgumentException("groupId is null");
     }
     commandContext.getGroupEntityManager().delete(groupId);
 

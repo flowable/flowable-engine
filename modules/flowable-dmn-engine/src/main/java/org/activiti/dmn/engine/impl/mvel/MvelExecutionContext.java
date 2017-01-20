@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.activiti.dmn.api.DecisionExecutionAuditContainer;
-import org.activiti.dmn.engine.ActivitiDmnException;
+import org.activiti.engine.common.api.ActivitiException;
 import org.apache.commons.lang3.StringUtils;
 import org.mvel2.ParserContext;
 import org.mvel2.integration.PropertyHandler;
@@ -45,11 +45,11 @@ public class MvelExecutionContext {
         if (variableId.contains(".")) {
             String rootVariableId = variableId.substring(0, variableId.indexOf("."));
             if (!stackVariables.containsKey(rootVariableId)) {
-                throw new ActivitiDmnException("referred id: " + rootVariableId + " is not present on the context");
+                throw new ActivitiException("referred id: " + rootVariableId + " is not present on the context");
             }
             
         } else if (!stackVariables.containsKey(variableId)) {
-            throw new ActivitiDmnException("referred id: " + variableId + " is not present on the context");
+            throw new ActivitiException("referred id: " + variableId + " is not present on the context");
         }
     }
 

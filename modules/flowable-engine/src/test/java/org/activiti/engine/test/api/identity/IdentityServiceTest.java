@@ -16,13 +16,13 @@ package org.activiti.engine.test.api.identity;
 import java.util.Arrays;
 import java.util.List;
 
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiOptimisticLockingException;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.Picture;
 import org.activiti.idm.api.User;
-import org.activiti.idm.engine.ActivitiIdmException;
-import org.activiti.idm.engine.ActivitiIdmIllegalArgumentException;
-import org.activiti.idm.engine.ActivitiIdmOptimisticLockingException;
 
 /**
  * @author Frederik Heremans
@@ -184,7 +184,7 @@ public class IdentityServiceTest extends PluggableActivitiTestCase {
     try {
       identityService.saveGroup(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIdmIllegalArgumentException ae) {
+    } catch (ActivitiIllegalArgumentException ae) {
       assertTextPresent("group is null", ae.getMessage());
     }
   }
@@ -193,7 +193,7 @@ public class IdentityServiceTest extends PluggableActivitiTestCase {
     try {
       identityService.saveUser(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIdmIllegalArgumentException ae) {
+    } catch (ActivitiIllegalArgumentException ae) {
       assertTextPresent("user is null", ae.getMessage());
     }
   }
@@ -202,7 +202,7 @@ public class IdentityServiceTest extends PluggableActivitiTestCase {
     try {
       identityService.createGroupQuery().groupId(null).singleResult();
       fail("ActivitiException expected");
-    } catch (ActivitiIdmIllegalArgumentException ae) {
+    } catch (ActivitiIllegalArgumentException ae) {
       assertTextPresent("id is null", ae.getMessage());
     }
   }
@@ -211,14 +211,14 @@ public class IdentityServiceTest extends PluggableActivitiTestCase {
     try {
       identityService.createMembership(null, "group");
       fail("ActivitiException expected");
-    } catch (ActivitiIdmIllegalArgumentException ae) {
+    } catch (ActivitiIllegalArgumentException ae) {
       assertTextPresent("userId is null", ae.getMessage());
     }
 
     try {
       identityService.createMembership("userId", null);
       fail("ActivitiException expected");
-    } catch (ActivitiIdmException ae) {
+    } catch (ActivitiException ae) {
       assertTextPresent("groupId is null", ae.getMessage());
     }
   }
@@ -227,7 +227,7 @@ public class IdentityServiceTest extends PluggableActivitiTestCase {
     try {
       identityService.createGroupQuery().groupMember(null).singleResult();
       fail("ActivitiException expected");
-    } catch (ActivitiIdmIllegalArgumentException ae) {
+    } catch (ActivitiIllegalArgumentException ae) {
       assertTextPresent("userId is null", ae.getMessage());
     }
   }
@@ -242,7 +242,7 @@ public class IdentityServiceTest extends PluggableActivitiTestCase {
     try {
       identityService.deleteGroup(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIdmIllegalArgumentException ae) {
+    } catch (ActivitiIllegalArgumentException ae) {
       assertTextPresent("groupId is null", ae.getMessage());
     }
   }
@@ -303,14 +303,14 @@ public class IdentityServiceTest extends PluggableActivitiTestCase {
     try {
       identityService.deleteMembership(null, "group");
       fail("ActivitiException expected");
-    } catch (ActivitiIdmIllegalArgumentException ae) {
+    } catch (ActivitiIllegalArgumentException ae) {
       assertTextPresent("userId is null", ae.getMessage());
     }
 
     try {
       identityService.deleteMembership("user", null);
       fail("ActivitiException expected");
-    } catch (ActivitiIdmException ae) {
+    } catch (ActivitiException ae) {
       assertTextPresent("groupId is null", ae.getMessage());
     }
   }
@@ -319,7 +319,7 @@ public class IdentityServiceTest extends PluggableActivitiTestCase {
     try {
       identityService.deleteUser(null);
       fail("ActivitiException expected");
-    } catch (ActivitiIdmIllegalArgumentException ae) {
+    } catch (ActivitiIllegalArgumentException ae) {
       assertTextPresent("userId is null", ae.getMessage());
     }
   }
@@ -352,7 +352,7 @@ public class IdentityServiceTest extends PluggableActivitiTestCase {
       identityService.saveUser(user2);
 
       fail("Expected an exception");
-    } catch (ActivitiIdmOptimisticLockingException e) {
+    } catch (ActivitiOptimisticLockingException e) {
       // Expected an exception
     }
 
@@ -375,7 +375,7 @@ public class IdentityServiceTest extends PluggableActivitiTestCase {
       identityService.saveGroup(group2);
 
       fail("Expected an exception");
-    } catch (ActivitiIdmOptimisticLockingException e) {
+    } catch (ActivitiOptimisticLockingException e) {
       // Expected an exception
     }
 

@@ -1,6 +1,6 @@
 package org.activiti.rest.service.api.management;
 
-import org.activiti.engine.management.TableMetaData;
+import org.activiti.engine.common.api.management.TableMetaData;
 import org.activiti.rest.service.BaseSpringRestTestCase;
 import org.activiti.rest.service.api.RestUrls;
 import org.apache.http.HttpStatus;

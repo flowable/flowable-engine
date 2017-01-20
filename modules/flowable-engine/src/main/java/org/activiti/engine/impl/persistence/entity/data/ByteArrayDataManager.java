@@ -14,6 +14,7 @@ package org.activiti.engine.impl.persistence.entity.data;
 
 import java.util.List;
 
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 import org.activiti.engine.impl.persistence.entity.ByteArrayEntity;
 
 /**

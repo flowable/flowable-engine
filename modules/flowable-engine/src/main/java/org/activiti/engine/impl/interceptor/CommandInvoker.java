@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,7 @@
  */
 package org.activiti.engine.impl.interceptor;
 
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.agenda.AbstractOperation;
 import org.activiti.engine.impl.context.Context;
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * @author Joram Barrez
  */
 public class CommandInvoker extends AbstractCommandInterceptor {
-  
+
   private static final Logger logger = LoggerFactory.getLogger(CommandInvoker.class);
 
   @Override
@@ -62,19 +63,19 @@ public class CommandInvoker extends AbstractCommandInterceptor {
   public void executeOperation(Runnable runnable) {
     if (runnable instanceof AbstractOperation) {
       AbstractOperation operation = (AbstractOperation) runnable;
-      
+
       // Execute the operation if the operation has no execution (i.e. it's an operation not working on a process instance)
       // or the operation has an execution and it is not ended
       if (operation.getExecution() == null || !operation.getExecution().isEnded()) {
-        
+
         if (logger.isDebugEnabled()) {
           logger.debug("Executing operation {} ", operation.getClass());
         }
-        
+
         runnable.run();
-        
+
       }
-      
+
     } else {
       runnable.run();
     }

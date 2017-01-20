@@ -13,7 +13,8 @@
 
 package org.activiti.engine.impl.persistence;
 
-import org.activiti.engine.delegate.event.ActivitiEventDispatcher;
+import org.activiti.engine.common.api.delegate.event.ActivitiEventDispatcher;
+import org.activiti.engine.common.runtime.Clock;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.engine.impl.asyncexecutor.JobManager;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -44,7 +45,6 @@ import org.activiti.engine.impl.persistence.entity.SuspendedJobEntityManager;
 import org.activiti.engine.impl.persistence.entity.TaskEntityManager;
 import org.activiti.engine.impl.persistence.entity.TimerJobEntityManager;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceEntityManager;
-import org.activiti.engine.runtime.Clock;
 
 /**
  * @author Tom Baeyens

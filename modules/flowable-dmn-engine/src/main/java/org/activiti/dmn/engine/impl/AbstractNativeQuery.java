@@ -17,12 +17,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.dmn.api.NativeQuery;
-import org.activiti.dmn.engine.ActivitiDmnException;
 import org.activiti.dmn.engine.impl.context.Context;
 import org.activiti.dmn.engine.impl.interceptor.Command;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
 import org.activiti.dmn.engine.impl.interceptor.CommandExecutor;
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.query.NativeQuery;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -160,7 +160,7 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> implem
     if (results.size() == 1) {
       return results.get(0);
     } else if (results.size() > 1) {
-      throw new ActivitiDmnException("Query return " + results.size() + " results instead of max 1");
+      throw new ActivitiException("Query return " + results.size() + " results instead of max 1");
     }
     return null;
   }

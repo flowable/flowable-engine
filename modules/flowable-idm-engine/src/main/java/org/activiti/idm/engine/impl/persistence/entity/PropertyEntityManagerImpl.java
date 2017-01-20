@@ -15,8 +15,8 @@ package org.activiti.idm.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.activiti.engine.common.impl.persistence.entity.data.DataManager;
 import org.activiti.idm.engine.IdmEngineConfiguration;
-import org.activiti.idm.engine.impl.persistence.entity.data.DataManager;
 import org.activiti.idm.engine.impl.persistence.entity.data.PropertyDataManager;
 
 /**

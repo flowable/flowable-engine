@@ -13,13 +13,14 @@
 package org.activiti.dmn.engine.impl.cfg.standalone;
 
 import org.activiti.dmn.engine.impl.cfg.TransactionContext;
-import org.activiti.dmn.engine.impl.cfg.TransactionContextFactory;
+import org.activiti.dmn.engine.impl.cfg.TransactionListener;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
+import org.activiti.engine.common.impl.cfg.TransactionContextFactory;
 
 /**
  * @author Tijs Rademakers
  */
-public class StandaloneMybatisTransactionContextFactory implements TransactionContextFactory {
+public class StandaloneMybatisTransactionContextFactory implements TransactionContextFactory<TransactionListener, CommandContext> {
 
   public TransactionContext openTransactionContext(CommandContext commandContext) {
     return new StandaloneMybatisTransactionContext(commandContext);

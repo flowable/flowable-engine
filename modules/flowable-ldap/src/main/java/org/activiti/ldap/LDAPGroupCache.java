@@ -17,7 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.runtime.ClockReader;
+import org.activiti.engine.common.runtime.ClockReader;
 import org.activiti.idm.api.Group;
 
 /**

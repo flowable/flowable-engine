@@ -16,12 +16,12 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.activiti.dmn.api.DecisionTable;
-import org.activiti.dmn.engine.ActivitiDmnIllegalArgumentException;
-import org.activiti.dmn.engine.ActivitiDmnObjectNotFoundException;
 import org.activiti.dmn.engine.impl.DecisionTableQueryImpl;
 import org.activiti.dmn.engine.impl.interceptor.Command;
 import org.activiti.dmn.engine.impl.interceptor.CommandContext;
 import org.activiti.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
+import org.activiti.engine.common.api.ActivitiIllegalArgumentException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 
 /**
  * @author Joram Barrez
@@ -40,14 +40,14 @@ public class SetDeploymentTenantIdCmd implements Command<Void>, Serializable {
 
   public Void execute(CommandContext commandContext) {
     if (deploymentId == null) {
-      throw new ActivitiDmnIllegalArgumentException("deploymentId is null");
+      throw new ActivitiIllegalArgumentException("deploymentId is null");
     }
 
     // Update all entities
 
     DmnDeploymentEntity deployment = commandContext.getDeploymentEntityManager().findById(deploymentId);
     if (deployment == null) {
-      throw new ActivitiDmnObjectNotFoundException("Could not find deployment with id " + deploymentId);
+      throw new ActivitiObjectNotFoundException("Could not find deployment with id " + deploymentId);
     }
     
     deployment.setTenantId(newTenantId);

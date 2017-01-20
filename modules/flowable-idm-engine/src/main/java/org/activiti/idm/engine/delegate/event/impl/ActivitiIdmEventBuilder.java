@@ -12,8 +12,8 @@
  */
 package org.activiti.idm.engine.delegate.event.impl;
 
-import org.activiti.idm.api.event.ActivitiIdmEntityEvent;
-import org.activiti.idm.api.event.ActivitiIdmEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.common.api.delegate.event.ActivitiEvent;
 import org.activiti.idm.api.event.ActivitiIdmEventType;
 import org.activiti.idm.api.event.ActivitiIdmMembershipEvent;
 
@@ -29,7 +29,7 @@ public class ActivitiIdmEventBuilder {
    *          type of event
    * @return an {@link ActivitiEvent} that doesn't have it's execution context-fields filled, as the event is a global event, independent of any running execution.
    */
-  public static ActivitiIdmEvent createGlobalEvent(ActivitiIdmEventType type) {
+  public static ActivitiEvent createGlobalEvent(ActivitiIdmEventType type) {
     ActivitiIdmEventImpl newEvent = new ActivitiIdmEventImpl(type);
     return newEvent;
   }
@@ -42,7 +42,7 @@ public class ActivitiIdmEventBuilder {
    * @return an {@link ActivitiEntityEvent}. In case an {@link ExecutionContext} is active, the execution related event fields will be populated. If not, execution details will be retrieved from the
    *         {@link Object} if possible.
    */
-  public static ActivitiIdmEntityEvent createEntityEvent(ActivitiIdmEventType type, Object entity) {
+  public static ActivitiEntityEvent createEntityEvent(ActivitiIdmEventType type, Object entity) {
     ActivitiIdmEntityEventImpl newEvent = new ActivitiIdmEntityEventImpl(entity, type);
     return newEvent;
   }

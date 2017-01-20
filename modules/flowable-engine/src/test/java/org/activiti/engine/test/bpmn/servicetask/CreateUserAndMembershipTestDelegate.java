@@ -13,9 +13,12 @@
 package org.activiti.engine.test.bpmn.servicetask;
 
 import org.activiti.engine.IdentityService;
+import org.activiti.engine.ManagementService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
 import org.activiti.engine.impl.context.Context;
+import org.activiti.engine.impl.interceptor.Command;
+import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.idm.api.Group;
 import org.activiti.idm.api.User;
 
@@ -26,6 +29,14 @@ public class CreateUserAndMembershipTestDelegate implements JavaDelegate {
 
   @Override
   public void execute(DelegateExecution execution) {
+    
+    ManagementService managementService = Context.getProcessEngineConfiguration().getManagementService();
+    managementService.executeCommand(new Command<Void>() {
+      @Override
+      public Void execute(CommandContext commandContext) {
+        return null;
+      }
+    });
 
     IdentityService identityService = Context.getProcessEngineConfiguration().getIdentityService();
 

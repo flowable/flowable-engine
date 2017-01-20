@@ -13,7 +13,7 @@
 
 package org.activiti.dmn.engine.impl.persistence.entity;
 
-import org.activiti.dmn.engine.impl.db.Entity;
+import org.activiti.engine.common.impl.persistence.entity.Entity;
 
 /**
  * @author Tijs Rademakers

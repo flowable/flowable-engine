@@ -20,8 +20,10 @@ import java.io.ObjectOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ActivitiObjectNotFoundException;
+import io.swagger.annotations.*;
+
+import org.activiti.engine.common.api.ActivitiException;
+import org.activiti.engine.common.api.ActivitiObjectNotFoundException;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,11 +37,23 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Frederik Heremans
  */
 @RestController
+@Api(tags = { "Tasks" }, description = "Manage Tasks")
 public class TaskVariableDataResource extends TaskVariableBaseResource {
 
+  @ApiOperation(value = "Get the binary data for a variable", tags = {"Tasks"}, nickname = "geTaskVariableData",
+          notes = "The response body contains the binary value of the variable. When the variable is of type binary, the content-type of the response is set to application/octet-stream, regardless of the content of the variable or the request accept-type header. In case of serializable, application/x-java-serialized-object is used as content-type.")
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message =  "Indicates the task was found and the requested variables are returned."),
+          @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have a variable with the given name (in the given scope). Status message provides additional information.")
+  })
+  @ApiImplicitParams(
+          @ApiImplicitParam(name = "scope", dataType = "string", value = "Scope of variable to be returned. When local, only task-local variable value is returned. When global, only variable value from the task’s parent execution-hierarchy are returned. When the parameter is omitted, a local variable will be returned if it exists, otherwise a global variable.", paramType = "query")
+  )
   @RequestMapping(value = "/runtime/tasks/{taskId}/variables/{variableName}/data", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody
-  byte[] getVariableData(@PathVariable("taskId") String taskId, @PathVariable("variableName") String variableName, @RequestParam(value = "scope", required = false) String scope,
+  byte[] getVariableData(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId,
+          @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
+          @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scope,
       HttpServletRequest request, HttpServletResponse response) {
 
     try {

@@ -1,6 +1,6 @@
 package org.activiti.engine.delegate.event.impl;
 
-import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiEngineEventType;
 import org.activiti.engine.delegate.event.ActivitiSequenceFlowTakenEvent;
 
 /**
@@ -18,7 +18,7 @@ public class ActivitiSequenceFlowTakenEventImpl extends ActivitiEventImpl implem
   protected String sourceActivityBehaviorClass;
   protected String targetActivityBehaviorClass;
 
-  public ActivitiSequenceFlowTakenEventImpl(ActivitiEventType type) {
+  public ActivitiSequenceFlowTakenEventImpl(ActivitiEngineEventType type) {
     super(type);
   }
 

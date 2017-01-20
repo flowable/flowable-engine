@@ -32,6 +32,7 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.common.impl.interceptor.CommandConfig;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
@@ -40,7 +41,6 @@ import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.impl.interceptor.Command;
-import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.repository.Deployment;
@@ -92,7 +92,19 @@ public abstract class AbstractActivitiTestCase extends AbstractTestCase {
   // Default: do nothing
   protected void closeDownProcessEngine() {
   }
-
+  
+  protected void nullifyServices() {
+    processEngineConfiguration = null;
+    repositoryService = null;
+    runtimeService = null;
+    taskService = null;
+    formService = null;
+    historyService = null;
+    identityService = null;
+    managementService = null;
+    dynamicBpmnService = null;
+  }
+  
   @Override
   public void runBare() throws Throwable {
     initializeProcessEngine();
