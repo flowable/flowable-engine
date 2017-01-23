@@ -4,10 +4,11 @@
 
 === Business archives
 
-To deploy processes, they have to be wrapped in a business archive.  A business archive is the unit of deployment to a Flowable Engine. A business archive is equivalent to a zip file.  It can contain  BPMN 2.0 processes, task forms, rules and any other type of file.  In general, a business archive contains a collection of named resources.
+To deploy processes, they have to be wrapped in a business archive.  A business archive is the unit of deployment to a Flowable Engine. A business archive is equivalent to a zip file.  It can contain  BPMN 2.0 processes, form definitions, DMN rules and any other type of file. In general, a business archive contains a collection of named resources.
 
 
 When a business archive is deployed, it is scanned for BPMN files with a +.bpmn20.xml+ or +.bpmn+ extension. Each of those will be parsed and may contain multiple process definitions.
+When the DMN engine is activated also +.dmn+ files are parsed and with the form engine activated +.form+ files are handled.
 
 [NOTE]
 ====
@@ -42,12 +43,12 @@ All custom classes that are used in your process (e.g. JavaDelegates used in Ser
 
 During deployment of a business archive however, those classes don't have to be present on the classpath. This means that your delegation classes don't have to be on the classpath when deploying a new business archive with Ant.
 
-When you are using the demo setup and you want to add your custom classes, you should add a jar containing your classes to the flowable-app or flowable-rest webapp lib. Don't forget to include the dependencies of your custom classes (if any) as well. Alternatively, you can include your dependencies in the libraries directory of your Tomcat installation, +${tomcat.home}/lib+.
+When you are using the demo setup and you want to add your custom classes, you should add a jar containing your classes to the flowable-task or flowable-rest webapp lib. Don't forget to include the dependencies of your custom classes (if any) as well. Alternatively, you can include your dependencies in the libraries directory of your Tomcat installation, +${tomcat.home}/lib+.
 
 
 ==== Using Spring beans from a process
 
-When expressions or scripts use Spring beans, those beans have to be available to the engine when executing the process definition. If you are building your own webapp and you configure your process engine in your context as described in <<springintegration,the spring integration section>>, that is straightforward. But bear in mind that you also should update the Flowable rest webapp with that context if you use it. You can do that by replacing the +flowable.cfg.xml+ in the +flowable-rest/lib/flowable-cfg.jar+ JAR file with an +flowable-context.xml+ file containing your Spring context configuration.
+When expressions or scripts use Spring beans, those beans have to be available to the engine when executing the process definition. If you are building your own webapp and you configure your process engine in your context as described in <<springintegration,the spring integration section>>, that is straightforward. But bear in mind that you also should update the Flowable task and rest webapps with that context if you use it.
 
 ==== Creating a single app
 

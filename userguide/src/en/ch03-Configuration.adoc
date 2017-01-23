@@ -143,8 +143,8 @@ Our benchmarks have shown that the MyBatis connection pool is not the most effic
 
 <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
 
-    <property name="dataSource" ref="dataSource" />
-    ...
+  <property name="dataSource" ref="dataSource" />
+  ...
 
 ----
 
@@ -246,7 +246,6 @@ flowable.{db}.{create|drop}.{type}.sql
 Where __db__ is any of the <<supporteddatabases,supported databases>> and __type__ is
 
 * *engine:* the tables needed for engine execution. Required.
-* *identity:* the tables containing users, groups and memberships of users to groups. These tables are optional and should be used when using the default identity management as shipped with the engine.
 * *history:* the tables that contain the history and audit information. Optional: not needed when history level is set to _none_. Note that this will also disable some features (such as commenting on tasks) which store the data in the history database.
 
 *Note for MySQL users:* MySQL version lower than 5.6.4 has no support for timestamps or dates with millisecond precision. To make things even worse, some version will throw an exception when trying to create such a column but other versions don't. When doing auto-creation/upgrade, the engine will change the DDL when executing it. When using the DDL file approach, both a regular version and a special file with _mysql55_ in it are available (this applies on anything lower than 5.6.4). This latter file will have column types with no millisecond precision in it.
@@ -270,7 +269,6 @@ The database names of Flowable all start with *ACT_*. The second part is a two-c
 
 * *ACT_RE_**: 'RE' stands for +repository+. Tables with this prefix contain 'static' information such as process definitions and process resources (images, rules, etc.).
 * *ACT_RU_**: 'RU' stands for +runtime+. These are the runtime tables that contain the runtime data of process instances, user tasks, variables, jobs, etc. Flowable only stores the runtime data during process instance execution, and removes the records when a process instance ends. This keeps the runtime tables small and fast.
-* *ACT_ID_**: 'ID' stands for +identity+. These tables contain identity information, such as users, groups, etc.
 * *ACT_HI_**: 'HI' stands for +history+. These are the tables that contain historic data, such as past process instances, variables, tasks, etc.
 * *ACT_GE_**: +general+ data, which is used in various use cases.
 
@@ -292,7 +290,8 @@ To upgrade, you have to start with putting the following configuration property 
 ----
 <beans >
 
-  <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+  <bean id="processEngineConfiguration" 
+      class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
     <!-- ... -->
     <property name="databaseSchemaUpdate" value="true" />
     <!-- ... -->
@@ -527,7 +526,8 @@ The property +eventListeners+ expects a list of +org.flowable.engine.delegate.ev
 
 [source,xml,linenums]
 ----
-<bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+<bean id="processEngineConfiguration" 
+    class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
     ...
     <property name="eventListeners">
       <list>
@@ -541,7 +541,8 @@ To get notified when certain types of events get dispatched, use the +typedEvent
 
 [source,xml,linenums]
 ----
-<bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+<bean id="processEngineConfiguration" 
+    class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
     ...
     <property name="typedEventListeners">
       <map>
@@ -575,7 +576,8 @@ It's possible to add and remove additional event-listeners to the engine by usin
 void addEventListener(FlowableEventListener listenerToAdd);
 
 /**
- * Adds an event-listener which will only be notified when an event occurs, which type is in the given types.
+ * Adds an event-listener which will only be notified when an event occurs, 
+ * which type is in the given types.
  * @param listenerToAdd the listener to add
  * @param types types of events the listener should be notified for
  */
@@ -637,9 +639,6 @@ Supported values for the +entityType+ are: +attachment+, +comment+, +execution+,
 
 
 ===== Listeners throwing BPMN events
-
-<<experimental, [EXPERIMENTAL] >>
-
 
 Another way of handling events being dispatched is to throw a BPMN event. Please bear in mind that it only makes sense to throw BPMN-events with certain kinds of Flowable event types. For example, throwing a BPMN event when the process-instance is deleted will result in an error. The snippet below shows how to throw a signal inside process-instance, throw a signal to an external process (global), throw a message-event inside the process-instance and throw an error-event inside the process-instance. Instead of using the +class+ or +delegateExpression+, the attribute +throwEvent+ is used, along with an additional attribute, specific to the type of event being thrown.
 
@@ -704,8 +703,8 @@ We opened up the event-dispatching mechanism through the API, to allow you to di
  * Dispatches the given event to any listeners that are registered.
  * @param event event to dispatch.
  *
- * @throws FlowableException if an exception occurs when dispatching the event or when the {@link FlowableEventDispatcher}
- * is disabled.
+ * @throws FlowableException if an exception occurs when dispatching the event or 
+ * when the {@link FlowableEventDispatcher} is disabled.
  * @throws FlowableIllegalArgumentException when the given event is not suitable for dispatching.
  */
  void dispatchEvent(FlowableEvent event);

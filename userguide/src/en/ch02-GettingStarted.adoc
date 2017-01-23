@@ -237,13 +237,15 @@ Save the following xml in a file named _holiday-request.bpmn20.xml_ under the _s
       </conditionExpression>
     </sequenceFlow>
 
-    <serviceTask id="externalSystemCall" name="Enter holidays in external system" flowable:class="org.flowable.CallExternalSystemDelegate"/>
+    <serviceTask id="externalSystemCall" name="Enter holidays in external system" 
+        flowable:class="org.flowable.CallExternalSystemDelegate"/>
     <sequenceFlow sourceRef="externalSystemCall" targetRef="holidayApprovedTask"/>
 
     <userTask id="holidayApprovedTask" name="Holiday approved"/>
     <sequenceFlow sourceRef="holidayApprovedTask" targetRef="approveEnd"/>
 
-    <serviceTask id="sendRejectionMail" name="Send out rejection email" flowable:class="org.flowable.SendRejectionMail"/>
+    <serviceTask id="sendRejectionMail" name="Send out rejection email" 
+        flowable:class="org.flowable.SendRejectionMail"/>
     <sequenceFlow sourceRef="sendRejectionMail" targetRef="rejectEnd"/>
 
     <endEvent id="approveEnd"/>
@@ -409,7 +411,8 @@ There is a last piece of the puzzle still missing: we haven't implemented the au
 
 [source,xml]
 ----
-<serviceTask id="externalSystemCall" name="Enter holidays in external system" flowable:class="org.flowable.CallExternalSystemDelegate"/>
+<serviceTask id="externalSystemCall" name="Enter holidays in external system" 
+    flowable:class="org.flowable.CallExternalSystemDelegate"/>
 ----
 
 In reality, this logic could be anything ranging from doing an HTTP REST call to some system, to doing some legacy code calls to a system the company has been using for decades. We won't implement the actual logic here, but have a simple logging statement inside.
