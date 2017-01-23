@@ -141,6 +141,7 @@ public class DbSqlSession implements Session {
     FLOWABLE_VERSIONS.add(new FlowableVersion("6.0.0.2"));
     FLOWABLE_VERSIONS.add(new FlowableVersion("6.0.0.3"));
     FLOWABLE_VERSIONS.add(new FlowableVersion("6.0.0.4"));
+    FLOWABLE_VERSIONS.add(new FlowableVersion("6.0.0.5"));
     
     /* Current */
     FLOWABLE_VERSIONS.add(new FlowableVersion(ProcessEngine.VERSION));
