@@ -296,7 +296,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     assertExecutedCommands("StartProcessInstanceCmd", "org.flowable.engine.impl.TaskQueryImpl", "ClaimTaskCmd" ,"CompleteTaskCmd");
     
     assertNoDeletes("ClaimTaskCmd");
-    assertDatabaseInserts("ClaimTaskCmd", "IdentityLinkEntityImpl", 1L, "HistoricIdentityLinkEntityImpl", 1L);    
+    assertDatabaseInserts("ClaimTaskCmd", "HistoricIdentityLinkEntityImpl-bulk-with-2", 1L, "IdentityLinkEntityImpl", 1L, "HistoricIdentityLinkEntityImpl", 1L);    
   }
   
   public void testTaskCandidateUsers() {
@@ -309,7 +309,6 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     
     taskService.deleteCandidateUser(task.getId(), "user01");
     taskService.deleteCandidateUser(task.getId(), "user02");
-    
     
     
     //Try to remove candidate users that are no (longer) part of the identity links for the task
@@ -327,8 +326,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         
     // Check "AddIdentityLinkCmd"
     assertNoDeletes("AddIdentityLinkCmd");
-    assertDatabaseInserts("AddIdentityLinkCmd", "CommentEntityImpl", 2L, "HistoricIdentityLinkEntityImpl-bulk-with-2", 2L, "IdentityLinkEntityImpl-bulk-with-2",
-            2l);
+    assertDatabaseInserts("AddIdentityLinkCmd", "CommentEntityImpl", 2L, "HistoricIdentityLinkEntityImpl-bulk-with-2", 2L, "IdentityLinkEntityImpl-bulk-with-2", 2l);
     assertDatabaseSelects("AddIdentityLinkCmd", "selectById org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 2L, "selectIdentityLinksByTask", 2L,
             "selectExecutionsWithSameRootProcessInstanceId", 2L, "selectIdentityLinksByProcessInstance", 2L);
     assertDatabaseUpdates("AddIdentityLinkCmd", "org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 2L,

@@ -130,9 +130,4 @@ public class HistoricIdentityLinkEntityImpl extends AbstractEntityNoRevision imp
   public void setCreateTime(Date createTime) {
     this.createTime = createTime;
   }
-
-  @Override
-  public Date getTime() {
-    return getCreateTime();
-  }
 }

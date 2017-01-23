@@ -25,7 +25,7 @@ import org.flowable.idm.api.UserQuery;
  * 
  * @author Frederik Heremans
  */
-public interface HistoricIdentityLink extends HistoricData {
+public interface HistoricIdentityLink {
 
   /**
    * Returns the type of link. See {@link IdentityLinkType} for the native supported types by the process engine.
