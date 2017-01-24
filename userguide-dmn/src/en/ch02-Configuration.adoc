@@ -7,18 +7,16 @@
 
 _The Flowable DMN engine is configured is a very similar way to the Flowable process engine. As a result the following instructions have a resemblance with their process engine counterpart._
 
-
-The Flowable DMN engine is configured through an XML file called +flowable.dmn.dcfg.xml+. Note that this is *not* applicable if you're using <<springintegration,the Spring style of building a DMN engine>>.
-
+The Flowable DMN engine is configured through an XML file called +flowable.dmn.cfg.xml+. Note that this is *not* applicable if you're using <<springintegration,the Spring style of building a DMN engine>>.
 
 The easiest way to obtain a +DmnEngine+, is to use the +org.flowable.dmn.engine.DmnEngines+ class:
 
 [source,java,linenums]
 ----
-DmnEngine processEngine = ProcessEngines.getDefaultProcessEngine()
+DmnEngine dmnEngine = DMNEngines.getDefaultDmnEngine()
 ----
 
-This will look for an +flowable.cfg.xml+ file on the classpath and construct an engine based on the configuration in that file. The following snippet shows an example configuration.  The following sections will give a detailed overview of the configuration properties.
+This will look for an +flowable.dmn.cfg.xml+ file on the classpath and construct an engine based on the configuration in that file. The following snippet shows an example configuration.  The following sections will give a detailed overview of the configuration properties.
 
 [source,xml,linenums]
 ----
@@ -26,7 +24,7 @@ This will look for an +flowable.cfg.xml+ file on the classpath and construct an 
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+  <bean id="dmnEngineConfiguration" class="org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration">
 
     <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000" />
     <property name="jdbcDriver" value="org.h2.Driver" />
@@ -35,27 +33,23 @@ This will look for an +flowable.cfg.xml+ file on the classpath and construct an 
 
     <property name="databaseSchemaUpdate" value="true" />
 
-    <property name="asyncExecutorActivate" value="false" />
-
-    <property name="mailServerHost" value="mail.my-corp.com" />
-    <property name="mailServerPort" value="5025" />
   </bean>
 
 </beans>
 ----
 
-Note that the configuration XML is in fact a Spring configuration. *This does not mean that Flowable can only be used in a Spring environment!* We are simply leveraging the parsing and dependency injection capabilities of Spring internally for building up the engine.
+Note that the configuration XML is in fact a Spring configuration. *This does not mean that Flowable DMN can only be used in a Spring environment!* We are simply leveraging the parsing and dependency injection capabilities of Spring internally for building up the engine.
 
-The ProcessEngineConfiguration object can also be created programmatically using the configuration file. It is also possible to use a different bean id (e.g. see line 3).
+The DMNEngineConfiguration object can also be created programmatically using the configuration file. It is also possible to use a different bean id (e.g. see line 3).
 
 [source,java,linenums]
 ----
-ProcessEngineConfiguration.
-  createProcessEngineConfigurationFromResourceDefault();
-  createProcessEngineConfigurationFromResource(String resource);
-  createProcessEngineConfigurationFromResource(String resource, String beanName);
-  createProcessEngineConfigurationFromInputStream(InputStream inputStream);
-  createProcessEngineConfigurationFromInputStream(InputStream inputStream, String beanName);
+DmnEngineConfiguration.
+  createDmnEngineConfigurationFromResourceDefault();
+  createDmnEngineConfigurationFromResource(String resource);
+  createDmnEngineConfigurationFromResource(String resource, String beanName);
+  createDmnEngineConfigurationFromInputStream(InputStream inputStream);
+  createDmnEngineConfigurationFromInputStream(InputStream inputStream, String beanName);
 ----
 
 
@@ -64,19 +58,18 @@ defaults (see <<configurationClasses,the different supported classes>> for more 
 
 [source,java,linenums]
 ----
-ProcessEngineConfiguration.createStandaloneProcessEngineConfiguration();
-ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration();
+DmnEngineConfiguration.createStandaloneDmnEngineConfiguration();
+DmnEngineConfiguration.createStandaloneInMemDmnEngineConfiguration();
 ----
 
-All these +ProcessEngineConfiguration.createXXX()+ methods return a +ProcessEngineConfiguration+ that can further be tweaked if needed. After calling the +buildProcessEngine()+ operation, a +ProcessEngine+ is created:
+All these +DmnEngineConfiguration.createXXX()+ methods return a +DmnEngineConfiguration+ that can further be tweaked if needed. After calling the +buildDmnEngine()+ operation, a +DmnEngine+ is created:
 
 [source,java,linenums]
 ----
-ProcessEngine processEngine = ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration()
-  .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE)
+DmnEngine dmnEngine = DmnEngineConfiguration.createStandaloneInMemDmnEngineConfiguration()
+  .setDatabaseSchemaUpdate(DmnEngineConfiguration.DB_SCHEMA_UPDATE_FALSE)
   .setJdbcUrl("jdbc:h2:mem:my-own-db;DB_CLOSE_DELAY=1000")
-  .setAsyncExecutorActivate(false)
-  .buildProcessEngine();
+  .buildDmnEngine();
 ----
 
 
@@ -84,23 +77,22 @@ ProcessEngine processEngine = ProcessEngineConfiguration.createStandaloneInMemPr
 [[configurationRoot]]
 
 
-=== ProcessEngineConfiguration bean
+=== DmnEngineConfiguration bean
 
 
-The +flowable.cfg.xml+ must contain a bean that has the id +$$'processEngineConfiguration'$$+.
+The +flowable.dmn.cfg.xml+ must contain a bean that has the id +$$'dmnEngineConfiguration'$$+.
 
 [source,xml,linenums]
 ----
- <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+ <bean id="dmnEngineConfiguration" class="org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration">
 ----
 
 
-This bean is then used to construct the +ProcessEngine+. There are multiple classes available that can be used to define the +processEngineConfiguration+. These classes represent different environments, and set defaults accordingly. It's a best practice to select the class the matches (the most) your environment, to minimalise the number of properties needed to configure the engine. The following classes are currently available (more will follow in future releases): [[configurationClasses]]
+This bean is then used to construct the +DmnEngine+. There are multiple classes available that can be used to define the +dmnEngineConfiguration+. These classes represent different environments, and set defaults accordingly. It's a best practice to select the class the matches (the most) your environment, to minimalise the number of properties needed to configure the engine. The following classes are currently available (more will follow in future releases): [[configurationClasses]]
 
-* *org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration*: the process engine is used in a standalone way. Flowable will take care of the transactions. By default, the database will only be checked when the engine boots (and an exception is thrown if there is no Flowable schema or the schema version is incorrect).
-* *org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration*: this is a convenience class for unit testing purposes. Flowable will take care of the transactions. An H2 in-memory database is used by default. The database will be created and dropped when the engine boots and shuts down. When using this, probably no additional configuration is needed (except when using for example the job executor or mail capabilities).
-* *org.flowable.spring.SpringProcessEngineConfiguration*: To be used when the process engine is used in a Spring environment.  See <<springintegration,the Spring integration section>> for more information.
-* *org.flowable.engine.impl.cfg.JtaProcessEngineConfiguration*: To be used when the engine runs in standalone mode, with JTA transactions.
+* *org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration*: the process engine is used in a standalone way. Flowable will take care of the transactions. By default, the database will only be checked when the engine boots (and an exception is thrown if there is no Flowable DMN schema or the schema version is incorrect).
+* *org.flowable.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration*: this is a convenience class for unit testing purposes. Flowable DMN will take care of the transactions. An H2 in-memory database is used by default. The database will be created and dropped when the engine boots and shuts down. When using this, probably no additional configuration is needed).
+* *org.flowable.dmn.spring.SpringDmnEngineConfiguration*: To be used when the DMN engine is used in a Spring environment.  See <<springintegration,the Spring integration section>> for more information.
 
 
 [[databaseConfiguration]]
@@ -108,7 +100,7 @@ This bean is then used to construct the +ProcessEngine+. There are multiple clas
 === Database configuration
 
 
-There are two ways to configure the database that the Flowable engine will use. The first option is to define the JDBC properties of the database:
+There are two ways to configure the database that the Flowable DMN engine will use. The first option is to define the JDBC properties of the database:
 
 * *jdbcUrl*: JDBC URL of the database.
 * *jdbcDriver*: implementation of the driver for the specific database type.
@@ -126,7 +118,7 @@ Example database configuration:
 
 [source,xml,linenums]
 ----
-<property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000" />
+<property name="jdbcUrl" value="jdbc:h2:mem:flowable_dmn;DB_CLOSE_DELAY=1000" />
 <property name="jdbcDriver" value="org.h2.Driver" />
 <property name="jdbcUsername" value="sa" />
 <property name="jdbcPassword" value="" />
@@ -138,13 +130,13 @@ Our benchmarks have shown that the MyBatis connection pool is not the most effic
 ----
 <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" >
   <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-  <property name="url" value="jdbc:mysql://localhost:3306/flowable" />
+  <property name="url" value="jdbc:mysql://localhost:3306/flowable_dmn" />
   <property name="username" value="flowable" />
   <property name="password" value="flowable" />
   <property name="defaultAutoCommit" value="false" />
 </bean>
 
-<bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+<bean id="dmnEngineConfiguration" class="org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration">
 
     <property name="dataSource" ref="dataSource" />
     ...
@@ -152,7 +144,7 @@ Our benchmarks have shown that the MyBatis connection pool is not the most effic
 ----
 
 
-Note that Flowable does not ship with a library that allows to define such a data source. So you have to make sure that the libraries are on your classpath.
+Note that Flowable DMN does not ship with a library that allows to define such a data source. So you have to make sure that the libraries are on your classpath.
 
 The following properties can be set, regardless of whether you are using the JDBC or data source approach:
 
@@ -168,7 +160,7 @@ The following properties can be set, regardless of whether you are using the JDB
 === JNDI Datasource Configuration
 
 
-By default, the database configuration for Flowable is contained within the db.properties files in the WEB-INF/classes of each web application. This isn't always ideal because it
+By default, the database configuration for Flowable DMN is contained within the db.properties files in the WEB-INF/classes of each web application. This isn't always ideal because it
 requires users to either modify the db.properties in the Flowable source and recompile the war file, or explode the war and modify the db.properties on every deployment.
 
 By using JNDI (Java Naming and Directory Interface) to obtain the database connection, the connection is fully managed by the Servlet Container and the configuration can be managed outside the war deployment. This also allows more control over the connection parameters than what is provided by the db.properties file.
@@ -219,13 +211,13 @@ Listed below are the types (case sensitive!) that Flowable uses to refer to data
 [[databaseTypes]]
 [options="header"]
 |===============
-|Flowable database type|Example JDBC URL|Notes
-|h2|jdbc:h2:tcp://localhost/flowable|Default configured database
-|mysql|jdbc:mysql://localhost:3306/flowable?autoReconnect=true|Tested using mysql-connector-java database driver
+|Flowable DMN database type|Example JDBC URL|Notes
+|h2|jdbc:h2:tcp://localhost/flowable_dmn|Default configured database
+|mysql|jdbc:mysql://localhost:3306/flowable_dmn?autoReconnect=true|Tested using mysql-connector-java database driver
 |oracle|jdbc:oracle:thin:@localhost:1521:xe|
-|postgres|jdbc:postgresql://localhost:5432/flowable|
-|db2|jdbc:db2://localhost:50000/flowable|
-|mssql|jdbc:sqlserver://localhost:1433;databaseName=flowable (jdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver) _OR_ jdbc:jtds:sqlserver://localhost:1433/flowable (jdbc.driver=net.sourceforge.jtds.jdbc.Driver)|Tested using Microsoft JDBC Driver 4.0 (sqljdbc4.jar) and JTDS Driver
+|postgres|jdbc:postgresql://localhost:5432/flowable_dmn|
+|db2|jdbc:db2://localhost:50000/flowable_dmn|
+|mssql|jdbc:sqlserver://localhost:1433;databaseName=flowable_dmn (jdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver) _OR_ jdbc:jtds:sqlserver://localhost:1433/flowable_dmn (jdbc.driver=net.sourceforge.jtds.jdbc.Driver)|Tested using Microsoft JDBC Driver 4.0 (sqljdbc4.jar) and JTDS Driver
 |===============
 
 
@@ -233,35 +225,7 @@ Listed below are the types (case sensitive!) that Flowable uses to refer to data
 
 === Creating the database tables
 
-The easiest way to create the database tables for your database is to:
-
-* Add the flowable-engine jars to your classpath
-* Add a suitable database driver
-* Add a Flowable configuration file (__flowable.cfg.xml__) to your classpath, pointing to your database (see <<databaseConfiguration,database configuration section>>)
-* Execute the main method of the _DbSchemaCreate_ class
-
-However, often only database administrators can execute DDL statements on a database. On a production system, this is also the wisest of choices. The SQL DDL statements can be found on the Flowable downloads page or inside the Flowable distribution folder, in the +database+ subdirectory. The scripts are also in the engine jar (__flowable-engine-x.jar__), in the package __org/flowable/db/create__ (the __drop__ folder contains the drop statements). The SQL files are of the form
-
-----
-flowable.{db}.{create|drop}.{type}.sql
-----
-
-Where __db__ is any of the <<supporteddatabases,supported databases>> and __type__ is
-
-* *engine:* the tables needed for engine execution. Required.
-* *identity:* the tables containing users, groups and memberships of users to groups. These tables are optional and should be used when using the default identity management as shipped with the engine.
-* *history:* the tables that contain the history and audit information. Optional: not needed when history level is set to _none_. Note that this will also disable some features (such as commenting on tasks) which store the data in the history database.
-
-*Note for MySQL users:* MySQL version lower than 5.6.4 has no support for timestamps or dates with millisecond precision. To make things even worse, some version will throw an exception when trying to create such a column but other versions don't. When doing auto-creation/upgrade, the engine will change the DDL when executing it. When using the DDL file approach, both a regular version and a special file with _mysql55_ in it are available (this applies on anything lower than 5.6.4). This latter file will have column types with no millisecond precision in it.
-
-Concretely, the following applies for MySQL version
-
-* *<5.6:* No millisecond precision available. DDL files available (look for files containing __mysql55__). Auto creation/update will work out of the box.
-* *5.6.0 - 5.6.3:* No millisecond precision available. Auto creation/update will NOT work. It is advised to upgrade to a newer database version anyway. DDL files for _mysql 5.5_ could be used if really needed.
-* *5.6.4+:* Millisecond precision available. DDL files available (default file containing __mysql__). Auto creation/update works out of the box.
-
-
-Do note that in the case of upgrading the MySQL database later on and the Flowable tables are already created/upgraded, the column type change will have to be done manually!
+LIQUIBASE
 
 
 [[database.tables.explained]]
@@ -269,13 +233,13 @@ Do note that in the case of upgrading the MySQL database later on and the Flowab
 
 === Database table names explained
 
-The database names of Flowable all start with *ACT_*. The second part is a two-character identification of the use case of the table. This use case will also roughly match the service API.
+The database names of Flowable all start with *ACT_DMN_*.
 
-* *ACT_RE_**: 'RE' stands for +repository+. Tables with this prefix contain 'static' information such as process definitions and process resources (images, rules, etc.).
-* *ACT_RU_**: 'RU' stands for +runtime+. These are the runtime tables that contain the runtime data of process instances, user tasks, variables, jobs, etc. Flowable only stores the runtime data during process instance execution, and removes the records when a process instance ends. This keeps the runtime tables small and fast.
-* *ACT_ID_**: 'ID' stands for +identity+. These tables contain identity information, such as users, groups, etc.
-* *ACT_HI_**: 'HI' stands for +history+. These are the tables that contain historic data, such as past process instances, variables, tasks, etc.
-* *ACT_GE_**: +general+ data, which is used in various use cases.
+// * *ACT_RE_**: 'RE' stands for +repository+. Tables with this prefix contain 'static' information such as process definitions and process resources (images, rules, etc.).
+// * *ACT_RU_**: 'RU' stands for +runtime+. These are the runtime tables that contain the runtime data of process instances, user tasks, variables, jobs, etc. Flowable only stores the runtime data during process instance execution, and removes the records when a process instance ends. This keeps the runtime tables small and fast.
+// * *ACT_ID_**: 'ID' stands for +identity+. These tables contain identity information, such as users, groups, etc.
+// * *ACT_HI_**: 'HI' stands for +history+. These are the tables that contain historic data, such as past process instances, variables, tasks, etc.
+// * *ACT_GE_**: +general+ data, which is used in various use cases.
 
 
 [[databaseUpgrade]]
