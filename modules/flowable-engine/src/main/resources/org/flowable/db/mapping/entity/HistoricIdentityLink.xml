@@ -54,7 +54,7 @@
            #{historicIdentityLink.userId, jdbcType=VARCHAR},
            #{historicIdentityLink.groupId, jdbcType=VARCHAR},
            #{historicIdentityLink.taskId, jdbcType=VARCHAR},
-           #{historicIdentityLink.processInstanceId, jdbcType=VARCHAR}
+           #{historicIdentityLink.processInstanceId, jdbcType=VARCHAR},
            #{historicIdentityLink.createTime, jdbcType=TIMESTAMP})
       </foreach>
     SELECT * FROM dual
