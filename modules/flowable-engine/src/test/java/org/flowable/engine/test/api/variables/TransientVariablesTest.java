@@ -240,7 +240,33 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
     assertEquals(0, runtimeService.getVariables(processInstance.getId()).size());
   }
   
-  
+  @Deployment
+  public void testLoopingExclusiveGateway() {
+    
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("loopingTransientVarsTest");
+        
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals("task1", task.getTaskDefinitionKey());
+    Map<String, Object> transientVarMap = new HashMap<>();
+    transientVarMap.put("status", 201);
+    taskService.complete(task.getId(), new HashMap<String, Object>(), transientVarMap);
+    
+    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals("task2", task.getTaskDefinitionKey());
+    taskService.complete(task.getId());
+    
+    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals("task1", task.getTaskDefinitionKey());
+    transientVarMap.clear();
+    transientVarMap.put("status", 200);
+    taskService.complete(task.getId(), new HashMap<String, Object>(), transientVarMap);
+    
+    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals("task3", task.getTaskDefinitionKey());
+    transientVarMap.clear();
+    transientVarMap.put("status2", 200);
+    taskService.complete(task.getId(), new HashMap<String, Object>(), transientVarMap);
+  }
   
   /* Service task class for previous tests */
   

@@ -566,6 +566,11 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getVariableCount() > 0)) {
       Collection<VariableInstance> executionVariables = executionEntity.getVariableInstancesLocal().values();
       for (VariableInstance variableInstance : executionVariables) {
+        
+        if (variableInstance instanceof VariableInstanceEntity == false) {
+          continue;
+        }
+        
         VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
         
         VariableInstanceEntityManager variableInstanceEntityManager = getVariableInstanceEntityManager();
