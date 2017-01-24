@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.history.HistoricIdentityLink;
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -281,9 +280,6 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
 
   @Deployment
   public void testHistoricIdentityLinksForTaskOwner() throws Exception {
-    Clock clock = super.processEngineConfiguration.getClock();
-    clock.setCurrentTime(new Date(1));
-    
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTaskProcess");
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
     assertNotNull(task);
@@ -294,19 +290,15 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
     // task is still active
     List<HistoricIdentityLink> historicIdentityLinksForTask = historyService.getHistoricIdentityLinksForTask(task.getId());
     assertEquals(1, historicIdentityLinksForTask.size());
-    assertEquals(new Date(1), historicIdentityLinksForTask.get(0).getCreateTime());
+    assertNotNull(historicIdentityLinksForTask.get(0).getCreateTime());
     
     assertEquals("kermit" , historicIdentityLinksForTask.get(0).getUserId());
     assertEquals(IdentityLinkType.OWNER, historicIdentityLinksForTask.get(0).getType());
-    
-    clock.setCurrentTime(new Date(10));
     
     //change owner
     taskService.setOwner(taskId, "gonzo");
     historicIdentityLinksForTask = historyService.getHistoricIdentityLinksForTask(task.getId());
     assertEquals(2, historicIdentityLinksForTask.size());
-    
-    clock.setCurrentTime(new Date(100));
     
     taskService.setOwner(taskId, null);
     historicIdentityLinksForTask = historyService.getHistoricIdentityLinksForTask(task.getId());
@@ -318,18 +310,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
     
     for (HistoricIdentityLink link: historicIdentityLinksForTask){
       assertNotNull(link.getCreateTime());
-      if ("kermit".equals(link.getUserId())){
-        assertEquals(new Date(1), link.getCreateTime());
-      }else if ("gonzo".equals(link.getUserId())){
-        assertEquals(new Date(10), link.getCreateTime());
-      }else if (link.getUserId() == null){
-        assertEquals(new Date(100), link.getCreateTime());
-      }else{
-        fail("Unexpected UserId");
-      }
     }
-    
-    clock.setCurrentTime(new Date(100));
     
     Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
     assertNotNull(secondTask);
@@ -338,14 +319,11 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
     taskService.saveTask(secondTask);
     historicIdentityLinksForTask = historyService.getHistoricIdentityLinksForTask(secondTask.getId());
     assertEquals(1, historicIdentityLinksForTask.size());
-    assertEquals(new Date(100), historicIdentityLinksForTask.get(0).getCreateTime());
+    assertNotNull(historicIdentityLinksForTask.get(0).getCreateTime());
   }
   
   @Deployment
   public void testHistoricIdentityLinksOnTaskClaim() throws Exception {
-    Clock clock = super.processEngineConfiguration.getClock();
-    clock.setCurrentTime(new Date(1));
-    
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTaskProcess");
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
     assertNotNull(task);
@@ -354,20 +332,14 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
     // we must keep track of who claimed it
     String taskId = task.getId();
     taskService.claim(taskId, "kermit");
-    clock.setCurrentTime(new Date(2));
     taskService.unclaim(taskId);
-    clock.setCurrentTime(new Date(3));
-
+    
     taskService.claim(taskId, "fozzie");
-    clock.setCurrentTime(new Date(4));
     taskService.unclaim(taskId);
-    clock.setCurrentTime(new Date(5));
-
+    
     taskService.claim(taskId, "gonzo");
-    clock.setCurrentTime(new Date(6));
     taskService.unclaim(taskId);
-    clock.setCurrentTime(new Date(7));
-
+    
     // task is still active
     List<HistoricIdentityLink> historicIdentityLinksForTask = historyService.getHistoricIdentityLinksForTask(task.getId());
     assertEquals(6, historicIdentityLinksForTask.size());
@@ -381,12 +353,12 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         nullCount++;
       } else if ("kermit".equals(link.getUserId())) {
         kermitCount++;
-        assertEquals(new Date(1), link.getCreateTime());
+        assertNotNull(link.getCreateTime());
       } else if ("fozzie".equals(link.getUserId())) {
         fozzieCount++;
-        assertEquals(new Date(3), link.getCreateTime());
+        assertNotNull(link.getCreateTime());
       } else if ("gonzo".equals(link.getUserId())) {
-        assertEquals(new Date(5), link.getCreateTime());
+        assertNotNull(link.getCreateTime());
         gonzoCount++;
       }
     }
@@ -447,7 +419,6 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
     historicIdentityLinksForTask = historyService.getHistoricIdentityLinksForTask(secondTaskId);
     assertEquals(1, historicIdentityLinksForTask.size());
     assertEquals("newKid", historicIdentityLinksForTask.get(0).getUserId());
-
   }
 
   @Deployment
