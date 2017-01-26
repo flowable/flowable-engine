@@ -32,8 +32,8 @@ public class ParallelProcessRevisitedTest extends SpringFlowableTestCase {
 
       @Override
       public void configure() throws Exception {
-        from("activiti:parallelCamelProcessRevisited:serviceTaskAsync1").to("bean:sleepBean?method=sleep");
-        from("activiti:parallelCamelProcessRevisited:serviceTaskAsync2").to("bean:sleepBean?method=sleep");
+        from("flowable:parallelCamelProcessRevisited:serviceTaskAsync1").to("bean:sleepBean?method=sleep");
+        from("flowable:parallelCamelProcessRevisited:serviceTaskAsync2").to("bean:sleepBean?method=sleep");
       }
     });
   }

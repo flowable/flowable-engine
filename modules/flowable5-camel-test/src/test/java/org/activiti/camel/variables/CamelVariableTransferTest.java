@@ -53,7 +53,7 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
           .setProperty("property3", simple("sampleValueForProperty3"))
           .transform(simple("sampleBody"))
           .to("log:testVariables?showProperties=true")
-          .to("activiti:testPropertiesProcess?copyVariablesFromProperties=true");
+          .to("flowable:testPropertiesProcess?copyVariablesFromProperties=true");
 
         from("direct:startNoProperties")
         .setProperty("property1", simple("sampleValueForProperty1"))
@@ -61,14 +61,14 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
         .setProperty("property3", simple("sampleValueForProperty3"))
         .transform(simple("sampleBody"))
         .to("log:testVariables?showProperties=true")
-        .to("activiti:testPropertiesProcess?copyVariablesFromProperties=false");
+        .to("flowable:testPropertiesProcess?copyVariablesFromProperties=false");
 
         from("direct:startFilteredProperties")
         .setProperty("property1", simple("sampleValueForProperty1"))
         .setProperty("property2", simple("sampleValueForProperty2"))
         .setProperty("property3", simple("sampleValueForProperty3"))
         .to("log:testVariables?showProperties=true")
-        .to("activiti:testPropertiesProcess?copyVariablesFromProperties=(property1|property2)"); 
+        .to("flowable:testPropertiesProcess?copyVariablesFromProperties=(property1|property2)"); 
         
         from("direct:startAllHeaders")
         .setHeader("property1", simple("sampleValueForProperty1"))
@@ -81,14 +81,14 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
         .setHeader("property2", simple("sampleValueForProperty2"))
         .setHeader("property3", simple("sampleValueForProperty3"))
         .to("log:testVariables?showProperties=true")
-        .to("activiti:testPropertiesProcess?copyVariablesFromHeader=false");   
+        .to("flowable:testPropertiesProcess?copyVariablesFromHeader=false");   
         
         from("direct:startFilteredHeaders")
         .setHeader("property1", simple("sampleValueForProperty1"))
         .setHeader("property2", simple("sampleValueForProperty2"))
         .setHeader("property3", simple("sampleValueForProperty3"))
         .to("log:testVariables?showProperties=true")
-        .to("activiti:testPropertiesProcess?copyVariablesFromHeader=(property1|property2)");   
+        .to("flowable:testPropertiesProcess?copyVariablesFromHeader=(property1|property2)");   
       }
     });   
   }

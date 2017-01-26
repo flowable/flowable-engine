@@ -53,7 +53,7 @@ public class CamelExceptionTest extends SpringFlowableTestCase {
     camelContext.addRoutes(new RouteBuilder() {
       @Override
       public void configure() throws Exception {
-        from("activiti:exceptionInRouteSynchron:errorCamelTask").to("log:helloWorld").bean(ThrowBpmnExceptionBean.class);
+        from("flowable:exceptionInRouteSynchron:errorCamelTask").to("log:helloWorld").bean(ThrowBpmnExceptionBean.class);
       }
     });
   }

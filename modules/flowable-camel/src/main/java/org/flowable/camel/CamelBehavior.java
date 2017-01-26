@@ -133,7 +133,7 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
   }
 
   protected FlowableEndpoint createEndpoint(DelegateExecution execution) {
-    String uri = "activiti://" + getProcessDefinitionKey(execution) + ":" + execution.getCurrentActivityId();
+    String uri = "flowable://" + getProcessDefinitionKey(execution) + ":" + execution.getCurrentActivityId();
     return getEndpoint(uri);
   }
 

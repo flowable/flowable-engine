@@ -33,7 +33,7 @@ public class MultipleInstanceRoute extends SpringFlowableTestCase {
 
       @Override
       public void configure() throws Exception {
-        from("activiti:multiInstanceCamelProcess:servicetask1").to("log:logMessage");
+        from("flowable:multiInstanceCamelProcess:servicetask1").to("log:logMessage");
       }
     });
   }

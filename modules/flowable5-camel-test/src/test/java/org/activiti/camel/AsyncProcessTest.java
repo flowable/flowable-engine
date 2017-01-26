@@ -40,8 +40,8 @@ public class AsyncProcessTest extends SpringFlowableTestCase {
 
       @Override
       public void configure() throws Exception {
-        from("activiti:asyncCamelProcess:serviceTaskAsync1").setHeader("destination", constant("activiti:asyncCamelProcess:receive1")).to("seda:asyncQueue");
-        from("activiti:asyncCamelProcess:serviceTaskAsync2").setHeader("destination", constant("activiti:asyncCamelProcess:receive2")).to("seda:asyncQueue2");
+        from("flowable:asyncCamelProcess:serviceTaskAsync1").setHeader("destination", constant("flowable:asyncCamelProcess:receive1")).to("seda:asyncQueue");
+        from("flowable:asyncCamelProcess:serviceTaskAsync2").setHeader("destination", constant("flowable:asyncCamelProcess:receive2")).to("seda:asyncQueue2");
         from("seda:asyncQueue").to("bean:sleepBean?method=sleep").to("seda:receiveQueue");
 
         from("seda:asyncQueue2").to("bean:sleepBean?method=sleep").to("seda:receiveQueue");

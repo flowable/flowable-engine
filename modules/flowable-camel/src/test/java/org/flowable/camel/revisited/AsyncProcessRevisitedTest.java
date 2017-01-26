@@ -39,11 +39,11 @@ public class AsyncProcessRevisitedTest extends SpringFlowableTestCase {
 
       @Override
       public void configure() throws Exception {
-        from("activiti:asyncCamelProcessRevisited:serviceTaskAsync1").to("bean:sleepBean?method=sleep").to("seda:continueAsync1");
-        from("seda:continueAsync1").to("activiti:asyncCamelProcessRevisited:receive1");
+        from("flowable:asyncCamelProcessRevisited:serviceTaskAsync1").to("bean:sleepBean?method=sleep").to("seda:continueAsync1");
+        from("seda:continueAsync1").to("flowable:asyncCamelProcessRevisited:receive1");
 
-        from("activiti:asyncCamelProcessRevisited:serviceTaskAsync2").to("bean:sleepBean?method=sleep").to("bean:sleepBean?method=sleep").to("seda:continueAsync2");
-        from("seda:continueAsync2").to("activiti:asyncCamelProcessRevisited:receive2");
+        from("flowable:asyncCamelProcessRevisited:serviceTaskAsync2").to("bean:sleepBean?method=sleep").to("bean:sleepBean?method=sleep").to("seda:continueAsync2");
+        from("seda:continueAsync2").to("flowable:asyncCamelProcessRevisited:receive2");
       }
     });
   }

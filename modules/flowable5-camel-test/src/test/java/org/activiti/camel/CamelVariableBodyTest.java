@@ -41,7 +41,7 @@ public class CamelVariableBodyTest extends SpringFlowableTestCase {
 
       @Override
       public void configure() throws Exception {
-        from("activiti:HelloCamel:serviceTask1").log(LoggingLevel.INFO, "Received message on service task").to("mock:serviceBehavior");
+        from("flowable:HelloCamel:serviceTask1").log(LoggingLevel.INFO, "Received message on service task").to("mock:serviceBehavior");
       }
     });
     service1 = (MockEndpoint) camelContext.getEndpoint("mock:serviceBehavior");

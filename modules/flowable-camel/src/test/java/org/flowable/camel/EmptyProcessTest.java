@@ -39,9 +39,9 @@ public class EmptyProcessTest extends SpringFlowableTestCase {
 
       @Override
       public void configure() throws Exception {
-        from("direct:startEmpty").to("activiti:emptyProcess");
-        from("direct:startEmptyWithHeader").setHeader("MyVar", constant("Foo")).to("activiti:emptyProcess?copyVariablesFromHeader=true");
-        from("direct:startEmptyBodyAsString").to("activiti:emptyProcess?copyBodyToCamelBodyAsString=true");
+        from("direct:startEmpty").to("flowable:emptyProcess");
+        from("direct:startEmptyWithHeader").setHeader("MyVar", constant("Foo")).to("flowable:emptyProcess?copyVariablesFromHeader=true");
+        from("direct:startEmptyBodyAsString").to("flowable:emptyProcess?copyBodyToCamelBodyAsString=true");
       }
     });
   }
