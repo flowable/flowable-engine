@@ -32,6 +32,8 @@ public class RemoteIdmAuthenticationProvider implements AuthenticationProvider {
     for (String privilege : user.getPrivileges()) {
       grantedAuthorities.add(new SimpleGrantedAuthority(privilege));
     }
+    
+    org.flowable.engine.impl.identity.Authentication.setAuthenticatedUserId(user.getId());
 
     Authentication auth = new UsernamePasswordAuthenticationToken(authentication.getPrincipal(), 
         authentication.getCredentials(), grantedAuthorities);
