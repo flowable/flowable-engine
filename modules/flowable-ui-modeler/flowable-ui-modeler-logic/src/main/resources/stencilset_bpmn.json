@@ -197,7 +197,7 @@
     "name" : "servicetaskexpressionpackage",
     "properties" : [ {
       "id" : "servicetaskexpression",
-      "type" : "String",
+      "type" : "Text",
       "title" : "Expression",
       "value" : "",
       "description" : "Service task logic defined with an expression.",
@@ -207,7 +207,7 @@
     "name" : "servicetaskdelegateexpressionpackage",
     "properties" : [ {
       "id" : "servicetaskdelegateexpression",
-      "type" : "String",
+      "type" : "Text",
       "title" : "Delegate expression",
       "value" : "",
       "description" : "Service task logic defined with a delegate expression.",
@@ -437,7 +437,7 @@
     "name" : "muletaskpayloadexpressionpackage",
     "properties" : [ {
       "id" : "muletaskpayloadexpression",
-      "type" : "String",
+      "type" : "Text",
       "title" : "Payload expression",
       "value" : "",
       "description" : "A required definition for the payload of the message sent to Mule.",
