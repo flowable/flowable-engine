@@ -120,6 +120,9 @@
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
       </if>
+      <if test="engineVersion != null">
+        and RES.ENGINE_VERSION_ = #{engineVersion}
+      </if>
       <if test="processDefinitionKey != null">
         and PROCDEF.KEY_ = #{processDefinitionKey}
       </if>

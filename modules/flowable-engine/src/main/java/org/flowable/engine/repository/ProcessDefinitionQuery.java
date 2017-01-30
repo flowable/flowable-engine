@@ -148,6 +148,11 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
    * Only select process definitions that do not have a tenant id.
    */
   ProcessDefinitionQuery processDefinitionWithoutTenantId();
+  
+  /**
+   * Only select process definitions that have the given engine version.
+   */
+  ProcessDefinitionQuery processDefinitionEngineVersion(String engineVersion);
 
   // Support for event subscriptions /////////////////////////////////////
 

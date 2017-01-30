@@ -87,6 +87,11 @@ public interface DeploymentQuery extends Query<DeploymentQuery, Deployment> {
    * Only select deployments that do not have a tenant id.
    */
   DeploymentQuery deploymentWithoutTenantId();
+  
+  /**
+   * Only select deployment that have the given engine version.
+   */
+  DeploymentQuery deploymentEngineVersion(String engineVersion);
 
   /** Only select deployments with the given process definition key. */
   DeploymentQuery processDefinitionKey(String key);

@@ -32,8 +32,8 @@ import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.persistence.entity.SuspensionState;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.impl.persistence.entity.SuspensionState.SuspensionStateUtil;
+import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -71,7 +71,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
     List<ProcessDefinitionEntity> processDefinitions = findProcessDefinition(commandContext);
     boolean hasV5ProcessDefinitions = false;
     for (ProcessDefinitionEntity processDefinitionEntity : processDefinitions) {
-      if (Flowable5Util.isFlowable5ProcessDefinition(commandContext, processDefinitionEntity)) {
+      if (Flowable5Util.isFlowable5ProcessDefinition(processDefinitionEntity, commandContext)) {
         hasV5ProcessDefinitions = true;
         break;
       }
@@ -146,7 +146,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
   protected void createTimerForDelayedExecution(CommandContext commandContext, List<ProcessDefinitionEntity> processDefinitions) {
     for (ProcessDefinitionEntity processDefinition : processDefinitions) {
       
-      if (Flowable5Util.isFlowable5ProcessDefinition(commandContext, processDefinition)) continue;
+      if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) continue;
       
       TimerJobEntity timer = commandContext.getTimerJobEntityManager().create();
       timer.setJobType(JobEntity.JOB_TYPE_TIMER);
@@ -167,7 +167,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
   protected void changeProcessDefinitionState(CommandContext commandContext, List<ProcessDefinitionEntity> processDefinitions) {
     for (ProcessDefinitionEntity processDefinition : processDefinitions) {
 
-      if (Flowable5Util.isFlowable5ProcessDefinition(commandContext, processDefinition)) continue;
+      if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) continue;
       
       SuspensionStateUtil.setSuspensionState(processDefinition, getProcessDefinitionSuspensionState());
 

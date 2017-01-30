@@ -38,7 +38,6 @@ import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti.engine.impl.scripting.ScriptingEngines;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.engine.runtime.ProcessInstanceBuilder;
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.compatibility.wrapper.Flowable5AttachmentWrapper;
@@ -85,11 +84,6 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
 
   protected DefaultProcessEngineFactory processEngineFactory;
   protected volatile ProcessEngine processEngine;
-  
-  @Override
-  public boolean isVersion5Tag(String tag) {
-    return StringUtils.equals(tag, V5_ENGINE_TAG) || StringUtils.equals(tag, "activiti-5") ;
-  }
   
   public ProcessDefinition getProcessDefinition(final String processDefinitionId) {
     final ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();

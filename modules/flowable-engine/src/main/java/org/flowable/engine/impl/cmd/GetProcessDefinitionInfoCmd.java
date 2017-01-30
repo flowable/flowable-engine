@@ -48,7 +48,7 @@ public class GetProcessDefinitionInfoCmd implements Command<ObjectNode>, Seriali
     DeploymentManager deploymentManager = commandContext.getProcessEngineConfiguration().getDeploymentManager();
     // make sure the process definition is in the cache
     ProcessDefinition processDefinition = deploymentManager.findDeployedProcessDefinitionById(processDefinitionId);
-    if (Flowable5Util.isFlowable5ProcessDefinition(commandContext, processDefinition)) {
+    if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
       Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
       return compatibilityHandler.getProcessDefinitionInfo(processDefinitionId);
     }

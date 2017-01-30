@@ -28,6 +28,7 @@ import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.ReflectUtil;
+import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
 import org.flowable.validation.validator.Problems;
@@ -288,6 +289,22 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
 
     for (org.flowable.engine.repository.Deployment deployment : deploymentList) {
       repositoryService.deleteDeployment(deployment.getId());
+    }
+  }
+  
+  public void testV5Deployment() {
+    String bpmnResourceName = "org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml";
+    try {
+      repositoryService.createDeployment()
+        .addClasspathResource(bpmnResourceName)
+        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
+        .name("v5")
+        .deploy();
+      
+      fail("Expected deployment exception because v5 compatibility handler is not enabled");
+      
+    } catch (FlowableException e) {
+      // expected
     }
   }
 

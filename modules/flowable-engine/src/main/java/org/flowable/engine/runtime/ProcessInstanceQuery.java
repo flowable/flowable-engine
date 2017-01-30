@@ -92,6 +92,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
    * Select the process instances which are defined by process definitions with the given ids.
    */
   ProcessInstanceQuery processDefinitionIds(Set<String> processDefinitionIds);
+  
+  /**
+   * Select the process instances which are defined by a process definition with the given engine version.
+   */
+  ProcessInstanceQuery processDefinitionEngineVersion(String processDefinitionEngineVersion);
 
   /**
    * Select the process instances which are defined by a deployment with the given id.

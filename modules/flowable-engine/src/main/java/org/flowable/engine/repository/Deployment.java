@@ -41,5 +41,7 @@ public interface Deployment {
   String getKey();
 
   String getTenantId();
+  
+  String getEngineVersion();
 
 }

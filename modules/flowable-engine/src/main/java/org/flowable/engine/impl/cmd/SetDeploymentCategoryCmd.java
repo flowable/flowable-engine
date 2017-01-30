@@ -19,6 +19,7 @@ import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.Deployment;
 
 /**
@@ -46,8 +47,7 @@ public class SetDeploymentCategoryCmd implements Command<Void> {
       throw new FlowableObjectNotFoundException("No deployment found for id = '" + deploymentId + "'", Deployment.class);
     }
     
-    if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled() && 
-        commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().isVersion5Tag(deployment.getEngineVersion())) {
+    if (Flowable5Util.isFlowable5Deployment(deployment, commandContext)) {
       commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().setDeploymentCategory(deploymentId, category);
     }
 

@@ -27,7 +27,6 @@ import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -120,10 +119,7 @@ public class DeploymentManager {
     ProcessDefinitionCacheEntry cachedProcessDefinition = processDefinitionCache.get(processDefinitionId);
 
     if (cachedProcessDefinition == null) {
-      CommandContext commandContext = Context.getCommandContext();
-      if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled() && 
-          Flowable5Util.isFlowable5ProcessDefinition(Context.getCommandContext(), processDefinition)) {
-        
+      if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, processEngineConfiguration)) {
         return Flowable5Util.getFlowable5CompatibilityHandler().resolveProcessDefinition(processDefinition);
       }
       
@@ -186,9 +182,7 @@ public class DeploymentManager {
       throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.", DeploymentEntity.class);
     }
 
-    if (processEngineConfiguration.isFlowable5CompatibilityEnabled() && 
-        processEngineConfiguration.getFlowable5CompatibilityHandler().isVersion5Tag(deployment.getEngineVersion()) ) {
-      
+    if (Flowable5Util.isFlowable5Deployment(deployment, processEngineConfiguration)) {
       processEngineConfiguration.getFlowable5CompatibilityHandler().deleteDeployment(deploymentId, cascade);
       return;
     }

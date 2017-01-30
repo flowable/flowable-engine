@@ -21,6 +21,7 @@ import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 
@@ -51,9 +52,7 @@ public class ChangeDeploymentTenantIdCmd implements Command<Void>, Serializable 
       throw new FlowableObjectNotFoundException("Could not find deployment with id " + deploymentId, Deployment.class);
     }
     
-    if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled() && 
-        commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().isVersion5Tag(deployment.getEngineVersion())) {
-      
+    if (Flowable5Util.isFlowable5Deployment(deployment, commandContext)) {
       commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().changeDeploymentTenantId(deploymentId, newTenantId);
       return null;
     }

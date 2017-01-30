@@ -148,6 +148,7 @@ import org.flowable.engine.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.flowable.engine.impl.cmd.ValidateExecutionRelatedEntityCountCfgCmd;
 import org.flowable.engine.impl.cmd.ValidateTaskRelatedEntityCountCfgCmd;
+import org.flowable.engine.impl.cmd.ValidateV5EntitiesCmd;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.impl.db.DbSqlSessionFactory;
@@ -852,7 +853,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   // Backwards compatibility //////////////////////////////////////////////////////////////
 
-  protected boolean isFlowable5CompatibilityEnabled; // Default flowable 5 backwards compatibility is disabled!
+  protected boolean flowable5CompatibilityEnabled; // Default flowable 5 backwards compatibility is disabled!
+  protected boolean validateFlowable5EntitiesEnabled = true; // When disabled no checks are performed for existing flowable 5 entities in the db
   protected Flowable5CompatibilityHandlerFactory flowable5CompatibilityHandlerFactory;
   protected Flowable5CompatibilityHandler flowable5CompatibilityHandler;
 
@@ -874,7 +876,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     ProcessEngineImpl processEngine = new ProcessEngineImpl(this);
 
     // trigger build of Flowable 5 Engine
-    if (isFlowable5CompatibilityEnabled && flowable5CompatibilityHandler != null) {
+    if (flowable5CompatibilityEnabled && flowable5CompatibilityHandler != null) {
       Context.setProcessEngineConfiguration(processEngine.getProcessEngineConfiguration());
       flowable5CompatibilityHandler.getRawProcessEngine();
     }
@@ -2024,7 +2026,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // If Flowable 5 compatibility is disabled, no need to do anything
     // If handler is injected, no need to do anything
-    if (!isFlowable5CompatibilityEnabled || flowable5CompatibilityHandler == null) {
+    if (flowable5CompatibilityEnabled && flowable5CompatibilityHandler == null) {
 
       // Create default factory if nothing set
       if (flowable5CompatibilityHandlerFactory == null) {
@@ -2045,6 +2047,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    * Called when the {@link ProcessEngine} is initialized, but before it is returned
    */
   protected void postProcessEngineInitialisation() {
+    if (validateFlowable5EntitiesEnabled) {
+      commandExecutor.execute(new ValidateV5EntitiesCmd());
+    }
+    
     if (performanceSettings.isValidateExecutionRelationshipCountConfigOnBoot()) {
       commandExecutor.execute(new ValidateExecutionRelatedEntityCountCfgCmd());
     }
@@ -2067,6 +2073,21 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // getters and setters
   // //////////////////////////////////////////////////////
 
+  public ProcessEngineConfigurationImpl setEngineName(String processEngineName) {
+    this.processEngineName = processEngineName;
+    return this;
+  }
+  
+  public ProcessEngineConfigurationImpl setDatabaseSchemaUpdate(String databaseSchemaUpdate) {
+    this.databaseSchemaUpdate = databaseSchemaUpdate;
+    return this;
+  }
+  
+  public ProcessEngineConfigurationImpl setJdbcUrl(String jdbcUrl) {
+    this.jdbcUrl = jdbcUrl;
+    return this;
+  }
+  
   @Override
   public ProcessEngineConfigurationImpl setDefaultCommandConfig(CommandConfig defaultCommandConfig) {
     this.defaultCommandConfig = defaultCommandConfig;
@@ -3538,7 +3559,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       this.clock.setCurrentCalendar(clock.getCurrentCalendar());
     }
 
-    if (isFlowable5CompatibilityEnabled && flowable5CompatibilityHandler != null) {
+    if (flowable5CompatibilityEnabled && flowable5CompatibilityHandler != null) {
       getFlowable5CompatibilityHandler().setClock(clock);
     }
     return this;
@@ -3547,7 +3568,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public void resetClock() {
     if (this.clock != null) {
       clock.reset();
-      if (isFlowable5CompatibilityEnabled && flowable5CompatibilityHandler != null) {
+      if (flowable5CompatibilityEnabled && flowable5CompatibilityHandler != null) {
         getFlowable5CompatibilityHandler().resetClock();
       }
     }
@@ -3574,11 +3595,20 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // Flowable 5
 
   public boolean isFlowable5CompatibilityEnabled() {
-    return isFlowable5CompatibilityEnabled;
+    return flowable5CompatibilityEnabled;
   }
 
-  public ProcessEngineConfigurationImpl setFlowable5CompatibilityEnabled(boolean isFlowable5CompatibilityEnabled) {
-    this.isFlowable5CompatibilityEnabled = isFlowable5CompatibilityEnabled;
+  public ProcessEngineConfigurationImpl setFlowable5CompatibilityEnabled(boolean flowable5CompatibilityEnabled) {
+    this.flowable5CompatibilityEnabled = flowable5CompatibilityEnabled;
+    return this;
+  }
+  
+  public boolean isValidateFlowable5EntitiesEnabled() {
+    return validateFlowable5EntitiesEnabled;
+  }
+  
+  public ProcessEngineConfigurationImpl setValidateFlowable5EntitiesEnabled(boolean validateFlowable5EntitiesEnabled) {
+    this.validateFlowable5EntitiesEnabled = validateFlowable5EntitiesEnabled;
     return this;
   }
 
@@ -3660,6 +3690,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setFlowable5CustomMybatisXMLMappers(Set<String> flowable5CustomMybatisXMLMappers) {
     this.flowable5CustomMybatisXMLMappers = flowable5CustomMybatisXMLMappers;
+    return this;
+  }
+  
+  public ProcessEngineConfigurationImpl setAsyncExecutorActivate(boolean asyncExecutorActivate) {
+    this.asyncExecutorActivate = asyncExecutorActivate;
     return this;
   }
 

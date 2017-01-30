@@ -60,7 +60,7 @@ public class AddIdentityLinkForProcessDefinitionCmd implements Command<Void>, Se
       throw new FlowableObjectNotFoundException("Cannot find process definition with id " + processDefinitionId, ProcessDefinition.class);
     }
     
-    if (Flowable5Util.isFlowable5ProcessDefinition(commandContext, processDefinition)) {
+    if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
       Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
       compatibilityHandler.addCandidateStarter(processDefinitionId, userId, groupId);
       return null;

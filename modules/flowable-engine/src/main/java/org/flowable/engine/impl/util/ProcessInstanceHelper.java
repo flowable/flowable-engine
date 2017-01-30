@@ -69,8 +69,8 @@ public class ProcessInstanceHelper {
       String businessKey, String processInstanceName, 
       Map<String, Object> variables, Map<String, Object> transientVariables, boolean startProcessInstance) {
     
-    CommandContext commandContext = Context.getCommandContext(); // Todo: ideally, context should be passed here
-    if (Flowable5Util.isFlowable5ProcessDefinition(commandContext, processDefinition)) {
+    CommandContext commandContext = Context.getCommandContext();
+    if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
       Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
       return compatibilityHandler.startProcessInstance(processDefinition.getKey(), processDefinition.getId(), 
           variables, transientVariables, businessKey, processDefinition.getTenantId(), processInstanceName);
@@ -100,19 +100,9 @@ public class ProcessInstanceHelper {
       Map<String, Object> variables, Map<String, Object> transientVariables) {
     
     CommandContext commandContext = Context.getCommandContext();
-    if (processDefinition.getEngineVersion() != null) {
-      if (commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().isVersion5Tag(processDefinition.getEngineVersion())) {
-        Flowable5CompatibilityHandler compatibilityHandler = commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler();
-
-        if (compatibilityHandler == null) {
-          throw new FlowableException("Found V5 process definition, but no compatibility handler on the classpath");
-        }
-
-        return compatibilityHandler.startProcessInstanceByMessage(messageName, variables, transientVariables, null, processDefinition.getTenantId());
-      
-      } else {
-        throw new FlowableException("Invalid 'engine' for process definition " + processDefinition.getId() + " : " + processDefinition.getEngineVersion());
-      }
+    if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
+      return commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().startProcessInstanceByMessage(
+          messageName, variables, transientVariables, null, processDefinition.getTenantId());
     }
 
     // Do not start process a process instance if the process definition is suspended

@@ -57,6 +57,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   protected Set<String> processInstanceIds;
   protected String processDefinitionKey;
   protected Set<String> processDefinitionKeys;
+  protected String processDefinitionEngineVersion;
   protected String deploymentId;
   protected List<String> deploymentIds;
   protected String superProcessInstanceId;
@@ -288,6 +289,16 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
       this.currentOrQueryObject.processDefinitionKeys = processDefinitionKeys;
     } else {
       this.processDefinitionKeys = processDefinitionKeys;
+    }
+    return this;
+  }
+  
+  @Override
+  public ProcessInstanceQuery processDefinitionEngineVersion(String processDefinitionEngineVersion) {
+    if (inOrStatement) {
+      this.currentOrQueryObject.processDefinitionEngineVersion = processDefinitionEngineVersion;
+    } else {
+      this.processDefinitionEngineVersion = processDefinitionEngineVersion;
     }
     return this;
   }
@@ -726,6 +737,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   public Set<String> getProcessDefinitionKeys() {
     return processDefinitionKeys;
+  }
+  
+  public String getProcessDefinitionEngineVersion() {
+    return processDefinitionEngineVersion;
   }
 
   public String getActivityId() {

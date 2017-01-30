@@ -15,9 +15,9 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.ProcessDefinition;
 
 /**
@@ -33,23 +33,14 @@ public class IsFlowable5ProcessDefinitionCmd implements Command<Boolean>, Serial
   }
 
   public Boolean execute(CommandContext commandContext) {
-    if (!commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled()) {
-      return false;
-    }
-    
     ProcessDefinition processDefinition = commandContext.getProcessEngineConfiguration()
         .getDeploymentManager()
         .findDeployedProcessDefinitionById(processDefinitionId);
     
-    if (processDefinition.getEngineVersion() != null) {
-      if (commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().isVersion5Tag(processDefinition.getEngineVersion())) {
-        if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled()) {
-          return true;
-        }
-      } else {
-        throw new FlowableException("Invalid 'engine' for process definition " + processDefinition.getId() + " : " + processDefinition.getEngineVersion());
-      }
+    if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
+      return true;
     }
+    
     return false;
   }
 }
