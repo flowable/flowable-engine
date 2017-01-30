@@ -18,7 +18,7 @@
 /* App Module */
 
 var flowableAdminApp = angular.module('flowableAdminApp', ['ngResource', 'ngRoute', 'ngCookies',
-    'pascalprecht.translate', 'ngGrid', 'ui.select2', 'ui.bootstrap', 'angularFileUpload', 'ui.keypress',
+    'pascalprecht.translate', 'ngGrid', 'ui.select2', 'ui.bootstrap', 'ngFileUpload', 'ui.keypress',
     'ui.grid', 'ui.grid.edit', 'ui.grid.selection', 'ui.grid.autoResize', 'ui.grid.moveColumns', 'ui.grid.cellNav']);
 
 flowableAdminApp
