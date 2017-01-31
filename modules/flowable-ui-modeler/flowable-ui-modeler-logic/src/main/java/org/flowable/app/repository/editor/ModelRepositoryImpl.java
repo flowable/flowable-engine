@@ -39,34 +39,17 @@ public class ModelRepositoryImpl implements ModelRepository {
   }
   
   @Override
-  public List<Model> findByModelType(Integer modelType) {
+  public List<Model> findByModelType(Integer modelType, String sort) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("modelType", modelType);
-    return findModelsByParameters(params);
-  }
-  
-  @Override
-  public List<Model> findByModelTypeAndFilter(Integer modelType, String filter) {
-    Map<String, Object> params = new HashMap<String, Object>();
-    params.put("modelType", modelType);
-    params.put("filter", filter);
-    return findModelsByParameters(params);
-  }
-
-  @Override
-  public List<Model> findByModelTypeAndCreatedBy(String createdBy, Integer modelType, String sort) {
-    Map<String, Object> params = new HashMap<String, Object>();
-    params.put("modelType", modelType);
-    params.put("createdBy", createdBy);
     params.put("sort", sort);
     return findModelsByParameters(params);
   }
   
   @Override
-  public List<Model> findByModelTypeAndCreatedBy(String createdBy, Integer modelType, String filter, String sort) {
+  public List<Model> findByModelTypeAndFilter(Integer modelType, String filter, String sort) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("modelType", modelType);
-    params.put("createdBy", createdBy);
     params.put("filter", filter);
     params.put("sort", sort);
     return findModelsByParameters(params);

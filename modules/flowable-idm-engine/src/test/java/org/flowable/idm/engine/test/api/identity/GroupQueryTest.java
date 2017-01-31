@@ -122,6 +122,17 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
     } catch (FlowableIllegalArgumentException e) {
     }
   }
+  
+  public void testQueryByNameLikeIgnoreCase() {
+    GroupQuery query = idmIdentityService.createGroupQuery().groupNameLikeIgnoreCase("%FAMOus%");
+    verifyQueryResults(query, 2);
+
+    query = idmIdentityService.createGroupQuery().groupNameLikeIgnoreCase("FAMOus%");
+    verifyQueryResults(query, 2);
+
+    query = idmIdentityService.createGroupQuery().groupNameLikeIgnoreCase("%SHoW%");
+    verifyQueryResults(query, 1);
+  }
 
   public void testQueryByType() {
     GroupQuery query = idmIdentityService.createGroupQuery().groupType("user");

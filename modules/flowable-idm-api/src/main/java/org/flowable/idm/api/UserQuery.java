@@ -29,6 +29,9 @@ public interface UserQuery extends Query<UserQuery, User> {
   
   /** Only select {@link User}s with the given ids/ */
   UserQuery userIds(List<String> ids);
+  
+  /** Only select {@link User}s with the given id (ignoring case) / */
+  UserQuery userIdIgnoreCase(String id);
 
   /** Only select {@link User}s with the given firstName. */
   UserQuery userFirstName(String firstName);
@@ -37,6 +40,11 @@ public interface UserQuery extends Query<UserQuery, User> {
    * Only select {@link User}s where the first name matches the given parameter. The syntax is that of SQL, eg. %name%.
    */
   UserQuery userFirstNameLike(String firstNameLike);
+  
+  /**
+   * Only select {@link User}s where the first name matches the given parameter (ignoring case). The syntax is that of SQL, eg. %name%.
+   */
+  UserQuery userFirstNameLikeIgnoreCase(String firstNameLikeIgnoreCase);
 
   /** Only select {@link User}s with the given lastName. */
   UserQuery userLastName(String lastName);
@@ -45,11 +53,21 @@ public interface UserQuery extends Query<UserQuery, User> {
    * Only select {@link User}s where the last name matches the given parameter. The syntax is that of SQL, eg. %name%.
    */
   UserQuery userLastNameLike(String lastNameLike);
+  
+  /**
+   * Only select {@link User}s where the last name matches the given parameter (ignoring case). The syntax is that of SQL, eg. %name%.
+   */
+  UserQuery userLastNameLikeIgnoreCase(String lastNameLikeIgnoreCase);
 
   /**
    * Only select {@link User}s where the full name matches the given parameters. Both the first name and last name will be tried, ie in semi-sql: where firstName like xxx or lastname like xxx
    */
   UserQuery userFullNameLike(String fullNameLike);
+  
+  /**
+   * Only select {@link User}s where the full name matches the given parameters (ignoring case). Both the first name and last name will be tried, ie in semi-sql: where firstName like xxx or lastname like xxx
+   */
+  UserQuery userFullNameLikeIgnoreCase(String fullNameLikeIgnoreCase);
 
   /** Only those {@link User}s with the given email address. */
   UserQuery userEmail(String email);

@@ -36,6 +36,7 @@ import org.flowable.app.model.editor.ModelKeyRepresentation;
 import org.flowable.app.model.editor.ModelRepresentation;
 import org.flowable.app.model.editor.decisiontable.DecisionTableDefinitionRepresentation;
 import org.flowable.app.model.editor.decisiontable.DecisionTableRepresentation;
+import org.flowable.app.repository.editor.ModelSort;
 import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.api.ModelService;
 import org.flowable.app.service.exception.BadRequestException;
@@ -92,10 +93,10 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
     List<Model> models = null;
     
     if (validFilter != null) {
-      models = modelRepository.findByModelTypeAndFilter(AbstractModel.MODEL_TYPE_DECISION_TABLE, validFilter);
+      models = modelRepository.findByModelTypeAndFilter(AbstractModel.MODEL_TYPE_DECISION_TABLE, validFilter, ModelSort.NAME_ASC);
 
     } else {
-      models = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE);
+      models = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE, ModelSort.NAME_ASC);
     }
 
     List<DecisionTableRepresentation> reps = new ArrayList<DecisionTableRepresentation>();

@@ -25,7 +25,7 @@ angular.module('flowableModeler')
 
 	  $scope.model = {
         filters: [
-            {id: 'myReusableDecisionTables', labelKey: 'MY-REUSABLE-DECISION-TABLES'}
+            {id: 'decisionTables', labelKey: 'DECISION-TABLES'}
 		],
 
 		sorts: [

@@ -41,7 +41,7 @@ public class GroupServiceImpl extends AbstractIdmService implements GroupService
   public List<Group> getGroups(String filter) {
     GroupQuery groupQuery = identityService.createGroupQuery();
     if (StringUtils.isNotEmpty(filter)) {
-      groupQuery.groupNameLike("%" + (filter != null ? filter : "") + "%");
+      groupQuery.groupNameLikeIgnoreCase("%" + (filter != null ? filter : "") + "%");
     }
     return groupQuery.orderByGroupName().asc().list();
   }
@@ -65,7 +65,7 @@ public class GroupServiceImpl extends AbstractIdmService implements GroupService
   protected UserQuery createUsersForGroupQuery(String groupId, String filter) {
     UserQuery userQuery = identityService.createUserQuery().memberOfGroup(groupId);
     if (StringUtils.isNotEmpty(filter)) {
-      userQuery.userFullNameLike("%" + filter + "%");
+      userQuery.userFullNameLikeIgnoreCase("%" + filter + "%");
     }
     return userQuery;
   }

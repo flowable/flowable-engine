@@ -28,6 +28,7 @@ import org.flowable.app.domain.editor.Model;
 import org.flowable.app.model.common.ResultListDataRepresentation;
 import org.flowable.app.model.editor.form.FormRepresentation;
 import org.flowable.app.repository.editor.ModelRepository;
+import org.flowable.app.repository.editor.ModelSort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,10 +72,10 @@ public class FormsResource {
 
     List<Model> models = null;
     if (validFilter != null) {
-      models = modelRepository.findByModelTypeAndFilter(AbstractModel.MODEL_TYPE_FORM, validFilter);
+      models = modelRepository.findByModelTypeAndFilter(AbstractModel.MODEL_TYPE_FORM, validFilter, ModelSort.NAME_ASC);
 
     } else {
-      models = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_FORM);
+      models = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_FORM, ModelSort.NAME_ASC);
     }
 
     List<FormRepresentation> reps = new ArrayList<FormRepresentation>();

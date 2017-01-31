@@ -112,11 +112,17 @@
           #{id}
         </foreach>
       </if>
+      <if test="idIgnoreCase != null">
+        and lower(RES.ID_) = #{idIgnoreCase}
+      </if>
       <if test="firstName != null">
         and RES.FIRST_ = #{firstName}
       </if>
       <if test="firstNameLike != null">
         and RES.FIRST_ like #{firstNameLike}${wildcardEscapeClause}
+      </if>
+      <if test="firstNameLikeIgnoreCase != null">
+        and lower(RES.FIRST_) like #{firstNameLikeIgnoreCase}${wildcardEscapeClause}
       </if>
       <if test="lastName != null">
         and RES.LAST_ = #{lastName}
@@ -124,8 +130,14 @@
       <if test="lastNameLike != null">
         and RES.LAST_ like #{lastNameLike}${wildcardEscapeClause}
       </if>
+      <if test="lastNameLikeIgnoreCase != null">
+        and lower(RES.LAST_) like #{lastNameLikeIgnoreCase}${wildcardEscapeClause}
+      </if>
       <if test="fullNameLike != null">
         and (RES.FIRST_ like #{fullNameLike}${wildcardEscapeClause} or RES.LAST_ like #{fullNameLike}${wildcardEscapeClause})
+      </if>
+      <if test="fullNameLikeIgnoreCase != null">
+        and (lower(RES.FIRST_) like #{fullNameLikeIgnoreCase}${wildcardEscapeClause} or lower(RES.LAST_) like #{fullNameLikeIgnoreCase}${wildcardEscapeClause})
       </if>
       <if test="email != null">
         and RES.EMAIL_ = #{email}

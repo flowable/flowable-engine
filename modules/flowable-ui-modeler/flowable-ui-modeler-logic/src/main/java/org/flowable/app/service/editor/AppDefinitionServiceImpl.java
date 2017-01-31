@@ -79,8 +79,7 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
     Map<String, AbstractModel> modelMap = new HashMap<String, AbstractModel>();
     List<AppDefinitionServiceRepresentation> resultList = new ArrayList<AppDefinitionServiceRepresentation>();
 
-    User user = SecurityUtils.getCurrentUserObject();
-    List<Model> createdByModels = modelRepository.findByModelTypeAndCreatedBy(user.getId(), AbstractModel.MODEL_TYPE_APP, ModelSort.NAME_ASC); 
+    List<Model> createdByModels = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_APP, ModelSort.NAME_ASC); 
     for (Model model : createdByModels) {
       modelMap.put(model.getId(), model);
     }
