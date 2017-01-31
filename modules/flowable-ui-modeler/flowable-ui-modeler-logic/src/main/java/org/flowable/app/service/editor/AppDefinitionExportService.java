@@ -11,6 +11,7 @@ import java.util.zip.ZipOutputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.flowable.app.domain.editor.AbstractModel;
 import org.flowable.app.domain.editor.AppDefinition;
 import org.flowable.app.domain.editor.AppModelDefinition;
@@ -18,6 +19,7 @@ import org.flowable.app.domain.editor.Model;
 import org.flowable.app.model.editor.AppDefinitionRepresentation;
 import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.app.service.exception.InternalServerErrorException;
+import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.slf4j.Logger;
@@ -96,6 +98,15 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
         
         for (Model decisionTableModel : decisionTableMap.values()) {
           createZipEntries(decisionTableModel, "decision-table-models", zipOutputStream);
+          try {
+            JsonNode decisionTableNode = objectMapper.readTree(decisionTableModel.getModelEditorJson());
+            DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionTableNode, decisionTableModel.getId(),
+                decisionTableModel.getVersion(), decisionTableModel.getLastUpdated());
+            byte[] dmnXMLBytes = dmnXMLConverter.convertToXML(dmnDefinition);
+            createZipEntry(zipOutputStream, "decision-table-models/" + decisionTableModel.getKey() + ".dmn", dmnXMLBytes);
+          } catch (Exception e) {
+            throw new InternalServerErrorException(String.format("Error converting decision table %s to XML",decisionTableModel.getName()));
+          }
         }
       }
 
