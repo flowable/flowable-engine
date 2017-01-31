@@ -14,18 +14,48 @@ package org.flowable.engine.app;
 
 public class AppModel {
 
+  protected String key;
+  protected String name;
+  protected String description;
   protected String theme;
   protected String icon;
-  
+
+  public String getKey() {
+    return key;
+  }
+
+  public void setKey(String key) {
+    this.key = key;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
   public String getTheme() {
     return theme;
   }
+
   public void setTheme(String theme) {
     this.theme = theme;
   }
+
   public String getIcon() {
     return icon;
   }
+
   public void setIcon(String icon) {
     this.icon = icon;
   }
