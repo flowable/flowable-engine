@@ -111,16 +111,16 @@ public class DeploymentService {
 			}
 		}
 
-		if (StringUtils.isEmpty(deploymentKey)) {
-			deploymentKey = "test123";
+		URIBuilder uriBuilder = clientUtil.createUriBuilder("repository/deployments");
+
+		if (StringUtils.isNotEmpty(deploymentKey)) {
+			uriBuilder.addParameter("deploymentKey", encode(deploymentKey));
+		}
+		if (StringUtils.isNotEmpty(deploymentName)) {
+			uriBuilder.addParameter("deploymentName", encode(deploymentName));
 		}
 
-		if (StringUtils.isEmpty(deploymentName)) {
-			deploymentName = "test123";
-		}
-
-
-		HttpPost post = new HttpPost(clientUtil.getServerUrl(serverConfig, clientUtil.createUriBuilder(String.format("repository/deployments?deploymentKey=%s&deploymentName", encode(deploymentKey), encode(deploymentName)))));
+		HttpPost post = new HttpPost(clientUtil.getServerUrl(serverConfig, uriBuilder));
 		HttpEntity reqEntity = MultipartEntityBuilder.create()
 				.addBinaryBody(name, inputStreamByteArray, ContentType.APPLICATION_OCTET_STREAM, name)
 				.build();
