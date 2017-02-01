@@ -85,6 +85,8 @@ public class V5RedeployTest extends AbstractTestCase {
     for (ProcessDefinition processDefinition : processDefinitions) {
       assertNull(processDefinition.getEngineVersion());
     }
+    
+    assertEquals(processDefinitions.get(0).getDeploymentId(), processDefinitions.get(1).getDeploymentId());
 
     // close the process engine
     processEngine.close();
@@ -150,6 +152,8 @@ public class V5RedeployTest extends AbstractTestCase {
     for (ProcessDefinition processDefinition : processDefinitions) {
       assertNull(processDefinition.getEngineVersion());
     }
+    
+    assertFalse(processDefinitions.get(0).getDeploymentId().equals(processDefinitions.get(1).getDeploymentId()));
 
     // close the process engine
     processEngine.close();
@@ -216,6 +220,8 @@ public class V5RedeployTest extends AbstractTestCase {
     for (ProcessDefinition processDefinition : processDefinitions) {
       assertNull(processDefinition.getEngineVersion());
     }
+    
+    assertEquals(processDefinitions.get(0).getDeploymentId(), processDefinitions.get(1).getDeploymentId());
 
     // close the process engine
     processEngine.close();
