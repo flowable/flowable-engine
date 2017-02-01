@@ -31,6 +31,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
 
   private static final long serialVersionUID = 1L;
   protected String deploymentId;
+  protected List<String> deploymentIds;
   protected String name;
   protected String nameLike;
   protected String category;
@@ -62,6 +63,14 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
       throw new FlowableIllegalArgumentException("Deployment id is null");
     }
     this.deploymentId = deploymentId;
+    return this;
+  }
+  
+  public DeploymentQueryImpl deploymentIds(List<String> deploymentIds) {
+    if (deploymentIds == null) {
+      throw new FlowableIllegalArgumentException("Deployment ids is null");
+    }
+    this.deploymentIds = deploymentIds;
     return this;
   }
 
@@ -208,6 +217,10 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
 
   public String getDeploymentId() {
     return deploymentId;
+  }
+  
+  public List<String> getDeploymentIds() {
+    return deploymentIds;
   }
 
   public String getName() {

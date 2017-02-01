@@ -146,6 +146,7 @@ import org.flowable.engine.impl.calendar.DueDateBusinessCalendar;
 import org.flowable.engine.impl.calendar.DurationBusinessCalendar;
 import org.flowable.engine.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
+import org.flowable.engine.impl.cmd.RedeployV5ProcessDefinitionsCmd;
 import org.flowable.engine.impl.cmd.ValidateExecutionRelatedEntityCountCfgCmd;
 import org.flowable.engine.impl.cmd.ValidateTaskRelatedEntityCountCfgCmd;
 import org.flowable.engine.impl.cmd.ValidateV5EntitiesCmd;
@@ -855,6 +856,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected boolean flowable5CompatibilityEnabled; // Default flowable 5 backwards compatibility is disabled!
   protected boolean validateFlowable5EntitiesEnabled = true; // When disabled no checks are performed for existing flowable 5 entities in the db
+  protected boolean redeployFlowable5ProcessDefinitions = false;
   protected Flowable5CompatibilityHandlerFactory flowable5CompatibilityHandlerFactory;
   protected Flowable5CompatibilityHandler flowable5CompatibilityHandler;
 
@@ -2049,6 +2051,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void postProcessEngineInitialisation() {
     if (validateFlowable5EntitiesEnabled) {
       commandExecutor.execute(new ValidateV5EntitiesCmd());
+    }
+    
+    if (redeployFlowable5ProcessDefinitions) {
+      commandExecutor.execute(new RedeployV5ProcessDefinitionsCmd());
     }
     
     if (performanceSettings.isValidateExecutionRelationshipCountConfigOnBoot()) {
@@ -3609,6 +3615,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   
   public ProcessEngineConfigurationImpl setValidateFlowable5EntitiesEnabled(boolean validateFlowable5EntitiesEnabled) {
     this.validateFlowable5EntitiesEnabled = validateFlowable5EntitiesEnabled;
+    return this;
+  }
+  
+  public boolean isRedeployFlowable5ProcessDefinitions() {
+    return redeployFlowable5ProcessDefinitions;
+  }
+  
+  public ProcessEngineConfigurationImpl setRedeployFlowable5ProcessDefinitions(boolean redeployFlowable5ProcessDefinitions) {
+    this.redeployFlowable5ProcessDefinitions = redeployFlowable5ProcessDefinitions;
     return this;
   }
 

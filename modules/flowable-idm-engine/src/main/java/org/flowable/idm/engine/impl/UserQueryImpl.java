@@ -215,6 +215,10 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
   public List<String> getIds() {
     return ids;
   }
+  
+  public String getIdIgnoreCase() {
+    return idIgnoreCase;
+  }
 
   public String getFirstName() {
     return firstName;
@@ -223,6 +227,10 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
   public String getFirstNameLike() {
     return firstNameLike;
   }
+  
+  public String getFirstNameLikeIgnoreCase() {
+    return firstNameLikeIgnoreCase;
+  }
 
   public String getLastName() {
     return lastName;
@@ -230,6 +238,10 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
 
   public String getLastNameLike() {
     return lastNameLike;
+  }
+  
+  public String getLastNameLikeIgnoreCase() {
+    return lastNameLikeIgnoreCase;
   }
 
   public String getEmail() {
@@ -250,6 +262,10 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
 
   public String getFullNameLike() {
     return fullNameLike;
+  }
+  
+  public String getFullNameLikeIgnoreCase() {
+    return fullNameLikeIgnoreCase;
   }
   
 }

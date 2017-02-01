@@ -13,6 +13,8 @@
 
 package org.flowable.engine.repository;
 
+import java.util.List;
+
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.common.api.query.Query;
 
@@ -33,6 +35,11 @@ public interface DeploymentQuery extends Query<DeploymentQuery, Deployment> {
    * Only select deployments with the given deployment id.
    */
   DeploymentQuery deploymentId(String deploymentId);
+  
+  /**
+   * Only select deployments with an id in the given set of ids.
+   */
+  DeploymentQuery deploymentIds(List<String> deploymentId);
 
   /**
    * Only select deployments with the given name.

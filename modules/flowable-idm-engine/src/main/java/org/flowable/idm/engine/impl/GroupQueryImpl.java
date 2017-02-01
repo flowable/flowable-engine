@@ -156,6 +156,10 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
   public String getNameLike() {
     return nameLike;
   }
+  
+  public String getNameLikeIgnoreCase() {
+    return nameLikeIgnoreCase;
+  }
 
   public String getType() {
     return type;
