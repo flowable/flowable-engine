@@ -19,6 +19,9 @@ import org.flowable.app.domain.editor.Model;
 import org.flowable.app.model.editor.AppDefinitionRepresentation;
 import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.app.service.exception.InternalServerErrorException;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.StartEvent;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
@@ -89,6 +92,19 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
             }
           }
 
+          BpmnModel bpmnModel = modelService.getBpmnModel(model, formMap, decisionTableMap);
+          Map<String, StartEvent> startEventMap = processNoneStartEvents(bpmnModel);
+
+          for (Process process : bpmnModel.getProcesses()) {
+            processUserTasks(process.getFlowElements(), process, startEventMap);
+          }
+
+          byte[] modelXML = modelService.getBpmnXML(bpmnModel);
+
+          // add BPMN XML model
+          createZipEntry(zipOutputStream, "bpmn-models/" + model.getKey().replaceAll(" ", "") + ".bpmn", modelXML);
+
+          // add JSON model
           createZipEntries(model, "bpmn-models", zipOutputStream);
         }
 

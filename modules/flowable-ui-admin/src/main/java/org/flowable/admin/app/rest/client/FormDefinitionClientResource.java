@@ -50,4 +50,14 @@ public class FormDefinitionClientResource extends AbstractClientResource {
       throw new BadRequestException(e.getMessage());
     }
   }
+  @RequestMapping(value = "/rest/admin/process-definition-start-form-definition/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getProcessDefinitionStartForm(@PathVariable String processDefinitionId) throws BadRequestException {
+
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+        try {
+            return clientService.getProcessDefinitionStartForm(serverConfig, processDefinitionId);
+        } catch (FlowableServiceException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
 }

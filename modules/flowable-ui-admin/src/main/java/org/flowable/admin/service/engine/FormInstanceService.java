@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
 
 /**
- * Service for invoking Activiti REST services.
+ * Service for invoking Flowable REST services.
  */
 @Service
 public class FormInstanceService {

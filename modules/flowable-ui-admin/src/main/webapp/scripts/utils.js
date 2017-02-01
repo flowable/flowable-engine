@@ -15,7 +15,7 @@
  
 /**
  *
- * Utility objects and methods for the Activiti Administrator app
+ * Utility objects and methods for the Flowable Admin app
  *
  */
 FlowableAdmin.Utils = {};
