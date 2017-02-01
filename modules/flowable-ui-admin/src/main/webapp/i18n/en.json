@@ -744,7 +744,8 @@
         },
         "DEPLOYMENT": {
         	"DELETED-DEPLOYMENT": "Deleted deployment '{{name}}'",
-        	"DELETE-ERROR": "Could not delete deployment. {{exception || ''}}"
+        	"DELETE-ERROR": "Could not delete deployment. {{exception || ''}}",
+        	"DEPLOYMENT-SUCCESS": "Deployment succeeded"
         },
         "APP-DEPLOYMENT": {
         	"DELETED-APP": "Deleted app '{{appDefinition.name}}'",

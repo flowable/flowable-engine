@@ -78,7 +78,6 @@ public class DeploymentsClientResource extends AbstractClientResource {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         String fileName = file.getOriginalFilename();
         if (fileName != null && (fileName.endsWith(".bpmn") || fileName.endsWith(".bpmn20.xml") || fileName.endsWith(".zip") || fileName.endsWith(".bar"))) {
-
           return clientService.uploadDeployment(serverConfig, fileName, file.getInputStream());
 
         } else {
@@ -86,9 +85,9 @@ public class DeploymentsClientResource extends AbstractClientResource {
           throw new BadRequestException("Invalid file name");
         }
 
-      } catch (IOException e) {
+      } catch (Exception e) {
         logger.error("Error deploying file", e);
-        throw new InternalServerErrorException("Could not deploy file: " + e.getMessage());
+        throw new BadRequestException("Could not deploy file: " + e.getMessage());
       }
 
     } else {

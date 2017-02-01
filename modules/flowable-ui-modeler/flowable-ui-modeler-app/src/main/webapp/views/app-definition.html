@@ -8,6 +8,9 @@
 			<a href="{{model.appExportUrl}}" class="btn btn-default" title="{{'APP.ACTION.EXPORT-ZIP' | translate}}" ng-if="model.app.latestVersion">
                 <i class="glyphicon glyphicon-save"></i>
             </a>
+            <a href="{{model.appBarExportUrl}}" class="btn btn-default" title="{{'APP.ACTION.EXPORT-BAR' | translate}}" ng-if="model.app.latestVersion">
+                <i class="glyphicon glyphicon-export"></i>
+            </a>
             <button type="button" class="btn btn-default" ng-click="importAppDefinition()" ng-if="model.app.latestVersion" translate>APPS-LIST.ACTION.IMPORT</button>
 			<button type="button" class="btn btn-default" ng-click="publish()" ng-if="model.app.latestVersion">
                 {{'APP.ACTION.PUBLISH' | translate}}

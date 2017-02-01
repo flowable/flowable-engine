@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-angular.module('flowableModeler').controller('ActivitiSignalRefCtrl', [ '$scope', function($scope) {
+angular.module('flowableModeler').controller('FlowableSignalRefCtrl', [ '$scope', function($scope) {
 
     // Find the parent shape on which the signal definitions are defined
     var signalDefinitionsProperty = undefined;

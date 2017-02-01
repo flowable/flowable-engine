@@ -39,6 +39,9 @@ angular.module('flowableModeler')
 
     		$scope.model.appExportUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/' + $routeParams.modelId +
                 '/export?version=' + Date.now();
+
+    		$scope.model.appBarExportUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/' + $routeParams.modelId +
+                '/export-bar?version=' + Date.now();
     	}
 
     	$http({method: 'GET', url: url}).

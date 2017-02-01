@@ -125,7 +125,7 @@ flowableAdminApp.controller('DeploymentsController', ['$rootScope', '$scope', '$
  * Controller for the upload a model from the process Modeler.
  */
  flowableAdminApp.controller('UploadDeploymentCtrl',
-    ['$scope', '$modalInstance', '$http', '$upload', function ($scope, $modalInstance, $http, $upload) {
+    ['$scope', '$modalInstance', '$http', 'Upload', '$timeout', '$translate', function ($scope, $modalInstance, $http, Upload, $timeout, $translate) {
 
     $scope.status = {loading: false};
 
@@ -135,27 +135,38 @@ flowableAdminApp.controller('DeploymentsController', ['$rootScope', '$scope', '$
 
         for (var i = 0; i < $files.length; i++) {
             var file = $files[i];
-            $upload.upload({
+
+            file.upload = Upload.upload({
                 url: '/app/rest/admin/deployments',
                 method: 'POST',
-                file: file
-            }).progress(function(evt) {
-                    $scope.status.loading = true;
-                    $scope.model.uploadProgress =  parseInt(100.0 * evt.loaded / evt.total);
-                }).success(function(data, status, headers, config) {
-                    $scope.status.loading = false;
-                    $modalInstance.close(true);
-                })
-            .error(function(data, status, headers, config) {
+                data: {file: file}
+            });
 
-                    if (data && data.message) {
-                        $scope.model.errorMessage = data.message;
+            file.upload.then(function (response) {
+                $timeout(function () {
+                    if (response.status >= 300) {
+                        if (response.data && response.data.message) {
+                            $scope.model.errorMessage = response.data.message;
+                        }
+
+                        $scope.model.error = true;
+                        $scope.status.loading = false;
+                    } else {
+                        $scope.addAlert($translate.instant('ALERT.DEPLOYMENT.DEPLOYMENT-SUCCESS'), 'info');
+                        $scope.status.loading = false;
+                        $modalInstance.close(true);
                     }
-
-                    $scope.model.error = true;
-                    $scope.status.loading = false;
                 });
+            }, function (response) {
+                if (response.status > 0)
+                    $scope.errorMsg = response.status + ': ' + response.data;
+            }, function (evt) {
+                file.progress = Math.min(100, parseInt(100.0 *
+                    evt.loaded / evt.total));
+            });
+
         }
+
     };
 
     $scope.cancel = function () {

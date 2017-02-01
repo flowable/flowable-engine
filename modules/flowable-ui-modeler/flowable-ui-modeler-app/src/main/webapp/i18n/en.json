@@ -345,7 +345,8 @@
             "SELECT-ICON": "Change icon...",
             "SELECT-THEME": "Change theme...",
             "EDIT-MODELS": "Edit included models",
-            "EXPORT-ZIP": "Export app definition as a zip file"
+            "EXPORT-ZIP": "Export app definition as a zip file",
+            "EXPORT-BAR": "Export app definition as a deployable bar file"
 
         },
         "DETAILS": {
