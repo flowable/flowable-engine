@@ -69,7 +69,7 @@
       "id" : "process_namespace",
       "type" : "String",
       "title" : "Target namespace",
-      "value" : "http://www.activiti.org/processdef",
+      "value" : "http://www.flowable.org/processdef",
       "description" : "Target namespace for the process definition.",
       "popular" : true
     } ]
