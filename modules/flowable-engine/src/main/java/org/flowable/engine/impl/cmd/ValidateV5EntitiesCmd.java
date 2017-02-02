@@ -39,7 +39,7 @@ public class ValidateV5EntitiesCmd implements Command<Void> {
     
       RepositoryService repositoryService = processEngineConfiguration.getRepositoryService();
       long numberOfV5Deployments = repositoryService.createDeploymentQuery().deploymentEngineVersion(Flowable5Util.V5_ENGINE_TAG).count();
-      logger.info("Total of v5 deployments found: " + numberOfV5Deployments);
+      logger.info("Total of v5 deployments found: {}", numberOfV5Deployments);
       
       if (numberOfV5Deployments > 0) {
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
