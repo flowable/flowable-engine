@@ -207,19 +207,24 @@ flowableAdminApp
             }).determinePreferredLanguage();
 
         }])
-        
-    .service('NotPermittedInterceptor', [ '$rootScope', '$window', function($rootScope, $window) {
-		var service = this;
-		service.responseError = function(response) {
-			if (response.status === 403) {
-				$rootScope.login = null;
-				$rootScope.authenticated = false;
-                $window.location.href = '/';
-                $window.location.reload();
-			}
-			return response;
-		};
-	}])     
+
+    .factory('NotPermittedInterceptor', [ '$q', '$window', '$rootScope', function($q, $window, $rootScope) {
+        return {
+            responseError: function ( response ) {
+
+                if (response.status === 403) {
+                    $rootScope.login = null;
+                    $rootScope.authenticated = false;
+                    $window.location.href = '/';
+                    $window.location.reload();
+                    return $q.reject(response);
+                }
+                else{
+                    return $q.reject(response);
+                }
+            }
+        }
+    }])
 
     // Custom Http interceptor that adds the correct prefix to each url
     .config(['$httpProvider', function ($httpProvider) {

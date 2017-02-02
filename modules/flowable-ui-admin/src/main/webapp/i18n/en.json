@@ -820,6 +820,7 @@
         "VERSION": "Version:",
         "KEY": "Key:",
         "DEPLOYMENT-ID": "Deployment ID:",
+        "PARENT-DEPLOYMENT-ID": "Parent deployment ID",
         "RESOURCE-NAME": "Resource name:",
         "DESCRIPTION": "Description:",
         "TENANT": "Tenant:",

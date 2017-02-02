@@ -197,7 +197,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
           appUser, appUser.getAuthorities()));
       
     } catch (Exception e) {
-      logger.trace("Could not set necessary threadlocals for token, e");
+      logger.trace("Could not set necessary threadlocals for token", e);
       redirectOrSendNotPermitted(request, response, token.getUserId());
     }
   }
@@ -216,17 +216,17 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
         
         if (user.getAuthorities() == null || user.getAuthorities().size() == 0) {
           redirectOrSendNotPermitted(request, response, user.getUserObject().getId());
-        }
-        
-        int matchingPrivileges = 0;
-        for (GrantedAuthority authority : user.getAuthorities()) {
-          if (requiredPrivileges.contains(authority.getAuthority())) {
-            matchingPrivileges++;
+        } else {
+          int matchingPrivileges = 0;
+          for (GrantedAuthority authority : user.getAuthorities()) {
+            if (requiredPrivileges.contains(authority.getAuthority())) {
+              matchingPrivileges++;
+            }
           }
-        }
-        
-        if (matchingPrivileges != requiredPrivileges.size()) {
-          redirectOrSendNotPermitted(request, response, user.getUserObject().getId());
+
+          if (matchingPrivileges != requiredPrivileges.size()) {
+            redirectOrSendNotPermitted(request, response, user.getUserObject().getId());
+          }
         }
       }
       

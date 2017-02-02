@@ -26,8 +26,8 @@ angular.module('flowableModeler')
         $scope.propertyWindowState.toggle = function () {
             $scope.propertyWindowState.collapsed = !$scope.propertyWindowState.collapsed;
             $timeout(function () {
-                jQuery(window).trigger('resize');
-            });
+                $window.dispatchEvent(new Event("resize"));
+            }, 100);
         };
 
         // Code that is dependent on an initialised Editor is wrapped in a promise for the editor
