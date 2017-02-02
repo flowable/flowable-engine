@@ -12,14 +12,16 @@
  */
 package org.flowable.cdi.test.api.annotation;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.flowable.cdi.BusinessProcess;
 import org.flowable.cdi.impl.annotation.StartProcessInterceptor;
 import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.cdi.test.impl.beans.DeclarativeProcessController;
 import org.flowable.engine.test.Deployment;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * Testcase for assuring that the {@link StartProcessInterceptor} behaves as expected.
@@ -29,7 +31,7 @@ import static org.junit.Assert.*;
 public class StartProcessTest extends CdiFlowableTestCase {
 
   @Test
-  @Deployment(resources = "org/activiti/cdi/test/api/annotation/StartProcessTest.bpmn20.xml")
+  @Deployment(resources = "org/flowable/cdi/test/api/annotation/StartProcessTest.bpmn20.xml")
   public void testStartProcessByKey() {
 
     assertNull(runtimeService.createProcessInstanceQuery().singleResult());
@@ -46,7 +48,7 @@ public class StartProcessTest extends CdiFlowableTestCase {
   }
 
   @Test
-  @Deployment(resources = "org/activiti/cdi/test/api/annotation/StartProcessTest.bpmn20.xml")
+  @Deployment(resources = "org/flowable/cdi/test/api/annotation/StartProcessTest.bpmn20.xml")
   public void testStartProcessByName() {
 
     assertNull(runtimeService.createProcessInstanceQuery().singleResult());
