@@ -20,6 +20,7 @@ import java.util.Map;
 import org.activiti.bpmn.model.MapExceptionEntry;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.impl.bpmn.data.AbstractDataAssociation;
@@ -116,11 +117,28 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     try {
       subProcessInstance.start();
     } catch (Exception e) {
-        if (!ErrorPropagation.mapException(e, execution, mapExceptions, true))
-            throw e;
-        
-      }
       
+      Throwable cause = e;
+      BpmnError error = null;
+      while (cause != null) {
+        if (cause instanceof BpmnError) {
+          error = (BpmnError) cause;
+          break;
+          
+        } else if (cause instanceof RuntimeException) {
+          if (ErrorPropagation.mapException((RuntimeException) cause, execution, mapExceptions)) {
+            return;
+          }
+        }
+        cause = cause.getCause();
+      }
+
+      if (error != null) {
+        ErrorPropagation.propagateError(error, execution);
+      } else {
+        throw e;
+      }
+    } 
   }
   
   public void setProcessDefinitonKey(String processDefinitonKey) {

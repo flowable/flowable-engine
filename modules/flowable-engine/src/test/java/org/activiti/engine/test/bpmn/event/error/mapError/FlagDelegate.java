@@ -32,8 +32,7 @@ public class FlagDelegate implements JavaDelegate{
   
   @Override
   public void execute(DelegateExecution execution) throws Exception {
-    visited =   true;
-    
+    visited = true;
   }
 
 }

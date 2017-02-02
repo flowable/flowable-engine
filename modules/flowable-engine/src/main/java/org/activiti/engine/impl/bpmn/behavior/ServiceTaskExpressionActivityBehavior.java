@@ -13,6 +13,9 @@
 
 package org.activiti.engine.impl.bpmn.behavior;
 
+import java.util.List;
+
+import org.activiti.bpmn.model.MapExceptionEntry;
 import org.activiti.engine.DynamicBpmnConstants;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.Expression;
@@ -40,12 +43,16 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
   protected Expression expression;
   protected Expression skipExpression;
   protected String resultVariable;
+  protected List<MapExceptionEntry> mapExceptions;
 
-  public ServiceTaskExpressionActivityBehavior(String serviceTaskId, Expression expression, Expression skipExpression, String resultVariable) {
+  public ServiceTaskExpressionActivityBehavior(String serviceTaskId, Expression expression, Expression skipExpression, 
+      String resultVariable, List<MapExceptionEntry> mapExceptions) {
+    
     this.serviceTaskId = serviceTaskId;
     this.expression = expression;
     this.skipExpression = skipExpression;
     this.resultVariable = resultVariable;
+    this.mapExceptions = mapExceptions;
   }
 
   public void execute(ActivityExecution execution) throws Exception {
@@ -72,6 +79,7 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
       }
 
       leave(execution);
+      
     } catch (Exception exc) {
 
       Throwable cause = exc;
@@ -80,6 +88,11 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
         if (cause instanceof BpmnError) {
           error = (BpmnError) cause;
           break;
+          
+        } else if (cause instanceof RuntimeException) {
+          if (ErrorPropagation.mapException((RuntimeException) cause, execution, mapExceptions)) {
+            return;
+          }
         }
         cause = cause.getCause();
       }
