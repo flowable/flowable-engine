@@ -14,15 +14,20 @@
  * Configure the HTTP provider such that no caching happens when fetching
  * a resource using $http.
  */
-flowableModule.service('NotPermittedInterceptor', [ '$window', function($window) {
-    var service = this;
-    service.responseError = function(response) {
-        if (response.status === 403) {
-            $window.location.href = FLOWABLE.CONFIG.contextRoot;
-            $window.location.reload();
+flowableModule.factory('NotPermittedInterceptor', [ '$q', '$window', function($q, $window) {
+    return {
+        responseError: function ( response ) {
+
+            if (response.status === 403) {
+                $window.location.href = FLOWABLE.CONFIG.contextRoot;
+                $window.location.reload();
+                return $q.reject(response);
+            }
+            else{
+                return $q.reject(response);
+            }
         }
-        return response;
-    };
+    }
 }]);
 
 flowableModule.config(['$httpProvider', function($httpProvider) {
