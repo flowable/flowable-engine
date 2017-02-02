@@ -144,22 +144,16 @@ flowableAdminApp.controller('DeploymentsController', ['$rootScope', '$scope', '$
 
             file.upload.then(function (response) {
                 $timeout(function () {
-                    if (response.status >= 300) {
-                        if (response.data && response.data.message) {
-                            $scope.model.errorMessage = response.data.message;
-                        }
-
-                        $scope.model.error = true;
-                        $scope.status.loading = false;
-                    } else {
-                        $scope.addAlert($translate.instant('ALERT.DEPLOYMENT.DEPLOYMENT-SUCCESS'), 'info');
-                        $scope.status.loading = false;
-                        $modalInstance.close(true);
-                    }
+                    $scope.addAlert($translate.instant('ALERT.DEPLOYMENT.DEPLOYMENT-SUCCESS'), 'info');
+                    $scope.status.loading = false;
+                    $modalInstance.close(true);
                 });
             }, function (response) {
-                if (response.status > 0)
-                    $scope.errorMsg = response.status + ': ' + response.data;
+                if (response.data && response.data.message) {
+                    $scope.model.errorMessage = response.data.message;
+                }
+                $scope.model.error = true;
+                $scope.status.loading = false;
             }, function (evt) {
                 file.progress = Math.min(100, parseInt(100.0 *
                     evt.loaded / evt.total));
