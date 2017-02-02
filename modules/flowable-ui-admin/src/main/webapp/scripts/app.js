@@ -214,6 +214,7 @@ flowableAdminApp
 
                 if (response.status === 403) {
                     $rootScope.login = null;
+                    $rootScope.authenticated = false;
                     $window.location.href = '/';
                     $window.location.reload();
                     return $q.reject(response);
