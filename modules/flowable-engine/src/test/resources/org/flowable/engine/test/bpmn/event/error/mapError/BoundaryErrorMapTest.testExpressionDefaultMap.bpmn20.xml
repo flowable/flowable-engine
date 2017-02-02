@@ -4,9 +4,9 @@
   <process id="processWithSingleExceptionMap" isExecutable="true">
     <startEvent id="theStart"></startEvent>
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="serviceTask"></sequenceFlow>
-    <serviceTask id="serviceTask" flowable:class="org.flowable.engine.test.bpmn.event.error.mapError.ThrowCustomExceptionDelegate">
+    <serviceTask id="serviceTask" flowable:expression="${throwCustomExceptionBean.throwException(execution)}">
       <extensionElements>
-        <flowable:mapException errorCode="myErrorCode1" includeChildExceptions="true">org.flowable.engine.test.bpmn.event.error.mapError.BoundaryErrorParentException</flowable:mapException>
+        <flowable:mapException errorCode="myErrorCode1" includeChildExceptions="true"></flowable:mapException>
       </extensionElements>
     </serviceTask>
     <boundaryEvent id="catchError" attachedToRef="serviceTask">

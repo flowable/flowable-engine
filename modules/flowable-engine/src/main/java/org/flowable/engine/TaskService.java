@@ -251,24 +251,66 @@ public interface TaskService {
   void complete(String taskId, Map<String, Object> variables, boolean localScope);
   
   /**
+   * Called when the task is successfully executed, and the task form has been submitted.
    * 
+   * @param taskId
+   *          the id of the task to complete, cannot be null.
+   * @param formDefinitionId
+   *          the id of the form definition that is filled-in to complete the task, cannot be null.
+   * @param outcome
+   *          the outcome of the completed form, can be null.
+   * @param variables
+   *          values of the completed form. May be null or empty.
+   * @throws FlowableObjectNotFoundException
+   *           when no task exists with the given id.
    */
   void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables);
   
   /**
+   * Called when the task is successfully executed, and the task form has been submitted.
    * 
+   * @param taskId
+   *          the id of the task to complete, cannot be null.
+   * @param formDefinitionId
+   *          the id of the form definition that is filled-in to complete the task, cannot be null.
+   * @param outcome
+   *          the outcome of the completed form, can be null.
+   * @param variables
+   *          values of the completed form. May be null or empty.
+   * @param transientVariables
+   *          additional transient values that need to added to the process instance transient variables. May be null or empty.
+   * @throws FlowableObjectNotFoundException
+   *           when no task exists with the given id.
    */
   void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, 
       Map<String, Object> variables, Map<String, Object> transientVariables);
   
   /**
+   * Called when the task is successfully executed, and the task form has been submitted.
    * 
+   * @param taskId
+   *          the id of the task to complete, cannot be null.
+   * @param formDefinitionId
+   *          the id of the form definition that is filled-in to complete the task, cannot be null.
+   * @param outcome
+   *          the outcome of the completed form, can be null.
+   * @param variables
+   *          values of the completed form. May be null or empty.
+   * @param localScope
+   *          If true, the provided variables will be stored task-local, instead of process instance wide (which is the default for {@link #complete(String, Map)}).
+   * @throws FlowableObjectNotFoundException
+   *           when no task exists with the given id.
    */
   void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, 
       Map<String, Object> variables, boolean localScope);
   
   /**
+   * Gets a Form model instance of the task form of a specific task
    * 
+   * @param taskId
+   *          id of the task, cannot be null.
+   * @throws FlowableObjectNotFoundException
+   *          when the task or form definition doesn't exist.
    */
   FormModel getTaskFormModel(String taskId);
 

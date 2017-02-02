@@ -4,11 +4,11 @@
 
   <process id="callProcssWithSingleExceptionMap" isExecutable="true">
     <startEvent id="theStart"></startEvent>
-    <serviceTask id="servicetask2" name="Set Flag" flowable:class="org.flowable.engine.test.bpmn.event.error.mapError.FlagDelegate"></serviceTask>
+    <serviceTask id="servicetask2" name="Set Flag" flowable:class="org.activiti.engine.test.bpmn.event.error.mapError.FlagDelegate"></serviceTask>
     <callActivity id="callactivity1" name="Call activity" calledElement="testCallProcessCalee">
      	<extensionElements>
     		<flowable:in source="exceptionClass" target="exceptionClass" />
-	        <flowable:mapException errorCode="myErrorCode1" includeChildExceptions="true">org.flowable.engine.test.bpmn.event.error.mapError.BoundaryErrorParentException</flowable:mapException>
+	        <flowable:mapException errorCode="myErrorCode1" includeChildExceptions="true">org.activiti.engine.test.bpmn.event.error.mapError.BoundaryErrorParentException</flowable:mapException>
 	 	</extensionElements>    		
     </callActivity>
     <sequenceFlow id="flow7" sourceRef="theStart" targetRef="callactivity1"></sequenceFlow>
