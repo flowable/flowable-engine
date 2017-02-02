@@ -30,7 +30,7 @@ import org.junit.Test;
 public class CompleteTaskTest extends CdiFlowableTestCase {
 
   @Test
-  @Deployment(resources = "org/activiti/cdi/test/api/annotation/CompleteTaskTest.bpmn20.xml")
+  @Deployment(resources = "org/flowable/cdi/test/api/annotation/CompleteTaskTest.bpmn20.xml")
   public void testCompleteTask() {
 
     BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);

@@ -75,7 +75,7 @@ public class BusinessProcessBeanTest extends CdiFlowableTestCase {
   }
 
   @Test
-  @Deployment(resources = "org/activiti/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
+  @Deployment(resources = "org/flowable/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
   public void testResolveProcessInstanceBean() {
     BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
 
@@ -96,7 +96,7 @@ public class BusinessProcessBeanTest extends CdiFlowableTestCase {
   }
 
   @Test
-  @Deployment(resources = "org/activiti/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
+  @Deployment(resources = "org/flowable/cdi/test/api/BusinessProcessBeanTest.test.bpmn20.xml")
   public void testResolveTaskBean() {
     BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
 
