@@ -1,4 +1,4 @@
-= Flowable Migraton Guide : Flowable v5 to Flowable v6
+= Flowable Migration Guide : Flowable v5 to Flowable v6
 :doctype: book
 :docinfo1: header
 :icons: font
@@ -103,7 +103,8 @@ This also means that _SignalableActivityBehavior_, the interface to be implement
 
 === Checked Exceptions
 
-In version 5, the delegate classes like _JavaDelegate_ and _ActivityBevior_ had _throws Exception_ in their signature. As with any modern framework, the use of checked Exceptions has been removed in version 6.
+In version 5, the delegate classes like _JavaDelegate_ and _ActivityBehavior_ had _throws Exception_ in their signature. As with any modern framework, the use
+ of checked Exceptions has been removed in version 6.
 
 === Delegate classes
 
