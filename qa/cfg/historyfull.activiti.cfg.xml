@@ -46,5 +46,8 @@
     <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
     <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
   </bean>
+  
+  <bean id="throwCustomExceptionBean" class="org.activiti.engine.test.bpmn.event.error.mapError.ThrowCustomExceptionBean" />
+  <bean id="throwCustomExceptionDelegate" class="org.activiti.engine.test.bpmn.event.error.mapError.ThrowCustomExceptionDelegate" />
 
 </beans>
