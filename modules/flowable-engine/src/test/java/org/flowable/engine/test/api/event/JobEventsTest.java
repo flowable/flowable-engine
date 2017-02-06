@@ -115,6 +115,108 @@ public class JobEventsTest extends PluggableFlowableTestCase {
   }
 
   /**
+   * Test job canceled and timer scheduled events for reschedule.
+   */
+  @Deployment
+  public void testJobEntityEventsForRescheduleTimer() throws Exception {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testJobEventsForReschedule");
+    Job originalTimerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertNotNull(originalTimerJob);
+
+    // Check if create-event has been dispatched
+    assertEquals(3, listener.getEventsReceived().size());
+    FlowableEngineEvent event = (FlowableEngineEvent) listener.getEventsReceived().get(0);
+    assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
+    checkEventContext(event, originalTimerJob);
+
+    event = (FlowableEngineEvent) listener.getEventsReceived().get(1);
+    assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+    checkEventContext(event, originalTimerJob);
+
+    event = (FlowableEngineEvent) listener.getEventsReceived().get(2);
+    assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
+    checkEventContext(event, originalTimerJob);
+
+    listener.clearEventsReceived();
+
+    // Reschedule the timer
+    managementService.rescheduleTimeDurationJob(originalTimerJob.getId(), "PT2H");
+
+    Job rescheduledJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertNotNull(rescheduledJob);
+    assertNotSame(originalTimerJob.getId(), rescheduledJob.getId());
+
+    assertEquals(5, listener.getEventsReceived().size());
+    event = (FlowableEngineEvent) listener.getEventsReceived().get(0);
+    assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
+    checkEventContext(event, originalTimerJob);
+
+    Job deletedJob = (Job) ((FlowableEntityEvent) event).getEntity();
+    checkEventContext(event, deletedJob);
+
+    event = (FlowableEngineEvent) listener.getEventsReceived().get(1);
+    Job newJob = (Job) ((FlowableEntityEvent) event).getEntity();
+    assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
+    checkEventContext(event, newJob);
+    checkEventContext(event, rescheduledJob);
+    assertEquals(newJob.getId(), rescheduledJob.getId());
+
+    event = (FlowableEngineEvent) listener.getEventsReceived().get(2);
+    assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+    newJob = (Job) ((FlowableEntityEvent) event).getEntity();
+    checkEventContext(event, newJob);
+
+    event = (FlowableEngineEvent) listener.getEventsReceived().get(3);
+    assertEquals(FlowableEngineEventType.JOB_RESCHEDULED, event.getType());
+    Job newTimerJob = (Job) ((FlowableEntityEvent) event).getEntity();
+    checkEventContext(event, rescheduledJob);
+    assertEquals(rescheduledJob.getId(), newTimerJob.getId());
+    assertEquals(rescheduledJob.getDuedate(), newTimerJob.getDuedate());
+
+    event = (FlowableEngineEvent) listener.getEventsReceived().get(4);
+    assertEquals(FlowableEngineEventType.TIMER_SCHEDULED ,event.getType());
+    newJob = (Job) ((FlowableEntityEvent) event).getEntity();
+    checkEventContext(event, newJob);
+
+    listener.clearEventsReceived();
+
+    // Force timer to fire
+    Calendar tomorrow = Calendar.getInstance();
+    tomorrow.add(Calendar.DAY_OF_YEAR, 1);
+    processEngineConfiguration.getClock().setCurrentTime(tomorrow.getTime());
+    managementService.moveTimerToExecutableJob(rescheduledJob.getId());
+    managementService.executeJob(rescheduledJob.getId());
+
+    // Check delete-event has been dispatched
+    assertEquals(6, listener.getEventsReceived().size());
+
+    event = (FlowableEngineEvent) listener.getEventsReceived().get(0);
+    assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
+    checkEventContext(event, rescheduledJob);
+
+    event = (FlowableEngineEvent) listener.getEventsReceived().get(1);
+    assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+    checkEventContext(event, rescheduledJob);
+
+    // First, a timer fired event has been dispatched
+    event = (FlowableEngineEvent) listener.getEventsReceived().get(3);
+    assertEquals(FlowableEngineEventType.TIMER_FIRED, event.getType());
+    checkEventContext(event, rescheduledJob);
+
+    // Next, a delete event has been dispatched
+    event = (FlowableEngineEvent) listener.getEventsReceived().get(4);
+    assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
+    checkEventContext(event, rescheduledJob);
+
+    // Finally, a complete event has been dispatched
+    event = (FlowableEngineEvent) listener.getEventsReceived().get(5);
+    assertEquals(FlowableEngineEventType.JOB_EXECUTION_SUCCESS, event.getType());
+    checkEventContext(event, rescheduledJob);
+
+    checkEventCount(0, FlowableEngineEventType.TIMER_SCHEDULED);
+  }
+
+  /**
    * Timer repetition
    */
   @Deployment
@@ -479,5 +581,6 @@ public class JobEventsTest extends PluggableFlowableTestCase {
     if (listener != null) {
       processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
     }
+    processEngineConfiguration.getClock().reset();
   }
 }
