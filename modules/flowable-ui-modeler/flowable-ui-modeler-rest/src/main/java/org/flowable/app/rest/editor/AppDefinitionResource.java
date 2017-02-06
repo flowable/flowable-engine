@@ -101,6 +101,11 @@ public class AppDefinitionResource {
     appDefinitionExportService.exportAppDefinition(response, modelId);
   }
 
+  @RequestMapping(value = "/rest/app-definitions/{modelId}/export-bar", method = RequestMethod.GET)
+  public void exportDeployableAppDefinition(HttpServletResponse response, @PathVariable String modelId) throws IOException {
+    appDefinitionExportService.exportDeployableAppDefinition(response, modelId);
+  }
+
   @Transactional
   @RequestMapping(value = "/rest/app-definitions/{modelId}/import", method = RequestMethod.POST, produces = "application/json")
   public AppDefinitionRepresentation importAppDefinition(HttpServletRequest request, @PathVariable String modelId, @RequestParam("file") MultipartFile file) {

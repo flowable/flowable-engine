@@ -58,7 +58,7 @@ public class UserDetailsService implements org.springframework.security.core.use
     User userFromDatabase = null;
 
     actualLogin = login.toLowerCase();
-    userFromDatabase = identityService.createUserQuery().userId(actualLogin).singleResult();
+    userFromDatabase = identityService.createUserQuery().userIdIgnoreCase(actualLogin).singleResult();
 
     // Verify user
     if (userFromDatabase == null) {

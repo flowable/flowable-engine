@@ -60,9 +60,7 @@ public class GetFormKeyCmd implements Command<String> {
   public String execute(CommandContext commandContext) {
     ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
     
-    if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled() && 
-        commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().isVersion5Tag(processDefinition.getEngineVersion())) {
-      
+    if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
       return Flowable5Util.getFlowable5CompatibilityHandler().getFormKey(processDefinitionId, taskDefinitionKey); 
     }
     

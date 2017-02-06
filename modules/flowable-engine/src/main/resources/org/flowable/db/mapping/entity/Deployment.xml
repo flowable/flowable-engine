@@ -90,6 +90,13 @@
       <if test="deploymentId != null">
         RES.ID_ = #{deploymentId}
       </if>
+      <if test="deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0">
+        and RES.ID_ IN
+        <foreach item="deploymentId" index="index" collection="deploymentIds" 
+                 open="(" separator="," close=")">
+          #{deploymentId}
+        </foreach>
+      </if>
       <if test="name != null">
         and RES.NAME_ = #{name}
       </if>
@@ -119,6 +126,9 @@
       </if>
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
+      </if>
+      <if test="engineVersion != null">
+        and RES.ENGINE_VERSION_ = #{engineVersion}
       </if>
       <if test="processDefinitionKey != null">
         and PROCDEF.KEY_ = #{processDefinitionKey}

@@ -33,6 +33,7 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
   protected List<String> ids;
   protected String name;
   protected String nameLike;
+  protected String nameLikeIgnoreCase;
   protected String type;
   protected String userId;
   protected List<String> userIds;
@@ -74,9 +75,17 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
 
   public GroupQuery groupNameLike(String nameLike) {
     if (nameLike == null) {
-      throw new FlowableIllegalArgumentException("Provided nameLike is null");
+      throw new FlowableIllegalArgumentException("Provided name is null");
     }
     this.nameLike = nameLike;
+    return this;
+  }
+  
+  public GroupQuery groupNameLikeIgnoreCase(String nameLikeIgnoreCase) {
+    if (nameLikeIgnoreCase == null) {
+      throw new FlowableIllegalArgumentException("Provided name is null");
+    }
+    this.nameLikeIgnoreCase = nameLikeIgnoreCase.toLowerCase();
     return this;
   }
 
@@ -146,6 +155,10 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
 
   public String getNameLike() {
     return nameLike;
+  }
+  
+  public String getNameLikeIgnoreCase() {
+    return nameLikeIgnoreCase;
   }
 
   public String getType() {

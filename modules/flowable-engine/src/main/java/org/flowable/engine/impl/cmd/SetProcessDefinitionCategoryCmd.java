@@ -50,7 +50,7 @@ public class SetProcessDefinitionCategoryCmd implements Command<Void> {
       throw new FlowableObjectNotFoundException("No process definition found for id = '" + processDefinitionId + "'", ProcessDefinition.class);
     }
     
-    if (Flowable5Util.isFlowable5ProcessDefinition(commandContext, processDefinition)) {
+    if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
       Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
       compatibilityHandler.setProcessDefinitionCategory(processDefinitionId, category);
       return null;

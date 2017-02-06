@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.bpmn.model.Activity;
+import org.flowable.bpmn.model.AdhocSubProcess;
 import org.flowable.bpmn.model.Artifact;
 import org.flowable.bpmn.model.Association;
 import org.flowable.bpmn.model.AssociationDirection;
@@ -173,7 +174,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
 
       public void draw(DefaultProcessDiagramCanvas processDiagramCanvas, BpmnModel bpmnModel, FlowNode flowNode) {
         GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(flowNode.getId());
-        processDiagramCanvas.drawTask(flowNode.getName(), graphicInfo);
+        processDiagramCanvas.drawTask(flowNode.getName(), graphicInfo, scaleFactor);
       }
     });
 
@@ -319,7 +320,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
       public void draw(DefaultProcessDiagramCanvas processDiagramCanvas, BpmnModel bpmnModel, FlowNode flowNode) {
         GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(flowNode.getId());
         if (graphicInfo.getExpanded() != null && !graphicInfo.getExpanded()) {
-          processDiagramCanvas.drawCollapsedSubProcess(flowNode.getName(), graphicInfo, false);
+          processDiagramCanvas.drawCollapsedSubProcess(flowNode.getName(), graphicInfo, false, scaleFactor);
         } else {
           processDiagramCanvas.drawExpandedSubProcess(flowNode.getName(), graphicInfo, false, scaleFactor);
         }
@@ -332,9 +333,22 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
       public void draw(DefaultProcessDiagramCanvas processDiagramCanvas, BpmnModel bpmnModel, FlowNode flowNode) {
         GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(flowNode.getId());
         if (graphicInfo.getExpanded() != null && !graphicInfo.getExpanded()) {
-          processDiagramCanvas.drawCollapsedSubProcess(flowNode.getName(), graphicInfo, true);
+          processDiagramCanvas.drawCollapsedSubProcess(flowNode.getName(), graphicInfo, true, scaleFactor);
         } else {
           processDiagramCanvas.drawExpandedSubProcess(flowNode.getName(), graphicInfo, true, scaleFactor);
+        }
+      }
+    });
+    
+    // Adhoc subprocess
+    activityDrawInstructions.put(AdhocSubProcess.class, new ActivityDrawInstruction() {
+
+      public void draw(DefaultProcessDiagramCanvas processDiagramCanvas, BpmnModel bpmnModel, FlowNode flowNode) {
+        GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(flowNode.getId());
+        if (graphicInfo.getExpanded() != null && !graphicInfo.getExpanded()) {
+          processDiagramCanvas.drawCollapsedSubProcess(flowNode.getName(), graphicInfo, false, scaleFactor);
+        } else {
+          processDiagramCanvas.drawExpandedSubProcess(flowNode.getName(), graphicInfo, false, scaleFactor);
         }
       }
     });
@@ -344,7 +358,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
 
       public void draw(DefaultProcessDiagramCanvas processDiagramCanvas, BpmnModel bpmnModel, FlowNode flowNode) {
         GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(flowNode.getId());
-        processDiagramCanvas.drawCollapsedCallActivity(flowNode.getName(), graphicInfo);
+        processDiagramCanvas.drawCollapsedCallActivity(flowNode.getName(), graphicInfo, scaleFactor);
       }
     });
 
@@ -354,7 +368,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
       public void draw(DefaultProcessDiagramCanvas processDiagramCanvas, BpmnModel bpmnModel, Artifact artifact) {
         GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(artifact.getId());
         TextAnnotation textAnnotation = (TextAnnotation) artifact;
-        processDiagramCanvas.drawTextAnnotation(textAnnotation.getText(), graphicInfo);
+        processDiagramCanvas.drawTextAnnotation(textAnnotation.getText(), graphicInfo, scaleFactor);
       }
     });
     
@@ -479,14 +493,14 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
     // Draw pool shape, if process is participant in collaboration
     for (Pool pool : bpmnModel.getPools()) {
       GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(pool.getId());
-      processDiagramCanvas.drawPoolOrLane(pool.getName(), graphicInfo);
+      processDiagramCanvas.drawPoolOrLane(pool.getName(), graphicInfo, scaleFactor);
     }
     
     // Draw lanes
     for (Process process : bpmnModel.getProcesses()) {
       for (Lane lane : process.getLanes()) {
         GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(lane.getId());
-        processDiagramCanvas.drawPoolOrLane(lane.getName(), graphicInfo);
+        processDiagramCanvas.drawPoolOrLane(lane.getName(), graphicInfo, scaleFactor);
       }
     }
     

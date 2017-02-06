@@ -56,8 +56,7 @@ public class DeleteIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
       throw new FlowableIllegalArgumentException("type is required when adding a new task identity link");
     }
 
-    // Special treatment for assignee and owner: group cannot be used and
-    // userId may be null
+    // Special treatment for assignee and owner: group cannot be used and userId may be null
     if (IdentityLinkType.ASSIGNEE.equals(type) || IdentityLinkType.OWNER.equals(type)) {
       if (groupId != null) {
         throw new FlowableIllegalArgumentException("Incompatible usage: cannot use type '" + type + "' together with a groupId");

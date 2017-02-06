@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.impl.bpmn.helper.ErrorPropagation;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.deploy.DeploymentManager;
@@ -114,11 +115,28 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     try {
       subProcessInstance.start();
     } catch (RuntimeException e) {
-        if (!ErrorPropagation.mapException(e, activityExecution, mapExceptions, true))
-            throw e;
-        
-      }
       
+      Throwable cause = e;
+      BpmnError error = null;
+      while (cause != null) {
+        if (cause instanceof BpmnError) {
+          error = (BpmnError) cause;
+          break;
+          
+        } else if (cause instanceof RuntimeException) {
+          if (ErrorPropagation.mapException((RuntimeException) cause, activityExecution, mapExceptions)) {
+            return;
+          }
+        }
+        cause = cause.getCause();
+      }
+
+      if (error != null) {
+        ErrorPropagation.propagateError(error, activityExecution);
+      } else {
+        throw e;
+      }
+    }
   }
   
   public void completing(DelegateExecution execution, DelegateExecution subProcessInstance) throws Exception {
@@ -129,8 +147,8 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
       Object value = null;
       if (dataOutputAssociation.getSourceExpression()!=null) {
         value = dataOutputAssociation.getSourceExpression().getValue(subProcessInstance);
-      }
-      else {
+        
+      } else {
         value = subProcessInstance.getVariable(dataOutputAssociation.getSource());
       }
       

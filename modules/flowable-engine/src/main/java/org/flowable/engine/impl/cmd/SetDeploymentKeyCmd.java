@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.cmd;
 
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
@@ -19,6 +20,7 @@ import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.Deployment;
 
 /**
@@ -46,9 +48,8 @@ public class SetDeploymentKeyCmd implements Command<Void> {
       throw new FlowableObjectNotFoundException("No deployment found for id = '" + deploymentId + "'", Deployment.class);
     }
     
-    if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled() && 
-        commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().isVersion5Tag(deployment.getEngineVersion())) {
-      return null;
+    if (Flowable5Util.isFlowable5Deployment(deployment, commandContext)) {
+      throw new FlowableException("Not supported for version 5 deployments");
     }
 
     // Update category

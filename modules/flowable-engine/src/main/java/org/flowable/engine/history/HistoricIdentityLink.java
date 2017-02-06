@@ -13,6 +13,8 @@
 
 package org.flowable.engine.history;
 
+import java.util.Date;
+
 import org.flowable.engine.task.IdentityLink;
 import org.flowable.engine.task.IdentityLinkType;
 import org.flowable.idm.api.GroupQuery;
@@ -44,6 +46,11 @@ public interface HistoricIdentityLink {
    * The id of the task associated with this identity link.
    */
   String getTaskId();
+  
+  /**
+   * Returns the time when the identity link was created.
+   */
+  Date getCreateTime();
 
   /**
    * The id of the process instance associated with this identity link.

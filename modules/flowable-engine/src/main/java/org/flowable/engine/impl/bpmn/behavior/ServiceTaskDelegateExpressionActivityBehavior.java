@@ -15,6 +15,7 @@ package org.flowable.engine.impl.bpmn.behavior;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -31,6 +32,7 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.ActivityBehaviorInvocation;
 import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
 import org.flowable.engine.impl.delegate.invocation.JavaDelegateInvocation;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -49,13 +51,16 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
   protected String serviceTaskId;
   protected Expression expression;
   protected Expression skipExpression;
-  private final List<FieldDeclaration> fieldDeclarations;
+  protected List<FieldDeclaration> fieldDeclarations;
+  protected List<MapExceptionEntry> mapExceptions;
 
-  public ServiceTaskDelegateExpressionActivityBehavior(String serviceTaskId, Expression expression, Expression skipExpression, List<FieldDeclaration> fieldDeclarations) {
+  public ServiceTaskDelegateExpressionActivityBehavior(String serviceTaskId, Expression expression, Expression skipExpression, 
+      List<FieldDeclaration> fieldDeclarations, List<MapExceptionEntry> mapExceptions) {
     this.serviceTaskId = serviceTaskId;
     this.expression = expression;
     this.skipExpression = skipExpression;
     this.fieldDeclarations = fieldDeclarations;
+    this.mapExceptions = mapExceptions;
   }
 
   @Override
@@ -109,6 +114,11 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
         if (cause instanceof BpmnError) {
           error = (BpmnError) cause;
           break;
+          
+        } else if (cause instanceof RuntimeException) {
+          if (ErrorPropagation.mapException((RuntimeException) cause, (ExecutionEntity) execution, mapExceptions)) {
+            return;
+          }
         }
         cause = cause.getCause();
       }

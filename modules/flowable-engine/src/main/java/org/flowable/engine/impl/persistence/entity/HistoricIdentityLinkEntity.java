@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.persistence.entity;
 
+import java.util.Date;
+
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.history.HistoricIdentityLink;
 
@@ -31,6 +33,8 @@ public interface HistoricIdentityLinkEntity extends HistoricIdentityLink, Entity
   void setGroupId(String groupId);
 
   void setTaskId(String taskId);
+  
+  void setCreateTime(Date createTime);
 
   void setProcessInstanceId(String processInstanceId);
     

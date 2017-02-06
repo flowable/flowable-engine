@@ -28,6 +28,7 @@ import org.flowable.engine.history.HistoricIdentityLink;
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.IdentityLinkType;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
@@ -275,6 +276,149 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
 
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().finished().count());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().unfinished().count());
+  }
+
+  @Deployment
+  public void testHistoricIdentityLinksForTaskOwner() throws Exception {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertNotNull(task);
+    
+    String taskId = task.getId();
+    taskService.setOwner(taskId, "kermit");        
+    
+    // task is still active
+    List<HistoricIdentityLink> historicIdentityLinksForTask = historyService.getHistoricIdentityLinksForTask(task.getId());
+    assertEquals(1, historicIdentityLinksForTask.size());
+    assertNotNull(historicIdentityLinksForTask.get(0).getCreateTime());
+    
+    assertEquals("kermit" , historicIdentityLinksForTask.get(0).getUserId());
+    assertEquals(IdentityLinkType.OWNER, historicIdentityLinksForTask.get(0).getType());
+    
+    //change owner
+    taskService.setOwner(taskId, "gonzo");
+    historicIdentityLinksForTask = historyService.getHistoricIdentityLinksForTask(task.getId());
+    assertEquals(2, historicIdentityLinksForTask.size());
+    
+    taskService.setOwner(taskId, null);
+    historicIdentityLinksForTask = historyService.getHistoricIdentityLinksForTask(task.getId());
+    assertEquals(3, historicIdentityLinksForTask.size());    
+    
+    taskService.complete(taskId);
+    historicIdentityLinksForTask = historyService.getHistoricIdentityLinksForTask(task.getId());
+    assertEquals(3, historicIdentityLinksForTask.size());
+    
+    for (HistoricIdentityLink link: historicIdentityLinksForTask){
+      assertNotNull(link.getCreateTime());
+    }
+    
+    Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertNotNull(secondTask);
+    
+    secondTask.setOwner("fozzie");
+    taskService.saveTask(secondTask);
+    historicIdentityLinksForTask = historyService.getHistoricIdentityLinksForTask(secondTask.getId());
+    assertEquals(1, historicIdentityLinksForTask.size());
+    assertNotNull(historicIdentityLinksForTask.get(0).getCreateTime());
+  }
+  
+  @Deployment
+  public void testHistoricIdentityLinksOnTaskClaim() throws Exception {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertNotNull(task);
+
+    // over a time period the task can be claimed by multiple users
+    // we must keep track of who claimed it
+    String taskId = task.getId();
+    taskService.claim(taskId, "kermit");
+    taskService.unclaim(taskId);
+    
+    taskService.claim(taskId, "fozzie");
+    taskService.unclaim(taskId);
+    
+    taskService.claim(taskId, "gonzo");
+    taskService.unclaim(taskId);
+    
+    // task is still active
+    List<HistoricIdentityLink> historicIdentityLinksForTask = historyService.getHistoricIdentityLinksForTask(task.getId());
+    assertEquals(6, historicIdentityLinksForTask.size());
+
+    int nullCount = 0, kermitCount = 0, fozzieCount = 0, gonzoCount = 0;
+
+    // The order of history identity links is not guaranteed.
+    for (HistoricIdentityLink link : historicIdentityLinksForTask) {
+      assertEquals("Expected ASSIGNEE lnk type", IdentityLinkType.ASSIGNEE, link.getType());
+      if (link.getUserId() == null) {
+        nullCount++;
+      } else if ("kermit".equals(link.getUserId())) {
+        kermitCount++;
+        assertNotNull(link.getCreateTime());
+      } else if ("fozzie".equals(link.getUserId())) {
+        fozzieCount++;
+        assertNotNull(link.getCreateTime());
+      } else if ("gonzo".equals(link.getUserId())) {
+        assertNotNull(link.getCreateTime());
+        gonzoCount++;
+      }
+    }
+
+    assertEquals(3, nullCount);
+    assertEquals(1, kermitCount);
+    assertEquals(1, fozzieCount);
+    assertEquals(1, gonzoCount);
+
+    List<HistoricIdentityLink> historicIdentityLinksForProcess = historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId());
+    assertEquals(3, historicIdentityLinksForProcess.size());
+
+    // historic links should be present after the task is completed
+    taskService.complete(taskId);
+    historicIdentityLinksForTask = historyService.getHistoricIdentityLinksForTask(task.getId());
+    nullCount = 0;
+    kermitCount = 0;
+    fozzieCount = 0;
+    gonzoCount = 0;
+
+    // The order of history identity links is not guaranteed.
+    for (HistoricIdentityLink link : historicIdentityLinksForTask) {
+      assertEquals("Expected ASSIGNEE lnk type", IdentityLinkType.ASSIGNEE, link.getType());
+      if (link.getUserId() == null) {
+        nullCount++;
+      } else if ("kermit".equals(link.getUserId())) {
+        kermitCount++;
+      } else if ("fozzie".equals(link.getUserId())) {
+        fozzieCount++;
+      } else if ("gonzo".equals(link.getUserId())) {
+        gonzoCount++;
+      }
+    }
+    
+    assertEquals(3, nullCount);
+    assertEquals(1, kermitCount);
+    assertEquals(1, fozzieCount);
+    assertEquals(1, gonzoCount);
+
+    historicIdentityLinksForProcess = historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId());
+    assertEquals(3, historicIdentityLinksForProcess.size());
+
+    Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertNotNull(secondTask);
+
+    String secondTaskId = secondTask.getId();
+    taskService.setAssignee(secondTaskId, "newKid");
+
+    // 4 users now participated to the process
+    historicIdentityLinksForProcess = historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId());
+    assertEquals(4, historicIdentityLinksForProcess.size());
+
+    // 4 users participated after the last task (and the process) is completed
+    taskService.complete(secondTaskId);
+    historicIdentityLinksForProcess = historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId());
+    assertEquals(4, historicIdentityLinksForProcess.size());
+
+    historicIdentityLinksForTask = historyService.getHistoricIdentityLinksForTask(secondTaskId);
+    assertEquals(1, historicIdentityLinksForTask.size());
+    assertEquals("newKid", historicIdentityLinksForTask.get(0).getUserId());
   }
 
   @Deployment
@@ -643,4 +787,6 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
     varValue = taskInstance.getTaskLocalVariables().get("taskVar");
     assertEquals(9, varValue);
   }
+  
+
 }

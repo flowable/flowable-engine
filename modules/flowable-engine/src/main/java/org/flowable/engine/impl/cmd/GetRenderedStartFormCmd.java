@@ -43,15 +43,14 @@ public class GetRenderedStartFormCmd implements Command<Object>, Serializable {
   public Object execute(CommandContext commandContext) {
     ProcessDefinition processDefinition = commandContext.getProcessEngineConfiguration().getDeploymentManager().findDeployedProcessDefinitionById(processDefinitionId);
     
-    if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled() && 
-        commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().isVersion5Tag(processDefinition.getEngineVersion())) {
-      
-      return Flowable5Util.getFlowable5CompatibilityHandler().getRenderedStartForm(processDefinitionId, formEngineName); 
-    }
-    
     if (processDefinition == null) {
       throw new FlowableObjectNotFoundException("Process Definition '" + processDefinitionId + "' not found", ProcessDefinition.class);
     }
+    
+    if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
+      return Flowable5Util.getFlowable5CompatibilityHandler().getRenderedStartForm(processDefinitionId, formEngineName); 
+    }
+    
     StartFormHandler startFormHandler = FormHandlerUtil.getStartFormHandler(commandContext, processDefinition); 
     if (startFormHandler == null) {
       return null;

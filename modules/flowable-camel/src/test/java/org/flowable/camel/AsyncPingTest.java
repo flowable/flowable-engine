@@ -43,8 +43,8 @@ public class AsyncPingTest extends SpringFlowableTestCase {
 
       @Override
       public void configure() throws Exception {
-        from("activiti:asyncPingProcess:serviceAsyncPing").to("seda:continueAsync");
-        from("seda:continueAsync").to("activiti:asyncPingProcess:receiveAsyncPing");
+        from("flowable:asyncPingProcess:serviceAsyncPing").to("seda:continueAsync");
+        from("seda:continueAsync").to("flowable:asyncPingProcess:receiveAsyncPing");
       }
     });
   }

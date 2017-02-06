@@ -37,7 +37,7 @@ public class PingPongTest extends SpringFlowableTestCase {
 
       @Override
       public void configure() throws Exception {
-        from("activiti:PingPongProcess:ping").transform().simple("${property.input} World");
+        from("flowable:PingPongProcess:ping").transform().simple("${property.input} World");
       }
     });
   }

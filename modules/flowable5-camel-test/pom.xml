@@ -83,11 +83,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-mvel</artifactId>
       <scope>test</scope>

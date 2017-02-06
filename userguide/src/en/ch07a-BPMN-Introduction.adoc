@@ -129,42 +129,42 @@ The XML version of this business process (__FinancialReportProcess.bpmn20.xml__)
   xmlns:flowable="http://flowable.org/bpmn"
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL">
 
-	<process id="financialReport" name="Monthly financial report reminder process">
+    <process id="financialReport" name="Monthly financial report reminder process">
 
-	  <startEvent id="theStart" />
+      <startEvent id="theStart" />
 
-	  <sequenceFlow id="flow1" sourceRef="theStart" targetRef="writeReportTask" />
+      <sequenceFlow id="flow1" sourceRef="theStart" targetRef="writeReportTask" />
 
-	  <userTask id="writeReportTask" name="Write monthly financial report" >
-	    <documentation>
-	      Write monthly financial report for publication to shareholders.
-	    </documentation>
-	    <potentialOwner>
-	      <resourceAssignmentExpression>
-	        <formalExpression>accountancy</formalExpression>
-	      </resourceAssignmentExpression>
-	    </potentialOwner>
-	  </userTask>
+      <userTask id="writeReportTask" name="Write monthly financial report" >
+        <documentation>
+          Write monthly financial report for publication to shareholders.
+        </documentation>
+        <potentialOwner>
+          <resourceAssignmentExpression>
+            <formalExpression>accountancy</formalExpression>
+          </resourceAssignmentExpression>
+        </potentialOwner>
+      </userTask>
 
-	  <sequenceFlow id="flow2" sourceRef="writeReportTask" targetRef="verifyReportTask" />
+      <sequenceFlow id="flow2" sourceRef="writeReportTask" targetRef="verifyReportTask" />
 
-	  <userTask id="verifyReportTask" name="Verify monthly financial report" >
-	    <documentation>
-	      Verify monthly financial report composed by the accountancy department.
-	      This financial report is going to be sent to all the company shareholders.
-	    </documentation>
-	    <potentialOwner>
-	      <resourceAssignmentExpression>
-	        <formalExpression>management</formalExpression>
-	      </resourceAssignmentExpression>
-	    </potentialOwner>
-	  </userTask>
+      <userTask id="verifyReportTask" name="Verify monthly financial report" >
+        <documentation>
+          Verify monthly financial report composed by the accountancy department.
+          This financial report is going to be sent to all the company shareholders.
+        </documentation>
+        <potentialOwner>
+          <resourceAssignmentExpression>
+            <formalExpression>management</formalExpression>
+          </resourceAssignmentExpression>
+        </potentialOwner>
+      </userTask>
 
-	  <sequenceFlow id="flow3" sourceRef="verifyReportTask" targetRef="theEnd" />
+      <sequenceFlow id="flow3" sourceRef="verifyReportTask" targetRef="theEnd" />
 
-	  <endEvent id="theEnd" />
+      <endEvent id="theEnd" />
 
-	</process>
+    </process>
 
 </definitions>
 ----
@@ -266,11 +266,12 @@ TaskService taskService = processEngine.getTaskService();
 List<Task> tasks = taskService.createTaskQuery().taskCandidateGroup("accountancy").list();
 ----
 
-Since we've configured our +ProcessEngine+ to use the same database as the demo setup is using, we can now log into the link:$$http://localhost:8080/flowable-app/$$[Flowable app]. Login as admin and create 2 new users _kermit_ and _fozzie_, giving kermit admin capabilities.  Then create 2 new organization groups named _accountancy_ and _management_,  and add fozzie to the new accountancy group. Now login with fozzie, and we will find  that we can start our business process after selecting the _Processes_ page in the _Task App_ and clicking on the _'Start a process'_ link and selecting the _'Monthly financial report'_ process.
+Since we've configured our +ProcessEngine+ to use the same database as the demo setup is using, we can now log into the link:$$http://localhost:8080/flowable-idm/$$[Flowable idm]. Login as admin/test and create 2 new users _kermit_ and _fozzie_, and give them both the _Access the workflow application_ privilege. Then create 2 new organization groups named _accountancy_ and _management_,  and add fozzie to the new accountancy group and add kermit to the management group. 
+Now login with fozzie to the link:$$http://localhost:8080/flowable-task/$$[Flowable task] application, and we will find that we can start our business process after selecting the Task App and the _Processes_ page and selecting the _'Monthly financial report'_ process.
 
 image::images/bpmn.financial.report.example.start.process.png[align="center"]
 
-As explained, the process will execute up to the first user task. Since we're logged in as kermit, we can see that there is a new candidate task available for him after we've started a process instance. Select the _Task App_ to view this new task.  Note that even if the process was started by someone else, the task would still be visible as a candidate task to everyone in the accountancy group.
+As explained, the process will execute up to the first user task. Since we're logged in as fozzie, we can see that there is a new candidate task available for him after we've started a process instance. Select the _Tasks_ page to view this new task.  Note that even if the process was started by someone else, the task would still be visible as a candidate task to everyone in the accountancy group.
 
 
 image::images/bpmn.financial.report.example.task.assigned.png[align="center"]
@@ -294,7 +295,7 @@ The task is now in the *personal task list of the one that claimed the task*.
 List<Task> tasks = taskService.createTaskQuery().taskAssignee("fozzie").list();
 ----
 
-In the Flowable UI App, clicking the _claim_ button will call the same operation. The task will now move to the personal task list of the logged on user. You also see that the assignee of the task changed to the current logged in user.
+In the Flowable Task App, clicking the _claim_ button will call the same operation. The task will now move to the personal task list of the logged on user. You also see that the assignee of the task changed to the current logged in user.
 
 image::images/bpmn.financial.report.example.claim.task.png[align="center"]
 
@@ -314,7 +315,7 @@ taskService.complete(task.getId());
 
 For the Flowable engine, this is an external signal that the process instance execution must be continued. The task itself is removed from the runtime data. The single outgoing transition out of the task is followed, moving the execution to the second task (__'verification of the report'__).  The same mechanism as described for the first task will now be used to assign the second task, with the small difference that the task will be assigned to the __management__ group.
 
-In the demo setup, completing the task is done by clicking the _complete_ button in the task list. Since Fozzie isn't an accountant, we need to log out of the Flowable app and login in as _kermit_ (who is a manager). The second task is now visible in the unassigned task lists.
+In the demo setup, completing the task is done by clicking the _complete_ button in the task list. Since Fozzie isn't an accountant, we need to log out of the Flowable task app and login in as _kermit_ (who is a manager). The second task is now visible in the unassigned task lists.
 
 
 [[bpmnFirstExampleEndingProcess]]
@@ -323,10 +324,6 @@ In the demo setup, completing the task is done by clicking the _complete_ button
 ==== Ending the process
 
 The verification task can be retrieved and claimed in exactly the same way as before. Completing this second task will move process execution to the end event, which finishes the process instance. The process instance and all related runtime execution data are removed from the datastore.
-
-When you log into Flowable app you can verify this, since no records will be found in the table where the process executions are stored.
-
-image::images/bpmn.financial.report.example.process.ended.png[align="center"]
 
 Programmatically, you can also verify that the process is ended using the +historyService+
 

@@ -625,6 +625,9 @@
       <if test="processDefinitionVersion != null">
         and P.VERSION_ = #{processDefinitionVersion}
       </if>
+      <if test="processDefinitionEngineVersion != null">
+        and P.ENGINE_VERSION_ = #{processDefinitionEngineVersion}
+      </if>
       <if test="executionId != null">
         and RES.ID_ = #{executionId}
       </if>
@@ -705,7 +708,7 @@
       <if test="nameLike != null">
         and RES.NAME_ like #{nameLike}${wildcardEscapeClause}
       </if>
-       <if test="nameLikeIgnoreCase != null">
+      <if test="nameLikeIgnoreCase != null">
         and lower(RES.NAME_) like #{nameLikeIgnoreCase}${wildcardEscapeClause}
       </if>
       <if test="involvedUser != null">
@@ -811,6 +814,9 @@
           </if>
           <if test="orQueryObject.processDefinitionVersion != null">
             or P_OR${orIndex}.VERSION_ = #{orQueryObject.processDefinitionVersion}
+          </if>
+          <if test="orQueryObject.processDefinitionEngineVersion != null">
+            or P_OR${orIndex}.ENGINE_VERSION_ = #{orQueryObject.processDefinitionEngineVersion}
           </if>
           <if test="orQueryObject.executionId != null">
             or RES.ID_ = #{orQueryObject.executionId}

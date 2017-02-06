@@ -189,7 +189,25 @@ public interface RuntimeService {
   ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, Map<String, Object> variables);
 
   /**
+   * Starts a new process instance in the exactly specified version of the process definition with the given id.
    * 
+   * A business key can be provided to associate the process instance with a certain identifier that has a clear business meaning. For example in an order process, the business key could be an order
+   * id. This business key can then be used to easily look up that process instance , see {@link ProcessInstanceQuery#processInstanceBusinessKey(String)}. Providing such a business key is definitely a
+   * best practice.
+   * 
+   * Only use this method when a form definition is attached to the start event of the provided process definition.
+   * This will expect the Flowable Form Engine to be enabled. A new form instance will be created after successfully starting a new process instance.
+   * 
+   * @param processDefinitionId
+   *          the id of the process definition, cannot be null.
+   * @param outcome
+   *          the form outcome of the start form, can be null.
+   * @param variables
+   *          variables to be passed, can be null
+   * @param processInstanceName
+   *          the name of the process instance to be started, can be null.
+   * @throws FlowableObjectNotFoundException
+   *           when no process definition is deployed with the given id.
    */
   ProcessInstance startProcessInstanceWithForm(String processDefinitionId, String outcome, Map<String, Object> variables, String processInstanceName);
   
@@ -300,7 +318,12 @@ public interface RuntimeService {
   ProcessInstance startProcessInstanceByMessageAndTenantId(String messageName, String businessKey, Map<String, Object> processVariables, String tenantId);
 
   /**
+   * Gets a Form model instance of the start form of a specific process definition or process instance
    * 
+   * @param processDefinitionId
+   *          id of process definition for which the start form should be retrieved.
+   * @param processInstanceId
+   *          id of process instance for which the start form should be retrieved.
    */
   FormModel getStartFormModel(String processDefinitionId, String processInstanceId);
   

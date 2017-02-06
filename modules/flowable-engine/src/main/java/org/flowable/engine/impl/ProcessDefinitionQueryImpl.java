@@ -60,6 +60,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   protected String tenantId;
   protected String tenantIdLike;
   protected boolean withoutTenantId;
+  protected String engineVersion;
 
   protected String eventSubscriptionName;
   protected String eventSubscriptionType;
@@ -247,6 +248,11 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     this.withoutTenantId = true;
     return this;
   }
+  
+  public ProcessDefinitionQuery processDefinitionEngineVersion(String engineVersion) {
+    this.engineVersion = engineVersion;
+    return this;
+  }
 
   public ProcessDefinitionQuery messageEventSubscription(String messageName) {
     return eventSubscription("message", messageName);
@@ -422,6 +428,10 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
   public boolean isWithoutTenantId() {
     return withoutTenantId;
+  }
+  
+  public String getEngineVersion() {
+    return engineVersion;
   }
   
   public String getAuthorizationUserId() {

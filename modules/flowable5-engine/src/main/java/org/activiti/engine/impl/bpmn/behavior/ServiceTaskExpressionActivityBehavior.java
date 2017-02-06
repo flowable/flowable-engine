@@ -13,6 +13,8 @@
 
 package org.activiti.engine.impl.bpmn.behavior;
 
+import java.util.List;
+
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.impl.bpmn.helper.ErrorPropagation;
@@ -20,9 +22,11 @@ import org.activiti.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.impl.delegate.ActivityBehavior;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -42,12 +46,16 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
   protected Expression expression;
   protected Expression skipExpression;
   protected String resultVariable;
+  protected List<MapExceptionEntry> mapExceptions;
 
-  public ServiceTaskExpressionActivityBehavior(String serviceTaskId, Expression expression, Expression skipExpression, String resultVariable) {
+  public ServiceTaskExpressionActivityBehavior(String serviceTaskId, Expression expression, Expression skipExpression, 
+      String resultVariable, List<MapExceptionEntry> mapExceptions) {
+    
     this.serviceTaskId = serviceTaskId;
     this.expression = expression;
     this.skipExpression = skipExpression;
     this.resultVariable = resultVariable;
+    this.mapExceptions = mapExceptions;
   }
 
   public void execute(DelegateExecution execution) {
@@ -83,6 +91,11 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
         if (cause instanceof BpmnError) {
           error = (BpmnError) cause;
           break;
+          
+        } else if (cause instanceof RuntimeException) {
+          if (ErrorPropagation.mapException((RuntimeException) cause, activityExecution, mapExceptions)) {
+            return;
+          }
         }
         cause = cause.getCause();
       }

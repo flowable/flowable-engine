@@ -89,9 +89,6 @@
 	   <if test="filter != null">
            and (lower(name) like #{filter, jdbcType=VARCHAR} or lower(description) like #{filter, jdbcType=VARCHAR}) 
       </if>
-      <if test="createdBy != null">
-           and created_by = #{createdBy, jdbcType=VARCHAR} 
-      </if>
       <if test="key != null">
            and model_key = #{key, jdbcType=VARCHAR}
       </if>

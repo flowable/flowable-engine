@@ -35,7 +35,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * Service for invoking Activiti REST services.
+ * Service for invoking Flowable REST services.
  */
 @Service
 public class AppService {

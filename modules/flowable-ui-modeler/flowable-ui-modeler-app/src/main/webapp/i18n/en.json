@@ -62,14 +62,14 @@
         },
 
         "FILTER" : {
-            "MY-PROCESSES": "My processes",
-            "MY-PROCESSES-COUNT": "You have {{total}} business process models",
-            "MY-PROCESSES-ONE": "You have one business process model",
-            "MY-PROCESSES-EMPTY": "It looks like you have not created any business process models yet. You can design process models, user forms and then bundle them up into a process app to share with any colleagues. The first step is to create a process model:",
-            "MY-PROCESSES-BPMN-HINT": "Create a BPMN model using the BPMN Visual Editor.",
-            "MY-PROCESSES-BPMN-IMPORT-HINT": "You can also import existing BPMN models.",
+            "PROCESSES": "Process models",
+            "PROCESSES-COUNT": "There are {{total}} process models",
+            "PROCESSES-ONE": "There is one process model",
+            "PROCESSES-EMPTY": "There is no process model created yet. You can design process models, user forms and then bundle them up into a process app. The first step is to create a process model:",
+            "PROCESSES-BPMN-HINT": "Create a BPMN model using the BPMN Visual Editor.",
+            "PROCESSES-BPMN-IMPORT-HINT": "You can also import existing BPMN models.",
             "FILTER-TEXT": ", matching \"{{filterText}}\"",
-            "FILTER-TEXT-EMPTY": "You have no business process models, matching \"{{filterText}}\"",
+            "FILTER-TEXT-EMPTY": "There are no process models matching \"{{filterText}}\"",
             "RECENT": "Recent",
             "RECENT-COUNT": "{{total}} recently used models",
             "RECENT-ONE": "One recently used models",
@@ -94,12 +94,12 @@
         },
 
         "FILTER" : {
-            "MY-REUSABLE-FORMS": "My forms",
-            "MY-REUSABLE-FORMS-COUNT": "You have {{total}} forms",
-            "MY-REUSABLE-FORMS-ONE": "You have one form",
-            "MY-REUSABLE-FORMS-EMPTY": "You have no forms.  To add one, click Create Form.",
+            "FORMS": "Forms",
+            "FORMS-COUNT": "There are {{total}} forms",
+            "FORMS-ONE": "There is one form",
+            "FORMS-EMPTY": "There are no forms.  To add one, click Create Form.",
             "FILTER-TEXT": ", matching \"{{filterText}}\"",
-            "FILTER-TEXT-EMPTY": "You have no form, matching \"{{filterText}}\""
+            "FILTER-TEXT-EMPTY": "There is no form matching \"{{filterText}}\""
         },
 
         "SORT": {
@@ -121,12 +121,12 @@
         },
 
         "FILTER": {
-            "MY-REUSABLE-DECISION-TABLES": "My decision tables",
-            "MY-REUSABLE-DECISION-TABLES-COUNT": "You have {{total}} decision tables",
-            "MY-REUSABLE-DECISION-TABLES-ONE": "You have one decision table",
-            "MY-REUSABLE-DECISION-TABLES-EMPTY": "You have no decision tables.  To add one, click Create Decision Table.",
+            "DECISION-TABLES": "Decision tables",
+            "DECISION-TABLES-COUNT": "There are {{total}} decision tables",
+            "DECISION-TABLES-ONE": "There is one decision table",
+            "DECISION-TABLES-EMPTY": "There are no decision tables. To add one, click Create Decision Table.",
             "FILTER-TEXT": ", matching \"{{filterText}}\"",
-            "FILTER-TEXT-EMPTY": "You have no decision table, matching \"{{filterText}}\""
+            "FILTER-TEXT-EMPTY": "There are no decision table matching \"{{filterText}}\""
         },
 
         "SORT": {
@@ -147,25 +147,15 @@
         },
 
         "FILTER" : {
-            "MY-APPS": "My app definitions",
-            "MY-APPS-COUNT": "You have {{total}} app definitions",
-            "MY-APPS-ONE": "You have one app definition",
-            "MY-APPS-EMPTY": "You have no app definitions.  To add one, click Create App Definition.",
+            "APPS": "App definitions",
+            "APPS-COUNT": "There are {{total}} app definitions",
+            "APPS-ONE": "There is one app definition",
+            "APPS-EMPTY": "There are no app definitions. To add one, click Create App Definition.",
             "FILTER-TEXT": ", matching \"{{filterText}}\"",
-            "FILTER-TEXT-EMPTY": "You have no app definitions, matching \"{{filterText}}\"",
+            "FILTER-TEXT-EMPTY": "There are no app definitions matching \"{{filterText}}\"",
 
-            "SHARED-WITH-ME": "Shared with Me",
-            "SHARED-WITH-ME-COUNT": "{{total}} app definitions have been shared with you",
-            "SHARED-WITH-ME-ONE": "One app definition has been shared with you",
-            "SHARED-WITH-ME-EMPTY": "There are no app definitions shared with you",
-
-            "SHARED-WITH-OTHERS": "Shared with others",
-            "SHARED-WITH-OTHERS-COUNT": "You have shared {{total}} app definitions with others",
-            "SHARED-WITH-OTHERS-ONE": "You have shared one app definition model with others",
-            "SHARED-WITH-OTHERS-EMPTY": "You have not shared any app definitions with others",
-
-            "NO-APPS": "You can create a Process App by publishing a bundle of Process Models and sharing it with your colleagues. You can add any Process App that has been shared with you on your Flowable home page. You can even create a Process App with no processes if you just want to group simple collaborative tasks!",
-            "NO-APPS-CALL-TO-ACTION": "You can create a Process App now.",
+            "NO-APPS": "You can create an App definition by publishing a bundle of Process Models.",
+            "NO-APPS-CALL-TO-ACTION": "You can create an App definition now.",
             "NO-APPS-NOTE": "Remember to Publish it when you are ready to use it."
         },
 
@@ -355,7 +345,8 @@
             "SELECT-ICON": "Change icon...",
             "SELECT-THEME": "Change theme...",
             "EDIT-MODELS": "Edit included models",
-            "EXPORT-ZIP": "Export app definition as a zip file"
+            "EXPORT-ZIP": "Export app definition as a zip file",
+            "EXPORT-BAR": "Export app definition as a deployable bar file"
 
         },
         "DETAILS": {

@@ -15,14 +15,14 @@
 
     <div class="upload-deployment-form">
 
-        <input type="file" ng-file-select="onFileSelect($files)" style="font-size: smaller; padding-top:6px;" >
+        <input type="file" ngf-select="onFileSelect($files)" style="font-size: smaller; padding-top:6px;" >
         <div class="dropbox"
-             ng-file-drop="onFileSelect($files)"
-             ng-file-drag-over-class="dragover"
+             ngf-drop="onFileSelect($files)"
+             ngf-drag-over-class="dragover"
              ng-show="dropSupported">
             {{'DEPLOYMENTS.POPUP.UPLOAD.DROPZONE' | translate}}
         </div>
-        <div ng-file-drop-available="dropSupported=true"
+        <div ngf-drop-available="dropSupported=true"
              ng-show="!dropSupported">{{'DEPLOYMENTS.POPUP.UPLOAD.NO-DROP' | translate}}</div>
         <div class="graph-wrapper" ng-show="status.loading" style="margin: 10px 0 10px 0">
             <div class="graph-bar" style="width:{{model.uploadProgress}}%"></div>

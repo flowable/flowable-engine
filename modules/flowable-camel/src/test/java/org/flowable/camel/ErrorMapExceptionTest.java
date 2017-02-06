@@ -37,7 +37,7 @@ public class ErrorMapExceptionTest extends SpringFlowableTestCase {
 
       @Override
       public void configure() throws Exception {
-        from("activiti:mapExceptionProcess:exceptionRoute").throwException(new MapExceptionParent("test exception"));
+        from("flowable:mapExceptionProcess:exceptionRoute").throwException(new MapExceptionParent("test exception"));
       }
     });
 
@@ -52,7 +52,7 @@ public class ErrorMapExceptionTest extends SpringFlowableTestCase {
 
       @Override
       public void configure() throws Exception {
-        from("activiti:mapExceptionDefaultProcess:exceptionRoute").throwException(new NullPointerException("test exception"));
+        from("flowable:mapExceptionDefaultProcess:exceptionRoute").throwException(new NullPointerException("test exception"));
       }
     });
     FlagJavaDelegate.reset();
@@ -66,7 +66,7 @@ public class ErrorMapExceptionTest extends SpringFlowableTestCase {
 
       @Override
       public void configure() throws Exception {
-        from("activiti:mapExceptionParentProcess:exceptionRoute").throwException(new MapExceptionChild("test exception"));
+        from("flowable:mapExceptionParentProcess:exceptionRoute").throwException(new MapExceptionChild("test exception"));
       }
     });
     FlagJavaDelegate.reset();

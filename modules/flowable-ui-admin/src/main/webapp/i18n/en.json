@@ -744,7 +744,8 @@
         },
         "DEPLOYMENT": {
         	"DELETED-DEPLOYMENT": "Deleted deployment '{{name}}'",
-        	"DELETE-ERROR": "Could not delete deployment. {{exception || ''}}"
+        	"DELETE-ERROR": "Could not delete deployment. {{exception || ''}}",
+        	"DEPLOYMENT-SUCCESS": "Deployment succeeded"
         },
         "APP-DEPLOYMENT": {
         	"DELETED-APP": "Deleted app '{{appDefinition.name}}'",
@@ -819,6 +820,7 @@
         "VERSION": "Version:",
         "KEY": "Key:",
         "DEPLOYMENT-ID": "Deployment ID:",
+        "PARENT-DEPLOYMENT-ID": "Parent deployment ID",
         "RESOURCE-NAME": "Resource name:",
         "DESCRIPTION": "Description:",
         "TENANT": "Tenant:",

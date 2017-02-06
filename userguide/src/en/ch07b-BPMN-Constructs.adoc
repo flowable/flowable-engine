@@ -17,7 +17,7 @@ The downside of a standard however, is the fact that it is always the result of 
 Although the BPMN 2.0 specification clearly states that it was made for custom extension, we make sure that:
 
 * The prerequisite of such a custom extension is that there *always* must be a simple transformation to the *standard way of doing things*. So when you decide to use a custom extension, you don't have to be afraid  that there is no way back.
-* When using a custom extension, this is always clearly indicated by giving the new XML element, attribute, etc. the *flowable:* namespace prefix.
+* When using a custom extension, this is always clearly indicated by giving the new XML element, attribute, etc. the *flowable:* namespace prefix. Note that the Flowable Engine also still supports the *activiti:* namespace prefix.
 
 So whether you want to use a custom extension or not, is completely up to you. Several factors will influence this decision (graphical editor usage, company policy, etc.). We only provide them since we believe that some points in the standard can be done simpler or more efficient. Feel free to give us (positive and/or negative) feedback on our extensions, or to post new ideas for custom extensions. Who knows, some day your idea might pop up in the specification!
 
@@ -159,21 +159,21 @@ A signal event definition is declared using the +signalEventDefinition+ element.
 [source,xml,linenums]
 ----
 <definitions... >
-	<!-- declaration of the signal -->
-	<signal id="alertSignal" name="alert" />
+    <!-- declaration of the signal -->
+    <signal id="alertSignal" name="alert" />
 
-	<process id="catchSignal">
-		<intermediateThrowEvent id="throwSignalEvent" name="Alert">
-			<!-- signal event definition -->
-			<signalEventDefinition signalRef="alertSignal" />
-		</intermediateThrowEvent>
-		...
-		<intermediateCatchEvent id="catchSignalEvent" name="On Alert">
-			<!-- signal event definition -->
-			<signalEventDefinition signalRef="alertSignal" />
-		</intermediateCatchEvent>
-		...
-	</process>
+    <process id="catchSignal">
+        <intermediateThrowEvent id="throwSignalEvent" name="Alert">
+            <!-- signal event definition -->
+            <signalEventDefinition signalRef="alertSignal" />
+        </intermediateThrowEvent>
+        ...
+        <intermediateCatchEvent id="catchSignalEvent" name="On Alert">
+            <!-- signal event definition -->
+            <signalEventDefinition signalRef="alertSignal" />
+        </intermediateCatchEvent>
+        ...
+    </process>
 </definitions>
 ----
 
@@ -194,7 +194,7 @@ RuntimeService.signalEventReceived(String signalName);
 RuntimeService.signalEventReceived(String signalName, String executionId);
 ----
 
-The difference between +signalEventReceived(String signalName);+ and +signalEventReceived(String signalName, String executionId);+ is that the first method throws the signal globally to all subscribed handlers (broadcast semantics) and the second method delivers the signal to a specific execution only.
+The difference between +signalEventReceived(String signalName)+ and +signalEventReceived(String signalName, String executionId)+ is that the first method throws the signal globally to all subscribed handlers (broadcast semantics) and the second method delivers the signal to a specific execution only.
 
 
 [[bpmnSignalEventDefinitionCatch]]
@@ -320,7 +320,8 @@ After you have received a message inside your application, you must decide what 
 ----
 ProcessInstance startProcessInstanceByMessage(String messageName);
 ProcessInstance startProcessInstanceByMessage(String messageName, Map<String, Object> processVariables);
-ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey, Map<String, Object> processVariables);
+ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey, 
+    Map<String, Object> processVariables);
 ----
 
 These methods allow starting a process instance using the referenced message.
@@ -466,11 +467,11 @@ The XML representation of a none start event is the normal start event declarati
 
 ===== Custom extensions for the none start event
 
-*formKey*: references to a form template that users have to fill in when starting a new process instance.  More information can be found in <<forms,the forms section>> Example:
+*formKey*: references to a form definition that users have to fill in when starting a new process instance.  More information can be found in <<forms,the forms section>> Example:
 
 [source,xml,linenums]
 ----
-<startEvent id="request" flowable:formKey="org/flowable/examples/taskforms/request.form" />
+<startEvent id="request" flowable:formKey="request" />
 ----
 
 
@@ -519,7 +520,7 @@ Example: process will start 4 times, in 5 minute intervals, starting on 11th mar
 <startEvent id="theStart">
   <timerEventDefinition>
     <timeCycle>R4/2011-03-11T12:13/PT5M</timeCycle>
-</timerEventDefinition>
+  </timerEventDefinition>
 </startEvent>
 ----
 
@@ -560,7 +561,8 @@ When *starting* a process instance, a message start event can be triggered using
 ----
 ProcessInstance startProcessInstanceByMessage(String messageName);
 ProcessInstance startProcessInstanceByMessage(String messageName, Map<String, Object> processVariables);
-ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey, Map<String, Object< processVariables);
+ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey, 
+    Map<String, Object< processVariables);
 ----
 
 
@@ -670,7 +672,7 @@ The XML representation of a signal start event is the normal start event declara
   <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
   <userTask id="theTask" name="Task in process A" />
   <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />
-	  <endEvent id="theEnd" />
+  <endEvent id="theEnd" />
 </process>
 ----
 
@@ -839,7 +841,7 @@ is equivalent with
 
 Note that the _errorRef_ must comply with the BPMN 2.0 schema, and must be a valid QName.
 
-[[bpmnCancelEndEvent]]
+[[bpmnTerminateEndEvent]]
 
 ==== Terminate End Event
 
@@ -869,15 +871,16 @@ Note that the _terminateAll_ attribute is optional (and _false_ by default).
 </endEvent>
 ----
 
+[[bpmnCancelEndEvent]]
 
 ==== Cancel End Event
 
-<<experimental, [EXPERIMENTAL]>>[[bpmnCancelEndEventDescription]]
+[[bpmnCancelEndEventDescription]]
 
 
 ===== Description
 
-The cancel end event can only be used in combination with a bpmn transaction subprocess. When the cancel end event is reached, a cancel event is thrown which must be caught by a cancel boundary event. The cancel boundary event then cancels the transaction and triggers compensation.
+The cancel end event can only be used in combination with a BPMN transaction subprocess. When the cancel end event is reached, a cancel event is thrown which must be caught by a cancel boundary event. The cancel boundary event then cancels the transaction and triggers compensation.
 
 
 [[bpmnCancelEndEventGraphicalNotation]]
@@ -1119,7 +1122,7 @@ A boundary signal event is defined as a typical <<bpmnBoundaryEvent,boundary eve
 [source,xml,linenums]
 ----
 <boundaryEvent id="boundary" attachedToRef="task" cancelActivity="true">
-          <signalEventDefinition signalRef="alertSignal"/>
+    <signalEventDefinition signalRef="alertSignal"/>
 </boundaryEvent>
 ----
 
@@ -1171,7 +1174,7 @@ A boundary message event is defined as a typical <<bpmnBoundaryEvent,boundary ev
 [source,xml,linenums]
 ----
 <boundaryEvent id="boundary" attachedToRef="task" cancelActivity="true">
-          <messageEventDefinition messageRef="newCustomerMessage"/>
+    <messageEventDefinition messageRef="newCustomerMessage"/>
 </boundaryEvent>
 ----
 
@@ -1192,7 +1195,7 @@ See section on <<bpmnMessageEventDefinition,message event definitions>>.
 
 ==== Cancel Boundary Event
 
-<<experimental, [EXPERIMENTAL]>>[[bpmnBoundaryCancelEventDescription]]
+[[bpmnBoundaryCancelEventDescription]]
 
 
 ===== Description
@@ -1243,7 +1246,7 @@ Since the cancel boundary event is always interrupting, the +cancelActivity+ att
 
 ==== Compensation Boundary Event
 
-<<experimental, [EXPERIMENTAL]>>[[bpmnBoundaryCompensationEventDescription]]
+[[bpmnBoundaryCompensationEventDescription]]
 
 
 ===== Description
@@ -1284,10 +1287,11 @@ A compensation boundary event is defined as a typical <<bpmnBoundaryEvent,bounda
 [source,xml,linenums]
 ----
 <boundaryEvent id="compensateBookHotelEvt" attachedToRef="bookHotel" >
-          <compensateEventDefinition />
+    <compensateEventDefinition />
 </boundaryEvent>
 
-<association associationDirection="One" id="a1"  sourceRef="compensateBookHotelEvt" targetRef="undoBookHotel" />
+<association associationDirection="One" id="a1" 
+    sourceRef="compensateBookHotelEvt" targetRef="undoBookHotel" />
 
 <serviceTask id="undoBookHotel" isForCompensation="true" flowable:class="..." />
 ----
@@ -1306,7 +1310,7 @@ All intermediate catching events are defined in the same way:
 [source,xml,linenums]
 ----
 <intermediateCatchEvent id="myIntermediateCatchEvent" >
-      <XXXEventDefinition/>
+    <XXXEventDefinition/>
 </intermediateCatchEvent>
 ----
 
@@ -1578,7 +1582,7 @@ See section on <<bpmnSignalEventDefinition,signal event definitions>>.
 
 ==== Compensation Intermediate Throwing Event
 
-<<experimental, [EXPERIMENTAL]>>[[bpmnIntermediateThrowCompensationEventDescription]]
+[[bpmnIntermediateThrowCompensationEventDescription]]
 
 
 ===== Description
@@ -1635,7 +1639,7 @@ A compensation intermediate event is defined as an <<bpmnIntermediateThrowEvent,
 [source,xml,linenums]
 ----
 <intermediateThrowEvent id="throwCompensation">
-	<compensateEventDefinition />
+    <compensateEventDefinition />
 </intermediateThrowEvent>
 ----
 
@@ -1644,7 +1648,7 @@ In addition, the optional argument +activityRef+ can be used to trigger compensa
 [source,xml,linenums]
 ----
 <intermediateThrowEvent id="throwCompensation">
-	<compensateEventDefinition activityRef="bookHotel" />
+    <compensateEventDefinition activityRef="bookHotel" />
 </intermediateThrowEvent>
 ----
 
@@ -1794,12 +1798,15 @@ A default sequence flow for a certain activity is defined by the *default attrib
 [source,xml,linenums]
 ----
 <exclusiveGateway id="exclusiveGw" name="Exclusive Gateway" default="flow2" />
+
 <sequenceFlow id="flow1" sourceRef="exclusiveGw" targetRef="task1">
-  <conditionExpression xsi:type="tFormalExpression">${conditionA}</conditionExpression>
+    <conditionExpression xsi:type="tFormalExpression">${conditionA}</conditionExpression>
 </sequenceFlow>
+
 <sequenceFlow id="flow2" sourceRef="exclusiveGw" targetRef="task2"/>
+
 <sequenceFlow id="flow3" sourceRef="exclusiveGw" targetRef="task3">
-  <conditionExpression xsi:type="tFormalExpression">${conditionB}</conditionExpression>
+    <conditionExpression xsi:type="tFormalExpression">${conditionB}</conditionExpression>
 </sequenceFlow>
 ----
 
@@ -1960,9 +1967,9 @@ In the above example, after the process is started, two tasks will be created:
 ----
 ProcessInstance pi = runtimeService.startProcessInstanceByKey("forkJoin");
 TaskQuery query = taskService.createTaskQuery()
-                         .processInstanceId(pi.getId())
-                         .orderByTaskName()
-                         .asc();
+    .processInstanceId(pi.getId())
+    .orderByTaskName()
+    .asc();
 
 List<Task> tasks = query.list();
 assertEquals(2, tasks.size());
@@ -2066,13 +2073,15 @@ In the above example, after the process is started, two tasks will be created if
 [source,java,linenums]
 ----
 HashMap<String, Object> variableMap = new HashMap<String, Object>();
-          variableMap.put("receivedPayment", true);
-          variableMap.put("shipOrder", true);
-          ProcessInstance pi = runtimeService.startProcessInstanceByKey("forkJoin");
+variableMap.put("receivedPayment", true);
+variableMap.put("shipOrder", true);
+
+ProcessInstance pi = runtimeService.startProcessInstanceByKey("forkJoin");
+
 TaskQuery query = taskService.createTaskQuery()
-                         .processInstanceId(pi.getId())
-                         .orderByTaskName()
-                         .asc();
+    .processInstanceId(pi.getId())
+    .orderByTaskName()
+    .asc();
 
 List<Task> tasks = query.list();
 assertEquals(1, tasks.size());
@@ -2147,41 +2156,41 @@ image::images/bpmn.event.based.gateway.example.png[align="center"]
 	xmlns:flowable="http://flowable.org/bpmn"
 	targetNamespace="Examples">
 
-	<signal id="alertSignal" name="alert" />
+    <signal id="alertSignal" name="alert" />
 
-	<process id="catchSignal">
+    <process id="catchSignal">
 
-		<startEvent id="start" />
+        <startEvent id="start" />
 
-		<sequenceFlow sourceRef="start" targetRef="gw1" />
+        <sequenceFlow sourceRef="start" targetRef="gw1" />
 
-		<eventBasedGateway id="gw1" />
+        <eventBasedGateway id="gw1" />
 
-		<sequenceFlow sourceRef="gw1" targetRef="signalEvent" />
-		<sequenceFlow sourceRef="gw1" targetRef="timerEvent" />
+        <sequenceFlow sourceRef="gw1" targetRef="signalEvent" />
+        <sequenceFlow sourceRef="gw1" targetRef="timerEvent" />
 
-		<intermediateCatchEvent id="signalEvent" name="Alert">
-			<signalEventDefinition signalRef="alertSignal" />
-		</intermediateCatchEvent>
+        <intermediateCatchEvent id="signalEvent" name="Alert">
+            <signalEventDefinition signalRef="alertSignal" />
+        </intermediateCatchEvent>
 
-		<intermediateCatchEvent id="timerEvent" name="Alert">
-			<timerEventDefinition>
-				<timeDuration>PT10M</timeDuration>
-			</timerEventDefinition>
-		</intermediateCatchEvent>
+        <intermediateCatchEvent id="timerEvent" name="Alert">
+            <timerEventDefinition>
+                <timeDuration>PT10M</timeDuration>
+            </timerEventDefinition>
+        </intermediateCatchEvent>
 
-		<sequenceFlow sourceRef="timerEvent" targetRef="exGw1" />
-		<sequenceFlow sourceRef="signalEvent" targetRef="task" />
+        <sequenceFlow sourceRef="timerEvent" targetRef="exGw1" />
+        <sequenceFlow sourceRef="signalEvent" targetRef="task" />
 
-		<userTask id="task" name="Handle alert"/>
+        <userTask id="task" name="Handle alert"/>
 
-		<exclusiveGateway id="exGw1" />
+        <exclusiveGateway id="exGw1" />
 
-		<sequenceFlow sourceRef="task" targetRef="exGw1" />
-		<sequenceFlow sourceRef="exGw1" targetRef="end" />
+        <sequenceFlow sourceRef="task" targetRef="exGw1" />
+        <sequenceFlow sourceRef="exGw1" targetRef="end" />
 
-		<endEvent id="end" />
-</process>
+        <endEvent id="end" />
+    </process>
 </definitions>
 ----
 
@@ -2238,7 +2247,7 @@ A user task can have also a description. In fact any BPMN 2.0 element can have a
 
 <userTask id="theTask" name="Schedule meeting" >
   <documentation>
-	  Schedule an engineering meeting for next week with the new hire.
+      Schedule an engineering meeting for next week with the new hire.
   </documentation>
 ----
 
@@ -2379,9 +2388,7 @@ Note: Although Flowable provides an identity management component, which is expo
 [[bpmnUserTaskUserCustomIdentityLinkAssignmentExtension]]
 
 
-===== Custom identity link types (Experimental)
-
-<<experimental,[EXPERIMENTAL]>>
+===== Custom identity link types
 
 The BPMN standard supports a single assigned user or *humanPerformer* or a set of users that form a potential pool of *potentialOwners* as defined in <<bpmnUserTaskAssignment,User assignment>>. In addition, Flowable defines <<bpmnUserTaskUserAssignmentExtension,extension attribute elements>> for the User Task that can represent the task *assignee* or *candidate owner*.
 
@@ -2422,28 +2429,28 @@ The custom link expressions are added to the _TaskDefinition_ class:
 ----
 
 protected Map<String, Set<Expression>> customUserIdentityLinkExpressions =
-      new HashMap<String, Set<Expression>>();
+    new HashMap<String, Set<Expression>>();
 protected Map<String, Set<Expression>> customGroupIdentityLinkExpressions =
-      new HashMap<String, Set<Expression>>();
+    new HashMap<String, Set<Expression>>();
 
-public Map<String,
-         Set<Expression>> getCustomUserIdentityLinkExpressions() {
-  return customUserIdentityLinkExpressions;
+public Map<String, Set<Expression>> getCustomUserIdentityLinkExpressions() {
+    return customUserIdentityLinkExpressions;
 }
 
-public void addCustomUserIdentityLinkExpression(String identityLinkType,
-      Set<Expression> idList)
-  customUserIdentityLinkExpressions.put(identityLinkType, idList);
+public void addCustomUserIdentityLinkExpression(
+        String identityLinkType, Set<Expression> idList) {
+        
+    customUserIdentityLinkExpressions.put(identityLinkType, idList);
 }
 
-public Map<String,
-       Set<Expression>> getCustomGroupIdentityLinkExpressions() {
-  return customGroupIdentityLinkExpressions;
+public Map<String, Set<Expression>> getCustomGroupIdentityLinkExpressions() {
+    return customGroupIdentityLinkExpressions;
 }
 
-public void addCustomGroupIdentityLinkExpression(String identityLinkType,
-       Set<Expression> idList) {
-  customGroupIdentityLinkExpressions.put(identityLinkType, idList);
+public void addCustomGroupIdentityLinkExpression(
+        String identityLinkType, Set<Expression> idList) {
+        
+    customGroupIdentityLinkExpressions.put(identityLinkType, idList);
 }
 ----
 
@@ -2455,9 +2462,8 @@ Finally, the _IdentityLinkType_ class must be extended to support the custom ide
 ----
 package com.yourco.engine.task;
 
-public class IdentityLinkType
-    extends org.flowable.engine.task.IdentityLinkType
-{
+public class IdentityLinkType extends org.flowable.engine.task.IdentityLinkType {
+    
     public static final String ADMINISTRATOR = "administrator";
 
     public static final String EXCLUDED_OWNER = "excludedOwner";
@@ -2586,9 +2592,9 @@ Do note that the Groovy scripting engine is bundled with the groovy-all jar. Bef
 [source,xml,linenums]
 ----
 <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
-      <version>2.x.x<version>
+    <groupId>org.codehaus.groovy</groupId>
+    <artifactId>groovy-all</artifactId>
+    <version>2.x.x<version>
 </dependency>
 ----
 
@@ -2764,7 +2770,7 @@ Let's create for example a Java class that can be used to change a process varia
 ----
 public class ToUppercase implements JavaDelegate {
 
-  public void execute(DelegateExecution execution) throws Exception {
+  public void execute(DelegateExecution execution) {
     String var = (String) execution.getVariable("input");
     var = var.toUpperCase();
     execution.setVariable("input", var);
@@ -2777,7 +2783,7 @@ Note: there will be *only one instance of that Java class created for the servic
 
 The classes that are referenced in the process definition (i.e. by using ++flowable:class++) are *NOT instantiated during deployment*. Only when a process execution arrives for the first time at the point in the process where the class is used, an instance of that class will be created. If the class cannot be found, an +FlowableException+ will be thrown. The reasoning for this is that the environment (and more specifically the __classpath__) when you are deploying is often different from the actual runtime environment. For example when using _ant_ or the business archive upload in the Flowable app to deploy processes, the classpath does not contain the referenced classes.
 
-<<internal,[INTERNAL: non-public implementation classes]>> It is also possible to provide a class that implements the _org.flowable.engine.impl.delegate.ActivityBehavior_ interface. Implementations have then access to the more powerful _ActivityExecution_ that for example also allows to influence the control flow of the process. Note however that this is not a very good practice, and should be avoided as much as possible. So, it is advised to use the _ActivityBehavior_ interface only for advanced use cases and if you know exactly what you're doing.
+<<internal,[INTERNAL: non-public implementation classes]>> It is also possible to provide a class that implements the _org.flowable.engine.impl.delegate.ActivityBehavior_ interface. Implementations have then access to more powerful engine funtionality, for example to influence the control flow of the process. Note however that this is not a very good practice, and should be avoided as much as possible. So, it is advised to use the _ActivityBehavior_ interface only for advanced use cases and if you know exactly what you're doing.
 
 
 [[serviceTaskFieldInjection]]
@@ -2843,7 +2849,7 @@ Alternatively, for longs texts (e.g. an inline e-mail) the _'flowable:string'_ s
 
 To inject values that are dynamically resolved at runtime, expressions can be used. Those expressions can use process variables, or Spring defined beans (if Spring is used). As noted in <<bpmnJavaServiceTaskImplementation,Service Task Implementation>>, an instance of the Java class is shared among all process-instances in a service task when using the _flowable:class_ attribute. To have dynamic injection of values in fields, you can inject value and method expressions in a +org.flowable.engine.delegate.Expression+ which can be evaluated/invoked using the +DelegateExecution+ passed in the +execute+ method.
 
-The example class below uses the injected expressions and resolves them using the current +DelegateExecution+. A _generBean_ method call is used while passing the _gender_ variable. Full code and test can be found in +org.flowable.examples.bpmn.servicetask.JavaServiceTaskTest.testExpressionFieldInjection+
+The example class below uses the injected expressions and resolves them using the current +DelegateExecution+. A _genderBean_ method call is used while passing the _gender_ variable. Full code and test can be found in +org.flowable.examples.bpmn.servicetask.JavaServiceTaskTest.testExpressionFieldInjection+
 
 [source,xml,linenums]
 ----
@@ -3008,7 +3014,7 @@ public class PrototypeDelegateExpressionBean implements JavaDelegate {
   }
 
   @Override
-  public void execute(DelegateExecution execution) throws Exception {
+  public void execute(DelegateExecution execution) {
 
     Number fieldAValue = (Number) fieldA.getValue(execution);
     Number fieldValueB = (Number) fieldB.getValue(execution);
@@ -3035,7 +3041,7 @@ public class SingletonDelegateExpressionBean implements JavaDelegate {
   }
 
   @Override
-  public void execute(DelegateExecution execution) throws Exception {
+  public void execute(DelegateExecution execution) {
 
     Expression fieldAExpression = DelegateHelper.getFieldExpression(execution, "fieldA");
     Number fieldA = (Number) fieldAExpression.getValue(execution);
@@ -3045,7 +3051,8 @@ public class SingletonDelegateExpressionBean implements JavaDelegate {
 
     int result = fieldA.intValue() + fieldB.intValue();
 
-    String resultVariableName = DelegateHelper.getFieldExpression(execution, "resultVariableName").getValue(execution).toString();
+    String resultVariableName = DelegateHelper.getFieldExpression(execution, 
+        "resultVariableName").getValue(execution).toString();
     execution.setVariable(resultVariableName, result);
   }
 
@@ -3225,17 +3232,17 @@ Here, the service task has two outgoing sequence flow, called +exception+ and +n
 ----
 public class ThrowsExceptionBehavior implements ActivityBehavior {
 
-  public void execute(ActivityExecution execution) throws Exception {
+  public void execute(DelegateExecution execution) {
     String var = (String) execution.getVariable("var");
 
-    PvmTransition transition = null;
+    String sequenceFlowToTake = null;
     try {
       executeLogic(var);
-      transition = execution.getActivity().findOutgoingTransition("no-exception");
+      sequenceFlowToTake = "no-exception";
     } catch (Exception e) {
-      transition = execution.getActivity().findOutgoingTransition("exception");
+      sequenceFlowToTake = "exception";
     }
-    execution.take(transition);
+    DelegateHelper.leaveDelegate(execution, sequenceFlowToTake);
   }
 
 }
@@ -3289,7 +3296,7 @@ public class StartProcessInstanceTestDelegateWithInjection {
 
 ==== Web Service Task
 
-<<experimental,[EXPERIMENTAL]>>[[bpmnWebserviceTaskDescription]]
+[[bpmnWebserviceTaskDescription]]
 
 
 ===== Description
@@ -3366,14 +3373,14 @@ Unless we are using the simplistic approach for data input and output associatio
 [source,xml,linenums]
 ----
 <ioSpecification>
-	<dataInput itemSubjectRef="tns:prettyPrintCountRequestItem" id="dataInputOfServiceTask" />
-	<dataOutput itemSubjectRef="tns:prettyPrintCountResponseItem" id="dataOutputOfServiceTask" />
-	<inputSet>
-		<dataInputRefs>dataInputOfServiceTask</dataInputRefs>
-	</inputSet>
-	<outputSet>
-		<dataOutputRefs>dataOutputOfServiceTask</dataOutputRefs>
-	</outputSet>
+    <dataInput itemSubjectRef="tns:prettyPrintCountRequestItem" id="dataInputOfServiceTask" />
+    <dataOutput itemSubjectRef="tns:prettyPrintCountResponseItem" id="dataOutputOfServiceTask" />
+    <inputSet>
+        <dataInputRefs>dataInputOfServiceTask</dataInputRefs>
+    </inputSet>
+    <outputSet>
+        <dataOutputRefs>dataOutputOfServiceTask</dataOutputRefs>
+    </outputSet>
 </ioSpecification>
 ----
 
@@ -3393,16 +3400,16 @@ To specify the data input association using expressions we need to define the so
 [source,xml,linenums]
 ----
 <dataInputAssociation>
-	<sourceRef>dataInputOfProcess</sourceRef>
-	<targetRef>dataInputOfServiceTask</targetRef>
-	<assignment>
-		<from>${dataInputOfProcess.prefix}</from>
-		<to>${dataInputOfServiceTask.prefix}</to>
-	</assignment>
-	<assignment>
-		<from>${dataInputOfProcess.suffix}</from>
-		<to>${dataInputOfServiceTask.suffix}</to>
-	</assignment>
+    <sourceRef>dataInputOfProcess</sourceRef>
+    <targetRef>dataInputOfServiceTask</targetRef>
+    <assignment>
+        <from>${dataInputOfProcess.prefix}</from>
+        <to>${dataInputOfServiceTask.prefix}</to>
+    </assignment>
+    <assignment>
+        <from>${dataInputOfProcess.suffix}</from>
+        <to>${dataInputOfServiceTask.suffix}</to>
+    </assignment>
 </dataInputAssociation>
 ----
 
@@ -3411,12 +3418,12 @@ On the other hand we can use the simplistic approach which is much more simple. 
 [source,xml,linenums]
 ----
 <dataInputAssociation>
-	<sourceRef>PrefixVariable</sourceRef>
-	<targetRef>prefix</targetRef>
+    <sourceRef>PrefixVariable</sourceRef>
+    <targetRef>prefix</targetRef>
 </dataInputAssociation>
 <dataInputAssociation>
-	<sourceRef>SuffixVariable</sourceRef>
-	<targetRef>suffix</targetRef>
+    <sourceRef>SuffixVariable</sourceRef>
+    <targetRef>suffix</targetRef>
 </dataInputAssociation>
 ----
 
@@ -3436,8 +3443,8 @@ To specify the data out association using expressions we need to define the targ
 [source,xml,linenums]
 ----
 <dataOutputAssociation>
-	<targetRef>dataOutputOfProcess</targetRef>
-	<transformation>${dataOutputOfServiceTask.prettyPrint}</transformation>
+    <targetRef>dataOutputOfProcess</targetRef>
+    <transformation>${dataOutputOfServiceTask.prettyPrint}</transformation>
 </dataOutputAssociation>
 ----
 
@@ -3446,8 +3453,8 @@ On the other hand we can use the simplistic approach which is much more simple. 
 [source,xml,linenums]
 ----
 <dataOutputAssociation>
-	<sourceRef>prettyPrint</sourceRef>
-	<targetRef>OutputVariable</targetRef>
+    <sourceRef>prettyPrint</sourceRef>
+    <targetRef>OutputVariable</targetRef>
 </dataOutputAssociation>
 ----
 
@@ -3456,7 +3463,7 @@ On the other hand we can use the simplistic approach which is much more simple. 
 
 ==== Business Rule Task
 
-<<experimental,[EXPERIMENTAL]>>[[bpmnBusinessRuleTaskDescription]]
+[[bpmnBusinessRuleTaskDescription]]
 
 
 ===== Description
@@ -3763,7 +3770,7 @@ public class SimpleCamelCallRoute extends RouteBuilder {
 
   @Override
   public void configure() throws Exception {
-    from("activiti:SimpleCamelCallProcess:simpleCall").to("log:org.flowable.camel.examples.SimpleCamelCall");
+    from("flowable:SimpleCamelCallProcess:simpleCall").to("log:org.flowable.camel.examples.SimpleCamelCall");
   }
 }
 ----
@@ -3833,7 +3840,7 @@ The variable "input" is actually the input for the Camel route and outputMap is 
   <sequenceFlow id="flow1" sourceRef="start" targetRef="ping"/>
   <serviceTask id="ping" flowable:type="camel"/>
   <sequenceFlow id="flow2" sourceRef="ping" targetRef="saveOutput"/>
-  <serviceTask id="saveOutput"  flowable:class="org.flowable.camel.examples.pingPong.SaveOutput" />
+  <serviceTask id="saveOutput" flowable:class="org.flowable.camel.examples.pingPong.SaveOutput" />
   <sequenceFlow id="flow3" sourceRef="saveOutput" targetRef="end"/>
   <endEvent id="end"/>
 </process>
@@ -3857,7 +3864,7 @@ If you do not specify and specific behaviour then, org.flowable.camel.impl.Camel
 ----
 @Override
 public void configure() throws Exception {
-  from("activiti:PingPongProcess:ping").transform().simple("${property.input} World");
+  from("flowable:PingPongProcess:ping").transform().simple("${property.input} World");
 }
 ----
 
@@ -3868,7 +3875,7 @@ There are three different behaviours already available out of the box in Flowabl
 
 [source,java,linenums]
 ----
-from("activiti:asyncCamelProcess:serviceTaskAsync2?copyVariablesToProperties=true").
+from("flowable:asyncCamelProcess:serviceTaskAsync2?copyVariablesToProperties=true").
 
 ----
 
@@ -3903,7 +3910,7 @@ For that to happen, a special syntax is available. There can be one or more para
 All variables having a name equal to one of these parameters without +var.return+ part, will be considered as output variables and will be copied back as camel properties with the same names. +
 For example in a route like:
 ----
-from("direct:start").to("activiti:process?var.return.exampleVar").to("mock:result");
+from("direct:start").to("flowable:process?var.return.exampleVar").to("mock:result");
 ----
 
 A Flowable variable with the name of +exampleVar+ will be considered as output variable and will be copied back as a property in camel with the same name.
@@ -3914,7 +3921,7 @@ A Flowable variable with the name of +exampleVar+ will be considered as output v
 
 ===== Asynchronous Ping Pong example
 
-Previous examples were all synchronous. The workflow stops, until the camel route is concluded and returned. In some cases, we might need the Flowable workflow to continue. For such purposes the asynchronous capability of the Camel service task is useful. You can make use of this feature by setting the async property of the Camel service task to true.
+Previous examples were all synchronous. The process instance waits until the camel route is concluded and returned. In some cases, we might need the Flowable process instance to continue. For such purposes the asynchronous capability of the Camel service task is useful. You can make use of this feature by setting the async property of the Camel service task to true.
 
 [source,xml,linenums]
 ----
@@ -3922,7 +3929,7 @@ Previous examples were all synchronous. The workflow stops, until the camel rout
 ----
 
 
-By setting this feature the specified Camel route is activated asynchronously by the Flowable job executor. When you define a queue in the Camel route the Flowable process will continue with the activities after the Camel service task. The Camel route will be executed fully asynchronously from the process execution. If you want to wait for a response of the Camel service task somewhere in your process definition, you can use a receive task.
+By setting this feature the specified Camel route is activated asynchronously by the Flowable job executor. When you define a queue in the Camel route the Flowable process instance will continue with the activities defined after the Camel service task in the process definition. The Camel route will be executed fully asynchronously from the process execution. If you want to wait for a response of the Camel service task somewhere in your process definition, you can use a receive task.
 
 [source,xml,linenums]
 ----
@@ -3933,11 +3940,11 @@ The process instance will wait until a signal is received, for example from Came
 
 [source,java,linenums]
 ----
- from("activiti:asyncPingProcess:serviceAsyncPing").to("activiti:asyncPingProcess:receiveAsyncPing");
+ from("flowable:asyncPingProcess:serviceAsyncPing").to("flowable:asyncPingProcess:receiveAsyncPing");
 ----
 
 
-* constant string "activiti"
+* constant string "flowable"
 * process name
 * receive task name
 
@@ -3947,16 +3954,16 @@ The process instance will wait until a signal is received, for example from Came
 
 ===== Instantiate workflow from Camel route
 
-In our all previous examples Flowable workflow started first and the Camel route was started within workflow. It is also possible from the other side. It is possible that a workflow is instantiated from an already started camel route. It is very similar to signalling receive task, except that the last part is not there. Here is a sample route:
+In all the previous examples, the Flowable process instance is started first and the Camel route was started from the process instance. It is also possible the other way around. It is possible that a process instance is started or invoked from an already started Camel route. It is very similar to signalling a receive task. Here is a sample route:
 
 [source,java,linenums]
 ----
-from("direct:start").to("activiti:camelProcess");
+from("direct:start").to("flowable:camelProcess");
 ----
 
-as you see the url has two parts, the first is constant string "flowable" and the second name is the name of the process. Obviously the process should already be deployed and startable by engine configuration.
+as you see the url has two parts, the first is constant string "flowable" and the second name is the name of the process definition. Obviously the process definition should already be deployed to the Flowable Engine.
 
-It is also possible to set the initiator of the process to some authenticated user id that is provided in a Camel header. To achieve this first of all an initiator variable must be specified in the process definition:
+It is also possible to set the initiator of the process instance to some authenticated user id that is provided in a Camel header. To achieve this, first of all an initiator variable must be specified in the process definition:
 
 [source,xml,linenums]
 ----
@@ -3969,7 +3976,7 @@ Then given that the user id is contained in a Camel header named _CamelProcessIn
 ----
 from("direct:startWithInitiatorHeader")
     .setHeader("CamelProcessInitiatorHeader", constant("kermit"))
-    .to("activiti:InitiatorCamelCallProcess?processInitiatorHeaderName=CamelProcessInitiatorHeader");
+    .to("flowable:InitiatorCamelCallProcess?processInitiatorHeaderName=CamelProcessInitiatorHeader");
 ----
 
 
@@ -4122,8 +4129,6 @@ The following XML snippet shows an example of using the shell Task. It runs shel
 
 ==== Execution listener
 
-*Compatibility note*: After releasing 5.3, we discovered that execution listeners and task listeners and expressions were still in non-public API. Those classes were in subpackages of +org.flowable.engine.impl...+,  which has +impl+ in it). +org.flowable.engine.impl.pvm.delegate.ExecutionListener+, +org.flowable.engine.impl.pvm.delegate.TaskListener+ and +org.flowable.engine.impl.pvm.el.Expression+ have been deprecated. From now on, you should use +org.flowable.engine.delegate.ExecutionListener+, +org.flowable.engine.delegate.TaskListener+ and +org.flowable.engine.delegate.Expression+. In the new publicly available API, access to +ExecutionListenerExecution.getEventSource()+ has been removed.  Apart from the deprecation compiler warning, the existing code should run fine.  But consider switching to the new public API interfaces (without .impl. in the package name).
-
 Execution listeners allow you to execute external Java code or evaluate an expression when certain events occur during process execution. The events that can be captured are:
 
 * Start and ending of a process instance.
@@ -4140,7 +4145,9 @@ The following process definition contains 3 execution listeners:
 <process id="executionListenersProcess">
 
   <extensionElements>
-    <flowable:executionListener class="org.flowable.examples.bpmn.executionlistener.ExampleExecutionListenerOne" event="start" />
+    <flowable:executionListener 
+      class="org.flowable.examples.bpmn.executionlistener.ExampleExecutionListenerOne" 
+      event="start" />
   </extensionElements>
 
   <startEvent id="theStart" />
@@ -4149,13 +4156,16 @@ The following process definition contains 3 execution listeners:
   <userTask id="firstTask" />
   <sequenceFlow sourceRef="firstTask" targetRef="secondTask">
     <extensionElements>
-      <flowable:executionListener class="org.flowable.examples.bpmn.executionListener.ExampleExecutionListenerTwo" />
+      <flowable:executionListener 
+        class="org.flowable.examples.bpmn.executionListener.ExampleExecutionListenerTwo" />
     </extensionElements>
   </sequenceFlow>
 
   <userTask id="secondTask" >
     <extensionElements>
-      <flowable:executionListener expression="${myPojo.myMethod(execution.event)}" event="end" />
+      <flowable:executionListener 
+        expression="${myPojo.myMethod(execution.event)}" 
+        event="end" />
     </extensionElements>
   </userTask>
   <sequenceFlow sourceRef="secondTask" targetRef="thirdTask" />
@@ -4207,7 +4217,9 @@ A while back, we also introduced a new type of execution listener, the org.flowa
 
 [source,xml,linenums]
 ----
-<flowable:executionListener event="start" class="org.flowable.engine.impl.bpmn.listener.ScriptExecutionListener" >
+<flowable:executionListener event="start" 
+    class="org.flowable.engine.impl.bpmn.listener.ScriptExecutionListener">
+    
   <flowable:field name="script">
     <flowable:string>
       def bar = "BAR";  // local variable
@@ -4218,6 +4230,7 @@ A while back, we also introduced a new type of execution listener, the org.flowa
   </flowable:field>
   <flowable:field name="language" stringValue="groovy" />
   <flowable:field name="resultVariable" stringValue="myVar" />
+  
 </flowable:executionListener>
 ----
 
@@ -4235,9 +4248,13 @@ The fragment below shows a simple example process with an execution listener wit
 ----
 <process id="executionListenersProcess">
   <extensionElements>
-    <flowable:executionListener class="org.flowable.examples.bpmn.executionListener.ExampleFieldInjectedExecutionListener" event="start">
+    <flowable:executionListener 
+        class="org.flowable.examples.bpmn.executionListener.ExampleFieldInjectedExecutionListener" 
+        event="start">
+        
       <flowable:field name="fixedValue" stringValue="Yes, I am " />
       <flowable:field name="dynamicValue" expression="${myVar}" />
+      
     </flowable:executionListener>
   </extensionElements>
 
@@ -4260,7 +4277,8 @@ public class ExampleFieldInjectedExecutionListener implements ExecutionListener 
   private Expression dynamicValue;
 
   public void notify(ExecutionListenerExecution execution) throws Exception {
-    execution.setVariable("var", fixedValue.getValue(execution).toString() + dynamicValue.getValue(execution).toString());
+    execution.setVariable("var", fixedValue.getValue(execution).toString() + 
+        dynamicValue.getValue(execution).toString());
   }
 }
 ----
@@ -4269,12 +4287,14 @@ The class +ExampleFieldInjectedExecutionListener+ concatenates the 2 injected fi
 
 [source,java,linenums]
 ----
-@Deployment(resources = {"org/flowable/examples/bpmn/executionListener/ExecutionListenersFieldInjectionProcess.bpmn20.xml"})
+@Deployment(resources = {
+  "org/flowable/examples/bpmn/executionListener/ExecutionListenersFieldInjectionProcess.bpmn20.xml"})
 public void testExecutionListenerFieldInjection() {
   Map<String, Object> variables = new HashMap<String, Object>();
   variables.put("myVar", "listening!");
 
-  ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("executionListenersProcess", variables);
+  ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
+      "executionListenersProcess", variables);
 
   Object varSetByListener = runtimeService.getVariable(processInstance.getId(), "var");
   assertNotNull(varSetByListener);
@@ -4322,7 +4342,6 @@ public class MyTaskCreateListener implements TaskListener {
   public void notify(DelegateTask delegateTask) {
     // Custom logic goes here
   }
-
 }
 ----
 
@@ -4509,7 +4528,7 @@ There is a caveat when using execution listeners in combination with multi insta
 ----
 <extensionElements>
     <flowable:executionListener event="start" class="org.flowable.MyStartListener"/>
-		<flowable:executionListener event="end" class="org.flowable.MyEndListener"/>
+    <flowable:executionListener event="end" class="org.flowable.MyEndListener"/>
 </extensionElements>
 ----
 
@@ -4560,8 +4579,6 @@ Note that the same applies when the _multiInstanceLoopCharacteristics_ are defin
 
 
 ===== Description
-
-<<experimental,[EXPERIMENTAL]>>
 
 If an activity is used for compensating the effects of another activity, it can be declared to be a compensation handler. Compensation handlers are not contained in normal flow and are only executed when a compensation event is thrown.
 
@@ -4680,8 +4697,7 @@ An Event Sub-Process must not have any incoming or outgoing sequence flows. Sinc
 
 *Current limitations:*
 
-* Flowable only supports interrupting Event Sub-Processes.
-* Flowable only supports Event Sub-Process triggered using an Error Start Event or Message Start Event.
+* Flowable supports Event Sub-Process triggered using an Error, Timer, Signal and Message Start Events.
 
 
 [[bpmnEventSubprocessGraphicalNotation]]
@@ -4723,11 +4739,11 @@ This is how the Event Sub-Process would look like in XML:
 [source,xml,linenums]
 ----
 <subProcess id="eventSubProcess" triggeredByEvent="true">
-	<startEvent id="catchError">
-		<errorEventDefinition errorRef="error" />
-	</startEvent>
-	<sequenceFlow id="flow2" sourceRef="catchError" targetRef="taskAfterErrorCatch" />
-	<userTask id="taskAfterErrorCatch" name="Provide additional data" />
+    <startEvent id="catchError">
+        <errorEventDefinition errorRef="error" />
+    </startEvent>
+    <sequenceFlow id="flow2" sourceRef="catchError" targetRef="taskAfterErrorCatch" />
+    <userTask id="taskAfterErrorCatch" name="Provide additional data" />
 </subProcess>
 ----
 
@@ -4751,8 +4767,6 @@ These two differences can help you decide whether a boundary event or an embedde
 
 
 ==== Transaction subprocess
-
-<<experimental,[EXPERIMENTAL]>>[[bpmnTransactionSubprocessDescription]]
 
 
 ===== Description
@@ -4884,11 +4898,13 @@ You can pass process variables to the sub process and vice versa. The data is co
 
 [source,xml,linenums]
 ----
-<callActivity id="callSubProcess" calledElement="checkCreditProcess" >
-  <extensionElements>
-	  <flowable:in source="someVariableInMainProcess" target="nameOfVariableInSubProcess" />
-	  <flowable:out source="someVariableInSubProcess" target="nameOfVariableInMainProcess" />
-  </extensionElements>
+<callActivity id="callSubProcess" calledElement="checkCreditProcess">
+    <extensionElements>
+        <flowable:in source="someVariableInMainProcess" 
+            target="nameOfVariableInSubProcess" />
+        <flowable:out source="someVariableInSubProcess" 
+            target="nameOfVariableInMainProcess" />
+    </extensionElements>
 </callActivity>
 ----
 
@@ -4906,10 +4922,10 @@ It is possible to use expressions here as well:
 [source,xml,linenums]
 ----
 <callActivity id="callSubProcess" calledElement="checkCreditProcess" >
-	<extensionElements>
-	  <flowable:in sourceExpression="${x+5}" target="y" />
-	  <flowable:out source="${y+5}" target="z" />
-	</extensionElements>
+    <extensionElements>
+        <flowable:in sourceExpression="${x+5}" target="y" />
+        <flowable:out source="${y+5}" target="z" />
+    </extensionElements>
 </callActivity>
 ----
 
@@ -4995,7 +5011,9 @@ In order to use this feature, we can use the _flowable:async="true"_ extension. 
 
 [source,xml,linenums]
 ----
-<serviceTask id="service1" name="Generate Invoice" flowable:class="my.custom.Delegate" flowable:async="true" />
+<serviceTask id="service1" name="Generate Invoice" 
+    flowable:class="my.custom.Delegate" 
+    flowable:async="true" />
 ----
 
 
@@ -5010,17 +5028,19 @@ On a userTask, receiveTask or other wait states, the async continuation allows u
 
 ==== Fail Retry
 
-Flowable, in its default configuration, reruns a job 3 times in case of any exception in execution of a job. This holds also for asynchronous task jobs. In some cases more flexibility is required. There are two parameters to be configured:
+Flowable, in its default configuration, reruns a job 3 times in case of any exception in execution of a job. This is also true for asynchronous jobs. In some cases more flexibility is required, and two additional parameters can be configured:
 
 * Number of retries
 * Delay between retries These parameters can be configured by +flowable:failedJobRetryTimeCycle+ element. Here is a sample usage:
 
 [source,xml,linenums]
 ----
-<serviceTask id="failingServiceTask" flowable:async="true" flowable:class="org.flowable.engine.test.jobexecutor.RetryFailingDelegate">
-	<extensionElements>
-		<flowable:failedJobRetryTimeCycle>R5/PT7M</flowable:failedJobRetryTimeCycle>
-	</extensionElements>
+<serviceTask id="failingServiceTask" flowable:async="true" 
+    flowable:class="org.flowable.engine.test.jobexecutor.RetryFailingDelegate">
+    
+    <extensionElements>
+        <flowable:failedJobRetryTimeCycle>R5/PT7M</flowable:failedJobRetryTimeCycle>
+    </extensionElements>
 </serviceTask>
 ----
 
@@ -5062,7 +5082,8 @@ How can I enable this feature? In recent releases, exclusive jobs are the defaul
 
 [source,xml,linenums]
 ----
-<serviceTask id="service" flowable:expression="${myService.performBooking(hotel, dates)}" flowable:async="true" flowable:exclusive="false" />
+<serviceTask id="service" flowable:expression="${myService.performBooking(hotel, dates)}" 
+    flowable:async="true" flowable:exclusive="false" />
 ----
 
 
@@ -5099,8 +5120,8 @@ In the above xml excerpt user(user3) refers directly to user user3 and group(gro
 [source,xml,linenums]
 ----
 <process id="potentialStarter" flowable:candidateStarterUsers="user1, user2"
-                               flowable:candidateStarterGroups="group1">
-      ...
+    flowable:candidateStarterGroups="group1">
+    ...
 ----
 
 
@@ -5126,7 +5147,9 @@ The following example shows how to get list of users who can initiate the given 
 
 [source,java,linenums]
 ----
-List<User> authorizedUsers =  identityService().createUserQuery().potentialStarter("processDefinitionId").list();
+List<User> authorizedUsers = identityService().createUserQuery()
+    .potentialStarter("processDefinitionId")
+    .list();
 ----
 
 
@@ -5134,7 +5157,9 @@ Exactly the same way, the list of groups that is configured as a potential start
 
 [source,java,linenums]
 ----
-List<Group> authorizedGroups =  identityService().createGroupQuery().potentialStarter("processDefinitionId").list();
+List<Group> authorizedGroups = identityService().createGroupQuery()
+    .potentialStarter("processDefinitionId")
+    .list();
 ----
 
 
@@ -5142,8 +5167,6 @@ List<Group> authorizedGroups =  identityService().createGroupQuery().potentialSt
 
 
 === Data objects
-
-<<experimental,[EXPERIMENTAL]>>
 
 BPMN provides the possibility to define data objects as part of a process or sub process element. According to the BPMN specification it's possible to include complex XML structures that might be imported from XSD definitions. As a first start to support data objects in Flowable the following XSD types are supported:
 

@@ -41,6 +41,7 @@ import org.flowable.app.model.editor.ReviveModelResultRepresentation.UnresolveMo
 import org.flowable.app.repository.editor.ModelHistoryRepository;
 import org.flowable.app.repository.editor.ModelRelationRepository;
 import org.flowable.app.repository.editor.ModelRepository;
+import org.flowable.app.repository.editor.ModelSort;
 import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.api.ModelService;
 import org.flowable.app.service.exception.BadRequestException;
@@ -115,7 +116,7 @@ public class ModelServiceImpl implements ModelService {
 
   @Override
   public List<AbstractModel> getModelsByModelType(Integer modelType) {
-    return new ArrayList<AbstractModel>(modelRepository.findByModelType(modelType));
+    return new ArrayList<AbstractModel>(modelRepository.findByModelType(modelType, ModelSort.NAME_ASC));
   }
   
   @Override

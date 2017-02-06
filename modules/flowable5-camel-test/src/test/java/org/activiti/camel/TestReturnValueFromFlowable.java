@@ -52,7 +52,7 @@ public class TestReturnValueFromFlowable extends SpringFlowableTestCase {
 
       @Override
       public void configure() throws Exception {
-        from("direct:startReturnResultTest").to("activiti:testResultProcess?var.return.exampleCamelReturnValue").to("mock:result");
+        from("direct:startReturnResultTest").to("flowable:testResultProcess?var.return.exampleCamelReturnValue").to("mock:result");
       }
     });
   }

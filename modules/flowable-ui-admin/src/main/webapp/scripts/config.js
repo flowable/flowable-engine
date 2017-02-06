@@ -15,7 +15,7 @@
  
 /**
  * 
- * Global fixed configuration values for Activiti Admin app.
+ * Global fixed configuration values for Flowable Admin app.
  * 
  */
 var FlowableAdmin = {};

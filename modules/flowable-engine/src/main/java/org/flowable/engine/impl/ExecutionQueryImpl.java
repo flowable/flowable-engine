@@ -45,6 +45,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   protected String processDefinitionCategory;
   protected String processDefinitionName;
   protected Integer processDefinitionVersion;
+  protected String processDefinitionEngineVersion;
   protected String activityId;
   protected String executionId;
   protected String parentId;
@@ -142,6 +143,15 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
       throw new FlowableIllegalArgumentException("Process definition version is null");
     }
     this.processDefinitionVersion = processDefinitionVersion;
+    return this;
+  }
+  
+  @Override
+  public ExecutionQuery processDefinitionEngineVersion(String processDefinitionEngineVersion) {
+    if (processDefinitionEngineVersion == null) {
+      throw new FlowableIllegalArgumentException("Process definition engine version is null");
+    }
+    this.processDefinitionEngineVersion = processDefinitionEngineVersion;
     return this;
   }
 
@@ -449,6 +459,10 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   
   public Integer getProcessDefinitionVersion() {
     return processDefinitionVersion;
+  }
+  
+  public String getProcessDefinitionEngineVersion() {
+    return processDefinitionEngineVersion;
   }
 
   public String getActivityId() {

@@ -45,13 +45,13 @@ public class CustomContextTest extends SpringFlowableTestCase {
 
       @Override
       public void configure() throws Exception {
-        from("direct:start").to("activiti:camelProcess");
+        from("direct:start").to("flowable:camelProcess");
 
-        from("activiti:camelProcess:serviceTask1").setBody().exchangeProperty("var1").to("mock:service1").setProperty("var2").constant("var2").setBody().properties();
+        from("flowable:camelProcess:serviceTask1").setBody().exchangeProperty("var1").to("mock:service1").setProperty("var2").constant("var2").setBody().properties();
 
-        from("activiti:camelProcess:serviceTask2?copyVariablesToBodyAsMap=true").to("mock:service2");
+        from("flowable:camelProcess:serviceTask2?copyVariablesToBodyAsMap=true").to("mock:service2");
 
-        from("direct:receive").to("activiti:camelProcess:receive");
+        from("direct:receive").to("flowable:camelProcess:receive");
       }
     });
 

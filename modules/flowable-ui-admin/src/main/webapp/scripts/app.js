@@ -18,7 +18,7 @@
 /* App Module */
 
 var flowableAdminApp = angular.module('flowableAdminApp', ['ngResource', 'ngRoute', 'ngCookies',
-    'pascalprecht.translate', 'ngGrid', 'ui.select2', 'ui.bootstrap', 'angularFileUpload', 'ui.keypress',
+    'pascalprecht.translate', 'ngGrid', 'ui.select2', 'ui.bootstrap', 'ngFileUpload', 'ui.keypress',
     'ui.grid', 'ui.grid.edit', 'ui.grid.selection', 'ui.grid.autoResize', 'ui.grid.moveColumns', 'ui.grid.cellNav']);
 
 flowableAdminApp
@@ -207,19 +207,24 @@ flowableAdminApp
             }).determinePreferredLanguage();
 
         }])
-        
-    .service('NotPermittedInterceptor', [ '$rootScope', '$window', function($rootScope, $window) {
-		var service = this;
-		service.responseError = function(response) {
-			if (response.status === 403) {
-				$rootScope.login = null;
-				$rootScope.authenticated = false;
-                $window.location.href = '/';
-                $window.location.reload();
-			}
-			return response;
-		};
-	}])     
+
+    .factory('NotPermittedInterceptor', [ '$q', '$window', '$rootScope', function($q, $window, $rootScope) {
+        return {
+            responseError: function ( response ) {
+
+                if (response.status === 403) {
+                    $rootScope.login = null;
+                    $rootScope.authenticated = false;
+                    $window.location.href = '/';
+                    $window.location.reload();
+                    return $q.reject(response);
+                }
+                else{
+                    return $q.reject(response);
+                }
+            }
+        }
+    }])
 
     // Custom Http interceptor that adds the correct prefix to each url
     .config(['$httpProvider', function ($httpProvider) {

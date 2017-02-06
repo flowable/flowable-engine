@@ -67,7 +67,6 @@ import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
@@ -168,7 +167,7 @@ public class BpmnDeployer implements Deployer {
           }
           
           processDefinition.setDiagramResourceName(diagramResourceName);
-          processDefinition.setEngineVersion(Flowable5CompatibilityHandler.V5_ENGINE_TAG);
+          processDefinition.setEngineVersion("v5");
           processDefinitions.add(processDefinition);
           bpmnModelMap.put(processDefinition.getKey(), bpmnParse.getBpmnModel());
         }

@@ -14,6 +14,7 @@ package org.flowable.compatibility.wrapper;
 
 import java.util.Date;
 
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.Deployment;
 
 /**
@@ -55,6 +56,11 @@ public class Flowable5DeploymentWrapper implements Deployment {
   @Override
   public String getTenantId() {
     return activiti5Deployment.getTenantId();
+  }
+  
+  @Override
+  public String getEngineVersion() {
+    return Flowable5Util.V5_ENGINE_TAG;
   }
   
   public org.activiti.engine.repository.Deployment getRawObject() {

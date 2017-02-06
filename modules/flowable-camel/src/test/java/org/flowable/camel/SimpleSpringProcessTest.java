@@ -44,12 +44,12 @@ public class SimpleSpringProcessTest extends SpringFlowableTestCase {
       @Override
       public void configure() throws Exception {
         from("direct:startWithInitiatorHeader").setHeader("CamelProcessInitiatorHeader", constant("kermit")).to(
-            "activiti:InitiatorCamelCallProcess?processInitiatorHeaderName=CamelProcessInitiatorHeader");
+            "flowable:InitiatorCamelCallProcess?processInitiatorHeaderName=CamelProcessInitiatorHeader");
 
-        from("direct:start").to("activiti:camelProcess");
-        from("direct:receive").to("activiti:camelProcess:receive");
-        from("activiti:camelProcess:serviceTask2?copyVariablesToBodyAsMap=true").to("mock:service2");
-        from("activiti:camelProcess:serviceTask1").setBody().simple("property[var1]").to("mock:service1").setProperty("var2").constant("var2").setBody().mvel("properties");
+        from("direct:start").to("flowable:camelProcess");
+        from("direct:receive").to("flowable:camelProcess:receive");
+        from("flowable:camelProcess:serviceTask2?copyVariablesToBodyAsMap=true").to("mock:service2");
+        from("flowable:camelProcess:serviceTask1").setBody().simple("property[var1]").to("mock:service1").setProperty("var2").constant("var2").setBody().mvel("properties");
       }
     });
 

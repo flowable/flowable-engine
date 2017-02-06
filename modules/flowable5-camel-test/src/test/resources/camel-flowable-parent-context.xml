@@ -11,8 +11,8 @@
     <bean id="dataSource" class="org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy">
         <property name="targetDataSource">
             <bean class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
-                <property name="driverClass" value="com.mysql.jdbc.Driver"/>
-                <property name="url" value="jdbc:mysql://127.0.0.1:3306/activititest?characterEncoding=UTF-8"/>
+                <property name="driverClass" value="org.h2.Driver"/>
+                <property name="url" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE"/>
                 <property name="username" value="alfresco"/>
                 <property name="password" value="alfresco"/>
             </bean>

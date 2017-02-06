@@ -215,6 +215,8 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
     
     processInstanceExecution.setProcessDefinitionId(processDefinition.getId());
     processInstanceExecution.setProcessDefinitionKey(processDefinition.getKey());
+    processInstanceExecution.setProcessDefinitionName(processDefinition.getName());
+    processInstanceExecution.setProcessDefinitionVersion(processDefinition.getVersion());
     processInstanceExecution.setBusinessKey(businessKey);
     processInstanceExecution.setScope(true); // process instance is always a scope for all child executions
 
@@ -564,6 +566,11 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getVariableCount() > 0)) {
       Collection<VariableInstance> executionVariables = executionEntity.getVariableInstancesLocal().values();
       for (VariableInstance variableInstance : executionVariables) {
+        
+        if (variableInstance instanceof VariableInstanceEntity == false) {
+          continue;
+        }
+        
         VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
         
         VariableInstanceEntityManager variableInstanceEntityManager = getVariableInstanceEntityManager();

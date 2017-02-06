@@ -37,15 +37,6 @@ public class ProfilingDbSqlSession extends DbSqlSession {
     super(dbSqlSessionFactory, entityCache, connection, catalog, schema);
   }
 
-  // public ProfilingDbSqlSession(DbSqlSessionFactory dbSqlSessionFactory) {
-  // super(dbSqlSessionFactory);
-  // }
-  //
-  // public ProfilingDbSqlSession(DbSqlSessionFactory dbSqlSessionFactory,
-  // Connection connection, String catalog, String schema) {
-  // super(dbSqlSessionFactory, connection, catalog, schema);
-  // }
-
   @Override
   public void flush() {
     long startTime = System.currentTimeMillis();
@@ -129,12 +120,13 @@ public class ProfilingDbSqlSession extends DbSqlSession {
 
   @Override
   protected void flushUpdates() {
-    super.flushUpdates();
     if (getCurrentCommandExecution() != null) {
       for (Entity persistentObject : updatedObjects) {
         getCurrentCommandExecution().addDbUpdate(persistentObject.getClass().getName());
       }
     }
+    
+    super.flushUpdates();
   }
 
   // DELETES

@@ -53,7 +53,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * Service for invoking Activiti REST services.
+ * Service for invoking Flowable REST services.
  */
 @Service
 public class FlowableClientService {
@@ -474,7 +474,7 @@ public class FlowableClientService {
             errorMessage = extractError(errorBody, "An error occurred while calling Flowable: " + response.getStatusLine());
 
           } else {
-            errorMessage = "An error was returned when calling the Activiti server";
+            errorMessage = "An error was returned when calling the Flowable server";
           }
         } catch (Exception e) {
           log.warn("Error consuming response from uri {}", request.getURI(), e);
@@ -503,8 +503,8 @@ public class FlowableClientService {
   }
 
   public String extractError(JsonNode errorBody, String defaultValue) {
-    if (errorBody != null && errorBody.isObject() && errorBody.has("errorMessage")) {
-      return errorBody.get("errorMessage").asText();
+    if (errorBody != null && errorBody.isObject() && errorBody.has("exception")) {
+      return errorBody.get("exception").asText();
     }
     return defaultValue;
   }

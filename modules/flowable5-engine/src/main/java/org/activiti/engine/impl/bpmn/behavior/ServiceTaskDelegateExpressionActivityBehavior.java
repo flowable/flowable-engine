@@ -27,6 +27,7 @@ import org.activiti.engine.impl.delegate.JavaDelegateInvocation;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti.engine.impl.pvm.delegate.SignallableActivityBehavior;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.Expression;
@@ -50,13 +51,17 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
   protected String serviceTaskId;
   protected Expression expression;
   protected Expression skipExpression;
-  private final List<FieldDeclaration> fieldDeclarations;
+  protected List<FieldDeclaration> fieldDeclarations;
+  protected List<MapExceptionEntry> mapExceptions;
 
-  public ServiceTaskDelegateExpressionActivityBehavior(String serviceTaskId, Expression expression, Expression skipExpression, List<FieldDeclaration> fieldDeclarations) {
+  public ServiceTaskDelegateExpressionActivityBehavior(String serviceTaskId, Expression expression, 
+      Expression skipExpression, List<FieldDeclaration> fieldDeclarations, List<MapExceptionEntry> mapExceptions) {
+    
     this.serviceTaskId = serviceTaskId;
     this.expression = expression;
     this.skipExpression = skipExpression;
     this.fieldDeclarations = fieldDeclarations;
+    this.mapExceptions = mapExceptions;
   }
 
   @Override
@@ -114,6 +119,11 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
         if (cause instanceof BpmnError) {
           error = (BpmnError) cause;
           break;
+          
+        } else if (cause instanceof RuntimeException) {
+          if (ErrorPropagation.mapException((RuntimeException) cause, activityExecution, mapExceptions)) {
+            return;
+          }
         }
         cause = cause.getCause();
       }

@@ -43,9 +43,7 @@ public class GetStartFormCmd implements Command<StartFormData>, Serializable {
       throw new FlowableObjectNotFoundException("No process definition found for id '" + processDefinitionId + "'", ProcessDefinition.class);
     }
     
-    if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled() && 
-        commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().isVersion5Tag(processDefinition.getEngineVersion())) {
-      
+    if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
       return Flowable5Util.getFlowable5CompatibilityHandler().getStartFormData(processDefinitionId);
     }
 

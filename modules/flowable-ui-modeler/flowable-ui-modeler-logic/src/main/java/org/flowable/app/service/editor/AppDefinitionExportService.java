@@ -11,42 +11,32 @@ import java.util.zip.ZipOutputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.flowable.app.domain.editor.AbstractModel;
 import org.flowable.app.domain.editor.AppDefinition;
 import org.flowable.app.domain.editor.AppModelDefinition;
 import org.flowable.app.domain.editor.Model;
 import org.flowable.app.model.editor.AppDefinitionRepresentation;
-import org.flowable.app.repository.editor.ModelRepository;
-import org.flowable.app.security.SecurityUtils;
-import org.flowable.app.service.api.ModelService;
 import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.app.service.exception.InternalServerErrorException;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.StartEvent;
+import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
-import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Service
 @Transactional
-public class AppDefinitionExportService {
+public class AppDefinitionExportService extends BaseAppDefinitionService {
 
   private static final Logger logger = LoggerFactory.getLogger(AppDefinitionExportService.class);
-
-  @Autowired
-  protected ModelService modelService;
-
-  @Autowired
-  protected ModelRepository modelRepository;
-
-  @Autowired
-  protected ObjectMapper objectMapper;
   
   protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
 
@@ -59,10 +49,22 @@ public class AppDefinitionExportService {
     Model appModel = modelService.getModel(modelId);
     AppDefinitionRepresentation appRepresentation = createAppDefinitionRepresentation(appModel);
 
-    createAppDefinitionZip(response, appModel, appRepresentation, SecurityUtils.getCurrentUserObject());
+    createAppDefinitionZip(response, appModel, appRepresentation);
   }
 
-  protected void createAppDefinitionZip(HttpServletResponse response, Model appModel, AppDefinitionRepresentation appDefinition, User user) {
+  public void exportDeployableAppDefinition(HttpServletResponse response, String modelId) throws IOException {
+
+    if (modelId == null) {
+      throw new BadRequestException("No application definition id provided");
+    }
+
+    Model appModel = modelService.getModel(modelId);
+    AppDefinitionRepresentation appRepresentation = createAppDefinitionRepresentation(appModel);
+
+    createAppDefinitionBar(response, appModel, appRepresentation);
+  }
+
+  protected void createAppDefinitionZip(HttpServletResponse response, Model appModel, AppDefinitionRepresentation appDefinition) {
     response.setHeader("Content-Disposition", "attachment; filename=" + appDefinition.getName() + ".zip");
     try {
       ServletOutputStream servletOutputStream = response.getOutputStream();
@@ -74,8 +76,8 @@ public class AppDefinitionExportService {
 
       List<AppModelDefinition> modelDefinitions = appDefinition.getDefinition().getModels();
       if (CollectionUtils.isNotEmpty(modelDefinitions)) {
-        Map<String, Model> formMap = new HashMap<String, Model>();
-        Map<String, Model> decisionTableMap = new HashMap<String, Model>();
+        Map<String, Model> formMap = new HashMap<>();
+        Map<String, Model> decisionTableMap = new HashMap<>();
 
         for (AppModelDefinition modelDef : modelDefinitions) {
           Model model = modelService.getModel(modelDef.getId());
@@ -90,6 +92,19 @@ public class AppDefinitionExportService {
             }
           }
 
+          BpmnModel bpmnModel = modelService.getBpmnModel(model, formMap, decisionTableMap);
+          Map<String, StartEvent> startEventMap = processNoneStartEvents(bpmnModel);
+
+          for (Process process : bpmnModel.getProcesses()) {
+            processUserTasks(process.getFlowElements(), process, startEventMap);
+          }
+
+          byte[] modelXML = modelService.getBpmnXML(bpmnModel);
+
+          // add BPMN XML model
+          createZipEntry(zipOutputStream, "bpmn-models/" + model.getKey().replaceAll(" ", "") + ".bpmn", modelXML);
+
+          // add JSON model
           createZipEntries(model, "bpmn-models", zipOutputStream);
         }
 
@@ -99,6 +114,15 @@ public class AppDefinitionExportService {
         
         for (Model decisionTableModel : decisionTableMap.values()) {
           createZipEntries(decisionTableModel, "decision-table-models", zipOutputStream);
+          try {
+            JsonNode decisionTableNode = objectMapper.readTree(decisionTableModel.getModelEditorJson());
+            DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionTableNode, decisionTableModel.getId(),
+                decisionTableModel.getVersion(), decisionTableModel.getLastUpdated());
+            byte[] dmnXMLBytes = dmnXMLConverter.convertToXML(dmnDefinition);
+            createZipEntry(zipOutputStream, "decision-table-models/" + decisionTableModel.getKey() + ".dmn", dmnXMLBytes);
+          } catch (Exception e) {
+            throw new InternalServerErrorException(String.format("Error converting decision table %s to XML",decisionTableModel.getName()));
+          }
         }
       }
 
@@ -113,6 +137,26 @@ public class AppDefinitionExportService {
       throw new InternalServerErrorException("Could not generate app definition zip archive");
     }
   }
+
+  public void createAppDefinitionBar(HttpServletResponse response, Model appModel, AppDefinitionRepresentation appDefinition) {
+      response.setHeader("Content-Disposition", "attachment; filename=" + appDefinition.getName() + ".bar");
+
+      try {
+        byte[] deployZipArtifact = createDeployableZipArtifact(appModel, appDefinition.getDefinition());
+
+        ServletOutputStream servletOutputStream = response.getOutputStream();
+        response.setContentType("application/zip");
+        servletOutputStream.write(deployZipArtifact);
+
+        // Flush and close stream
+        servletOutputStream.flush();
+        servletOutputStream.close();
+
+      } catch (Exception e) {
+        logger.error("Could not generate app definition bar archive", e);
+        throw new InternalServerErrorException("Could not generate app definition bar archive");
+      }
+    }
   
   protected void createZipEntries(Model model, String directoryName, ZipOutputStream zipOutputStream) throws Exception {
     createZipEntry(zipOutputStream, directoryName + "/" + model.getKey() + ".json", createModelEntryJson(model));
@@ -163,4 +207,5 @@ public class AppDefinitionExportService {
     zipOutputStream.write(content);
     zipOutputStream.closeEntry();
   }
+
 }

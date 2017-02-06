@@ -302,7 +302,7 @@ public class ErrorPropagation {
     }
   }
   
-  protected static String findMatchingExceptionMapping(Exception e, List<MapExceptionEntry> exceptionMap) {
+  public static String findMatchingExceptionMapping(Exception e, List<MapExceptionEntry> exceptionMap) {
     String defaultExceptionMapping = null;
 
     for (MapExceptionEntry me : exceptionMap) {

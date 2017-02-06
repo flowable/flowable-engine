@@ -29,6 +29,7 @@ import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.engine.common.impl.cfg.TransactionState;
 import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
@@ -41,6 +42,7 @@ import org.flowable.engine.impl.el.NoExecutionVariableScope;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.flowable.engine.impl.jobexecutor.AsyncJobAddedNotification;
+import org.flowable.engine.impl.jobexecutor.JobAddedTransactionListener;
 import org.flowable.engine.impl.jobexecutor.JobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
@@ -439,8 +441,13 @@ public class DefaultJobManager implements JobManager {
   }
   
   protected void hintAsyncExecutor(JobEntity job) {
-    AsyncJobAddedNotification jobAddedNotification = new AsyncJobAddedNotification(job, getAsyncExecutor());
-    getCommandContext().addCloseListener(jobAddedNotification);
+    if (Context.getTransactionContext() != null) {
+      JobAddedTransactionListener jobAddedTransactionListener = new JobAddedTransactionListener(job, getAsyncExecutor());
+      Context.getTransactionContext().addTransactionListener(TransactionState.COMMITTED, jobAddedTransactionListener);
+    } else {
+      AsyncJobAddedNotification jobAddedNotification = new AsyncJobAddedNotification(job, getAsyncExecutor());
+      getCommandContext().addCloseListener(jobAddedNotification);
+    }
   }
   
   protected JobEntity internalCreateAsyncJob(ExecutionEntity execution, boolean exclusive) {

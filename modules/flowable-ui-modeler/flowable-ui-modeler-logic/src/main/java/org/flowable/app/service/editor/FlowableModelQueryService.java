@@ -42,7 +42,6 @@ import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
-import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,13 +97,11 @@ public class FlowableModelQueryService {
 
     String validFilter = makeValidFilterText(filterText);
 
-    User user = SecurityUtils.getCurrentUserObject();
-
     if (validFilter != null) {
-      models = modelRepository.findByModelTypeAndCreatedBy(user.getId(), modelType, validFilter, sort);
+      models = modelRepository.findByModelTypeAndFilter(modelType, validFilter, sort);
 
     } else {
-      models = modelRepository.findByModelTypeAndCreatedBy(user.getId(), modelType, sort);
+      models = modelRepository.findByModelType(modelType, sort);
     }
 
     if (CollectionUtils.isNotEmpty(models)) {
@@ -126,10 +123,8 @@ public class FlowableModelQueryService {
 
     List<ModelRepresentation> resultList = new ArrayList<ModelRepresentation>();
 
-    User user = SecurityUtils.getCurrentUserObject();
-
     List<String> addedModelIds = new ArrayList<String>();
-    List<Model> models = modelRepository.findByModelTypeAndCreatedBy(user.getId(), 0, ModelSort.MODIFIED_DESC);
+    List<Model> models = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_BPMN, ModelSort.MODIFIED_DESC);
 
     if (CollectionUtils.isNotEmpty(models)) {
       for (Model model : models) {

@@ -50,4 +50,7 @@
     <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
   </bean>
 
+  <bean id="throwCustomExceptionBean" class="org.flowable.engine.test.bpmn.event.error.mapError.ThrowCustomExceptionBean" />
+  <bean id="throwCustomExceptionDelegate" class="org.flowable.engine.test.bpmn.event.error.mapError.ThrowCustomExceptionDelegate" />
+
 </beans>

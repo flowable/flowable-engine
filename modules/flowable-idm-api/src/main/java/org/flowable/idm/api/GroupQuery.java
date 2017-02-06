@@ -37,6 +37,11 @@ public interface GroupQuery extends Query<GroupQuery, Group> {
    * Only select {@link Group}s where the name matches the given parameter. The syntax to use is that of SQL, eg. %test%.
    */
   GroupQuery groupNameLike(String groupNameLike);
+  
+  /**
+   * Only select {@link Group}s where the name matches the given parameter (ignoring case). The syntax to use is that of SQL, eg. %test%.
+   */
+  GroupQuery groupNameLikeIgnoreCase(String groupNameLikeIgnoreCase);
 
   /** Only select {@link Group}s which have the given type. */
   GroupQuery groupType(String groupType);

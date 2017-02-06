@@ -84,6 +84,11 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
     } catch (FlowableIllegalArgumentException e) {
     }
   }
+  
+  public void testQueryByIdIgnoreCase() {
+    UserQuery query = idmIdentityService.createUserQuery().userIdIgnoreCase("KErmit");
+    verifyQueryResults(query, 1);
+  }
 
   public void testQueryByFirstName() {
     UserQuery query = idmIdentityService.createUserQuery().userFirstName("Gonzo");
@@ -122,6 +127,14 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
     } catch (FlowableIllegalArgumentException e) {
     }
   }
+  
+  public void testQueryByFirstNameLikeIgnoreCase() {
+    UserQuery query = idmIdentityService.createUserQuery().userFirstNameLikeIgnoreCase("%O%");
+    verifyQueryResults(query, 2);
+
+    query = idmIdentityService.createUserQuery().userFirstNameLikeIgnoreCase("KEr%");
+    verifyQueryResults(query, 1);
+  }
 
   public void testQueryByLastName() {
     UserQuery query = idmIdentityService.createUserQuery().userLastName("Bear");
@@ -149,6 +162,14 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
     query = idmIdentityService.createUserQuery().userLastNameLike("%ea%");
     verifyQueryResults(query, 2);
   }
+  
+  public void testQueryByLastNameLikeIgnoreCase() {
+    UserQuery query = idmIdentityService.createUserQuery().userLastNameLikeIgnoreCase("%ROg%");
+    verifyQueryResults(query, 1);
+
+    query = idmIdentityService.createUserQuery().userLastNameLikeIgnoreCase("%Ea%");
+    verifyQueryResults(query, 2);
+  }
 
   public void testQueryByFullNameLike() {
     UserQuery query = idmIdentityService.createUserQuery().userFullNameLike("%erm%");
@@ -158,6 +179,17 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
     verifyQueryResults(query, 2);
 
     query = idmIdentityService.createUserQuery().userFullNameLike("%e%");
+    verifyQueryResults(query, 3);
+  }
+  
+  public void testQueryByFullNameLikeIgnoreCase() {
+    UserQuery query = idmIdentityService.createUserQuery().userFullNameLikeIgnoreCase("%ERm%");
+    verifyQueryResults(query, 1);
+
+    query = idmIdentityService.createUserQuery().userFullNameLikeIgnoreCase("%Ea%");
+    verifyQueryResults(query, 2);
+
+    query = idmIdentityService.createUserQuery().userFullNameLikeIgnoreCase("%E%");
     verifyQueryResults(query, 3);
   }
 

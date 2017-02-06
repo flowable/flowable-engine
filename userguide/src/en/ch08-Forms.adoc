@@ -2,7 +2,68 @@
 
 == Forms
 
-Flowable provides a convenient and flexible way to add forms for the manual steps of your business processes.  We support two strategies to work with forms: Build-in form rendering with form properties and external form rendering.
+Flowable provides a convenient and flexible way to add forms for the manual steps of your business processes. 
+We support two strategies to work with forms: Built-in form rendering with a form definition (created with the form designer) and external form rendering.
+For the external form rendering strategy form properties can be used (that was supported in the Explorer web application in version 5), or a form key definition that points to an external form reference that can be resolved with custom coding.
+
+[[formDefinition]]
+
+=== Form definition
+
+Full information about the form definitions and Flowable form engine can be found in the link:$$http://flowable.org/docs/form-userguide$$[Form Engine user guide].
+Form definitions can be created with the Flowable Form Designer that's part of the Flowable Modeler web application, or created by hand with a JSON editor.
+The Form Engine user guide describes the structure of the form definition JSON in full length. The following form field types are supported:
+
+* Text: rendered as a text field
+* Multiline text: rendered as a text area field
+* Number: rendered as a text field, but only allows numeric values
+* Checkbox: rendered as a checkbox field
+* Date: rendered as a date field
+* Dropdown: rendered as a select field with the option values configured in the field definition
+* Radio buttons: rendered as a radio field with the option values configured in the field definition
+* People: rendered as a select field where a person from the Identity user table can be selected
+* Group of people: rendered as a select field where a group from the Identity group table can be selected
+* Upload: rendered as an upload field
+* Expression: rendered as a label and allows you to use JUEL expressions to use variables and/or other dynamic values in the label text
+
+The Flowable task application is able to render an html form from the form definition JSON.
+You can also use the Flowable API to get the form definition JSON yourself.
+
+[source,java,linenums]
+----
+FormModel RuntimeService.getStartFormModel(String processDefinitionId, String processInstanceId)
+----
+
+or 
+
+[source,java,linenums]
+----
+FormModel TaskService.getTaskFormModel(String taskId)
+----
+
+The FormModel object is a Java object representation of the form definition JSON.
+
+To start a process instance with a start form definition you can use the following API call:
+
+[source,java,linenums]
+----
+ProcessInstance RuntimeService.startProcessInstanceWithForm(String processDefinitionId, String outcome, 
+    Map<String, Object> variables, String processInstanceName)
+----
+
+When a form definition is defined on (one of) the start event(s) of a process definition, this method can be used to start a process instance with the values filled-in in the start form.
+The Flowable task application uses this method to start a process instance with a form as well.
+All form values need to be passed in the variables map and an optional form outcome string and process instance name can be provided.
+
+In a similar way, a user task can be completed with a form using the following API call:
+
+[source,java,linenums]
+----
+void TaskService.completeTaskWithForm(String taskId, String formDefinitionId, 
+    String outcome, Map<String, Object> variables)
+----
+
+Again, for more information about form definitions have a look at the link:$$http://flowable.org/docs/form-userguide$$[Form Engine user guide].
 
 
 [[formProperties]]

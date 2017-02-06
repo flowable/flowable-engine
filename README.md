@@ -16,4 +16,4 @@ Flowable QA: http://qa.flowable.org
 
 Flowable forum: http://forum.flowable.org
 
-Contributing to Flowable: https://github.com/flowable/flowable-engine/wiki/Contributing-to-Flowable
+Contributing to Flowable: https://github.com/flowable/flowable-engine/wiki

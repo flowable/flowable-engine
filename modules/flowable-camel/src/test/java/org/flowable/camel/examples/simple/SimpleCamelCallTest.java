@@ -31,7 +31,7 @@ public class SimpleCamelCallTest extends SpringFlowableTestCase {
 
       @Override
       public void configure() throws Exception {
-        from("activiti:SimpleCamelCallProcess:simpleCall").to("log: org.activiti.camel.examples.SimpleCamelCall");
+        from("flowable:SimpleCamelCallProcess:simpleCall").to("log: org.flowable.camel.examples.SimpleCamelCall");
       }
     });
   }

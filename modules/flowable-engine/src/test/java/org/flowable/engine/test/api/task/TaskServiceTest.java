@@ -36,6 +36,7 @@ import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.engine.impl.TaskServiceImpl;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.persistence.CountingTaskEntity;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -788,6 +789,66 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
     identityService.deleteUser(user.getId());
     taskService.deleteTask(task.getId(), true);
   }
+  
+  @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  public void testCountingTaskForAddRemoveIdentityLink() {
+    processEngineConfiguration.setEnableTaskRelationshipCounts(true);
+
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task currentTask = taskService.createTaskQuery().singleResult();
+    assertEquals(0, ((CountingTaskEntity) currentTask).getIdentityLinkCount());
+
+    taskService.addUserIdentityLink(currentTask.getId(), "user01", IdentityLinkType.PARTICIPANT);
+    currentTask = taskService.createTaskQuery().singleResult();
+    assertEquals(1, ((CountingTaskEntity) currentTask).getIdentityLinkCount());
+    
+    taskService.addUserIdentityLink(currentTask.getId(), "user02", IdentityLinkType.PARTICIPANT);
+    currentTask = taskService.createTaskQuery().singleResult();
+    assertEquals(2, ((CountingTaskEntity) currentTask).getIdentityLinkCount());
+    
+    taskService.deleteUserIdentityLink(currentTask.getId(), "user01", IdentityLinkType.PARTICIPANT);
+    currentTask = taskService.createTaskQuery().singleResult();
+    assertEquals(1, ((CountingTaskEntity) currentTask).getIdentityLinkCount());
+    
+    taskService.addGroupIdentityLink(currentTask.getId(), "group01", IdentityLinkType.PARTICIPANT);
+    currentTask = taskService.createTaskQuery().singleResult();
+    assertEquals(2, ((CountingTaskEntity) currentTask).getIdentityLinkCount());
+    
+    taskService.addGroupIdentityLink(currentTask.getId(), "group02", IdentityLinkType.PARTICIPANT);
+    currentTask = taskService.createTaskQuery().singleResult();
+    assertEquals(3, ((CountingTaskEntity) currentTask).getIdentityLinkCount());
+    
+    taskService.addGroupIdentityLink(currentTask.getId(), "group02", IdentityLinkType.PARTICIPANT);
+    currentTask = taskService.createTaskQuery().singleResult();
+    assertEquals(4, ((CountingTaskEntity) currentTask).getIdentityLinkCount());
+    
+    //start removing identity links
+    taskService.deleteGroupIdentityLink(currentTask.getId(), "group02", IdentityLinkType.PARTICIPANT);
+    currentTask = taskService.createTaskQuery().singleResult();
+    //Two identityLinks with id "group02" are found. Both are deleted.
+    assertEquals(2, ((CountingTaskEntity) currentTask).getIdentityLinkCount());
+    
+    //remove "user02" once
+    taskService.deleteUserIdentityLink(currentTask.getId(), "user02", IdentityLinkType.PARTICIPANT);
+    currentTask = taskService.createTaskQuery().singleResult();
+    assertEquals(1, ((CountingTaskEntity) currentTask).getIdentityLinkCount());
+    
+    //remove "user02" twice
+    taskService.deleteUserIdentityLink(currentTask.getId(), "user02", IdentityLinkType.PARTICIPANT);
+    currentTask = taskService.createTaskQuery().singleResult();
+    assertEquals(1, ((CountingTaskEntity) currentTask).getIdentityLinkCount());
+    
+    taskService.deleteGroupIdentityLink(currentTask.getId(), "group01", IdentityLinkType.PARTICIPANT);
+    currentTask = taskService.createTaskQuery().singleResult();
+    assertEquals(0, ((CountingTaskEntity) currentTask).getIdentityLinkCount());
+    
+    //make sure the "identityLinkCount" value does not go negative
+    taskService.deleteGroupIdentityLink(currentTask.getId(), "group01", IdentityLinkType.PARTICIPANT);
+    currentTask = taskService.createTaskQuery().singleResult();
+    assertEquals(0, ((CountingTaskEntity) currentTask).getIdentityLinkCount());
+    
+    processEngineConfiguration.setEnableTaskRelationshipCounts(false);
+  }
 
   public void testAddCandidateUserNullTaskId() {
     try {
@@ -1246,6 +1307,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
     taskService.setVariableLocal(currentTask.getId(), "variable1", "value1");
     assertEquals("value1", taskService.getVariable(currentTask.getId(), "variable1"));
     assertEquals("value1", taskService.getVariableLocal(currentTask.getId(), "variable1"));
+    
+
 
     taskService.removeVariableLocal(currentTask.getId(), "variable1");
 
@@ -1253,6 +1316,56 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
     assertNull(taskService.getVariableLocal(currentTask.getId(), "variable1"));
 
     checkHistoricVariableUpdateEntity("variable1", processInstance.getId());
+  }
+  
+  @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  public void testCountingTaskForAddRemoveVariable() {
+    processEngineConfiguration.setEnableTaskRelationshipCounts(true);
+
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task currentTask = taskService.createTaskQuery().singleResult();
+
+    assertEquals(0, ((CountingTaskEntity) currentTask).getVariableCount());
+
+    taskService.setVariableLocal(currentTask.getId(), "variable1", "value1");
+    currentTask = taskService.createTaskQuery().singleResult();
+
+    assertEquals(1, ((CountingTaskEntity) currentTask).getVariableCount());
+
+    // process variables should have no effect
+    taskService.setVariable(currentTask.getId(), "processVariable1", "procValue1");
+    currentTask = taskService.createTaskQuery().singleResult();
+
+    assertEquals(1, ((CountingTaskEntity) currentTask).getVariableCount());
+
+    Map<String, Object> localVars = new HashMap<String, Object>();
+    localVars.put("localVar1", "localValue1");
+    localVars.put("localVar2", "localValue2");
+    localVars.put("localVar3", "localValue3");
+
+    taskService.setVariablesLocal(currentTask.getId(), localVars);
+    currentTask = taskService.createTaskQuery().singleResult();
+
+    assertEquals(4, ((CountingTaskEntity) currentTask).getVariableCount());
+
+    taskService.removeVariablesLocal(currentTask.getId(), localVars.keySet());
+    currentTask = taskService.createTaskQuery().singleResult();
+    assertEquals(1, ((CountingTaskEntity) currentTask).getVariableCount());
+
+    taskService.removeVariablesLocal(currentTask.getId(), localVars.keySet());
+    currentTask = taskService.createTaskQuery().singleResult();
+    assertEquals(1, ((CountingTaskEntity) currentTask).getVariableCount());
+
+    taskService.removeVariableLocal(currentTask.getId(), "variable1");
+    currentTask = taskService.createTaskQuery().singleResult();
+    assertEquals(0, ((CountingTaskEntity) currentTask).getVariableCount());
+
+    // make sure it does not get negative
+    taskService.removeVariableLocal(currentTask.getId(), "variable1");
+    currentTask = taskService.createTaskQuery().singleResult();
+    assertEquals(0, ((CountingTaskEntity) currentTask).getVariableCount());
+    
+    processEngineConfiguration.setEnableTaskRelationshipCounts(false);
   }
 
   public void testRemoveVariableLocalNullTaskId() {

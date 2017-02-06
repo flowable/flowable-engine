@@ -38,8 +38,8 @@ public class MultiInstanceTest extends SpringFlowableTestCase {
 
   		@Override
   		public void configure() throws Exception {
-  		  from("activiti:miProcessExample:serviceTask1").to("seda:continueAsync1");
-  		  from("seda:continueAsync1").to("bean:sleepBean?method=sleep").to("activiti:miProcessExample:receive1");
+  		  from("flowable:miProcessExample:serviceTask1").to("seda:continueAsync1");
+  		  from("seda:continueAsync1").to("bean:sleepBean?method=sleep").to("flowable:miProcessExample:receive1");
   		}
   	});
   }

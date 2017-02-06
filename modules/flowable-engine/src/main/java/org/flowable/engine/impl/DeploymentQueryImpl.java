@@ -31,6 +31,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
 
   private static final long serialVersionUID = 1L;
   protected String deploymentId;
+  protected List<String> deploymentIds;
   protected String name;
   protected String nameLike;
   protected String category;
@@ -41,6 +42,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
   protected String tenantId;
   protected String tenantIdLike;
   protected boolean withoutTenantId;
+  protected String engineVersion;
   protected String processDefinitionKey;
   protected String processDefinitionKeyLike;
   protected boolean latest;
@@ -61,6 +63,14 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
       throw new FlowableIllegalArgumentException("Deployment id is null");
     }
     this.deploymentId = deploymentId;
+    return this;
+  }
+  
+  public DeploymentQueryImpl deploymentIds(List<String> deploymentIds) {
+    if (deploymentIds == null) {
+      throw new FlowableIllegalArgumentException("Deployment ids is null");
+    }
+    this.deploymentIds = deploymentIds;
     return this;
   }
 
@@ -140,6 +150,11 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
     this.withoutTenantId = true;
     return this;
   }
+  
+  public DeploymentQueryImpl deploymentEngineVersion(String engineVersion) {
+    this.engineVersion = engineVersion;
+    return this;
+  }
 
   public DeploymentQueryImpl processDefinitionKey(String key) {
     if (key == null) {
@@ -203,6 +218,10 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
   public String getDeploymentId() {
     return deploymentId;
   }
+  
+  public List<String> getDeploymentIds() {
+    return deploymentIds;
+  }
 
   public String getName() {
     return name;
@@ -230,6 +249,10 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
 
   public boolean isWithoutTenantId() {
     return withoutTenantId;
+  }
+  
+  public String getEngineVersion() {
+    return engineVersion;
   }
 
   public String getProcessDefinitionKey() {

@@ -138,6 +138,20 @@ All related classes that used the term 'persistent object' have been refactored 
 
 In version 5, the identity logic and tables were an integral part of the process engine. In version 6, the logic has been refactored into a separate module called _flowable-idm-engine_ (where idm stands for 'identity management). The related database tables are managed by this engine. For backwards compatibility, the idm engine is enabled by default when booting up the process engine. To disable the engine, set the _disableIdmEngine_ to _true_ in the process engine configuration. In that case, no identity database tables (starting with _ACT_ID_) will be created or can be removed if they exist already.
 
+=== Camel endpoint renamed to flowable
+
+When using the Flowable Camel module make sure to use the flowable endpoint, instead of the activiti endpoint. The route below provides a simple example:
+
+[source,java,linenums]
+----
+public class SimpleCamelCallRoute extends RouteBuilder {
+
+  @Override
+  public void configure() throws Exception {
+    from("flowable:SimpleCamelCallProcess:simpleCall").to("log:org.flowable.camel.examples.SimpleCamelCall");
+  }
+}
+---- 
 
 == V5 compatibility
 

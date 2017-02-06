@@ -49,12 +49,18 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
   public Deployment execute(CommandContext commandContext) {
 
     // Backwards compatibility with v5
-    if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled()
-        && deploymentBuilder.getDeploymentProperties() != null 
+    if (deploymentBuilder.getDeploymentProperties() != null 
         && deploymentBuilder.getDeploymentProperties().containsKey(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION)
         && deploymentBuilder.getDeploymentProperties().get(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION).equals(Boolean.TRUE)) {
       
+      if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled() && 
+          commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler() != null) {
+        
         return deployAsFlowable5ProcessDefinition(commandContext);
+        
+      } else {
+        throw new FlowableException("Can't deploy a v5 deployment with no flowable 5 compatibility enabled or no compatibility handler on the classpath");
+      }
     }
 
     return executeDeploy(commandContext);

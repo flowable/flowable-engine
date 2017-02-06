@@ -35,23 +35,24 @@ image::images/designer.create.flowable.project.png[align="center"]
 image::images/designer.bpmn.file.png[align="center"]
 
 
-* BPMN 2.0 XML files can be imported into the Flowable Designer and a diagram will be created. Just copy the BPMN 2.0 XML file to your project and open the file with the Flowable Diagram Editor view. The Flowable Designer uses the BPMN DI information of the file to create the diagram. If you have a BPMN 2.0 XML file without BPMN DI information, no diagram can be created.
+* BPMN 2.0 XML files can be imported into the Flowable Designer and a diagram will be created. Just copy the BPMN 2.0 XML file to your project and open the file with the Flowable Diagram Editor view. The Flowable Designer uses the BPMN DI information of the file to create the diagram. If you have a BPMN 2.0 XML file without BPMN DI information, the Flowable BPMN autolayout module is used to created a graphical representation of the diagram.
 
-image::images/designer.open.importedfile.png[align="center"]
+image::images/designer.open.importedfile.png[align="center", width="600"]
+
 
 *  For deployment a BAR file and optionally a JAR file is created by the Flowable Designer by right-clicking on a Flowable project in the package explorer and choosing the _Create deployment artifacts_ option at the bottom of the popup menu. For more information about the deployment functionality of the Designer look at the <<eclipseDesignerDeployment,deployment>> section.
 
-image::images/designer.create.deployment.png[align="center"]
+image::images/designer.create.deployment.png[align="center", width="500"]
 
 
 * Generate a unit test (right click on a BPMN 2.0 XML file in the package explorer and select __generate unit test__) A unit test is generated with a Flowable configuration that runs on an embedded H2 database. You can now run the unit test to test your process definition.
 
-image::images/designer.unittest.generate.png[align="center"]
+image::images/designer.unittest.generate.png[align="center", width="600"]
 
 
 * The Flowable project is generated as a Maven project. To configure the dependencies you need to run _mvn eclipse:eclipse_ and the Maven dependencies will be configured as expected. Note that for process design Maven dependencies are not needed. They are only needed to run unit tests.
 
-image::images/designer.project.maven.png[align="center"]
+image::images/designer.project.maven.png[align="center", width="500"]
 
 
 [[eclipseDesignerBPMNFeatures]]
@@ -119,7 +120,7 @@ image::images/designer.sequence.condition.png[align="center"]
 
 Deploying process definitions and task forms on the Flowable Engine is not hard. You need a BAR file containing the process definition BPMN 2.0 XML file and optionally task forms and an image of the process that can be viewed in the Flowable app. In the Flowable Designer it's made very easy to create a BAR file. When you've finished your process implementation just right-click on your Flowable project in the package explorer and choose for the *Create deployment artifacts* option at the bottom of the popup menu.
 
-image::images/designer.create.deployment.png[align="center"]
+image::images/designer.create.deployment.png[align="center", width="600"]
 
 Then a deployment directory is created containing the BAR file and optionally a JAR file with the Java classes of your Flowable project.
 
@@ -161,7 +162,7 @@ You can find the code examples listed below in source control with Flowable Desi
 
 [NOTE]
 ====
-You can setup your project in whichever tool you prefer and build the JAR with your build tool of choice. For the instructions below, a setup is assumed with Eclipse Kepler or Indigo, using Maven (3.x) as build tool, but any setup should enable you to create the same results.
+You can setup your project in whichever tool you prefer and build the JAR with your build tool of choice. For the instructions below, a setup is assumed with Eclipse Mars or Neon, using Maven (3.x) as build tool, but any setup should enable you to create the same results.
 ====
 
 
@@ -202,7 +203,7 @@ Add the integration library to your project's dependencies by including this dep
   <dependency>
     <groupId>org.flowable.designer</groupId>
     <artifactId>org.flowable.designer.integration</artifactId>
-    <version>5.12.0</version> <!-- Use the current Flowable Designer version -->
+    <version>5.22.0</version> <!-- Use the current Flowable Designer version -->
     <scope>compile</scope>
   </dependency>
 </dependencies>
@@ -221,11 +222,11 @@ Finally, in the++ pom.xml++ file, add the configuration for the ++maven-compiler
 ----
 <build>
   <plugins>
-        <plugin>
+    <plugin>
       <artifactId>maven-compiler-plugin</artifactId>
       <configuration>
-        <source>1.5</source>
-        <target>1.5</target>
+        <source>1.8</source>
+        <target>1.8</target>
         <showDeprecation>true</showDeprecation>
         <showWarnings>true</showWarnings>
         <optimize>true</optimize>
@@ -234,7 +235,7 @@ Finally, in the++ pom.xml++ file, add the configuration for the ++maven-compiler
     <plugin>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-jar-plugin</artifactId>
-      <version>2.3.1</version>
+      <version>2.3.2</version>
       <configuration>
         <archive>
           <index>true</index>
@@ -280,25 +281,25 @@ That's it for the setup. Now you're ready to start creating customizations to Fl
 You might be wondering how you can add your extension to Flowable Designer so your customizations are applied. These are the steps to do just that:
 * Once you've created your extension JAR (for instance, by performing a mvn install in your project to build it with Maven), you need to transfer the extension to the computer where Flowable Designer is installed;
 * Store the extension somewhere on the hard drive where it will be able to remain and remember the location. _Note:_ the location must be outside the Eclipse workspace of Flowable Designer - storing the extension inside the workspace will lead to the user getting a popup error message and the extensions being unavailable;
-* Start Flowable Designer and from the menu, select +Window+ > +Preferences+
+* Start Flowable Designer and from the menu, select +Window+ > +Preferences+ or +Eclipse+ > +Preferences+
 * In the preferences screen, type +user+ as keyword. You should see an option to access the +User Libraries+ in Eclipse in the +Java+ section.
 
-image::images/designer.preferences.userlibraries.png[align="center"]
+image::images/designer.preferences.userlibraries.png[align="center", width="250"]
 
 
 * Select the User Libraries item and a tree view shows up to the right where you can add libraries. You should see the default group where you can add extensions to Flowable Designer (depending on your Eclipse installation, you might see several others as well).
 
-image::images/designer.preferences.userlibraries.activiti.empty.png[align="center"]
+image::images/designer.preferences.userlibraries.flowable.empty.png[align="center", width="600"]
 
 
-* Select the +Flowable Designer Extensions+ group and click the +Add JARs...+ button. Navigate to the folder where your extension is stored and select the extension file you want to add. After completing this, your preferences screen should show the extension as part of the +Flowable Designer Extensions+ group, as shown below.
+* Select the +Flowable Designer Extensions+ group and click the +Add JARs...+ or +Add External JARs...+ button. Navigate to the folder where your extension is stored and select the extension file you want to add. After completing this, your preferences screen should show the extension as part of the +Flowable Designer Extensions+ group, as shown below.
 
-image::images/designer.preferences.userlibraries.activiti.moneytasks.png[align="center"]
+image::images/designer.preferences.userlibraries.flowable.moneytasks.png[align="center", width="600"]
 
 
 * Click the +OK+ button to save and close the preferences dialog. The +Flowable Designer Extensions+ group is automatically added to new Flowable projects you create. You can see the user library as entry in the project's tree in the Navigator or Package Explorer. If you already had Flowable projects in the workspace, you should also see the new extensions show up in the group. An example is shown below.
 
-image::images/designer.userlibraries.project.png[align="center"]
+image::images/designer.userlibraries.project.png[align="center", width="400"]
 
 
 Diagrams you open will now have the shapes from the new extension in their palette (or shapes disabled, depending on the customizations in your extension). If you already had a diagram opened, close and reopen it to see the changes in the palette.
@@ -352,24 +353,22 @@ Below is the listing for a further elaboration of the +MoneyTask+. A comment fie
  * @since 1.0.0
  */
 @Runtime(javaDelegateClass = "org.acme.runtime.AcmeMoneyJavaDelegation")
-@Help(displayHelpShort = "Creates a new account", displayHelpLong = "Creates a new account using the account number specified")
+@Help(displayHelpShort = "Creates a new account", displayHelpLong = 
+    "Creates a new account using the account number specified")
 public class AcmeMoneyTask extends AbstractCustomServiceTask {
 
-  private static final String HELP_ACCOUNT_NUMBER_LONG = "Provide a number that is suitable as an account number.";
+  private static final String HELP_ACCOUNT_NUMBER_LONG = 
+      "Provide a number that is suitable as an account number.";
 
   @Property(type = PropertyType.TEXT, displayName = "Account Number", required = true)
   @Help(displayHelpShort = "Provide an account number", displayHelpLong = HELP_ACCOUNT_NUMBER_LONG)
   private String accountNumber;
 
   @Property(type = PropertyType.MULTILINE_TEXT, displayName = "Comments")
-  @Help(displayHelpShort = "Provide comments", displayHelpLong = "You can add comments to the node to provide a brief description.")
+  @Help(displayHelpShort = "Provide comments", displayHelpLong = 
+      "You can add comments to the node to provide a brief description.")
   private String comments;
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.flowable.designer.integration.servicetask.AbstractCustomServiceTask #contributeToPaletteDrawer()
-   */
   @Override
   public String contributeToPaletteDrawer() {
     return "Acme Corporation";
@@ -380,11 +379,6 @@ public class AcmeMoneyTask extends AbstractCustomServiceTask {
     return "Money node";
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.flowable.designer.integration.servicetask.AbstractCustomServiceTask #getSmallIconPath()
-   */
   @Override
   public String getSmallIconPath() {
     return "icons/coins.png";
@@ -395,7 +389,7 @@ public class AcmeMoneyTask extends AbstractCustomServiceTask {
 
 If you extend Flowable Designer with this shape, The palette and corresponding node will look like this:
 
-image::images/designer.palette.add.money.png[align="center"]
+image::images/designer.palette.add.money.png[align="center", width="250"]
 
 
 The properties screen for the money task is shown below. Note the required message for the +accountNumber+ field.
@@ -492,8 +486,10 @@ This property type expects the class member you have annotated to also have an a
 [source,java,linenums]
 ----
 @Property(type = PropertyType.RADIO_CHOICE, displayName = "Withdrawl limit", required = true)
-@Help(displayHelpShort = "The maximum daily withdrawl amount ", displayHelpLong = "Choose the maximum daily amount that can be withdrawn from the account.")
-@PropertyItems({ LIMIT_LOW_LABEL, LIMIT_LOW_VALUE, LIMIT_MEDIUM_LABEL, LIMIT_MEDIUM_VALUE, LIMIT_HIGH_LABEL, LIMIT_HIGH_VALUE })
+@Help(displayHelpShort = "The maximum daily withdrawl amount ", 
+    displayHelpLong = "Choose the maximum daily amount that can be withdrawn from the account.")
+@PropertyItems({ LIMIT_LOW_LABEL, LIMIT_LOW_VALUE, LIMIT_MEDIUM_LABEL, LIMIT_MEDIUM_VALUE, 
+    LIMIT_HIGH_LABEL, LIMIT_HIGH_VALUE })
 private String withdrawlLimit;
 ----
 
@@ -511,10 +507,12 @@ This property type expects the class member you have annotated to also have an a
 [source,java,linenums]
 ----
 @Property(type = PropertyType.COMBOBOX_CHOICE, displayName = "Account type", required = true)
-@Help(displayHelpShort = "The type of account", displayHelpLong = "Choose a type of account from the list of options")
-@PropertyItems({ ACCOUNT_TYPE_SAVINGS_LABEL, ACCOUNT_TYPE_SAVINGS_VALUE, ACCOUNT_TYPE_JUNIOR_LABEL, ACCOUNT_TYPE_JUNIOR_VALUE, ACCOUNT_TYPE_JOINT_LABEL,
-  ACCOUNT_TYPE_JOINT_VALUE, ACCOUNT_TYPE_TRANSACTIONAL_LABEL, ACCOUNT_TYPE_TRANSACTIONAL_VALUE, ACCOUNT_TYPE_STUDENT_LABEL, ACCOUNT_TYPE_STUDENT_VALUE,
-  ACCOUNT_TYPE_SENIOR_LABEL, ACCOUNT_TYPE_SENIOR_VALUE })
+@Help(displayHelpShort = "The type of account", 
+    displayHelpLong = "Choose a type of account from the list of options")
+@PropertyItems({ ACCOUNT_TYPE_SAVINGS_LABEL, ACCOUNT_TYPE_SAVINGS_VALUE, ACCOUNT_TYPE_JUNIOR_LABEL, 
+    ACCOUNT_TYPE_JUNIOR_VALUE, ACCOUNT_TYPE_JOINT_LABEL, ACCOUNT_TYPE_JOINT_VALUE, 
+    ACCOUNT_TYPE_TRANSACTIONAL_LABEL, ACCOUNT_TYPE_TRANSACTIONAL_VALUE, ACCOUNT_TYPE_STUDENT_LABEL, 
+    ACCOUNT_TYPE_STUDENT_VALUE, ACCOUNT_TYPE_SENIOR_LABEL, ACCOUNT_TYPE_SENIOR_VALUE })
 private String accountType;
 ----
 
@@ -532,7 +530,8 @@ This property type expects the class member you have annotated to also have an a
 [source,java,linenums]
 ----
 @Property(type = PropertyType.DATE_PICKER, displayName = "Expiry date", required = true)
-@Help(displayHelpShort = "The date the account expires ", displayHelpLong = "Choose the date when the account will expire if no extended before the date.")
+@Help(displayHelpShort = "The date the account expires ", 
+    displayHelpLong = "Choose the date when the account will expire if no extended before the date.")
 @DatePickerProperty(dateTimePattern = "MM-dd-yyyy", swtStyle = 32)
 private String expiryDate;
 ----
@@ -580,11 +579,6 @@ Extending the +AbstractDefaultPaletteCustomizer+ class requires you to implement
 ----
 public class MyPaletteCustomizer extends AbstractDefaultPaletteCustomizer {
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.flowable.designer.integration.palette.DefaultPaletteCustomizer#disablePaletteEntries()
-   */
   @Override
   public List<PaletteEntry> disablePaletteEntries() {
     List<PaletteEntry> result = new ArrayList<PaletteEntry>();
@@ -608,11 +602,6 @@ To disable all of the default shapes, you could use something similar to the cod
 ----
 public class MyPaletteCustomizer extends AbstractDefaultPaletteCustomizer {
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.flowable.designer.integration.palette.DefaultPaletteCustomizer#disablePaletteEntries()
-   */
   @Override
   public List<PaletteEntry> disablePaletteEntries() {
     List<PaletteEntry> result = new ArrayList<PaletteEntry>();
@@ -672,11 +661,6 @@ clearMarkersForDiagram();
 You should also use the progress monitor provided (in the ++DiagramWorkerContext++) to report your progress back to the user because validations and/or marshalling actions can take up some time during which the user is forced to wait. Reporting progress requires some knowledge of how you should use Eclipse's features. Take a look at link:$$http://www.eclipse.org/articles/Article-Progress-Monitors/article.html$$[this article] for a thorough explanation of the concepts and usage.
 
 ===== Creating a ProcessValidator extension
-
-[NOTE]
-====
-Under review!
-====
 
 
 Create an extension to the +org.flowable.designer.eclipse.extension.validation.ProcessValidator+ extension point in your +plugin.xml+ file. For this extension point, you are required to subclass the +AbstractProcessValidator+ class.

@@ -34,7 +34,7 @@ public class InitiatorCamelCallTest extends SpringFlowableTestCase {
       @Override
       public void configure() throws Exception {
         from("direct:startWithInitiatorHeader").setHeader("CamelProcessInitiatorHeader", constant("kermit")).to(
-            "activiti:InitiatorCamelCallProcess?processInitiatorHeaderName=CamelProcessInitiatorHeader");
+            "flowable:InitiatorCamelCallProcess?processInitiatorHeaderName=CamelProcessInitiatorHeader");
       }
     });
   }

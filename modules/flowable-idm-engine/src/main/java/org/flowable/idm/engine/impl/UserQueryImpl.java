@@ -31,11 +31,15 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
   private static final long serialVersionUID = 1L;
   protected String id;
   protected List<String> ids;
+  protected String idIgnoreCase;
   protected String firstName;
   protected String firstNameLike;
+  protected String firstNameLikeIgnoreCase;
   protected String lastName;
   protected String lastNameLike;
+  protected String lastNameLikeIgnoreCase;
   protected String fullNameLike;
+  protected String fullNameLikeIgnoreCase;
   protected String email;
   protected String emailLike;
   protected String groupId;
@@ -67,10 +71,18 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
     this.ids = ids;
     return this;
   }
+  
+  public UserQuery userIdIgnoreCase(String id) {
+    if (id == null) {
+      throw new FlowableIllegalArgumentException("Provided id is null");
+    }
+    this.idIgnoreCase = id.toLowerCase();
+    return this;
+  }
 
   public UserQuery userFirstName(String firstName) {
     if (firstName == null) {
-      throw new FlowableIllegalArgumentException("Provided firstName is null");
+      throw new FlowableIllegalArgumentException("Provided first name is null");
     }
     this.firstName = firstName;
     return this;
@@ -78,15 +90,23 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
 
   public UserQuery userFirstNameLike(String firstNameLike) {
     if (firstNameLike == null) {
-      throw new FlowableIllegalArgumentException("Provided firstNameLike is null");
+      throw new FlowableIllegalArgumentException("Provided first name is null");
     }
     this.firstNameLike = firstNameLike;
+    return this;
+  }
+  
+  public UserQuery userFirstNameLikeIgnoreCase(String firstNameLikeIgnoreCase) {
+    if (firstNameLikeIgnoreCase == null) {
+      throw new FlowableIllegalArgumentException("Provided first name is null");
+    }
+    this.firstNameLikeIgnoreCase = firstNameLikeIgnoreCase.toLowerCase();
     return this;
   }
 
   public UserQuery userLastName(String lastName) {
     if (lastName == null) {
-      throw new FlowableIllegalArgumentException("Provided lastName is null");
+      throw new FlowableIllegalArgumentException("Provided last name is null");
     }
     this.lastName = lastName;
     return this;
@@ -94,9 +114,17 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
 
   public UserQuery userLastNameLike(String lastNameLike) {
     if (lastNameLike == null) {
-      throw new FlowableIllegalArgumentException("Provided lastNameLike is null");
+      throw new FlowableIllegalArgumentException("Provided last name is null");
     }
     this.lastNameLike = lastNameLike;
+    return this;
+  }
+  
+  public UserQuery userLastNameLikeIgnoreCase(String lastNameLikeIgnoreCase) {
+    if (lastNameLikeIgnoreCase == null) {
+      throw new FlowableIllegalArgumentException("Provided last name is null");
+    }
+    this.lastNameLikeIgnoreCase = lastNameLikeIgnoreCase.toLowerCase();
     return this;
   }
 
@@ -105,6 +133,14 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
       throw new FlowableIllegalArgumentException("Provided full name is null");
     }
     this.fullNameLike = fullNameLike;
+    return this;
+  }
+  
+  public UserQuery userFullNameLikeIgnoreCase(String fullNameLikeIgnoreCase) {
+    if (fullNameLikeIgnoreCase == null) {
+      throw new FlowableIllegalArgumentException("Provided full name is null");
+    }
+    this.fullNameLikeIgnoreCase = fullNameLikeIgnoreCase.toLowerCase();
     return this;
   }
 
@@ -179,6 +215,10 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
   public List<String> getIds() {
     return ids;
   }
+  
+  public String getIdIgnoreCase() {
+    return idIgnoreCase;
+  }
 
   public String getFirstName() {
     return firstName;
@@ -187,6 +227,10 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
   public String getFirstNameLike() {
     return firstNameLike;
   }
+  
+  public String getFirstNameLikeIgnoreCase() {
+    return firstNameLikeIgnoreCase;
+  }
 
   public String getLastName() {
     return lastName;
@@ -194,6 +238,10 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
 
   public String getLastNameLike() {
     return lastNameLike;
+  }
+  
+  public String getLastNameLikeIgnoreCase() {
+    return lastNameLikeIgnoreCase;
   }
 
   public String getEmail() {
@@ -214,6 +262,10 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
 
   public String getFullNameLike() {
     return fullNameLike;
+  }
+  
+  public String getFullNameLikeIgnoreCase() {
+    return fullNameLikeIgnoreCase;
   }
   
 }

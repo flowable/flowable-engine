@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 /**
- * Service for invoking Activiti REST services.
+ * Service for invoking Flowable REST services.
  */
 @Service
 public class DecisionAuditService {
