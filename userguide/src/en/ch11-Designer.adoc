@@ -530,8 +530,8 @@ This property type expects the class member you have annotated to also have an a
 [source,java,linenums]
 ----
 @Property(type = PropertyType.DATE_PICKER, displayName = "Expiry date", required = true)
-@Help(displayHelpShort = "The date the account expires ", 
-    displayHelpLong = "Choose the date when the account will expire if no extended before the date.")
+@Help(displayHelpShort = "The date the account expires.",
+    displayHelpLong = "Choose the date when the account will expire if not extended before the date.")
 @DatePickerProperty(dateTimePattern = "MM-dd-yyyy", swtStyle = 32)
 private String expiryDate;
 ----
