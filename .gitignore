@@ -18,3 +18,4 @@ modules/flowable-webapp-rest2/src/main/webapp/docs
 modules/flowable-app-rest/.extract
 modules/flowable-ui-idm/flowable-ui-idm-app/.extract
 modules/flowable-app-rest/src/main/webapp/docs/specfile
+userguide-dmn/src/en/output
