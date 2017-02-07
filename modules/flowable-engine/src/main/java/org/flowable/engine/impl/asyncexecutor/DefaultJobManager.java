@@ -127,7 +127,7 @@ public class DefaultJobManager implements JobManager {
   }
 
   @Override
-  public void rescheduleTimerJob(String timerJobId, TimerEventDefinition timerEventDefinition) {
+  public TimerJobEntity rescheduleTimerJob(String timerJobId, TimerEventDefinition timerEventDefinition) {
     TimerJobEntityManager jobManager = processEngineConfiguration.getTimerJobEntityManager();
     TimerJobEntity timerJob = jobManager.findById(timerJobId);
     if (timerJob != null) {
@@ -145,7 +145,9 @@ public class DefaultJobManager implements JobManager {
               timerJob.getJobHandlerType(), timerJob.getJobHandlerConfiguration());
       
       scheduleTimerJob(rescheduledTimerJob);
+      return rescheduledTimerJob;
     }
+    return null;
   }
   
   @Override

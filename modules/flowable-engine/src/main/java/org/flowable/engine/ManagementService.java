@@ -191,7 +191,7 @@ public interface ManagementService {
    * @param timeDate
    *          A fixed date in ISO 8601 format, when job will be fired
    */
-  void rescheduleTimeDateJob(String jobId, String timeDate);
+  Job rescheduleTimeDateJob(String jobId, String timeDate);
   
   /**
    * Reschedule a timer job with a time duration.
@@ -201,7 +201,7 @@ public interface ManagementService {
    * @param timeDuration
    *          How long the timer should run before it is fired in ISO 8601 format. For example, PT10D means the timer will run for 10 days before it fires.
    */
-  void rescheduleTimeDurationJob(String jobId, String timeDuration);
+  Job rescheduleTimeDurationJob(String jobId, String timeDuration);
   
   /**
    * Reschedule a timer job with a time cycle.
@@ -211,7 +211,7 @@ public interface ManagementService {
    * @param timeCycle
    *          Specifies a repeating interval at which the timer will fire in ISO 8601 format. For example R3/PT10H means the timer will fire three timers in intervals of 10 hours.
    */
-  void rescheduleTimeCycleJob(String jobId, String timeCycle);
+  Job rescheduleTimeCycleJob(String jobId, String timeCycle);
   
   /**
    * Reschedule a timer job.
@@ -229,7 +229,7 @@ public interface ManagementService {
    * @param calendarName
    *          The name of a business calendar defined in the process engine configuration. If null the default business calendars is used.
    */
-  void rescheduleTimerJob(String jobId, String timeDate, String timeDuration, String timeCycle, String endDate, String calendarName);
+  Job rescheduleTimerJob(String jobId, String timeDate, String timeDuration, String timeCycle, String endDate, String calendarName);
 
   /**
    * Returns the full stacktrace of the exception that occurs when the job with the given id was last executed. 
