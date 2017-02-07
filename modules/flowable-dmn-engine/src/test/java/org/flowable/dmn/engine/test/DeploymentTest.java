@@ -138,6 +138,43 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
     }
 
     @Test
+    @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/deployment/multiple_decisions.dmn")
+    public void deployMultipleDecisions() throws Exception {
+        DecisionTable decision = repositoryService.createDecisionTableQuery()
+            .latestVersion()
+            .decisionTableKey("decision")
+            .singleResult();
+        assertNotNull(decision);
+        assertEquals("decision", decision.getKey());
+
+        assertTrue(dmnEngineConfiguration.getDeploymentManager().getDecisionCache().contains(decision.getId()));
+        dmnEngineConfiguration.getDeploymentManager().getDecisionCache().clear();
+        assertFalse(dmnEngineConfiguration.getDeploymentManager().getDecisionCache().contains(decision.getId()));
+
+        decision = repositoryService.getDecisionTable(decision.getId());
+        assertNotNull(decision);
+        assertEquals("decision", decision.getKey());
+
+
+        DecisionTable decision2 = repositoryService.createDecisionTableQuery()
+            .latestVersion()
+            .decisionTableKey("decision2")
+            .singleResult();
+        assertNotNull(decision2);
+        assertEquals("decision2", decision2.getKey());
+
+        assertTrue(dmnEngineConfiguration.getDeploymentManager().getDecisionCache().contains(decision2.getId()));
+        dmnEngineConfiguration.getDeploymentManager().getDecisionCache().clear();
+        assertFalse(dmnEngineConfiguration.getDeploymentManager().getDecisionCache().contains(decision2.getId()));
+
+        decision2 = repositoryService.getDecisionTable(decision2.getId());
+        assertNotNull(decision2);
+        assertEquals("decision2", decision2.getKey());
+
+
+    }
+
+    @Test
     public void numberTest1() {
         BigDecimal bigDecimal1 = new BigDecimal("3");
         BigDecimal bigDecimal2 = bigDecimal1.divide(new BigDecimal("2")).setScale(0, BigDecimal.ROUND_HALF_UP);
