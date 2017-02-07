@@ -23,7 +23,7 @@ import org.junit.Test;
 public class EventNotificationTest extends CdiFlowableTestCase {
 
   @Test
-  @Deployment(resources = { "org/activiti/cdi/test/impl/event/EventNotificationTest.process1.bpmn20.xml" })
+  @Deployment(resources = { "org/flowable/cdi/test/impl/event/EventNotificationTest.process1.bpmn20.xml" })
   public void testReceiveAll() {
     TestEventListener listenerBean = getBeanInstance(TestEventListener.class);
     listenerBean.reset();
@@ -37,7 +37,7 @@ public class EventNotificationTest extends CdiFlowableTestCase {
   }
 
   @Test
-  @Deployment(resources = { "org/activiti/cdi/test/impl/event/EventNotificationTest.process1.bpmn20.xml", "org/activiti/cdi/test/impl/event/EventNotificationTest.process2.bpmn20.xml" })
+  @Deployment(resources = { "org/flowable/cdi/test/impl/event/EventNotificationTest.process1.bpmn20.xml", "org/flowable/cdi/test/impl/event/EventNotificationTest.process2.bpmn20.xml" })
   public void testSelectEventsPerProcessDefinition() {
     TestEventListener listenerBean = getBeanInstance(TestEventListener.class);
     listenerBean.reset();
@@ -52,7 +52,7 @@ public class EventNotificationTest extends CdiFlowableTestCase {
   }
 
   @Test
-  @Deployment(resources = { "org/activiti/cdi/test/impl/event/EventNotificationTest.process1.bpmn20.xml" })
+  @Deployment(resources = { "org/flowable/cdi/test/impl/event/EventNotificationTest.process1.bpmn20.xml" })
   public void testSelectEventsPerActivity() {
     TestEventListener listenerBean = getBeanInstance(TestEventListener.class);
     listenerBean.reset();
@@ -72,7 +72,7 @@ public class EventNotificationTest extends CdiFlowableTestCase {
   }
 
   @Test
-  @Deployment(resources = { "org/activiti/cdi/test/impl/event/TaskEventNotificationTest.process3.bpmn20.xml" })
+  @Deployment(resources = { "org/flowable/cdi/test/impl/event/TaskEventNotificationTest.process3.bpmn20.xml" })
   public void testCreateEventsPerActivity() {
     TestEventListener listenerBean = getBeanInstance(TestEventListener.class);
     listenerBean.reset();

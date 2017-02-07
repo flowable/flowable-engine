@@ -19,6 +19,7 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.calendar.BusinessCalendar;
@@ -170,8 +171,10 @@ public class TimerUtil {
   public static String prepareRepeat(String dueDate) {
     if (dueDate.startsWith("R") && dueDate.split("/").length == 2) {
         DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
-        Date now = Context.getProcessEngineConfiguration().getClock().getCurrentTime();
-        return dueDate.replace("/", "/" + fmt.print(new DateTime(now, DateTimeZone.UTC)) + "/");
+        Clock clock = Context.getProcessEngineConfiguration().getClock();
+        Date now = clock.getCurrentTime();
+        return dueDate.replace("/", "/" + fmt.print(new DateTime(now, 
+            DateTimeZone.forTimeZone(clock.getCurrentTimeZone()))) + "/");
     }
     return dueDate;
   }

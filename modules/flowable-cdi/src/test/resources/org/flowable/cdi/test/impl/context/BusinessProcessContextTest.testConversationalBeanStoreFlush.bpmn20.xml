@@ -7,7 +7,7 @@
 
 		<startEvent id="startEvent" />
 		
-		<serviceTask id="serviceTask" activiti:expression="#{processScopedMessageBean.setMessage('Hello from Activiti')}" />
+		<serviceTask id="serviceTask" activiti:expression="#{processScopedMessageBean.setMessage('Hello from Flowable')}" />
 
 		<userTask id="wait" />
 

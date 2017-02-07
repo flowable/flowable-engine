@@ -27,7 +27,7 @@ public class ProcessVariablesTest extends CdiFlowableTestCase {
 
   @Ignore
   @Test
-  @Deployment(resources = "org/activiti/cdi/BusinessProcessBeanTest.test.bpmn20.xml")
+  @Deployment(resources = "org/flowable/cdi/BusinessProcessBeanTest.test.bpmn20.xml")
   public void testResolveString() {
     BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
 

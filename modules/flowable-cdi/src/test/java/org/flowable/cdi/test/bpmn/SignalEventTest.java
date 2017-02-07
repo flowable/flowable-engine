@@ -62,8 +62,8 @@ public class SignalEventTest extends CdiFlowableTestCase {
   }
 
   @Test
-  @Deployment(resources = { "org/activiti/cdi/test/bpmn/SignalEventTests.catchAlertSignalBoundaryWithReceiveTask.bpmn20.xml",
-      "org/activiti/cdi/test/bpmn/SignalEventTests.throwAlertSignalWithDelegate.bpmn20.xml" })
+  @Deployment(resources = { "org/flowable/cdi/test/bpmn/SignalEventTests.catchAlertSignalBoundaryWithReceiveTask.bpmn20.xml",
+      "org/flowable/cdi/test/bpmn/SignalEventTests.throwAlertSignalWithDelegate.bpmn20.xml" })
   public void testSignalCatchBoundaryWithVariables() {
     HashMap<String, Object> variables1 = new HashMap<String, Object>();
     variables1.put("processName", "catchSignal");

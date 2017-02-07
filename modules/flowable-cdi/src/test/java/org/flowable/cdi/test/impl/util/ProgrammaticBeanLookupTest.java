@@ -35,19 +35,19 @@ public class ProgrammaticBeanLookupTest {
 
   @Deployment(name = "normal", managed = false)
   public static JavaArchive createDeployment() {
-    return ShrinkWrap.create(JavaArchive.class).addClass(ProgrammaticBeanLookup.class).addClass(FlowableServices.class).addAsManifestResource("org/activiti/cdi/test/impl/util/beans.xml", "beans.xml");
+    return ShrinkWrap.create(JavaArchive.class).addClass(ProgrammaticBeanLookup.class).addClass(FlowableServices.class).addAsManifestResource("org/flowable/cdi/test/impl/util/beans.xml", "beans.xml");
   }
 
   @Deployment(name = "withAlternative", managed = false)
   public static JavaArchive createDeploymentWithAlternative() {
     return ShrinkWrap.create(JavaArchive.class).addClass(ProgrammaticBeanLookup.class).addClass(FlowableServices.class).addClass(AlternativeTestBean.class)
-        .addAsManifestResource("org/activiti/cdi/test/impl/util/beansWithAlternative.xml", "beans.xml");
+        .addAsManifestResource("org/flowable/cdi/test/impl/util/beansWithAlternative.xml", "beans.xml");
   }
 
   @Deployment(name = "withSpecialization", managed = false)
   public static JavaArchive createDeploymentWithSpecialization() {
     return ShrinkWrap.create(JavaArchive.class).addClass(ProgrammaticBeanLookup.class).addClass(FlowableServices.class).addClass(SpecializedTestBean.class)
-        .addAsManifestResource("org/activiti/cdi/test/impl/util/beans.xml", "beans.xml");
+        .addAsManifestResource("org/flowable/cdi/test/impl/util/beans.xml", "beans.xml");
   }
 
   @Test

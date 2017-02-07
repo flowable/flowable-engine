@@ -41,7 +41,7 @@ public class StartProcessTest extends CdiFlowableTestCase {
 
     assertNotNull(runtimeService.createProcessInstanceQuery().singleResult());
 
-    assertEquals("Activiti", businessProcess.getVariable("name"));
+    assertEquals("Flowable", businessProcess.getVariable("name"));
 
     businessProcess.startTask(taskService.createTaskQuery().singleResult().getId());
     businessProcess.completeTask();
@@ -59,7 +59,7 @@ public class StartProcessTest extends CdiFlowableTestCase {
 
     assertNotNull(runtimeService.createProcessInstanceQuery().singleResult());
 
-    assertEquals("Activiti", businessProcess.getVariable("name"));
+    assertEquals("Flowable", businessProcess.getVariable("name"));
 
     businessProcess.startTask(taskService.createTaskQuery().singleResult().getId());
     businessProcess.completeTask();

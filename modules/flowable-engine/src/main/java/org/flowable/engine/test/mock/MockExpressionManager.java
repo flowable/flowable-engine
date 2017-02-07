@@ -20,12 +20,17 @@ import javax.el.ELResolver;
 import javax.el.ListELResolver;
 import javax.el.MapELResolver;
 
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.el.VariableScopeElResolver;
 
 public class MockExpressionManager extends ExpressionManager {
 
+  public MockExpressionManager(ProcessEngineConfiguration processEngineConfiguration) {
+    super(processEngineConfiguration);
+  }
+  
   @Override
   protected ELResolver createElResolver(VariableScope variableScope) {
     CompositeELResolver compositeElResolver = new CompositeELResolver();

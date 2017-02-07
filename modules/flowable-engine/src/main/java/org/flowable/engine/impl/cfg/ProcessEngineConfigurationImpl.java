@@ -1905,7 +1905,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void initExpressionManager() {
     if (expressionManager == null) {
-      expressionManager = new ExpressionManager(beans);
+      expressionManager = new ExpressionManager(beans, this);
     }
   }
 

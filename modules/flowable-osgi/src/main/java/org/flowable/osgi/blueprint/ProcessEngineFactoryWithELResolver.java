@@ -10,6 +10,7 @@ import javax.el.ELResolver;
 import javax.el.ListELResolver;
 import javax.el.MapELResolver;
 
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.el.ExpressionManager;
@@ -28,7 +29,7 @@ public class ProcessEngineFactoryWithELResolver extends ProcessEngineFactory {
   @Override
   public void init() throws Exception {
     ProcessEngineConfigurationImpl configImpl = (ProcessEngineConfigurationImpl) getProcessEngineConfiguration();
-    configImpl.setExpressionManager(new BlueprintExpressionManager());
+    configImpl.setExpressionManager(new BlueprintExpressionManager(configImpl));
 
     List<ResolverFactory> resolverFactories = configImpl.getResolverFactories();
     if (resolverFactories == null) {
@@ -42,6 +43,11 @@ public class ProcessEngineFactoryWithELResolver extends ProcessEngineFactory {
   }
 
   public class BlueprintExpressionManager extends ExpressionManager {
+    
+    public BlueprintExpressionManager(ProcessEngineConfiguration processEngineConfiguration) {
+      super(processEngineConfiguration);
+    }
+    
     @Override
     protected ELResolver createElResolver(VariableScope variableScope) {
       CompositeELResolver compositeElResolver = new CompositeELResolver();
