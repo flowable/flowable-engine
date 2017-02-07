@@ -392,7 +392,8 @@ Which, if you run this, should look something like this:
 
 image::images/getting.started.console.logging3.png[align="center"]
 
-The manager can now *complete the task*. In reality, this often means that a form is sumitted by the user. The data from the form is then passed as _process variables_. Here, we'll mimic this by passing a map with the 'approved' variable (the name is important, as it's used later on in the conditions of the sequence flow!) when the task is completed:
+The manager can now *complete the task*. In reality, this often means that a form is submitted by the user. The data from the form is then passed as _process
+ variables_. Here, we'll mimic this by passing a map with the 'approved' variable (the name is important, as it's used later on in the conditions of the sequence flow!) when the task is completed:
 
 [source,java,linenums]
 ----

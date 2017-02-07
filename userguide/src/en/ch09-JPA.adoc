@@ -141,7 +141,7 @@ ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
     "UpdateJPAValuesProcess", variables);
 ----
 
-The first node in our process definition contains a +serviceTask+ that will invoke the method +setValue+ on +entityToUpdate+, which resolves to the JPA variable we set earlier when starting the process instance and will be loaded from the +EntityManager+ associated with the current engine's context'.
+The first node in our process definition contains a +serviceTask+ that will invoke the method +setValue+ on +entityToUpdate+, which resolves to the JPA variable we set earlier when starting the process instance and will be loaded from the +EntityManager+ associated with the current engine's context.
 
 [source,xml,linenums]
 ----
