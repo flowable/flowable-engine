@@ -35,7 +35,8 @@ When no identity logic is needed in the Flowable Engine the IDM engine can be di
 
 This means that no user and group queries can be used and candidate groups in a task query can not be retrieved for a user.
 
-The default IDM Engine configurator can also be overriden to initialize the IDM Engine in a custom way. A good example is the LDAPConfigurator implementation which overrides the default IDM Engine to use a LDAP server instead of the default IDM database tables. The +idmProcessEngineConfigurator+ property of the process engine configuration can be used to set a custom configurator like the LDAPConfigurator
+The default IDM Engine configurator can also be overridden to initialize the IDM Engine in a custom way. A good example is the LDAPConfigurator
+implementation which overrides the default IDM Engine to use a LDAP server instead of the default IDM database tables. The +idmProcessEngineConfigurator+ property of the process engine configuration can be used to set a custom configurator like the LDAPConfigurator
 
 [source,xml,linenums]
 ----
