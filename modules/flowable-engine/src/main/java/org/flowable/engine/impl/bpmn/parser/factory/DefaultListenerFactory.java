@@ -182,7 +182,7 @@ public class DefaultListenerFactory extends AbstractBehaviorFactory implements L
     if (entityType != null) {
       Class<?> entityClass = ENTITY_MAPPING.get(entityType.trim());
       if (entityClass == null) {
-        throw new FlowableIllegalArgumentException("Unsupported entity-type for an ActivitiEventListener: " + entityType);
+        throw new FlowableIllegalArgumentException("Unsupported entity-type for a FlowableEventListener: " + entityType);
       }
       return entityClass;
     }

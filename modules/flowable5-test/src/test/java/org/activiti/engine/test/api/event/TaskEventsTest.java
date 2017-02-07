@@ -205,7 +205,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
 	
 	/**
    * This method checks to ensure that the task.fireEvent(TaskListener.EVENTNAME_CREATE), fires before
-   * the dispatchEvent ActivitiEventType.TASK_CREATED.  A ScriptTaskListener updates the priority and
+   * the dispatchEvent FLowableEventType.TASK_CREATED.  A ScriptTaskListener updates the priority and
    * assignee before the dispatchEvent() takes place.
      */
   @Deployment(resources= {"org/activiti/engine/test/api/event/TaskEventsTest.testEventFiring.bpmn20.xml"})

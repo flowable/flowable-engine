@@ -20,7 +20,7 @@ import org.junit.Before;
 import org.junit.Rule;
 
 /**
- * Parent class for internal Activiti DMN tests.
+ * Parent class for internal Flowable DMN tests.
  * 
  * Boots up a dmn engine and caches it.
  * 

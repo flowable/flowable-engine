@@ -18,7 +18,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.validation.validator.ValidatorSet;
 
 /**
- * Validates a process definition against the rules of the Activiti engine to be executable
+ * Validates a process definition against the rules of the Flowable engine to be executable
  * 
  * @author jbarrez
  */

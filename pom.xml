@@ -717,7 +717,7 @@
 				<artifactId>guava</artifactId>
 				<version>17.0</version>
 			</dependency>
-			<!-- Activiti Modeler -->
+			<!-- Flowable Modeler -->
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-core</artifactId>

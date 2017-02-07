@@ -87,7 +87,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
     assertEquals(":-(", new String((byte[]) historicVariableUpdate.getValue()));
     assertEquals(0, historicVariableUpdate.getRevision());
     
-    // Activiti 6: we don't store the start event activityId anymore!
+    // Flowable 6: we don't store the start event activityId anymore!
 //    assertEquals(historicStartEvent.getId(), historicVariableUpdate.getActivityInstanceId());
     assertNull(historicVariableUpdate.getActivityInstanceId());
 

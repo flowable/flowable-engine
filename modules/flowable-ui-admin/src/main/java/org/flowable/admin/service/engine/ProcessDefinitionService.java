@@ -112,7 +112,7 @@ public class ProcessDefinitionService {
 				if (success) {
 					return bpmnModel;
 				} else {
-					exception = new FlowableServiceException("An error occurred while calling Activiti: " + response.getStatusLine());
+					exception = new FlowableServiceException("An error occurred while calling Flowable: " + response.getStatusLine());
 				}
 			} catch (Exception e) {
                 log.warn("Error consuming response from uri {}", request.getURI(), e);

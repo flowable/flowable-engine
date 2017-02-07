@@ -12,6 +12,9 @@
  */
 package org.flowable.examples.debugger;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 import org.apache.commons.collections.Predicate;
 import org.flowable.engine.impl.agenda.ContinueProcessOperation;
 import org.flowable.engine.impl.interceptor.CommandExecutor;
@@ -20,11 +23,8 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.examples.groovy.GroovyScriptTest;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-
 /**
- * This example shows how to use Activiti in the debug mode
+ * This example shows how to use Flowable in the debug mode
  *
  * @author martin.grofcik
  */

@@ -10,9 +10,9 @@
 		
 		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
 
-		<userTask id="theTask" name="Book flight for Activiti conference" >
+		<userTask id="theTask" name="Book flight for Flowable conference" >
 		  <documentation>
-		    Book flight Brussels-Rome for Activiti BPM conference.
+		    Book flight Brussels-Rome for Flowable BPM conference.
 		  </documentation>
 		  <potentialOwner>
 		    <resourceAssignmentExpression>

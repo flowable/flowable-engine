@@ -224,7 +224,7 @@ public class EmailSendTaskTest extends EmailTestCase {
     } catch(FlowableException e) {
       // fine
     } catch(Exception e) {
-      fail("Only an ActivitiException is expected here but not: " + e);
+      fail("Only a FlowableException is expected here but not: " + e);
     }
   }
  

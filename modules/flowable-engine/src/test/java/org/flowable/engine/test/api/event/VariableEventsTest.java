@@ -173,7 +173,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
    * Test variable events when done within a process (eg. execution-listener)
    */
   @Deployment
-  public void ActivitiEventType() throws Exception {
+  public void FlowableEventType() throws Exception {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variableProcess");
     assertNotNull(processInstance);
 

@@ -13,13 +13,13 @@
 
 package org.flowable.spring.test.transaction;
 
+import javax.sql.DataSource;
+
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.sql.DataSource;
 
 /**
  * @author Tom Baeyens
@@ -45,7 +45,7 @@ public class UserBean {
   public void hello() {
     // here you can do transactional stuff in your domain model
     // and it will be combined in the same transaction as
-    // the startProcessInstanceByKey to the Activiti RuntimeService
+    // the startProcessInstanceByKey to the Flowable RuntimeService
     runtimeService.startProcessInstanceByKey("helloProcess");
   }
 

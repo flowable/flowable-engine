@@ -12,7 +12,7 @@ import org.flowable.validation.ValidationError;
 import org.flowable.validation.validator.ValidatorSet;
 
 /**
- * Sample Process Validator for Activiti Test case.
+ * Sample Process Validator for Flowable Test case.
  */
 public class FlowableTestCaseProcessValidator implements ProcessValidator {
 

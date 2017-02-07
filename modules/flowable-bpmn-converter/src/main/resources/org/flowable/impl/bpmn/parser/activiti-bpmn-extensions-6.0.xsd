@@ -11,7 +11,7 @@
   <annotation>
     <documentation>
       This XML Schema defines and documents BPMN 2.0 extension elements and
-      attributes introduced by Activiti.
+      attributes introduced by Flowable.
     </documentation>
   </annotation>
 
@@ -56,8 +56,8 @@
     <annotation>
       <documentation>
         Attribute used on a startEvent or a userTask.
-        The value can be anything. The default form support in Activiti
-        assumes that this is a reference to a form html file insed the deployment
+        The value can be anything. The default form support in Flowable
+        assumes that this is a reference to a form html file used in the deployment
         of the process definition. But this key can also be something completely different,
         in case of external form resolving.
       </documentation>
@@ -656,7 +656,7 @@
   <element name="in">
     <annotation>
       <documentation>
-        Element to specify Data Input in Activiti Shortcuts
+        Element to specify Data Input in Flowable Shortcuts
         (compare to DataInputAssociation in BPMN)
       </documentation>
     </annotation>
@@ -669,7 +669,7 @@
   <element name="out">
     <annotation>
       <documentation>
-        Element to specify Data Output in Activiti Shortcuts
+        Element to specify Data Output in Flowable Shortcuts
         (compare to DataOutputAssociation in BPMN)
       </documentation>
     </annotation>
