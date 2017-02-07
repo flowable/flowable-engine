@@ -103,7 +103,7 @@ To make the Process engine aware of the DMN engine the *org.flowable.dmn.engine.
 <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
 
     <bean id="dmnEngineConfiguration" class="org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration">
-        <property name="jdbcUrl" value="jdbc:h2:mem:flowable_dmn;DB_CLOSE_DELAY=1000" />
+        <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000" />
         <property name="jdbcDriver" value="org.h2.Driver" />
         <property name="jdbcUsername" value="sa" />
         <property name="jdbcPassword" value="" />

@@ -1,38 +1,35 @@
 [[chapterApi]]
 
-== The Flowable API
+== The Flowable DMN API
 
 [[apiEngine]]
 
 
-=== The Process Engine API and services
+=== The DMN Engine API and services
 
-The engine API is the most common way of interacting with Flowable. The central starting point is the +ProcessEngine+, which can be created in several ways as described in the  <<configuration,configuration section>>. From the ProcessEngine, you can obtain the various services that contain the workflow/BPM methods.  ProcessEngine and the services objects are thread safe. So you can keep a reference to 1 of those for a whole server.
+The DMN engine API is the most common way of interacting with Flowable DMN. The central starting point is the +DmnEngine+, which can be created in several ways as described in the  <<configuration,configuration section>>. From the DmnEngine, you can obtain the various other services.
+DmnEngine and the services objects are thread safe. So you can keep a reference to 1 of those for a whole server.
 
 image::images/api.services.png[align="center"]
 
 [source,java,linenums]
 ----
-ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine();
+DmnEngine dmnEngine = DmnEngines.getDefaultDmnEngine();
 
-RuntimeService runtimeService = processEngine.getRuntimeService();
-RepositoryService repositoryService = processEngine.getRepositoryService();
-TaskService taskService = processEngine.getTaskService();
-ManagementService managementService = processEngine.getManagementService();
-IdentityService identityService = processEngine.getIdentityService();
-HistoryService historyService = processEngine.getHistoryService();
-FormService formService = processEngine.getFormService();
-DynamicBpmnService dynamicBpmnService = processEngine.getDynamicBpmnService();
+DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+DmnRepositoryService dmnRepositoryService = dmnEngine.getDmnRepositoryService();
+DmnManagementService dmnManagementService = dmnEngine.getDmnManagementService();
 ----
 
-+ProcessEngines.getDefaultProcessEngine()+ will initialize and build a process engine the first time it is called and afterwards always return the same process engine. Proper creation and closing of all process engines can be done with +ProcessEngines.init()+  and +ProcessEngines.destroy()+.
++DmnEngines.getDefaultDmnEngine()+ will initialize and build a DMN engine the first time it is called and afterwards always return the same DMN engine. Proper creation and closing of all DMN engines can be done with +DMNEngines.init()+  and +DMNEngines.destroy()+.
 
 
-The ProcessEngines class will scan for all +flowable.cfg.xml+ and +flowable-context.xml+ files. For all +flowable.cfg.xml+ files, the process engine will be built in the typical Flowable way: +ProcessEngineConfiguration.createProcessEngineConfigurationFromInputStream(inputStream).buildProcessEngine()+. For all +flowable-context.xml+ files, the process engine will be built in the Spring way: First the Spring application context is created and then the process engine is obtained from that application context.
+The DmnEngines class will scan for all +flowable.dmn.cfg.xml+ and +flowable-dmn-context.xml+ files. For all +flowable.dmn.cfg.xml+ files, the DMN engine will be built in the typical Flowable way: +DmnEngineConfiguration.createDmnEngineConfigurationFromInputStream(inputStream).buildDmnEngine()+. For all +flowable-dmn-context.xml+ files, the DMN engine will be built in the Spring way: First the Spring application context is created and then the DMN engine is obtained from that application context.
 
-All services are stateless. This means that you can easily run Flowable on multiple nodes in a cluster, each going to the same database, without having to worry about which machine actually executed previous calls. Any call to any service is idempotent regardless of where it is executed.
+All services are stateless. This means that you can easily run Flowable DMN on multiple nodes in a cluster, each going to the same database, without having to worry about which machine actually executed previous calls. Any call to any service is idempotent regardless of where it is executed.
 
-The *RepositoryService* is probably the first service needed when working with the Flowable engine. This service offers operations for managing and manipulating +deployments+ and +process definitions+. Without going into much detail here, a process definition is a Java counterpart of BPMN 2.0 process. It is a representation of the structure and behaviour of each of the steps of a process. A +deployment+ is the unit of packaging within the Flowable engine. A deployment can contain multiple BPMN 2.0 xml files and any other resource. The choice of what is included in one deployment is up to the developer. It can range from a single process BPMN 2.0 xml file to a whole package of processes and relevant resources (for example the deployment 'hr-processes' could contain everything related to hr processes). The +RepositoryService+ allows to +deploy+ such packages. Deploying a deployment means it is uploaded to the engine, where all processes are inspected and parsed before being stored in the database. From that point on, the deployment is known to the system and any process included in the deployment can now be started.
+The *DmnRepositoryService* is probably the first service needed when working with the Flowable DMN engine. This service offers operations for managing and manipulating +deployments+ and +DMN definitions+. A DMN definition is the root concept of a DMN model. (The main concepts of DMN are explained in the <dmn-introduction, DMN introduction section>) It contains the definition of the +Decision Table+. 
+A +deployment+ is the unit of packaging within the Flowable DMN engine. A deployment can contain multiple DMN xml files. Deploying a deployment means it is uploaded to the engine, where all DMN definitions are inspected and parsed before being stored in the database. From that point on, the deployment is known to the system and any process included in the deployment can now be started.
 
 Furthermore, this service allows to
 
