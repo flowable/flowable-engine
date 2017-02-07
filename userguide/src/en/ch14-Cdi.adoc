@@ -16,7 +16,7 @@ The flowable-cdi modules leverages both the configurability of Flowable and the 
 <dependency>
 	<groupId>org.flowable</groupId>
 	<artifactId>flowable-cdi</artifactId>
-	<version>5.x</version>
+	<version>6.x</version>
 </dependency>
 ----
 
@@ -109,7 +109,7 @@ Note that the above configuration requires the "spring-context" module:
 <dependency>
 	<groupId>org.springframework</groupId>
 	<artifactId>spring-context</artifactId>
-	<version>3.0.3.RELEASE</version>
+	<version>4.2.5.RELEASE</version>
 </dependency>
 ----
 
@@ -117,7 +117,7 @@ The configuration in a Java SE environment looks exactly  like the examples prov
      	
 ==== Deploying Processes
 
-Processes can be deployed using standard flowable-api (++RepositoryService++). In addition, flowable-cdi offers the possibility to  auto-deploy processes listed in a file named ++processes.xml++ located top-level in the classpath. This is an example  processes.xml file:
+Processes can be deployed using standard Flowable API (++RepositoryService++). In addition, flowable-cdi offers the possibility to  auto-deploy processes listed in a file named ++processes.xml++ located top-level in the classpath. This is an example processes.xml file:
      
 [source,xml,linenums]
 ----
@@ -132,13 +132,13 @@ Processes can be deployed using standard flowable-api (++RepositoryService++). I
      
 ===Contextual Process Execution with CDI
 
-In this section we briefly look at the contextual process execution model used by the Flowable cdi extension. A BPMN business process is typically a long-running interaction, comprised of both user and system tasks. At runtime, a process is split-up into a set of individual units of work, performed by users and/or  application logic. In flowable-cdi, a process instance can be associated with a cdi scope, the association representing a  unit of work. This is particularly useful, if a unit of work is complex, for instance if the implementation of  a UserTask is a complex sequence of different forms and "non-process-scoped" state needs to be kept during this interaction.
+In this section we briefly look at the contextual process execution model used by the Flowable CDI extension. A BPMN business process is typically a long-running interaction, comprised of both user and system tasks. At runtime, a process is split-up into a set of individual units of work, performed by users and/or  application logic. In flowable-cdi, a process instance can be associated with a cdi scope, the association representing a  unit of work. This is particularly useful, if a unit of work is complex, for instance if the implementation of  a UserTask is a complex sequence of different forms and "non-process-scoped" state needs to be kept during this interaction.
 
 In the default configuration, process instances are associated with the "broadest" active scope, starting with  the conversation and falling back to the request if the conversation context is not active.	 
 
 ==== Associating a Conversation with a Process Instance 
 	
-When resolving @BusinessProcessScoped beans, or injecting process variables, we rely on an existing association  between an active cdi scope and a process instance. Flowable-cdi provides the +org.flowable.cdi.BusinessProcess+ bean  for controlling the association, most prominently:
+When resolving @BusinessProcessScoped beans, or injecting process variables, we rely on an existing association  between an active cdi scope and a process instance. flowable-cdi provides the +org.flowable.cdi.BusinessProcess+ bean  for controlling the association, most prominently:
 		
 * the _startProcessBy(...)_ methods, mirroring the respective methods exposed by the Flowable +RuntimeService+ allowing to start and subsequently associating a business process,
 * +resumeProcessById(String processInstanceId)+, allowing to associate the process instance with the provided id,
@@ -232,7 +232,7 @@ Sometimes, we want to work with process scoped beans, in the absence of an assoc
 
 ==== Injecting Process Variables
 
-Process variables are available for injection. Flowable-CDI supports 
+Process variables are available for injection. flowable-cdi supports 
 	  	
 * type-safe injection of +@BusinessProcessScoped+ beans using +@Inject \[additional qualifiers\] Type fieldName+
 * unsafe injection of other process variables using the +@ProcessVariable(name?)+ qualifier: 
@@ -254,8 +254,6 @@ In order to reference process variables using EL, we have similar options:
 ----
 
 ==== Receiving Process Events
-
-<<experimental,[EXPERIMENTAL]>>
 
 Flowable can be hooked-up to the CDI event-bus. This allows us to be notified of process events using standard CDI event mechanisms.  In order to enable CDI event support for Flowable, enable the corresponding parse listener in the configuration:
 

@@ -280,11 +280,6 @@
         	</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
-				<artifactId>flowable-idm-engine-configurator</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.flowable</groupId>
 				<artifactId>flowable-dmn-api</artifactId>
 				<version>${project.version}</version>
 			</dependency>

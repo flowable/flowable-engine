@@ -40,44 +40,42 @@ The LDAP integration has currently two main use cases:
 
 === Configuration
 
-Integrating the LDAP system with Flowable is done by injecting an instance of +org.flowable.ldap.LDAPConfigurator+ in the +configurators+ section of the process engine configuration. This class is highly extensible: methods can be easily overridden and many dependent beans are pluggable if the default implementation would not fit the use case.
+Integrating the LDAP system with Flowable is done by injecting an instance of +org.flowable.ldap.LDAPConfigurator+ in the +idmProcessEngineConfigurator+ section of the process engine configuration. This class is highly extensible: methods can be easily overridden and many dependent beans are pluggable if the default implementation would not fit the use case.
 
 This is an example configuration (note: of course, when creating the engine programmatically this is completely similar). Don't worry about all the properties for now, we'll look at them in detail in a next section.
 
 [source,xml,linenums]
 ----
-    <bean id="processEngineConfiguration" class="...SomeProcessEngineConfigurationClass">
-        ...
-        <property name="configurators">
-          <list>
-              <bean class="org.flowable.ldap.LDAPConfigurator">
+<bean id="processEngineConfiguration" class="...SomeProcessEngineConfigurationClass">
+    ...
+    <property name="idmProcessEngineConfigurator">
+      <bean class="org.flowable.ldap.LDAPConfigurator">
 
-                <!-- Server connection params -->
-                <property name="server" value="ldap://localhost" />
-                <property name="port" value="33389" />
-                <property name="user" value="uid=admin, ou=users, o=flowable" />
-                <property name="password" value="pass" />
+        <!-- Server connection params -->
+        <property name="server" value="ldap://localhost" />
+        <property name="port" value="33389" />
+        <property name="user" value="uid=admin, ou=users, o=flowable" />
+        <property name="password" value="pass" />
 
-                <!-- Query params -->
-                <property name="baseDn" value="o=flowable" />
-                <property name="queryUserByUserId" value="(&(objectClass=inetOrgPerson)(uid={0}))" />
-                <property name="queryUserByFullNameLike" value="(&(objectClass=inetOrgPerson)(|({0}=*{1}*)({2}=*{3}*)))" />
-                <property name="queryGroupsForUser" value="(&(objectClass=groupOfUniqueNames)(uniqueMember={0}))" />
+        <!-- Query params -->
+        <property name="baseDn" value="o=flowable" />
+        <property name="queryUserByUserId" value="(&(objectClass=inetOrgPerson)(uid={0}))" />
+        <property name="queryUserByFullNameLike" value="(&(objectClass=inetOrgPerson)(|({0}=*{1}*)({2}=*{3}*)))" />
+        <property name="queryGroupsForUser" value="(&(objectClass=groupOfUniqueNames)(uniqueMember={0}))" />
 
-                <!-- Attribute config -->
-                <property name="userIdAttribute" value="uid" />
-                <property name="userFirstNameAttribute" value="cn" />
-                <property name="userLastNameAttribute" value="sn" />
-                <property name="userEmailAttribute" value="mail" />
+        <!-- Attribute config -->
+        <property name="userIdAttribute" value="uid" />
+        <property name="userFirstNameAttribute" value="cn" />
+        <property name="userLastNameAttribute" value="sn" />
+        <property name="userEmailAttribute" value="mail" />
 
 
-                <property name="groupIdAttribute" value="cn" />
-                <property name="groupNameAttribute" value="cn" />
+        <property name="groupIdAttribute" value="cn" />
+        <property name="groupNameAttribute" value="cn" />
 
-              </bean>
-          </list>
-        </property>
-    </bean>
+      </bean>
+    </property>
+</bean>
 ----
 
 [[ldap_properties]]
