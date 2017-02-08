@@ -29,11 +29,9 @@ public class InputClauseParser extends BaseChildElementParser {
         return ELEMENT_INPUT_CLAUSE;
     }
 
-    public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, DmnDefinition model) throws Exception {
+    public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, DecisionTable decisionTable) throws Exception {
         if (!(parentElement instanceof DecisionTable))
           return;
-
-        DecisionTable decisionTable = (DecisionTable) parentElement;
 
         InputClause input = new InputClause();
         input.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));

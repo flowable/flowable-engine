@@ -60,7 +60,7 @@ public class DmnJsonConverter {
     decision.setName(DmnJsonConverterUtil.getValueAsString("name", modelNode));
     decision.setDescription(DmnJsonConverterUtil.getValueAsString("description", modelNode));
 
-    definition.addDrgElement(decision);
+    definition.addDecision(decision);
 
     // decision table
     //
@@ -76,8 +76,7 @@ public class DmnJsonConverter {
     // default orientation
     decisionTable.setPreferredOrientation(DecisionTableOrientation.RULE_AS_ROW);
 
-    decision.setDecisionTable(decisionTable);
-    definition.setCurrentDecisionTable(decisionTable);
+    decision.setExpression(decisionTable);
 
     // inputs
     processDecisionTable(modelNode, definition, decisionTable);
@@ -89,16 +88,19 @@ public class DmnJsonConverter {
 
     ObjectNode modelNode = objectMapper.createObjectNode();
 
+    Decision firstDecision = definition.getDecisions().get(0);
+    DecisionTable decisionTable = (DecisionTable) firstDecision.getExpression();
+
     modelNode.put("id", definition.getId());
-    modelNode.put("key", definition.getDrgElements().get(0).getId());
+    modelNode.put("key", firstDecision.getId());
     modelNode.put("name", definition.getName());
     modelNode.put("description", definition.getDescription());
-    modelNode.put("hitIndicator", definition.getCurrentDecisionTable().getHitPolicy().name());
+    modelNode.put("hitIndicator", decisionTable.getHitPolicy().name());
 
     // input expressions
     ArrayNode inputExpressionsNode = objectMapper.createArrayNode();
 
-    for (InputClause clause : definition.getCurrentDecisionTable().getInputs()) {
+    for (InputClause clause : decisionTable.getInputs()) {
 
       LiteralExpression inputExpression = clause.getInputExpression();
 
@@ -116,7 +118,7 @@ public class DmnJsonConverter {
     // output expressions
     ArrayNode outputExpressionsNode = objectMapper.createArrayNode();
 
-    for (OutputClause clause : definition.getCurrentDecisionTable().getOutputs()) {
+    for (OutputClause clause : decisionTable.getOutputs()) {
 
       ObjectNode outputExpressionNode = objectMapper.createObjectNode();
       outputExpressionNode.put("id", clause.getId());
@@ -131,7 +133,7 @@ public class DmnJsonConverter {
 
     // rules
     ArrayNode rulesNode = objectMapper.createArrayNode();
-    for (DecisionRule rule : definition.getCurrentDecisionTable().getRules()) {
+    for (DecisionRule rule : decisionTable.getRules()) {
 
       ObjectNode ruleNode = objectMapper.createObjectNode();
 

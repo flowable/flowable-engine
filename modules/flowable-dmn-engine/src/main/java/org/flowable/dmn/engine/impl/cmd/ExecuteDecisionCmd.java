@@ -23,6 +23,7 @@ import org.flowable.dmn.engine.impl.interceptor.Command;
 import org.flowable.dmn.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
 import org.flowable.dmn.engine.impl.persistence.deploy.DeploymentManager;
+import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
@@ -95,9 +96,9 @@ public class ExecuteDecisionCmd implements Command<RuleEngineExecutionResult>, S
     }
 
     DecisionTableCacheEntry decisionTableCacheEntry = deploymentManager.resolveDecisionTable(decisionTable);
-    DmnDefinition dmnDefinition = decisionTableCacheEntry.getDmnDefinition();
+    Decision decision = decisionTableCacheEntry.getDecision();
 
-    RuleEngineExecutionResult executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(dmnDefinition, variables, 
+    RuleEngineExecutionResult executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(decision, variables,
         dmnEngineConfiguration.getCustomExpressionFunctions(), dmnEngineConfiguration.getCustomPropertyHandlers());
 
     if (executionResult != null && executionResult.getAuditTrail() != null) {

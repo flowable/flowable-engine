@@ -12,19 +12,20 @@
  */
 package org.flowable.dmn.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.util.List;
-
 import org.flowable.dmn.model.Decision;
+import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.OutputClause;
 import org.junit.Test;
 
-public class SimpleConverterTest extends AbstractConverterTest {
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class MultipleDecisionsConverterTest extends AbstractConverterTest {
 
     @Test
     public void convertXMLToModel() throws Exception {
@@ -40,20 +41,35 @@ public class SimpleConverterTest extends AbstractConverterTest {
     }
 
     protected String getResource() {
-        return "simple.dmn";
+        return "multiple_decisions.dmn";
     }
 
     private void validateModel(DmnDefinition model) {
         List<Decision> decisions = model.getDecisions();
-        assertEquals(1, decisions.size());
+        assertEquals(2, decisions.size());
         
-        DecisionTable decisionTable = (DecisionTable) decisions.get(0).getExpression();
-        assertNotNull(decisionTable);
-        
-        List<InputClause> inputClauses = decisionTable.getInputs();
-        assertEquals(3, inputClauses.size());
+        DecisionTable decisionTable1 = (DecisionTable) decisions.get(0).getExpression();
+        assertNotNull(decisionTable1);
 
-        List<OutputClause> outputClauses = decisionTable.getOutputs();
-        assertEquals(1, outputClauses.size());
+        List<InputClause> inputClauses1 = decisionTable1.getInputs();
+        assertEquals(2, inputClauses1.size());
+
+        List<OutputClause> outputClauses1 = decisionTable1.getOutputs();
+        assertEquals(1, outputClauses1.size());
+
+        List<DecisionRule> rules1 = decisionTable1.getRules();
+        assertEquals(2, rules1.size());
+
+        DecisionTable decisionTable2 = (DecisionTable) decisions.get(1).getExpression();
+        assertNotNull(decisionTable2);
+
+        List<InputClause> inputClauses2 = decisionTable2.getInputs();
+        assertEquals(2, inputClauses2.size());
+
+        List<OutputClause> outputClauses2 = decisionTable2.getOutputs();
+        assertEquals(1, outputClauses2.size());
+
+        List<DecisionRule> rules2 = decisionTable2.getRules();
+        assertEquals(2, rules2.size());
     }
 }

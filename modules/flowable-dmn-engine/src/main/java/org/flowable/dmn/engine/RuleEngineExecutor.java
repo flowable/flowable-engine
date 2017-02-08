@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.flowable.dmn.api.RuleEngineExecutionResult;
-import org.flowable.dmn.model.DmnDefinition;
+import org.flowable.dmn.model.Decision;
 import org.mvel2.integration.PropertyHandler;
 
 /**
@@ -24,6 +24,6 @@ import org.mvel2.integration.PropertyHandler;
  */
 public interface RuleEngineExecutor {
 
-  RuleEngineExecutionResult execute(DmnDefinition decisionDefinition, Map<String, Object> executionVariables,
-      Map<String, Method> customExpressionFunctions, Map<Class<?>, PropertyHandler> propertyHandlers);
+  RuleEngineExecutionResult execute(Decision decision, Map<String, Object> inputVariables,
+                                    Map<String, Method> customExpressionFunctions, Map<Class<?>, PropertyHandler> propertyHandlers);
 }

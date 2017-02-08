@@ -39,8 +39,10 @@ public class DecisionTableModelResourceTest extends BaseSpringDmnRestTestCase {
     JsonNode resultNode = objectMapper.readTree(response.getEntity().getContent());
     closeResponse(response);
     assertNotNull(resultNode);
-    JsonNode currentDecisionTable = resultNode.get("currentDecisionTable");
-    assertNotNull(currentDecisionTable);
-    assertEquals("decisionTable", currentDecisionTable.get("id").textValue());
+    JsonNode firstDecision = resultNode.get("decisions").get(0);
+    assertNotNull(firstDecision);
+
+    JsonNode decisionTableNode = firstDecision.get("expression");
+    assertEquals("decisionTable", decisionTableNode.get("id").textValue());
   }
 }
