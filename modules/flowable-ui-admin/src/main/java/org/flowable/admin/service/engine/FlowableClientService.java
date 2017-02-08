@@ -441,9 +441,9 @@ public class FlowableClientService {
 
   public FlowableServiceException wrapException(Exception e, HttpUriRequest request) {
     if (e instanceof HttpHostConnectException) {
-      return new FlowableServiceException("Unable to connect to the Activiti server.");
+      return new FlowableServiceException("Unable to connect to the Flowable server.");
     } else if (e instanceof ConnectTimeoutException) {
-      return new FlowableServiceException("Connection to the Activiti server timed out.");
+      return new FlowableServiceException("Connection to the Flowable server timed out.");
     } else {
       // Use the raw exception message
       return new FlowableServiceException(e.getClass().getName() + ": " + e.getMessage());
