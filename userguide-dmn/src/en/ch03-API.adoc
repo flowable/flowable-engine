@@ -110,34 +110,17 @@ long count = dmnRepositoryService.createNativeDeploymentQuery()
 
 Since Flowable DMN is an embeddable Java engine, writing unit tests for DMN definitions is as simple as writing regular unit tests.
 
-Flowable supports both JUnit versions 3 and 4 styles of unit testing. In the JUnit 3 style, the +org.flowable.dmn.engine.test.AbstractFlowableDmnTestCase+ must be extended. This will make the DmnEngine and the services available through protected member fields. In the +setup()+ of the test, the DmnEngine will be initialized by default with the +flowable.dmn.cfg.xml+ resource on the classpath.  To specify a different configuration file, override the _getConfigurationResource()_ method. DMN engines are cached statically over multiple unit tests when the configuration resource is the same.
+Flowable supports JUnit version 4 styles of unit testing. When writing JUnit 4 unit tests, the +org.flowable.dmn.engine.test.FlowableDmnRule+ Rule can be used. Through this rule, the DMN engine and services are available through getters. Including this +Rule+ will enable the use of the +org.flowable.dmn.engine.test.DmnDeploymentAnnotation+ annotation (see above for an explanation of its use and configuration) and it will look for the default configuration file on the classpath. DMN engines are statically cached over multiple unit tests when using the same configuration resource.
+It's also possible to provide a custom engine configuration to the rule.
 
-By extending +AbstractFlowableDmnTestCase+, you can annotate test methods with +org.flowable.dmn.engine.test.DmnDeploymentAnnotation+. Before the test is run, a resource file of the form +testClassName.testMethod.dmn+ in the same package as the test class, will be deployed. At the end of the test, the deployment will be deleted, including all decision tables. The +DmnDeploymentAnnotation+ annotation also supports setting the resource location explicitly. See the class itself for more information.
-
-Taking all that in account, a JUnit 3 style test looks as follows.
-
-[source,java,linenums]
-----
-public class MyDmnDeploymentTest extends AbstractFlowableDmnTestCase {
-
-  @DmnDeploymentAnnotation
-  public void simpleDeploymentTest() {
-      DmnDeployment deployment = repositoryService.createDeploymentQuery().singleResult();
-      assertNotNull(deployment);
-  }
-}
-----
-
-To get the same functionality when using the JUnit 4 style of writing unit tests, the +org.flowable.dmn.engine.test.FlowableDmnRule+ Rule must be used. Through this rule, the DMN engine and services are available through getters. As with the +AbstractFlowableDmnTestCase+ (see above), including this +Rule+ will enable the use of the +org.flowable.dmn.engine.test.DmnDeploymentAnnotation+ annotation (see above for an explanation of its use and configuration) and it will look for the default configuration file on the classpath. DMN engines are statically cached over multiple unit tests when using the same configuration resource.
-
-The following code snippet shows an example of using the JUnit 4 style of testing and the usage of the +FlowableDmnRule+.
+The following code snippet shows an example of using the JUnit 4 style of testing and the usage of the +FlowableDmnRule+ (and passing an optional custom configuration)
 
 [source,java,linenums]
 ----
 public class MyDecisionTableTest {
 
   @Rule
-  public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
+  public FlowableDmnRule flowableDmnRule = new FlowableDmnRule("custom1.flowable.dmn.cfg.xml");
 
   @Test
   @DmnDeploymentAnnotation
