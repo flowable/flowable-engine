@@ -18,7 +18,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-import org.flowable.dmn.api.DecisionTable;
+import org.flowable.dmn.api.DmnDecisionTable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -36,7 +36,7 @@ public class ProcessDefinitionDecisionTableCollectionResource extends BaseProces
 
   @ApiOperation(value = "Get all decision tables for a process-definition", tags = {"Process Definitions"})
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Indicates the process definition was found and the decision tables are returned.", response = DecisionTable.class, responseContainer = "List"),
+      @ApiResponse(code = 200, message = "Indicates the process definition was found and the decision tables are returned.", response = DmnDecisionTable.class, responseContainer = "List"),
       @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
   })
   @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/decision-tables", method = RequestMethod.GET, produces = "application/json")
@@ -44,7 +44,7 @@ public class ProcessDefinitionDecisionTableCollectionResource extends BaseProces
       @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
       HttpServletRequest request) {
 
-    List<DecisionTable> decisionTables = repositoryService.getDecisionTablesForProcessDefinition(processDefinitionId);
+    List<DmnDecisionTable> decisionTables = repositoryService.getDecisionTablesForProcessDefinition(processDefinitionId);
 
     return restResponseFactory.createDecisionTableResponseList(decisionTables, processDefinitionId);
   }

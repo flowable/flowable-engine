@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.dmn.api.DecisionTable;
+import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DecisionTableQueryImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
@@ -82,7 +82,7 @@ public class MybatisDecisionTableDataManager extends AbstractDataManager<Decisio
 
   @Override
   @SuppressWarnings("unchecked")
-  public List<DecisionTable> findDecisionTablesByQueryCriteria(DecisionTableQueryImpl decisionTableQuery, Page page) {
+  public List<DmnDecisionTable> findDecisionTablesByQueryCriteria(DecisionTableQueryImpl decisionTableQuery, Page page) {
     return getDbSqlSession().selectList("selectDecisionTablesByQueryCriteria", decisionTableQuery, page);
   }
 
@@ -140,7 +140,7 @@ public class MybatisDecisionTableDataManager extends AbstractDataManager<Decisio
 
   @Override
   @SuppressWarnings("unchecked")
-  public List<DecisionTable> findDecisionTablesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
+  public List<DmnDecisionTable> findDecisionTablesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
     return getDbSqlSession().selectListWithRawParameter("selectDecisionTableByNativeQuery", parameterMap, firstResult, maxResults);
   }
 

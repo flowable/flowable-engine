@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.flowable.dmn.api.DecisionTable;
+import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.DmnDeployment;
 import org.junit.Test;
 
@@ -29,7 +29,7 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
     @Test
     @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/deployment/multiple_conclusions.dmn")
     public void deploySingleDecision() {
-        DecisionTable decision = repositoryService.createDecisionTableQuery()
+        DmnDecisionTable decision = repositoryService.createDecisionTableQuery()
                 .latestVersion()
                 .decisionTableKey("decision")
                 .singleResult();
@@ -40,7 +40,7 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
     @Test
     @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/deployment/multiple_conclusions.dmn")
     public void deploySingleDecisionAndValidateCache() {
-        DecisionTable decision = repositoryService.createDecisionTableQuery()
+        DmnDecisionTable decision = repositoryService.createDecisionTableQuery()
                 .latestVersion()
                 .decisionTableKey("decision")
                 .singleResult();
@@ -59,7 +59,7 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
     @Test
     @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/deployment/multiple_conclusions.dmn")
     public void deploySingleDecisionAndValidateVersioning() {
-        DecisionTable decision = repositoryService.createDecisionTableQuery()
+        DmnDecisionTable decision = repositoryService.createDecisionTableQuery()
                 .latestVersion()
                 .decisionTableKey("decision")
                 .singleResult();
@@ -85,7 +85,7 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
                 .tenantId("testTenant")
                 .deploy();
 
-        DecisionTable decision = repositoryService.createDecisionTableQuery()
+        DmnDecisionTable decision = repositoryService.createDecisionTableQuery()
                 .latestVersion()
                 .decisionTableKey("decision")
                 .decisionTableTenantId("testTenant")
@@ -113,7 +113,7 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
                 .tenantId("testTenant")
                 .deploy();
 
-        DecisionTable decision = repositoryService.createDecisionTableQuery()
+        DmnDecisionTable decision = repositoryService.createDecisionTableQuery()
                 .latestVersion()
                 .decisionTableKey("decision")
                 .decisionTableTenantId("testTenant")
@@ -140,7 +140,7 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
     @Test
     @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/deployment/multiple_decisions.dmn")
     public void deployMultipleDecisions() throws Exception {
-        DecisionTable decision = repositoryService.createDecisionTableQuery()
+        DmnDecisionTable decision = repositoryService.createDecisionTableQuery()
             .latestVersion()
             .decisionTableKey("decision")
             .singleResult();
@@ -156,7 +156,7 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
         assertEquals("decision", decision.getKey());
 
 
-        DecisionTable decision2 = repositoryService.createDecisionTableQuery()
+        DmnDecisionTable decision2 = repositoryService.createDecisionTableQuery()
             .latestVersion()
             .decisionTableKey("decision2")
             .singleResult();

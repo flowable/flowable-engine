@@ -14,6 +14,6 @@ package org.flowable.dmn.api;
 
 import org.flowable.engine.common.api.query.NativeQuery;
 
-public interface NativeDecisionTableQuery extends NativeQuery<NativeDecisionTableQuery, DecisionTable> {
+public interface NativeDecisionTableQuery extends NativeQuery<NativeDecisionTableQuery, DmnDecisionTable> {
 
 }

@@ -21,8 +21,8 @@ import java.util.Set;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.ServiceTask;
-import org.flowable.dmn.api.DecisionTable;
-import org.flowable.dmn.api.DecisionTableQuery;
+import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecisionTableQuery;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
@@ -34,7 +34,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 /**
  * @author Yvo Swillens
  */
-public class GetDecisionTablesForProcessDefinitionCmd implements Command<List<DecisionTable>>, Serializable {
+public class GetDecisionTablesForProcessDefinitionCmd implements Command<List<DmnDecisionTable>>, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected String processDefinitionId;
@@ -44,7 +44,7 @@ public class GetDecisionTablesForProcessDefinitionCmd implements Command<List<De
     this.processDefinitionId = processDefinitionId;
   }
 
-  public List<DecisionTable> execute(CommandContext commandContext) {
+  public List<DmnDecisionTable> execute(CommandContext commandContext) {
     ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
 
     if (processDefinition == null) {
@@ -66,14 +66,14 @@ public class GetDecisionTablesForProcessDefinitionCmd implements Command<List<De
     }
 
     dmnRepositoryService = commandContext.getProcessEngineConfiguration().getDmnEngineRepositoryService();
-    List<DecisionTable> decisionTables = getDecisionTablesFromModel(bpmnModel, processDefinition);
+    List<DmnDecisionTable> decisionTables = getDecisionTablesFromModel(bpmnModel, processDefinition);
 
     return decisionTables;
   }
 
-  protected List<DecisionTable> getDecisionTablesFromModel(BpmnModel bpmnModel, ProcessDefinition processDefinition) {
+  protected List<DmnDecisionTable> getDecisionTablesFromModel(BpmnModel bpmnModel, ProcessDefinition processDefinition) {
     Set<String> decisionTableKeys = new HashSet<>();
-    List<DecisionTable> decisionTables = new ArrayList<>();
+    List<DmnDecisionTable> decisionTables = new ArrayList<>();
     List<ServiceTask> serviceTasks = bpmnModel.getMainProcess().findFlowElementsOfType(ServiceTask.class, true);
 
     for (ServiceTask serviceTask : serviceTasks) {
@@ -96,9 +96,9 @@ public class GetDecisionTablesForProcessDefinitionCmd implements Command<List<De
     return decisionTables;
   }
 
-  protected void addDecisionTableToCollection(List<DecisionTable> decisionTables, String decisionTableKey, ProcessDefinition processDefinition) {
-    DecisionTableQuery decisionTableQuery = dmnRepositoryService.createDecisionTableQuery();
-    DecisionTable decisionTable = decisionTableQuery.decisionTableKey(decisionTableKey).parentDeploymentId(processDefinition.getDeploymentId()).singleResult();
+  protected void addDecisionTableToCollection(List<DmnDecisionTable> decisionTables, String decisionTableKey, ProcessDefinition processDefinition) {
+    DmnDecisionTableQuery decisionTableQuery = dmnRepositoryService.createDecisionTableQuery();
+    DmnDecisionTable decisionTable = decisionTableQuery.decisionTableKey(decisionTableKey).parentDeploymentId(processDefinition.getDeploymentId()).singleResult();
 
     if (decisionTable != null) {
       decisionTables.add(decisionTable);

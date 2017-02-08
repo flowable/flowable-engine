@@ -12,7 +12,7 @@
  */
 package org.flowable.rest.service.api.repository;
 
-import org.flowable.dmn.api.DecisionTable;
+import org.flowable.dmn.api.DmnDecisionTable;
 
 /**
  * @author Yvo Swillens
@@ -31,7 +31,7 @@ public class DecisionTableResponse {
   private String tenantId;
   private String url;
 
-  public DecisionTableResponse(DecisionTable decisionTable) {
+  public DecisionTableResponse(DmnDecisionTable decisionTable) {
     this.id = decisionTable.getId();
     this.category = decisionTable.getCategory();
     this.name = decisionTable.getName();
