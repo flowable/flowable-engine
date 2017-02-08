@@ -12,6 +12,7 @@
  */
 package org.flowable.dmn.engine.test;
 
+import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
@@ -35,22 +36,23 @@ public class AbstractFlowableDmnTest {
     public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000";
 
     @Rule
-    public FlowableDmnRule activitiRule = new FlowableDmnRule();
+    public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
 
     protected static DmnEngine cachedDmnEngine;
     protected DmnEngineConfiguration dmnEngineConfiguration;
     protected DmnRepositoryService repositoryService;
     protected DmnRuleService ruleService;
+    protected DmnManagementService managementService;
 
     @Before
     public void initDmnEngine() {
         if (cachedDmnEngine == null) {
-            cachedDmnEngine = activitiRule.getDmnEngine();
+            cachedDmnEngine = flowableDmnRule.getDmnEngine();
         }
-
         this.dmnEngineConfiguration = cachedDmnEngine.getDmnEngineConfiguration();
         this.repositoryService = cachedDmnEngine.getDmnRepositoryService();
         this.ruleService = cachedDmnEngine.getDmnRuleService();
+        this.managementService = cachedDmnEngine.getDmnManagementService();
     }
 
 }
