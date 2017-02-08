@@ -92,7 +92,8 @@ public class HolidayRequest {
 
 The first thing we need to do is to instantiate a *ProcessEngine* instance. This is a thread-safe object that you typically have to instantiate only once in an application. 
 A _ProcessEngine_ is created from a *ProcessEngineConfiguration* instance, which allows you to configure and tweak the settings for the process engine. Often, the _ProcessEngineConfiguration_ is created 
-using a configuration XML file, but (as we do here) you can also create it programmatically. The minimum configuration a ProcessEngineConfiguration_ needs is a JDBC connection to a database:
+using a configuration XML file, but (as we do here) you can also create it programmatically. The minimum configuration a _ProcessEngineConfiguration_ needs
+is a JDBC connection to a database:
 
 [source,java,linenums]
 ----
@@ -126,7 +127,7 @@ Alternatively, Flowable ships with a set of SQL files that can be used to create
 
 The *ProcessEngine* object is then created using this configuration (line 17).
 
-You can now run this. The easiest in Eclipse is to right-click on the class file and select _Run As -> Java Application_
+You can now run this. The easiest in Eclipse is to right-click on the class file and select _Run As -> Java Application_:
 
 image::images/getting.started.run.main.png[align="center"]
 
@@ -259,7 +260,7 @@ Save the following xml in a file named _holiday-request.bpmn20.xml_ under the _s
 
 Lines 2 to 11 look a bit daunting, but for all subsequent process definitions it'll be the same. It's kind of _boilerplate_ stuff that's needed to be fully compatible with the BPMN 2.0 standard specification.
 
-Every step, or in BPMN 2.0 terminology *'flowable'* , has an _id_ attribute that gives it a unique identifier in the XML file. All _activities_ can have an optional name too, which increases the readability of the visual diagram of course.
+Every step, or in BPMN 2.0 terminology *'flowable'*, has an _id_ attribute that gives it a unique identifier in the XML file. All _activities_ can have an optional name too, which increases the readability of the visual diagram of course.
 
 The _activities_ are connected with a *sequence flow*, which is a directed arrow in the visual diagram. When executing a process instance, the execution will flow from the _start event_ to the next _activity_, following the _sequence flow_.
 
@@ -294,7 +295,7 @@ System.out.println("Found process definition : " + processDefinition.getName());
 
 ==== Starting a process instance
 
-We now have the process definition _deployed_ to the process engine, so _process instances_ can be started using this _process definition_ as 'blueprint'.
+We now have the process definition _deployed_ to the process engine, so _process instances_ can be started using this _process definition_ as a 'blueprint'.
 
 To start the process instance, we need to provide some initial _process variables_. Typically, you'll get these via a form that is presented to the user or via a REST API when a process is triggered by something automatic. In this example, we'll keep it simple and use the java.util.Scanner class to simply input some data on the command line:
 
@@ -314,7 +315,7 @@ String description = scanner.nextLine();
 
 Next, we can start a _process instance_ via the _RuntimeService_. The collected data is passed as a _java.util.Map_ instance, where the key is the identifier that will be used to retrieve the variables later on. The process instance is started using a _key_. This _key_ matches the _id_ attribute that is set in the BPMN 2.0 XML file, in this case _holidayRequest_.
 
-(note: there are many ways you'll learn later on to start a process instance, beyond using a key)
+(NOTE: there are many ways you'll learn later on to start a process instance, beyond using a key.)
 
 [source,xml]
 ----
@@ -416,7 +417,8 @@ There is a last piece of the puzzle still missing: we haven't implemented the au
     flowable:class="org.flowable.CallExternalSystemDelegate"/>
 ----
 
-In reality, this logic could be anything ranging from doing an HTTP REST call to some system, to doing some legacy code calls to a system the company has been using for decades. We won't implement the actual logic here, but have a simple logging statement inside.
+In reality, this logic could be anything ranging from doing an HTTP REST call to some system or to doing some legacy code calls to a system the company has
+been using for decades. We won't implement the actual logic here but simply log the _processing_.
 
 Create a new class (_File -> New -> Class_ in Eclipse), fill in _org.flowable_ as package name and _CallExternalSystemDelegate_ as class name. Make that class implement the _org.flowable.engine.delegate.JavaDelegate_ interface and implement the _execute_ method:
 
@@ -482,7 +484,7 @@ externalSystemCall took 1 milliseconds
 
 ==== Conclusion
 
-This tutorial introduced various Flowable and BPMN 2.0 concepts and terminology while also demonstrating how use the Flowable API programmatically.
+This tutorial introduced various Flowable and BPMN 2.0 concepts and terminology while also demonstrating how to use the Flowable API programmatically.
 
 Of course, this is just the start of the journey. The following sections will dive more deeply into the many options and features that the Flowable engine supports. Other sections go into the various ways the Flowable engine can be set up and used, and describe in detail all the BPMN 2.0 constructs that are possible.
 
