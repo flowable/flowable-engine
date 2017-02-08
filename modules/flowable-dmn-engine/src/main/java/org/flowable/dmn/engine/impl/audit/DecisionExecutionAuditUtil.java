@@ -34,11 +34,6 @@ public class DecisionExecutionAuditUtil {
             throw new IllegalArgumentException("decision does not contain decision key");
         }
 
-        if (decision.getExpression() == null || !(decision.getExpression() instanceof DecisionTable)) {
-            logger.error("decision does not contain expression type decision table");
-            throw new IllegalArgumentException("decision does not contain expression type decision table");
-        }
-
         DecisionTable decisionTable = (DecisionTable) decision.getExpression();
 
         if (decisionTable.getHitPolicy() == null) {
