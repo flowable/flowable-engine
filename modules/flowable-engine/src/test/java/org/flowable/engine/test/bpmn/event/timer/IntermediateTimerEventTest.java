@@ -178,7 +178,13 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
     // reschedule timer for two hours from now
     calendar = Calendar.getInstance();
     calendar.add(Calendar.HOUR, 2);
-    managementService.rescheduleTimeDateJob(timerJob.getId(), sdf.format(calendar.getTime()));
+    Job rescheduledJob = managementService.rescheduleTimeDateJob(timerJob.getId(), sdf.format(calendar.getTime()));
+    assertNotNull(rescheduledJob);
+    assertNotNull(rescheduledJob.getId());
+    assertNotSame(timerJob.getId(), rescheduledJob.getId());
+
+    Job timer = managementService.createTimerJobQuery().singleResult();
+    assertEquals(rescheduledJob.getId(), timer.getId());
     
     timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
     diffInMilliseconds = Math.abs(startTimeInMillis - timerJob.getDuedate().getTime());
