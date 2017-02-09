@@ -250,8 +250,6 @@ public class DmnXMLConverter implements DmnXMLConstants {
                 }
             }
             
-//            processDmnElements(model.getCurrentDecisionTable());
-
         } catch (DmnXMLException e) {
             throw e;
 
@@ -261,33 +259,6 @@ public class DmnXMLConverter implements DmnXMLConstants {
         }
         return model;
     }
-//
-//    protected void processDmnElements(DecisionTable decisionTable) {
-//        Map<String, RuleInputClauseContainer> inputClauseMap = new HashMap<String, RuleInputClauseContainer>();
-//        Map<String, RuleOutputClauseContainer> outputClauseMap = new HashMap<String, RuleOutputClauseContainer>();
-////
-////        for (DecisionRule rule : decisionTable.getRules()) {
-////            List<RuleInputClauseContainer> finalInputs = new ArrayList<>();
-////            for (RuleInputClauseContainer inputContainer : rule.getInputEntries()) {
-////                if (inputContainer.getInputEntry() != null) {
-////                    finalInputs.add(inputContainer);
-////                }
-////            }
-////
-////            List<RuleOutputClauseContainer> finalOutputs = new ArrayList<>();
-////            for (RuleOutputClauseContainer outputContainer : rule.getOutputEntries()) {
-////                if (outputContainer.getInputOutputExpression() != null) {
-////                    finalConclusions.add(conclusionContainer);
-////
-////                } else {
-////                    throw new DmnXMLException("Can not find conclusion entry " + conclusionContainer.getInputOutputExpression().getId());
-////                }
-////            }
-////
-////            rule.setInputEntries(ru);
-////            rule.setConclusions(finalConclusions);
-////        }
-//    }
 
     public byte[] convertToXML(DmnDefinition model) {
         return convertToXML(model, DEFAULT_ENCODING);
