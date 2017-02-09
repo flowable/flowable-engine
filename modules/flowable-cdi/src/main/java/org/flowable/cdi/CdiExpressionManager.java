@@ -20,8 +20,8 @@ import javax.el.ListELResolver;
 import javax.el.MapELResolver;
 
 import org.flowable.cdi.impl.el.CdiResolver;
-import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.VariableScope;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.el.VariableScopeElResolver;
 
@@ -40,7 +40,7 @@ import org.flowable.engine.impl.el.VariableScopeElResolver;
  */
 public class CdiExpressionManager extends ExpressionManager {
   
-  public CdiExpressionManager(ProcessEngineConfiguration processEngineConfiguration) {
+  public CdiExpressionManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
     super(processEngineConfiguration);
   }
 

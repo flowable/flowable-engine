@@ -22,8 +22,8 @@ import javax.el.ELContext;
 import javax.el.ELResolver;
 import javax.el.PropertyNotWritableException;
 
-import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.VariableScope;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.el.ExpressionManager;
 
 /**
@@ -35,7 +35,7 @@ public class SimulationExpressionManager extends ExpressionManager {
 
   /**
    */
-  public SimulationExpressionManager(Map<Object, Object> beans, ProcessEngineConfiguration processEngineConfiguration) {
+  public SimulationExpressionManager(Map<Object, Object> beans, ProcessEngineConfigurationImpl processEngineConfiguration) {
     super(beans, processEngineConfiguration);
   }
 

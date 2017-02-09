@@ -18,6 +18,8 @@ import javax.el.ExpressionFactory;
 import javax.el.FunctionMapper;
 import javax.el.VariableMapper;
 
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+
 /**
  * Simple implementation of the {@link ELContext} used during parsings.
  * 
@@ -29,13 +31,19 @@ import javax.el.VariableMapper;
  * @author Joram Barrez
  */
 public class ParsingElContext extends ELContext {
+  
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+
+  public ParsingElContext(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    this.processEngineConfiguration = processEngineConfiguration;
+  }
 
   public ELResolver getELResolver() {
     return null;
   }
 
   public FunctionMapper getFunctionMapper() {
-    return null;
+    return new FlowableFunctionMapper(processEngineConfiguration);
   }
 
   public VariableMapper getVariableMapper() {

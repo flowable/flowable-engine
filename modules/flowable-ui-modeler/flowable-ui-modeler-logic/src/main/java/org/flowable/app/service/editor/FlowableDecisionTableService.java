@@ -45,6 +45,7 @@ import org.flowable.app.util.XmlUtil;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
 import org.flowable.editor.dmn.converter.DmnJsonConverter;
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -176,13 +177,18 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
         XMLStreamReader xtr = xif.createXMLStreamReader(xmlIn);
 
         DmnDefinition dmnDefinition = dmnXmlConverter.convertToDmnModel(xtr);
+        
+        if (dmnDefinition.getDecisions().size() == 0) {
+          throw new FlowableException("No decisions found in " + fileName);
+        }
+        
         ObjectNode editorJsonNode = dmnJsonConverter.convertToJson(dmnDefinition);
 
         // remove id to avoid InvalidFormatException when deserializing
         editorJsonNode.remove("id");
 
         ModelRepresentation modelRepresentation = new ModelRepresentation();
-        modelRepresentation.setKey(dmnDefinition.getCurrentDecisionTable().getId());
+        modelRepresentation.setKey(dmnDefinition.getDecisions().get(0).getId());
         modelRepresentation.setName(dmnDefinition.getName());
         modelRepresentation.setDescription(dmnDefinition.getDescription());
         modelRepresentation.setModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE);

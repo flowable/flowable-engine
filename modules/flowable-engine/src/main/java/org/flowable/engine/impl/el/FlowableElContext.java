@@ -17,6 +17,8 @@ import javax.el.ELResolver;
 import javax.el.FunctionMapper;
 import javax.el.VariableMapper;
 
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -24,9 +26,11 @@ import javax.el.VariableMapper;
 public class FlowableElContext extends ELContext {
 
   protected ELResolver elResolver;
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-  public FlowableElContext(ELResolver elResolver) {
+  public FlowableElContext(ELResolver elResolver, ProcessEngineConfigurationImpl processEngineConfiguration) {
     this.elResolver = elResolver;
+    this.processEngineConfiguration = processEngineConfiguration;
   }
 
   public ELResolver getELResolver() {
@@ -34,7 +38,7 @@ public class FlowableElContext extends ELContext {
   }
 
   public FunctionMapper getFunctionMapper() {
-    return new FlowableFunctionMapper();
+    return new FlowableFunctionMapper(processEngineConfiguration);
   }
 
   public VariableMapper getVariableMapper() {
