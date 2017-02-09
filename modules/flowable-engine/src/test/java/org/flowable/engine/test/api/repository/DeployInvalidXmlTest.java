@@ -27,15 +27,12 @@ public class DeployInvalidXmlTest extends PluggableFlowableTestCase {
   protected void setUp() throws Exception {
     super.setUp();
 
-    processEngineConfiguration.setEnableSafeBpmnXml(true); // Needs to be
-                                                           // enabled to
-                                                           // test this
+    processEngineConfiguration.setEnableSafeBpmnXml(true); // Needs to be enabled to test this
   }
 
   @Override
   protected void tearDown() throws Exception {
-    processEngineConfiguration.setEnableSafeBpmnXml(false); // set back to
-                                                            // default
+    processEngineConfiguration.setEnableSafeBpmnXml(false); // set back to default
     super.tearDown();
   }
 
@@ -58,8 +55,7 @@ public class DeployInvalidXmlTest extends PluggableFlowableTestCase {
     }
   }
 
-  // Need to put this in a String here, if we use a separate file, the cpu
-  // usage
+  // Need to put this in a String here, if we use a separate file, the cpu usage
   // of Eclipse skyrockets, regardless of the file is opened or not
 
   private static String UNSAFE_XML = "<?xml version='1.0' encoding='UTF-8'?>" + "<!-- Billion Laugh attacks : http://portal.sliderocket.com/CJAKM/xml-attacks -->" + "<!DOCTYPE lols ["
@@ -72,8 +68,7 @@ public class DeployInvalidXmlTest extends PluggableFlowableTestCase {
       + "  <documentation>This is a process for testing purposes</documentation>" + " <startEvent id='theStart' />" + " <sequenceFlow id='flow1' sourceRef='theStart' targetRef='theTask' />"
       + " <userTask id='theTask' name='my task' />" + " <sequenceFlow id='flow2' sourceRef='theTask' targetRef='theEnd' />" + " <endEvent id='theEnd' />" + "</process>" + "</definitions>";
 
-  // See
-  // https://activiti.atlassian.net/browse/ACT-1579?focusedCommentId=319886#comment-319886
+  // See https://activiti.atlassian.net/browse/ACT-1579?focusedCommentId=319886#comment-319886
   public void testProcessEngineDenialOfServiceAttackUsingUnsafeXmlTest() throws InterruptedException {
 
     // Putting this in a Runnable so we can time it out
@@ -114,8 +109,11 @@ public class DeployInvalidXmlTest extends PluggableFlowableTestCase {
   }
 
   public void testExternalEntityResolvingTest() {
-    String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/repository/DeployInvalidXmlTest.testExternalEntityResolvingTest.bpmn20.xml").deploy()
+    String deploymentId = repositoryService.createDeployment()
+		.addClasspathResource("org/flowable/engine/test/api/repository/DeployInvalidXmlTest.testExternalEntityResolvingTest.bpmn20.xml")
+		.deploy()
         .getId();
+    
     try {
       ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
       assertEquals("Test 1 2 3 null", processDefinition.getDescription());
