@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
@@ -38,7 +39,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Models" }, description = "Manage Models")
+@Api(tags = { "Models" }, description = "Manage Models", authorizations = {@Authorization(value="basicAuth")})
 public class ModelSourceExtraResource extends BaseModelSourceResource {
 
   @RequestMapping(value = "/repository/models/{modelId}/source-extra", method = RequestMethod.GET)

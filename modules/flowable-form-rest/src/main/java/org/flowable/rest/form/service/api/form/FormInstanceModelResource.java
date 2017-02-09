@@ -19,6 +19,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormService;
@@ -34,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Form Instance Models" }, description = "Manage Form Instance Models")
+@Api(tags = { "Form Instance Models" }, description = "Manage Form Instance Models", authorizations = {@Authorization(value="basicAuth")})
 public class FormInstanceModelResource {
 
   @Autowired

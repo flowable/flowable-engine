@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.runtime.Execution;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Executions" }, description = "Manage Executions")
+@Api(tags = { "Executions" }, description = "Manage Executions", authorizations = {@Authorization(value="basicAuth")})
 public class ExecutionResource extends ExecutionBaseResource {
 
   @ApiOperation(value = "Get an execution", tags = {"Executions"})

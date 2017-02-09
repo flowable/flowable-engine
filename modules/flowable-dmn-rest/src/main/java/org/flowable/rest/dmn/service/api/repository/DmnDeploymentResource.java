@@ -19,6 +19,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
@@ -34,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Deployment" }, description = "Manage Decision Table Deployments")
+@Api(tags = { "Deployment" }, description = "Manage Decision Table Deployments", authorizations = {@Authorization(value="basicAuth")})
 public class DmnDeploymentResource {
 
   @Autowired

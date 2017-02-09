@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.apache.commons.io.IOUtils;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -36,7 +37,7 @@ import java.io.InputStream;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions")
+@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = {@Authorization(value="basicAuth")})
 public class ProcessDefinitionImageResource extends BaseProcessDefinitionResource {
 
   @ApiOperation(value = "Get a process definition image", tags = {"Process Definitions"})

@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -30,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Deployment" }, description = "Manage Deployment")
+@Api(tags = { "Deployment" }, description = "Manage Deployment", authorizations = {@Authorization(value="basicAuth")})
 public class DeploymentResourceDataResource extends BaseDeploymentResourceDataResource {
 
   @ResponseBody

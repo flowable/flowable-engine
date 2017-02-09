@@ -20,6 +20,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.engine.impl.ModelQueryProperty;
 import org.flowable.engine.repository.Model;
@@ -41,7 +42,7 @@ import java.util.Map;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Models" }, description = "Manage Models")
+@Api(tags = { "Models" }, description = "Manage Models", authorizations = {@Authorization(value="basicAuth")})
 public class ModelCollectionResource extends BaseModelResource {
 
   private static Map<String, QueryProperty> allowedSortProperties = new HashMap<String, QueryProperty>();

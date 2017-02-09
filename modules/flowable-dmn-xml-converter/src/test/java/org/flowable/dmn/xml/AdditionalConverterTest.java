@@ -45,17 +45,17 @@ public class AdditionalConverterTest extends AbstractConverterTest {
     }
 
     private void validateModel(DmnDefinition model) {
-        List<Decision> decisions = model.getDrgElements();
+        List<Decision> decisions = model.getDecisions();
         assertEquals(1, decisions.size());
         
-        DecisionTable decisionTable = decisions.get(0).getDecisionTable();
+        DecisionTable decisionTable = (DecisionTable) decisions.get(0).getExpression();
         assertNotNull(decisionTable);
         
         List<InputClause> inputClauses = decisionTable.getInputs();
         assertEquals(2, inputClauses.size());
 
         List<OutputClause> outputClauses = decisionTable.getOutputs();
-        assertEquals(1, outputClauses.size());
+        assertEquals(2, outputClauses.size());
 
         List<DecisionRule> rules = decisionTable.getRules();
         assertEquals(2, rules.size());
@@ -64,5 +64,7 @@ public class AdditionalConverterTest extends AbstractConverterTest {
         assertNotNull(rules.get(0).getInputEntries().get(0).getInputClause().getInputExpression().getText());
         assertNotNull(rules.get(0).getOutputEntries().get(0).getOutputClause().getTypeRef());
         assertNotNull(rules.get(0).getOutputEntries().get(0).getOutputClause().getName());
+        assertNotNull(rules.get(0).getOutputEntries().get(1).getOutputClause().getTypeRef());
+        assertNotNull(rules.get(0).getOutputEntries().get(1).getOutputClause().getName());
     }
 }

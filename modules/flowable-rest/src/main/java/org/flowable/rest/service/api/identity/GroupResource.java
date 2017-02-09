@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.idm.api.Group;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Groups" }, description = "Manage Groups")
+@Api(tags = { "Groups" }, description = "Manage Groups", authorizations = {@Authorization(value="basicAuth")})
 public class GroupResource extends BaseGroupResource {
 
   @ApiOperation(value = "Get a single group", tags = {"Groups"})

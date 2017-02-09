@@ -17,7 +17,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.flowable.dmn.api.DecisionTable;
+import io.swagger.annotations.Authorization;
+import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.model.DmnDefinition;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Decision Tables" }, description = "Manage Decision Tables")
+@Api(tags = { "Decision Tables" }, description = "Manage Decision Tables", authorizations = {@Authorization(value="basicAuth")})
 public class DecisionTableModelResource extends BaseDecisionTableResource {
 
   @ApiOperation(value = "Get a decision table DMN (definition) model", tags = {"Decision Tables"},  nickname = "getDmnModelResource")
@@ -38,7 +39,7 @@ public class DecisionTableModelResource extends BaseDecisionTableResource {
   })
   @RequestMapping(value = "/dmn-repository/decision-tables/{decisionTableId}/model", method = RequestMethod.GET, produces = "application/json")
   public DmnDefinition getDmnModelResource(@ApiParam(name = "decisionTableId") @PathVariable String decisionTableId) {
-    DecisionTable decisionTable = geDecisionTableFromRequest(decisionTableId);
+    DmnDecisionTable decisionTable = geDecisionTableFromRequest(decisionTableId);
     return dmnRepositoryService.getDmnDefinition(decisionTable.getId());
   }
 }

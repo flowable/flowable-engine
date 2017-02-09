@@ -27,13 +27,22 @@
       "type": "string",
       "variableId": "ruleConclusion1",
       "variableType": "variable"
+    },
+    {
+      "entries": null,
+      "id": "9",
+      "label": "Output 2",
+      "type": "string",
+      "variableId": "ruleConclusion2",
+      "variableType": "variable"
     }
   ],
   "rules": [
     {
       "4": "!= 1",
       "7": "> 9-9-2015",
-      "8": "123"
+      "8": "123",
+      "9": "456"
     }
   ]
 }

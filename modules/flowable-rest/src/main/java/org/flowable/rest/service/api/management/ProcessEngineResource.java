@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.common.EngineInfo;
@@ -32,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Engine" }, description = "Manage Engine")
+@Api(tags = { "Engine" }, description = "Manage Engine", authorizations = {@Authorization(value="basicAuth")})
 public class ProcessEngineResource {
 
   @Autowired

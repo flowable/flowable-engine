@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.task.Task;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +32,7 @@ import java.util.List;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Tasks" }, description = "Manage Tasks")
+@Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = {@Authorization(value="basicAuth")})
 public class TaskSubTaskCollectionResource extends TaskBaseResource {
 
   @ApiOperation(value = "Get list of sub tasks for a task", tags = {"Tasks"})

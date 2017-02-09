@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.dmn.api.DecisionTable;
+import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.engine.app.AppModel;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
@@ -479,13 +479,13 @@ public interface RepositoryService {
   List<ValidationError> validateProcess(BpmnModel bpmnModel);
 
   /**
-   * Retrieves the {@link DecisionTable}s associated with the given process definition.
+   * Retrieves the {@link DmnDecisionTable}s associated with the given process definition.
    *
    * @param processDefinitionId
    *          id of the process definition, cannot be null.
    *
    */
-  List<DecisionTable> getDecisionTablesForProcessDefinition(String processDefinitionId);
+  List<DmnDecisionTable> getDecisionTablesForProcessDefinition(String processDefinitionId);
 
   /**
    * Retrieves the {@link java.text.Normalizer.Form}s associated with the given process definition.

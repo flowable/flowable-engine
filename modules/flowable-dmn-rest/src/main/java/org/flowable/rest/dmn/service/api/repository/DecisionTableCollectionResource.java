@@ -24,7 +24,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.flowable.dmn.api.DecisionTableQuery;
+import io.swagger.annotations.Authorization;
+import org.flowable.dmn.api.DmnDecisionTableQuery;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.impl.DecisionTableQueryProperty;
 import org.flowable.engine.common.api.query.QueryProperty;
@@ -40,7 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Decision Tables" }, description = "Manage Decision Tables")
+@Api(tags = { "Decision Tables" }, description = "Manage Decision Tables", authorizations = {@Authorization(value="basicAuth")})
 public class DecisionTableCollectionResource {
 
   private static final Map<String, QueryProperty> properties = new HashMap<>();
@@ -84,7 +85,7 @@ public class DecisionTableCollectionResource {
   })
   @RequestMapping(value = "/dmn-repository/decision-tables", method = RequestMethod.GET, produces = "application/json")
   public DataResponse getDecisionTables(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
-    DecisionTableQuery decisionTableQuery = dmnRepositoryService.createDecisionTableQuery();
+    DmnDecisionTableQuery decisionTableQuery = dmnRepositoryService.createDecisionTableQuery();
 
     // Populate filter-parameters
     if (allRequestParams.containsKey("category")) {

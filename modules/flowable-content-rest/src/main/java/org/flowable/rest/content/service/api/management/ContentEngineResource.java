@@ -12,6 +12,11 @@
  */
 package org.flowable.rest.content.service.api.management;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.ContentEngines;
 import org.flowable.engine.common.EngineInfo;
@@ -24,8 +29,13 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Tijs Rademakers
  */
 @RestController
+@Api(tags = { "Engine" }, description = "Manage Content Engine", authorizations = {@Authorization(value="basicAuth")})
 public class ContentEngineResource {
 
+  @ApiOperation(value = "Get Content engine info", tags = {"Engine"})
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message =  "Indicates the engine info is returned."),
+  })
   @RequestMapping(value = "/content-management/engine", method = RequestMethod.GET, produces = "application/json")
   public ContentEngineInfoResponse getEngineInfo() {
     ContentEngineInfoResponse response = new ContentEngineInfoResponse();

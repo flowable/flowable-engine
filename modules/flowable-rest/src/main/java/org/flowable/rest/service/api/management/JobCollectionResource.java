@@ -20,6 +20,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.runtime.JobQuery;
@@ -39,7 +40,7 @@ import java.util.Map;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Jobs" }, description = "Manage Jobs")
+@Api(tags = { "Jobs" }, description = "Manage Jobs", authorizations = {@Authorization(value="basicAuth")})
 public class JobCollectionResource {
 
   @Autowired

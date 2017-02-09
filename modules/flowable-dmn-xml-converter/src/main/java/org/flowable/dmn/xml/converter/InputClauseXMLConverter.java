@@ -15,6 +15,7 @@ package org.flowable.dmn.xml.converter;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnElement;
 import org.flowable.dmn.model.InputClause;
@@ -35,9 +36,9 @@ public class InputClauseXMLConverter extends BaseDmnXMLConverter {
     }
 
     @Override
-    protected DmnElement convertXMLToElement(XMLStreamReader xtr, DmnDefinition model) throws Exception {
+    protected DmnElement convertXMLToElement(XMLStreamReader xtr, DmnDefinition model, DecisionTable decisionTable) throws Exception {
         InputClause clause = new InputClause();
-        parseChildElements(getXMLElementName(), clause, model, xtr);
+        parseChildElements(getXMLElementName(), clause, decisionTable, xtr);
         return clause;
     }
 

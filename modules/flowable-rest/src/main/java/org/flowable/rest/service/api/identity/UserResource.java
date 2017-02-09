@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.idm.api.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +34,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Users" }, description = "Manage Users")
+@Api(tags = { "Users" }, description = "Manage Users", authorizations = {@Authorization(value="basicAuth")})
 public class UserResource extends BaseUserResource {
 
   @ApiOperation(value = "Get a single user", tags = {"Users"})

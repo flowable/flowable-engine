@@ -15,7 +15,7 @@ package org.flowable.dmn.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.dmn.api.DecisionTable;
+import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.engine.impl.DecisionTableQueryImpl;
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
@@ -34,7 +34,7 @@ public interface DecisionTableEntityManager extends EntityManager<DecisionTableE
   DecisionTableEntity findLatestDecisionTableByKeyParentDeploymentIdAndTenantId(String decisionTableKey, 
       String parentDeploymentId, String tenantId);
 
-  List<DecisionTable> findDecisionTablesByQueryCriteria(DecisionTableQueryImpl decisionTableQuery, Page page);
+  List<DmnDecisionTable> findDecisionTablesByQueryCriteria(DecisionTableQueryImpl decisionTableQuery, Page page);
 
   long findDecisionTableCountByQueryCriteria(DecisionTableQueryImpl decisionTableQuery);
 
@@ -44,7 +44,7 @@ public interface DecisionTableEntityManager extends EntityManager<DecisionTableE
 
   DecisionTableEntity findDecisionTableByKeyAndVersionAndTenantId(String decisionTableKey, Integer processDefinitionVersion, String tenantId);
 
-  List<DecisionTable> findDecisionTablesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+  List<DmnDecisionTable> findDecisionTablesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
 
   long findDecisionTableCountByNativeQuery(Map<String, Object> parameterMap);
 

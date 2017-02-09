@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.rest.service.api.RestResponseFactory;
@@ -41,7 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Runtime" }, description = "Manage Runtime")
+@Api(tags = { "Runtime" }, description = "Manage Runtime", authorizations = {@Authorization(value="basicAuth")})
 public class SignalResource {
 
   @Autowired

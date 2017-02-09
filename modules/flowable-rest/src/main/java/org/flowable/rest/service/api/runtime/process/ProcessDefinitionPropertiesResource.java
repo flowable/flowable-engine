@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.FormService;
 import org.flowable.engine.form.FormProperty;
 import org.flowable.engine.form.StartFormData;
@@ -33,7 +34,7 @@ import java.util.Map;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions")
+@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = {@Authorization(value="basicAuth")})
 public class ProcessDefinitionPropertiesResource {
 
   @Autowired

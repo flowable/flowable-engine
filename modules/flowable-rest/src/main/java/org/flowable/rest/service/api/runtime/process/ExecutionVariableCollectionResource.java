@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
@@ -35,7 +36,7 @@ import java.util.List;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Executions" }, description = "Manage Executions")
+@Api(tags = { "Executions" }, description = "Manage Executions", authorizations = {@Authorization(value="basicAuth")})
 public class ExecutionVariableCollectionResource extends BaseVariableCollectionResource {
 
   @ApiOperation(value = "List of variables for an execution", tags = {"Executions"}, nickname = "listExecutionVariables")

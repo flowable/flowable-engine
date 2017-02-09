@@ -65,14 +65,14 @@ public class DmnJsonConverterTest {
     Assert.assertEquals("definition_abc", dmnDefinition.getId());
     Assert.assertEquals("decisionTableRule1", dmnDefinition.getName());
 
-    Assert.assertNotNull(dmnDefinition.getDrgElements());
-    Assert.assertEquals(1, dmnDefinition.getDrgElements().size());
+    Assert.assertNotNull(dmnDefinition.getDecisions());
+    Assert.assertEquals(1, dmnDefinition.getDecisions().size());
 
-    Decision decision = dmnDefinition.getDrgElements().get(0);
+    Decision decision = dmnDefinition.getDecisions().get(0);
     Assert.assertNotNull(decision);
     Assert.assertEquals("decTable1", decision.getId());
 
-    DecisionTable decisionTable = decision.getDecisionTable();
+    DecisionTable decisionTable = (DecisionTable) decision.getExpression();
     Assert.assertNotNull(decisionTable);
     Assert.assertEquals("decisionTable_11", decisionTable.getId());
     Assert.assertEquals(HitPolicy.ANY, decisionTable.getHitPolicy());
@@ -179,14 +179,14 @@ public class DmnJsonConverterTest {
     Assert.assertEquals("decisionTableRule1", dmnDefinition.getName());
     Assert.assertEquals(DmnJsonConverter.URI_JSON, dmnDefinition.getTypeLanguage());
 
-    Assert.assertNotNull(dmnDefinition.getDrgElements());
-    Assert.assertEquals(1, dmnDefinition.getDrgElements().size());
+    Assert.assertNotNull(dmnDefinition.getDecisions());
+    Assert.assertEquals(1, dmnDefinition.getDecisions().size());
 
-    Decision decision = dmnDefinition.getDrgElements().get(0);
+    Decision decision = dmnDefinition.getDecisions().get(0);
     Assert.assertNotNull(decision);
     Assert.assertEquals("decTable1", decision.getId());
 
-    DecisionTable decisionTable = decision.getDecisionTable();
+    DecisionTable decisionTable = (DecisionTable) decision.getExpression();
     Assert.assertNotNull(decisionTable);
 
     Assert.assertEquals("decisionTable_11", decisionTable.getId());
@@ -253,7 +253,9 @@ public class DmnJsonConverterTest {
 
     Assert.assertNotNull(dmnDefinition);
 
-    List<DecisionRule> rules = dmnDefinition.getCurrentDecisionTable().getRules();
+    DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
+
+    List<DecisionRule> rules = decisionTable.getRules();
     Assert.assertNotNull(rules);
     Assert.assertEquals(1, rules.size());
     Assert.assertNotNull(rules.get(0).getOutputEntries());

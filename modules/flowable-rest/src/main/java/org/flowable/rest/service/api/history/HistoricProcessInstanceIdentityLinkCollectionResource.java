@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.history.HistoricIdentityLink;
 import org.flowable.rest.service.api.RestResponseFactory;
@@ -35,7 +36,7 @@ import java.util.List;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History" }, description = "Manage History")
+@Api(tags = { "History" }, description = "Manage History", authorizations = {@Authorization(value="basicAuth")})
 public class HistoricProcessInstanceIdentityLinkCollectionResource {
 
   @Autowired

@@ -78,12 +78,6 @@
             if(window.SwaggerTranslator) {
             window.SwaggerTranslator.translate();
           }
-
-//          temp disabled; needed for basic auth on curl example
-//
-//          var basicAuth = new SwaggerClient.PasswordAuthorization('basic', 'kermit', 'kermit');
-//          swaggerUi.api.clientAuthorizations.add("basicAuth", basicAuth);
-
         },
         onFailure: function(data) {
           log("Unable to Load SwaggerUI");

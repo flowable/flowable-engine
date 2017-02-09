@@ -20,6 +20,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.api.RequestUtil;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +35,7 @@ import java.util.Map;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History" }, description = "Manage History")
+@Api(tags = { "History" }, description = "Manage History", authorizations = {@Authorization(value="basicAuth")})
 public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstanceBaseResource {
 
   @ApiOperation(value = "Get historic task instances", tags = { "History" }, nickname = "listHistoricTaskInstances")

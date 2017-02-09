@@ -17,8 +17,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.dmn.api.DecisionTable;
-import org.flowable.dmn.api.DecisionTableQuery;
+import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecisionTableQuery;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnDeploymentQuery;
 import org.flowable.dmn.api.DmnRepositoryService;
@@ -58,10 +58,10 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
 
   public void testBasicActivitiSpringIntegration() {
     createAppContext("org/flowable/spring/test/autodeployment/SpringAutoDeployTest-context.xml");
-    List<DecisionTable> decisionTables = repositoryService.createDecisionTableQuery().orderByDecisionTableKey().asc().list();
+    List<DmnDecisionTable> decisionTables = repositoryService.createDecisionTableQuery().orderByDecisionTableKey().asc().list();
 
     Set<String> decisionTableKeys = new HashSet<String>();
-    for (DecisionTable decisionTable : decisionTables) {
+    for (DmnDecisionTable decisionTable : decisionTables) {
       decisionTableKeys.add(decisionTable.getKey());
     }
 
@@ -76,7 +76,7 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
     createAppContext(CTX_PATH);
     DmnDeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
     assertEquals(1, deploymentQuery.count());
-    DecisionTableQuery decisionTableQuery = repositoryService.createDecisionTableQuery();
+    DmnDecisionTableQuery decisionTableQuery = repositoryService.createDecisionTableQuery();
     assertEquals(2, decisionTableQuery.count());
 
     // Creating a new app context with same resources doesn't lead to more deployments

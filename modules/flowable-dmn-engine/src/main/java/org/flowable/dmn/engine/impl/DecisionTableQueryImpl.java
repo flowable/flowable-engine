@@ -16,8 +16,8 @@ package org.flowable.dmn.engine.impl;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.dmn.api.DecisionTable;
-import org.flowable.dmn.api.DecisionTableQuery;
+import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecisionTableQuery;
 import org.flowable.dmn.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -27,7 +27,7 @@ import org.flowable.engine.common.impl.Page;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, DecisionTable> implements DecisionTableQuery {
+public class DecisionTableQueryImpl extends AbstractQuery<DmnDecisionTableQuery, DmnDecisionTable> implements DmnDecisionTableQuery {
 
   private static final long serialVersionUID = 1L;
   protected String id;
@@ -73,7 +73,7 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
   }
   
   @Override
-  public DecisionTableQuery decisionTableIds(Set<String> decisionTableIds) {
+  public DmnDecisionTableQuery decisionTableIds(Set<String> decisionTableIds) {
   	this.ids = decisionTableIds;
   	return this;
   }
@@ -188,25 +188,25 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
     return this;
   }
 
-  public DecisionTableQuery decisionTableVersionGreaterThan(Integer decisionTableVersion) {
+  public DmnDecisionTableQuery decisionTableVersionGreaterThan(Integer decisionTableVersion) {
     checkVersion(decisionTableVersion);
     this.versionGt = decisionTableVersion;
     return this;
   }
 
-  public DecisionTableQuery decisionTableVersionGreaterThanOrEquals(Integer decisionTableVersion) {
+  public DmnDecisionTableQuery decisionTableVersionGreaterThanOrEquals(Integer decisionTableVersion) {
     checkVersion(decisionTableVersion);
     this.versionGte = decisionTableVersion;
     return this;
   }
 
-  public DecisionTableQuery decisionTableVersionLowerThan(Integer decisionTableVersion) {
+  public DmnDecisionTableQuery decisionTableVersionLowerThan(Integer decisionTableVersion) {
     checkVersion(decisionTableVersion);
     this.versionLt = decisionTableVersion;
     return this;
   }
 
-  public DecisionTableQuery decisionTableVersionLowerThanOrEquals(Integer decisionTableVersion) {
+  public DmnDecisionTableQuery decisionTableVersionLowerThanOrEquals(Integer decisionTableVersion) {
     checkVersion(decisionTableVersion);
     this.versionLte = decisionTableVersion;
     return this;
@@ -225,7 +225,7 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
     return this;
   }
 
-  public DecisionTableQuery decisionTableTenantId(String tenantId) {
+  public DmnDecisionTableQuery decisionTableTenantId(String tenantId) {
     if (tenantId == null) {
       throw new FlowableIllegalArgumentException("decision table tenantId is null");
     }
@@ -233,7 +233,7 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
     return this;
   }
 
-  public DecisionTableQuery decisionTableTenantIdLike(String tenantIdLike) {
+  public DmnDecisionTableQuery decisionTableTenantIdLike(String tenantIdLike) {
     if (tenantIdLike == null) {
       throw new FlowableIllegalArgumentException("decision table tenantId is null");
     }
@@ -241,38 +241,38 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
     return this;
   }
 
-  public DecisionTableQuery decisionTableWithoutTenantId() {
+  public DmnDecisionTableQuery decisionTableWithoutTenantId() {
     this.withoutTenantId = true;
     return this;
   }
 
   // sorting ////////////////////////////////////////////
 
-  public DecisionTableQuery orderByDeploymentId() {
+  public DmnDecisionTableQuery orderByDeploymentId() {
     return orderBy(DecisionTableQueryProperty.DEPLOYMENT_ID);
   }
 
-  public DecisionTableQuery orderByDecisionTableKey() {
+  public DmnDecisionTableQuery orderByDecisionTableKey() {
     return orderBy(DecisionTableQueryProperty.DECISION_TABLE_KEY);
   }
 
-  public DecisionTableQuery orderByDecisionTableCategory() {
+  public DmnDecisionTableQuery orderByDecisionTableCategory() {
     return orderBy(DecisionTableQueryProperty.DECISION_TABLE_CATEGORY);
   }
 
-  public DecisionTableQuery orderByDecisionTableId() {
+  public DmnDecisionTableQuery orderByDecisionTableId() {
     return orderBy(DecisionTableQueryProperty.DECISION_TABLE_ID);
   }
 
-  public DecisionTableQuery orderByDecisionTableVersion() {
+  public DmnDecisionTableQuery orderByDecisionTableVersion() {
     return orderBy(DecisionTableQueryProperty.DECISION_TABLE_VERSION);
   }
 
-  public DecisionTableQuery orderByDecisionTableName() {
+  public DmnDecisionTableQuery orderByDecisionTableName() {
     return orderBy(DecisionTableQueryProperty.DECISION_TABLE_NAME);
   }
 
-  public DecisionTableQuery orderByTenantId() {
+  public DmnDecisionTableQuery orderByTenantId() {
     return orderBy(DecisionTableQueryProperty.DECISION_TABLE_TENANT_ID);
   }
 
@@ -283,7 +283,7 @@ public class DecisionTableQueryImpl extends AbstractQuery<DecisionTableQuery, De
     return commandContext.getDecisionTableEntityManager().findDecisionTableCountByQueryCriteria(this);
   }
 
-  public List<DecisionTable> executeList(CommandContext commandContext, Page page) {
+  public List<DmnDecisionTable> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     return commandContext.getDecisionTableEntityManager().findDecisionTablesByQueryCriteria(this, page);
   }

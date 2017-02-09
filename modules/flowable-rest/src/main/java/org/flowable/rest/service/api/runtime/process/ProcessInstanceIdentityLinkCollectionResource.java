@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.rest.service.api.engine.RestIdentityLink;
@@ -36,7 +37,7 @@ import java.util.List;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Instances" }, description = "Manage Process Instances")
+@Api(tags = { "Process Instances" }, description = "Manage Process Instances", authorizations = {@Authorization(value="basicAuth")})
 public class ProcessInstanceIdentityLinkCollectionResource extends BaseProcessInstanceResource {
 
   @ApiOperation(value = "Get involved people for process instance", tags = { "Process Instances" }, nickname = "listProcessInstanceIdentityLinks",

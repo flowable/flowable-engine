@@ -15,8 +15,8 @@ package org.flowable.dmn.engine.impl;
 import java.io.InputStream;
 import java.util.List;
 
-import org.flowable.dmn.api.DecisionTable;
-import org.flowable.dmn.api.DecisionTableQuery;
+import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecisionTableQuery;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.api.DmnDeploymentQuery;
@@ -60,7 +60,7 @@ public class DmnRepositoryServiceImpl extends ServiceImpl implements DmnReposito
       commandExecutor.execute(new DeleteDeploymentCmd(deploymentId));
     }
     
-    public DecisionTableQuery createDecisionTableQuery() {
+    public DmnDecisionTableQuery createDecisionTableQuery() {
       return new DecisionTableQueryImpl(commandExecutor);
     }
 
@@ -92,7 +92,7 @@ public class DmnRepositoryServiceImpl extends ServiceImpl implements DmnReposito
       return new NativeDmnDeploymentQueryImpl(commandExecutor);
     }
     
-    public DecisionTable getDecisionTable(String decisionTableId) {
+    public DmnDecisionTable getDecisionTable(String decisionTableId) {
       return commandExecutor.execute(new GetDeploymentDecisionTableCmd(decisionTableId));
     }
     

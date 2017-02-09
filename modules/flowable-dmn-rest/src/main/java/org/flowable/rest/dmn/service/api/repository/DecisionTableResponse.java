@@ -12,7 +12,7 @@
  */
 package org.flowable.rest.dmn.service.api.repository;
 
-import org.flowable.dmn.api.DecisionTable;
+import org.flowable.dmn.api.DmnDecisionTable;
 
 /**
  * @author Yvo Swillens
@@ -31,7 +31,7 @@ public class DecisionTableResponse {
   protected String parentDeploymentId;
   protected String tenantId;
 
-  public DecisionTableResponse(DecisionTable decisionTable) {
+  public DecisionTableResponse(DmnDecisionTable decisionTable) {
     setId(decisionTable.getId());
     setCategory(decisionTable.getCategory());
     setName(decisionTable.getName());

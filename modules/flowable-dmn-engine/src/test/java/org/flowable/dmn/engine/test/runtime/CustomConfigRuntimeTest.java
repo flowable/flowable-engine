@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.dmn.engine.test;
+package org.flowable.dmn.engine.test.runtime;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +19,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.api.RuleEngineExecutionResult;
 import org.flowable.dmn.engine.DmnEngine;
+import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
+import org.flowable.dmn.engine.test.FlowableDmnRule;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;

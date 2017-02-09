@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnDeploymentBuilder;
@@ -49,7 +50,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Deployment" }, description = "Manage Decision Table Deployments")
+@Api(tags = { "Deployment" }, description = "Manage Decision Table Deployments", authorizations = {@Authorization(value="basicAuth")})
 public class DmnDeploymentCollectionResource {
 
   private static Map<String, QueryProperty> allowedSortProperties = new HashMap<>();

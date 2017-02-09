@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.dmn.api.DecisionTable;
+import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.form.FormData;
 import org.flowable.engine.form.FormProperty;
@@ -1173,20 +1173,20 @@ public class RestResponseFactory {
     return response;
   }
 
-  public List<DecisionTableResponse> createDecisionTableResponseList(List<DecisionTable> decisionTables, String processDefinitionId) {
+  public List<DecisionTableResponse> createDecisionTableResponseList(List<DmnDecisionTable> decisionTables, String processDefinitionId) {
     RestUrlBuilder urlBuilder = createUrlBuilder();
     List<DecisionTableResponse> responseList = new ArrayList<>();
-    for (DecisionTable decisionTable : decisionTables) {
+    for (DmnDecisionTable decisionTable : decisionTables) {
       responseList.add(createDecisionTableResponse(decisionTable, processDefinitionId, urlBuilder));
     }
     return responseList;
   }
 
-  public DecisionTableResponse createDecisionTableResponse(DecisionTable decisionTable, String processDefinitionId) {
+  public DecisionTableResponse createDecisionTableResponse(DmnDecisionTable decisionTable, String processDefinitionId) {
     return createDecisionTableResponse(decisionTable, processDefinitionId, createUrlBuilder());
   }
 
-  public DecisionTableResponse createDecisionTableResponse(DecisionTable decisionTable, String processDefinitionId, RestUrlBuilder urlBuilder) {
+  public DecisionTableResponse createDecisionTableResponse(DmnDecisionTable decisionTable, String processDefinitionId, RestUrlBuilder urlBuilder) {
     DecisionTableResponse decisionTableResponse = new DecisionTableResponse(decisionTable);
     decisionTableResponse.setUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION_DECISION_TABLES_COLLECTION, processDefinitionId));
 

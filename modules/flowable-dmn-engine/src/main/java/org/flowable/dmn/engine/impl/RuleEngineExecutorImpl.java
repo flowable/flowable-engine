@@ -26,6 +26,7 @@ import org.flowable.dmn.engine.impl.mvel.ExecutionVariableFactory;
 import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
 import org.flowable.dmn.engine.impl.mvel.MvelExecutionContextBuilder;
 import org.flowable.dmn.engine.impl.mvel.MvelExpressionExecutor;
+import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnDefinition;
@@ -48,30 +49,32 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
   /**
    * Executes the given decision table and creates the outcome results
    *
-   * @param decisionDefinition
-   *          the DMN decision definition
-   * @param executionVariables
-   *          map with execution variables
+   * @param decision
+   *          the DMN decision
+   * @param inputVariables
+   *          map with input variables
    * @return updated execution variables map
    */
   @Override
-  public RuleEngineExecutionResult execute(DmnDefinition decisionDefinition, Map<String, Object> executionVariables,
-      Map<String, Method> customExpressionFunctions, Map<Class<?>, PropertyHandler> propertyHandlers) {
+  public RuleEngineExecutionResult execute(Decision decision, Map<String, Object> inputVariables,
+                                           Map<String, Method> customExpressionFunctions, Map<Class<?>, PropertyHandler> propertyHandlers) {
 
-    if (decisionDefinition == null) {
+    if (decision == null) {
       throw new IllegalArgumentException("no decision provided");
     }
 
-    if (decisionDefinition.getCurrentDecisionTable() == null) {
-      throw new IllegalArgumentException("no decision table present in definition");
+    if (decision.getExpression() == null || !(decision.getExpression() instanceof DecisionTable)) {
+      throw new IllegalArgumentException("no decision table present in decision");
     }
 
+    DecisionTable currentDecisionTable = (DecisionTable) decision.getExpression();
+
     // create execution context and audit trail
-    MvelExecutionContext executionContext = MvelExecutionContextBuilder.build(decisionDefinition, executionVariables, 
+    MvelExecutionContext executionContext = MvelExecutionContextBuilder.build(decision, inputVariables,
         customExpressionFunctions, propertyHandlers);
 
     // evaluate decision table
-    Map<String, Object> resultVariables = evaluateDecisionTable(decisionDefinition.getCurrentDecisionTable(), executionContext);
+    Map<String, Object> resultVariables = evaluateDecisionTable(currentDecisionTable, executionContext);
 
     // end audit trail
     executionContext.getAuditContainer().stopAudit(resultVariables);

@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.form.api.FormDefinitionQuery;
 import org.flowable.form.api.FormRepositoryService;
@@ -40,7 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Form Definitions" }, description = "Manage Form Definitions")
+@Api(tags = { "Form Definitions" }, description = "Manage Form Definitions", authorizations = {@Authorization(value="basicAuth")})
 public class FormDefinitionCollectionResource {
 
   private static final Map<String, QueryProperty> properties = new HashMap<>();

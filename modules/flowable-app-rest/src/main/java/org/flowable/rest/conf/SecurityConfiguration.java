@@ -35,6 +35,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
       if (swaggerDocsEnable) {
         httpSecurity
           .authorizeRequests()
+          .antMatchers("/docs/**").permitAll()
           .anyRequest()
           .authenticated().and().httpBasic();
       } else {

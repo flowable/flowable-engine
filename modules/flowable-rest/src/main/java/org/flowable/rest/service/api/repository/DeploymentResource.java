@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.repository.Deployment;
@@ -37,7 +38,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Deployment" }, description = "Manage Deployment")
+@Api(tags = { "Deployment" }, description = "Manage Deployment", authorizations = {@Authorization(value="basicAuth")})
 public class DeploymentResource {
 
   @Autowired

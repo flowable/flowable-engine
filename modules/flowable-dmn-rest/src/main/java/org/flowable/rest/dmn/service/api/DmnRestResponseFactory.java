@@ -15,7 +15,7 @@ package org.flowable.rest.dmn.service.api;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.dmn.api.DecisionTable;
+import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.RuleEngineExecutionResult;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -49,21 +49,21 @@ public class DmnRestResponseFactory {
     initializeVariableConverters();
   }
 
-  public DecisionTableResponse createDecisionTableResponse(DecisionTable decisionTable) {
+  public DecisionTableResponse createDecisionTableResponse(DmnDecisionTable decisionTable) {
     return createDecisionTableResponse(decisionTable, createUrlBuilder());
   }
 
-  public DecisionTableResponse createDecisionTableResponse(DecisionTable decisionTable, DmnRestUrlBuilder urlBuilder) {
+  public DecisionTableResponse createDecisionTableResponse(DmnDecisionTable decisionTable, DmnRestUrlBuilder urlBuilder) {
     DecisionTableResponse response = new DecisionTableResponse(decisionTable);
     response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_DECISION_TABLE, decisionTable.getId()));
 
     return response;
   }
 
-  public List<DecisionTableResponse> createDecisionTableResponseList(List<DecisionTable> decisionTables) {
+  public List<DecisionTableResponse> createDecisionTableResponseList(List<DmnDecisionTable> decisionTables) {
     DmnRestUrlBuilder urlBuilder = createUrlBuilder();
     List<DecisionTableResponse> responseList = new ArrayList<>();
-    for (DecisionTable instance : decisionTables) {
+    for (DmnDecisionTable instance : decisionTables) {
       responseList.add(createDecisionTableResponse(instance, urlBuilder));
     }
     return responseList;

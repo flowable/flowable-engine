@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.rest.api.DataResponse;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +32,7 @@ import java.util.Map;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Form Instances" }, description = "Manage Form Instances")
+@Api(tags = { "Form Instances" }, description = "Manage Form Instances", authorizations = {@Authorization(value="basicAuth")})
 public class FormInstanceQueryResource extends BaseFormInstanceResource {
 
   @ApiOperation(value = "Query form instances", tags = { "Form Instances" }, notes = "The request body can contain all possible filters that can be used in the List form instances URL query. On top of these, it’s possible to provide an array of variables to include in the query, with their format described here.\n"

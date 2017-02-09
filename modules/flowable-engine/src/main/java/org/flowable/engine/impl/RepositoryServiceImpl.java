@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.dmn.api.DecisionTable;
+import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.app.AppModel;
 import org.flowable.engine.impl.cmd.ActivateProcessDefinitionCmd;
@@ -302,7 +302,7 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
     return commandExecutor.execute(new ValidateBpmnModelCmd(bpmnModel));
   }
 
-  public List<DecisionTable> getDecisionTablesForProcessDefinition(String processDefinitionId) {
+  public List<DmnDecisionTable> getDecisionTablesForProcessDefinition(String processDefinitionId) {
     return commandExecutor.execute(new GetDecisionTablesForProcessDefinitionCmd(processDefinitionId));
   }
 

@@ -20,6 +20,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.engine.impl.ProcessDefinitionQueryProperty;
@@ -40,7 +41,7 @@ import java.util.Map;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions")
+@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = {@Authorization(value="basicAuth")})
 public class ProcessDefinitionCollectionResource {
 
   private static final Map<String, QueryProperty> properties = new HashMap<String, QueryProperty>();

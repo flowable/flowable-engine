@@ -19,6 +19,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.query.QueryProperty;
@@ -48,7 +49,7 @@ import io.swagger.annotations.ApiResponses;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Users" }, description = "Manage Users")
+@Api(tags = { "Users" }, description = "Manage Users", authorizations = {@Authorization(value="basicAuth")})
 public class UserCollectionResource {
 
   protected static HashMap<String, QueryProperty> properties = new HashMap<String, QueryProperty>();

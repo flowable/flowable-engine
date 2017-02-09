@@ -16,6 +16,7 @@ package org.flowable.rest.service.api.runtime.process;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.rest.exception.FlowableConflictException;
@@ -37,7 +38,7 @@ import io.swagger.annotations.ApiResponses;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Instances" }, description = "Manage Process Instances")
+@Api(tags = { "Process Instances" }, description = "Manage Process Instances", authorizations = {@Authorization(value="basicAuth")})
 public class ProcessInstanceResource extends BaseProcessInstanceResource {
 
   @ApiOperation(value = "Get a process instance", tags = {"Process Instances"}, nickname = "getProcessInstance")

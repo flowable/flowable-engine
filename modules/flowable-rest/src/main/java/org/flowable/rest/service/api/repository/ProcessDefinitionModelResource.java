@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions")
+@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = {@Authorization(value="basicAuth")})
 public class ProcessDefinitionModelResource extends BaseProcessDefinitionResource {
 
   @ApiOperation(value = "Get a process definition BPMN model", tags = {"Process Definitions"},  nickname = "getBpmnModelResource")

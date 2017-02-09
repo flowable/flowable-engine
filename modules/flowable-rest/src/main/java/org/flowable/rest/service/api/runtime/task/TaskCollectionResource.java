@@ -20,6 +20,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.task.Task;
 import org.flowable.rest.api.DataResponse;
@@ -42,7 +43,7 @@ import java.util.Map;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Tasks" }, description = "Manage Tasks")
+@Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = {@Authorization(value="basicAuth")})
 public class TaskCollectionResource extends TaskBaseResource {
 
   @ApiOperation(value = "List of tasks", tags = {"Tasks"})

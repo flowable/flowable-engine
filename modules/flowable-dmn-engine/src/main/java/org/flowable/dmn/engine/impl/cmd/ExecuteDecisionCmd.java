@@ -16,14 +16,14 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.dmn.api.DecisionTable;
+import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.RuleEngineExecutionResult;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.interceptor.Command;
 import org.flowable.dmn.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
 import org.flowable.dmn.engine.impl.persistence.deploy.DeploymentManager;
-import org.flowable.dmn.model.DmnDefinition;
+import org.flowable.dmn.model.Decision;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 
@@ -61,7 +61,7 @@ public class ExecuteDecisionCmd implements Command<RuleEngineExecutionResult>, S
 
     DmnEngineConfiguration dmnEngineConfiguration = commandContext.getDmnEngineConfiguration();
     DeploymentManager deploymentManager = dmnEngineConfiguration.getDeploymentManager();
-    DecisionTable decisionTable = null;
+    DmnDecisionTable decisionTable = null;
 
     if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(parentDeploymentId) && StringUtils.isNotEmpty(tenantId)) {
       decisionTable = deploymentManager.findDeployedLatestDecisionByKeyParentDeploymentIdAndTenantId(decisionKey, parentDeploymentId, tenantId);
@@ -95,9 +95,9 @@ public class ExecuteDecisionCmd implements Command<RuleEngineExecutionResult>, S
     }
 
     DecisionTableCacheEntry decisionTableCacheEntry = deploymentManager.resolveDecisionTable(decisionTable);
-    DmnDefinition dmnDefinition = decisionTableCacheEntry.getDmnDefinition();
+    Decision decision = decisionTableCacheEntry.getDecision();
 
-    RuleEngineExecutionResult executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(dmnDefinition, variables, 
+    RuleEngineExecutionResult executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(decision, variables,
         dmnEngineConfiguration.getCustomExpressionFunctions(), dmnEngineConfiguration.getCustomPropertyHandlers());
 
     if (executionResult != null && executionResult.getAuditTrail() != null) {

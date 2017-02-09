@@ -12,7 +12,7 @@
  */
 package org.flowable.dmn.engine.test;
 
-import org.flowable.dmn.api.DecisionTable;
+import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
     assertNotNull(processDefinition);
     assertEquals("oneDecisionTaskProcess", processDefinition.getKey());
 
-    DecisionTable decisionTable = dmnRepositoryService.createDecisionTableQuery()
+    DmnDecisionTable decisionTable = dmnRepositoryService.createDecisionTableQuery()
         .latestVersion()
         .decisionTableKey("decision1")
         .singleResult();
@@ -47,7 +47,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
     assertEquals("decision1", decisionTable.getKey());
 
 
-    List<DecisionTable> decisionTableList = repositoryService.getDecisionTablesForProcessDefinition(processDefinition.getId());
+    List<DmnDecisionTable> decisionTableList = repositoryService.getDecisionTablesForProcessDefinition(processDefinition.getId());
     assertEquals(1l, decisionTableList.size());
     assertEquals("decision1", decisionTableList.get(0).getKey());
   }

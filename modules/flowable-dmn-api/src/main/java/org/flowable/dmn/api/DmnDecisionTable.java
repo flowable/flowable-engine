@@ -19,7 +19,7 @@ package org.flowable.dmn.api;
  * @author Tijs Rademakers
  * @author Joram Barez
  */
-public interface DecisionTable {
+public interface DmnDecisionTable {
 
   /** unique identifier */
   String getId();

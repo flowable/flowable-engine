@@ -15,7 +15,7 @@ package org.flowable.dmn.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
-import org.flowable.dmn.api.DecisionTable;
+import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.engine.impl.DecisionTableQueryImpl;
 import org.flowable.dmn.engine.impl.interceptor.Command;
 import org.flowable.dmn.engine.impl.interceptor.CommandContext;
@@ -57,8 +57,8 @@ public class SetDeploymentTenantIdCmd implements Command<Void>, Serializable {
     commandContext.getDecisionTableEntityManager().updateDecisionTableTenantIdForDeployment(deploymentId, newTenantId);
 
     // Doing decision tables in memory, cause we need to clear the decision table cache
-    List<DecisionTable> decisionTables = new DecisionTableQueryImpl().deploymentId(deploymentId).list();
-    for (DecisionTable decisionTable : decisionTables) {
+    List<DmnDecisionTable> decisionTables = new DecisionTableQueryImpl().deploymentId(deploymentId).list();
+    for (DmnDecisionTable decisionTable : decisionTables) {
       commandContext.getDmnEngineConfiguration().getDecisionCache().remove(decisionTable.getId());
     }
     

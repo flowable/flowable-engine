@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.task.Task;
 import org.flowable.rest.service.api.engine.RestIdentityLink;
@@ -36,7 +37,7 @@ import java.util.List;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Tasks" }, description = "Manage Tasks")
+@Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = {@Authorization(value="basicAuth")})
 public class TaskIdentityLinkCollectionResource extends TaskBaseResource {
 
   @ApiOperation(value = "Get all identity links for a task", tags = {"Tasks"}, nickname = "listTasksInstanceIdentityLinks")
