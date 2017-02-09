@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.rest.service.api.engine.EventResponse;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +33,7 @@ import java.util.List;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Tasks" }, description = "Manage Tasks")
+@Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = {@Authorization(value="basicAuth")})
 public class TaskEventCollectionResource extends TaskBaseResource {
 
   @ApiOperation(value = "Get all events for a task", tags = {"Tasks"})

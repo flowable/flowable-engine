@@ -20,6 +20,7 @@ import java.util.zip.ZipInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.Authorization;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.common.api.FlowableException;
@@ -53,7 +54,7 @@ import io.swagger.annotations.ApiResponses;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Deployment" }, description = "Manage Deployment")
+@Api(tags = { "Deployment" }, description = "Manage Deployment", authorizations = {@Authorization(value="basicAuth")})
 public class DeploymentCollectionResource {
 
   protected static final String DEPRECATED_API_DEPLOYMENT_SEGMENT = "deployment";

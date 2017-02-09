@@ -17,6 +17,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.EventSubscriptionQuery;
 import org.flowable.rest.api.DataResponse;
@@ -40,7 +41,7 @@ import io.swagger.annotations.ApiResponses;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Event subscriptions" }, description = "Query event subscriptions")
+@Api(tags = { "Event subscriptions" }, description = "Query event subscriptions", authorizations = {@Authorization(value="basicAuth")})
 public class EventSubscriptionCollectionResource {
 
   @Autowired

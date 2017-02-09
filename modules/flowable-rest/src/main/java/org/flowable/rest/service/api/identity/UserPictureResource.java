@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.apache.commons.io.IOUtils;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -42,7 +43,7 @@ import java.io.ByteArrayOutputStream;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Users" }, description = "Manage Users")
+@Api(tags = { "Users" }, description = "Manage Users", authorizations = {@Authorization(value="basicAuth")})
 public class UserPictureResource extends BaseUserResource {
 
   @ApiOperation(value = "Get a user’s picture", tags = {"Users"},

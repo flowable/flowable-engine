@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.idm.api.Group;
 import org.flowable.rest.exception.FlowableConflictException;
@@ -35,7 +36,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Groups" }, description = "Manage Groups")
+@Api(tags = { "Groups" }, description = "Manage Groups", authorizations = {@Authorization(value="basicAuth")})
 public class GroupMembershipCollectionResource extends BaseGroupResource {
 
   @ApiOperation(value = "Add a member to a group", tags = {"Groups"})

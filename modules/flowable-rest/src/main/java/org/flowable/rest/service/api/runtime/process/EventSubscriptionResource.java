@@ -15,6 +15,7 @@ package org.flowable.rest.service.api.runtime.process;
 
 import javax.servlet.http.HttpServletRequest;
 
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.runtime.EventSubscription;
@@ -35,7 +36,7 @@ import io.swagger.annotations.ApiResponses;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Event subscriptions" }, description = "Manage event subscriptions")
+@Api(tags = { "Event subscriptions" }, description = "Manage event subscriptions", authorizations = {@Authorization(value="basicAuth")})
 public class EventSubscriptionResource {
 
   @Autowired

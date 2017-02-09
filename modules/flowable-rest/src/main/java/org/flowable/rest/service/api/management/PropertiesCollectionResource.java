@@ -20,6 +20,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.ManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Engine" }, description = "Manage Engine")
+@Api(tags = { "Engine" }, description = "Manage Engine", authorizations = {@Authorization(value="basicAuth")})
 public class PropertiesCollectionResource {
 
   @Autowired
