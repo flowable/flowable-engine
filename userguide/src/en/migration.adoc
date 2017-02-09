@@ -1,4 +1,4 @@
-= Flowable Migration Guide : Flowable v5 to Flowable v6
+= Flowable Migration Guide : Flowable v5 to Flowable V6
 :doctype: book
 :docinfo1: header
 :icons: font
@@ -11,9 +11,9 @@
 
 == Introduction
 
-This guide describes the various things that are needed when migrating from Flowable v 5.x to Flowable version 6. This is a preliminary version of the migration guide, which will be updated while alpha/beta releases of Flowable v6 are being pushed out. As it goes with such releases, many things can still change on the road to a stable version. At that point, the migration guide will be formalized and the regular user guide will be updated to reflect all the features and capabilities in Flowable v6, as was the case for Flowable v5.
+This guide describes the various things that are needed when migrating from Flowable v5.x to Flowable V6. This is a preliminary version of the migration guide, which will be updated as alpha/beta releases of Flowable V6 are being pushed out. As it goes with such releases, many things can still change on the road to a stable version. At that point, the migration guide will be formalized and the regular user guide will be updated to reflect all the features and capabilities in Flowable V6, as was the case for Flowable v5.
 
-*This current Flowable v6 release is for testing purposes only! Do not use in production yet.* The main goal of this release is to gather feedback, report issues and to have people test out their process definitions on v6. Of course, as before, all contributions are more than welcomed through our Github page. The Flowable v6 code lives currently link:$$https://github.com/flowable/flowable-engine$$[on the _master_ branch]
+*The current Flowable V6 release is for test purposes only! Do not use in production yet.* The main goal of this release is to gather feedback, report issues and to have people test out their process definitions on V6. Of course, as before, all contributions are more than welcomed through our Github page. The Flowable V6 code lives currently link:$$https://github.com/flowable/flowable-engine$$[on the _master_ branch]
 
 == Design goals
 
@@ -22,23 +22,23 @@ The design goals of version 6 are:
 * Complete backwards compatibility with version 5: database-wise, concept-wise and code-wise.
 * Rewrite of the core engine: direct execution of BPMN 2.0 (vs transformation to intermediate model)
 * Simpler and cleaner runtime execution data structure, where predictability of the structure is crucial
-* Decoupling of persistence layers for future possible different implementations
+* Decoupling of persistence layers for future alternative implementations
 
 
 == Database migration
 
-There is no database migration when moving from v5 to v6: the database schema is the same for v5 and v6. All data produced by Flowable v5 can simply remain in the database. When the v6 engine is started for the first time, it will do an automatic update (as with any v5 version) to the schema. Besides some small schema changes, the main update is the job table that has been split up in a job, timer job, suspended job and dead letter job table.
-The timer jobs that are not yet due, will be moved to the new timer table. Jobs with no more retries left will be moved to the dead letter job table and jobs for suspended process instances will be moved to the suspended job table.
+There is no database migration needed when moving from v5 to V6: the database schema is the same for v5 and V6, with some additional tables and columns. All data produced by Flowable v5 can simply remain in the database, even including active, in-flight process instances. When the V6 engine is started for the first time, it will do an automatic update to the schema (as with previous v5 versions). Besides some small schema changes, the main update is that the job table has been split up into job, timer job, suspended job and dead letter job tables.
+Any timer jobs that are not yet due will be moved to the new timer table. Jobs with no more retries left will be moved to the dead letter job table, and jobs for suspended process instances will be moved to the suspended job table.
 
 == Conceptual changes
 
-The main reason for calling this Flowable version _6_ is because the core engine has been completely rewritten. The way core engine operations are executed has changed completely, along with a direct execution of BPMN (in V5 there is an intermediate model). Also the way runtime executions are represented (the _execution tree_) changed. In general, both areas have been simplified significantly, making execution simpler and clearer while also making the writing of custom behavior easier and more accessible.
+The main reason for calling this Flowable version _6_ is because the core engine has been completely rewritten. The way core engine operations are executed has changed completely, along with a direct execution of BPMN (in v5 there is an intermediate model). Also, the way runtime executions are represented (the _execution tree_) changed. In general, both areas have been simplified significantly, making execution simpler and clearer, while also making the writing of custom behavior easier and more accessible.  An embedded v5 engine is available in V6 to ensure complete execution compatibility if desired.
 
-In the future, we'll describe the inner workings of the engine in detail.
+In future articles, we'll describe the inner workings of the engine in detail.
 
 == Breaking changes
 
-The following changes are breaking changes (ie there will be a compile error most likely).
+The following changes are breaking changes (i.e. there will likely be a compile error).
 
 === Package rename: org.activiti to org.flowable
 
@@ -46,8 +46,8 @@ All org.activiti packages have been renamed to org.flowable.
 
 === Activiti class name renaming
 
-All class names that contained Activiti have been renamed and Activiti is replaced with Flowable.
-For example ActivitiEvent has been renamed to FlowableEvent, and ActivitiException has been renamed to FlowableException.
+All class names that contained "Activiti" have been renamed, with Activiti replaced by Flowable.
+For example, ActivitiEvent has been renamed to FlowableEvent, and ActivitiException has been renamed to FlowableException.
 
 === activiti.cfg.xml renamed to flowable.cfg.xml
 
@@ -56,11 +56,11 @@ The same is true for the default Spring configuration file activiti-context.xml,
 
 === PVM classes
 
-All classes previously in the org.activiti.engine.impl.pvm package (and sub packages) have been removed. This is because the _PVM_ (Process Virtual Machine) model has been removed and replaced by a simpler and more lightweight model.
+All classes previously in the org.activiti.engine.impl.pvm package (and sub packages) have been removed. This is because the _PVM_ (Process Virtual Machine) model has been replaced by a simpler and more lightweight model.
 
 This means that usages of _ActivityImpl_, _ProcessDefinitionImpl_, _ExecutionImpl_, _TransitionImpl_ are now invalid.
 
-Generally, most of the usage of these classes in version 5 came down to getting information that was contained in the process definition. In version 6, all the process definition information can be found through the _BpmnModel_, which is a Java representation of the BPMN 2.0 XML for the process definition (enhanced to make certain operations and searches easier).
+Most of the usage of these classes in v5 came down to getting information that was contained in the process definition. In V6, all the process definition information can be found through the _BpmnModel_, which is a Java representation of the BPMN 2.0 XML of the process definition (enhanced to make certain operations and searches easier).
 
 The quickest way to get the _BpmnModel_ for a process definition is to use the org.flowable.engine.impl.util.ProcessDefinitionUtil class:
 
@@ -74,37 +74,36 @@ ProcessDefinitionUtil.getProcess(String processDefinitionId);
 
 === ActivityExecution is replaced by DelegateExecution
 
-We removed ActivityExecution and replaced it where used with the DelegateExecution class.
+We removed ActivityExecution and replaced it, where used, with the DelegateExecution class.
 
 All methods from the ActivityExecution class are copied to the DelegateExecution class.
 
 === Job, timer, suspended and dead letter jobs
 
-Flowable 5 had only 1 job table and this meant that a fairly complex query had to be executed to get the jobs that needed to be executed from the database.
+Flowable v5 had only 1 job table and this meant that a fairly complex query had to be executed to get the jobs that needed to be executed from the database.
 
-With Flowable 6, the jobs have been split up in a job (ACT_RU_JOB), timer (ACT_RU_TIMER_JOB), suspended (ACT_RU_SUSPENDED_JOB), and (ACT_RU_DEADLETTER_JOB) dead letter table.
-Jobs in the job table can be directly executed (like asynchronous jobs and due timer jobs). So there's no need for a complex query anymore, the only where clause is a lock time column that should be NULL.
+With Flowable V6, the jobs have been split up in job (ACT_RU_JOB), timer (ACT_RU_TIMER_JOB), suspended (ACT_RU_SUSPENDED_JOB), and (ACT_RU_DEADLETTER_JOB) dead letter tables.
+Jobs in the job table (such as asynchronous jobs and due timer jobs) can be directly executed. So there's no need for a complex query anymore, the only 'where' clause is a lock time column that should be NULL.
 Timer jobs are now persisted in a dedicated timer jobs table and there's a thread that checks for timer jobs due to execute. When a timer job is due to be executed, the job will be moved to the job table.
-When the job executor Runnable is ready to execute the job it will be fetched from the job table and executed.
+When the job executor Runnable is ready to execute the job, it will be fetched from the job table and executed.
 When a process definition and process instance is suspended, the corresponding jobs will be moved to a separate suspended job table. This simplifies the job executor query and makes it very clear which jobs are suspended.
 If a job execution fails, the job will be placed in the timer job table with a due date that's set to current time + the async failed job wait time configured on the process engine configuration.
-When the job is due to be executed it will be moved to the job table again and be executed. When the number of retries is down to zero, the job will be moved to the dead letter table and no automatic execution will be performed.
+When the job is due to be executed, it will be moved to the job table again and be executed. When the number of retries is down to zero, the job will be moved to the dead letter table and no automatic execution will be performed.
 This also simplifies the default job executor queries and makes it obvious which jobs are stuck and might need manual intervention.
 
-The embedded Flowable 5 engine in Flowable 6 works with these 4 job tables as well. But there's only one threadpool fetching jobs from the database, shared between the engines. When a job is fetched from the database, the engine version for the job is checked based on the process definition id, and the job is executed by the Flowable 6 or embedded Flowable 5 Engine.
+The embedded Flowable v5 engine in Flowable V6 works with these 4 job tables as well. But there's only one threadpool fetching jobs from the database, shared between the engines. When a job is fetched from the database, the engine version for the job is checked based on the process definition id, and the job is executed by the Flowable V6 or embedded Flowable v5 Engine.
 
 === Signaling an execution
 
-In version 5, there always was confusion about _signaling an execution_, when using for example _runtimeService.signal(executionI);_. As a _signal_ is a valid BPMN 2.0 concept and feature, it conflicts conceptually.
+In v5, there was always confusion about _signaling an execution_ when using, for example, _runtimeService.signal(executionI);_. As a _signal_ is a valid BPMN 2.0 concept and feature, it conflicts conceptually.
 
-In version 6, the _signal()_ methods have been renamed to _trigger()_.
+In V6, the _signal()_ methods have been renamed to _trigger()_.
 
 This also means that _SignalableActivityBehavior_, the interface to be implemented for behaviors that can be _triggered_ from external sources, is now called _TriggerableActivityBehavior_.
 
 === Checked Exceptions
 
-In version 5, the delegate classes like _JavaDelegate_ and _ActivityBehavior_ had _throws Exception_ in their signature. As with any modern framework, the use
- of checked Exceptions has been removed in version 6.
+In v5, the delegate classes, such as _JavaDelegate_ and _ActivityBehavior_, have _throws Exception_ in their signatures. As with any modern framework, the use of checked Exceptions has been removed in V6.
 
 === Delegate classes
 
@@ -119,7 +118,7 @@ They have been replaced by calls to the ExecutionEntityManager, which can be fet
 
 === EntityManagers
 
-In Flowable version 5, all EntityManager (responsible for persistence but also certain logic) classes did not have an interface. In version 6, all EntityManager classes have been renamed to have _Impl_ as suffix and an interface without the suffix. This effectively means that the version 5 EntityManager class name is now the name of the corresponding interface.
+In Flowable v5, all EntityManager classes (responsible for persistence but also certain logic) did not have an interface. In V6, all EntityManager classes have been renamed to have _Impl_ as suffix and an interface without the suffix. This effectively means that the v5 EntityManager class name is now the name of the corresponding interface.
 
 All EntityManager interfaces extend the generic org.flowable.engine.impl.persistence.entity.EntityManager interface. All implementation classes extend a generic _AbstractEntityManager_ interface.
 
@@ -130,18 +129,18 @@ Also, for consistency:
 
 === PersistentObject renamed to Entity
 
-The class _org.flowable.engine.impl.db.PersistentObject_ has been renamed to _Entity_ to be consistent with all the other classes (EntityManagers and such)..
+The class _org.flowable.engine.impl.db.PersistentObject_ has been renamed to _Entity_ to be consistent with all the other classes (EntityManagers and so on).
 
 All related classes that used the term 'persistent object' have been refactored to 'entity' too.
 
 
 === Separation of identity logic and tables
 
-In version 5, the identity logic and tables were an integral part of the process engine. In version 6, the logic has been refactored into a separate module called _flowable-idm-engine_ (where idm stands for 'identity management). The related database tables are managed by this engine. For backwards compatibility, the idm engine is enabled by default when booting up the process engine. To disable the engine, set the _disableIdmEngine_ to _true_ in the process engine configuration. In that case, no identity database tables (starting with _ACT_ID_) will be created or can be removed if they exist already.
+In v5, the identity logic and tables were an integral part of the process engine. In V6, the logic has been refactored into a separate module called _flowable-idm-engine_ (where IDM stands for 'identity management). The related database tables are managed by this engine. For backwards compatibility, the IDM engine is enabled by default when booting up the process engine. To disable the engine, set the _disableIdmEngine_ to _true_ in the process engine configuration. When disabled, no identity database tables (starting with _ACT_ID_) will be created, or they can be removed if they already exist.
 
 === Camel endpoint renamed to flowable
 
-When using the Flowable Camel module make sure to use the flowable endpoint, instead of the activiti endpoint. The route below provides a simple example:
+When using the Flowable Camel module, make sure to use the flowable endpoint, instead of the activiti endpoint. The Route below provides a simple example:
 
 [source,java,linenums]
 ----
@@ -156,23 +155,23 @@ public class SimpleCamelCallRoute extends RouteBuilder {
 
 == V5 compatibility
 
-When migrating to Flowable version 6 (which basically means replacing the JAR files on the classpath), all current deployments and process definitions are _tagged_ as being a _version 5_ artifact. At various points (completing a task, starting a new process instance, task assignment, ... quite a long list) the engine will check whether the involved process definition has that _version 5 tag_. If so, it will delegate execution to an _embedded mini version 5 engine_.
+When migrating to Flowable V6 (typically by replacing the JAR files on the classpath), all current deployments and process definitions are _tagged_ as being _version 5_ artifacts. At various points (completing a task, starting a new process instance, task assignment, ... quite a long list) the engine will check whether the associated process definition has the _version 5 tag_. If so, it will delegate execution to an _embedded compact version 5 engine_.
 
-This means that the compatibility approach we opted for is that of a phase out: let the current process definitions run in _'version 5 mode_ until the behaviour has been verified and tested to be identical on version 6.
+To eliminate migration, use of the embedded v5 engine allows a phase out approach: let any current process definitions run in _'version 5 mode_ until you have verified and tested the behavior of your processes to be identical on V6.
 
-To enable this behavior (by default it is _disabled_!), add the following to the engine config:
+By default the embedded v5 engine is _disabled_!  To enable it, add the following to the engine config:
 
 ----
 <property name="flowable5CompatibilityEnabled" value="true" />
 ----
 
-*and* add the *flowable5-compatibility* jar to your classpath (manually or through a dependency mechanism like Maven)..
+*and* add the *flowable5-compatibility* JAR to your classpath (manually or through a dependency mechanism, such as Maven).
 
-In case the default implementation _org.flowable.compatibility.DefaultFlowable5CompatibilityHandler_ is insufficient, as custom implementation can be created. Set the _flowable5CompatibilityHandlerFactory_ property of the engine configuration to the fully qualified classname to make that happen. That Factory class should produce an instance of the handler responsible for bridging from version 6 to 5.
+In the rare case of the default implementation _org.flowable.compatibility.DefaultFlowable5CompatibilityHandler_ being insufficient, a custom implementation can be created. To do this, set the _flowable5CompatibilityHandlerFactory_ property of the engine configuration to the fully qualified classname. That Factory class should produce an instance of the handler responsible for bridging from version 6 to 5.
 
-To move a process definition to run on the version 6 engine, simply redeploy it. New process instances will be running in _version 6 mode_, while existing process instances will run in _version 5 mode).
+To move a v5 process definition to run on the V6 engine, simply redeploy it. New process instances will run in _version 6 mode_, while existing process instances will run in _version 5 mode_).
 
-If for some reason, you'd still want to deploy a new version of a process definition to run in _version 5 mode_, the following code can be used:
+If, for some reason, you still want to deploy a new version of a process definition to run in _version 5 mode_, the following code can be used:
 
 ----
 repositoryService.createDeployment()
@@ -181,7 +180,7 @@ repositoryService.createDeployment()
       .deploy();
 ----
 
-If you are using the Flowable Spring module additional configuration is needed if you want Flowable 5 compatibility:
+If you are using the Flowable Spring module, additional configuration is needed for Flowable v5 compatibility:
 
 ----
 <property name="flowable5CompatibilityEnabled" value="true" />
@@ -192,4 +191,4 @@ If you are using the Flowable Spring module additional configuration is needed i
 <bean id="flowable5CompabilityFactory" class="org.flowable.compatibility.spring.SpringFlowable5CompatibilityHandlerFactory" />
 ----
 
-*and* add the *flowable5-spring* and *flowable5-spring-compatibility* jars to your classpath (manually or through a dependency mechanism like Maven)..
+*and* add the *flowable5-spring* and *flowable5-spring-compatibility* JARs to your classpath (manually or through a dependency mechanism, such as Maven).
