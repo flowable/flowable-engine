@@ -19,6 +19,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Decision Tables" }, description = "Manage Decision Tables")
+@Api(tags = { "Decision Tables" }, description = "Manage Decision Tables", authorizations = {@Authorization(value="basicAuth")})
 public class DecisionTableResourceDataResource extends BaseDecisionTableResource {
 
   @ApiOperation(value = "Get a decision table resource content", tags = {"Decision Tables"})

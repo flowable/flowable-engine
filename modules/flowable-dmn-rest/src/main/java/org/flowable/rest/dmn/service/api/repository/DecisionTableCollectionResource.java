@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.dmn.api.DmnDecisionTableQuery;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.impl.DecisionTableQueryProperty;
@@ -40,7 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Decision Tables" }, description = "Manage Decision Tables")
+@Api(tags = { "Decision Tables" }, description = "Manage Decision Tables", authorizations = {@Authorization(value="basicAuth")})
 public class DecisionTableCollectionResource {
 
   private static final Map<String, QueryProperty> properties = new HashMap<>();

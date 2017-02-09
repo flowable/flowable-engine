@@ -16,6 +16,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngines;
 import org.flowable.engine.common.EngineInfo;
@@ -28,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Engine" }, description = "Manage DMN Engine")
+@Api(tags = { "Engine" }, description = "Manage DMN Engine", authorizations = {@Authorization(value="basicAuth")})
 public class DmnEngineResource {
 
   @ApiOperation(value = "Get DMN engine info", tags = {"Engine"})

@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.dmn.api.RuleEngineExecutionResult;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
@@ -37,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Decision Executor" }, description = "Execute Decision Table")
+@Api(tags = { "Decision Executor" }, description = "Execute Decision Table", authorizations = {@Authorization(value="basicAuth")})
 public class DecisionExecutorResource extends BaseDecisionExecutorResource {
 
   @ApiOperation(value = "Execute a Decision", tags = {"Decision Executor"})

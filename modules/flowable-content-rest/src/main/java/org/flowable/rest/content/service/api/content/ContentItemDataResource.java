@@ -18,6 +18,7 @@ import java.io.InputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.Authorization;
 import org.apache.commons.io.IOUtils;
 import org.flowable.content.api.ContentItem;
 import org.flowable.engine.common.api.FlowableException;
@@ -46,7 +47,7 @@ import io.swagger.annotations.ApiResponses;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Content item" }, description = "Manage content item data")
+@Api(tags = { "Content item" }, description = "Manage content item data", authorizations = {@Authorization(value="basicAuth")})
 public class ContentItemDataResource extends ContentItemBaseResource {
   
   @Autowired

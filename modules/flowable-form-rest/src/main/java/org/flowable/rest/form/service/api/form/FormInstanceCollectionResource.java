@@ -19,6 +19,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.rest.api.DataResponse;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,7 +33,7 @@ import java.util.Map;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Form Instances" }, description = "Manage Form Instances")
+@Api(tags = { "Form Instances" }, description = "Manage Form Instances", authorizations = {@Authorization(value="basicAuth")})
 public class FormInstanceCollectionResource extends BaseFormInstanceResource {
 
     @ApiOperation(value = "List of form instances", tags = {"Form Instances"})

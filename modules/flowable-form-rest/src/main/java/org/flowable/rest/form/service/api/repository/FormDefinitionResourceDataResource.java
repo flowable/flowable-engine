@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.apache.commons.io.IOUtils;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
@@ -40,7 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Form Definitions" }, description = "Manage Form Definitions")
+@Api(tags = { "Form Definitions" }, description = "Manage Form Definitions", authorizations = {@Authorization(value="basicAuth")})
 public class FormDefinitionResourceDataResource  {
 
   @Autowired

@@ -17,6 +17,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import io.swagger.annotations.Authorization;
 import org.flowable.rest.api.DataResponse;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +35,7 @@ import io.swagger.annotations.ApiResponses;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Content item" }, description = "Query content items")
+@Api(tags = { "Content item" }, description = "Query content items", authorizations = {@Authorization(value="basicAuth")})
 public class ContentItemQueryResource extends ContentItemBaseResource {
 
   @ApiOperation(value = "Query for content items", tags = {"Content item"},

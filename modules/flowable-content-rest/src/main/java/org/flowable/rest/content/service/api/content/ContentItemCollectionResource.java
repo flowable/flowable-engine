@@ -17,6 +17,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.Authorization;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentService;
 import org.flowable.engine.common.api.FlowableException;
@@ -47,7 +48,7 @@ import io.swagger.annotations.ApiResponses;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Content item" }, description = "Manages Content item")
+@Api(tags = { "Content item" }, description = "Manages Content item", authorizations = {@Authorization(value="basicAuth")})
 public class ContentItemCollectionResource extends ContentItemBaseResource {
 
   @Autowired
