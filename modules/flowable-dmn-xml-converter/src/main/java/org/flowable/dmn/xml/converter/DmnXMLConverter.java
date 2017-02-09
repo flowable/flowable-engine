@@ -249,7 +249,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
                     converter.convertToDmnModel(xtr, model, currentDecisionTable);
                 }
             }
-            
+
         } catch (DmnXMLException e) {
             throw e;
 
