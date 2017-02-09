@@ -10,7 +10,7 @@
 
 	<target name="build.docs" depends="clean">
 		<mkdir dir="target/html" />
-		<exec dir="src/en" executable="./generate-all.sh" />
+		<exec dir="src/en" executable="./generate-html.sh" />
 		<copy todir="target/html/en">
 			<fileset dir="src/en/output">
 				<include name="**/**" />

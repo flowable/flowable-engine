@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Parent class for internal Activiti tests.
+ * Parent class for internal Flowable tests.
  * 
  * Boots up a process engine and caches it.
  * 

@@ -54,13 +54,11 @@ public class BusinessProcessContextTest extends CdiFlowableTestCase {
 
     getBeanInstance(BusinessProcess.class).associateExecutionById(pid);
 
-    // assert that the variable assigned on the businessProcess bean is
-    // flushed
+    // assert that the variable assigned on the businessProcess bean is flushed
     assertEquals("testValue", runtimeService.getVariable(pid, "testVariable"));
 
-    // assert that the value set to the message bean in the first service
-    // task is flushed
-    assertEquals("Hello from Activiti", getBeanInstance(ProcessScopedMessageBean.class).getMessage());
+    // assert that the value set to the message bean in the first service task is flushed
+    assertEquals("Hello from Flowable", getBeanInstance(ProcessScopedMessageBean.class).getMessage());
 
     // complete the task to allow the process instance to terminate
     taskService.complete(taskService.createTaskQuery().singleResult().getId());

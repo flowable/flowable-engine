@@ -126,7 +126,7 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
   }
 
   /**
-   * Test the {@link BaseEntityEventListener} shipped with Activiti.
+   * Test the {@link BaseEntityEventListener} shipped with Flowable.
    */
   public void baseEntityEventListener() throws Exception {
     TestBaseEntityEventListener listener = new TestBaseEntityEventListener();

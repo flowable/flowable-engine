@@ -45,7 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Abstract base class for executing activiti-cdi tests in a Java SE environment, using Weld-SE.
+ * Abstract base class for executing flowable-cdi tests in a Java SE environment, using Weld-SE.
  * 
  * @author Daniel Meyer
  */
@@ -61,7 +61,7 @@ public abstract class CdiFlowableTestCase {
   }
 
   @Rule
-  public FlowableRule activitiRule = new FlowableRule(getBeanInstance(ProcessEngine.class));
+  public FlowableRule flowableRule = new FlowableRule(getBeanInstance(ProcessEngine.class));
 
   protected BeanManager beanManager;
 
@@ -81,7 +81,7 @@ public abstract class CdiFlowableTestCase {
     beanManager = ProgrammaticBeanLookup.lookup(BeanManager.class);
     processEngine = ProgrammaticBeanLookup.lookup(ProcessEngine.class);
     processEngineConfiguration = ((ProcessEngineImpl) ProcessEngineLookupForTestsuite.processEngine).getProcessEngineConfiguration();
-    activitiRule.setProcessEngineConfiguration(processEngineConfiguration);
+    flowableRule.setProcessEngineConfiguration(processEngineConfiguration);
     formService = processEngine.getFormService();
     historyService = processEngine.getHistoryService();
     identityService = processEngine.getIdentityService();
@@ -103,7 +103,7 @@ public abstract class CdiFlowableTestCase {
     return ProgrammaticBeanLookup.lookup(name);
   }
 
-  // ////////////////////// copied from AbstractActivitiTestcase
+  // ////////////////////// copied from AbstractFlowableTestcase
 
   public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis) {
     AsyncExecutor asyncExecutor = processEngineConfiguration.getAsyncExecutor();

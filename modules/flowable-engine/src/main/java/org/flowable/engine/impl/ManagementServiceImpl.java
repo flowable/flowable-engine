@@ -124,23 +124,23 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   }
   
   @Override
-  public void rescheduleTimeDateJob(String jobId, String timeDate) {
-    commandExecutor.execute(new RescheduleTimerJobCmd(jobId, timeDate, null, null, null, null));
+  public Job rescheduleTimeDateJob(String jobId, String timeDate) {
+    return commandExecutor.execute(new RescheduleTimerJobCmd(jobId, timeDate, null, null, null, null));
   }
   
   @Override
-  public void rescheduleTimeDurationJob(String jobId, String timeDuration) {
-    commandExecutor.execute(new RescheduleTimerJobCmd(jobId, null, timeDuration, null, null, null));
+  public Job rescheduleTimeDurationJob(String jobId, String timeDuration) {
+    return commandExecutor.execute(new RescheduleTimerJobCmd(jobId, null, timeDuration, null, null, null));
   }
   
   @Override
-  public void rescheduleTimeCycleJob(String jobId, String timeCycle) {
-    commandExecutor.execute(new RescheduleTimerJobCmd(jobId, null, null, timeCycle, null, null));
+  public Job rescheduleTimeCycleJob(String jobId, String timeCycle) {
+    return commandExecutor.execute(new RescheduleTimerJobCmd(jobId, null, null, timeCycle, null, null));
   }
   
   @Override
-  public void rescheduleTimerJob(String jobId, String timeDate, String timeDuration, String timeCycle, String endDate, String calendarName) {
-    commandExecutor.execute(new RescheduleTimerJobCmd(jobId, timeDate, timeDuration, timeCycle, endDate, calendarName));
+  public Job rescheduleTimerJob(String jobId, String timeDate, String timeDuration, String timeCycle, String endDate, String calendarName) {
+    return commandExecutor.execute(new RescheduleTimerJobCmd(jobId, timeDate, timeDuration, timeCycle, endDate, calendarName));
   }
 
   public TablePageQuery createTablePageQuery() {

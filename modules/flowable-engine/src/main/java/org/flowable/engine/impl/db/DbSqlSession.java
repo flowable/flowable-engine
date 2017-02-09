@@ -897,7 +897,7 @@ public class DbSqlSession implements Session {
       PropertyEntity dbVersionProperty = selectById(PropertyEntityImpl.class, "schema.version");
       String dbVersion = dbVersionProperty.getValue();
 
-      // Determine index in the sequence of Activiti releases
+      // Determine index in the sequence of Flowable releases
       matchingVersionIndex = findMatchingVersionIndex(dbVersion);
       
       // If no match has been found, but the version starts with '5.x', 

@@ -54,7 +54,7 @@
       <documentation>
         Attribute used on a startEvent or a userTask. 
         The value can be anything. The default form support in Activiti
-        assumes that this is a reference to a form html file insed the deployment
+        assumes that this is a reference to a form html file used in the deployment
         of the process definition. But this key can also be something completely different,
         in case of external form resolving.
       </documentation>

@@ -1,5 +1,5 @@
 /* Copyright 2005-2015 Alfresco Software, Ltd.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 /**
  *
  * Utility objects and methods for the Flowable Admin app
@@ -56,7 +56,7 @@ FlowableAdmin.Utils.variableFilterOperators = [
 
 
 /**
- * Activiti.Utils.Filter
+ * FlowableAdmin.Utils.Filter
  *
  * Generic list filter implementation.
  */
@@ -242,7 +242,7 @@ FlowableAdmin.Utils.Filter.prototype = {
 			}, 100);
 		}
 	},
-	
+
 	removeProperty: function(prop) {
 	    if (prop !== undefined) {
 	        delete this.properties[prop.id];
@@ -318,7 +318,7 @@ FlowableAdmin.Utils.Filter.prototype = {
 				}
 			}
 		}
-		
+
 		if(httpConfig.method == 'POST' ) {
 			// Populate JSON-body
 			httpConfig.data = params;

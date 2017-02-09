@@ -2783,7 +2783,7 @@ Note: there will be *only one instance of that Java class created for the servic
 
 The classes that are referenced in the process definition (i.e. by using ++flowable:class++) are *NOT instantiated during deployment*. Only when a process execution arrives for the first time at the point in the process where the class is used, an instance of that class will be created. If the class cannot be found, an +FlowableException+ will be thrown. The reasoning for this is that the environment (and more specifically the __classpath__) when you are deploying is often different from the actual runtime environment. For example when using _ant_ or the business archive upload in the Flowable app to deploy processes, the classpath does not contain the referenced classes.
 
-<<internal,[INTERNAL: non-public implementation classes]>> It is also possible to provide a class that implements the _org.flowable.engine.impl.delegate.ActivityBehavior_ interface. Implementations have then access to more powerful engine funtionality, for example to influence the control flow of the process. Note however that this is not a very good practice, and should be avoided as much as possible. So, it is advised to use the _ActivityBehavior_ interface only for advanced use cases and if you know exactly what you're doing.
+<<internal,[INTERNAL: non-public implementation classes]>> It is also possible to provide a class that implements the _org.flowable.engine.impl.delegate.ActivityBehavior_ interface. Implementations have then access to more powerful engine functionality, for example to influence the control flow of the process. Note however that this is not a very good practice, and should be avoided as much as possible. So, it is advised to use the _ActivityBehavior_ interface only for advanced use cases and if you know exactly what you're doing.
 
 
 [[serviceTaskFieldInjection]]
@@ -2933,7 +2933,7 @@ The easiest solution to solve this, is to either
 * rewrite the Java delegate to use an expression and passing the needed data to the delegate via a method arguments.
 * return a new instance of the delegate class each time the delegate expression is resolved. For example when using Spring, this means that the scope of the bean must be set to *prototype* (for example by adding the @Scope(SCOPE_PROTOTYPE) annotation to the delegate class)
 
-As of Flowable version 5.22, the process engine configuration can be configured in a way to disable the use of field injection on delegate epxressions, by setting the value of the _delegateExpressionFieldInjectionMode_ property (which takes one of the values in the _org.flowable.engine.imp.cfg.DelegateExpressionFieldInjectionMode_ enum).
+As of Flowable version 5.22, the process engine configuration can be configured in a way to disable the use of field injection on delegate expressions, by setting the value of the _delegateExpressionFieldInjectionMode_ property (which takes one of the values in the _org.flowable.engine.imp.cfg.DelegateExpressionFieldInjectionMode_ enum).
 
 Following settings are possible:
 

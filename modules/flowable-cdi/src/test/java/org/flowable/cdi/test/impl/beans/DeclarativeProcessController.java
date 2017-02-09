@@ -27,12 +27,12 @@ public class DeclarativeProcessController {
 
   @StartProcess(name = "Name of the Process")
   public void startProcessByName() {
-    name = "Activiti";
+    name = "Flowable";
   }
 
   @StartProcess("keyOfTheProcess")
   public void startProcessByKey() {
-    name = "Activiti";
+    name = "Flowable";
   }
 
   @CompleteTask(endConversation = false)

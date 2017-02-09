@@ -20,14 +20,16 @@ include::ch09-JPA.adoc[]
 
 include::ch10-History.adoc[]
 
-include::ch11-Designer.adoc[]
+include::ch11-IDM.adoc[]
 
-include::ch12-REST.adoc[]
+include::ch12-Designer.adoc[]
 
-include::ch13-Cdi.adoc[]
+include::ch13-REST.adoc[]
 
-include::ch14-Ldap.adoc[]
+include::ch14-Cdi.adoc[]
 
-include::ch15-Advanced.adoc[]
+include::ch15-Ldap.adoc[]
 
-include::ch16-tooling.adoc[]
+include::ch16-Advanced.adoc[]
+
+include::ch17-tooling.adoc[]

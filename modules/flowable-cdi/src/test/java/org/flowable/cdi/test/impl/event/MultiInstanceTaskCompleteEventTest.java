@@ -10,7 +10,7 @@ import org.junit.Test;
 public class MultiInstanceTaskCompleteEventTest extends CdiFlowableTestCase {
 
   @Test
-  @Deployment(resources = { "org/activiti/cdi/test/impl/event/MultiInstanceTaskCompleteEventTest.process1.bpmn20.xml.bpmn" })
+  @Deployment(resources = { "org/flowable/cdi/test/impl/event/MultiInstanceTaskCompleteEventTest.process1.bpmn20.xml.bpmn" })
   public void testReceiveAll() {
 
     TestEventListener listenerBean = getBeanInstance(TestEventListener.class);

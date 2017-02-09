@@ -26,6 +26,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -83,7 +84,7 @@ public class FormDeploymentCollectionResource {
       @ApiResponse(code = 200, message = "Indicates the request was successful."),
   })
   @RequestMapping(value = "/form-repository/deployments", method = RequestMethod.GET, produces = "application/json")
-  public DataResponse getDeployments(@RequestParam Map<String, String> allRequestParams) {
+  public DataResponse getDeployments(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
     FormDeploymentQuery deploymentQuery = formRepositoryService.createDeploymentQuery();
 
     // Apply filters

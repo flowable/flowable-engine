@@ -21,8 +21,9 @@ import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 
-public class RescheduleTimerJobCmd implements Command<Void>, Serializable {
+public class RescheduleTimerJobCmd implements Command<TimerJobEntity>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -58,15 +59,15 @@ public class RescheduleTimerJobCmd implements Command<Void>, Serializable {
     this.calendarName = calendarName;
   }
 
-  public Void execute(CommandContext commandContext) {
+  public TimerJobEntity execute(CommandContext commandContext) {
     TimerEventDefinition ted = new TimerEventDefinition();
     ted.setTimeDate(timeDate);
     ted.setTimeDuration(timeDuration);
     ted.setTimeCycle(timeCycle);
     ted.setEndDate(endDate);
     ted.setCalendarName(calendarName);
-    commandContext.getJobManager().rescheduleTimerJob(timerJobId, ted);
-    return null;
+    TimerJobEntity timerJob = commandContext.getJobManager().rescheduleTimerJob(timerJobId, ted);
+    return timerJob;
   }
 
 }

@@ -27,7 +27,7 @@ An example configuration is already in comments in this file. This is also the p
 
 ==== Usage in Tomcat
 
-Due to link:$$http://tomcat.apache.org/tomcat-7.0-doc/security-howto.html$$[ default security properties on Tomcat], *escaped forward slashes (++%2F++ and ++%5C++) are not allowed by default (400-result is returned).* This may have an impact on the deployment resources and their data-URL, as the URL can potentially contain escaped forward slashes.
+Due to link:$$http://tomcat.apache.org/tomcat-8.0-doc/security-howto.html$$[ default security properties on Tomcat], *escaped forward slashes (++%2F++ and ++%5C++) are not allowed by default (400-result is returned).* This may have an impact on the deployment resources and their data-URL, as the URL can potentially contain escaped forward slashes.
 
 When issues are experienced with unexpected 400-results, set the following system-property:
 
@@ -88,7 +88,7 @@ When an error occurs (both client and server, 4XX and 5XX status-codes) the resp
 ===== URL fragments
 
 
-Parameters that are part of the url (e.g. the deploymentId parameter in ++http://host/actviti-rest/service/repository/deployments/{deploymentId}++)
+Parameters that are part of the url (e.g. the deploymentId parameter in ++http://host/flowable-rest/service/repository/deployments/{deploymentId}++)
  need to be properly escaped (see link:$$https://en.wikipedia.org/wiki/Percent-encoding$$[URL-encoding or Percent-encoding]) in case the segment contains special characters. Most frameworks have this functionality built in, but it should be taken into account. Especially for segments that can contains forward-slashes (e.g. deployment resource), this is required.
 
 ===== Rest URL query parameters
@@ -283,7 +283,7 @@ GET repository/deployments
       "name": "flowable-examples.bar",
       "deploymentTime": "2010-10-13T14:54:26.750+02:00",
       "category": "examples",
-      "url": "http://localhost:8081/service/repository/deployments/10",
+      "url": "http://localhost:8081/flowable-rest/service/repository/deployments/10",
       "tenantId": null
     }
   ],
@@ -328,7 +328,7 @@ GET repository/deployments/{deploymentId}
   "name": "flowable-examples.bar",
   "deploymentTime": "2010-10-13T14:54:26.750+02:00",
   "category": "examples",
-  "url": "http://localhost:8081/service/repository/deployments/10",
+  "url": "http://localhost:8081/flowable-rest/service/repository/deployments/10",
   "tenantId" : null
 }
 ----
@@ -364,7 +364,7 @@ An additional parameter (form-field) can be passed in the request body with name
   "name": "flowable-examples.bar",
   "deploymentTime": "2010-10-13T14:54:26.750+02:00",
   "category": null,
-  "url": "http://localhost:8081/service/repository/deployments/10",
+  "url": "http://localhost:8081/flowable-rest/service/repository/deployments/10",
   "tenantId" : "myTenant"
 }
 ----

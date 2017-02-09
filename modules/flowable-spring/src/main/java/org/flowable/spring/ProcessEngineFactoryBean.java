@@ -60,7 +60,8 @@ public class ProcessEngineFactoryBean implements FactoryBean<ProcessEngine>, Dis
 
   protected void configureExpressionManager() {
     if (processEngineConfiguration.getExpressionManager() == null && applicationContext != null) {
-      processEngineConfiguration.setExpressionManager(new SpringExpressionManager(applicationContext, processEngineConfiguration.getBeans()));
+      processEngineConfiguration.setExpressionManager(new SpringExpressionManager(applicationContext, 
+          processEngineConfiguration.getBeans(), processEngineConfiguration));
     }
   }
 

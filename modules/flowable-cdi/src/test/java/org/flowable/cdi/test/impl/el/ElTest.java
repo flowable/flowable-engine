@@ -29,11 +29,11 @@ public class ElTest extends CdiFlowableTestCase {
   public void testSetBeanProperty() throws Exception {
     MessageBean messageBean = getBeanInstance(MessageBean.class);
     runtimeService.startProcessInstanceByKey("setBeanProperty");
-    assertEquals("Greetings from Activiti", messageBean.getMessage());
+    assertEquals("Greetings from Flowable", messageBean.getMessage());
   }
 
   // @Test
-  // @Deployment(resources="org/activiti/cdi/test/impl/el/ElTest.testInvalidExpression.bpmn20.xml")
+  // @Deployment(resources="org/flowable/cdi/test/impl/el/ElTest.testInvalidExpression.bpmn20.xml")
   // public void testInvalidExpressions() throws Exception {
   // ProcessInstance pi =
   // runtimeService.startProcessInstanceByKey("invalidExpression");

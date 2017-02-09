@@ -28,7 +28,7 @@ public class BusinessKeyTest extends CdiFlowableTestCase {
   @Test
   @Deployment
   public void testBusinessKeyInjectable() {
-    String businessKey = "Activiti";
+    String businessKey = "Flowable";
     String pid = runtimeService.startProcessInstanceByKey("keyOfTheProcess", businessKey).getId();
     getBeanInstance(BusinessProcess.class).associateExecutionById(pid);
 

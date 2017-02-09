@@ -408,7 +408,7 @@ public class FlowableClientService {
             JsonNode errorBody = objectMapper.readTree(responseContent);
             errorMessage = extractError(errorBody, "An error occurred while calling Flowable: " + response.getStatusLine());
           } else {
-            errorMessage = "An error was returned when calling the Activiti server";
+            errorMessage = "An error was returned when calling the Flowable server";
           }
         } catch (Exception e) {
           log.warn("Error consuming response from uri {}", request.getURI(), e);

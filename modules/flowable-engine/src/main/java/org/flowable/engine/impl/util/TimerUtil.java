@@ -12,7 +12,6 @@
  */
 package org.flowable.engine.impl.util;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +19,7 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.calendar.BusinessCalendar;
@@ -34,6 +34,9 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
 /**
  * @author Joram Barrez
@@ -167,8 +170,11 @@ public class TimerUtil {
 
   public static String prepareRepeat(String dueDate) {
     if (dueDate.startsWith("R") && dueDate.split("/").length == 2) {
-      SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-      return dueDate.replace("/", "/" + sdf.format(Context.getProcessEngineConfiguration().getClock().getCurrentTime()) + "/");
+        DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
+        Clock clock = Context.getProcessEngineConfiguration().getClock();
+        Date now = clock.getCurrentTime();
+        return dueDate.replace("/", "/" + fmt.print(new DateTime(now, 
+            DateTimeZone.forTimeZone(clock.getCurrentTimeZone()))) + "/");
     }
     return dueDate;
   }

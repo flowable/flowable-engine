@@ -197,9 +197,9 @@ angular.module('flowableApp')
                 */
                 var viewerUrl = appResourceRoot + "../display/displaymodel.html?version=" + Date.now();
 
-                // If Activiti has been deployed inside an AMD environment Raphael will fail to register
-                // itself globally until displaymodel.js (which depends ona global Raphale variable) is runned,
-                // therefor remove AMD's define method until we have loaded in Raphael and displaymodel.js
+                // If Flowable has been deployed inside an AMD environment Raphael will fail to register
+                // itself globally until displaymodel.js (which depends ona global Raphale variable) is running,
+                // therefore remove AMD's define method until we have loaded in Raphael and displaymodel.js
                 // and assume/hope its not used during.
                 var amdDefine = window.define;
                 window.define = undefined;

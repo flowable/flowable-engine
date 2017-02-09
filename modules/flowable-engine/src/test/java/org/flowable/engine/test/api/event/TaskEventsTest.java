@@ -238,7 +238,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
   
   /**
    * This method checks to ensure that the task.fireEvent(TaskListener.EVENTNAME_CREATE), fires before
-   * the dispatchEvent ActivitiEventType.TASK_CREATED.  A ScriptTaskListener updates the priority and
+   * the dispatchEvent FlowableEventType.TASK_CREATED.  A ScriptTaskListener updates the priority and
    * assignee before the dispatchEvent() takes place.
      */
   @Deployment(resources= {"org/flowable/engine/test/api/event/TaskEventsTest.testEventFiring.bpmn20.xml"})
@@ -273,7 +273,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
       Task taskFromEvent = tlistener.getTasks().get(2);
       assertEquals(task.getId(), taskFromEvent.getId());
 
-      // verify script listener has done its job, on create before ActivitiEntityEvent was fired
+      // verify script listener has done its job, on create before FlowableEntityEvent was fired
       assertEquals("The ScriptTaskListener must set this value before the dispatchEvent fires.","scriptedAssignee", taskFromEvent.getAssignee());
       assertEquals("The ScriptTaskListener must set this value before the dispatchEvent fires.",877, taskFromEvent.getPriority());
 

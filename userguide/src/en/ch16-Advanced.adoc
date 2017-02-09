@@ -15,17 +15,17 @@ In Flowable 6 (and later), the async executor is the only one available. For ver
 
 Two types of jobs exist: timers (like those belonging to a boundary event on a user task) and async continuations (belonging to a service task with the _flowable:async="true"_ attribute).
 
-*Timers* are the easiest to explain: they are persisted in the ACT_RU_TIMER_JOB table with a certain due date. There is a thread in the async executor that periodically checks if there are new timers that fire (i.e. the due date is 'before' the current time). When that happens, the timer is removed and an async job is created and inserted.
+*Timers* are the easiest to explain: they are persisted in the ACT\_RU\_TIMER_JOB table with a certain due date. There is a thread in the async executor that periodically checks if there are new timers that fire (i.e. the due date is 'before' the current time). When that happens, the timer is removed and an async job is created and inserted.
 
-An *async job* is inserted in the database during the execution of process instance steps (which means 'during some API call that was made'). If the async executor is active for the current Flowable engine, the async job is actually already _locked_. This means that the job entry is inserted in the ACT_RU_JOB table and will have a _lock owner_ and a _lock expiration time_ set. A transaction listener that fires on a successful commit of the API call triggers the async executor of the same engine to execute the job (so the data is guaranteed to be in the database). To do this, the async executor has a (configurable) thread pool from which a thread will execute the job and continue the process asynchronously. If the Flowable engine does not have the async executor enabled, the async job is inserted in the ACT_RU_JOB table without being locked.
+An *async job* is inserted in the database during the execution of process instance steps (which means 'during some API call that was made'). If the async executor is active for the current Flowable engine, the async job is actually already _locked_. This means that the job entry is inserted in the ACT\_RU\_JOB table and will have a _lock owner_ and a _lock expiration time_ set. A transaction listener that fires on a successful commit of the API call triggers the async executor of the same engine to execute the job (so the data is guaranteed to be in the database). To do this, the async executor has a (configurable) thread pool from which a thread will execute the job and continue the process asynchronously. If the Flowable engine does not have the async executor enabled, the async job is inserted in the ACT\_RU\_JOB table without being locked.
 
 Similar to the thread that checks for new timers, the async executor has a thread that 'acquires' new async jobs. These are jobs that are present in the table and are not locked. This thread will lock these jobs for the current Flowable engine and pass it to the async executor.
 
 The thread pool executing the jobs uses an in-memory queue to take jobs from. When this queue is full (this is configurable), the job will be unlocked and re-inserted into its table. This way, other async executors can pick it up instead.
 
-In case an exception happens during job execution, the async job will be transformed to a timer job with a due date. It will be picked up like a regular timer job and become an async job again, to be retried soon. When a job has been retried for a (configurable) number of times and continues to fail, the job is assumed to be 'dead' and moved to the ACT_RU_DEADLETTER_JOB. The 'deadletter' concept is widely used in various other systems. An admin will now need to inspect the exception for the failed job and decide what the best course of action is.
+In case an exception happens during job execution, the async job will be transformed to a timer job with a due date. It will be picked up like a regular timer job and become an async job again, to be retried soon. When a job has been retried for a (configurable) number of times and continues to fail, the job is assumed to be 'dead' and moved to the ACT\_RU\_DEADLETTER\_JOB. The 'deadletter' concept is widely used in various other systems. An admin will now need to inspect the exception for the failed job and decide what the best course of action is.
 
-Process definitions and process instances can be suspended. Suspended jobs related to these definitions or instances are put in the ACT_RU_SUSPENDED_JOB table, to make sure the query to acquire jobs has a few as possible conditions in its where clause.
+Process definitions and process instances can be suspended. Suspended jobs related to these definitions or instances are put in the ACT\_RU\_SUSPENDED\_JOB table, to make sure the query to acquire jobs has a few as possible conditions in its where clause.
 
 One thing that is clear from the above, for people familiar with the old implementations of the job/async executor: the main goal is to allow the 'acquire queries' to be as simple as possible. In the past (before version 6), one table was used for all job types/states, which made the 'where' condition large as it catered for all the use cases. This problem is now solved and our benchmarks have proved that this new design delivers better performance and is more scalable.
 
@@ -221,7 +221,7 @@ public interface BpmnParseHandler {
 }
 ----
 
-The +getHandledTypes()+ method returns a collection of all the types handled by this parser.  The possible types are a subclass of +BaseElement+, as directed by the generic type of the collection. You can also extend the +AbstractBpmnParseHandler+ class and override the +getHandledType()+ method, which only returns one Class and not a collection. This class contains also some helper methods shared by many of the default parse handlers.  The +BpmnParseHandler+ instance will be called when the parser encounters any of the returned types by this method. In the following example, whenever a process contained in a BPMN 2.0 xml is encountered, it  will execute the logic in the +executeParse+ method (which is a typecasted method that replaces the regular +parse+ method on the +BpmnParseHandler+ interface).
+The +getHandledTypes()+ method returns a collection of all the types handled by this parser.  The possible types are a subclass of +BaseElement+, as directed by the generic type of the collection. You can also extend the +AbstractBpmnParseHandler+ class and override the +getHandledType()+ method, which only returns one Class and not a collection. This class contains also some helper methods shared by many of the default parse handlers.  The +BpmnParseHandler+ instance will be called when the parser encounters any of the returned types by this method. In the following example, whenever a process contained in a BPMN 2.0 XML is encountered, it  will execute the logic in the +executeParse+ method (which is a typecasted method that replaces the regular +parse+ method on the +BpmnParseHandler+ interface).
 
 [source,java,linenums]
 ----
@@ -263,8 +263,7 @@ public class CustomUserTaskBpmnParseHandler extends ServiceTaskParseHandler {
     super.executeParse(bpmnParse, serviceTask);
 
     // Make always async
-    ActivityImpl activity = findActivity(bpmnParse, serviceTask.getId());
-    activity.setAsync(true);
+    serviceTask.setAsynchronous(true);
   }
 
 }
@@ -710,7 +709,7 @@ List<? extends TaskInfo> taskInfos = taskInfoQueryWrapper.getTaskInfoQuery().or(
 
 === Custom identity management by overriding standard SessionFactory
 
-If you do not want to use a full _ProcessEngineConfigurator_ implementation like in the  <<chapter_ldap,LDAP integration>>, but still want to plug in your custom identity management framework,  then you can also override the _SessionFactory_ classes directly in the _ProcessEngineConfiguration_.  In Spring this can be easily done by adding the following to the _ProcessEngineConfiguration_ bean definition:
+If you do not want to use a full _ProcessEngineConfigurator_ implementation like in the  <<chapter_ldap,LDAP integration>>, but still want to plug in your custom identity management framework,  then you can also override the _IdmIdentityServiceImpl_ class or implement the _IdmIdentityService_ interface directly and use the implemented class for the _idmIdentityService_ property in the _ProcessEngineConfiguration_. In Spring this can be easily done by adding the following to the _ProcessEngineConfiguration_ bean definition:
 
 [source,xml,linenums]
 ----
@@ -718,11 +717,8 @@ If you do not want to use a full _ProcessEngineConfigurator_ implementation like
 
     ...
 
-    <property name="customSessionFactories">
-        <list>
-            <bean class="com.mycompany.MyGroupManagerFactory"/>
-            <bean class="com.mycompany.MyUserManagerFactory"/>
-        </list>
+    <property name="idmIdentityService">
+        <bean class="com.mycompany.IdmIdentityServiceBean"/>
     </property>
 
     ...
@@ -731,88 +727,23 @@ If you do not want to use a full _ProcessEngineConfigurator_ implementation like
 
 ----
 
-The _MyGroupManagerFactory_ and _MyUserManagerFactory_ need to implement the _org.flowable.engine.impl.interceptor.SessionFactory_ interface. The call to _openSession()_ returns the custom class implementation that does the actual identity management. For groups this is a class that inherits from _org.flowable.engine.impl.persistence.entity.GroupEntityManager_ and for managing users it must inherit from _org.flowable.engine.impl.persistence.entity.UserEntityManager_. The following code sample contains a custom manager factory for groups:
-
-[source,java,linenums]
-----
-package com.mycompany;
-
-import org.flowable.engine.impl.interceptor.Session;
-import org.flowable.engine.impl.interceptor.SessionFactory;
-import org.flowable.engine.impl.persistence.entity.GroupIdentityManager;
-
-public class MyGroupManagerFactory implements SessionFactory {
-
-	@Override
-	public Class<?> getSessionType() {
-		return GroupIdentityManager.class;
-	}
-
-	@Override
-	public Session openSession() {
-		return new MyCompanyGroupManager();
-	}
-
-}
-----
-
-The _MyCompanyGroupManager_ created by the factory is doing the actual work. You do not need to override all members of _GroupEntityManager_ though, just the ones required for your use case. The following sample provides an indication of how this may look like (only a selection of members are shown):
-
-[source,java,linenums]
-----
-public class MyCompanyGroupManager extends GroupEntityManager {
-
-    private static Logger log = LoggerFactory.getLogger(MyCompanyGroupManager.class);
-
-    @Override
-    public List<Group> findGroupsByUser(String userId) {
-        log.debug("findGroupByUser called with userId: " + userId);
-        return super.findGroupsByUser(userId);
-    }
-
-    @Override
-    public List<Group> findGroupByQueryCriteria(GroupQueryImpl query, Page page) {
-        log.debug("findGroupByQueryCriteria called, query: " + query + " page: " + page);
-        return super.findGroupByQueryCriteria(query, page);
-    }
-
-    @Override
-    public long findGroupCountByQueryCriteria(GroupQueryImpl query) {
-        log.debug("findGroupCountByQueryCriteria called, query: " + query);
-        return super.findGroupCountByQueryCriteria(query);
-    }
-
-    @Override
-    public Group createNewGroup(String groupId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void deleteGroup(String groupId) {
-        throw new UnsupportedOperationException();
-    }
-}
-----
-
-Add your own implementation in the appropriate methods to plugin your own identity management solution.
-You have to figure out which member of the base class must be overridden. For example the following call:
+Have a look at the _LDAPIdentityServiceImpl_ class implementation to have a good example of how to implement the methods of the _IdmIdentityService_ interface.
+You have to figure out which methods you want to implement in the custom identity service class. For example the following call:
 
 [source,java,linenums]
 ----
 long potentialOwners = identityService.createUserQuery().memberOfGroup("management").count();
 ----
 
-leads to a call on the following member of the _UserIdentityManager_ interface:
+leads to a call on the following member of the _IdmIdentityService_ interface:
 
 [source,java,linenums]
 ----
-List<User> findUserByQueryCriteria(UserQueryImpl query, Page page);
+UserQuery createUserQuery();
 ----
 
 
-The code for the <<chapter_ldap,LDAP integration>> contains full examples of how to implement this. Check out the code on Github, specifically the following classes
-          link:$$https://github.com/Flowable/Flowable/blob/master/modules/flowable-ldap/src/main/java/org/flowable/ldap/LDAPGroupManager.java$$[LDAPGroupManager] and
-   link:$$https://github.com/Flowable/Flowable/blob/master/modules/flowable-ldap/src/main/java/org/flowable/ldap/LDAPUserManager.java$$[LDAPUserManager].
+The code for the <<chapter_ldap,LDAP integration>> contains full examples of how to implement this. Check out the code on Github: link:$$https://github.com/flowable/flowable-engine/blob/master/modules/flowable-ldap/src/main/java/org/flowable/ldap/LDAPIdentityServiceImpl.java$$[LDAPIdentityServiceImpl].
 
 
 [[advanced.safe.bpmn.xml]]
@@ -838,9 +769,9 @@ If the platform on which Flowable runs does support it, do enable this feature.
 [[advanced.event.logging]]
 
 
-=== Event logging (Experimental)
+=== Event logging
 
-An (experimental) event logging mechanism has been introduced. The logging mechanism builds upon the general-purpose <<eventDispatcher,event mechanism of the Flowable engine>> and is disabled by default. The idea is that the events originating from the engine are caught, and a map containing all the event data (and some more) is created and provided to an _org.flowable.engine.impl.event.logger.EventFlusher_ which will flush this data to somewhere else. By default, simple database-backed event handlers/flusher is used, which serializes the said map to JSON using Jackson and stores it in the database as an _EventLogEntryEntity_ instance.  The table required for this database logging is  created by default (called __$$ACT_EVT_LOG$$__). This table can be deleted if the event logging is not used.
+An event logging mechanism has been introduced. The logging mechanism builds upon the general-purpose <<eventDispatcher,event mechanism of the Flowable engine>> and is disabled by default. The idea is that the events originating from the engine are caught, and a map containing all the event data (and some more) is created and provided to an _org.flowable.engine.impl.event.logger.EventFlusher_ which will flush this data to somewhere else. By default, simple database-backed event handlers/flusher is used, which serializes the said map to JSON using Jackson and stores it in the database as an _EventLogEntryEntity_ instance.  The table required for this database logging is  created by default (called __$$ACT_EVT_LOG$$__). This table can be deleted if the event logging is not used.
 
 To enable the database logger:
 
@@ -857,7 +788,7 @@ databaseEventLogger = new EventLogger(processEngineConfiguration.getClock());
 runtimeService.addEventListener(databaseEventLogger);
 ----
 
-The EventLogger class can be subclassed. In particular, the _createEventFlusher()_ method needs to return an instance of the _org.flowable.engine.impl.event.logger.EventFlusher_ interface if the default database logging is not wanted. The _managementService.getEventLogEntries(startLogNr, size);_  can be used to retrieve the _EventLogEntryEntity_ instances through Flowable.
+The EventLogger class can be extended. In particular, the _createEventFlusher()_ method needs to return an instance of the _org.flowable.engine.impl.event.logger.EventFlusher_ interface if the default database logging is not wanted. The _managementService.getEventLogEntries(startLogNr, size);_  can be used to retrieve the _EventLogEntryEntity_ instances through Flowable.
 
 It is easy to see how this table data can now be used to feed the JSON into a big data NoSQL store such as MongoDB, Elastic Search, etc. It is also easy to see that the classes used here (org.flowable.engine.impl.event.logger.EventLogger/EventFlusher and many EventHandler classes) are pluggable and can be tweaked to your own use case (eg not storing the JSON in the database, but firing it straight onto a queue or big data store).
 
@@ -877,8 +808,6 @@ However, it could be a specific version of a supported and tested database does 
 
 [[advancedSecureScripting]]
 === Secure Scripting
-
-*Experimental*: the secure scripting feature has been added as part of the Flowable 5.22 release.
 
 By default, when using a <<bpmnScriptTask, script task>>, the script that is executed has similar capabilities as a Java delegate. It has full access to the JVM, can run forever (due to infinite loops) or use up a lot of memory. However, Java delegates need to be written and put on the classpath in a jar and they have a different lifecyle from a process definitions. End-users generally will not write Java delegates, as this is a typical the job of a developer.
 
@@ -932,12 +861,12 @@ It's used as follows:
 ----
 <flowable:executionListener event="start" class="org.flowable.scripting.secure.listener.SecureJavascriptExecutionListener">
   <flowable:field name="script">
-	  <flowable:string>
-		  <![CDATA[
-        execution.setVariable('test');
-			]]>
-	  </flowable:string>
-	</flowable:field>
+    <flowable:string>
+        <![CDATA[
+            execution.setVariable('test');
+        ]]>
+    </flowable:string>
+  </flowable:field>
   <flowable:field name="language" stringValue="javascript" />
 </flowable:executionListener>
 ----

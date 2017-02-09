@@ -9,7 +9,7 @@ import org.junit.Test;
 public class MultiInstanceServiceTaskEventTest extends CdiFlowableTestCase {
 
   @Test
-  @Deployment(resources = { "org/activiti/cdi/test/impl/event/MultiInstanceServiceTaskEvent.bpmn20.xml" })
+  @Deployment(resources = { "org/flowable/cdi/test/impl/event/MultiInstanceServiceTaskEvent.bpmn20.xml" })
   public void testReceiveAll() {
 
     TestEventListener listenerBean = getBeanInstance(TestEventListener.class);

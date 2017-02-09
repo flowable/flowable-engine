@@ -28,7 +28,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 
 /**
- * These are the first tests ever written for Activiti 6.
+ * These are the first tests ever written for Flowable 6.
  * Keeping them here for nostalgic reasons.
  * 
  * @author Joram Barrez

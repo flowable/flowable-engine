@@ -75,7 +75,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
     // messageId
     try {
       repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/message/MessageBoundaryEventTest.testDoubleBoundaryMessageEventSameMessageId.bpmn20.xml").deploy();
-      fail("Deployment should fail because Activiti cannot handle two boundary message events with same messageId.");
+      fail("Deployment should fail because Flowable cannot handle two boundary message events with same messageId.");
     } catch (Exception e) {
       assertEquals(0, repositoryService.createDeploymentQuery().count());
     }

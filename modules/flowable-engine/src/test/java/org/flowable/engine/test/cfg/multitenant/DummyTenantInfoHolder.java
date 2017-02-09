@@ -39,7 +39,7 @@ public class DummyTenantInfoHolder implements TenantInfoHolder {
     currentUserId.set(userId);
     currentTenantId.set(userToTenantMapping.get(userId));
     
-    Authentication.setAuthenticatedUserId(userId); // Activiti engine
+    Authentication.setAuthenticatedUserId(userId); // Flowable engine
   }
   
   public String getCurrentUserId() {

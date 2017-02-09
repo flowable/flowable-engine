@@ -92,7 +92,7 @@ The +flowable.cfg.xml+ must contain a bean that has the id +$$'processEngineConf
 ----
 
 
-This bean is then used to construct the +ProcessEngine+. There are multiple classes available that can be used to define the +processEngineConfiguration+. These classes represent different environments, and set defaults accordingly. It's a best practice to select the class the matches (the most) your environment, to minimalise the number of properties needed to configure the engine. The following classes are currently available (more will follow in future releases): [[configurationClasses]]
+This bean is then used to construct the +ProcessEngine+. There are multiple classes available that can be used to define the +processEngineConfiguration+. These classes represent different environments, and set defaults accordingly. It's a best practice to select the class the matches (the most) your environment, to minimise the number of properties needed to configure the engine. The following classes are currently available (more will follow in future releases): [[configurationClasses]]
 
 * *org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration*: the process engine is used in a standalone way. Flowable will take care of the transactions. By default, the database will only be checked when the engine boots (and an exception is thrown if there is no Flowable schema or the schema version is incorrect).
 * *org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration*: this is a convenience class for unit testing purposes. Flowable will take care of the transactions. An H2 in-memory database is used by default. The database will be created and dropped when the engine boots and shuts down. When using this, probably no additional configuration is needed (except when using for example the job executor or mail capabilities).
@@ -149,7 +149,7 @@ Our benchmarks have shown that the MyBatis connection pool is not the most effic
 ----
 
 
-Note that Flowable does not ship with a library that allows to define such a data source. So you have to make sure that the libraries are on your classpath.
+Note that Flowable does not ship with a library that allows one to define such a data source. So you have to make sure that the libraries are on your classpath.
 
 The following properties can be set, regardless of whether you are using the JDBC or data source approach:
 
@@ -440,13 +440,15 @@ Example when using Maven (version omitted):
 === Mapped Diagnostic Contexts
 
 
-Flowable supports Mapped Diagnostic Contexts feature of SLF4j. These basic information are passed to the underlying logger along with what is going to be logged:
+Flowable supports Mapped Diagnostic Contexts feature of SLF4j. This basic information is passed to the underlying logger along with what is going to be
+logged:
 
 * processDefinition Id as mdcProcessDefinitionID
 * processInstance Id as mdcProcessInstanceID
 * execution Id as mdcExecutionId
 
-None of these information are logged by default. The logger can be configured to show them in desired format, extra to the usual logged messages. For example in Log4j the following sample layout definition  causes the logger to show the above mentioned information:
+None of this information is logged by default. The logger can be configured to show them in desired format, extra to the usual logged messages. For example in
+Log4j the following sample layout definition  causes the logger to show the above mentioned information:
 
 [source,properties,linenums]
 ----
@@ -734,7 +736,7 @@ Listed below are all event types that can occur in the engine. Each type corresp
 |JOB_EXECUTION_FAILURE|The execution of a job has failed. The event contains the job that was executed and the exception.|+org.flowable...FlowableEntityEvent+ and +org.flowable...FlowableExceptionEvent+
 |JOB_RETRIES_DECREMENTED|The number of job retries have been decremented due to a failed job. The event contains the job that was updated.|+org.flowable...FlowableEntityEvent+
 |TIMER_SCHEDULED|A timer job has been created and is scheduled for being executed at a future point in time.|+org.flowable...FlowableEntityEvent+
-|TIMER_FIRED|A timer has been fired. The event contains the job that was executed?|+org.flowable...FlowableEntityEvent+
+|TIMER_FIRED|A timer has been fired. The event contains the job that was executed.|+org.flowable...FlowableEntityEvent+
 |JOB_CANCELED|A job has been canceled. The event contains the job that was canceled. Job can be canceled by API call, task was completed and associated boundary timer was canceled, on the new process definition deployment.|+org.flowable...FlowableEntityEvent+
 |ACTIVITY_STARTED|An activity is starting to execute|+org.flowable...FlowableActivityEvent+
 |ACTIVITY_COMPLETED|An activity is completed successfully|+org.flowable...FlowableActivityEvent+

@@ -12,7 +12,7 @@
                 <activiti:field name="from" expression="sender@test.com"></activiti:field>
                 <activiti:field name="subject" expression="Test Email"></activiti:field>
                 <activiti:field name="html">
-                    <activiti:expression><![CDATA[Welcome to Activiti]]></activiti:expression>
+                    <activiti:expression><![CDATA[Welcome to Flowable]]></activiti:expression>
                 </activiti:field>
             </extensionElements>
         </serviceTask>

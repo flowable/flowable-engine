@@ -28,32 +28,30 @@
 		<property name="dataSource" ref="dataSource" />
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="databaseSchemaUpdate" value="true" />
-		<property name="configurators">
-		  <list>
-		      <bean class="org.flowable.ldap.LDAPConfigurator">
+		<property name="idmProcessEngineConfigurator">
+		  <bean class="org.flowable.ldap.LDAPConfigurator">
 		      
-		        <!-- Server connection params -->
-                <property name="server" value="ldap://localhost" />
-                <property name="port" value="33389" />
-                <property name="user" value="uid=admin, ou=users, o=flowable" />
-                <property name="password" value="pass" />
-                
-                <!-- Query params -->
-                <property name="baseDn" value="o=flowable" />
-                <property name="queryUserByUserId" value="(&amp;(objectClass=inetOrgPerson)(uid={0}))" />
-                <property name="queryUserByFullNameLike" value="(&amp;(objectClass=inetOrgPerson)(|({0}=*{1}*)({2}=*{3}*)))" />
-                <property name="queryGroupsForUser" value="(&amp;(objectClass=groupOfUniqueNames)(uniqueMember={0}))" />
-                
-                <!-- Attribute config -->
-                <property name="userIdAttribute" value="uid" />
-                <property name="userFirstNameAttribute" value="cn" />
-                <property name="userLastNameAttribute" value="sn" />
-                
-                <property name="groupIdAttribute" value="uid" />
-                <property name="groupNameAttribute" value="cn" />
-                
-		      </bean>
-		  </list>
+	        <!-- Server connection params -->
+            <property name="server" value="ldap://localhost" />
+            <property name="port" value="33389" />
+            <property name="user" value="uid=admin, ou=users, o=flowable" />
+            <property name="password" value="pass" />
+            
+            <!-- Query params -->
+            <property name="baseDn" value="o=flowable" />
+            <property name="queryUserByUserId" value="(&amp;(objectClass=inetOrgPerson)(uid={0}))" />
+            <property name="queryUserByFullNameLike" value="(&amp;(objectClass=inetOrgPerson)(|({0}=*{1}*)({2}=*{3}*)))" />
+            <property name="queryGroupsForUser" value="(&amp;(objectClass=groupOfUniqueNames)(uniqueMember={0}))" />
+            
+            <!-- Attribute config -->
+            <property name="userIdAttribute" value="uid" />
+            <property name="userFirstNameAttribute" value="cn" />
+            <property name="userLastNameAttribute" value="sn" />
+            
+            <property name="groupIdAttribute" value="uid" />
+            <property name="groupNameAttribute" value="cn" />
+               
+	      </bean>
 		</property>
 	</bean>
 

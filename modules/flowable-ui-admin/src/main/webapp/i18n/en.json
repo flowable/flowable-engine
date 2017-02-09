@@ -119,7 +119,7 @@
             "TENANT": "Tenant"
         },
         "ACTIONS": {
-            "UPLOAD-FROM-MODELER": "Upload from Activiti Editor"
+            "UPLOAD-FROM-MODELER": "Upload from Flowable Editor"
         },
         "POPUP": {
             "UPLOAD-FROM-MODELER": {
@@ -127,7 +127,7 @@
                 "PASSWORD": "Password",
                 "ERROR": "We couldn't contact the Editor",
                 "UNAUTHORIZED": "Invalid credentials",
-                "UPLOAD-DESCRIPTION": "The process model will now be fetched and deployed to the currently active Activiti cluster. Select an appropriate name for deployment package."
+                "UPLOAD-DESCRIPTION": "The process model will now be fetched and deployed to the currently active Flowable cluster. Select an appropriate name for deployment package."
             }
         }
     },
@@ -602,7 +602,7 @@
         "USER": "User:",
         "MASTER-MANDATORY": "Master configuration mandatory:",
         "METRICS-SEND-INTERVAL": "Metric send interval:",
-        "ENDPOINT-HELP": "The endpoint configuration (each cluster has only one) needs to point to an Activiti REST installation. This endpoint will then be used to retrieve and manage the data used in the other sections (for example deployments, process definitions, and so on) of this application.",
+        "ENDPOINT-HELP": "The endpoint configuration (each cluster has only one) needs to point to a Flowable REST installation. This endpoint will then be used to retrieve and manage the data used in the other sections (for example deployments, process definitions, and so on) of this application.",
         "ENDPOINT-NAME": "Name:",
         "ENDPOINT-DESCRIPTION": "Description:",
         "ENDPOINT-ADDRESS": "Server address:",
@@ -681,7 +681,7 @@
         "POPUP": {
             "UPLOAD": {
                 "DESCRIPTION": "Select a .zip app definition to deploy.",
-                "WARNING": "Uploading a process is only possible to an Activiti UI instance.",
+                "WARNING": "Uploading a process is only possible to an Flowable UI instance.",
                 "DROPZONE": "Or drop a file here",
                 "NO-DROP": "File drop is not supported by your browser",
                 "CANCEL-UPLOAD": "Cancel upload",
