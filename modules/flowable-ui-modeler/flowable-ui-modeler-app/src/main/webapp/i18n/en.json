@@ -315,7 +315,15 @@
             "SAVE-DESCRIPTION": "You need to give a name and a unique key for the new decision table and you may want to add a description at the same time.",
             "DELETE-TITLE": "Delete decision table",
             "DELETE-DESCRIPTION": "Are you sure you want to delete the decision table \"{{name}}\"?",
-            "SAVE-DECISION-TABLE-TITLE": "Save decision table"
+            "SAVE-DECISION-TABLE-TITLE": "Save decision table",
+            "IMPORT-DESCRIPTION": "Please browse for or drop a DMN XML definition with an .dmn or .dmn.xml extension",
+          	"IMPORT-TITLE": "Import a DMN model",
+	        "IMPORT": {
+	            "DROPZONE": "Drop a .dmn or .dmn.xml DMN XML file",
+	            "CANCEL-UPLOAD": "Cancel the upload",
+	            "ERROR": "Error while processing the DMN XML file",
+	            "NO-DROP": "Drag and drop not supported"
+	        }
         },
         "ALERT": {
             "FAVORITE-CONFIRM": "This decision table is now favorited",

@@ -131,8 +131,6 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
   protected void exportDecisionTable(HttpServletResponse response, AbstractModel decisionTableModel) {
     DecisionTableRepresentation decisionTableRepresentation = getDecisionTableRepresentation(decisionTableModel);
 
-    // TODO Validate
-
     try {
 
       JsonNode editorJsonNode = objectMapper.readTree(decisionTableModel.getModelEditorJson());
@@ -184,6 +182,7 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
         editorJsonNode.remove("id");
 
         ModelRepresentation modelRepresentation = new ModelRepresentation();
+        modelRepresentation.setKey(dmnDefinition.getCurrentDecisionTable().getId());
         modelRepresentation.setName(dmnDefinition.getName());
         modelRepresentation.setDescription(dmnDefinition.getDescription());
         modelRepresentation.setModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE);

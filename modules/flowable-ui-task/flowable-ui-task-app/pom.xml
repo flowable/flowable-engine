@@ -236,10 +236,6 @@
 
         <!-- EMAIL -->
         <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-        </dependency>
-        <dependency>
         	<groupId>javax.mail</groupId>
         	<artifactId>mail</artifactId>
         </dependency>
