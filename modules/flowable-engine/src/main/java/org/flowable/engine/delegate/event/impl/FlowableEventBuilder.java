@@ -28,6 +28,7 @@ import org.flowable.engine.delegate.event.FlowableEntityWithVariablesEvent;
 import org.flowable.engine.delegate.event.FlowableErrorEvent;
 import org.flowable.engine.delegate.event.FlowableMessageEvent;
 import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
+import org.flowable.engine.delegate.event.FlowableJobRescheduledEvent;
 import org.flowable.engine.delegate.event.FlowableSequenceFlowTakenEvent;
 import org.flowable.engine.delegate.event.FlowableSignalEvent;
 import org.flowable.engine.delegate.event.FlowableVariableEvent;
@@ -116,6 +117,23 @@ public class FlowableEventBuilder {
 
     // In case an execution-context is active, populate the event fields
     // related to the execution
+    populateEventWithCurrentContext(newEvent);
+    return newEvent;
+  }
+
+  /**
+   * @param type
+   *          type of event
+   * @param newJob
+   *           the new job that was created due to the reschedule
+   * @param originalJobId
+   *          the job id of the original job that was rescheduled
+   * @return an {@link FlowableEntityEvent}. In case an {@link ExecutionContext} is active, the execution related event fields will be populated. If not, execution details will be retrieved from the
+   *         {@link Object} if possible.
+   */
+  public static FlowableJobRescheduledEvent createJobRescheduledEvent(FlowableEngineEventType type, Job newJob, String originalJobId) {
+    FlowableJobRescheduledEventImpl newEvent = new FlowableJobRescheduledEventImpl(newJob, originalJobId, type);
+
     populateEventWithCurrentContext(newEvent);
     return newEvent;
   }
