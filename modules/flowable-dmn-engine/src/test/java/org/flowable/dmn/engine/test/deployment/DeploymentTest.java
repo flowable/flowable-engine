@@ -177,6 +177,27 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
     }
 
     @Test
+    public void deployWithCategory() throws Exception {
+
+        repositoryService.createDeployment().name("secondDeployment")
+            .addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn")
+            .tenantId("testTenant")
+            .category("TEST_DEPLOYMENT_CATEGORY")
+            .deploy();
+
+        DmnDeployment deployment = repositoryService.createDeploymentQuery().deploymentCategory("TEST_DEPLOYMENT_CATEGORY").singleResult();
+        assertNotNull(deployment);
+
+        DmnDecisionTable decisionTable = repositoryService.createDecisionTableQuery().decisionTableKey("decision").singleResult();
+        assertNotNull(decisionTable);
+
+        repositoryService.setDecisionTableCategory(decisionTable.getId(),"TEST_DECISION_TABLE_CATEGORY");
+
+        DmnDecisionTable decisionTableWithCategory = repositoryService.createDecisionTableQuery().decisionTableCategory("TEST_DECISION_TABLE_CATEGORY").singleResult();
+        assertNotNull(decisionTableWithCategory);
+    }
+
+    @Test
     @DmnDeploymentAnnotation
     public void testNativeQuery() {
         DmnDeployment deployment = repositoryService.createDeploymentQuery().singleResult();
