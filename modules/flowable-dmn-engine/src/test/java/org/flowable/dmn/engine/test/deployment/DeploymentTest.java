@@ -195,6 +195,8 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
 
         DmnDecisionTable decisionTableWithCategory = repositoryService.createDecisionTableQuery().decisionTableCategory("TEST_DECISION_TABLE_CATEGORY").singleResult();
         assertNotNull(decisionTableWithCategory);
+
+        deleteDeployments();
     }
 
     @Test
