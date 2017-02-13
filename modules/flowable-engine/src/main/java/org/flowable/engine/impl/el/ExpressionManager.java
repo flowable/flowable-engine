@@ -13,7 +13,6 @@
 package org.flowable.engine.impl.el;
 
 import java.util.Map;
-import java.util.Properties;
 
 import javax.el.ArrayELResolver;
 import javax.el.BeanELResolver;
@@ -25,10 +24,10 @@ import javax.el.ListELResolver;
 import javax.el.MapELResolver;
 import javax.el.ValueExpression;
 
-import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.bpmn.data.ItemInstance;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.VariableScopeImpl;
 
 import de.odysseus.el.ExpressionFactoryImpl;
@@ -51,27 +50,30 @@ import de.odysseus.el.ExpressionFactoryImpl;
 public class ExpressionManager {
 
   protected ExpressionFactory expressionFactory;
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  
   // Default implementation (does nothing)
-  protected ELContext parsingElContext = new ParsingElContext();
+  protected ELContext parsingElContext;
   protected Map<Object, Object> beans;
 
-  public ExpressionManager(ProcessEngineConfiguration processEngineConfiguration) {
+  public ExpressionManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
     this(null, processEngineConfiguration);
   }
 
-  public ExpressionManager(ProcessEngineConfiguration processEngineConfiguration, boolean initFactory) {
+  public ExpressionManager(ProcessEngineConfigurationImpl processEngineConfiguration, boolean initFactory) {
     this(null, processEngineConfiguration, false);
   }
 
-  public ExpressionManager(Map<Object, Object> beans, ProcessEngineConfiguration processEngineConfiguration) {
+  public ExpressionManager(Map<Object, Object> beans, ProcessEngineConfigurationImpl processEngineConfiguration) {
     this(beans, processEngineConfiguration, true);
   }
 
-  public ExpressionManager(Map<Object, Object> beans, ProcessEngineConfiguration processEngineConfiguration, boolean initFactory) {
-    // Use the ExpressionFactoryImpl in flowable build in version of juel,
-    // with parametrised method expressions enabled
-    expressionFactory = new ExpressionFactoryImpl((Properties)null, new FlowableTypeConverter(processEngineConfiguration));
+  public ExpressionManager(Map<Object, Object> beans, ProcessEngineConfigurationImpl processEngineConfiguration, boolean initFactory) {
+    // Use the ExpressionFactoryImpl in flowable build in version of juel, with parametrised method expressions enabled
+    this.expressionFactory = new ExpressionFactoryImpl();
+    this.processEngineConfiguration = processEngineConfiguration;
     this.beans = beans;
+    this.parsingElContext = new ParsingElContext(processEngineConfiguration);
   }
 
   public Expression createExpression(String expression) {
@@ -102,7 +104,7 @@ public class ExpressionManager {
 
   protected FlowableElContext createElContext(VariableScope variableScope) {
     ELResolver elResolver = createElResolver(variableScope);
-    return new FlowableElContext(elResolver);
+    return new FlowableElContext(elResolver, processEngineConfiguration);
   }
 
   protected ELResolver createElResolver(VariableScope variableScope) {
@@ -119,7 +121,7 @@ public class ExpressionManager {
     elResolver.add(new ListELResolver());
     elResolver.add(new MapELResolver());
     elResolver.add(new JsonNodeELResolver());
-    elResolver.add(new DynamicBeanPropertyELResolver(ItemInstance.class, "getFieldValue", "setFieldValue")); // TODO: needs verification
+    elResolver.add(new DynamicBeanPropertyELResolver(ItemInstance.class, "getFieldValue", "setFieldValue"));
     elResolver.add(new BeanELResolver());
     return elResolver;
   }

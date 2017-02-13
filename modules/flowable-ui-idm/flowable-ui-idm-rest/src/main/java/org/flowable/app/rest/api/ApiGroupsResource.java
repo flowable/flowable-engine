@@ -31,7 +31,7 @@ public class ApiGroupsResource {
   protected GroupService groupService;
   
   @RequestMapping(value = "/idm/groups", method = RequestMethod.GET, produces = {"application/json"})
-  public List<GroupRepresentation> findUsersByFilter(@RequestParam("filter") String filter) {
+  public List<GroupRepresentation> findGroupsByFilter(@RequestParam("filter") String filter) {
     List<GroupRepresentation> result = new ArrayList<GroupRepresentation>();
     List<Group> groups = groupService.getGroups(filter);
     for (Group group : groups) {

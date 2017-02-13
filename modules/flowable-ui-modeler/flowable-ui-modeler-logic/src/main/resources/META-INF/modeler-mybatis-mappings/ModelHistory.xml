@@ -82,13 +82,13 @@
 	   select * from ${prefix}ACT_DE_MODEL_HISTORY 
 	   where created_by = #{createdBy, jdbcType=VARCHAR}
 	   and model_type = #{modelType, jdbcType=INTEGER}
-	   and removal_date is not null
+	   and removal_date is null
 	</select>
 	
 	<select id="selectModelHistoryByModelId" parameterType="string" resultMap="modelHistoryResultMap">
        select * from ${prefix}ACT_DE_MODEL_HISTORY 
        where model_id = #{modelId, jdbcType=VARCHAR}
-       and removal_date is not null
+       and removal_date is null
     </select>
     
     <delete id="deleteModelHistory" parameterType="org.flowable.app.domain.editor.ModelHistory">

@@ -71,6 +71,7 @@ import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.compatibility.DefaultFlowable5CompatibilityHandlerFactory;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandlerFactory;
+import org.flowable.engine.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventDispatcherImpl;
 import org.flowable.engine.form.AbstractFormType;
@@ -156,6 +157,7 @@ import org.flowable.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.impl.db.IbatisVariableTypeHandler;
 import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
 import org.flowable.engine.impl.el.ExpressionManager;
+import org.flowable.engine.impl.el.FlowableDateFunctionDelegate;
 import org.flowable.engine.impl.event.CompensationEventHandler;
 import org.flowable.engine.impl.event.EventHandler;
 import org.flowable.engine.impl.event.MessageEventHandler;
@@ -719,6 +721,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
   */
   protected ExecuteAsyncRunnableFactory asyncExecutorExecuteAsyncRunnableFactory;
+  
+  // JUEL functions ///////////////////////////////////////////////////////////
+  protected List<FlowableFunctionDelegate> flowableFunctionDelegates;
+  protected List<FlowableFunctionDelegate> customFlowableFunctionDelegates;
 
   // BPMN PARSER //////////////////////////////////////////////////////////////
 
@@ -729,11 +735,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected ListenerFactory listenerFactory;
   protected BpmnParseFactory bpmnParseFactory;
 
-  // PROCESS VALIDATION //////////////////////////////////////////////////////////////
+  // PROCESS VALIDATION ///////////////////////////////////////////////////////
 
   protected ProcessValidator processValidator;
 
-  // OTHER //////////////////////////////////////////////////////////////////////
+  // OTHER ////////////////////////////////////////////////////////////////////
 
   protected List<FormEngine> customFormEngines;
   protected Map<String, FormEngine> formEngines;
@@ -945,6 +951,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initFailedJobCommandFactory();
     initEventDispatcher();
     initProcessValidator();
+    initFunctionDelegates();
     initDatabaseEventLogging();
     initFlowable5CompatibilityHandler();
     configuratorsAfterInit();
@@ -2015,6 +2022,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       this.processValidator = new ProcessValidatorFactory().createDefaultProcessValidator();
     }
   }
+  
+  public void initFunctionDelegates() {
+    if (this.flowableFunctionDelegates == null) {
+      this.flowableFunctionDelegates = new ArrayList<>();
+      this.flowableFunctionDelegates.add(new FlowableDateFunctionDelegate());
+    }
+    
+    if (this.customFlowableFunctionDelegates != null) {
+      this.flowableFunctionDelegates.addAll(this.customFlowableFunctionDelegates);
+    }
+  }
 
   public void initDatabaseEventLogging() {
     if (enableDatabaseEventLogging) {
@@ -2986,6 +3004,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setProcessValidator(ProcessValidator processValidator) {
     this.processValidator = processValidator;
+    return this;
+  }
+  
+  public List<FlowableFunctionDelegate> getFlowableFunctionDelegates() {
+    return flowableFunctionDelegates;
+  }
+
+  public ProcessEngineConfigurationImpl setFlowableFunctionDelegates(List<FlowableFunctionDelegate> flowableFunctionDelegates) {
+    this.flowableFunctionDelegates = flowableFunctionDelegates;
+    return this;
+  }
+  
+  public List<FlowableFunctionDelegate> getCustomFlowableFunctionDelegates() {
+    return customFlowableFunctionDelegates;
+  }
+
+  public ProcessEngineConfigurationImpl setCustomFlowableFunctionDelegates(List<FlowableFunctionDelegate> customFlowableFunctionDelegates) {
+    this.customFlowableFunctionDelegates = customFlowableFunctionDelegates;
     return this;
   }
 

@@ -111,40 +111,54 @@ public class DefaultJobManager implements JobManager {
     return timerEntity;
   }
   
-  @Override
-  public void scheduleTimerJob(TimerJobEntity timerJob) {
-    if (timerJob == null) {
-      throw new FlowableException("Empty timer job can not be scheduled");
+    @Override
+    public void scheduleTimerJob(TimerJobEntity timerJob) {
+        scheduleTimer(timerJob);
+        sendTimerScheduledEvent(timerJob);
     }
-    
-    processEngineConfiguration.getTimerJobEntityManager().insert(timerJob);
 
-    CommandContext commandContext = Context.getCommandContext();
-    FlowableEventDispatcher eventDispatcher = commandContext.getEventDispatcher();
-    if (eventDispatcher.isEnabled()) {
-      eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_SCHEDULED, timerJob));
+    private void scheduleTimer(TimerJobEntity timerJob) {
+        if (timerJob == null) {
+            throw new FlowableException("Empty timer job can not be scheduled");
+        }
+        processEngineConfiguration.getTimerJobEntityManager().insert(timerJob);
     }
-  }
 
-  @Override
+    private void sendTimerScheduledEvent(TimerJobEntity timerJob) {
+        CommandContext commandContext = Context.getCommandContext();
+        FlowableEventDispatcher eventDispatcher = commandContext.getEventDispatcher();
+        if (eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(
+                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_SCHEDULED, timerJob));
+        }
+    }
+
   public TimerJobEntity rescheduleTimerJob(String timerJobId, TimerEventDefinition timerEventDefinition) {
     TimerJobEntityManager jobManager = processEngineConfiguration.getTimerJobEntityManager();
     TimerJobEntity timerJob = jobManager.findById(timerJobId);
     if (timerJob != null) {
-      processEngineConfiguration.getTimerJobEntityManager().delete(timerJob);
-      
       BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(timerJob.getProcessDefinitionId());
       Event eventElement = (Event) bpmnModel.getFlowElement(TimerEventHandler.getActivityIdFromConfiguration(timerJob.getJobHandlerConfiguration()));
       boolean isInterruptingTimer = false;
       if (eventElement instanceof BoundaryEvent) {
         isInterruptingTimer = ((BoundaryEvent) eventElement).isCancelActivity();
       }
-      
+
       ExecutionEntity execution = processEngineConfiguration.getExecutionEntityManager().findById(timerJob.getExecutionId());
       TimerJobEntity rescheduledTimerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, isInterruptingTimer, execution, 
               timerJob.getJobHandlerType(), timerJob.getJobHandlerConfiguration());
-      
-      scheduleTimerJob(rescheduledTimerJob);
+
+      processEngineConfiguration.getTimerJobEntityManager().delete(timerJob);
+      scheduleTimer(rescheduledTimerJob);
+
+      if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+          Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                  FlowableEventBuilder.createJobRescheduledEvent(FlowableEngineEventType.JOB_RESCHEDULED, rescheduledTimerJob, timerJob.getId()));
+      }
+
+      // job rescheduled event should occur before new timer scheduled event
+      sendTimerScheduledEvent(rescheduledTimerJob);
+
       return rescheduledTimerJob;
     }
     return null;

@@ -91,6 +91,11 @@ public enum FlowableEngineEventType implements FlowableEventType {
   JOB_RETRIES_DECREMENTED,
 
   /**
+   * The job has been rescheduled.
+   */
+  JOB_RESCHEDULED,
+
+  /**
    * An event type to be used by custom events. These types of events are never thrown by the engine itself, only be an external API call to dispatch an event.
    */
   CUSTOM,

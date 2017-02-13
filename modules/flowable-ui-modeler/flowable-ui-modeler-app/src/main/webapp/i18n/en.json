@@ -274,7 +274,12 @@
           "EDIT-DESCRIPTION": "Change any of the form properties below and then press Save to update the form.",
           "DELETE-DESCRIPTION": "Are you sure you want to delete the form \"{{name}}\"?",
           "EDIT-TITLE":"Edit form details",
-          "DELETE-TITLE": "Delete form"
+          "DELETE-TITLE": "Delete form",
+          "USE-AS-NEW-TITLE": "Use as new version",
+          "USE-AS-NEW-VERSION": "Use as new version",
+          "USE-AS-NEW-DESCRIPTION": "Are you sure you want to use version {{version}} to create a new version of \"{{name}}\"?",
+          "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "Could not fully restore the app model to the chosen version: some referenced models are missing due to being deleted in the past. Please update the app model accordingly. Missing models:",
+          "USE-AS-NEW-UNRESOLVED-MODEL": "Model '{{name}}' with internal id {{id}}, created by {{createdBy}}"
         }
     },
 
@@ -297,7 +302,6 @@
             "USE-AS-NEW-VERSION": "Use as new version",
             "FAVORITE": "Favorite this decision table",
             "DUPLICATE": "Duplicate this decision table"
-
         },
         "DETAILS": {
             "HISTORY-TITLE": "History",
@@ -315,7 +319,20 @@
             "SAVE-DESCRIPTION": "You need to give a name and a unique key for the new decision table and you may want to add a description at the same time.",
             "DELETE-TITLE": "Delete decision table",
             "DELETE-DESCRIPTION": "Are you sure you want to delete the decision table \"{{name}}\"?",
-            "SAVE-DECISION-TABLE-TITLE": "Save decision table"
+            "SAVE-DECISION-TABLE-TITLE": "Save decision table",
+            "IMPORT-DESCRIPTION": "Please browse for or drop a DMN XML definition with an .dmn or .dmn.xml extension",
+          	"IMPORT-TITLE": "Import a DMN model",
+	        "IMPORT": {
+	            "DROPZONE": "Drop a .dmn or .dmn.xml DMN XML file",
+	            "CANCEL-UPLOAD": "Cancel the upload",
+	            "ERROR": "Error while processing the DMN XML file",
+	            "NO-DROP": "Drag and drop not supported"
+	        },
+            "USE-AS-NEW-TITLE": "Use as new version",
+            "USE-AS-NEW-VERSION": "Use as new version",
+            "USE-AS-NEW-DESCRIPTION": "Are you sure you want to use version {{version}} to create a new version of \"{{name}}\"?",
+            "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "Could not fully restore the app model to the chosen version: some referenced models are missing due to being deleted in the past. Please update the app model accordingly. Missing models:",
+            "USE-AS-NEW-UNRESOLVED-MODEL": "Model '{{name}}' with internal id {{id}}, created by {{createdBy}}"
         },
         "ALERT": {
             "FAVORITE-CONFIRM": "This decision table is now favorited",
