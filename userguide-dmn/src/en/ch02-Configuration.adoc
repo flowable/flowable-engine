@@ -5,7 +5,7 @@
 
 === Creating a DMN Engine
 
-_The Flowable DMN engine is configured is a very similar way to the Flowable process engine. As a result the following instructions have a resemblance with their process engine counterpart._
+_The Flowable DMN engine is structured in a very similar way to the Flowable process engine. As a result parts of the documentation have a resemblance with their process engine counterpart._
 
 The Flowable DMN engine is configured through an XML file called +flowable.dmn.cfg.xml+. Note that this is *not* applicable if you're using <<springintegration,the Spring style of building a DMN engine>>.
 

@@ -32,7 +32,6 @@ import org.junit.Test;
 /**
  * @author Yvo Swillens
  */
-@Ignore
 public class CustomConfigRuntimeTest {
 
     public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000";
