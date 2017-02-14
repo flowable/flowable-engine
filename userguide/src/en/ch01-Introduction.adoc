@@ -18,7 +18,7 @@ link:$$http://flowable.org/downloads.html$$[http://flowable.org/downloads.html]
 === Sources
 
 The distribution contains most of the sources as JAR files. The source code for Flowable can be found on
-  link:$$https://github.com/Flowable/Flowable$$[https://github.com/Flowable/Flowable]
+  link:$$https://github.com/flowable/flowable-engine$$[https://github.com/flowable/flowable-engine]
 
 
 [[required.software]]
