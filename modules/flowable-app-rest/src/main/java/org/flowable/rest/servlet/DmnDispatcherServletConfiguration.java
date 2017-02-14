@@ -10,7 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 @Configuration
 @ComponentScan({ "org.flowable.rest.dmn.exception", "org.flowable.rest.dmn.service.api" })
 @EnableAsync
-public class DmnDispatcherServletConfiguration extends WebMvcConfigurationSupport {
+public class DmnDispatcherServletConfiguration extends BaseDispatcherServletConfiguration {
 
   protected final Logger log = LoggerFactory.getLogger(DmnDispatcherServletConfiguration.class);
 
