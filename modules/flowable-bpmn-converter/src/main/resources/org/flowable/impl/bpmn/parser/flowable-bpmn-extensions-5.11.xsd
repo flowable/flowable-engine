@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema
   xmlns="http://www.w3.org/2001/XMLSchema"
-  targetNamespace="http://activiti.org/bpmn"
-  xmlns:tns="http://activiti.org/bpmn"
+  targetNamespace="http://flowable.org/bpmn"
+  xmlns:tns="http://flowable.org/bpmn"
   xmlns:sem="http://www.omg.org/spec/BPMN/20100524/MODEL"
   elementFormDefault="qualified">
   
@@ -220,9 +220,6 @@
     </annotation>
     <simpleType>
       <restriction base="string">
-        <enumeration value="camel"/>
-        <enumeration value="mail"/>
-        <enumeration value="mule"/>
         <enumeration value="shell"/>
       </restriction>
     </simpleType>
@@ -341,16 +338,6 @@
         The provided group(s) will be candidate for performing the user task.
         In case of multiple group ids, a comma-separated list must be provided.
         Also supports expressions that evaluate to a String or Collection&lt;String&gt;.
-      </documentation>
-    </annotation>
-  </attribute>
-
-  <attribute name="priority">
-    <annotation>
-      <documentation>
-        User Task attribute to set the priority of a user task.
-        The provided priority can be used to sort user tasks in the task list.
-        Also supports expressions that evaluate to a String.
       </documentation>
     </annotation>
   </attribute>
@@ -490,78 +477,6 @@
     </complexType>
   </element>
   
-  <element name="eventListener">
-    <annotation>
-      <documentation>
-        Extension element for defining event-listeners on a process-definition.
-      </documentation>
-    </annotation>
-    <complexType>
-      <attribute name="events">
-        <annotation>
-          <documentation>
-           Comma-separated list of event-types an event-listener is configured to be notified of. Can also be a single event-type.  
-          </documentation>
-        </annotation>
-      </attribute>
-      <attribute name="entityType">
-        <annotation>
-          <documentation>
-           Type of entity that should be targeted by events for which the event-listener should be notified. 
-          </documentation>
-        </annotation>
-        <simpleType>
-          <restriction base="string">
-            <enumeration value="attachment" />
-            <enumeration value="comment" />
-            <enumeration value="execution" />
-            <enumeration value="identity-link" />
-            <enumeration value="job" />
-            <enumeration value="process-definition" />
-            <enumeration value="process-instance" />
-            <enumeration value="task" />
-          </restriction>
-        </simpleType>
-      </attribute>
-      <attribute name="throwEvent">
-        <annotation>
-          <documentation>
-           Type of event to be throw as a response to a matching activiti-event being dispatched.
-          </documentation>
-        </annotation>
-        <simpleType>
-          <restriction base="string">
-            <enumeration value="signal" />
-            <enumeration value="globalSignal" />
-            <enumeration value="message" />
-            <enumeration value="error" />
-          </restriction>
-        </simpleType>
-      </attribute>
-      <attribute name="signalName">
-        <annotation>
-          <documentation>
-           Name of a signal.  
-          </documentation>
-        </annotation>
-      </attribute>
-      <attribute name="messageName">
-        <annotation>
-          <documentation>
-           Name of a message.  
-          </documentation>
-        </annotation>
-      </attribute>
-      <attribute name="errorCode">
-        <annotation>
-          <documentation>
-           Error-code of an error event.  
-          </documentation>
-        </annotation>
-      </attribute>
-    </complexType>
-  </element>
-  
   <element name="in">
     <annotation>
       <documentation>
@@ -608,31 +523,5 @@
       </documentation>
     </annotation>
   </attribute>
-
-  <attribute name="elementIndexVariable" type="string">
-    <annotation>
-      <documentation>
-        To be used on the multiInstanceLoopCharacteristics element. Denotes the name of the process
-        index variable that will be set on each created instance. According to BPMN specification
-        index variable name is loopCounter, which is used for default value.
-      </documentation>
-    </annotation>
-  </attribute>
-  
-  <element name="mapException">
-    <annotation>
-      <documentation>
-        To be used on exception handling. All exceptions with given class will be handled as BpmnError with the given errorCode
-      </documentation>
-    </annotation>
-    <complexType>
-    	<sequence>
-    	   <element name="errorCode" type="string"/>
-    	   <element name="includeChildExceptions" type="boolean"/>
-    	</sequence>
-    </complexType>
-  </element>
-  
-
   
 </schema>

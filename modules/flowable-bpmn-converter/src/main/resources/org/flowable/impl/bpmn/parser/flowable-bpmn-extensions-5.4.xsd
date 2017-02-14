@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema
   xmlns="http://www.w3.org/2001/XMLSchema"
-  targetNamespace="http://activiti.org/bpmn"
-  xmlns:tns="http://activiti.org/bpmn"
+  targetNamespace="http://flowable.org/bpmn"
+  xmlns:tns="http://flowable.org/bpmn"
+  xmlns:sem="http://www.omg.org/spec/BPMN/20100524/MODEL"
   elementFormDefault="qualified">
+  
+<import namespace="http://www.omg.org/spec/BPMN/20100524/MODEL" schemaLocation="Semantic.xsd" />  
   
   <!-- TODO
   
@@ -175,12 +178,12 @@
     </annotation>
     <simpleType>
       <restriction base="string">
-        <enumeration value="mail"/>
+        <enumeration value="shell"/>
       </restriction>
     </simpleType>
   </attribute>
   
-  <attribute name="resultVariableName" type="string">
+  <attribute name="resultVariable" type="string">
     <annotation>
       <documentation>
         Attribute on Service and Script Task corresponding with a process variable name.
@@ -246,6 +249,15 @@
     </annotation>
   </attribute>
   
+  <attribute name="dueDate" type="tns:tExpression">
+    <annotation>
+      <documentation>
+        User Task attribute to set the task due date.
+        The expression should resolve to a value of typejava.util.Date.
+      </documentation>
+    </annotation>
+  </attribute>
+  
   <attribute name="candidateUsers">
     <annotation>
       <documentation>
@@ -268,6 +280,36 @@
     </annotation>
   </attribute>
 
+  <attribute name="candidateStarterUsers">
+    <annotation>
+      <documentation>
+        Process attribute to set the potential starts of a process.
+        Provided user(s) will be able to start the process.        
+        In case of multiple user ids, a comma-separated list must be provided.
+        Also supports expressions that evaluate to a String or Collection&lt;String&gt;.
+      </documentation>
+    </annotation>
+  </attribute>
+  
+  <attribute name="candidateStarterGroups">
+    <annotation>
+      <documentation>
+        Process attribute to set the potential starts of a process.
+        Provided group(s) will be able to start the process.        
+        In case of multiple group ids, a comma-separated list must be provided.
+        Also supports expressions that evaluate to a String or Collection&lt;String&gt;.
+      </documentation>
+    </annotation>
+  </attribute>
+  
+  <complexType name="tPotentialStarter">
+	<complexContent>
+		<extension base="sem:tHumanPerformer" />
+	</complexContent>
+  </complexType>
+  
+  <element name="potentialStarter" type="string" />
+  
   <element name="taskListener">
     <annotation>
       <documentation>
@@ -328,7 +370,7 @@
       </documentation>
     </annotation>
     <complexType>
-      <sequence>
+      <sequence minOccurs="0" maxOccurs="unbounded">
         <element ref="tns:field" />
       </sequence>
       <attribute name="class" type="string">
@@ -371,5 +413,52 @@
       </attribute>
     </complexType>
   </element>
+  
+  <element name="in">
+    <annotation>
+      <documentation>
+        Element to specify Data Input in Activiti Shortcuts
+        (compare to DataInputAssociation in BPMN)
+      </documentation>
+    </annotation>
+    <complexType>
+      <attribute name="source" type="string" use="optional"/>
+      <attribute name="sourceExpression" type="tns:tExpression" use="optional"/>
+      <attribute name="target" type="string" use="required" />
+    </complexType>
+  </element>
+  <element name="out">
+    <annotation>
+      <documentation>
+        Element to specify Data Output in Activiti Shortcuts
+        (compare to DataOutputAssociation in BPMN)
+      </documentation>
+    </annotation>
+    <complexType>
+      <attribute name="source" type="string" use="optional"/>
+      <attribute name="sourceExpression" type="tns:tExpression" use="optional"/>
+      <attribute name="target" type="string" use="required" />
+    </complexType>
+  </element>
+  
+  <attribute name="collection" type="string">
+    <annotation>
+      <documentation>
+        To be used on the multiInstanceLoopCharacteristics element, referencing a collection.
+        For each element in the collection, an instance will be created. Can be an expression 
+        or reference to a process variable.
+      </documentation>
+    </annotation>
+  </attribute>
+  
+  <attribute name="elementVariable" type="string">
+    <annotation>
+      <documentation>
+        To be used on the multiInstanceLoopCharacteristics element, used in conjunction with
+        the activiti:collection attribute. Denotes the name of the process variable that
+        will be set on each created instance, containing an element of the specified collection.
+      </documentation>
+    </annotation>
+  </attribute>
   
 </schema>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema
   xmlns="http://www.w3.org/2001/XMLSchema"
-  targetNamespace="http://activiti.org/bpmn"
-  xmlns:tns="http://activiti.org/bpmn"
+  targetNamespace="http://flowable.org/bpmn"
+  xmlns:tns="http://flowable.org/bpmn"
   elementFormDefault="qualified">
   
   <!-- TODO
@@ -328,7 +328,7 @@
       </documentation>
     </annotation>
     <complexType>
-      <sequence minOccurs="0" maxOccurs="unbounded">
+      <sequence>
         <element ref="tns:field" />
       </sequence>
       <attribute name="class" type="string">
@@ -371,33 +371,5 @@
       </attribute>
     </complexType>
   </element>
-  
-  <element name="in">
-    <annotation>
-      <documentation>
-        Element to specify Data Input in Activiti Shortcuts
-        (compare to DataInputAssociation in BPMN)
-      </documentation>
-    </annotation>
-    <complexType>
-      <attribute name="source" type="string" use="optional"/>
-      <attribute name="sourceExpression" type="tns:tExpression" use="optional"/>
-      <attribute name="target" type="string" use="required" />
-    </complexType>
-  </element>
-  <element name="out">
-    <annotation>
-      <documentation>
-        Element to specify Data Output in Activiti Shortcuts
-        (compare to DataOutputAssociation in BPMN)
-      </documentation>
-    </annotation>
-    <complexType>
-      <attribute name="source" type="string" use="optional"/>
-      <attribute name="sourceExpression" type="tns:tExpression" use="optional"/>
-      <attribute name="target" type="string" use="required" />
-    </complexType>
-  </element>
-  
   
 </schema>

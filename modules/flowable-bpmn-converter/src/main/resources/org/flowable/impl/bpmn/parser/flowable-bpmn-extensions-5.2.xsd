@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema
   xmlns="http://www.w3.org/2001/XMLSchema"
-  targetNamespace="http://activiti.org/bpmn"
-  xmlns:tns="http://activiti.org/bpmn"
-  xmlns:sem="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  targetNamespace="http://flowable.org/bpmn"
+  xmlns:tns="http://flowable.org/bpmn"
   elementFormDefault="qualified">
   
-<import namespace="http://www.omg.org/spec/BPMN/20100524/MODEL" schemaLocation="Semantic.xsd" />  
+  <!-- TODO
+  
+    
+       formKey
+
+       formProperty id="" type variable expression writable required
+                    activiti:value
+   -->
 
   <annotation>
     <documentation>
@@ -14,15 +20,6 @@
       attributes introduced by Activiti.
     </documentation>
   </annotation>
-  
-  <attribute name="extensionId" type="string">
-    <annotation>
-      <documentation>
-        Attribute on a task.
-        Can be used to represent the custom service task identifier.
-      </documentation>
-    </annotation>
-  </attribute>
   
   <attribute name="initiator" type="string">
     <annotation>
@@ -69,7 +66,7 @@
       <documentation>
         Attribute on a startEvent or userTask.
         Allows to specify a custom class that will be called during the parsing 
-        of the form information. This way, it is possible to use custom forms and form handling.
+        of the form information. Thus way, it is possible to use custom forms and form handling.
         This class must implement the 
         org.activiti.engine.inpl.form.FormHamdler/StartFormHandler/taskFormHandler interface
         (specific interface depending on the activity). 
@@ -92,32 +89,7 @@
       </documentation>
     </annotation>
     <complexType>
-      <sequence>
-	    <element name="value" minOccurs="0" maxOccurs="unbounded">
-	   	  <annotation>
-		    <documentation>
-		      Defines a (potential) value for the form property.
-		      Especially usedful when using 'enum' as type.	
-		    </documentation>
-		  </annotation>
-		  <complexType>
-		    <attribute name="id" type="string">
-			  <annotation>
-			    <documentation>
-					Defines the internal value for the form property value.
-			    </documentation>
-			  </annotation>
-		    </attribute>
-		    <attribute name="name" type="string">
-			  <annotation>
-			    <documentation>
-					Defines the display label for the form property value.
-			    </documentation>
-			  </annotation>
-		    </attribute>
-	      </complexType>
-	    </element>
-	  </sequence>
+      <!-- TODO: activiti:value -->
       <attribute name="id" use="required" type="string">
         <annotation>
           <documentation>
@@ -175,23 +147,6 @@
           </documentation>
         </annotation>
       </attribute>
-      <attribute name="datePattern" type="string">
-        <annotation>
-			<documentation>
-				Can be used when type is 'date' and defines how a date should be provided
-				in the form. Any date pattern that is compatible
-				with java.text.SimpleDataFormat is valid.
-			</documentation>
-        </annotation>
-      </attribute>
-      <attribute name="value" type="tns:tExpression">
-        <annotation>
-			<documentation>
-				A literal or an expression that evaluates at runtime to the value for
-				the form property.
-			</documentation>
-        </annotation>
-      </attribute>
     </complexType>
   </element>
   
@@ -220,12 +175,12 @@
     </annotation>
     <simpleType>
       <restriction base="string">
-        <enumeration value="shell"/>
+        <enumeration value="mail"/>
       </restriction>
     </simpleType>
   </attribute>
   
-  <attribute name="resultVariable" type="string">
+  <attribute name="resultVariableName" type="string">
     <annotation>
       <documentation>
         Attribute on Service and Script Task corresponding with a process variable name.
@@ -249,26 +204,6 @@
         Allows to specify an expression on a service task, taskListener or executionListener
         that at runtime must resolve to an object that implements the corresponsing
         interface (JavaDelegate, ActivityBehavior, TaskListener, ExecutionListener, etc.)
-      </documentation>
-    </annotation>
-  </attribute>
-  
-  <attribute name="async" type="boolean">
-    <annotation>
-      <documentation>
-        The async attribute can be set on an activity (task, call activity or sub process) to let
-        the job executor handle the execution of the activity asynchronously. This provides ways
-        to define transaction boundaries for your process execution.
-      </documentation>
-    </annotation>
-  </attribute>
-  
-  <attribute name="exclusive" type="boolean">
-    <annotation>
-      <documentation>
-        Can be used in combination with an async value of true. By default exclusive is set to false
-        and the job executor can run multiple async tasks of the same process instance concurrently.
-        When exclusive is set to true, only one async task of the same process instance will be executed at a time.
       </documentation>
     </annotation>
   </attribute>
@@ -311,15 +246,6 @@
     </annotation>
   </attribute>
   
-  <attribute name="dueDate" type="tns:tExpression">
-    <annotation>
-      <documentation>
-        User Task attribute to set the task due date.
-        The expression should resolve to a value of typejava.util.Date.
-      </documentation>
-    </annotation>
-  </attribute>
-  
   <attribute name="candidateUsers">
     <annotation>
       <documentation>
@@ -342,36 +268,6 @@
     </annotation>
   </attribute>
 
-  <attribute name="candidateStarterUsers">
-    <annotation>
-      <documentation>
-        Process attribute to set the potential starts of a process.
-        Provided user(s) will be able to start the process.        
-        In case of multiple user ids, a comma-separated list must be provided.
-        Also supports expressions that evaluate to a String or Collection&lt;String&gt;.
-      </documentation>
-    </annotation>
-  </attribute>
-  
-  <attribute name="candidateStarterGroups">
-    <annotation>
-      <documentation>
-        Process attribute to set the potential starts of a process.
-        Provided group(s) will be able to start the process.        
-        In case of multiple group ids, a comma-separated list must be provided.
-        Also supports expressions that evaluate to a String or Collection&lt;String&gt;.
-      </documentation>
-    </annotation>
-  </attribute>
-  
-  <complexType name="tPotentialStarter">
-	<complexContent>
-		<extension base="sem:tHumanPerformer" />
-	</complexContent>
-  </complexType>
-  
-  <element name="potentialStarter" type="string" />
-  
   <element name="taskListener">
     <annotation>
       <documentation>
@@ -380,8 +276,8 @@
       </documentation>
     </annotation>
     <complexType>
-      <sequence>
-        <element ref="tns:field" minOccurs="0" maxOccurs="unbounded" />
+      <sequence minOccurs="0" maxOccurs="unbounded">
+        <element ref="tns:field" />
       </sequence>
       <attribute name="class" type="string">
         <annotation>
@@ -418,7 +314,6 @@
             <enumeration value="create" />
             <enumeration value="assignment" />
             <enumeration value="complete" />
-            <enumeration value="delete" />
           </restriction>
         </simpleType>
       </attribute>
@@ -433,8 +328,8 @@
       </documentation>
     </annotation>
     <complexType>
-      <sequence>
-        <element ref="tns:field" minOccurs="0" maxOccurs="unbounded"/>
+      <sequence minOccurs="0" maxOccurs="unbounded">
+        <element ref="tns:field" />
       </sequence>
       <attribute name="class" type="string">
         <annotation>
@@ -504,24 +399,5 @@
     </complexType>
   </element>
   
-  <attribute name="collection" type="string">
-    <annotation>
-      <documentation>
-        To be used on the multiInstanceLoopCharacteristics element, referencing a collection.
-        For each element in the collection, an instance will be created. Can be an expression 
-        or reference to a process variable.
-      </documentation>
-    </annotation>
-  </attribute>
-  
-  <attribute name="elementVariable" type="string">
-    <annotation>
-      <documentation>
-        To be used on the multiInstanceLoopCharacteristics element, used in conjunction with
-        the activiti:collection attribute. Denotes the name of the process variable that
-        will be set on each created instance, containing an element of the specified collection.
-      </documentation>
-    </annotation>
-  </attribute>
   
 </schema>
