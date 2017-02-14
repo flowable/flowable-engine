@@ -55,16 +55,16 @@ public class FormDeploymentResourceDataResource {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Indicates both form deployment and resource have been found and the resource data has been returned."),
       @ApiResponse(code = 404, message = "Indicates the requested form deployment was not found or there is no resource with the given id present in the form deployment. The status-description contains additional information.")})
-  @RequestMapping(value = "/form-repository/deployments/{deploymentId}/resourcedata/{resourceId}", method = RequestMethod.GET)
+  @RequestMapping(value = "/form-repository/deployments/{deploymentId}/resourcedata/{resourceName}", method = RequestMethod.GET)
   @ResponseBody
   public byte[] getFormDeploymentResource(@ApiParam(name = "deploymentId") @PathVariable("deploymentId") String deploymentId,
-                                          @ApiParam(name = "resourceId") @PathVariable("resourceId") String resourceId,
+                                          @ApiParam(name = "resourceName") @PathVariable("resourceName") String resourceName,
                                           HttpServletResponse response) {
     if (deploymentId == null) {
       throw new FlowableIllegalArgumentException("No deployment id provided");
     }
-    if (resourceId == null) {
-      throw new FlowableIllegalArgumentException("No resource id provided");
+    if (resourceName == null) {
+      throw new FlowableIllegalArgumentException("No resource name provided");
     }
 
     // Check if deployment exists
@@ -75,10 +75,10 @@ public class FormDeploymentResourceDataResource {
 
     List<String> resourceList = formRepositoryService.getDeploymentResourceNames(deploymentId);
 
-    if (resourceList.contains(resourceId)) {
-      final InputStream resourceStream = formRepositoryService.getResourceAsStream(deploymentId, resourceId);
+    if (resourceList.contains(resourceName)) {
+      final InputStream resourceStream = formRepositoryService.getResourceAsStream(deploymentId, resourceName);
 
-      String contentType = contentTypeResolver.resolveContentType(resourceId);
+      String contentType = contentTypeResolver.resolveContentType(resourceName);
       response.setContentType(contentType);
       try {
         return IOUtils.toByteArray(resourceStream);
@@ -87,7 +87,7 @@ public class FormDeploymentResourceDataResource {
       }
     } else {
       // Resource not found in deployment
-      throw new FlowableObjectNotFoundException("Could not find a resource with id '" + resourceId + "' in deployment '" + deploymentId);
+      throw new FlowableObjectNotFoundException("Could not find a resource with name '" + resourceName + "' in deployment '" + deploymentId);
     }
   }
 }

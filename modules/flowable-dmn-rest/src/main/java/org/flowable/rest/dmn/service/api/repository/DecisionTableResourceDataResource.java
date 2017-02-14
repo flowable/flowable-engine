@@ -24,6 +24,7 @@ import org.flowable.dmn.api.DmnDecisionTable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = { "Decision Tables" }, description = "Manage Decision Tables", authorizations = {@Authorization(value="basicAuth")})
 public class DecisionTableResourceDataResource extends BaseDecisionTableResource {
 
+  @ResponseBody
   @ApiOperation(value = "Get a decision table resource content", tags = {"Decision Tables"})
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Indicates both decision table and resource have been found and the resource data has been returned."),

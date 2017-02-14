@@ -80,7 +80,7 @@ public class DecisionTableCollectionResource {
       @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues ="name,id,key,category,deploymentId,version", paramType = "query"),
   })
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Indicates request was successful and the process-definitions are returned"),
+      @ApiResponse(code = 200, message = "Indicates request was successful and the decision tables are returned"),
       @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format or that latest is used with other parameters other than key and keyLike. The status-message contains additional information.")
   })
   @RequestMapping(value = "/dmn-repository/decision-tables", method = RequestMethod.GET, produces = "application/json")
