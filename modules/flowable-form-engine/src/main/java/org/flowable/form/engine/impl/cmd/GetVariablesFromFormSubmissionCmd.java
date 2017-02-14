@@ -137,14 +137,8 @@ public class GetVariablesFromFormSubmissionCmd implements Command<Map<String, Ob
     } else if (formField.getType().equals(FormFieldTypes.PEOPLE) || formField.getType().equals(FormFieldTypes.FUNCTIONAL_GROUP)) {
       if (formFieldValue instanceof Map<?, ?>) {
         Map<String, Object> value = (Map<String, Object>) formFieldValue;
-        Object id = value.get("id");
-        if (id instanceof Number) {
-          result = ((Number) id).longValue();
-          
-        } else {
-          // Wrong type, ignore
-          result = null;
-        }
+        result = value.get("id").toString();
+        
       } else {
         // Incorrect or empty map, ignore
         result = null;
