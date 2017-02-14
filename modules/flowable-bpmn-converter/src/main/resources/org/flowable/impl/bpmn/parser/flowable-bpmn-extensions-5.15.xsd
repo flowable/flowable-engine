@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema
   xmlns="http://www.w3.org/2001/XMLSchema"
-  targetNamespace="http://activiti.org/bpmn"
-  xmlns:tns="http://activiti.org/bpmn"
+  targetNamespace="http://flowable.org/bpmn"
+  xmlns:tns="http://flowable.org/bpmn"
   xmlns:sem="http://www.omg.org/spec/BPMN/20100524/MODEL"
   elementFormDefault="qualified">
   
@@ -618,12 +618,21 @@
       </documentation>
     </annotation>
   </attribute>
+  
+  <element name="mapException">
+    <annotation>
+      <documentation>
+        To be used on exception handling. All exceptions with given class will be handled as BpmnError with the given errorCode
+      </documentation>
+    </annotation>
+    <complexType>
+    	<sequence>
+    	   <element name="errorCode" type="string"/>
+    	   <element name="includeChildExceptions" type="boolean"/>
+    	</sequence>
+    </complexType>
+  </element>
+  
 
-    <attribute name="endDate" type="string">
-        <annotation>
-            <documentation>
-                To be used with in the timeCycle definition
-            </documentation>
-        </annotation>
-    </attribute>
+  
 </schema>

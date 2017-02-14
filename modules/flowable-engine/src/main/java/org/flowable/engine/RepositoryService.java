@@ -328,9 +328,7 @@ public interface RepositoryService {
    * 
    * @param processDefinitionId
    *          id of a {@link ProcessDefinition}, cannot be null.
-<<<<<<< HEAD:modules/flowable-engine/src/main/java/org/flowable/engine/RepositoryService.java
-   * @return Map with process element ids as keys and positions and dimensions as values;
-   *         null when the input stream of a process diagram is null.
+   * @return DiagramLayout instance containing diagram info, null when the input stream of a process diagram is null.
    * @throws FlowableObjectNotFoundException
    *        when the process model or diagram doesn't exist.
    */

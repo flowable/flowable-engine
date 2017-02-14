@@ -42,8 +42,7 @@ public class FormDefinitionDeploymentHelper  {
     Set<String> keySet = new LinkedHashSet<String>();
     for (FormDefinitionEntity form : forms) {
       if (keySet.contains(form.getKey())) {
-        throw new FlowableException(
-            "The deployment contains forms with the same key, this is not allowed");
+        throw new FlowableException("The deployment contains forms with the same key, this is not allowed");
       }
       keySet.add(form.getKey());
     }

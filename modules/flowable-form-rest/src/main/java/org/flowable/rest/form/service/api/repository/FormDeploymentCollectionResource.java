@@ -141,11 +141,11 @@ public class FormDeploymentCollectionResource {
     try {
       FormDeploymentBuilder deploymentBuilder = formRepositoryService.createDeployment();
       String fileName = file.getOriginalFilename();
-      if (StringUtils.isEmpty(fileName) || !(fileName.endsWith(".form") || fileName.endsWith(".xml"))) {
+      if (StringUtils.isEmpty(fileName) || !(fileName.endsWith(".form"))) {
         fileName = file.getName();
       }
 
-      if (fileName.endsWith(".form") || fileName.endsWith(".xml")) {
+      if (fileName.endsWith(".form")) {
         deploymentBuilder.addInputStream(fileName, file.getInputStream());
       } else {
         throw new FlowableIllegalArgumentException("File must be of type .xml or .form");

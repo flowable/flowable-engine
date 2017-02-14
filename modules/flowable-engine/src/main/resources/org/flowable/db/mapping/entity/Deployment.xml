@@ -12,7 +12,7 @@
   </insert>
 
   <insert id="bulkInsertDeployment" parameterType="java.util.List">
-    insert into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_)
+    insert into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, ENGINE_VERSION_)
     values
       <foreach collection="list" item="deployment" index="index" separator=",">
         (#{deployment.id, jdbcType=VARCHAR},
@@ -20,20 +20,22 @@
          #{deployment.category, jdbcType=VARCHAR},
          #{deployment.key, jdbcType=VARCHAR},
          #{deployment.tenantId, jdbcType=VARCHAR},
-         #{deployment.deploymentTime, jdbcType=TIMESTAMP})
+         #{deployment.deploymentTime, jdbcType=TIMESTAMP},
+         #{deployment.engineVersion, jdbcType=VARCHAR})
       </foreach>
   </insert>
 
   <insert id="bulkInsertDeployment" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL 
       <foreach collection="list" item="deployment" index="index">
-        into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_) VALUES 
+        into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, ENGINE_VERSION_) VALUES 
           (#{deployment.id, jdbcType=VARCHAR},
            #{deployment.name, jdbcType=VARCHAR},
            #{deployment.category, jdbcType=VARCHAR},
            #{deployment.key, jdbcType=VARCHAR},
            #{deployment.tenantId, jdbcType=VARCHAR},
-           #{deployment.deploymentTime, jdbcType=TIMESTAMP})
+           #{deployment.deploymentTime, jdbcType=TIMESTAMP},
+           #{deployment.engineVersion, jdbcType=VARCHAR})
       </foreach>
     SELECT * FROM dual
   </insert>
