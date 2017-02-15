@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/DMN/20151130" id="simple" name="Simple" namespace="http://activiti.org/dmn">
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="simple" name="Simple" namespace="http://activiti.org/dmn">
     <decision id="decision2" name="Simple decision 2">
         <decisionTable id="decisionTable2">
           <input>

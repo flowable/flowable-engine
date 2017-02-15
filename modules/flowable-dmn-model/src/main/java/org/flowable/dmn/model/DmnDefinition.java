@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class DmnDefinition extends NamedElement {
 
-    public static final String DMN_1_1 = "http://www.omg.org/spec/DMN/20151130";
+    public static final String DMN_1_1 = "http://www.omg.org/spec/DMN/20151101";
     protected String expressionLanguage;
     protected String typeLanguage;
     protected String namespace;

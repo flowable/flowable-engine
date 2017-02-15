@@ -1,4 +1,4 @@
-<definitions xmlns="http://www.omg.org/spec/DMN/20151130" id="definition_8002" name="OrderCalculation" namespace="http://www.activiti.org/dmn">
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="definition_8002" name="OrderCalculation" namespace="http://www.activiti.org/dmn">
   <decision id="OrderCalculation" name="OrderCalculation">
     <decisionTable id="decisionTable_8002" hitPolicy="FIRST">
       <input label="Order Size">
