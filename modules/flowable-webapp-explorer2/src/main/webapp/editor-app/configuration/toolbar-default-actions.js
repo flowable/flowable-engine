@@ -303,7 +303,7 @@ KISBPM.TOOLBAR = {
 activitiModule.controller('SaveModelCtrl',[ '$rootScope', '$scope', '$http', '$route', '$location','editorManager',
     function ($rootScope, $scope, $http, $route, $location,editorManager) {
 
-    var modelMetaData = editorManager.getModelMetaData();
+    var modelMetaData = editorManager.getBaseModelData();
 
     var description = '';
     if (modelMetaData.description) {
@@ -342,7 +342,7 @@ activitiModule.controller('SaveModelCtrl',[ '$rootScope', '$scope', '$http', '$r
         modelMetaData.name = $scope.saveDialog.name;
         modelMetaData.description = $scope.saveDialog.description;
 
-        var json = editorManager.saveAsJson();
+        var json = editorManager.getModel();
 
         var selection = editorManager.getSelection();
         editorManager.setSelection([]);
@@ -367,7 +367,7 @@ activitiModule.controller('SaveModelCtrl',[ '$rootScope', '$scope', '$http', '$r
         var svgDOM = DataManager.serialize(svgClone);
 
         var params = {
-            json_xml: editorManager.saveAsJson(),
+            json_xml: JSON.stringify(json),
             svg_xml: svgDOM,
             name: $scope.saveDialog.name,
             description: $scope.saveDialog.description

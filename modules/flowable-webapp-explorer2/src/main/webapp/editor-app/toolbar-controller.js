@@ -63,40 +63,50 @@ angular.module('activitiModeler')
         };
         
         /* Key bindings */
-        Mousetrap.bind(['command+z', 'ctrl+z'], function(e) {
+        Mousetrap.bind('mod+z', function(e) {
         	var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate,'editorManager' : editorManager};
         	KISBPM.TOOLBAR.ACTIONS.undo(services);
-            return false;
         });
         
-        Mousetrap.bind(['command+y', 'ctrl+y'], function(e) {
+        Mousetrap.bind('mod+y', function(e) {
         	var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate,'editorManager' : editorManager};
         	KISBPM.TOOLBAR.ACTIONS.redo(services);
-            return false;
         });
         
-        Mousetrap.bind(['command+c', 'ctrl+c'], function(e) {
+        Mousetrap.bind('mod+c', function(e) {
         	var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate,'editorManager' : editorManager};
         	KISBPM.TOOLBAR.ACTIONS.copy(services);
-            return false;
         });
         
-        Mousetrap.bind(['command+v', 'ctrl+v'], function(e) {
+        Mousetrap.bind('mod+v', function(e) {
         	var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate,'editorManager' : editorManager};
         	KISBPM.TOOLBAR.ACTIONS.paste(services);
-            return false;
         });
         
-        Mousetrap.bind(['del'], function(e) {
-        	var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate,'editorManager' : editorManager};
-        	KISBPM.TOOLBAR.ACTIONS.deleteItem(services);
-            return false;
+        Mousetrap.bind('del', function(e) {
+            console.log("testjueh");
+        	$scope.$apply(function(){
+                var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate,'editorManager' : editorManager};
+                KISBPM.TOOLBAR.ACTIONS.deleteItem(services);
+            });
         });
 
         /* Undo logic */
 
         $scope.undoStack = [];
         $scope.redoStack = [];
+
+        KISBPM.eventBus.addListener(KISBPM.eventBus.EVENT_TYPE_UNDO_REDO_RESET,function($scope){
+            this.undoStack = [];
+            this.redoStack = [];
+            for(var i = 0; i < this.items.length; i++)
+            {
+                var item = this.items[i];
+                if (item.action === 'KISBPM.TOOLBAR.ACTIONS.undo' || item.action === "KISBPM.TOOLBAR.ACTIONS.redo"){
+                    item.enabled = false;
+                }
+            }
+        },$scope);
 
         $scope.editorFactory.promise.then(function() {
 
@@ -127,7 +137,6 @@ angular.module('activitiModeler')
                 editorManager.updateSelection();
 
             });
-
         });
         
         // Handle enable/disable toolbar buttons 

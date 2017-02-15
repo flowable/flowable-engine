@@ -1,5 +1,6 @@
 /**
  * Created by Pardo David on 3/01/2017.
+ * For this service to work the user must call bootEditor method
  */
 angular.module("activitiModeler").factory("editorManager", ["$http", function ($http) {
     var editorManager = Class.create({
@@ -12,27 +13,18 @@ angular.module("activitiModeler").factory("editorManager", ["$http", function ($
                 "EventSubProcess": "event.subprocess.png"
             };
 
-            var self = this;
-            this.modelId = EDITOR.UTIL.getParameterByName('modelId');
-            //we first initialize the stencilset used by the editor. The editorId is always the modelId.
-            $http.get(KISBPM.URL.getStencilSet()).then(function (response) {
-                var baseUrl = "http://b3mn.org/stencilset/";
-                self.stencilData = jQuery.extend(true, {}, response.data); //we don't want a references!
-                var stencilSet = new ORYX.Core.StencilSet.StencilSet(baseUrl, response.data); //the stencilset alters the data ref!
-                ORYX.Core.StencilSet.loadStencilSet(baseUrl, stencilSet, self.modelId);
-                //after the stencilset is loaded we make sure the plugins.xml is loaded.
-                return $http.get(ORYX.CONFIG.PLUGINS_CONFIG);
-            }).then(function (response) {
-                ORYX._loadPlugins(response.data);
-                return $http.get(KISBPM.URL.getModel(self.modelId));
-            }).then(function (response) {
-                self.bootEditor(response);
-            }).catch(function (error) {
-                console.log("Problem officer " + error);
-            });
+            this.current = this.modelId;
+            this.loading = true;
         },
-        getModelId: function(){
-          return this.modelId;
+        getModelId: function () {
+            return this.modelId;
+        },
+        setModelId: function (modelId){
+            this.modelId = modelId;
+        },
+        setStencilData: function(stencilData){
+            //we don't want a references!
+            this.stencilData = jQuery.extend(true, {},stencilData);
         },
         getStencilData: function () {
             return this.stencilData;
@@ -74,7 +66,7 @@ angular.module("activitiModeler").factory("editorManager", ["$http", function ($
             return this.editor.getRules();
         },
         eventCoordinates: function (coordinates) {
-           return this.editor.eventCoordinates(coordinates);
+            return this.editor.eventCoordinates(coordinates);
         },
         eventCoordinatesXY: function (x, y) {
             return this.editor.eventCoordinatesXY(x, y);
@@ -89,67 +81,32 @@ angular.module("activitiModeler").factory("editorManager", ["$http", function ($
             return this.modelData;
         },
         edit: function (resourceId) {
-            //TODO: check if the resourceId match an editable thing.
-            //store the curent editor state
-            this.canvasTracker.set(this.current, this.editor.getSerializedJSON());
-            this.current = resourceId;
+            //Save the current canvas in the canvastracker if it is the root process.
+            this.syncCanvasTracker();
 
-            //check if there is already a model for the resource
-            var canvasModel = this.canvasTracker.get(resourceId);
-            if (!canvasModel) {
-                //TODO: fetch the name of the subprocess.
-                canvasModel = this.createModel(resourceId, "");
-            } else {
-                canvasModel = JSON.parse(canvasModel);
+            this.loading = true;
+
+            var shapes = this.getCanvas().getChildren();
+            shapes.each(function (shape) {
+                this.editor.deleteShape(shape);
+            }.bind(this));
+
+            shapes = this.canvasTracker.get(resourceId);
+            if(!shapes){
+                shapes = JSON.stringify([]);
             }
 
-            //clear the canvas.
-            var shapes = this.getCanvas().getChildShapes();
-            var editor = this.editor;
-            shapes.each(function (shape) {
-                editor.deleteShape(shape);
+            this.editor.loadSerialized({
+                childShapes: shapes
             });
-
-            this.editor.loadSerialized(canvasModel);
-            this.editor.setSelection([this.getCanvas()]);
-
 
             this.getCanvas().update();
 
+            this.current = resourceId;
+
+            this.loading = false;
             KISBPM.eventBus.dispatch("EDITORMANAGER-EDIT-ACTION", {});
-
-
-        },
-        createModel: function (modelId, name) {
-            if (!name || name.length === 0) {
-                name = "New subprocess";
-            }
-            var model = {
-                bounds: {
-                    lowerRight: {
-                        x: 1485.0,
-                        y: 700.0
-                    },
-                    upperLeft: {
-                        x: 0.0,
-                        y: 0.0
-                    }
-                },
-                resourceId: "canvas",
-                stencil: {
-                    id: "SubProcessDiagram"
-                },
-                stencilset: {
-                    namespace: "http://b3mn.org/stencilset/bpmn2.0#",
-                    url: "../editor/stencilsets/bpmn2.0/bpmn2.0.json"
-                },
-                properties: {
-                    process_id: modelId,
-                    name: name
-                }
-            }
-
-            return model;
+            KISBPM.eventBus.dispatch(KISBPM.eventBus.EVENT_TYPE_UNDO_REDO_RESET, {});
         },
         getTree: function () {
             //build a tree of all subprocesses and there children.
@@ -171,7 +128,6 @@ angular.module("activitiModeler").factory("editorManager", ["$http", function ($
                 var stencilId = childShape.stencil.id;
                 //we are currently only interested in the expanded subprocess and collapsed processes
                 if (stencilId && this.treeFilteredElements.indexOf(stencilId) > -1) {
-                    console.log(childShape.resourceId);
                     var child = new Hash();
                     child.set("name", childShape.properties.name || "No name provided");
                     child.set("id", childShape.resourceId);
@@ -186,8 +142,7 @@ angular.module("activitiModeler").factory("editorManager", ["$http", function ($
                         if (childShape.childShapes.length === 0) {
                             child.set("children", []);
                         } else {
-                            var collapsedSubprocessDiagram = childShape.childShapes[0];
-                            child.set("children", this._buildTreeChildren(collapsedSubprocessDiagram.childShapes));
+                            child.set("children", this._buildTreeChildren(childShape.childShapes));
                         }
                         child.set("editable", true);
                     } else {
@@ -200,68 +155,130 @@ angular.module("activitiModeler").factory("editorManager", ["$http", function ($
             }
             return children;
         },
-        syncCanvasTracker:function(){
-            this.canvasTracker.set(this.current, this.editor.getSerializedJSON());
+        syncCanvasTracker: function () {
+            var shapes = this.getCanvas().getChildren();
+            var jsonShapes = [];
+            shapes.each(function (shape) {
+                //toJson is an summary object but its not a json string.!!!!!
+                jsonShapes.push(shape.toJSON());
+            });
+            this.canvasTracker.set(this.current, JSON.stringify(jsonShapes));
         },
         getModel: function () {
             this.syncCanvasTracker();
 
-            var root = JSON.parse(this.canvasTracker.get(this.modelId));
-            //attach all subprocesses canvas as childshape
-            this._mergeCanvasToChild(root);
-            return root;
+            //this is an object.
+            var editorConfig = this.editor.getJSON();
+            var model = {
+                modelId: this.modelId,
+                bounds: editorConfig.bounds,
+                properties: editorConfig.properties,
+                childShapes: JSON.parse(this.canvasTracker.get(this.modelId)),
+                stencil: {
+                    id: "BPMNDiagram",
+                },
+                stencilset: {
+                    namespace: "http://b3mn.org/stencilset/bpmn2.0#",
+                    url: "../editor/stencilsets/bpmn2.0/bpmn2.0.json"
+                }
+            };
+
+            this._mergeCanvasToChild(model);
+
+            return model;
         },
         bootEditor: function (response) {
+            //TODO: populate the canvas with correct json sections.
+            //resetting the state
             this.canvasTracker = new Hash();
 
-            var config = jQuery.extend(true,{},response.data); //avoid a reference to the original object.
-            this.canvasTracker.set(config.modelId,JSON.stringify(config.model)); //this will be overwritten almost instantly.
-            this.findAndRegisterCanvas(config.model.childShapes);
+            var config = jQuery.extend(true, {}, response.data); //avoid a reference to the original object.
+            this.findAndRegisterCanvas(config.model.childShapes); //this will remove any childshapes of a collapseable subprocess.
+            this.canvasTracker.set(config.modelId, JSON.stringify(config.model.childShapes)); //this will be overwritten almost instantly.
 
-            //TODO: boot the editor.
             this.modelData = response.data;
             this.editor = new ORYX.Editor(config);
             this.current = this.editor.id;
+            this.loading = false;
 
             KISBPM.eventBus.editor = this.editor;
             KISBPM.eventBus.dispatch("ORYX-EDITOR-LOADED", {});
+            KISBPM.eventBus.dispatch(KISBPM.eventBus.EVENT_TYPE_EDITOR_READY, {});
         },
         findAndRegisterCanvas: function (childShapes) {
-              for(var i = 0; i < childShapes.length; i++){
-                  var childShape =  childShapes[i];
-                  if(childShape.stencil.id === "CollapsedSubProcess"){
-                      //TODO: at this point there is an edge case that there is no canvas child if the collapsed subprocess was never opened.
-                      var subChildShapes = childShape.childShapes;
-                      if( subChildShapes && subChildShapes.length === 1){
-                          this.canvasTracker.set(childShape.resourceId,JSON.stringify(subChildShapes[0]));
-                          //a canvas can't be nested as a child because the editor would crash on redundant information.
-                          childShape.childShapes = []; //reference to config will clear the value.
-                      }else{
-                          //the canvastracker will auto correct itself with a new canvasmodel see this.edit()...
-                      }
-                  }
-                  this.findAndRegisterCanvas(childShape.childShapes);
-              }
-        },
-        _mergeCanvasToChild: function (parent) {
-            for (var i = 0; i < parent.childShapes.length; i++) {
-                var childShape = parent.childShapes[i];
-                var tracked = this.canvasTracker.get(childShape.resourceId);
-                if (tracked) {
-                    tracked = JSON.parse(tracked);
-                    this._mergeCanvasToChild(tracked);
-                    childShape.childShapes.push(tracked);
+            for (var i = 0; i < childShapes.length; i++) {
+                var childShape = childShapes[i];
+                if (childShape.stencil.id === "CollapsedSubProcess") {
+                    if (childShape.childShapes.length > 0) {
+                        //the canvastracker will auto correct itself with a new canvasmodel see this.edit()...
+                        this.findAndRegisterCanvas(childShape.childShapes);
+                        //a canvas can't be nested as a child because the editor would crash on redundant information.
+                        this.canvasTracker.set(childShape.resourceId, JSON.stringify(childShape.childShapes));
+                        //reference to config will clear the value.
+                        childShape.childShapes = [];
+                    } else {
+                        this.canvasTracker.set(childShape.resourceId, '[]');
+                    }
                 }
             }
         },
-        saveAsJson: function () {
-            return JSON.stringify(this.getModel());
+        _mergeCanvasToChild: function (parent) {
+            for (var i = 0; i < parent.childShapes.length; i++) {
+                var childShape = parent.childShapes[i]
+                if(childShape.stencil.id === "CollapsedSubProcess"){
+                    console.log(childShape.resourceId + " " + parent.resourceId);
+                    var elements = this.canvasTracker.get(childShape.resourceId);
+                    if(elements){
+                        elements = JSON.parse(elements);
+                    }else{
+                        elements = [];
+                    }
+                    childShape.childShapes = elements;
+                    this._mergeCanvasToChild(childShape);
+                }else if(childShape.stencil.id === "SubProcess"){
+                    this._mergeCanvasToChild(childShape);
+                }else{
+                    //do nothing?
+                }
+            }
         },
-        dispatchOryxEvent: function(event){
+        dispatchOryxEvent: function (event) {
             KISBPM.eventBus.dispatchOryxEvent(event);
         },
-        getModelMetaData:function(){
-            return this.modelData;
+        isLoading: function(){
+            return this.loading;
+        },
+        navigateTo: function(resourceId){
+            //TODO: this could be improved by check if the resourceId is not equal to the current tracker...
+            this.syncCanvasTracker();
+            var found = false;
+            this.canvasTracker.each(function(pair){
+                var key = pair.key;
+                var children = JSON.parse(pair.value);
+                var targetable = this._findTarget(children,resourceId);
+                if(!found && targetable){
+                    this.edit(key);
+                    var activiti = this.getCanvas().getChildShapeByResourceId(targetable);
+                    this.setSelection([activiti],[],true);
+                    found = true;
+                }
+            },this);
+        },
+        _findTarget: function(children,resourceId){
+            for(var i =0; i < children.length; i++){
+                var child = children[i];
+                if(child.resourceId === resourceId){
+                    return child.resourceId;
+                }else if(child.properties && child.properties["overrideid"] === resourceId){
+                    return child.resourceId;
+                }else{
+                    var result = this._findTarget(child.childShapes,resourceId);
+                    if(result){
+                        return result;
+                    }
+                }
+            }
+            return false;
         }
     });
 

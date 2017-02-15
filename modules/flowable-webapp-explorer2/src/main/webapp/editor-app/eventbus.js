@@ -51,6 +51,8 @@ KISBPM.eventBus = {
     /** Event fired when the quick menu buttons should be hidden. */
     EVENT_TYPE_HIDE_SHAPE_BUTTONS: 'event-type-hide-shape-buttons',
 
+    EVENT_TYPE_UNDO_REDO_RESET : 'event-type-undo-redo-reset',
+
     /** A mapping for storing the listeners*/
     listeners: {},
 

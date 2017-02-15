@@ -1,5 +1,3 @@
-'use strict'
-
 angular.module('activitiModeler').controller('ProcessNavigatorController',['editorManager', '$scope',function(editorManager,$scope){
     //problem here the ORYX editor is bound to the rootscope. In theory this communication should be moved to a service.
 
@@ -36,10 +34,10 @@ angular.module('activitiModeler').controller('ProcessNavigatorController',['edit
         //console.log(event);
         //this event is fired when the user changes a property by the property editor.
         if(event.type === "event-type-property-value-changed"){
-           if(event.property.key === "oryx-overrideid" || event.property.key === "oryx-name"){
-               renderProcessHierarchy()
-           }
-       //this event is fired when the stencil / shape's text is changed / updated.
+            if(event.property.key === "oryx-overrideid" || event.property.key === "oryx-name"){
+                renderProcessHierarchy()
+            }
+            //this event is fired when the stencil / shape's text is changed / updated.
         }else if(event.type === "propertyChanged"){
             if(event.name === "oryx-overrideid" || event.name === "oryx-name"){
                 renderProcessHierarchy();
@@ -59,8 +57,13 @@ angular.module('activitiModeler').controller('ProcessNavigatorController',['edit
             return false;
         }
         console.log("rendering treeview")
+        if(!editorManager.isLoading()){
+            //the current implementation of has a lot of eventlisteners. when calling getTree() it could manipulate
+            //the canvastracker while the canvas is stille loading stuff.
+            //TODO: check if its possible to trigger the re-rendering by a single event instead of registering on 10 events...
+            $scope.treeview = editorManager.getTree();
+        }
 
-        $scope.treeview = editorManager.getTree();
     }
 
 }]);
