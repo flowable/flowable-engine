@@ -10,6 +10,4 @@ include::ch05-Deployment.adoc[]
 
 include::ch06-DMN-Introduction.adoc[]
 
-include::ch07-DMN-Constructs.adoc[]
-
-include::ch08-REST.adoc[]
+include::ch07-REST.adoc[]
