@@ -87,7 +87,7 @@ Quartz
 
 JSON
  * Location: http://www.JSON.org/java
- * Included in flowable-engine-<version>.jar in package org.flowable.engine.impl.json
+ * Included in flowable-engine-<version>.jar in package org.flowable.engine.impl.util.json
  * License:
 ===============================================================================
 Copyright (c) 2002 JSON.org
