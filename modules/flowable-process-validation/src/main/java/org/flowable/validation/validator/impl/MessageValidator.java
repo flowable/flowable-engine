@@ -26,20 +26,20 @@ import org.flowable.validation.validator.ValidatorImpl;
  */
 public class MessageValidator extends ValidatorImpl {
 
-  @Override
-  public void validate(BpmnModel bpmnModel, List<ValidationError> errors) {
-    if (bpmnModel.getMessages() != null && !bpmnModel.getMessages().isEmpty()) {
-      for (Message message : bpmnModel.getMessages()) {
+    @Override
+    public void validate(BpmnModel bpmnModel, List<ValidationError> errors) {
+        if (bpmnModel.getMessages() != null && !bpmnModel.getMessages().isEmpty()) {
+            for (Message message : bpmnModel.getMessages()) {
 
-        // Item ref
-        if (StringUtils.isNotEmpty(message.getItemRef())) {
-          if (!bpmnModel.getItemDefinitions().containsKey(message.getItemRef())) {
-            addError(errors, Problems.MESSAGE_INVALID_ITEM_REF, null, message, "Item reference is invalid: not found");
-          }
+                // Item ref
+                if (StringUtils.isNotEmpty(message.getItemRef())) {
+                    if (!bpmnModel.getItemDefinitions().containsKey(message.getItemRef())) {
+                        addError(errors, Problems.MESSAGE_INVALID_ITEM_REF, null, message, "Item reference is invalid: not found");
+                    }
+                }
+
+            }
         }
-
-      }
     }
-  }
 
 }

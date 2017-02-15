@@ -20,8 +20,8 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
  */
 public abstract class AbstractSimulationActivityBehavior implements ActivityBehavior {
 
-  public AbstractSimulationActivityBehavior() {
-  }
+    public AbstractSimulationActivityBehavior() {
+    }
 
-  public abstract void execute(DelegateExecution execution);
+    public abstract void execute(DelegateExecution execution);
 }

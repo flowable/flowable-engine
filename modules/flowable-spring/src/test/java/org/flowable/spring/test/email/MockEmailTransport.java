@@ -17,34 +17,34 @@ import org.slf4j.LoggerFactory;
  */
 public class MockEmailTransport extends Transport {
 
-  private static Logger logger = LoggerFactory.getLogger(MockEmailTransport.class);
+    private static Logger logger = LoggerFactory.getLogger(MockEmailTransport.class);
 
-  public MockEmailTransport(Session smtpSession, URLName urlName) {
-    super(smtpSession, urlName);
-  }
-
-  @Override
-  public void sendMessage(Message message, Address[] addresses) throws MessagingException {
-    try {
-      logger.info(message.getContent().toString());
-    } catch (IOException ex) {
-      logger.error("Error occurred while sending email", ex);
+    public MockEmailTransport(Session smtpSession, URLName urlName) {
+        super(smtpSession, urlName);
     }
-  }
 
-  @Override
-  public void connect() throws MessagingException {
-  }
+    @Override
+    public void sendMessage(Message message, Address[] addresses) throws MessagingException {
+        try {
+            logger.info(message.getContent().toString());
+        } catch (IOException ex) {
+            logger.error("Error occurred while sending email", ex);
+        }
+    }
 
-  @Override
-  public void connect(String host, int port, String username, String password) throws MessagingException {
-  }
+    @Override
+    public void connect() throws MessagingException {
+    }
 
-  @Override
-  public void connect(String host, String username, String password) throws MessagingException {
-  }
+    @Override
+    public void connect(String host, int port, String username, String password) throws MessagingException {
+    }
 
-  @Override
-  public void close() {
-  }
+    @Override
+    public void connect(String host, String username, String password) throws MessagingException {
+    }
+
+    @Override
+    public void close() {
+    }
 }

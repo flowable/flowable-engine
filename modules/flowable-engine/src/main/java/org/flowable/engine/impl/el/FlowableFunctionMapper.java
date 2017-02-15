@@ -27,24 +27,24 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
  * @author Tijs Rademakers
  */
 public class FlowableFunctionMapper extends FunctionMapper {
-  
-  protected ProcessEngineConfigurationImpl processEngineConfiguration;
-  
-  public FlowableFunctionMapper(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    this.processEngineConfiguration = processEngineConfiguration;
-  }
 
-  public Method resolveFunction(String prefix, String localName) {
-    List<FlowableFunctionDelegate> functionDelegates = processEngineConfiguration.getFlowableFunctionDelegates();
-    if (functionDelegates != null) {
-      for (FlowableFunctionDelegate functionDelegate : functionDelegates) {
-        if (functionDelegate.prefix().equals(prefix) && functionDelegate.localName().equals(localName)) {
-          return functionDelegate.functionMethod();
-        }
-      }
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
+
+    public FlowableFunctionMapper(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        this.processEngineConfiguration = processEngineConfiguration;
     }
-    
-    return null;
-  }
+
+    public Method resolveFunction(String prefix, String localName) {
+        List<FlowableFunctionDelegate> functionDelegates = processEngineConfiguration.getFlowableFunctionDelegates();
+        if (functionDelegates != null) {
+            for (FlowableFunctionDelegate functionDelegate : functionDelegates) {
+                if (functionDelegate.prefix().equals(prefix) && functionDelegate.localName().equals(localName)) {
+                    return functionDelegate.functionMethod();
+                }
+            }
+        }
+
+        return null;
+    }
 
 }

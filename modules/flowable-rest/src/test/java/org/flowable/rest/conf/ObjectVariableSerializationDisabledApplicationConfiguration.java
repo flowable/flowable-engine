@@ -26,10 +26,8 @@ import org.springframework.context.annotation.PropertySources;
         "org.flowable.rest.conf.engine"
 })
 @PropertySources({
-	@PropertySource(value = "classpath:disable-object-variable-serialization.properties", ignoreResourceNotFound = false)
+        @PropertySource(value = "classpath:disable-object-variable-serialization.properties", ignoreResourceNotFound = false)
 })
 public class ObjectVariableSerializationDisabledApplicationConfiguration {
-	
-	
 
 }

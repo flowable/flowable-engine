@@ -21,14 +21,14 @@ import org.flowable.idm.api.User;
  */
 public interface PersistentTokenService {
 
-  Token getPersistentToken(String tokenId);
+    Token getPersistentToken(String tokenId);
 
-  Token getPersistentToken(String tokenId, boolean invalidateCacheEntry);
+    Token getPersistentToken(String tokenId, boolean invalidateCacheEntry);
 
-  Token saveAndFlush(Token persistentToken);
+    Token saveAndFlush(Token persistentToken);
 
-  void delete(Token persistentToken);
+    void delete(Token persistentToken);
 
-  public Token createToken(User user, String remoteAddress, String userAgent);
+    public Token createToken(User user, String remoteAddress, String userAgent);
 
 }

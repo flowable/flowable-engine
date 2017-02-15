@@ -26,18 +26,18 @@ import org.flowable.engine.impl.history.HistoryLevel;
  */
 public class MyTransactionalOperationTransactionDependentExecutionListener extends CurrentActivityTransactionDependentExecutionListener {
 
-  @Override
-  public void notify(String processInstanceId, String executionId, FlowElement currentFlowElement,
-                     Map<String, Object> executionVariables, Map<String, Object> customPropertiesMap) {
-    
-    super.notify(processInstanceId, executionId, currentFlowElement, executionVariables, customPropertiesMap);
+    @Override
+    public void notify(String processInstanceId, String executionId, FlowElement currentFlowElement,
+            Map<String, Object> executionVariables, Map<String, Object> customPropertiesMap) {
 
-    if (Context.getCommandContext().getProcessEngineConfiguration().getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-      HistoryService historyService = Context.getCommandContext().getProcessEngineConfiguration().getHistoryService();
-  
-      // delete first historic instance
-      List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
-      historyService.deleteHistoricProcessInstance(historicProcessInstances.get(0).getId());
+        super.notify(processInstanceId, executionId, currentFlowElement, executionVariables, customPropertiesMap);
+
+        if (Context.getCommandContext().getProcessEngineConfiguration().getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoryService historyService = Context.getCommandContext().getProcessEngineConfiguration().getHistoryService();
+
+            // delete first historic instance
+            List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
+            historyService.deleteHistoricProcessInstance(historicProcessInstances.get(0).getId());
+        }
     }
-  }
 }

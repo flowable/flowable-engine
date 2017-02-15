@@ -30,18 +30,18 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Decision Tables" }, description = "Manage Decision Tables", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Decision Tables" }, description = "Manage Decision Tables", authorizations = { @Authorization(value = "basicAuth") })
 public class DecisionTableResource extends BaseDecisionTableResource {
 
-  @ApiOperation(value = "Get a decision table", tags = {"Decision Tables"})
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Indicates request was successful and the decision table is returned"),
-      @ApiResponse(code = 404, message = "Indicates the requested decision table was not found.")
-  })
-  @RequestMapping(value = "/dmn-repository/decision-tables/{decisionTableId}", method = RequestMethod.GET, produces = "application/json")
-  public DecisionTableResponse getDecisionTable(@ApiParam(name = "decisionTableId") @PathVariable String decisionTableId, HttpServletRequest request) {
-    DmnDecisionTable decisionTable = geDecisionTableFromRequest(decisionTableId);
+    @ApiOperation(value = "Get a decision table", tags = { "Decision Tables" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates request was successful and the decision table is returned"),
+            @ApiResponse(code = 404, message = "Indicates the requested decision table was not found.")
+    })
+    @RequestMapping(value = "/dmn-repository/decision-tables/{decisionTableId}", method = RequestMethod.GET, produces = "application/json")
+    public DecisionTableResponse getDecisionTable(@ApiParam(name = "decisionTableId") @PathVariable String decisionTableId, HttpServletRequest request) {
+        DmnDecisionTable decisionTable = geDecisionTableFromRequest(decisionTableId);
 
-    return dmnRestResponseFactory.createDecisionTableResponse(decisionTable);
-  }
+        return dmnRestResponseFactory.createDecisionTableResponse(decisionTable);
+    }
 }

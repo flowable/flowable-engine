@@ -23,30 +23,30 @@ import org.flowable.engine.repository.DeploymentProperties;
  * @author Joram Barrez
  */
 public class CustomDeploymentCacheTest extends ResourceFlowableTestCase {
-  
-  public CustomDeploymentCacheTest() {
-    super("org/activiti/standalone/deploy/custom.deployment.cache.test.flowable.cfg.xml");
-  }
-  
-  public void testCustomDeploymentCacheUsed() {
-    ProcessEngineConfigurationImpl activiti5Config = (ProcessEngineConfigurationImpl) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
-    CustomDeploymentCache customCache = (CustomDeploymentCache) activiti5Config.getProcessDefinitionCache();
-    assertNull(customCache.getCachedProcessDefinition());
 
-    String processDefinitionTemplate = DeploymentCacheTestUtil.readTemplateFile("/org/activiti/standalone/deploy/deploymentCacheTest.bpmn20.xml");
-    for (int i = 1; i <= 5; i++) {
-      repositoryService.createDeployment()
-              .addString("Process " + i + ".bpmn20.xml", MessageFormat.format(processDefinitionTemplate, i))
-              .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
-              .deploy();
-      
-      assertNotNull(customCache.getCachedProcessDefinition());
+    public CustomDeploymentCacheTest() {
+        super("org/activiti/standalone/deploy/custom.deployment.cache.test.flowable.cfg.xml");
     }
-    
-    // Cleanup
-    for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
-      repositoryService.deleteDeployment(deployment.getId(), true);
+
+    public void testCustomDeploymentCacheUsed() {
+        ProcessEngineConfigurationImpl activiti5Config = (ProcessEngineConfigurationImpl) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
+        CustomDeploymentCache customCache = (CustomDeploymentCache) activiti5Config.getProcessDefinitionCache();
+        assertNull(customCache.getCachedProcessDefinition());
+
+        String processDefinitionTemplate = DeploymentCacheTestUtil.readTemplateFile("/org/activiti/standalone/deploy/deploymentCacheTest.bpmn20.xml");
+        for (int i = 1; i <= 5; i++) {
+            repositoryService.createDeployment()
+                    .addString("Process " + i + ".bpmn20.xml", MessageFormat.format(processDefinitionTemplate, i))
+                    .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
+                    .deploy();
+
+            assertNotNull(customCache.getCachedProcessDefinition());
+        }
+
+        // Cleanup
+        for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+            repositoryService.deleteDeployment(deployment.getId(), true);
+        }
     }
-  }
-  
+
 }

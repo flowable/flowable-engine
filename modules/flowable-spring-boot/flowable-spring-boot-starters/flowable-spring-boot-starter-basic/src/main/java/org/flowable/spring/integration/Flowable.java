@@ -25,32 +25,28 @@ import org.springframework.messaging.MessagingException;
 public class Flowable {
 
     /**
-     * This is the component that you'll use in your Spring Integration
-     * {@link org.springframework.integration.dsl.IntegrationFlow}.
+     * This is the component that you'll use in your Spring Integration {@link org.springframework.integration.dsl.IntegrationFlow}.
      */
     public static FlowableInboundGateway inboundGateway(ProcessEngine processEngine, String... varsToPreserve) {
         return new FlowableInboundGateway(processEngine, varsToPreserve);
     }
 
     /**
-     * This is the bean to expose and then reference
-     * from your Flowable BPMN flow in an expression.
+     * This is the bean to expose and then reference from your Flowable BPMN flow in an expression.
      */
     public static IntegrationActivityBehavior inboundGatewayActivityBehavior(FlowableInboundGateway gateway) {
         return new IntegrationActivityBehavior(gateway);
     }
 
     /**
-     * Any message that enters this {@link org.springframework.messaging.MessageHandler}
-     * containing a {@code executionId} parameter will trigger a
+     * Any message that enters this {@link org.springframework.messaging.MessageHandler} containing a {@code executionId} parameter will trigger a
      * {@link org.flowable.engine.RuntimeService#signal(String)}.
      */
     public static MessageHandler signallingMessageHandler(final ProcessEngine processEngine) {
         return new MessageHandler() {
             @Override
             public void handleMessage(Message<?> message) throws MessagingException {
-                String executionId = message.getHeaders().containsKey("executionId") ?
-                        (String) message.getHeaders().get("executionId") : (String) null;
+                String executionId = message.getHeaders().containsKey("executionId") ? (String) message.getHeaders().get("executionId") : (String) null;
 
                 if (null != executionId)
                     processEngine.getRuntimeService().trigger(executionId);

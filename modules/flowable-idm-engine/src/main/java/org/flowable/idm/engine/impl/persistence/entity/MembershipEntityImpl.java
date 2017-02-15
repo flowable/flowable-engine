@@ -20,43 +20,43 @@ import java.io.Serializable;
  */
 public class MembershipEntityImpl extends AbstractEntityNoRevision implements MembershipEntity, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String userId;
-  protected String groupId;
-  
-  public MembershipEntityImpl() {
-    
-  }
+    protected String userId;
+    protected String groupId;
 
-  public Object getPersistentState() {
-    // membership is not updatable
-    return MembershipEntityImpl.class;
-  }
+    public MembershipEntityImpl() {
 
-  public String getId() {
-    // membership doesn't have an id
-    return null;
-  }
+    }
 
-  public void setId(String id) {
-    // membership doesn't have an id
-  }
-  
-  public String getUserId() {
-    return userId;
-  }
+    public Object getPersistentState() {
+        // membership is not updatable
+        return MembershipEntityImpl.class;
+    }
 
-  public void setUserId(String userId) {
-    this.userId = userId;
-  }
+    public String getId() {
+        // membership doesn't have an id
+        return null;
+    }
 
-  public String getGroupId() {
-    return groupId;
-  }
+    public void setId(String id) {
+        // membership doesn't have an id
+    }
 
-  public void setGroupId(String groupId) {
-    this.groupId = groupId;
-  }
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
 
 }

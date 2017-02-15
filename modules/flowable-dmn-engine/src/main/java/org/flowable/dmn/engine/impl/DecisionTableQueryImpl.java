@@ -29,356 +29,356 @@ import org.flowable.engine.common.impl.Page;
  */
 public class DecisionTableQueryImpl extends AbstractQuery<DmnDecisionTableQuery, DmnDecisionTable> implements DmnDecisionTableQuery {
 
-  private static final long serialVersionUID = 1L;
-  protected String id;
-  protected Set<String> ids;
-  protected String category;
-  protected String categoryLike;
-  protected String categoryNotEquals;
-  protected String name;
-  protected String nameLike;
-  protected String deploymentId;
-  protected Set<String> deploymentIds;
-  protected String parentDeploymentId;
-  protected String parentDeploymentIdLike;
-  protected String key;
-  protected String keyLike;
-  protected String resourceName;
-  protected String resourceNameLike;
-  protected Integer version;
-  protected Integer versionGt;
-  protected Integer versionGte;
-  protected Integer versionLt;
-  protected Integer versionLte;
-  protected boolean latest;
-  protected String decisionTableId;
-  protected String tenantId;
-  protected String tenantIdLike;
-  protected boolean withoutTenantId;
+    private static final long serialVersionUID = 1L;
+    protected String id;
+    protected Set<String> ids;
+    protected String category;
+    protected String categoryLike;
+    protected String categoryNotEquals;
+    protected String name;
+    protected String nameLike;
+    protected String deploymentId;
+    protected Set<String> deploymentIds;
+    protected String parentDeploymentId;
+    protected String parentDeploymentIdLike;
+    protected String key;
+    protected String keyLike;
+    protected String resourceName;
+    protected String resourceNameLike;
+    protected Integer version;
+    protected Integer versionGt;
+    protected Integer versionGte;
+    protected Integer versionLt;
+    protected Integer versionLte;
+    protected boolean latest;
+    protected String decisionTableId;
+    protected String tenantId;
+    protected String tenantIdLike;
+    protected boolean withoutTenantId;
 
-  public DecisionTableQueryImpl() {
-  }
-
-  public DecisionTableQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
-  public DecisionTableQueryImpl(CommandExecutor commandExecutor) {
-    super(commandExecutor);
-  }
-
-  public DecisionTableQueryImpl decisionTableId(String decisionTableId) {
-    this.id = decisionTableId;
-    return this;
-  }
-  
-  @Override
-  public DmnDecisionTableQuery decisionTableIds(Set<String> decisionTableIds) {
-  	this.ids = decisionTableIds;
-  	return this;
-  }
-  
-  public DecisionTableQueryImpl decisionTableCategory(String category) {
-    if (category == null) {
-      throw new FlowableIllegalArgumentException("category is null");
+    public DecisionTableQueryImpl() {
     }
-    this.category = category;
-    return this;
-  }
 
-  public DecisionTableQueryImpl decisionTableCategoryLike(String categoryLike) {
-    if (categoryLike == null) {
-      throw new FlowableIllegalArgumentException("categoryLike is null");
+    public DecisionTableQueryImpl(CommandContext commandContext) {
+        super(commandContext);
     }
-    this.categoryLike = categoryLike;
-    return this;
-  }
 
-  public DecisionTableQueryImpl decisionTableCategoryNotEquals(String categoryNotEquals) {
-    if (categoryNotEquals == null) {
-      throw new FlowableIllegalArgumentException("categoryNotEquals is null");
+    public DecisionTableQueryImpl(CommandExecutor commandExecutor) {
+        super(commandExecutor);
     }
-    this.categoryNotEquals = categoryNotEquals;
-    return this;
-  }
 
-  public DecisionTableQueryImpl decisionTableName(String name) {
-    if (name == null) {
-      throw new FlowableIllegalArgumentException("name is null");
+    public DecisionTableQueryImpl decisionTableId(String decisionTableId) {
+        this.id = decisionTableId;
+        return this;
     }
-    this.name = name;
-    return this;
-  }
 
-  public DecisionTableQueryImpl decisionTableNameLike(String nameLike) {
-    if (nameLike == null) {
-      throw new FlowableIllegalArgumentException("nameLike is null");
+    @Override
+    public DmnDecisionTableQuery decisionTableIds(Set<String> decisionTableIds) {
+        this.ids = decisionTableIds;
+        return this;
     }
-    this.nameLike = nameLike;
-    return this;
-  }
 
-  public DecisionTableQueryImpl deploymentId(String deploymentId) {
-    if (deploymentId == null) {
-      throw new FlowableIllegalArgumentException("id is null");
+    public DecisionTableQueryImpl decisionTableCategory(String category) {
+        if (category == null) {
+            throw new FlowableIllegalArgumentException("category is null");
+        }
+        this.category = category;
+        return this;
     }
-    this.deploymentId = deploymentId;
-    return this;
-  }
 
-  public DecisionTableQueryImpl deploymentIds(Set<String> deploymentIds) {
-    if (deploymentIds == null) {
-      throw new FlowableIllegalArgumentException("ids are null");
+    public DecisionTableQueryImpl decisionTableCategoryLike(String categoryLike) {
+        if (categoryLike == null) {
+            throw new FlowableIllegalArgumentException("categoryLike is null");
+        }
+        this.categoryLike = categoryLike;
+        return this;
     }
-    this.deploymentIds = deploymentIds;
-    return this;
-  }
-  
-  public DecisionTableQueryImpl parentDeploymentId(String parentDeploymentId) {
-    if (parentDeploymentId == null) {
-      throw new FlowableIllegalArgumentException("parentDeploymentId is null");
+
+    public DecisionTableQueryImpl decisionTableCategoryNotEquals(String categoryNotEquals) {
+        if (categoryNotEquals == null) {
+            throw new FlowableIllegalArgumentException("categoryNotEquals is null");
+        }
+        this.categoryNotEquals = categoryNotEquals;
+        return this;
     }
-    this.parentDeploymentId = parentDeploymentId;
-    return this;
-  }
-  
-  public DecisionTableQueryImpl parentDeploymentIdLike(String parentDeploymentIdLike) {
-    if (parentDeploymentIdLike == null) {
-      throw new FlowableIllegalArgumentException("parentDeploymentIdLike is null");
+
+    public DecisionTableQueryImpl decisionTableName(String name) {
+        if (name == null) {
+            throw new FlowableIllegalArgumentException("name is null");
+        }
+        this.name = name;
+        return this;
     }
-    this.parentDeploymentIdLike = parentDeploymentIdLike;
-    return this;
-  }
 
-  public DecisionTableQueryImpl decisionTableKey(String key) {
-    if (key == null) {
-      throw new FlowableIllegalArgumentException("key is null");
+    public DecisionTableQueryImpl decisionTableNameLike(String nameLike) {
+        if (nameLike == null) {
+            throw new FlowableIllegalArgumentException("nameLike is null");
+        }
+        this.nameLike = nameLike;
+        return this;
     }
-    this.key = key;
-    return this;
-  }
 
-  public DecisionTableQueryImpl decisionTableKeyLike(String keyLike) {
-    if (keyLike == null) {
-      throw new FlowableIllegalArgumentException("keyLike is null");
+    public DecisionTableQueryImpl deploymentId(String deploymentId) {
+        if (deploymentId == null) {
+            throw new FlowableIllegalArgumentException("id is null");
+        }
+        this.deploymentId = deploymentId;
+        return this;
     }
-    this.keyLike = keyLike;
-    return this;
-  }
 
-  public DecisionTableQueryImpl decisionTableResourceName(String resourceName) {
-    if (resourceName == null) {
-      throw new FlowableIllegalArgumentException("resourceName is null");
+    public DecisionTableQueryImpl deploymentIds(Set<String> deploymentIds) {
+        if (deploymentIds == null) {
+            throw new FlowableIllegalArgumentException("ids are null");
+        }
+        this.deploymentIds = deploymentIds;
+        return this;
     }
-    this.resourceName = resourceName;
-    return this;
-  }
 
-  public DecisionTableQueryImpl decisionTableResourceNameLike(String resourceNameLike) {
-    if (resourceNameLike == null) {
-      throw new FlowableIllegalArgumentException("resourceNameLike is null");
+    public DecisionTableQueryImpl parentDeploymentId(String parentDeploymentId) {
+        if (parentDeploymentId == null) {
+            throw new FlowableIllegalArgumentException("parentDeploymentId is null");
+        }
+        this.parentDeploymentId = parentDeploymentId;
+        return this;
     }
-    this.resourceNameLike = resourceNameLike;
-    return this;
-  }
 
-  public DecisionTableQueryImpl decisionTableVersion(Integer version) {
-    checkVersion(version);
-    this.version = version;
-    return this;
-  }
-
-  public DmnDecisionTableQuery decisionTableVersionGreaterThan(Integer decisionTableVersion) {
-    checkVersion(decisionTableVersion);
-    this.versionGt = decisionTableVersion;
-    return this;
-  }
-
-  public DmnDecisionTableQuery decisionTableVersionGreaterThanOrEquals(Integer decisionTableVersion) {
-    checkVersion(decisionTableVersion);
-    this.versionGte = decisionTableVersion;
-    return this;
-  }
-
-  public DmnDecisionTableQuery decisionTableVersionLowerThan(Integer decisionTableVersion) {
-    checkVersion(decisionTableVersion);
-    this.versionLt = decisionTableVersion;
-    return this;
-  }
-
-  public DmnDecisionTableQuery decisionTableVersionLowerThanOrEquals(Integer decisionTableVersion) {
-    checkVersion(decisionTableVersion);
-    this.versionLte = decisionTableVersion;
-    return this;
-  }
-  
-  protected void checkVersion(Integer version) {
-    if (version == null) {
-      throw new FlowableIllegalArgumentException("version is null");
-    } else if (version <= 0) {
-      throw new FlowableIllegalArgumentException("version must be positive");
+    public DecisionTableQueryImpl parentDeploymentIdLike(String parentDeploymentIdLike) {
+        if (parentDeploymentIdLike == null) {
+            throw new FlowableIllegalArgumentException("parentDeploymentIdLike is null");
+        }
+        this.parentDeploymentIdLike = parentDeploymentIdLike;
+        return this;
     }
-  }
 
-  public DecisionTableQueryImpl latestVersion() {
-    this.latest = true;
-    return this;
-  }
-
-  public DmnDecisionTableQuery decisionTableTenantId(String tenantId) {
-    if (tenantId == null) {
-      throw new FlowableIllegalArgumentException("decision table tenantId is null");
+    public DecisionTableQueryImpl decisionTableKey(String key) {
+        if (key == null) {
+            throw new FlowableIllegalArgumentException("key is null");
+        }
+        this.key = key;
+        return this;
     }
-    this.tenantId = tenantId;
-    return this;
-  }
 
-  public DmnDecisionTableQuery decisionTableTenantIdLike(String tenantIdLike) {
-    if (tenantIdLike == null) {
-      throw new FlowableIllegalArgumentException("decision table tenantId is null");
+    public DecisionTableQueryImpl decisionTableKeyLike(String keyLike) {
+        if (keyLike == null) {
+            throw new FlowableIllegalArgumentException("keyLike is null");
+        }
+        this.keyLike = keyLike;
+        return this;
     }
-    this.tenantIdLike = tenantIdLike;
-    return this;
-  }
 
-  public DmnDecisionTableQuery decisionTableWithoutTenantId() {
-    this.withoutTenantId = true;
-    return this;
-  }
+    public DecisionTableQueryImpl decisionTableResourceName(String resourceName) {
+        if (resourceName == null) {
+            throw new FlowableIllegalArgumentException("resourceName is null");
+        }
+        this.resourceName = resourceName;
+        return this;
+    }
 
-  // sorting ////////////////////////////////////////////
+    public DecisionTableQueryImpl decisionTableResourceNameLike(String resourceNameLike) {
+        if (resourceNameLike == null) {
+            throw new FlowableIllegalArgumentException("resourceNameLike is null");
+        }
+        this.resourceNameLike = resourceNameLike;
+        return this;
+    }
 
-  public DmnDecisionTableQuery orderByDeploymentId() {
-    return orderBy(DecisionTableQueryProperty.DEPLOYMENT_ID);
-  }
+    public DecisionTableQueryImpl decisionTableVersion(Integer version) {
+        checkVersion(version);
+        this.version = version;
+        return this;
+    }
 
-  public DmnDecisionTableQuery orderByDecisionTableKey() {
-    return orderBy(DecisionTableQueryProperty.DECISION_TABLE_KEY);
-  }
+    public DmnDecisionTableQuery decisionTableVersionGreaterThan(Integer decisionTableVersion) {
+        checkVersion(decisionTableVersion);
+        this.versionGt = decisionTableVersion;
+        return this;
+    }
 
-  public DmnDecisionTableQuery orderByDecisionTableCategory() {
-    return orderBy(DecisionTableQueryProperty.DECISION_TABLE_CATEGORY);
-  }
+    public DmnDecisionTableQuery decisionTableVersionGreaterThanOrEquals(Integer decisionTableVersion) {
+        checkVersion(decisionTableVersion);
+        this.versionGte = decisionTableVersion;
+        return this;
+    }
 
-  public DmnDecisionTableQuery orderByDecisionTableId() {
-    return orderBy(DecisionTableQueryProperty.DECISION_TABLE_ID);
-  }
+    public DmnDecisionTableQuery decisionTableVersionLowerThan(Integer decisionTableVersion) {
+        checkVersion(decisionTableVersion);
+        this.versionLt = decisionTableVersion;
+        return this;
+    }
 
-  public DmnDecisionTableQuery orderByDecisionTableVersion() {
-    return orderBy(DecisionTableQueryProperty.DECISION_TABLE_VERSION);
-  }
+    public DmnDecisionTableQuery decisionTableVersionLowerThanOrEquals(Integer decisionTableVersion) {
+        checkVersion(decisionTableVersion);
+        this.versionLte = decisionTableVersion;
+        return this;
+    }
 
-  public DmnDecisionTableQuery orderByDecisionTableName() {
-    return orderBy(DecisionTableQueryProperty.DECISION_TABLE_NAME);
-  }
+    protected void checkVersion(Integer version) {
+        if (version == null) {
+            throw new FlowableIllegalArgumentException("version is null");
+        } else if (version <= 0) {
+            throw new FlowableIllegalArgumentException("version must be positive");
+        }
+    }
 
-  public DmnDecisionTableQuery orderByTenantId() {
-    return orderBy(DecisionTableQueryProperty.DECISION_TABLE_TENANT_ID);
-  }
+    public DecisionTableQueryImpl latestVersion() {
+        this.latest = true;
+        return this;
+    }
 
-  // results ////////////////////////////////////////////
+    public DmnDecisionTableQuery decisionTableTenantId(String tenantId) {
+        if (tenantId == null) {
+            throw new FlowableIllegalArgumentException("decision table tenantId is null");
+        }
+        this.tenantId = tenantId;
+        return this;
+    }
 
-  public long executeCount(CommandContext commandContext) {
-    checkQueryOk();
-    return commandContext.getDecisionTableEntityManager().findDecisionTableCountByQueryCriteria(this);
-  }
+    public DmnDecisionTableQuery decisionTableTenantIdLike(String tenantIdLike) {
+        if (tenantIdLike == null) {
+            throw new FlowableIllegalArgumentException("decision table tenantId is null");
+        }
+        this.tenantIdLike = tenantIdLike;
+        return this;
+    }
 
-  public List<DmnDecisionTable> executeList(CommandContext commandContext, Page page) {
-    checkQueryOk();
-    return commandContext.getDecisionTableEntityManager().findDecisionTablesByQueryCriteria(this, page);
-  }
+    public DmnDecisionTableQuery decisionTableWithoutTenantId() {
+        this.withoutTenantId = true;
+        return this;
+    }
 
-  public void checkQueryOk() {
-    super.checkQueryOk();
-  }
+    // sorting ////////////////////////////////////////////
 
-  // getters ////////////////////////////////////////////
+    public DmnDecisionTableQuery orderByDeploymentId() {
+        return orderBy(DecisionTableQueryProperty.DEPLOYMENT_ID);
+    }
 
-  public String getDeploymentId() {
-    return deploymentId;
-  }
+    public DmnDecisionTableQuery orderByDecisionTableKey() {
+        return orderBy(DecisionTableQueryProperty.DECISION_TABLE_KEY);
+    }
 
-  public Set<String> getDeploymentIds() {
-    return deploymentIds;
-  }
+    public DmnDecisionTableQuery orderByDecisionTableCategory() {
+        return orderBy(DecisionTableQueryProperty.DECISION_TABLE_CATEGORY);
+    }
 
-  public String getId() {
-    return id;
-  }
+    public DmnDecisionTableQuery orderByDecisionTableId() {
+        return orderBy(DecisionTableQueryProperty.DECISION_TABLE_ID);
+    }
 
-  public Set<String> getIds() {
-    return ids;
-  }
+    public DmnDecisionTableQuery orderByDecisionTableVersion() {
+        return orderBy(DecisionTableQueryProperty.DECISION_TABLE_VERSION);
+    }
 
-  public String getName() {
-    return name;
-  }
+    public DmnDecisionTableQuery orderByDecisionTableName() {
+        return orderBy(DecisionTableQueryProperty.DECISION_TABLE_NAME);
+    }
 
-  public String getNameLike() {
-    return nameLike;
-  }
+    public DmnDecisionTableQuery orderByTenantId() {
+        return orderBy(DecisionTableQueryProperty.DECISION_TABLE_TENANT_ID);
+    }
 
-  public String getKey() {
-    return key;
-  }
+    // results ////////////////////////////////////////////
 
-  public String getKeyLike() {
-    return keyLike;
-  }
+    public long executeCount(CommandContext commandContext) {
+        checkQueryOk();
+        return commandContext.getDecisionTableEntityManager().findDecisionTableCountByQueryCriteria(this);
+    }
 
-  public Integer getVersion() {
-    return version;
-  }
-  
-  public Integer getVersionGt() {
-    return versionGt;
-  }
-  
-  public Integer getVersionGte() {
-    return versionGte;
-  }
-  
-  public Integer getVersionLt() {
-    return versionLt;
-  }
-  
-  public Integer getVersionLte() {
-    return versionLte;
-  }
+    public List<DmnDecisionTable> executeList(CommandContext commandContext, Page page) {
+        checkQueryOk();
+        return commandContext.getDecisionTableEntityManager().findDecisionTablesByQueryCriteria(this, page);
+    }
 
-  public boolean isLatest() {
-    return latest;
-  }
+    public void checkQueryOk() {
+        super.checkQueryOk();
+    }
 
-  public String getCategory() {
-    return category;
-  }
+    // getters ////////////////////////////////////////////
 
-  public String getCategoryLike() {
-    return categoryLike;
-  }
+    public String getDeploymentId() {
+        return deploymentId;
+    }
 
-  public String getResourceName() {
-    return resourceName;
-  }
+    public Set<String> getDeploymentIds() {
+        return deploymentIds;
+    }
 
-  public String getResourceNameLike() {
-    return resourceNameLike;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public String getCategoryNotEquals() {
-    return categoryNotEquals;
-  }
+    public Set<String> getIds() {
+        return ids;
+    }
 
-  public String getTenantId() {
-    return tenantId;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public String getTenantIdLike() {
-    return tenantIdLike;
-  }
+    public String getNameLike() {
+        return nameLike;
+    }
 
-  public boolean isWithoutTenantId() {
-    return withoutTenantId;
-  }
+    public String getKey() {
+        return key;
+    }
+
+    public String getKeyLike() {
+        return keyLike;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public Integer getVersionGt() {
+        return versionGt;
+    }
+
+    public Integer getVersionGte() {
+        return versionGte;
+    }
+
+    public Integer getVersionLt() {
+        return versionLt;
+    }
+
+    public Integer getVersionLte() {
+        return versionLte;
+    }
+
+    public boolean isLatest() {
+        return latest;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public String getCategoryLike() {
+        return categoryLike;
+    }
+
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    public String getResourceNameLike() {
+        return resourceNameLike;
+    }
+
+    public String getCategoryNotEquals() {
+        return categoryNotEquals;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public String getTenantIdLike() {
+        return tenantIdLike;
+    }
+
+    public boolean isWithoutTenantId() {
+        return withoutTenantId;
+    }
 }

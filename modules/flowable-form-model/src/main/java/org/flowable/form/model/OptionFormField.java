@@ -18,34 +18,34 @@ import java.util.List;
  * @author Tijs Rademakers
  */
 public class OptionFormField extends FormField {
-  
-  private static final long serialVersionUID = 1L;
 
-  protected String optionType;
-  protected Boolean hasEmptyValue;
-  protected List<Option> options;
+    private static final long serialVersionUID = 1L;
 
-  public String getOptionType() {
-    return optionType;
-  }
+    protected String optionType;
+    protected Boolean hasEmptyValue;
+    protected List<Option> options;
 
-  public void setOptionType(String optionType) {
-    this.optionType = optionType;
-  }
+    public String getOptionType() {
+        return optionType;
+    }
 
-  public Boolean getHasEmptyValue() {
-    return hasEmptyValue;
-  }
+    public void setOptionType(String optionType) {
+        this.optionType = optionType;
+    }
 
-  public void setHasEmptyValue(Boolean hasEmptyValue) {
-    this.hasEmptyValue = hasEmptyValue;
-  }
+    public Boolean getHasEmptyValue() {
+        return hasEmptyValue;
+    }
 
-  public List<Option> getOptions() {
-    return options;
-  }
+    public void setHasEmptyValue(Boolean hasEmptyValue) {
+        this.hasEmptyValue = hasEmptyValue;
+    }
 
-  public void setOptions(List<Option> options) {
-    this.options = options;
-  }
+    public List<Option> getOptions() {
+        return options;
+    }
+
+    public void setOptions(List<Option> options) {
+        this.options = options;
+    }
 }

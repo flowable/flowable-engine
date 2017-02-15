@@ -21,23 +21,23 @@ import org.junit.Test;
 
 public class JavaDelegateTest extends AbstractFlowable6CompatibilityTest {
 
-  @Test
-  public void testFlowable5JavaDelegate() {
-    
-    // Check data for existing process
-    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("javaDelegateTestProcess").singleResult();
-    assertNotNull(processInstance);
-    Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
-    assertEquals(1, variables.size());
-    assertNotNull(variables.get("testVar"));
-    
-    // Redploying it. Note that we have a new delegate now!
-    repositoryService.createDeployment().addClasspathResource("javaDelegateProcess-flowable6.bpmn20.xml").deploy();
-    processInstance = runtimeService.startProcessInstanceByKey("javaDelegateTestProcess");
-    variables = runtimeService.getVariables(processInstance.getId());
-    assertEquals(1, variables.size());
-    assertNotNull(variables.get("testVarFromActiviti6"));
-    assertNull(variables.get("testVar"));
-  }
+    @Test
+    public void testFlowable5JavaDelegate() {
+
+        // Check data for existing process
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("javaDelegateTestProcess").singleResult();
+        assertNotNull(processInstance);
+        Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
+        assertEquals(1, variables.size());
+        assertNotNull(variables.get("testVar"));
+
+        // Redploying it. Note that we have a new delegate now!
+        repositoryService.createDeployment().addClasspathResource("javaDelegateProcess-flowable6.bpmn20.xml").deploy();
+        processInstance = runtimeService.startProcessInstanceByKey("javaDelegateTestProcess");
+        variables = runtimeService.getVariables(processInstance.getId());
+        assertEquals(1, variables.size());
+        assertNotNull(variables.get("testVarFromActiviti6"));
+        assertNull(variables.get("testVar"));
+    }
 
 }

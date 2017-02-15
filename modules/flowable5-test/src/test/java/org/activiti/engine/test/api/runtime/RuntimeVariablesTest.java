@@ -30,108 +30,108 @@ import org.flowable.engine.test.Deployment;
  */
 public class RuntimeVariablesTest extends PluggableFlowableTestCase {
 
-  @Deployment
-  public void testGetVariablesByExecutionIds(){
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    Task task1 = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
-    Task task2 = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
+    @Deployment
+    public void testGetVariablesByExecutionIds() {
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        Task task1 = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
+        Task task2 = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
 
-    // Task local variables
-    taskService.setVariableLocal(task1.getId(), "taskVar1", "sayHello1");
-    // Execution variables
-    taskService.setVariable(task1.getId(), "executionVar1", "helloWorld1");
+        // Task local variables
+        taskService.setVariableLocal(task1.getId(), "taskVar1", "sayHello1");
+        // Execution variables
+        taskService.setVariable(task1.getId(), "executionVar1", "helloWorld1");
 
-    // Task local variables
-    taskService.setVariableLocal(task2.getId(), "taskVar2", "sayHello2");
-    // Execution variables
-    taskService.setVariable(task2.getId(), "executionVar2", "helloWorld2");
-    
-    // only 1 process
-    Set<String> executionIds = new HashSet<String>();
-    executionIds.add(task1.getExecutionId());
-    List<VariableInstance> variables = runtimeService.getVariableInstancesByExecutionIds(executionIds);
-    assertEquals(1, variables.size());
-    checkVariable(task1.getExecutionId(), "executionVar1", "helloWorld1", variables);
-    
-    // 2 process
-    executionIds = new HashSet<String>();
-    executionIds.add(task1.getExecutionId());
-    executionIds.add(task2.getExecutionId());
-    variables = runtimeService.getVariableInstancesByExecutionIds(executionIds);
-    assertEquals(2, variables.size());
-    checkVariable(task1.getExecutionId(), "executionVar1", "helloWorld1", variables);
-    checkVariable(task2.getExecutionId(), "executionVar2", "helloWorld2", variables);
-  }
-  
-  @Deployment(resources={
-    "org/activiti/engine/test/api/runtime/RuntimeVariablesTest.testGetVariablesByExecutionIds.bpmn20.xml"
-  })
-  public void testGetVariablesByExecutionIdsForSerializableType(){
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    Task task1 = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
-    
-    StringBuilder sb = new StringBuilder("a");
-    for(int i = 0; i < 4001; i++) {
-         sb.append("a");
+        // Task local variables
+        taskService.setVariableLocal(task2.getId(), "taskVar2", "sayHello2");
+        // Execution variables
+        taskService.setVariable(task2.getId(), "executionVar2", "helloWorld2");
+
+        // only 1 process
+        Set<String> executionIds = new HashSet<String>();
+        executionIds.add(task1.getExecutionId());
+        List<VariableInstance> variables = runtimeService.getVariableInstancesByExecutionIds(executionIds);
+        assertEquals(1, variables.size());
+        checkVariable(task1.getExecutionId(), "executionVar1", "helloWorld1", variables);
+
+        // 2 process
+        executionIds = new HashSet<String>();
+        executionIds.add(task1.getExecutionId());
+        executionIds.add(task2.getExecutionId());
+        variables = runtimeService.getVariableInstancesByExecutionIds(executionIds);
+        assertEquals(2, variables.size());
+        checkVariable(task1.getExecutionId(), "executionVar1", "helloWorld1", variables);
+        checkVariable(task2.getExecutionId(), "executionVar2", "helloWorld2", variables);
     }
-    String serializableTypeVar = sb.toString();
-    
-    // Execution variables
-    taskService.setVariable(task1.getId(), "executionVar1", serializableTypeVar);
-    
-    // only 1 process
-    Set<String> executionIds = new HashSet<String>();
-    executionIds.add(task1.getExecutionId());
-    List<VariableInstance> variables = runtimeService.getVariableInstancesByExecutionIds(executionIds);
-    assertEquals(serializableTypeVar, variables.get(0).getValue());
-  }
-  
-  private void checkVariable(String executionId, String name, String value, List<VariableInstance> variables){
-    for (VariableInstance variable : variables){
-      if (executionId.equals(variable.getExecutionId())){
-        assertEquals(name, variable.getName());
-        assertEquals(value, variable.getValue());
-        return;
-      }
+
+    @Deployment(resources = {
+            "org/activiti/engine/test/api/runtime/RuntimeVariablesTest.testGetVariablesByExecutionIds.bpmn20.xml"
+    })
+    public void testGetVariablesByExecutionIdsForSerializableType() {
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        Task task1 = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
+
+        StringBuilder sb = new StringBuilder("a");
+        for (int i = 0; i < 4001; i++) {
+            sb.append("a");
+        }
+        String serializableTypeVar = sb.toString();
+
+        // Execution variables
+        taskService.setVariable(task1.getId(), "executionVar1", serializableTypeVar);
+
+        // only 1 process
+        Set<String> executionIds = new HashSet<String>();
+        executionIds.add(task1.getExecutionId());
+        List<VariableInstance> variables = runtimeService.getVariableInstancesByExecutionIds(executionIds);
+        assertEquals(serializableTypeVar, variables.get(0).getValue());
     }
-    fail();
-  }
-  
-  @Deployment(resources={
-    "org/activiti/engine/test/api/runtime/variableScope.bpmn20.xml"
-  })
-  public void testGetVariablesByExecutionIdsForScope(){
-    Map<String, Object> processVars = new HashMap<String, Object>();
-    processVars.put("processVar", "processVar");
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variableScopeProcess", processVars);
-    
-    Set<String> executionIds = new HashSet<String>();
-    List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-    for (Execution execution : executions){
-      if (!processInstance.getId().equals(execution.getId())){
-        executionIds.add(execution.getId());
-        runtimeService.setVariableLocal(execution.getId(), "executionVar", "executionVar");
-      }
+
+    private void checkVariable(String executionId, String name, String value, List<VariableInstance> variables) {
+        for (VariableInstance variable : variables) {
+            if (executionId.equals(variable.getExecutionId())) {
+                assertEquals(name, variable.getName());
+                assertEquals(value, variable.getValue());
+                return;
+            }
+        }
+        fail();
     }
-    
-    List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-    for (Task task : tasks){
-      taskService.setVariableLocal(task.getId(), "taskVar", "taskVar");
+
+    @Deployment(resources = {
+            "org/activiti/engine/test/api/runtime/variableScope.bpmn20.xml"
+    })
+    public void testGetVariablesByExecutionIdsForScope() {
+        Map<String, Object> processVars = new HashMap<String, Object>();
+        processVars.put("processVar", "processVar");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variableScopeProcess", processVars);
+
+        Set<String> executionIds = new HashSet<String>();
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        for (Execution execution : executions) {
+            if (!processInstance.getId().equals(execution.getId())) {
+                executionIds.add(execution.getId());
+                runtimeService.setVariableLocal(execution.getId(), "executionVar", "executionVar");
+            }
+        }
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        for (Task task : tasks) {
+            taskService.setVariableLocal(task.getId(), "taskVar", "taskVar");
+        }
+
+        List<VariableInstance> executionVariableInstances = runtimeService.getVariableInstancesByExecutionIds(executionIds);
+        assertEquals(2, executionVariableInstances.size());
+        assertEquals("executionVar", executionVariableInstances.get(0).getName());
+        assertEquals("executionVar", executionVariableInstances.get(0).getValue());
+        assertEquals("executionVar", executionVariableInstances.get(1).getName());
+        assertEquals("executionVar", executionVariableInstances.get(1).getValue());
+
+        executionIds = new HashSet<String>();
+        executionIds.add(processInstance.getId());
+        executionVariableInstances = runtimeService.getVariableInstancesByExecutionIds(executionIds);
+        assertEquals(1, executionVariableInstances.size());
+        assertEquals("processVar", executionVariableInstances.get(0).getName());
+        assertEquals("processVar", executionVariableInstances.get(0).getValue());
     }
-    
-    List<VariableInstance> executionVariableInstances = runtimeService.getVariableInstancesByExecutionIds(executionIds);
-    assertEquals(2, executionVariableInstances.size());
-    assertEquals("executionVar", executionVariableInstances.get(0).getName());
-    assertEquals("executionVar", executionVariableInstances.get(0).getValue());
-    assertEquals("executionVar", executionVariableInstances.get(1).getName());
-    assertEquals("executionVar", executionVariableInstances.get(1).getValue());
-    
-    executionIds = new HashSet<String>();
-    executionIds.add(processInstance.getId());
-    executionVariableInstances = runtimeService.getVariableInstancesByExecutionIds(executionIds);
-    assertEquals(1, executionVariableInstances.size());
-    assertEquals("processVar", executionVariableInstances.get(0).getName());
-    assertEquals("processVar", executionVariableInstances.get(0).getValue());
-  }
 }

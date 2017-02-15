@@ -25,10 +25,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 
 /**
- * As a process enters a wait-state, this forwards the
- * flow into Spring Integration. Spring Integration flows
- * may ultimately return a reply message and that will signal the
- * execution.
+ * As a process enters a wait-state, this forwards the flow into Spring Integration. Spring Integration flows may ultimately return a reply message and that will signal the execution.
  *
  * @author Josh Long
  */
@@ -57,7 +54,7 @@ public class FlowableInboundGateway extends MessagingGatewaySupport {
     }
 
     public void execute(IntegrationActivityBehavior receiveTaskActivityBehavior,
-                        DelegateExecution execution) {
+            DelegateExecution execution) {
         Map<String, Object> stringObjectMap = new HashMap<String, Object>();
         stringObjectMap.put(executionId, execution.getId());
 
@@ -80,6 +77,5 @@ public class FlowableInboundGateway extends MessagingGatewaySupport {
     public void signal(IntegrationActivityBehavior receiveTaskActivityBehavior, DelegateExecution execution, String signalName, Object data) {
         receiveTaskActivityBehavior.leave(execution);
     }
-
 
 }

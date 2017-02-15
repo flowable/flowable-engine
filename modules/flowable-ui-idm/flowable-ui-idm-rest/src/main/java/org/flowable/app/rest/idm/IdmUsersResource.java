@@ -38,64 +38,63 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class IdmUsersResource {
-  
-  @Autowired
-  protected UserService userService;
-    
+
+    @Autowired
+    protected UserService userService;
+
     @RequestMapping(value = "/rest/admin/users", method = RequestMethod.GET)
     public ResultListDataRepresentation getUsers(
-            @RequestParam(required=false) String filter, 
-            @RequestParam(required=false) String sort,
-            @RequestParam(required=false) Integer start,
-            @RequestParam(required=false) String groupId) {
-      
-      int startValue = start != null ? start.intValue() : 0;
+            @RequestParam(required = false) String filter,
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false) Integer start,
+            @RequestParam(required = false) String groupId) {
 
-      List<User> users = userService.getUsers(filter, sort, start);
-      ResultListDataRepresentation result = new ResultListDataRepresentation();
-      result.setTotal(userService.getUserCount(filter, sort, startValue, groupId));
-      result.setStart(startValue);
-      result.setSize(users.size());
-      result.setData(convertToUserRepresentations(users));
-      return result;
+        int startValue = start != null ? start.intValue() : 0;
+
+        List<User> users = userService.getUsers(filter, sort, start);
+        ResultListDataRepresentation result = new ResultListDataRepresentation();
+        result.setTotal(userService.getUserCount(filter, sort, startValue, groupId));
+        result.setStart(startValue);
+        result.setSize(users.size());
+        result.setData(convertToUserRepresentations(users));
+        return result;
     }
-    
+
     protected List<UserRepresentation> convertToUserRepresentations(List<User> users) {
-      List<UserRepresentation> result = new ArrayList<UserRepresentation>(users.size());
-      for (User user : users) {
-        result.add(new UserRepresentation(user));
-      }
-      return result;
+        List<UserRepresentation> result = new ArrayList<UserRepresentation>(users.size());
+        for (User user : users) {
+            result.add(new UserRepresentation(user));
+        }
+        return result;
     }
 
     @ResponseStatus(value = HttpStatus.OK)
     @RequestMapping(value = "/rest/admin/users/{userId}", method = RequestMethod.PUT)
     public void updateUserDetails(@PathVariable String userId, @RequestBody UpdateUsersRepresentation updateUsersRepresentation) {
-      userService.updateUserDetails(userId, updateUsersRepresentation.getFirstName(), 
-          updateUsersRepresentation.getLastName(), 
-          updateUsersRepresentation.getEmail());
+        userService.updateUserDetails(userId, updateUsersRepresentation.getFirstName(),
+                updateUsersRepresentation.getLastName(),
+                updateUsersRepresentation.getEmail());
     }
-    
+
     @ResponseStatus(value = HttpStatus.OK)
     @RequestMapping(value = "/rest/admin/users", method = RequestMethod.PUT)
     public void bulkUpdateUserDetails(@RequestBody UpdateUsersRepresentation updateUsersRepresentation) {
-     userService.bulkUpdatePassword(updateUsersRepresentation.getUsers(), updateUsersRepresentation.getPassword());
+        userService.bulkUpdatePassword(updateUsersRepresentation.getUsers(), updateUsersRepresentation.getPassword());
     }
-    
+
     @ResponseStatus(value = HttpStatus.OK)
     @RequestMapping(value = "/rest/admin/users/{userId}", method = RequestMethod.DELETE)
     public void deleteUser(@PathVariable String userId) {
-      userService.deleteUser(userId);
+        userService.deleteUser(userId);
     }
- 
-    
+
     @RequestMapping(value = "/rest/admin/users", method = RequestMethod.POST)
     public UserRepresentation createNewUser(@RequestBody CreateUserRepresentation userRepresentation) {
-      return new UserRepresentation(userService.createNewUser(userRepresentation.getId(), 
-          userRepresentation.getFirstName(), 
-          userRepresentation.getLastName(), 
-          userRepresentation.getEmail(), 
-          userRepresentation.getPassword()));
+        return new UserRepresentation(userService.createNewUser(userRepresentation.getId(),
+                userRepresentation.getFirstName(),
+                userRepresentation.getLastName(),
+                userRepresentation.getEmail(),
+                userRepresentation.getPassword()));
     }
-    
+
 }

@@ -27,33 +27,32 @@ import org.flowable.engine.common.api.management.TablePageQuery;
  */
 public interface IdmManagementService {
 
-  /**
-   * Get the mapping containing {table name, row count} entries of the database schema.
-   */
-  Map<String, Long> getTableCount();
+    /**
+     * Get the mapping containing {table name, row count} entries of the database schema.
+     */
+    Map<String, Long> getTableCount();
 
-  /**
-   * Gets the table name (including any configured prefix) for an entity.
-   */
-  String getTableName(Class<?> idmEntityClass);
+    /**
+     * Gets the table name (including any configured prefix) for an entity.
+     */
+    String getTableName(Class<?> idmEntityClass);
 
-  /**
-   * Gets the metadata (column names, column types, etc.) of a certain table. Returns null when no table exists with the given name.
-   */
-  TableMetaData getTableMetaData(String tableName);
+    /**
+     * Gets the metadata (column names, column types, etc.) of a certain table. Returns null when no table exists with the given name.
+     */
+    TableMetaData getTableMetaData(String tableName);
 
-  /**
-   * Creates a {@link TablePageQuery} that can be used to fetch {@link org.flowable.engine.common.api.management.TablePage} containing specific sections of table row data.
-   */
-  TablePageQuery createTablePageQuery();
-  
+    /**
+     * Creates a {@link TablePageQuery} that can be used to fetch {@link org.flowable.engine.common.api.management.TablePage} containing specific sections of table row data.
+     */
+    TablePageQuery createTablePageQuery();
 
-  /** get the list of properties. */
-  Map<String, String> getProperties();
+    /** get the list of properties. */
+    Map<String, String> getProperties();
 
-  /**
-   * programmatic schema update on a given connection returning feedback about what happened
-   */
-  String databaseSchemaUpgrade(Connection connection, String catalog, String schema);
+    /**
+     * programmatic schema update on a given connection returning feedback about what happened
+     */
+    String databaseSchemaUpgrade(Connection connection, String catalog, String schema);
 
 }

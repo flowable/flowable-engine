@@ -21,13 +21,13 @@ public class AttachmentResponseInfo extends ResponseInfo {
 
     protected String fileName;
     protected byte[] bytes;
-    
+
     public AttachmentResponseInfo(String fileName, byte[] bytes) {
         super(200);
         this.fileName = fileName;
         this.bytes = bytes;
     }
-    
+
     public AttachmentResponseInfo(int statusCode, JsonNode content) {
         super(statusCode, content);
     }
@@ -39,5 +39,5 @@ public class AttachmentResponseInfo extends ResponseInfo {
     public byte[] getBytes() {
         return bytes;
     }
-    
+
 }

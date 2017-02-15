@@ -32,78 +32,77 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Rest resource for managing users, specifically related to tasks and
- * processes.
+ * Rest resource for managing users, specifically related to tasks and processes.
  */
 @RestController
 public class WorkflowUsersResource {
 
-  @Autowired
-  private RemoteIdmService remoteIdmService;
+    @Autowired
+    private RemoteIdmService remoteIdmService;
 
-  @Autowired
-  private RuntimeService runtimeService;
+    @Autowired
+    private RuntimeService runtimeService;
 
-  @Autowired
-  private TaskService taskService;
+    @Autowired
+    private TaskService taskService;
 
-  @RequestMapping(value = "/rest/workflow-users", method = RequestMethod.GET)
-  public ResultListDataRepresentation getUsers(@RequestParam(value = "filter", required = false) String filter,
-      @RequestParam(value = "excludeTaskId", required = false) String excludeTaskId,
-      @RequestParam(value = "excludeProcessId", required = false) String excludeProcessId) {
-   
-    List<? extends User> matchingUsers = remoteIdmService.findUsersByNameFilter(filter);
+    @RequestMapping(value = "/rest/workflow-users", method = RequestMethod.GET)
+    public ResultListDataRepresentation getUsers(@RequestParam(value = "filter", required = false) String filter,
+            @RequestParam(value = "excludeTaskId", required = false) String excludeTaskId,
+            @RequestParam(value = "excludeProcessId", required = false) String excludeProcessId) {
 
-    // Filter out users already part of the task/process of which the ID has been passed
-    if (excludeTaskId != null) {
-      filterUsersInvolvedInTask(excludeTaskId, matchingUsers);
-    } else if (excludeProcessId != null) {
-      filterUsersInvolvedInProcess(excludeProcessId, matchingUsers);
-    }
+        List<? extends User> matchingUsers = remoteIdmService.findUsersByNameFilter(filter);
 
-    List<UserRepresentation> userRepresentations = new ArrayList<UserRepresentation>(matchingUsers.size());
-    for (User user : matchingUsers) {
-      userRepresentations.add(new UserRepresentation(user));
-    }
-
-    return new ResultListDataRepresentation(userRepresentations);
-    
-  }
-  
-  protected void filterUsersInvolvedInProcess(String excludeProcessId, List<? extends User> matchingUsers) {
-    Set<String> involvedUsers = getInvolvedUsersAsSet(
-        runtimeService.getIdentityLinksForProcessInstance(excludeProcessId));
-    removeinvolvedUsers(matchingUsers, involvedUsers);
-  }
-
-  protected void filterUsersInvolvedInTask(String excludeTaskId, List<? extends User> matchingUsers) {
-    Set<String> involvedUsers = getInvolvedUsersAsSet(taskService.getIdentityLinksForTask(excludeTaskId));
-    removeinvolvedUsers(matchingUsers, involvedUsers);
-  }
-
-  protected Set<String> getInvolvedUsersAsSet(List<IdentityLink> involvedPeople) {
-    Set<String> involved = null;
-    if (involvedPeople.size() > 0) {
-      involved = new HashSet<String>();
-      for (IdentityLink link : involvedPeople) {
-        if (link.getUserId() != null) {
-          involved.add(link.getUserId());
+        // Filter out users already part of the task/process of which the ID has been passed
+        if (excludeTaskId != null) {
+            filterUsersInvolvedInTask(excludeTaskId, matchingUsers);
+        } else if (excludeProcessId != null) {
+            filterUsersInvolvedInProcess(excludeProcessId, matchingUsers);
         }
-      }
-    }
-    return involved;
-  }
 
-  protected void removeinvolvedUsers(List<? extends User> matchingUsers, Set<String> involvedUsers) {
-    if (involvedUsers != null) {
-      // Using iterator to be able to remove without ConcurrentModExceptions
-      Iterator<? extends User> userIt = matchingUsers.iterator();
-      while (userIt.hasNext()) {
-        if (involvedUsers.contains(userIt.next().getId())) {
-          userIt.remove();
+        List<UserRepresentation> userRepresentations = new ArrayList<UserRepresentation>(matchingUsers.size());
+        for (User user : matchingUsers) {
+            userRepresentations.add(new UserRepresentation(user));
         }
-      }
+
+        return new ResultListDataRepresentation(userRepresentations);
+
     }
-  }
+
+    protected void filterUsersInvolvedInProcess(String excludeProcessId, List<? extends User> matchingUsers) {
+        Set<String> involvedUsers = getInvolvedUsersAsSet(
+                runtimeService.getIdentityLinksForProcessInstance(excludeProcessId));
+        removeinvolvedUsers(matchingUsers, involvedUsers);
+    }
+
+    protected void filterUsersInvolvedInTask(String excludeTaskId, List<? extends User> matchingUsers) {
+        Set<String> involvedUsers = getInvolvedUsersAsSet(taskService.getIdentityLinksForTask(excludeTaskId));
+        removeinvolvedUsers(matchingUsers, involvedUsers);
+    }
+
+    protected Set<String> getInvolvedUsersAsSet(List<IdentityLink> involvedPeople) {
+        Set<String> involved = null;
+        if (involvedPeople.size() > 0) {
+            involved = new HashSet<String>();
+            for (IdentityLink link : involvedPeople) {
+                if (link.getUserId() != null) {
+                    involved.add(link.getUserId());
+                }
+            }
+        }
+        return involved;
+    }
+
+    protected void removeinvolvedUsers(List<? extends User> matchingUsers, Set<String> involvedUsers) {
+        if (involvedUsers != null) {
+            // Using iterator to be able to remove without ConcurrentModExceptions
+            Iterator<? extends User> userIt = matchingUsers.iterator();
+            while (userIt.hasNext()) {
+                if (involvedUsers.contains(userIt.next().getId())) {
+                    userIt.remove();
+                }
+            }
+        }
+    }
 
 }

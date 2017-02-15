@@ -41,60 +41,60 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RequestMapping("/rest/admin/form-deployments")
 public class FormDeploymentsClientResource extends AbstractClientResource {
 
-  private static final Logger logger = LoggerFactory.getLogger(FormDeploymentsClientResource.class);
+    private static final Logger logger = LoggerFactory.getLogger(FormDeploymentsClientResource.class);
 
-  @Autowired
-  protected FormDeploymentService clientService;
+    @Autowired
+    protected FormDeploymentService clientService;
 
-  /**
-   * GET /rest/admin/form-deployments -> get a list of form deployments.
-   */
-  @RequestMapping(method = RequestMethod.GET, produces = "application/json")
-  public JsonNode listDeployments(HttpServletRequest request) {
-    logger.debug("REST request to get a list of form deployments");
+    /**
+     * GET /rest/admin/form-deployments -> get a list of form deployments.
+     */
+    @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+    public JsonNode listDeployments(HttpServletRequest request) {
+        logger.debug("REST request to get a list of form deployments");
 
-    JsonNode resultNode = null;
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
-    Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
-
-    try {
-      resultNode = clientService.listDeployments(serverConfig, parameterMap);
-
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting form deployments", e);
-      throw new BadRequestException(e.getMessage());
-    }
-
-    return resultNode;
-  }
-
-  /**
-   * POST /rest/admin/form-deployments: upload a form deployment
-   */
-  @RequestMapping(method = RequestMethod.POST, produces = "application/json")
-  public JsonNode handleFileUpload(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
-    if (!file.isEmpty()) {
-      try {
+        JsonNode resultNode = null;
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
-        String fileName = file.getOriginalFilename();
-        if (fileName != null && (fileName.endsWith(".form") || fileName.endsWith(".xml"))) {
+        Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
 
-          return clientService.uploadDeployment(serverConfig, fileName, file.getInputStream());
+        try {
+            resultNode = clientService.listDeployments(serverConfig, parameterMap);
 
-        } else {
-          logger.error("Invalid form deployment file name {}", fileName);
-          throw new BadRequestException("Invalid file name");
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting form deployments", e);
+            throw new BadRequestException(e.getMessage());
         }
 
-      } catch (IOException e) {
-        logger.error("Error deploying form upload", e);
-        throw new InternalServerErrorException("Could not deploy file: " + e.getMessage());
-      }
-
-    } else {
-      logger.error("No form deployment file found in request");
-      throw new BadRequestException("No file found in POST body");
+        return resultNode;
     }
-  }
+
+    /**
+     * POST /rest/admin/form-deployments: upload a form deployment
+     */
+    @RequestMapping(method = RequestMethod.POST, produces = "application/json")
+    public JsonNode handleFileUpload(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
+        if (!file.isEmpty()) {
+            try {
+                ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+                String fileName = file.getOriginalFilename();
+                if (fileName != null && (fileName.endsWith(".form") || fileName.endsWith(".xml"))) {
+
+                    return clientService.uploadDeployment(serverConfig, fileName, file.getInputStream());
+
+                } else {
+                    logger.error("Invalid form deployment file name {}", fileName);
+                    throw new BadRequestException("Invalid file name");
+                }
+
+            } catch (IOException e) {
+                logger.error("Error deploying form upload", e);
+                throw new InternalServerErrorException("Could not deploy file: " + e.getMessage());
+            }
+
+        } else {
+            logger.error("No form deployment file found in request");
+            throw new BadRequestException("No file found in POST body");
+        }
+    }
 
 }

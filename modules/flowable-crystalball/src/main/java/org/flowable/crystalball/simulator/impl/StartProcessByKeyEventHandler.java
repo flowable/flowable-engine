@@ -27,33 +27,33 @@ import java.util.Map;
  */
 public class StartProcessByKeyEventHandler implements SimulationEventHandler {
 
-  private static Logger log = LoggerFactory.getLogger(StartProcessByKeyEventHandler.class);
+    private static Logger log = LoggerFactory.getLogger(StartProcessByKeyEventHandler.class);
 
-  /** process to start key */
-  protected String processToStartKey;
-  protected String businessKey;
-  protected String variablesKey;
+    /** process to start key */
+    protected String processToStartKey;
+    protected String businessKey;
+    protected String variablesKey;
 
-  public StartProcessByKeyEventHandler(String processToStartKey, String businessKey, String variablesKey) {
-    this.processToStartKey = processToStartKey;
-    this.businessKey = businessKey;
-    this.variablesKey = variablesKey;
-  }
+    public StartProcessByKeyEventHandler(String processToStartKey, String businessKey, String variablesKey) {
+        this.processToStartKey = processToStartKey;
+        this.businessKey = businessKey;
+        this.variablesKey = variablesKey;
+    }
 
-  @Override
-  public void init() {
-  }
+    @Override
+    public void init() {
+    }
 
-  @Override
-  public void handle(SimulationEvent event) {
-    // start process now
-    String processDefinitionKey = (String) event.getProperty(processToStartKey);
-    String businessKey = (String) event.getProperty(this.businessKey);
-    @SuppressWarnings("unchecked")
-    Map<String, Object> variables = (Map<String, Object>) event.getProperty(variablesKey);
+    @Override
+    public void handle(SimulationEvent event) {
+        // start process now
+        String processDefinitionKey = (String) event.getProperty(processToStartKey);
+        String businessKey = (String) event.getProperty(this.businessKey);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> variables = (Map<String, Object>) event.getProperty(variablesKey);
 
-    log.debug("Starting new processDefKey[{}] businessKey[{}] with variables[{}]", processDefinitionKey, businessKey, variables);
-    SimulationRunContext.getRuntimeService().startProcessInstanceByKey(processDefinitionKey, businessKey, variables);
-  }
+        log.debug("Starting new processDefKey[{}] businessKey[{}] with variables[{}]", processDefinitionKey, businessKey, variables);
+        SimulationRunContext.getRuntimeService().startProcessInstanceByKey(processDefinitionKey, businessKey, variables);
+    }
 
 }

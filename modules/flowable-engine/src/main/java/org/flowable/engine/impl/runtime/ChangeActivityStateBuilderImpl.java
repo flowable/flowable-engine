@@ -20,44 +20,44 @@ import org.flowable.engine.runtime.ChangeActivityStateBuilder;
  */
 public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilder {
 
-  protected RuntimeServiceImpl runtimeService;
+    protected RuntimeServiceImpl runtimeService;
 
-  protected String processInstanceId;
-  protected String cancelActivityId;
-  protected String startActivityId;
+    protected String processInstanceId;
+    protected String cancelActivityId;
+    protected String startActivityId;
 
-  public ChangeActivityStateBuilderImpl(RuntimeServiceImpl runtimeService) {
-    this.runtimeService = runtimeService;
-  }
+    public ChangeActivityStateBuilderImpl(RuntimeServiceImpl runtimeService) {
+        this.runtimeService = runtimeService;
+    }
 
-  public ChangeActivityStateBuilder processInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-    return this;
-  }
+    public ChangeActivityStateBuilder processInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+        return this;
+    }
 
-  public ChangeActivityStateBuilder cancelActivityId(String cancelActivityId) {
-    this.cancelActivityId = cancelActivityId;
-    return this;
-  }
-  
-  public ChangeActivityStateBuilder startActivityId(String startActivityId) {
-    this.startActivityId = startActivityId;
-    return this;
-  }
+    public ChangeActivityStateBuilder cancelActivityId(String cancelActivityId) {
+        this.cancelActivityId = cancelActivityId;
+        return this;
+    }
 
-  public void changeState() {
-    runtimeService.changeActivityState(this);
-  }
+    public ChangeActivityStateBuilder startActivityId(String startActivityId) {
+        this.startActivityId = startActivityId;
+        return this;
+    }
 
-  public String getProcessInstanceId() {
-    return processInstanceId;
-  }
+    public void changeState() {
+        runtimeService.changeActivityState(this);
+    }
 
-  public String getCancelActivityId() {
-    return cancelActivityId;
-  }
-  
-  public String getStartActivityId() {
-    return startActivityId;
-  }
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    public String getCancelActivityId() {
+        return cancelActivityId;
+    }
+
+    public String getStartActivityId() {
+        return startActivityId;
+    }
 }

@@ -37,125 +37,125 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @RestController
 public class ProcessInstanceClientResource extends AbstractClientResource {
-  
-  private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceClientResource.class);
 
-  @Autowired
-  protected ProcessInstanceService clientService;
+    private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceClientResource.class);
 
-  @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode getProcessInstance(@PathVariable String processInstanceId, @RequestParam(required = false, defaultValue = "false") boolean runtime) throws BadRequestException {
+    @Autowired
+    protected ProcessInstanceService clientService;
 
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-    try {
-      return clientService.getProcessInstance(serverConfig, processInstanceId);
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting process instance {}", processInstanceId, e);
-      throw new BadRequestException(e.getMessage());
+    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getProcessInstance(@PathVariable String processInstanceId, @RequestParam(required = false, defaultValue = "false") boolean runtime) throws BadRequestException {
+
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            return clientService.getProcessInstance(serverConfig, processInstanceId);
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting process instance {}", processInstanceId, e);
+            throw new BadRequestException(e.getMessage());
+        }
     }
-  }
 
-  @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/tasks", method = RequestMethod.GET)
-  public JsonNode getSubtasks(@PathVariable String processInstanceId) throws BadRequestException {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-    try {
-      return clientService.getTasks(serverConfig, processInstanceId);
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting tasks for process instance {}", processInstanceId, e);
-      throw new BadRequestException(e.getMessage());
+    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/tasks", method = RequestMethod.GET)
+    public JsonNode getSubtasks(@PathVariable String processInstanceId) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            return clientService.getTasks(serverConfig, processInstanceId);
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting tasks for process instance {}", processInstanceId, e);
+            throw new BadRequestException(e.getMessage());
+        }
     }
-  }
 
-  @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables", method = RequestMethod.GET)
-  public JsonNode getVariables(@PathVariable String processInstanceId) throws BadRequestException {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-    try {
-      return clientService.getVariables(serverConfig, processInstanceId);
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting variables for process instance {}", processInstanceId, e);
-      throw new BadRequestException(e.getMessage());
+    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables", method = RequestMethod.GET)
+    public JsonNode getVariables(@PathVariable String processInstanceId) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            return clientService.getVariables(serverConfig, processInstanceId);
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting variables for process instance {}", processInstanceId, e);
+            throw new BadRequestException(e.getMessage());
+        }
     }
-  }
 
-  @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables/{variableName}", method = RequestMethod.PUT)
-  @ResponseStatus(value = HttpStatus.OK)
-  public void updateVariable(@PathVariable String processInstanceId, @PathVariable String variableName, @RequestBody ObjectNode body) throws BadRequestException {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-    try {
-      clientService.updateVariable(serverConfig, processInstanceId, variableName, body);
-    } catch (FlowableServiceException e) {
-      logger.error("Error updating variable {} for process instance {}", variableName, processInstanceId, e);
-      throw new BadRequestException(e.getMessage());
+    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables/{variableName}", method = RequestMethod.PUT)
+    @ResponseStatus(value = HttpStatus.OK)
+    public void updateVariable(@PathVariable String processInstanceId, @PathVariable String variableName, @RequestBody ObjectNode body) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            clientService.updateVariable(serverConfig, processInstanceId, variableName, body);
+        } catch (FlowableServiceException e) {
+            logger.error("Error updating variable {} for process instance {}", variableName, processInstanceId, e);
+            throw new BadRequestException(e.getMessage());
+        }
     }
-  }
 
-  @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables", method = RequestMethod.POST)
-  @ResponseStatus(value = HttpStatus.OK)
-  public void createVariable(@PathVariable String processInstanceId, @RequestBody ObjectNode body) throws BadRequestException {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-    try {
-      clientService.createVariable(serverConfig, processInstanceId, body);
-    } catch (FlowableServiceException e) {
-      logger.error("Error creating variable for process instance {}", processInstanceId, e);
-      throw new BadRequestException(e.getMessage());
+    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables", method = RequestMethod.POST)
+    @ResponseStatus(value = HttpStatus.OK)
+    public void createVariable(@PathVariable String processInstanceId, @RequestBody ObjectNode body) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            clientService.createVariable(serverConfig, processInstanceId, body);
+        } catch (FlowableServiceException e) {
+            logger.error("Error creating variable for process instance {}", processInstanceId, e);
+            throw new BadRequestException(e.getMessage());
+        }
     }
-  }
 
-  @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables/{variableName}", method = RequestMethod.DELETE)
-  @ResponseStatus(value = HttpStatus.OK)
-  public void deleteVariable(@PathVariable String processInstanceId, @PathVariable String variableName) throws BadRequestException {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-    try {
-      clientService.deleteVariable(serverConfig, processInstanceId, variableName);
-    } catch (FlowableServiceException e) {
-      logger.error("Error deleting variable for process instance {}", processInstanceId, e);
-      throw new BadRequestException(e.getMessage());
+    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables/{variableName}", method = RequestMethod.DELETE)
+    @ResponseStatus(value = HttpStatus.OK)
+    public void deleteVariable(@PathVariable String processInstanceId, @PathVariable String variableName) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            clientService.deleteVariable(serverConfig, processInstanceId, variableName);
+        } catch (FlowableServiceException e) {
+            logger.error("Error deleting variable for process instance {}", processInstanceId, e);
+            throw new BadRequestException(e.getMessage());
+        }
     }
-  }
 
-  @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/subprocesses", method = RequestMethod.GET)
-  public JsonNode getSubProcesses(@PathVariable String processInstanceId) throws BadRequestException {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-    try {
-      return clientService.getSubProcesses(serverConfig, processInstanceId);
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting sub processes for process instance {}", processInstanceId, e);
-      throw new BadRequestException(e.getMessage());
+    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/subprocesses", method = RequestMethod.GET)
+    public JsonNode getSubProcesses(@PathVariable String processInstanceId) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            return clientService.getSubProcesses(serverConfig, processInstanceId);
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting sub processes for process instance {}", processInstanceId, e);
+            throw new BadRequestException(e.getMessage());
+        }
     }
-  }
 
-  @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/jobs", method = RequestMethod.GET)
-  public JsonNode getJobs(@PathVariable String processInstanceId) throws BadRequestException {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-    try {
-      return clientService.getJobs(serverConfig, processInstanceId);
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting jobs for process instance {}", processInstanceId, e);
-      throw new BadRequestException(e.getMessage());
+    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/jobs", method = RequestMethod.GET)
+    public JsonNode getJobs(@PathVariable String processInstanceId) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            return clientService.getJobs(serverConfig, processInstanceId);
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting jobs for process instance {}", processInstanceId, e);
+            throw new BadRequestException(e.getMessage());
+        }
     }
-  }
 
-  @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}", method = RequestMethod.POST)
-  @ResponseStatus(value = HttpStatus.OK)
-  public void executeAction(@PathVariable String processInstanceId, @RequestBody JsonNode actionBody) throws BadRequestException {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-    try {
-      clientService.executeAction(serverConfig, processInstanceId, actionBody);
-    } catch (FlowableServiceException e) {
-      logger.error("Error executing action on process instance {}", processInstanceId, e);
-      throw new BadRequestException(e.getMessage());
+    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}", method = RequestMethod.POST)
+    @ResponseStatus(value = HttpStatus.OK)
+    public void executeAction(@PathVariable String processInstanceId, @RequestBody JsonNode actionBody) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            clientService.executeAction(serverConfig, processInstanceId, actionBody);
+        } catch (FlowableServiceException e) {
+            logger.error("Error executing action on process instance {}", processInstanceId, e);
+            throw new BadRequestException(e.getMessage());
+        }
     }
-  }
-  
-  @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/change-state", method = RequestMethod.POST)
-  @ResponseStatus(value = HttpStatus.OK)
-  public void changeActivityState(@PathVariable String processInstanceId, @RequestBody JsonNode changeStateBody) throws BadRequestException {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-    try {
-      clientService.changeActivityState(serverConfig, processInstanceId, changeStateBody);
-    } catch (FlowableServiceException e) {
-      logger.error("Error changing activity state for process instance {}", processInstanceId, e);
-      throw new BadRequestException(e.getMessage());
+
+    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/change-state", method = RequestMethod.POST)
+    @ResponseStatus(value = HttpStatus.OK)
+    public void changeActivityState(@PathVariable String processInstanceId, @RequestBody JsonNode changeStateBody) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            clientService.changeActivityState(serverConfig, processInstanceId, changeStateBody);
+        } catch (FlowableServiceException e) {
+            logger.error("Error changing activity state for process instance {}", processInstanceId, e);
+            throw new BadRequestException(e.getMessage());
+        }
     }
-  }
 }

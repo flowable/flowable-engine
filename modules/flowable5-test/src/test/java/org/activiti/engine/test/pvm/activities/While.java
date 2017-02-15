@@ -18,44 +18,43 @@ import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 
-
 /**
  * @author Tom Baeyens
  */
 public class While implements ActivityBehavior {
-  
-  String variableName;
-  int from;
-  int to;
-  
-  public While(String variableName, int from, int to) {
-    this.variableName = variableName;
-    this.from = from;
-    this.to = to;
-  }
 
-  public void execute(DelegateExecution execution) {
-    ActivityExecution activityExecution = (ActivityExecution) execution;
-    PvmTransition more = activityExecution.getActivity().findOutgoingTransition("more");
-    PvmTransition done = activityExecution.getActivity().findOutgoingTransition("done");
-    
-    Integer value = (Integer) execution.getVariable(variableName);
+    String variableName;
+    int from;
+    int to;
 
-    if (value==null) {
-      execution.setVariable(variableName, from);
-      activityExecution.take(more);
-      
-    } else {
-      value = value+1;
-      
-      if (value<to) {
-        execution.setVariable(variableName, value);
-        activityExecution.take(more);
-        
-      } else {
-        activityExecution.take(done);
-      }
+    public While(String variableName, int from, int to) {
+        this.variableName = variableName;
+        this.from = from;
+        this.to = to;
     }
-  }
+
+    public void execute(DelegateExecution execution) {
+        ActivityExecution activityExecution = (ActivityExecution) execution;
+        PvmTransition more = activityExecution.getActivity().findOutgoingTransition("more");
+        PvmTransition done = activityExecution.getActivity().findOutgoingTransition("done");
+
+        Integer value = (Integer) execution.getVariable(variableName);
+
+        if (value == null) {
+            execution.setVariable(variableName, from);
+            activityExecution.take(more);
+
+        } else {
+            value = value + 1;
+
+            if (value < to) {
+                execution.setVariable(variableName, value);
+                activityExecution.take(more);
+
+            } else {
+                activityExecution.take(done);
+            }
+        }
+    }
 
 }

@@ -26,23 +26,23 @@ import org.flowable.engine.task.IdentityLink;
  */
 public class GetIdentityLinksForProcessInstanceCmd implements Command<List<IdentityLink>>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String processInstanceId;
+    protected String processInstanceId;
 
-  public GetIdentityLinksForProcessInstanceCmd(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
-
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public List<IdentityLink> execute(CommandContext commandContext) {
-    ExecutionEntity processInstance = commandContext.getExecutionEntityManager().findById(processInstanceId);
-
-    if (processInstance == null) {
-      throw new FlowableObjectNotFoundException("Cannot find process definition with id " + processInstanceId, ExecutionEntity.class);
+    public GetIdentityLinksForProcessInstanceCmd(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
     }
 
-    return (List) processInstance.getIdentityLinks();
-  }
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public List<IdentityLink> execute(CommandContext commandContext) {
+        ExecutionEntity processInstance = commandContext.getExecutionEntityManager().findById(processInstanceId);
+
+        if (processInstance == null) {
+            throw new FlowableObjectNotFoundException("Cannot find process definition with id " + processInstanceId, ExecutionEntity.class);
+        }
+
+        return (List) processInstance.getIdentityLinks();
+    }
 
 }

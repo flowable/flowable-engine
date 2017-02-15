@@ -17,15 +17,15 @@ import java.util.List;
 import org.flowable.app.domain.editor.ModelHistory;
 
 public interface ModelHistoryRepository {
-  
-  void save(ModelHistory modelHistory);
-  
-  void delete(ModelHistory modelHistory);
-  
-  ModelHistory get(String id);
 
-	List<ModelHistory> findByModelTypAndCreatedBy(String createdBy, Integer modelType);
-	
-	List<ModelHistory> findByModelId(String modelId);
-	
+    void save(ModelHistory modelHistory);
+
+    void delete(ModelHistory modelHistory);
+
+    ModelHistory get(String id);
+
+    List<ModelHistory> findByModelTypAndCreatedBy(String createdBy, Integer modelType);
+
+    List<ModelHistory> findByModelId(String modelId);
+
 }

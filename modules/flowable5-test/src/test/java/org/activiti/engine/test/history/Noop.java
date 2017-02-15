@@ -16,13 +16,12 @@ package org.activiti.engine.test.history;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 
-
 /**
  * @author Joram Barrez
  */
 public class Noop implements JavaDelegate {
 
-  public void execute(DelegateExecution execution) {
-  }
+    public void execute(DelegateExecution execution) {
+    }
 
 }

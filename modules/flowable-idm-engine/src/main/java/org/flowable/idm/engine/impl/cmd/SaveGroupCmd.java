@@ -26,33 +26,33 @@ import org.flowable.idm.engine.impl.persistence.entity.GroupEntity;
  */
 public class SaveGroupCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected Group group;
+    private static final long serialVersionUID = 1L;
+    protected Group group;
 
-  public SaveGroupCmd(Group group) {
-    this.group = group;
-  }
-
-  public Void execute(CommandContext commandContext) {
-    if (group == null) {
-      throw new FlowableIllegalArgumentException("group is null");
+    public SaveGroupCmd(Group group) {
+        this.group = group;
     }
 
-    if (commandContext.getGroupEntityManager().isNewGroup(group)) {
-      if (group instanceof GroupEntity) {
-        commandContext.getGroupEntityManager().insert((GroupEntity) group);
-      } else {
-        commandContext.getDbSqlSession().insert((Entity) group);
-      }
-    } else {
-      if (group instanceof GroupEntity) {
-        commandContext.getGroupEntityManager().update((GroupEntity) group);
-      } else {
-        commandContext.getDbSqlSession().update((Entity) group);
-      }
-      
+    public Void execute(CommandContext commandContext) {
+        if (group == null) {
+            throw new FlowableIllegalArgumentException("group is null");
+        }
+
+        if (commandContext.getGroupEntityManager().isNewGroup(group)) {
+            if (group instanceof GroupEntity) {
+                commandContext.getGroupEntityManager().insert((GroupEntity) group);
+            } else {
+                commandContext.getDbSqlSession().insert((Entity) group);
+            }
+        } else {
+            if (group instanceof GroupEntity) {
+                commandContext.getGroupEntityManager().update((GroupEntity) group);
+            } else {
+                commandContext.getDbSqlSession().update((Entity) group);
+            }
+
+        }
+        return null;
     }
-    return null;
-  }
 
 }

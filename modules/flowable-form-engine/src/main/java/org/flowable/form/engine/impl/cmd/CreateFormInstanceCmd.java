@@ -35,85 +35,85 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class CreateFormInstanceCmd implements Command<FormInstance>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected FormModel formModel;
-  protected Map<String, Object> variables;
-  protected String taskId;
-  protected String processInstanceId;
-  
-  public CreateFormInstanceCmd(FormModel formModel, Map<String, Object> variables, String taskId, String processInstanceId) {
-    this.formModel = formModel;
-    this.variables = variables;
-    this.taskId = taskId;
-    this.processInstanceId = processInstanceId;
-  }
+    protected FormModel formModel;
+    protected Map<String, Object> variables;
+    protected String taskId;
+    protected String processInstanceId;
 
-  public FormInstance execute(CommandContext commandContext) {
-    
-    if (formModel == null || formModel.getId() == null) {
-      throw new FlowableException("Invalid form model provided");
+    public CreateFormInstanceCmd(FormModel formModel, Map<String, Object> variables, String taskId, String processInstanceId) {
+        this.formModel = formModel;
+        this.variables = variables;
+        this.taskId = taskId;
+        this.processInstanceId = processInstanceId;
     }
-    
-    ObjectMapper objectMapper = commandContext.getFormEngineConfiguration().getObjectMapper();
-    ObjectNode submittedFormValuesJson = objectMapper.createObjectNode();
-    
-    ObjectNode valuesNode = submittedFormValuesJson.putObject("values");
-    
-    // Loop over all form fields and see if a value was provided
-    Map<String, FormField> fieldMap = formModel.allFieldsAsMap();
-    for (String fieldId : fieldMap.keySet()) {
-      FormField formField = fieldMap.get(fieldId);
 
-      if (FormFieldTypes.EXPRESSION.equals(formField.getType()) || FormFieldTypes.CONTAINER.equals(formField.getType())) {
-        continue;
-      }
+    public FormInstance execute(CommandContext commandContext) {
 
-      if (variables.containsKey(fieldId)) {
-        Object variableValue = variables.get(fieldId);
-        if (variableValue == null) {
-          valuesNode.putNull(fieldId);
-        } else if (variableValue instanceof Long) {
-          valuesNode.put(fieldId, (Long) variables.get(fieldId));
-          
-        } else if (variableValue instanceof Double) {
-          valuesNode.put(fieldId, (Double) variables.get(fieldId));
-        
-        } else if (variableValue instanceof LocalDate) {
-          valuesNode.put(fieldId, ((LocalDate) variableValue).toString());
-        
-        } else {
-          valuesNode.put(fieldId, variableValue.toString());
+        if (formModel == null || formModel.getId() == null) {
+            throw new FlowableException("Invalid form model provided");
         }
-      }
-    }
 
-    // Handle outcome
-    String outcomeVariable = null;
-    if (formModel.getOutcomeVariableName() != null) {
-      outcomeVariable = formModel.getOutcomeVariableName();
-    } else {
-      outcomeVariable = "form_" + formModel.getKey() + "_outcome";
+        ObjectMapper objectMapper = commandContext.getFormEngineConfiguration().getObjectMapper();
+        ObjectNode submittedFormValuesJson = objectMapper.createObjectNode();
+
+        ObjectNode valuesNode = submittedFormValuesJson.putObject("values");
+
+        // Loop over all form fields and see if a value was provided
+        Map<String, FormField> fieldMap = formModel.allFieldsAsMap();
+        for (String fieldId : fieldMap.keySet()) {
+            FormField formField = fieldMap.get(fieldId);
+
+            if (FormFieldTypes.EXPRESSION.equals(formField.getType()) || FormFieldTypes.CONTAINER.equals(formField.getType())) {
+                continue;
+            }
+
+            if (variables.containsKey(fieldId)) {
+                Object variableValue = variables.get(fieldId);
+                if (variableValue == null) {
+                    valuesNode.putNull(fieldId);
+                } else if (variableValue instanceof Long) {
+                    valuesNode.put(fieldId, (Long) variables.get(fieldId));
+
+                } else if (variableValue instanceof Double) {
+                    valuesNode.put(fieldId, (Double) variables.get(fieldId));
+
+                } else if (variableValue instanceof LocalDate) {
+                    valuesNode.put(fieldId, ((LocalDate) variableValue).toString());
+
+                } else {
+                    valuesNode.put(fieldId, variableValue.toString());
+                }
+            }
+        }
+
+        // Handle outcome
+        String outcomeVariable = null;
+        if (formModel.getOutcomeVariableName() != null) {
+            outcomeVariable = formModel.getOutcomeVariableName();
+        } else {
+            outcomeVariable = "form_" + formModel.getKey() + "_outcome";
+        }
+
+        if (variables.containsKey(outcomeVariable) && variables.get(outcomeVariable) != null) {
+            submittedFormValuesJson.put("flowable_form_outcome", variables.get(outcomeVariable).toString());
+        }
+
+        FormInstanceEntityManager formInstanceEntityManager = commandContext.getFormInstanceEntityManager();
+        FormInstanceEntity formInstanceEntity = formInstanceEntityManager.create();
+        formInstanceEntity.setFormDefinitionId(formModel.getId());
+        formInstanceEntity.setTaskId(taskId);
+        formInstanceEntity.setProcessInstanceId(processInstanceId);
+        formInstanceEntity.setSubmittedDate(new Date());
+        try {
+            formInstanceEntity.setFormValueBytes(objectMapper.writeValueAsBytes(submittedFormValuesJson));
+        } catch (Exception e) {
+            throw new FlowableException("Error setting form values JSON", e);
+        }
+
+        formInstanceEntityManager.insert(formInstanceEntity);
+
+        return formInstanceEntity;
     }
-      
-    if (variables.containsKey(outcomeVariable) && variables.get(outcomeVariable) != null) {
-      submittedFormValuesJson.put("flowable_form_outcome", variables.get(outcomeVariable).toString());
-    }
-    
-    FormInstanceEntityManager formInstanceEntityManager = commandContext.getFormInstanceEntityManager();
-    FormInstanceEntity formInstanceEntity = formInstanceEntityManager.create();
-    formInstanceEntity.setFormDefinitionId(formModel.getId());
-    formInstanceEntity.setTaskId(taskId);
-    formInstanceEntity.setProcessInstanceId(processInstanceId);
-    formInstanceEntity.setSubmittedDate(new Date());
-    try {
-      formInstanceEntity.setFormValueBytes(objectMapper.writeValueAsBytes(submittedFormValuesJson));
-    } catch (Exception e) {
-      throw new FlowableException("Error setting form values JSON", e);
-    }
-    
-    formInstanceEntityManager.insert(formInstanceEntity);
-    
-    return formInstanceEntity;
-  }
 }

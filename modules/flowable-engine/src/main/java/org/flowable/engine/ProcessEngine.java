@@ -22,18 +22,12 @@ import org.flowable.idm.api.IdmIdentityService;
  * Provides access to all the services that expose the BPM and workflow operations.
  * 
  * <ul>
- * <li>
- * <b>{@link org.flowable.engine.RuntimeService}: </b> Allows the creation of {@link org.flowable.engine.repository.Deployment}s and the starting of and searching on
+ * <li><b>{@link org.flowable.engine.RuntimeService}: </b> Allows the creation of {@link org.flowable.engine.repository.Deployment}s and the starting of and searching on
  * {@link org.flowable.engine.runtime.ProcessInstance}s.</li>
- * <li>
- * <b>{@link org.flowable.engine.TaskService}: </b> Exposes operations to manage human (standalone) {@link org.flowable.engine.task.Task}s, such as claiming, completing and assigning tasks</li>
- * <li>
- * <b>{@link org.flowable.engine.IdentityService}: </b> Used for managing {@link org.flowable.idm.api.User}s, {@link org.flowable.idm.api.Group}s and the
- * relations between them<</li>
- * <li>
- * <b>{@link org.flowable.engine.ManagementService}: </b> Exposes engine admin and maintenance operations</li>
- * <li>
- * <b>{@link org.flowable.engine.HistoryService}: </b> Service exposing information about ongoing and past process instances.</li>
+ * <li><b>{@link org.flowable.engine.TaskService}: </b> Exposes operations to manage human (standalone) {@link org.flowable.engine.task.Task}s, such as claiming, completing and assigning tasks</li>
+ * <li><b>{@link org.flowable.engine.IdentityService}: </b> Used for managing {@link org.flowable.idm.api.User}s, {@link org.flowable.idm.api.Group}s and the relations between them<</li>
+ * <li><b>{@link org.flowable.engine.ManagementService}: </b> Exposes engine admin and maintenance operations</li>
+ * <li><b>{@link org.flowable.engine.HistoryService}: </b> Service exposing information about ongoing and past process instances.</li>
  * </ul>
  * 
  * Typically, there will be only one central ProcessEngine instance needed in a end-user application. Building a ProcessEngine is done through a {@link ProcessEngineConfiguration} instance and is a
@@ -45,43 +39,43 @@ import org.flowable.idm.api.IdmIdentityService;
  */
 public interface ProcessEngine {
 
-  /** the version of the flowable library */
-  public static String VERSION = "6.0.0.5"; // Note the extra .x at the end. To cater for snapshot releases with different database changes
+    /** the version of the flowable library */
+    public static String VERSION = "6.0.0.5"; // Note the extra .x at the end. To cater for snapshot releases with different database changes
 
-  /**
-   * The name as specified in 'process-engine-name' in the flowable.cfg.xml configuration file. The default name for a process engine is 'default
-   */
-  String getName();
+    /**
+     * The name as specified in 'process-engine-name' in the flowable.cfg.xml configuration file. The default name for a process engine is 'default
+     */
+    String getName();
 
-  void close();
-  
-  RepositoryService getRepositoryService();
+    void close();
 
-  RuntimeService getRuntimeService();
+    RepositoryService getRepositoryService();
 
-  FormService getFormService();
+    RuntimeService getRuntimeService();
 
-  TaskService getTaskService();
+    FormService getFormService();
 
-  HistoryService getHistoryService();
+    TaskService getTaskService();
 
-  IdentityService getIdentityService();
+    HistoryService getHistoryService();
 
-  ManagementService getManagementService();
-  
-  DynamicBpmnService getDynamicBpmnService();
+    IdentityService getIdentityService();
 
-  ProcessEngineConfiguration getProcessEngineConfiguration();
-  
-  FormRepositoryService getFormEngineRepositoryService();
-  
-  org.flowable.form.api.FormService getFormEngineFormService();
-  
-  DmnRepositoryService getDmnRepositoryService();
-  
-  DmnRuleService getDmnRuleService();
-  
-  IdmIdentityService getIdmIdentityService();
-  
-  ContentService getContentService();
+    ManagementService getManagementService();
+
+    DynamicBpmnService getDynamicBpmnService();
+
+    ProcessEngineConfiguration getProcessEngineConfiguration();
+
+    FormRepositoryService getFormEngineRepositoryService();
+
+    org.flowable.form.api.FormService getFormEngineFormService();
+
+    DmnRepositoryService getDmnRepositoryService();
+
+    DmnRuleService getDmnRuleService();
+
+    IdmIdentityService getIdmIdentityService();
+
+    ContentService getContentService();
 }

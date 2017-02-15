@@ -19,13 +19,13 @@ import org.flowable.compatibility.testdata.Flowable5TestDataGenerator;
 
 public class JavaDelegateTestDataGenerator implements Flowable5TestDataGenerator {
 
-  @Override
-  public void generateTestData(ProcessEngine processEngine) {
-    RepositoryService repositoryService = processEngine.getRepositoryService();
-    repositoryService.createDeployment().addClasspathResource("javaDelegateProcess.bpmn20.xml").deploy();
-    
-    RuntimeService runtimeService = processEngine.getRuntimeService();
-    runtimeService.startProcessInstanceByKey("javaDelegateTestProcess");
-  }
+    @Override
+    public void generateTestData(ProcessEngine processEngine) {
+        RepositoryService repositoryService = processEngine.getRepositoryService();
+        repositoryService.createDeployment().addClasspathResource("javaDelegateProcess.bpmn20.xml").deploy();
+
+        RuntimeService runtimeService = processEngine.getRuntimeService();
+        runtimeService.startProcessInstanceByKey("javaDelegateTestProcess");
+    }
 
 }

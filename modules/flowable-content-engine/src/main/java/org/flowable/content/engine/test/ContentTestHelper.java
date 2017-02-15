@@ -29,46 +29,46 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class ContentTestHelper {
 
-  private static Logger log = LoggerFactory.getLogger(ContentTestHelper.class);
+    private static Logger log = LoggerFactory.getLogger(ContentTestHelper.class);
 
-  public static final String EMPTY_LINE = "\n";
+    public static final String EMPTY_LINE = "\n";
 
-  static Map<String, ContentEngine> contentEngines = new HashMap<String, ContentEngine>();
+    static Map<String, ContentEngine> contentEngines = new HashMap<String, ContentEngine>();
 
-  // Engine startup and shutdown helpers
-  // ///////////////////////////////////////////////////
+    // Engine startup and shutdown helpers
+    // ///////////////////////////////////////////////////
 
-  public static ContentEngine getContentEngine(String configurationResource) {
-    ContentEngine contentEngine = contentEngines.get(configurationResource);
-    if (contentEngine == null) {
-      log.debug("==== BUILDING CONTENT ENGINE ========================================================================");
-      contentEngine = ContentEngineConfiguration.createContentEngineConfigurationFromResource(configurationResource)
-          .setDatabaseSchemaUpdate(ContentEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE)
-          .buildContentEngine();
-      log.debug("==== CONTENT ENGINE CREATED =========================================================================");
-      contentEngines.put(configurationResource, contentEngine);
+    public static ContentEngine getContentEngine(String configurationResource) {
+        ContentEngine contentEngine = contentEngines.get(configurationResource);
+        if (contentEngine == null) {
+            log.debug("==== BUILDING CONTENT ENGINE ========================================================================");
+            contentEngine = ContentEngineConfiguration.createContentEngineConfigurationFromResource(configurationResource)
+                    .setDatabaseSchemaUpdate(ContentEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE)
+                    .buildContentEngine();
+            log.debug("==== CONTENT ENGINE CREATED =========================================================================");
+            contentEngines.put(configurationResource, contentEngine);
+        }
+        return contentEngine;
     }
-    return contentEngine;
-  }
 
-  public static void closeContentEngines() {
-    for (ContentEngine contentEngine : contentEngines.values()) {
-      contentEngine.close();
+    public static void closeContentEngines() {
+        for (ContentEngine contentEngine : contentEngines.values()) {
+            contentEngine.close();
+        }
+        contentEngines.clear();
     }
-    contentEngines.clear();
-  }
 
-  /**
-   * Each test is assumed to clean up all DB content it entered. After a test method executed, this method scans all tables to see if the DB is completely clean. It throws AssertionFailed in case the
-   * DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
-   */
-  public static void assertAndEnsureCleanDb(ContentEngine contentEngine) {
-    log.debug("verifying that db is clean after test");
-    ContentService contentService = contentEngine.getContentEngineConfiguration().getContentService();
-    List<ContentItem> items = contentService.createContentItemQuery().list();
-    if (items != null && !items.isEmpty()) {
-      throw new AssertionError("ContentItem is not empty");
+    /**
+     * Each test is assumed to clean up all DB content it entered. After a test method executed, this method scans all tables to see if the DB is completely clean. It throws AssertionFailed in case
+     * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
+     */
+    public static void assertAndEnsureCleanDb(ContentEngine contentEngine) {
+        log.debug("verifying that db is clean after test");
+        ContentService contentService = contentEngine.getContentEngineConfiguration().getContentService();
+        List<ContentItem> items = contentService.createContentItemQuery().list();
+        if (items != null && !items.isEmpty()) {
+            throw new AssertionError("ContentItem is not empty");
+        }
     }
-  }
 
 }

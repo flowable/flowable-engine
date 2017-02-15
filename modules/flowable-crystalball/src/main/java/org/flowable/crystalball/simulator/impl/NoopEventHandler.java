@@ -22,14 +22,14 @@ import org.flowable.crystalball.simulator.SimulationEventHandler;
  */
 public class NoopEventHandler implements SimulationEventHandler {
 
-  @Override
-  public void init() {
+    @Override
+    public void init() {
 
-  }
+    }
 
-  @Override
-  public void handle(SimulationEvent event) {
+    @Override
+    public void handle(SimulationEvent event) {
 
-  }
+    }
 
 }

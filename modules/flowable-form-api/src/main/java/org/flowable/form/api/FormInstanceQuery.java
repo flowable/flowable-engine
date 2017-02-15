@@ -25,105 +25,105 @@ import org.flowable.engine.common.api.query.Query;
  */
 public interface FormInstanceQuery extends Query<FormInstanceQuery, FormInstance> {
 
-  /**
-   * Only select submitted forms with the given id.
-   */
-  FormInstanceQuery id(String id);
-  
-  /**
-   * Only select submitted forms with the given ids.
-   */
-  FormInstanceQuery ids(Set<String> ids);
-  
-  /**
-   * Only select submitted forms with the given form definition id.
-   */
-  FormInstanceQuery formDefinitionId(String formDefinitionId);
+    /**
+     * Only select submitted forms with the given id.
+     */
+    FormInstanceQuery id(String id);
 
-  /**
-   * Only select submitted forms with a form definition id like the given string.
-   */
-  FormInstanceQuery formDefinitionIdLike(String formDefinitionIdLike);
+    /**
+     * Only select submitted forms with the given ids.
+     */
+    FormInstanceQuery ids(Set<String> ids);
 
-  /**
-   * Only select submitted forms with the given task id.
-   */
-  FormInstanceQuery taskId(String taskId);
+    /**
+     * Only select submitted forms with the given form definition id.
+     */
+    FormInstanceQuery formDefinitionId(String formDefinitionId);
 
-  /**
-   * Only select submitted forms with a task id like the given string.
-   */
-  FormInstanceQuery taskIdLike(String taskIdLike);
-  
-  /**
-   * Only select submitted forms with the given process instance id.
-   */
-  FormInstanceQuery processInstanceId(String processInstanceId);
+    /**
+     * Only select submitted forms with a form definition id like the given string.
+     */
+    FormInstanceQuery formDefinitionIdLike(String formDefinitionIdLike);
 
-  /**
-   * Only select submitted forms with a process instance id like the given string.
-   */
-  FormInstanceQuery processInstanceIdLike(String processInstanceIdLike);
-  
-  /**
-   * Only select submitted forms with the given process definition id.
-   */
-  FormInstanceQuery processDefinitionId(String processDefinitionId);
+    /**
+     * Only select submitted forms with the given task id.
+     */
+    FormInstanceQuery taskId(String taskId);
 
-  /**
-   * Only select submitted forms with a process definition id like the given string.
-   */
-  FormInstanceQuery processDefinitionIdLike(String processDefinitionIdLike);
-  
-  /**
-   * Only select submitted forms submitted on the given time
-   */
-  FormInstanceQuery submittedDate(Date submittedDate);
-  
-  /**
-   * Only select submitted forms submitted before the given time
-   */
-  FormInstanceQuery submittedDateBefore(Date beforeTime);
+    /**
+     * Only select submitted forms with a task id like the given string.
+     */
+    FormInstanceQuery taskIdLike(String taskIdLike);
 
-  /**
-   * Only select submitted forms submitted after the given time
-   */
-  FormInstanceQuery submittedDateAfter(Date afterTime);
-  
-  /**
-   * Only select submitted forms with the given submitted by value.
-   */
-  FormInstanceQuery submittedBy(String submittedBy);
+    /**
+     * Only select submitted forms with the given process instance id.
+     */
+    FormInstanceQuery processInstanceId(String processInstanceId);
 
-  /**
-   * Only select submitted forms with a submitted by like the given string.
-   */
-  FormInstanceQuery submittedByLike(String submittedByLike);
+    /**
+     * Only select submitted forms with a process instance id like the given string.
+     */
+    FormInstanceQuery processInstanceIdLike(String processInstanceIdLike);
 
-  /**
-   * Only select submitted forms that have the given tenant id.
-   */
-  FormInstanceQuery deploymentTenantId(String tenantId);
+    /**
+     * Only select submitted forms with the given process definition id.
+     */
+    FormInstanceQuery processDefinitionId(String processDefinitionId);
 
-  /**
-   * Only select submitted forms with a tenant id like the given one.
-   */
-  FormInstanceQuery deploymentTenantIdLike(String tenantIdLike);
+    /**
+     * Only select submitted forms with a process definition id like the given string.
+     */
+    FormInstanceQuery processDefinitionIdLike(String processDefinitionIdLike);
 
-  /**
-   * Only select submitted forms that do not have a tenant id.
-   */
-  FormInstanceQuery deploymentWithoutTenantId();
+    /**
+     * Only select submitted forms submitted on the given time
+     */
+    FormInstanceQuery submittedDate(Date submittedDate);
 
-  // sorting ////////////////////////////////////////////////////////
+    /**
+     * Only select submitted forms submitted before the given time
+     */
+    FormInstanceQuery submittedDateBefore(Date beforeTime);
 
-  /**
-   * Order by submitted date (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  FormInstanceQuery orderBySubmittedDate();
+    /**
+     * Only select submitted forms submitted after the given time
+     */
+    FormInstanceQuery submittedDateAfter(Date afterTime);
 
-  /**
-   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  FormInstanceQuery orderByTenantId();
+    /**
+     * Only select submitted forms with the given submitted by value.
+     */
+    FormInstanceQuery submittedBy(String submittedBy);
+
+    /**
+     * Only select submitted forms with a submitted by like the given string.
+     */
+    FormInstanceQuery submittedByLike(String submittedByLike);
+
+    /**
+     * Only select submitted forms that have the given tenant id.
+     */
+    FormInstanceQuery deploymentTenantId(String tenantId);
+
+    /**
+     * Only select submitted forms with a tenant id like the given one.
+     */
+    FormInstanceQuery deploymentTenantIdLike(String tenantIdLike);
+
+    /**
+     * Only select submitted forms that do not have a tenant id.
+     */
+    FormInstanceQuery deploymentWithoutTenantId();
+
+    // sorting ////////////////////////////////////////////////////////
+
+    /**
+     * Order by submitted date (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    FormInstanceQuery orderBySubmittedDate();
+
+    /**
+     * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    FormInstanceQuery orderByTenantId();
 }

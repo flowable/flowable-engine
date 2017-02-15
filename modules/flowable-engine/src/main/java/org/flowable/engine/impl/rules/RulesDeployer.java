@@ -34,32 +34,32 @@ import org.slf4j.LoggerFactory;
  */
 public class RulesDeployer implements Deployer {
 
-  private static final Logger log = LoggerFactory.getLogger(RulesDeployer.class);
+    private static final Logger log = LoggerFactory.getLogger(RulesDeployer.class);
 
-  public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
-    log.debug("Processing rules deployment {}", deployment.getName());
+    public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
+        log.debug("Processing rules deployment {}", deployment.getName());
 
-    KnowledgeBuilder knowledgeBuilder = null;
+        KnowledgeBuilder knowledgeBuilder = null;
 
-    DeploymentManager deploymentManager = Context.getProcessEngineConfiguration().getDeploymentManager();
+        DeploymentManager deploymentManager = Context.getProcessEngineConfiguration().getDeploymentManager();
 
-    Map<String, ResourceEntity> resources = deployment.getResources();
-    for (String resourceName : resources.keySet()) {
-      if (resourceName.endsWith(".drl")) { // is only parsing .drls sufficient? what about other rule dsl's? (@see ResourceType)
-        log.info("Processing rules resource {}", resourceName);
-        if (knowledgeBuilder == null) {
-          knowledgeBuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+        Map<String, ResourceEntity> resources = deployment.getResources();
+        for (String resourceName : resources.keySet()) {
+            if (resourceName.endsWith(".drl")) { // is only parsing .drls sufficient? what about other rule dsl's? (@see ResourceType)
+                log.info("Processing rules resource {}", resourceName);
+                if (knowledgeBuilder == null) {
+                    knowledgeBuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+                }
+                ResourceEntity resourceEntity = resources.get(resourceName);
+                byte[] resourceBytes = resourceEntity.getBytes();
+                Resource droolsResource = ResourceFactory.newByteArrayResource(resourceBytes);
+                knowledgeBuilder.add(droolsResource, ResourceType.DRL);
+            }
         }
-        ResourceEntity resourceEntity = resources.get(resourceName);
-        byte[] resourceBytes = resourceEntity.getBytes();
-        Resource droolsResource = ResourceFactory.newByteArrayResource(resourceBytes);
-        knowledgeBuilder.add(droolsResource, ResourceType.DRL);
-      }
-    }
 
-    if (knowledgeBuilder != null) {
-      KnowledgeBase knowledgeBase = knowledgeBuilder.newKnowledgeBase();
-      deploymentManager.getKnowledgeBaseCache().add(deployment.getId(), knowledgeBase);
+        if (knowledgeBuilder != null) {
+            KnowledgeBase knowledgeBase = knowledgeBuilder.newKnowledgeBase();
+            deploymentManager.getKnowledgeBaseCache().add(deployment.getId(), knowledgeBase);
+        }
     }
-  }
 }

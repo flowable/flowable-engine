@@ -36,26 +36,26 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RestController
 @RequestMapping("/rest/admin/models")
 public class ModelsClientResource extends AbstractClientResource {
-  
-  private static final Logger logger = LoggerFactory.getLogger(ModelsClientResource.class);
 
-  @Autowired
-  protected ModelService clientService;
+    private static final Logger logger = LoggerFactory.getLogger(ModelsClientResource.class);
 
-  /**
-   * GET /rest/admin/models -> get a list of apps.
-   */
-  @RequestMapping(method = RequestMethod.GET, produces = "application/json")
-  public JsonNode listModels(HttpServletRequest request) {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-    Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
+    @Autowired
+    protected ModelService clientService;
 
-    try {
-      return clientService.listModels(serverConfig, parameterMap);
+    /**
+     * GET /rest/admin/models -> get a list of apps.
+     */
+    @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+    public JsonNode listModels(HttpServletRequest request) {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
 
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting models", e);
-      throw new BadRequestException(e.getMessage());
+        try {
+            return clientService.listModels(serverConfig, parameterMap);
+
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting models", e);
+            throw new BadRequestException(e.getMessage());
+        }
     }
-  }
 }

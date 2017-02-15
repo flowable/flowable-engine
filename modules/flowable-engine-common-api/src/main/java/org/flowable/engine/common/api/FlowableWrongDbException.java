@@ -21,33 +21,33 @@ package org.flowable.engine.common.api;
  */
 public class FlowableWrongDbException extends FlowableException {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  String libraryVersion;
-  String dbVersion;
+    String libraryVersion;
+    String dbVersion;
 
-  public FlowableWrongDbException(String libraryVersion, String dbVersion) {
-    super(
-        "version mismatch: library version is '"
-            + libraryVersion
-            + "', db version is "
-            + dbVersion
-            + " Hint: Set <property name=\"databaseSchemaUpdate\" to value=\"true\" or value=\"create-drop\" (use create-drop for testing only!) in bean processEngineConfiguration in flowable.cfg.xml for automatic schema creation");
-    this.libraryVersion = libraryVersion;
-    this.dbVersion = dbVersion;
-  }
+    public FlowableWrongDbException(String libraryVersion, String dbVersion) {
+        super(
+                "version mismatch: library version is '"
+                        + libraryVersion
+                        + "', db version is "
+                        + dbVersion
+                        + " Hint: Set <property name=\"databaseSchemaUpdate\" to value=\"true\" or value=\"create-drop\" (use create-drop for testing only!) in bean processEngineConfiguration in flowable.cfg.xml for automatic schema creation");
+        this.libraryVersion = libraryVersion;
+        this.dbVersion = dbVersion;
+    }
 
-  /**
-   * The version of the Flowable library used.
-   */
-  public String getLibraryVersion() {
-    return libraryVersion;
-  }
+    /**
+     * The version of the Flowable library used.
+     */
+    public String getLibraryVersion() {
+        return libraryVersion;
+    }
 
-  /**
-   * The version of the Flowable library that was used to create the database schema.
-   */
-  public String getDbVersion() {
-    return dbVersion;
-  }
+    /**
+     * The version of the Flowable library that was used to create the database schema.
+     */
+    public String getDbVersion() {
+        return dbVersion;
+    }
 }

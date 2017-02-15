@@ -25,32 +25,32 @@ import org.flowable.engine.common.impl.interceptor.SessionFactory;
  */
 public class EntityManagerSessionFactory implements SessionFactory {
 
-  protected EntityManagerFactory entityManagerFactory;
-  protected boolean handleTransactions;
-  protected boolean closeEntityManager;
+    protected EntityManagerFactory entityManagerFactory;
+    protected boolean handleTransactions;
+    protected boolean closeEntityManager;
 
-  public EntityManagerSessionFactory(Object entityManagerFactory, boolean handleTransactions, boolean closeEntityManager) {
-    if (entityManagerFactory == null) {
-      throw new FlowableIllegalArgumentException("entityManagerFactory is null");
+    public EntityManagerSessionFactory(Object entityManagerFactory, boolean handleTransactions, boolean closeEntityManager) {
+        if (entityManagerFactory == null) {
+            throw new FlowableIllegalArgumentException("entityManagerFactory is null");
+        }
+        if (!(entityManagerFactory instanceof EntityManagerFactory)) {
+            throw new FlowableIllegalArgumentException("EntityManagerFactory must implement 'javax.persistence.EntityManagerFactory'");
+        }
+
+        this.entityManagerFactory = (EntityManagerFactory) entityManagerFactory;
+        this.handleTransactions = handleTransactions;
+        this.closeEntityManager = closeEntityManager;
     }
-    if (!(entityManagerFactory instanceof EntityManagerFactory)) {
-      throw new FlowableIllegalArgumentException("EntityManagerFactory must implement 'javax.persistence.EntityManagerFactory'");
+
+    public Class<?> getSessionType() {
+        return EntityManagerSession.class;
     }
 
-    this.entityManagerFactory = (EntityManagerFactory) entityManagerFactory;
-    this.handleTransactions = handleTransactions;
-    this.closeEntityManager = closeEntityManager;
-  }
+    public Session openSession(AbstractCommandContext commandContext) {
+        return new EntityManagerSessionImpl(entityManagerFactory, handleTransactions, closeEntityManager);
+    }
 
-  public Class<?> getSessionType() {
-    return EntityManagerSession.class;
-  }
-
-  public Session openSession(AbstractCommandContext commandContext) {
-    return new EntityManagerSessionImpl(entityManagerFactory, handleTransactions, closeEntityManager);
-  }
-
-  public EntityManagerFactory getEntityManagerFactory() {
-    return entityManagerFactory;
-  }
+    public EntityManagerFactory getEntityManagerFactory() {
+        return entityManagerFactory;
+    }
 }

@@ -21,12 +21,12 @@ import org.flowable.idm.api.Group;
  */
 public interface GroupEntity extends Group, Entity, HasRevision {
 
-  String getName();
+    String getName();
 
-  void setName(String name);
- 
-  String getType();
+    void setName(String name);
 
-  void setType(String type);
+    String getType();
+
+    void setType(String type);
 
 }

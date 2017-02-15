@@ -22,9 +22,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class CustomUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    
+
     private final Logger log = LoggerFactory.getLogger(CustomUsernamePasswordAuthenticationFilter.class);
-    
+
     public CustomUsernamePasswordAuthenticationFilter() {
         super();
     }

@@ -22,78 +22,76 @@ import org.flowable.engine.runtime.Job;
  */
 public interface AsyncExecutor {
 
-  /**
-   * Starts the Async Executor: jobs will be acquired and executed.
-   */
-  void start();
-  
-  /**
-   * Stops executing jobs.
-   */
-  void shutdown();
+    /**
+     * Starts the Async Executor: jobs will be acquired and executed.
+     */
+    void start();
 
-  /**
-   * Offers the provided {@link JobEntity} to this {@link AsyncExecutor} instance
-   * to execute. If the offering does not work for some reason, false 
-   * will be returned (For example when the job queue is full in the {@link DefaultAsyncJobExecutor}). 
-   */
-  boolean executeAsyncJob(Job job);
-  
-  int getRemainingCapacity();
-  
-  
-  /* Getters and Setters */
-  
-  void setProcessEngineConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration);
-  
-  ProcessEngineConfigurationImpl getProcessEngineConfiguration();
-  
-  boolean isAutoActivate();
+    /**
+     * Stops executing jobs.
+     */
+    void shutdown();
 
-  void setAutoActivate(boolean isAutoActivate);
-  
-  boolean isActive();
-  
-  String getLockOwner();
-  
-  int getTimerLockTimeInMillis();
-  
-  void setTimerLockTimeInMillis(int lockTimeInMillis);
-  
-  int getAsyncJobLockTimeInMillis();
-  
-  void setAsyncJobLockTimeInMillis(int lockTimeInMillis);
-  
-  int getDefaultTimerJobAcquireWaitTimeInMillis();
-  
-  void setDefaultTimerJobAcquireWaitTimeInMillis(int waitTimeInMillis);
-  
-  int getDefaultAsyncJobAcquireWaitTimeInMillis();
-  
-  void setDefaultAsyncJobAcquireWaitTimeInMillis(int waitTimeInMillis);
-  
-  public int getDefaultQueueSizeFullWaitTimeInMillis();
+    /**
+     * Offers the provided {@link JobEntity} to this {@link AsyncExecutor} instance to execute. If the offering does not work for some reason, false will be returned (For example when the job queue is
+     * full in the {@link DefaultAsyncJobExecutor}).
+     */
+    boolean executeAsyncJob(Job job);
 
-  public void setDefaultQueueSizeFullWaitTimeInMillis(int defaultQueueSizeFullWaitTimeInMillis);
-  
-  int getMaxAsyncJobsDuePerAcquisition();
-  
-  void setMaxAsyncJobsDuePerAcquisition(int maxJobs);
-  
-  int getMaxTimerJobsPerAcquisition();
-  
-  void setMaxTimerJobsPerAcquisition(int maxJobs);
-  
-  int getRetryWaitTimeInMillis();
-  
-  void setRetryWaitTimeInMillis(int retryWaitTimeInMillis);
-  
-  int getResetExpiredJobsInterval();
+    int getRemainingCapacity();
 
-  void setResetExpiredJobsInterval(int resetExpiredJobsInterval);
-  
-  int getResetExpiredJobsPageSize();
-  
-  void setResetExpiredJobsPageSize(int resetExpiredJobsPageSize);
-  
+    /* Getters and Setters */
+
+    void setProcessEngineConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration);
+
+    ProcessEngineConfigurationImpl getProcessEngineConfiguration();
+
+    boolean isAutoActivate();
+
+    void setAutoActivate(boolean isAutoActivate);
+
+    boolean isActive();
+
+    String getLockOwner();
+
+    int getTimerLockTimeInMillis();
+
+    void setTimerLockTimeInMillis(int lockTimeInMillis);
+
+    int getAsyncJobLockTimeInMillis();
+
+    void setAsyncJobLockTimeInMillis(int lockTimeInMillis);
+
+    int getDefaultTimerJobAcquireWaitTimeInMillis();
+
+    void setDefaultTimerJobAcquireWaitTimeInMillis(int waitTimeInMillis);
+
+    int getDefaultAsyncJobAcquireWaitTimeInMillis();
+
+    void setDefaultAsyncJobAcquireWaitTimeInMillis(int waitTimeInMillis);
+
+    public int getDefaultQueueSizeFullWaitTimeInMillis();
+
+    public void setDefaultQueueSizeFullWaitTimeInMillis(int defaultQueueSizeFullWaitTimeInMillis);
+
+    int getMaxAsyncJobsDuePerAcquisition();
+
+    void setMaxAsyncJobsDuePerAcquisition(int maxJobs);
+
+    int getMaxTimerJobsPerAcquisition();
+
+    void setMaxTimerJobsPerAcquisition(int maxJobs);
+
+    int getRetryWaitTimeInMillis();
+
+    void setRetryWaitTimeInMillis(int retryWaitTimeInMillis);
+
+    int getResetExpiredJobsInterval();
+
+    void setResetExpiredJobsInterval(int resetExpiredJobsInterval);
+
+    int getResetExpiredJobsPageSize();
+
+    void setResetExpiredJobsPageSize(int resetExpiredJobsPageSize);
+
 }

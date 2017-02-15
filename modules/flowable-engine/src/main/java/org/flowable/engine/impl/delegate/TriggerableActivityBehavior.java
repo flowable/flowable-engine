@@ -19,6 +19,6 @@ import org.flowable.engine.delegate.DelegateExecution;
  */
 public interface TriggerableActivityBehavior extends ActivityBehavior {
 
-  void trigger(DelegateExecution execution, String signalEvent, Object signalData);
+    void trigger(DelegateExecution execution, String signalEvent, Object signalData);
 
 }

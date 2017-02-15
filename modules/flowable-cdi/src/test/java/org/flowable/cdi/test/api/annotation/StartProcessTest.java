@@ -30,39 +30,39 @@ import org.junit.Test;
  */
 public class StartProcessTest extends CdiFlowableTestCase {
 
-  @Test
-  @Deployment(resources = "org/flowable/cdi/test/api/annotation/StartProcessTest.bpmn20.xml")
-  public void testStartProcessByKey() {
+    @Test
+    @Deployment(resources = "org/flowable/cdi/test/api/annotation/StartProcessTest.bpmn20.xml")
+    public void testStartProcessByKey() {
 
-    assertNull(runtimeService.createProcessInstanceQuery().singleResult());
+        assertNull(runtimeService.createProcessInstanceQuery().singleResult());
 
-    getBeanInstance(DeclarativeProcessController.class).startProcessByKey();
-    BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
+        getBeanInstance(DeclarativeProcessController.class).startProcessByKey();
+        BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
 
-    assertNotNull(runtimeService.createProcessInstanceQuery().singleResult());
+        assertNotNull(runtimeService.createProcessInstanceQuery().singleResult());
 
-    assertEquals("Flowable", businessProcess.getVariable("name"));
+        assertEquals("Flowable", businessProcess.getVariable("name"));
 
-    businessProcess.startTask(taskService.createTaskQuery().singleResult().getId());
-    businessProcess.completeTask();
-  }
+        businessProcess.startTask(taskService.createTaskQuery().singleResult().getId());
+        businessProcess.completeTask();
+    }
 
-  @Test
-  @Deployment(resources = "org/flowable/cdi/test/api/annotation/StartProcessTest.bpmn20.xml")
-  public void testStartProcessByName() {
+    @Test
+    @Deployment(resources = "org/flowable/cdi/test/api/annotation/StartProcessTest.bpmn20.xml")
+    public void testStartProcessByName() {
 
-    assertNull(runtimeService.createProcessInstanceQuery().singleResult());
+        assertNull(runtimeService.createProcessInstanceQuery().singleResult());
 
-    getBeanInstance(DeclarativeProcessController.class).startProcessByName();
+        getBeanInstance(DeclarativeProcessController.class).startProcessByName();
 
-    BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
+        BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
 
-    assertNotNull(runtimeService.createProcessInstanceQuery().singleResult());
+        assertNotNull(runtimeService.createProcessInstanceQuery().singleResult());
 
-    assertEquals("Flowable", businessProcess.getVariable("name"));
+        assertEquals("Flowable", businessProcess.getVariable("name"));
 
-    businessProcess.startTask(taskService.createTaskQuery().singleResult().getId());
-    businessProcess.completeTask();
-  }
+        businessProcess.startTask(taskService.createTaskQuery().singleResult().getId());
+        businessProcess.completeTask();
+    }
 
 }

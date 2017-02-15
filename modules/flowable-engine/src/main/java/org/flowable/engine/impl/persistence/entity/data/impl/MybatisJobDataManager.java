@@ -33,72 +33,72 @@ import org.flowable.engine.runtime.Job;
  * @author Tijs Rademakers
  */
 public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implements JobDataManager {
-  
-  protected CachedEntityMatcher<JobEntity> jobsByExecutionIdMatcher = new JobsByExecutionIdMatcher();
-  
-  public MybatisJobDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    super(processEngineConfiguration);
-  }
 
-  @Override
-  public Class<? extends JobEntity> getManagedEntityClass() {
-    return JobEntityImpl.class;
-  }
-  
-  @Override
-  public JobEntity create() {
-    return new JobEntityImpl();
-  }
-  
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<JobEntity> findJobsToExecute(Page page) {
-    return getDbSqlSession().selectList("selectJobsToExecute", null, page);
-  }
+    protected CachedEntityMatcher<JobEntity> jobsByExecutionIdMatcher = new JobsByExecutionIdMatcher();
 
-  @Override
-  public List<JobEntity> findJobsByExecutionId(final String executionId) {
-    return getList("selectJobsByExecutionId", executionId, jobsByExecutionIdMatcher, true);
-  }
-  
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<JobEntity> findJobsByProcessInstanceId(final String processInstanceId) {
-    return getDbSqlSession().selectList("selectJobsByProcessInstanceId", processInstanceId);
-  }
+    public MybatisJobDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<JobEntity> findExpiredJobs(Page page) {
-    Date now = getClock().getCurrentTime();
-    return getDbSqlSession().selectList("selectExpiredJobs", now, page);
-  }
+    @Override
+    public Class<? extends JobEntity> getManagedEntityClass() {
+        return JobEntityImpl.class;
+    }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery, Page page) {
-    final String query = "selectJobByQueryCriteria";
-    return getDbSqlSession().selectList(query, jobQuery, page);
-  }
-  
-  @Override
-  public long findJobCountByQueryCriteria(JobQueryImpl jobQuery) {
-    return (Long) getDbSqlSession().selectOne("selectJobCountByQueryCriteria", jobQuery);
-  }
+    @Override
+    public JobEntity create() {
+        return new JobEntityImpl();
+    }
 
-  @Override
-  public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
-    HashMap<String, Object> params = new HashMap<String, Object>();
-    params.put("deploymentId", deploymentId);
-    params.put("tenantId", newTenantId);
-    getDbSqlSession().update("updateJobTenantIdForDeployment", params);
-  }
-  
-  @Override
-  public void resetExpiredJob(String jobId) {
-    Map<String, Object> params = new HashMap<String, Object>(2);
-    params.put("id", jobId);
-    getDbSqlSession().update("resetExpiredJob", params);
-  }
-  
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<JobEntity> findJobsToExecute(Page page) {
+        return getDbSqlSession().selectList("selectJobsToExecute", null, page);
+    }
+
+    @Override
+    public List<JobEntity> findJobsByExecutionId(final String executionId) {
+        return getList("selectJobsByExecutionId", executionId, jobsByExecutionIdMatcher, true);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<JobEntity> findJobsByProcessInstanceId(final String processInstanceId) {
+        return getDbSqlSession().selectList("selectJobsByProcessInstanceId", processInstanceId);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<JobEntity> findExpiredJobs(Page page) {
+        Date now = getClock().getCurrentTime();
+        return getDbSqlSession().selectList("selectExpiredJobs", now, page);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery, Page page) {
+        final String query = "selectJobByQueryCriteria";
+        return getDbSqlSession().selectList(query, jobQuery, page);
+    }
+
+    @Override
+    public long findJobCountByQueryCriteria(JobQueryImpl jobQuery) {
+        return (Long) getDbSqlSession().selectOne("selectJobCountByQueryCriteria", jobQuery);
+    }
+
+    @Override
+    public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
+        HashMap<String, Object> params = new HashMap<String, Object>();
+        params.put("deploymentId", deploymentId);
+        params.put("tenantId", newTenantId);
+        getDbSqlSession().update("updateJobTenantIdForDeployment", params);
+    }
+
+    @Override
+    public void resetExpiredJob(String jobId) {
+        Map<String, Object> params = new HashMap<String, Object>(2);
+        params.put("id", jobId);
+        getDbSqlSession().update("resetExpiredJob", params);
+    }
+
 }

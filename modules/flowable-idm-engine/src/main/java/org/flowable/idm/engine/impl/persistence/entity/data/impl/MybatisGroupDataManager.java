@@ -29,47 +29,47 @@ import org.flowable.idm.engine.impl.persistence.entity.data.GroupDataManager;
  */
 public class MybatisGroupDataManager extends AbstractDataManager<GroupEntity> implements GroupDataManager {
 
-  public MybatisGroupDataManager(IdmEngineConfiguration idmEngineConfiguration) {
-    super(idmEngineConfiguration);
-  }
+    public MybatisGroupDataManager(IdmEngineConfiguration idmEngineConfiguration) {
+        super(idmEngineConfiguration);
+    }
 
-  @Override
-  public Class<? extends GroupEntity> getManagedEntityClass() {
-    return GroupEntityImpl.class;
-  }
-  
-  @Override
-  public GroupEntity create() {
-    return new GroupEntityImpl();
-  }
-  
-  @SuppressWarnings("unchecked")
-  public List<Group> findGroupByQueryCriteria(GroupQueryImpl query, Page page) {
-    return getDbSqlSession().selectList("selectGroupByQueryCriteria", query, page);
-  }
+    @Override
+    public Class<? extends GroupEntity> getManagedEntityClass() {
+        return GroupEntityImpl.class;
+    }
 
-  public long findGroupCountByQueryCriteria(GroupQueryImpl query) {
-    return (Long) getDbSqlSession().selectOne("selectGroupCountByQueryCriteria", query);
-  }
+    @Override
+    public GroupEntity create() {
+        return new GroupEntityImpl();
+    }
 
-  @SuppressWarnings("unchecked")
-  public List<Group> findGroupsByUser(String userId) {
-    return getDbSqlSession().selectList("selectGroupsByUserId", userId);
-  }
-  
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<Group> findGroupsByPrivilegeId(String privilegeId) {
-    return getDbSqlSession().selectList("selectGroupsWithPrivilegeId", privilegeId);
-  }
+    @SuppressWarnings("unchecked")
+    public List<Group> findGroupByQueryCriteria(GroupQueryImpl query, Page page) {
+        return getDbSqlSession().selectList("selectGroupByQueryCriteria", query, page);
+    }
 
-  @SuppressWarnings("unchecked")
-  public List<Group> findGroupsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return getDbSqlSession().selectListWithRawParameter("selectGroupByNativeQuery", parameterMap, firstResult, maxResults);
-  }
+    public long findGroupCountByQueryCriteria(GroupQueryImpl query) {
+        return (Long) getDbSqlSession().selectOne("selectGroupCountByQueryCriteria", query);
+    }
 
-  public long findGroupCountByNativeQuery(Map<String, Object> parameterMap) {
-    return (Long) getDbSqlSession().selectOne("selectGroupCountByNativeQuery", parameterMap);
-  }
-  
+    @SuppressWarnings("unchecked")
+    public List<Group> findGroupsByUser(String userId) {
+        return getDbSqlSession().selectList("selectGroupsByUserId", userId);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Group> findGroupsByPrivilegeId(String privilegeId) {
+        return getDbSqlSession().selectList("selectGroupsWithPrivilegeId", privilegeId);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Group> findGroupsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
+        return getDbSqlSession().selectListWithRawParameter("selectGroupByNativeQuery", parameterMap, firstResult, maxResults);
+    }
+
+    public long findGroupCountByNativeQuery(Map<String, Object> parameterMap) {
+        return (Long) getDbSqlSession().selectOne("selectGroupCountByNativeQuery", parameterMap);
+    }
+
 }

@@ -13,7 +13,7 @@
 package org.flowable.app.security;
 
 public interface CookieConstants {
-  
-  String COOKIE_NAME = "FLOWABLE_REMEMBER_ME";
+
+    String COOKIE_NAME = "FLOWABLE_REMEMBER_ME";
 
 }

@@ -21,22 +21,22 @@ import org.flowable.engine.test.Deployment;
 
 public class ExclusiveTimerEventTest extends PluggableFlowableTestCase {
 
-  @Deployment
-  public void testCatchingTimerEvent() throws Exception {
+    @Deployment
+    public void testCatchingTimerEvent() throws Exception {
 
-    // Set the clock fixed
-    Date startTime = new Date();
+        // Set the clock fixed
+        Date startTime = new Date();
 
-    // After process start, there should be 3 timers created
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("exclusiveTimers");
-    TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
-    assertEquals(3, jobQuery.count());
+        // After process start, there should be 3 timers created
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("exclusiveTimers");
+        TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
+        assertEquals(3, jobQuery.count());
 
-    // After setting the clock to time '50minutes and 5 seconds', the timers should fire
-    processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((50 * 60 * 1000) + 5000)));
-    waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5000L, 500L);
+        // After setting the clock to time '50minutes and 5 seconds', the timers should fire
+        processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((50 * 60 * 1000) + 5000)));
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5000L, 500L);
 
-    assertEquals(0, jobQuery.count());
-    assertProcessEnded(pi.getProcessInstanceId());
-  }
+        assertEquals(0, jobQuery.count());
+        assertProcessEnded(pi.getProcessInstanceId());
+    }
 }

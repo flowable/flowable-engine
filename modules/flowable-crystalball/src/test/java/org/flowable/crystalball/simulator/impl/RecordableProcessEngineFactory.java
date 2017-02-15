@@ -9,15 +9,15 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
  */
 public class RecordableProcessEngineFactory extends SimulationProcessEngineFactory {
 
-  public RecordableProcessEngineFactory(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractRecordFlowableEventListener listener) {
-    super(processEngineConfiguration);
-    processEngineConfiguration.getEventDispatcher().addEventListener(listener);
-  }
+    public RecordableProcessEngineFactory(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractRecordFlowableEventListener listener) {
+        super(processEngineConfiguration);
+        processEngineConfiguration.getEventDispatcher().addEventListener(listener);
+    }
 
-  @Override
-  public ProcessEngineImpl getObject() {
-    ProcessEngineImpl processEngine = super.getObject();
+    @Override
+    public ProcessEngineImpl getObject() {
+        ProcessEngineImpl processEngine = super.getObject();
 
-    return processEngine;
-  }
+        return processEngine;
+    }
 }

@@ -21,24 +21,24 @@ import org.flowable.engine.delegate.DelegateExecution;
  */
 public class ThrowCustomExceptionBean {
 
-  public void throwException(DelegateExecution execution) {
-    Object exceptionClassVar = execution.getVariable("exceptionClass");
-    if (exceptionClassVar == null) {
-      return;
+    public void throwException(DelegateExecution execution) {
+        Object exceptionClassVar = execution.getVariable("exceptionClass");
+        if (exceptionClassVar == null) {
+            return;
+        }
+
+        String exceptionClassName = exceptionClassVar.toString();
+
+        if (StringUtils.isNotEmpty(exceptionClassName)) {
+            RuntimeException exception = null;
+            try {
+                Class<?> clazz = Class.forName(exceptionClassName);
+                exception = (RuntimeException) clazz.newInstance();
+
+            } catch (Exception e) {
+                throw new FlowableException("Class not found", e);
+            }
+            throw exception;
+        }
     }
-
-    String exceptionClassName = exceptionClassVar.toString();
-
-    if (StringUtils.isNotEmpty(exceptionClassName)) {
-      RuntimeException exception = null;
-      try {
-        Class<?> clazz = Class.forName(exceptionClassName);
-        exception = (RuntimeException) clazz.newInstance();
-
-      } catch (Exception e) {
-        throw new FlowableException("Class not found", e);
-      }
-      throw exception;
-    }
-  }
 }

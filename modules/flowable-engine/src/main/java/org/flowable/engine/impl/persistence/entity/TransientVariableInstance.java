@@ -15,8 +15,7 @@ package org.flowable.engine.impl.persistence.entity;
 import org.flowable.engine.delegate.VariableScope;
 
 /**
- * A dummy implementation of {@link VariableInstance}, used for storing transient variables
- * on a {@link VariableScope}, as the {@link VariableScope} works with instances of {@link VariableInstance}
+ * A dummy implementation of {@link VariableInstance}, used for storing transient variables on a {@link VariableScope}, as the {@link VariableScope} works with instances of {@link VariableInstance}
  * and not with raw key/values.
  * 
  * Nothing more than a thin wrapper around a name and value. All the other methods are not implemented.
@@ -24,195 +23,195 @@ import org.flowable.engine.delegate.VariableScope;
  * @author Joram Barrez
  */
 public class TransientVariableInstance implements VariableInstance {
-  
-  public static String TYPE_TRANSIENT = "transient";
-  
-  protected String variableName;
-  protected Object variableValue;
-  
-  public TransientVariableInstance(String variableName, Object variableValue) {
-    this.variableName = variableName;
-    this.variableValue = variableValue;
-  }
 
-  @Override
-  public String getName() {
-    return variableName;
-  }
+    public static String TYPE_TRANSIENT = "transient";
 
-  @Override
-  public String getTextValue() {
-    return null;
-  }
+    protected String variableName;
+    protected Object variableValue;
 
-  @Override
-  public void setTextValue(String textValue) {
-    
-  }
+    public TransientVariableInstance(String variableName, Object variableValue) {
+        this.variableName = variableName;
+        this.variableValue = variableValue;
+    }
 
-  @Override
-  public String getTextValue2() {
-    return null;
-  }
+    @Override
+    public String getName() {
+        return variableName;
+    }
 
-  @Override
-  public void setTextValue2(String textValue2) {
-    
-  }
+    @Override
+    public String getTextValue() {
+        return null;
+    }
 
-  @Override
-  public Long getLongValue() {
-    return null;
-  }
+    @Override
+    public void setTextValue(String textValue) {
 
-  @Override
-  public void setLongValue(Long longValue) {
-    
-  }
+    }
 
-  @Override
-  public Double getDoubleValue() {
-    return null;
-  }
+    @Override
+    public String getTextValue2() {
+        return null;
+    }
 
-  @Override
-  public void setDoubleValue(Double doubleValue) {
-    
-  }
+    @Override
+    public void setTextValue2(String textValue2) {
 
-  @Override
-  public byte[] getBytes() {
-    return null;
-  }
+    }
 
-  @Override
-  public void setBytes(byte[] bytes) {
-    
-  }
+    @Override
+    public Long getLongValue() {
+        return null;
+    }
 
-  @Override
-  public Object getCachedValue() {
-    return null;
-  }
+    @Override
+    public void setLongValue(Long longValue) {
 
-  @Override
-  public void setCachedValue(Object cachedValue) {
-    
-  }
+    }
 
-  @Override
-  public String getId() {
-    return null;
-  }
+    @Override
+    public Double getDoubleValue() {
+        return null;
+    }
 
-  @Override
-  public void setId(String id) {
-    
-  }
+    @Override
+    public void setDoubleValue(Double doubleValue) {
 
-  @Override
-  public boolean isInserted() {
-    return false;
-  }
+    }
 
-  @Override
-  public void setInserted(boolean inserted) {
-    
-  }
+    @Override
+    public byte[] getBytes() {
+        return null;
+    }
 
-  @Override
-  public boolean isUpdated() {
-    return false;
-  }
+    @Override
+    public void setBytes(byte[] bytes) {
 
-  @Override
-  public void setUpdated(boolean updated) {
-    
-  }
+    }
 
-  @Override
-  public boolean isDeleted() {
-    return false;
-  }
+    @Override
+    public Object getCachedValue() {
+        return null;
+    }
 
-  @Override
-  public void setDeleted(boolean deleted) {
-    
-  }
+    @Override
+    public void setCachedValue(Object cachedValue) {
 
-  @Override
-  public Object getPersistentState() {
-    return null;
-  }
+    }
 
-  @Override
-  public void setRevision(int revision) {
-    
-  }
+    @Override
+    public String getId() {
+        return null;
+    }
 
-  @Override
-  public int getRevision() {
-    return 0;
-  }
+    @Override
+    public void setId(String id) {
 
-  @Override
-  public int getRevisionNext() {
-    return 0;
-  }
+    }
 
-  @Override
-  public void setName(String name) {
-    
-  }
+    @Override
+    public boolean isInserted() {
+        return false;
+    }
 
-  @Override
-  public void setProcessInstanceId(String processInstanceId) {
-    
-  }
+    @Override
+    public void setInserted(boolean inserted) {
 
-  @Override
-  public void setExecutionId(String executionId) {
-    
-  }
+    }
 
-  @Override
-  public Object getValue() {
-    return variableValue;
-  }
+    @Override
+    public boolean isUpdated() {
+        return false;
+    }
 
-  @Override
-  public void setValue(Object value) {
-    variableValue = value;
-  }
+    @Override
+    public void setUpdated(boolean updated) {
 
-  @Override
-  public String getTypeName() {
-    return TYPE_TRANSIENT;
-  }
+    }
 
-  @Override
-  public void setTypeName(String typeName) {
-    
-  }
+    @Override
+    public boolean isDeleted() {
+        return false;
+    }
 
-  @Override
-  public String getProcessInstanceId() {
-    return null;
-  }
+    @Override
+    public void setDeleted(boolean deleted) {
 
-  @Override
-  public String getTaskId() {
-    return null;
-  }
+    }
 
-  @Override
-  public void setTaskId(String taskId) {
-    
-  }
+    @Override
+    public Object getPersistentState() {
+        return null;
+    }
 
-  @Override
-  public String getExecutionId() {
-    return null;
-  }
+    @Override
+    public void setRevision(int revision) {
+
+    }
+
+    @Override
+    public int getRevision() {
+        return 0;
+    }
+
+    @Override
+    public int getRevisionNext() {
+        return 0;
+    }
+
+    @Override
+    public void setName(String name) {
+
+    }
+
+    @Override
+    public void setProcessInstanceId(String processInstanceId) {
+
+    }
+
+    @Override
+    public void setExecutionId(String executionId) {
+
+    }
+
+    @Override
+    public Object getValue() {
+        return variableValue;
+    }
+
+    @Override
+    public void setValue(Object value) {
+        variableValue = value;
+    }
+
+    @Override
+    public String getTypeName() {
+        return TYPE_TRANSIENT;
+    }
+
+    @Override
+    public void setTypeName(String typeName) {
+
+    }
+
+    @Override
+    public String getProcessInstanceId() {
+        return null;
+    }
+
+    @Override
+    public String getTaskId() {
+        return null;
+    }
+
+    @Override
+    public void setTaskId(String taskId) {
+
+    }
+
+    @Override
+    public String getExecutionId() {
+        return null;
+    }
 
 }

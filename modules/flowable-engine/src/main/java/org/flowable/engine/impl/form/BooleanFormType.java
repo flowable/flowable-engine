@@ -21,32 +21,32 @@ import org.flowable.engine.form.AbstractFormType;
  */
 public class BooleanFormType extends AbstractFormType {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public String getName() {
-    return "boolean";
-  }
-
-  public String getMimeType() {
-    return "plain/text";
-  }
-
-  public Object convertFormValueToModelValue(String propertyValue) {
-    if (propertyValue == null || "".equals(propertyValue)) {
-      return null;
-    }
-    return Boolean.valueOf(propertyValue);
-  }
-
-  public String convertModelValueToFormValue(Object modelValue) {
-
-    if (modelValue == null) {
-      return null;
+    public String getName() {
+        return "boolean";
     }
 
-    if (Boolean.class.isAssignableFrom(modelValue.getClass()) || boolean.class.isAssignableFrom(modelValue.getClass())) {
-      return modelValue.toString();
+    public String getMimeType() {
+        return "plain/text";
     }
-    throw new FlowableIllegalArgumentException("Model value is not of type boolean, but of type " + modelValue.getClass().getName());
-  }
+
+    public Object convertFormValueToModelValue(String propertyValue) {
+        if (propertyValue == null || "".equals(propertyValue)) {
+            return null;
+        }
+        return Boolean.valueOf(propertyValue);
+    }
+
+    public String convertModelValueToFormValue(Object modelValue) {
+
+        if (modelValue == null) {
+            return null;
+        }
+
+        if (Boolean.class.isAssignableFrom(modelValue.getClass()) || boolean.class.isAssignableFrom(modelValue.getClass())) {
+            return modelValue.toString();
+        }
+        throw new FlowableIllegalArgumentException("Model value is not of type boolean, but of type " + modelValue.getClass().getName());
+    }
 }

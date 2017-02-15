@@ -25,19 +25,19 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
  */
 public class GetDmnDefinitionCmd implements Command<DmnDefinition>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String decisionTableId;
+    protected String decisionTableId;
 
-  public GetDmnDefinitionCmd(String decisionTableId) {
-    this.decisionTableId = decisionTableId;
-  }
-
-  public DmnDefinition execute(CommandContext commandContext) {
-    if (decisionTableId == null) {
-      throw new FlowableIllegalArgumentException("decisionTableId is null");
+    public GetDmnDefinitionCmd(String decisionTableId) {
+        this.decisionTableId = decisionTableId;
     }
 
-    return DecisionTableUtil.getDmnDefinition(decisionTableId);
-  }
+    public DmnDefinition execute(CommandContext commandContext) {
+        if (decisionTableId == null) {
+            throw new FlowableIllegalArgumentException("decisionTableId is null");
+        }
+
+        return DecisionTableUtil.getDmnDefinition(decisionTableId);
+    }
 }

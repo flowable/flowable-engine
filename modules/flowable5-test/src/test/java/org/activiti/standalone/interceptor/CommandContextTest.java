@@ -19,26 +19,25 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 
-
 /**
  * @author Tom Baeyens
  */
 public class CommandContextTest extends PluggableFlowableTestCase {
 
-  public void testCommandContextGetCurrentAfterException() {
-    try {
-      CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawCommandExecutor();
-      commandExecutor.execute(new Command<Object>() {
-        public Object execute(CommandContext commandContext) {
-          throw new IllegalStateException("here i come!");
+    public void testCommandContextGetCurrentAfterException() {
+        try {
+            CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawCommandExecutor();
+            commandExecutor.execute(new Command<Object>() {
+                public Object execute(CommandContext commandContext) {
+                    throw new IllegalStateException("here i come!");
+                }
+            });
+
+            fail("expected exception");
+        } catch (IllegalStateException e) {
+            // OK
         }
-      });
-   
-      fail("expected exception");
-    } catch (IllegalStateException e) {
-      // OK
+
+        assertNull(Context.getCommandContext());
     }
-    
-    assertNull(Context.getCommandContext());
-  }
 }

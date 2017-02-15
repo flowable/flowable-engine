@@ -34,47 +34,47 @@ import org.slf4j.LoggerFactory;
  */
 public class DeployResourcesEventHandler implements SimulationEventHandler {
 
-  private static Logger log = LoggerFactory.getLogger(DeployResourcesEventHandler.class);
+    private static Logger log = LoggerFactory.getLogger(DeployResourcesEventHandler.class);
 
-  /** process to start key */
-  protected String resourcesKey;
+    /** process to start key */
+    protected String resourcesKey;
 
-  public DeployResourcesEventHandler(String resourcesKey) {
-    this.resourcesKey = resourcesKey;
-  }
-
-  @Override
-  public void init() {
-  }
-
-  @Override
-  public void handle(SimulationEvent event) {
-
-    @SuppressWarnings("unchecked")
-    Map<String, ResourceEntity> resources = (Map<String, ResourceEntity>) event.getProperty(resourcesKey);
-
-    List<InputStream> inputStreams = new ArrayList<InputStream>();
-
-    try {
-      DeploymentBuilder deploymentBuilder = SimulationRunContext.getRepositoryService().createDeployment();
-
-      for (ResourceEntity resource : resources.values()) {
-        log.debug("adding resource [{}] to deployment", resource.getName());
-        InputStream is = new ByteArrayInputStream(resource.getBytes());
-        deploymentBuilder.addInputStream(resource.getName(), is);
-        inputStreams.add(is);
-      }
-
-      deploymentBuilder.deploy();
-    } finally {
-      for (InputStream is : inputStreams) {
-        try {
-          is.close();
-        } catch (IOException e) {
-          log.error("Unable to close resource input stream {}", is);
-        }
-      }
+    public DeployResourcesEventHandler(String resourcesKey) {
+        this.resourcesKey = resourcesKey;
     }
-  }
+
+    @Override
+    public void init() {
+    }
+
+    @Override
+    public void handle(SimulationEvent event) {
+
+        @SuppressWarnings("unchecked")
+        Map<String, ResourceEntity> resources = (Map<String, ResourceEntity>) event.getProperty(resourcesKey);
+
+        List<InputStream> inputStreams = new ArrayList<InputStream>();
+
+        try {
+            DeploymentBuilder deploymentBuilder = SimulationRunContext.getRepositoryService().createDeployment();
+
+            for (ResourceEntity resource : resources.values()) {
+                log.debug("adding resource [{}] to deployment", resource.getName());
+                InputStream is = new ByteArrayInputStream(resource.getBytes());
+                deploymentBuilder.addInputStream(resource.getName(), is);
+                inputStreams.add(is);
+            }
+
+            deploymentBuilder.deploy();
+        } finally {
+            for (InputStream is : inputStreams) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    log.error("Unable to close resource input stream {}", is);
+                }
+            }
+        }
+    }
 
 }

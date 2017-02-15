@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Bean;
 import flowable.mappers.CustomMybatisMapper;
 
 /**
- *  @author Dominik Bartos
+ * @author Dominik Bartos
  */
 @SpringBootApplication
 public class Application {
@@ -56,7 +56,6 @@ public class Application {
             }
         };
     }
-
 
     public static void main(String args[]) {
         SpringApplication.run(Application.class, args);

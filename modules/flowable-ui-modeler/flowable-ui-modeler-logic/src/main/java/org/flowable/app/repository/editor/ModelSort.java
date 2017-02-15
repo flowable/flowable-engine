@@ -14,12 +14,12 @@ package org.flowable.app.repository.editor;
 
 public interface ModelSort {
 
-  String NAME_ASC = "nameAsc";
-  
-  String NAME_DESC = "nameDesc";
-  
-  String MODIFIED_ASC = "modifiedAsc";
-  
-  String MODIFIED_DESC = "modifiedDesc";
-  
+    String NAME_ASC = "nameAsc";
+
+    String NAME_DESC = "nameDesc";
+
+    String MODIFIED_ASC = "modifiedAsc";
+
+    String MODIFIED_DESC = "modifiedDesc";
+
 }

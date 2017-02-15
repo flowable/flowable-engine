@@ -22,17 +22,17 @@ import org.flowable.engine.runtime.Job;
  * @author Daniel Meyer
  */
 public class AsyncContinuationJobHandler implements JobHandler {
-  
-  public static final String TYPE = "async-continuation";
 
-  public String getType() {
-    return TYPE;
-  }
-  
-  public void execute(Job job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
-    // ATM only AtomicOperationTransitionCreateScope can be performed asynchronously 
-    AtomicOperation atomicOperation = AtomicOperation.TRANSITION_CREATE_SCOPE;
-    commandContext.performOperation(atomicOperation, execution);
-  }
+    public static final String TYPE = "async-continuation";
+
+    public String getType() {
+        return TYPE;
+    }
+
+    public void execute(Job job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
+        // ATM only AtomicOperationTransitionCreateScope can be performed asynchronously
+        AtomicOperation atomicOperation = AtomicOperation.TRANSITION_CREATE_SCOPE;
+        commandContext.performOperation(atomicOperation, execution);
+    }
 
 }

@@ -25,18 +25,18 @@ import org.flowable.idm.engine.impl.interceptor.CommandContext;
  */
 public class CreateUserCmd implements Command<User>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String userId;
+    protected String userId;
 
-  public CreateUserCmd(String userId) {
-    if (userId == null) {
-      throw new FlowableIllegalArgumentException("userId is null");
+    public CreateUserCmd(String userId) {
+        if (userId == null) {
+            throw new FlowableIllegalArgumentException("userId is null");
+        }
+        this.userId = userId;
     }
-    this.userId = userId;
-  }
 
-  public User execute(CommandContext commandContext) {
-    return commandContext.getUserEntityManager().createNewUser(userId);
-  }
+    public User execute(CommandContext commandContext) {
+        return commandContext.getUserEntityManager().createNewUser(userId);
+    }
 }

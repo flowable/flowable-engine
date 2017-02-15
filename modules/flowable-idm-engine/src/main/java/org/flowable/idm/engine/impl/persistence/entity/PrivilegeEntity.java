@@ -19,7 +19,7 @@ import org.flowable.idm.api.Privilege;
  * @author Joram Barrez
  */
 public interface PrivilegeEntity extends Entity, Privilege {
-  
-  void setName(String name);
-  
+
+    void setName(String name);
+
 }

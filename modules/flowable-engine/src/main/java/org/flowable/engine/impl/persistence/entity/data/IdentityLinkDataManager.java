@@ -21,19 +21,19 @@ import org.flowable.engine.impl.persistence.entity.IdentityLinkEntity;
  * @author Joram Barrez
  */
 public interface IdentityLinkDataManager extends DataManager<IdentityLinkEntity> {
-  
-  List<IdentityLinkEntity> findIdentityLinksByTaskId(String taskId);
 
-  List<IdentityLinkEntity> findIdentityLinksByProcessInstanceId(String processInstanceId);
+    List<IdentityLinkEntity> findIdentityLinksByTaskId(String taskId);
 
-  List<IdentityLinkEntity> findIdentityLinksByProcessDefinitionId(String processDefinitionId);
+    List<IdentityLinkEntity> findIdentityLinksByProcessInstanceId(String processInstanceId);
 
-  List<IdentityLinkEntity> findIdentityLinkByTaskUserGroupAndType(String taskId, String userId, String groupId, String type);
+    List<IdentityLinkEntity> findIdentityLinksByProcessDefinitionId(String processDefinitionId);
 
-  List<IdentityLinkEntity> findIdentityLinkByProcessInstanceUserGroupAndType(String processInstanceId, String userId, String groupId, String type);
+    List<IdentityLinkEntity> findIdentityLinkByTaskUserGroupAndType(String taskId, String userId, String groupId, String type);
 
-  List<IdentityLinkEntity> findIdentityLinkByProcessDefinitionUserAndGroup(String processDefinitionId, String userId, String groupId);
-  
-  void deleteIdentityLinksByProcDef(String processDefId);
+    List<IdentityLinkEntity> findIdentityLinkByProcessInstanceUserGroupAndType(String processInstanceId, String userId, String groupId, String type);
+
+    List<IdentityLinkEntity> findIdentityLinkByProcessDefinitionUserAndGroup(String processDefinitionId, String userId, String groupId);
+
+    void deleteIdentityLinksByProcDef(String processDefId);
 
 }

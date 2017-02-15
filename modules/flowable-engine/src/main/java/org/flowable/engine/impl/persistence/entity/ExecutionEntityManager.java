@@ -28,78 +28,72 @@ import org.flowable.engine.runtime.ProcessInstance;
  * @author Joram Barrez
  */
 public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
-  
-  ExecutionEntity createProcessInstanceExecution(ProcessDefinition processDefinition, String businessKey, String tenantId, String initiatorVariableName);
 
-  ExecutionEntity createChildExecution(ExecutionEntity parentExecutionEntity);
-  
-  ExecutionEntity createSubprocessInstance(ProcessDefinition processDefinition, ExecutionEntity superExecutionEntity, String businessKey);
-  
-  /**
-   * Finds the {@link ExecutionEntity} for the given root process instance id.
-   * All children will have been fetched and initialized. 
-   */
-  ExecutionEntity findByRootProcessInstanceId(String rootProcessInstanceId);
+    ExecutionEntity createProcessInstanceExecution(ProcessDefinition processDefinition, String businessKey, String tenantId, String initiatorVariableName);
 
-  ExecutionEntity findSubProcessInstanceBySuperExecutionId(String superExecutionId);
+    ExecutionEntity createChildExecution(ExecutionEntity parentExecutionEntity);
 
-  List<ExecutionEntity> findChildExecutionsByParentExecutionId(String parentExecutionId);
+    ExecutionEntity createSubprocessInstance(ProcessDefinition processDefinition, ExecutionEntity superExecutionEntity, String businessKey);
 
-  List<ExecutionEntity> findChildExecutionsByProcessInstanceId(String processInstanceId);
+    /**
+     * Finds the {@link ExecutionEntity} for the given root process instance id. All children will have been fetched and initialized.
+     */
+    ExecutionEntity findByRootProcessInstanceId(String rootProcessInstanceId);
 
-  List<ExecutionEntity> findExecutionsByParentExecutionAndActivityIds(String parentExecutionId, Collection<String> activityIds);
+    ExecutionEntity findSubProcessInstanceBySuperExecutionId(String superExecutionId);
 
-  long findExecutionCountByQueryCriteria(ExecutionQueryImpl executionQuery);
+    List<ExecutionEntity> findChildExecutionsByParentExecutionId(String parentExecutionId);
 
-  List<ExecutionEntity> findExecutionsByQueryCriteria(ExecutionQueryImpl executionQuery, Page page);
+    List<ExecutionEntity> findChildExecutionsByProcessInstanceId(String processInstanceId);
 
-  long findProcessInstanceCountByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
+    List<ExecutionEntity> findExecutionsByParentExecutionAndActivityIds(String parentExecutionId, Collection<String> activityIds);
 
-  List<ProcessInstance> findProcessInstanceByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
-  
-  List<ProcessInstance> findProcessInstanceAndVariablesByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
+    long findExecutionCountByQueryCriteria(ExecutionQueryImpl executionQuery);
 
-  Collection<ExecutionEntity> findInactiveExecutionsByProcessInstanceId(String processInstanceId);
+    List<ExecutionEntity> findExecutionsByQueryCriteria(ExecutionQueryImpl executionQuery, Page page);
 
-  Collection<ExecutionEntity> findInactiveExecutionsByActivityIdAndProcessInstanceId(String activityId, String processInstanceId);
-  
-  List<Execution> findExecutionsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    long findProcessInstanceCountByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
 
-  List<ProcessInstance> findProcessInstanceByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<ProcessInstance> findProcessInstanceByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
 
-  long findExecutionCountByNativeQuery(Map<String, Object> parameterMap);
-  
+    List<ProcessInstance> findProcessInstanceAndVariablesByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
 
-  /**
-   * Returns all child executions of a given {@link ExecutionEntity}.
-   * In the list, child executions will be behind parent executions. 
-   */
-  List<ExecutionEntity> collectChildren(ExecutionEntity executionEntity);
-  
-  ExecutionEntity findFirstScope(ExecutionEntity executionEntity);
-  
-  ExecutionEntity findFirstMultiInstanceRoot(ExecutionEntity executionEntity);
-  
+    Collection<ExecutionEntity> findInactiveExecutionsByProcessInstanceId(String processInstanceId);
 
-  void updateExecutionTenantIdForDeployment(String deploymentId, String newTenantId);
-  
-  String updateProcessInstanceBusinessKey(ExecutionEntity executionEntity, String businessKey);
-  
+    Collection<ExecutionEntity> findInactiveExecutionsByActivityIdAndProcessInstanceId(String activityId, String processInstanceId);
 
-  void deleteProcessInstancesByProcessDefinition(String processDefinitionId, String deleteReason, boolean cascade);
+    List<Execution> findExecutionsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
 
-  void deleteProcessInstance(String processInstanceId, String deleteReason, boolean cascade);
-  
-  void deleteProcessInstanceExecutionEntity(String processInstanceId, String currentFlowElementId, 
-      String deleteReason, boolean cascade, boolean cancel);
-  
-  void deleteChildExecutions(ExecutionEntity executionEntity, String deleteReason, boolean cancel);
-  
-  void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason, boolean cancel);
+    List<ProcessInstance> findProcessInstanceByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
 
+    long findExecutionCountByNativeQuery(Map<String, Object> parameterMap);
 
-  void updateProcessInstanceLockTime(String processInstanceId);
+    /**
+     * Returns all child executions of a given {@link ExecutionEntity}. In the list, child executions will be behind parent executions.
+     */
+    List<ExecutionEntity> collectChildren(ExecutionEntity executionEntity);
 
-  void clearProcessInstanceLockTime(String processInstanceId);
+    ExecutionEntity findFirstScope(ExecutionEntity executionEntity);
+
+    ExecutionEntity findFirstMultiInstanceRoot(ExecutionEntity executionEntity);
+
+    void updateExecutionTenantIdForDeployment(String deploymentId, String newTenantId);
+
+    String updateProcessInstanceBusinessKey(ExecutionEntity executionEntity, String businessKey);
+
+    void deleteProcessInstancesByProcessDefinition(String processDefinitionId, String deleteReason, boolean cascade);
+
+    void deleteProcessInstance(String processInstanceId, String deleteReason, boolean cascade);
+
+    void deleteProcessInstanceExecutionEntity(String processInstanceId, String currentFlowElementId,
+            String deleteReason, boolean cascade, boolean cancel);
+
+    void deleteChildExecutions(ExecutionEntity executionEntity, String deleteReason, boolean cancel);
+
+    void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason, boolean cancel);
+
+    void updateProcessInstanceLockTime(String processInstanceId);
+
+    void clearProcessInstanceLockTime(String processInstanceId);
 
 }

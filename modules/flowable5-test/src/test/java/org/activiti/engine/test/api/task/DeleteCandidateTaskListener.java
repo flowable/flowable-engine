@@ -5,7 +5,7 @@ import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
 
 public class DeleteCandidateTaskListener implements TaskListener {
-  public void notify(DelegateTask delegateTask) {
-    delegateTask.deleteCandidateUser("admin");
-  }
+    public void notify(DelegateTask delegateTask) {
+        delegateTask.deleteCandidateUser("admin");
+    }
 }

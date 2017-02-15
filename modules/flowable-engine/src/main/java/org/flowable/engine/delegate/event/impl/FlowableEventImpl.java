@@ -23,66 +23,66 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
  */
 public class FlowableEventImpl implements FlowableEvent {
 
-  protected FlowableEngineEventType type;
-  protected String executionId;
-  protected String processInstanceId;
-  protected String processDefinitionId;
+    protected FlowableEngineEventType type;
+    protected String executionId;
+    protected String processInstanceId;
+    protected String processDefinitionId;
 
-  /**
-   * Creates a new event implementation, not part of an execution context.
-   */
-  public FlowableEventImpl(FlowableEngineEventType type) {
-    this(type, null, null, null);
-  }
-
-  /**
-   * Creates a new event implementation, part of an execution context.
-   */
-  public FlowableEventImpl(FlowableEngineEventType type, String executionId, String processInstanceId, String processDefinitionId) {
-    if (type == null) {
-      throw new FlowableIllegalArgumentException("type is null");
+    /**
+     * Creates a new event implementation, not part of an execution context.
+     */
+    public FlowableEventImpl(FlowableEngineEventType type) {
+        this(type, null, null, null);
     }
-    this.type = type;
-    this.executionId = executionId;
-    this.processInstanceId = processInstanceId;
-    this.processDefinitionId = processDefinitionId;
-  }
 
-  public FlowableEngineEventType getType() {
-    return type;
-  }
+    /**
+     * Creates a new event implementation, part of an execution context.
+     */
+    public FlowableEventImpl(FlowableEngineEventType type, String executionId, String processInstanceId, String processDefinitionId) {
+        if (type == null) {
+            throw new FlowableIllegalArgumentException("type is null");
+        }
+        this.type = type;
+        this.executionId = executionId;
+        this.processInstanceId = processInstanceId;
+        this.processDefinitionId = processDefinitionId;
+    }
 
-  public void setType(FlowableEngineEventType type) {
-    this.type = type;
-  }
+    public FlowableEngineEventType getType() {
+        return type;
+    }
 
-  public String getExecutionId() {
-    return executionId;
-  }
+    public void setType(FlowableEngineEventType type) {
+        this.type = type;
+    }
 
-  public void setExecutionId(String executionId) {
-    this.executionId = executionId;
-  }
+    public String getExecutionId() {
+        return executionId;
+    }
 
-  public String getProcessDefinitionId() {
-    return processDefinitionId;
-  }
+    public void setExecutionId(String executionId) {
+        this.executionId = executionId;
+    }
 
-  public void setProcessDefinitionId(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
 
-  public String getProcessInstanceId() {
-    return processInstanceId;
-  }
+    public void setProcessDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
 
-  public void setProcessInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
 
-  @Override
-  public String toString() {
-    return getClass() + " - " + type;
-  }
-  
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
+
+    @Override
+    public String toString() {
+        return getClass() + " - " + type;
+    }
+
 }

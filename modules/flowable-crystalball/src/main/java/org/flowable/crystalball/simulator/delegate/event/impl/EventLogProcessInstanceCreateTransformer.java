@@ -29,44 +29,44 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class EventLogProcessInstanceCreateTransformer extends EventLog2SimulationEventFunction {
 
-  public static final String PROCESS_INSTANCE_ID = "processInstanceId";
-  private final String processDefinitionIdKey;
-  private final String businessKey;
-  private final String variablesKey;
+    public static final String PROCESS_INSTANCE_ID = "processInstanceId";
+    private final String processDefinitionIdKey;
+    private final String businessKey;
+    private final String variablesKey;
 
-  public EventLogProcessInstanceCreateTransformer(String simulationEventType, String processDefinitionIdKey, String businessKey, String variablesKey) {
-    super(simulationEventType);
-    this.processDefinitionIdKey = processDefinitionIdKey;
-    this.businessKey = businessKey;
-    this.variablesKey = variablesKey;
-  }
-
-  @SuppressWarnings({ "unchecked" })
-  @Override
-  public SimulationEvent apply(EventLogEntry event) {
-    if ("PROCESSINSTANCE_START".equals(event.getType())) {
-
-      ObjectMapper objectMapper = new ObjectMapper();
-      Map<String, Object> data;
-      try {
-        data = objectMapper.readValue(event.getData(), new TypeReference<HashMap<String, Object>>() {
-        });
-      } catch (IOException e) {
-        throw new CrystalballException("unable to parse JSON string.", e);
-      }
-      String processDefinitionId = (String) data.get(Fields.PROCESS_DEFINITION_ID);
-      Map<String, Object> variableMap = (Map<String, Object>) data.get(Fields.VARIABLES);
-      String businessKeyValue = (String) data.get(Fields.BUSINESS_KEY);
-      String processInstanceId = (String) data.get(Fields.PROCESS_INSTANCE_ID);
-
-      Map<String, Object> simEventProperties = new HashMap<String, Object>();
-      simEventProperties.put(processDefinitionIdKey, processDefinitionId);
-      simEventProperties.put(this.businessKey, businessKeyValue);
-      simEventProperties.put(variablesKey, variableMap);
-      simEventProperties.put(PROCESS_INSTANCE_ID, processInstanceId);
-
-      return new SimulationEvent.Builder(simulationEventType).priority((int) event.getLogNumber()).properties(simEventProperties).build();
+    public EventLogProcessInstanceCreateTransformer(String simulationEventType, String processDefinitionIdKey, String businessKey, String variablesKey) {
+        super(simulationEventType);
+        this.processDefinitionIdKey = processDefinitionIdKey;
+        this.businessKey = businessKey;
+        this.variablesKey = variablesKey;
     }
-    return null;
-  }
+
+    @SuppressWarnings({ "unchecked" })
+    @Override
+    public SimulationEvent apply(EventLogEntry event) {
+        if ("PROCESSINSTANCE_START".equals(event.getType())) {
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            Map<String, Object> data;
+            try {
+                data = objectMapper.readValue(event.getData(), new TypeReference<HashMap<String, Object>>() {
+                });
+            } catch (IOException e) {
+                throw new CrystalballException("unable to parse JSON string.", e);
+            }
+            String processDefinitionId = (String) data.get(Fields.PROCESS_DEFINITION_ID);
+            Map<String, Object> variableMap = (Map<String, Object>) data.get(Fields.VARIABLES);
+            String businessKeyValue = (String) data.get(Fields.BUSINESS_KEY);
+            String processInstanceId = (String) data.get(Fields.PROCESS_INSTANCE_ID);
+
+            Map<String, Object> simEventProperties = new HashMap<String, Object>();
+            simEventProperties.put(processDefinitionIdKey, processDefinitionId);
+            simEventProperties.put(this.businessKey, businessKeyValue);
+            simEventProperties.put(variablesKey, variableMap);
+            simEventProperties.put(PROCESS_INSTANCE_ID, processInstanceId);
+
+            return new SimulationEvent.Builder(simulationEventType).priority((int) event.getLogNumber()).properties(simEventProperties).build();
+        }
+        return null;
+    }
 }

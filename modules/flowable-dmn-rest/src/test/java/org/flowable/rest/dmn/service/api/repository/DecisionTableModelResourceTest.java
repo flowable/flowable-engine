@@ -27,22 +27,22 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class DecisionTableModelResourceTest extends BaseSpringDmnRestTestCase {
 
-  @DmnDeploymentAnnotation(resources = { "org/flowable/rest/dmn/service/api/repository/simple.dmn" })
-  public void testGetDecisionTableModel() throws Exception {
+    @DmnDeploymentAnnotation(resources = { "org/flowable/rest/dmn/service/api/repository/simple.dmn" })
+    public void testGetDecisionTableModel() throws Exception {
 
-    DmnDecisionTable decisionTable = dmnRepositoryService.createDecisionTableQuery().singleResult();
+        DmnDecisionTable decisionTable = dmnRepositoryService.createDecisionTableQuery().singleResult();
 
-    HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE_MODEL, decisionTable.getId()));
-    CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE_MODEL, decisionTable.getId()));
+        CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
-    // Check "OK" status
-    JsonNode resultNode = objectMapper.readTree(response.getEntity().getContent());
-    closeResponse(response);
-    assertNotNull(resultNode);
-    JsonNode firstDecision = resultNode.get("decisions").get(0);
-    assertNotNull(firstDecision);
+        // Check "OK" status
+        JsonNode resultNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertNotNull(resultNode);
+        JsonNode firstDecision = resultNode.get("decisions").get(0);
+        assertNotNull(firstDecision);
 
-    JsonNode decisionTableNode = firstDecision.get("expression");
-    assertEquals("decisionTable", decisionTableNode.get("id").textValue());
-  }
+        JsonNode decisionTableNode = firstDecision.get("expression");
+        assertEquals("decisionTable", decisionTableNode.get("id").textValue());
+    }
 }

@@ -17,9 +17,7 @@ package org.flowable.dmn.model;
  */
 public enum DecisionTableOrientation {
 
-    RULE_AS_ROW("Rule-as-Row"),
-    RULE_AS_COLUMN("Rule-as-Column"),
-    CROSS_TABLE("CrossTable");
+    RULE_AS_ROW("Rule-as-Row"), RULE_AS_COLUMN("Rule-as-Column"), CROSS_TABLE("CrossTable");
 
     private final String value;
 
@@ -32,7 +30,7 @@ public enum DecisionTableOrientation {
     }
 
     public static DecisionTableOrientation fromValue(String value) {
-        for (DecisionTableOrientation c: DecisionTableOrientation.values()) {
+        for (DecisionTableOrientation c : DecisionTableOrientation.values()) {
             if (c.value.equals(value)) {
                 return c;
             }

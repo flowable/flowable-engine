@@ -21,33 +21,33 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 
 public class TestFlowableEntityEventListener implements FlowableEventListener {
 
-	private List<FlowableEvent> eventsReceived;
-	private Class<?> entityClass;
-	
-	public TestFlowableEntityEventListener(Class<?> entityClass) {
-		this.entityClass = entityClass;
-		
-		eventsReceived = new ArrayList<FlowableEvent>();
-  }
-	
-	public List<FlowableEvent> getEventsReceived() {
-	  return eventsReceived;
-  }
-	
-	public void clearEventsReceived() {
-		eventsReceived.clear();
-	}
-	
-	@Override
-	public void onEvent(FlowableEvent event) {
-		if (event instanceof FlowableEntityEvent && entityClass.isAssignableFrom(((FlowableEntityEvent) event).getEntity().getClass())) {
-			eventsReceived.add(event);
-		}
-	}
+    private List<FlowableEvent> eventsReceived;
+    private Class<?> entityClass;
 
-	@Override
-	public boolean isFailOnException() {
-		return true;
-	}
+    public TestFlowableEntityEventListener(Class<?> entityClass) {
+        this.entityClass = entityClass;
+
+        eventsReceived = new ArrayList<FlowableEvent>();
+    }
+
+    public List<FlowableEvent> getEventsReceived() {
+        return eventsReceived;
+    }
+
+    public void clearEventsReceived() {
+        eventsReceived.clear();
+    }
+
+    @Override
+    public void onEvent(FlowableEvent event) {
+        if (event instanceof FlowableEntityEvent && entityClass.isAssignableFrom(((FlowableEntityEvent) event).getEntity().getClass())) {
+            eventsReceived.add(event);
+        }
+    }
+
+    @Override
+    public boolean isFailOnException() {
+        return true;
+    }
 
 }

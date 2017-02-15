@@ -56,136 +56,136 @@ import org.flowable.engine.task.Task;
  * @author Joram Barrez
  */
 public class DefaultListenerFactory extends AbstractBehaviorFactory implements ListenerFactory {
-  private final ClassDelegateFactory classDelegateFactory;
+    private final ClassDelegateFactory classDelegateFactory;
 
-  public DefaultListenerFactory(ClassDelegateFactory classDelegateFactory) {
-    this.classDelegateFactory = classDelegateFactory;
-  }
-
-  public DefaultListenerFactory() {
-    this(new DefaultClassDelegateFactory());
-  }
-
-  public static final Map<String, Class<?>> ENTITY_MAPPING = new HashMap<String, Class<?>>();
-  static {
-    ENTITY_MAPPING.put("attachment", Attachment.class);
-    ENTITY_MAPPING.put("comment", Comment.class);
-    ENTITY_MAPPING.put("execution", Execution.class);
-    ENTITY_MAPPING.put("identity-link", IdentityLink.class);
-    ENTITY_MAPPING.put("job", Job.class);
-    ENTITY_MAPPING.put("process-definition", ProcessDefinition.class);
-    ENTITY_MAPPING.put("process-instance", ProcessInstance.class);
-    ENTITY_MAPPING.put("task", Task.class);
-  }
-
-  @Override
-  public TaskListener createClassDelegateTaskListener(FlowableListener listener) {
-    return classDelegateFactory.create(listener.getImplementation(),
-        createFieldDeclarations(listener.getFieldExtensions()));
-  }
-
-  @Override
-  public TaskListener createExpressionTaskListener(FlowableListener listener) {
-    return new ExpressionTaskListener(expressionManager.createExpression(listener.getImplementation()));
-  }
-
-  @Override
-  public TaskListener createDelegateExpressionTaskListener(FlowableListener listener) {
-    return new DelegateExpressionTaskListener(expressionManager.createExpression(listener.getImplementation()), createFieldDeclarations(listener.getFieldExtensions()));
-  }
-
-  @Override
-  public TransactionDependentTaskListener createTransactionDependentDelegateExpressionTaskListener(FlowableListener listener) {
-    return new DelegateExpressionTransactionDependentTaskListener(expressionManager.createExpression(listener.getImplementation()));
-  }
-
-  @Override
-  public ExecutionListener createClassDelegateExecutionListener(FlowableListener listener) {
-    return classDelegateFactory.create(listener.getImplementation(), createFieldDeclarations(listener.getFieldExtensions()));
-  }
-
-  @Override
-  public ExecutionListener createExpressionExecutionListener(FlowableListener listener) {
-    return new ExpressionExecutionListener(expressionManager.createExpression(listener.getImplementation()));
-  }
-
-  @Override
-  public ExecutionListener createDelegateExpressionExecutionListener(FlowableListener listener) {
-    return new DelegateExpressionExecutionListener(expressionManager.createExpression(listener.getImplementation()), createFieldDeclarations(listener.getFieldExtensions()));
-  }
-
-  @Override
-  public DelegateExpressionTransactionDependentExecutionListener createTransactionDependentDelegateExpressionExecutionListener(FlowableListener listener) {
-    return new DelegateExpressionTransactionDependentExecutionListener(expressionManager.createExpression(listener.getImplementation()));
-  }
-
-  @Override
-  public FlowableEventListener createClassDelegateEventListener(EventListener eventListener) {
-    return new DelegateFlowableEventListener(eventListener.getImplementation(), getEntityType(eventListener.getEntityType()));
-  }
-
-  @Override
-  public FlowableEventListener createDelegateExpressionEventListener(EventListener eventListener) {
-    return new DelegateExpressionFlowableEventListener(expressionManager.createExpression(eventListener.getImplementation()), getEntityType(eventListener.getEntityType()));
-  }
-
-  @Override
-  public FlowableEventListener createEventThrowingEventListener(EventListener eventListener) {
-    BaseDelegateEventListener result = null;
-    if (ImplementationType.IMPLEMENTATION_TYPE_THROW_SIGNAL_EVENT.equals(eventListener.getImplementationType())) {
-      result = new SignalThrowingEventListener();
-      ((SignalThrowingEventListener) result).setSignalName(eventListener.getImplementation());
-      ((SignalThrowingEventListener) result).setProcessInstanceScope(true);
-    } else if (ImplementationType.IMPLEMENTATION_TYPE_THROW_GLOBAL_SIGNAL_EVENT.equals(eventListener.getImplementationType())) {
-      result = new SignalThrowingEventListener();
-      ((SignalThrowingEventListener) result).setSignalName(eventListener.getImplementation());
-      ((SignalThrowingEventListener) result).setProcessInstanceScope(false);
-    } else if (ImplementationType.IMPLEMENTATION_TYPE_THROW_MESSAGE_EVENT.equals(eventListener.getImplementationType())) {
-      result = new MessageThrowingEventListener();
-      ((MessageThrowingEventListener) result).setMessageName(eventListener.getImplementation());
-    } else if (ImplementationType.IMPLEMENTATION_TYPE_THROW_ERROR_EVENT.equals(eventListener.getImplementationType())) {
-      result = new ErrorThrowingEventListener();
-      ((ErrorThrowingEventListener) result).setErrorCode(eventListener.getImplementation());
+    public DefaultListenerFactory(ClassDelegateFactory classDelegateFactory) {
+        this.classDelegateFactory = classDelegateFactory;
     }
 
-    if (result == null) {
-      throw new FlowableIllegalArgumentException("Cannot create an event-throwing event-listener, unknown implementation type: " + eventListener.getImplementationType());
+    public DefaultListenerFactory() {
+        this(new DefaultClassDelegateFactory());
     }
 
-    result.setEntityClass(getEntityType(eventListener.getEntityType()));
-    return result;
-  }
-
-  @Override
-  public CustomPropertiesResolver createClassDelegateCustomPropertiesResolver(FlowableListener listener) {
-    return classDelegateFactory.create(listener.getCustomPropertiesResolverImplementation(), null);
-  }
-
-  @Override
-  public CustomPropertiesResolver createExpressionCustomPropertiesResolver(FlowableListener listener) {
-    return new ExpressionCustomPropertiesResolver(expressionManager.createExpression(listener.getCustomPropertiesResolverImplementation()));
-  }
-
-  @Override
-  public CustomPropertiesResolver createDelegateExpressionCustomPropertiesResolver(FlowableListener listener) {
-    return new DelegateExpressionCustomPropertiesResolver(expressionManager.createExpression(listener.getCustomPropertiesResolverImplementation()));
-  }
-
-  /**
-   * @param entityType
-   *          the name of the entity
-   * @return
-   * @throws FlowableIllegalArgumentException
-   *           when the given entity name
-   */
-  protected Class<?> getEntityType(String entityType) {
-    if (entityType != null) {
-      Class<?> entityClass = ENTITY_MAPPING.get(entityType.trim());
-      if (entityClass == null) {
-        throw new FlowableIllegalArgumentException("Unsupported entity-type for a FlowableEventListener: " + entityType);
-      }
-      return entityClass;
+    public static final Map<String, Class<?>> ENTITY_MAPPING = new HashMap<String, Class<?>>();
+    static {
+        ENTITY_MAPPING.put("attachment", Attachment.class);
+        ENTITY_MAPPING.put("comment", Comment.class);
+        ENTITY_MAPPING.put("execution", Execution.class);
+        ENTITY_MAPPING.put("identity-link", IdentityLink.class);
+        ENTITY_MAPPING.put("job", Job.class);
+        ENTITY_MAPPING.put("process-definition", ProcessDefinition.class);
+        ENTITY_MAPPING.put("process-instance", ProcessInstance.class);
+        ENTITY_MAPPING.put("task", Task.class);
     }
-    return null;
-  }
+
+    @Override
+    public TaskListener createClassDelegateTaskListener(FlowableListener listener) {
+        return classDelegateFactory.create(listener.getImplementation(),
+                createFieldDeclarations(listener.getFieldExtensions()));
+    }
+
+    @Override
+    public TaskListener createExpressionTaskListener(FlowableListener listener) {
+        return new ExpressionTaskListener(expressionManager.createExpression(listener.getImplementation()));
+    }
+
+    @Override
+    public TaskListener createDelegateExpressionTaskListener(FlowableListener listener) {
+        return new DelegateExpressionTaskListener(expressionManager.createExpression(listener.getImplementation()), createFieldDeclarations(listener.getFieldExtensions()));
+    }
+
+    @Override
+    public TransactionDependentTaskListener createTransactionDependentDelegateExpressionTaskListener(FlowableListener listener) {
+        return new DelegateExpressionTransactionDependentTaskListener(expressionManager.createExpression(listener.getImplementation()));
+    }
+
+    @Override
+    public ExecutionListener createClassDelegateExecutionListener(FlowableListener listener) {
+        return classDelegateFactory.create(listener.getImplementation(), createFieldDeclarations(listener.getFieldExtensions()));
+    }
+
+    @Override
+    public ExecutionListener createExpressionExecutionListener(FlowableListener listener) {
+        return new ExpressionExecutionListener(expressionManager.createExpression(listener.getImplementation()));
+    }
+
+    @Override
+    public ExecutionListener createDelegateExpressionExecutionListener(FlowableListener listener) {
+        return new DelegateExpressionExecutionListener(expressionManager.createExpression(listener.getImplementation()), createFieldDeclarations(listener.getFieldExtensions()));
+    }
+
+    @Override
+    public DelegateExpressionTransactionDependentExecutionListener createTransactionDependentDelegateExpressionExecutionListener(FlowableListener listener) {
+        return new DelegateExpressionTransactionDependentExecutionListener(expressionManager.createExpression(listener.getImplementation()));
+    }
+
+    @Override
+    public FlowableEventListener createClassDelegateEventListener(EventListener eventListener) {
+        return new DelegateFlowableEventListener(eventListener.getImplementation(), getEntityType(eventListener.getEntityType()));
+    }
+
+    @Override
+    public FlowableEventListener createDelegateExpressionEventListener(EventListener eventListener) {
+        return new DelegateExpressionFlowableEventListener(expressionManager.createExpression(eventListener.getImplementation()), getEntityType(eventListener.getEntityType()));
+    }
+
+    @Override
+    public FlowableEventListener createEventThrowingEventListener(EventListener eventListener) {
+        BaseDelegateEventListener result = null;
+        if (ImplementationType.IMPLEMENTATION_TYPE_THROW_SIGNAL_EVENT.equals(eventListener.getImplementationType())) {
+            result = new SignalThrowingEventListener();
+            ((SignalThrowingEventListener) result).setSignalName(eventListener.getImplementation());
+            ((SignalThrowingEventListener) result).setProcessInstanceScope(true);
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_THROW_GLOBAL_SIGNAL_EVENT.equals(eventListener.getImplementationType())) {
+            result = new SignalThrowingEventListener();
+            ((SignalThrowingEventListener) result).setSignalName(eventListener.getImplementation());
+            ((SignalThrowingEventListener) result).setProcessInstanceScope(false);
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_THROW_MESSAGE_EVENT.equals(eventListener.getImplementationType())) {
+            result = new MessageThrowingEventListener();
+            ((MessageThrowingEventListener) result).setMessageName(eventListener.getImplementation());
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_THROW_ERROR_EVENT.equals(eventListener.getImplementationType())) {
+            result = new ErrorThrowingEventListener();
+            ((ErrorThrowingEventListener) result).setErrorCode(eventListener.getImplementation());
+        }
+
+        if (result == null) {
+            throw new FlowableIllegalArgumentException("Cannot create an event-throwing event-listener, unknown implementation type: " + eventListener.getImplementationType());
+        }
+
+        result.setEntityClass(getEntityType(eventListener.getEntityType()));
+        return result;
+    }
+
+    @Override
+    public CustomPropertiesResolver createClassDelegateCustomPropertiesResolver(FlowableListener listener) {
+        return classDelegateFactory.create(listener.getCustomPropertiesResolverImplementation(), null);
+    }
+
+    @Override
+    public CustomPropertiesResolver createExpressionCustomPropertiesResolver(FlowableListener listener) {
+        return new ExpressionCustomPropertiesResolver(expressionManager.createExpression(listener.getCustomPropertiesResolverImplementation()));
+    }
+
+    @Override
+    public CustomPropertiesResolver createDelegateExpressionCustomPropertiesResolver(FlowableListener listener) {
+        return new DelegateExpressionCustomPropertiesResolver(expressionManager.createExpression(listener.getCustomPropertiesResolverImplementation()));
+    }
+
+    /**
+     * @param entityType
+     *            the name of the entity
+     * @return
+     * @throws FlowableIllegalArgumentException
+     *             when the given entity name
+     */
+    protected Class<?> getEntityType(String entityType) {
+        if (entityType != null) {
+            Class<?> entityClass = ENTITY_MAPPING.get(entityType.trim());
+            if (entityClass == null) {
+                throw new FlowableIllegalArgumentException("Unsupported entity-type for a FlowableEventListener: " + entityType);
+            }
+            return entityClass;
+        }
+        return null;
+    }
 }

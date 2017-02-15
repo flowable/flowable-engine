@@ -47,69 +47,68 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Transactional
 public class FlowableTaskFormService {
 
-  private static final Logger logger = LoggerFactory.getLogger(FlowableTaskFormService.class);
+    private static final Logger logger = LoggerFactory.getLogger(FlowableTaskFormService.class);
 
-  @Autowired
-  protected TaskService taskService;
-  
-  @Autowired
-  protected RepositoryService repositoryService;
-  
-  @Autowired
-  protected HistoryService historyService;
+    @Autowired
+    protected TaskService taskService;
 
-  @Autowired
-  protected FormRepositoryService formRepositoryService;
-  
-  @Autowired
-  protected FormService formService;
+    @Autowired
+    protected RepositoryService repositoryService;
 
-  @Autowired
-  protected PermissionService permissionService;
+    @Autowired
+    protected HistoryService historyService;
 
-  @Autowired
-  protected ObjectMapper objectMapper;
+    @Autowired
+    protected FormRepositoryService formRepositoryService;
 
-  public FormModel getTaskForm(String taskId) {
-    HistoricTaskInstance task = permissionService.validateReadPermissionOnTask(SecurityUtils.getCurrentUserObject(), taskId);
-    return taskService.getTaskFormModel(task.getId());
-  }
-  
-  public void completeTaskForm(String taskId, CompleteFormRepresentation completeTaskFormRepresentation) {
+    @Autowired
+    protected FormService formService;
 
-    // Get the form definition
-    Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+    @Autowired
+    protected PermissionService permissionService;
 
-    if (task == null) {
-      throw new NotFoundException("Task not found with id: " + taskId);
-    }
-    
-    User currentUser = SecurityUtils.getCurrentUserObject();
-    if (!permissionService.isTaskOwnerOrAssignee(currentUser, taskId)) {
-      if (!permissionService.validateIfUserIsInitiatorAndCanCompleteTask(currentUser, task)) {
-        throw new NotPermittedException();
-      }
-    }
-    
-    taskService.completeTaskWithForm(taskId, completeTaskFormRepresentation.getFormId(), 
-        completeTaskFormRepresentation.getOutcome(), completeTaskFormRepresentation.getValues());
-  }
-  
-  public List<ProcessInstanceVariableRepresentation> getProcessInstanceVariables(String taskId) {
-    HistoricTaskInstance task = permissionService.validateReadPermissionOnTask(SecurityUtils.getCurrentUserObject(), taskId);
-    List<HistoricVariableInstance> historicVariables = historyService.createHistoricVariableInstanceQuery().processInstanceId(task.getProcessInstanceId()).list();
+    @Autowired
+    protected ObjectMapper objectMapper;
 
-    // Get all process-variables to extract values from
-    Map<String, ProcessInstanceVariableRepresentation> processInstanceVariables = new HashMap<String, ProcessInstanceVariableRepresentation>();
-
-    for (HistoricVariableInstance historicVariableInstance : historicVariables) {
-        ProcessInstanceVariableRepresentation processInstanceVariableRepresentation = new ProcessInstanceVariableRepresentation(
-                historicVariableInstance.getVariableName(), historicVariableInstance.getVariableTypeName(), historicVariableInstance.getValue());
-        processInstanceVariables.put(historicVariableInstance.getId(), processInstanceVariableRepresentation);
+    public FormModel getTaskForm(String taskId) {
+        HistoricTaskInstance task = permissionService.validateReadPermissionOnTask(SecurityUtils.getCurrentUserObject(), taskId);
+        return taskService.getTaskFormModel(task.getId());
     }
 
-    List<ProcessInstanceVariableRepresentation> processInstanceVariableRepresenations = 
-        new ArrayList<ProcessInstanceVariableRepresentation>(processInstanceVariables.values());
-    return processInstanceVariableRepresenations;
-  }
+    public void completeTaskForm(String taskId, CompleteFormRepresentation completeTaskFormRepresentation) {
+
+        // Get the form definition
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+
+        if (task == null) {
+            throw new NotFoundException("Task not found with id: " + taskId);
+        }
+
+        User currentUser = SecurityUtils.getCurrentUserObject();
+        if (!permissionService.isTaskOwnerOrAssignee(currentUser, taskId)) {
+            if (!permissionService.validateIfUserIsInitiatorAndCanCompleteTask(currentUser, task)) {
+                throw new NotPermittedException();
+            }
+        }
+
+        taskService.completeTaskWithForm(taskId, completeTaskFormRepresentation.getFormId(),
+                completeTaskFormRepresentation.getOutcome(), completeTaskFormRepresentation.getValues());
+    }
+
+    public List<ProcessInstanceVariableRepresentation> getProcessInstanceVariables(String taskId) {
+        HistoricTaskInstance task = permissionService.validateReadPermissionOnTask(SecurityUtils.getCurrentUserObject(), taskId);
+        List<HistoricVariableInstance> historicVariables = historyService.createHistoricVariableInstanceQuery().processInstanceId(task.getProcessInstanceId()).list();
+
+        // Get all process-variables to extract values from
+        Map<String, ProcessInstanceVariableRepresentation> processInstanceVariables = new HashMap<String, ProcessInstanceVariableRepresentation>();
+
+        for (HistoricVariableInstance historicVariableInstance : historicVariables) {
+            ProcessInstanceVariableRepresentation processInstanceVariableRepresentation = new ProcessInstanceVariableRepresentation(
+                    historicVariableInstance.getVariableName(), historicVariableInstance.getVariableTypeName(), historicVariableInstance.getValue());
+            processInstanceVariables.put(historicVariableInstance.getId(), processInstanceVariableRepresentation);
+        }
+
+        List<ProcessInstanceVariableRepresentation> processInstanceVariableRepresenations = new ArrayList<ProcessInstanceVariableRepresentation>(processInstanceVariables.values());
+        return processInstanceVariableRepresenations;
+    }
 }

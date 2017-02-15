@@ -26,23 +26,23 @@ import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
 @SuppressWarnings("rawtypes")
 public class FlowableEntityWithVariablesEventImpl extends FlowableEntityEventImpl implements FlowableEntityWithVariablesEvent {
 
-  protected Map variables;
-  protected boolean localScope;
+    protected Map variables;
+    protected boolean localScope;
 
-  public FlowableEntityWithVariablesEventImpl(Object entity, Map variables, boolean localScope, FlowableEngineEventType type) {
-    super(entity, type);
+    public FlowableEntityWithVariablesEventImpl(Object entity, Map variables, boolean localScope, FlowableEngineEventType type) {
+        super(entity, type);
 
-    this.variables = variables;
-    this.localScope = localScope;
-  }
+        this.variables = variables;
+        this.localScope = localScope;
+    }
 
-  @Override
-  public Map getVariables() {
-    return variables;
-  }
+    @Override
+    public Map getVariables() {
+        return variables;
+    }
 
-  @Override
-  public boolean isLocalScope() {
-    return localScope;
-  }
+    @Override
+    public boolean isLocalScope() {
+        return localScope;
+    }
 }

@@ -27,17 +27,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TaskResource {
 
-  @Autowired
-  protected FlowableTaskService taskService;
+    @Autowired
+    protected FlowableTaskService taskService;
 
-  @RequestMapping(value = "/rest/tasks/{taskId}", method = RequestMethod.GET, produces = "application/json")
-  public TaskRepresentation getTask(@PathVariable String taskId, HttpServletResponse response) {
-    return taskService.getTask(taskId, response);
-  }
+    @RequestMapping(value = "/rest/tasks/{taskId}", method = RequestMethod.GET, produces = "application/json")
+    public TaskRepresentation getTask(@PathVariable String taskId, HttpServletResponse response) {
+        return taskService.getTask(taskId, response);
+    }
 
-  @RequestMapping(value = "/rest/tasks/{taskId}", method = RequestMethod.PUT, produces = "application/json")
-  public TaskRepresentation updateTask(@PathVariable("taskId") String taskId, @RequestBody TaskUpdateRepresentation updated) {
-    return taskService.updateTask(taskId, updated);
-  }
+    @RequestMapping(value = "/rest/tasks/{taskId}", method = RequestMethod.PUT, produces = "application/json")
+    public TaskRepresentation updateTask(@PathVariable("taskId") String taskId, @RequestBody TaskUpdateRepresentation updated) {
+        return taskService.updateTask(taskId, updated);
+    }
 
 }

@@ -22,26 +22,26 @@ import org.flowable.engine.impl.util.Flowable5Util;
  */
 public class SetTaskPriorityCmd extends NeedsActiveTaskCmd<Void> {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected int priority;
+    protected int priority;
 
-  public SetTaskPriorityCmd(String taskId, int priority) {
-    super(taskId);
-    this.priority = priority;
-  }
-
-  protected Void execute(CommandContext commandContext, TaskEntity task) {
-    if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      compatibilityHandler.setTaskPriority(taskId, priority);
-      return null;
+    public SetTaskPriorityCmd(String taskId, int priority) {
+        super(taskId);
+        this.priority = priority;
     }
-    
-    task.setPriority(priority);
-    commandContext.getHistoryManager().recordTaskPriorityChange(task.getId(), task.getPriority());
-    commandContext.getTaskEntityManager().update(task);
-    return null;
-  }
+
+    protected Void execute(CommandContext commandContext, TaskEntity task) {
+        if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
+            Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+            compatibilityHandler.setTaskPriority(taskId, priority);
+            return null;
+        }
+
+        task.setPriority(priority);
+        commandContext.getHistoryManager().recordTaskPriorityChange(task.getId(), task.getPriority());
+        commandContext.getTaskEntityManager().update(task);
+        return null;
+    }
 
 }

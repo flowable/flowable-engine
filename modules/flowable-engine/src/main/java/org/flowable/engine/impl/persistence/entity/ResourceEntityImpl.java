@@ -23,60 +23,60 @@ import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevisi
  */
 public class ResourceEntityImpl extends AbstractEntityNoRevision implements ResourceEntity, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String name;
-  protected byte[] bytes;
-  protected String deploymentId;
-  protected boolean generated;
+    protected String name;
+    protected byte[] bytes;
+    protected String deploymentId;
+    protected boolean generated;
 
-  public ResourceEntityImpl() {
-    
-  }
-  
-  public String getName() {
-    return name;
-  }
+    public ResourceEntityImpl() {
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    }
 
-  public byte[] getBytes() {
-    return bytes;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setBytes(byte[] bytes) {
-    this.bytes = bytes;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public String getDeploymentId() {
-    return deploymentId;
-  }
+    public byte[] getBytes() {
+        return bytes;
+    }
 
-  public void setDeploymentId(String deploymentId) {
-    this.deploymentId = deploymentId;
-  }
+    public void setBytes(byte[] bytes) {
+        this.bytes = bytes;
+    }
 
-  public Object getPersistentState() {
-    return ResourceEntityImpl.class;
-  }
+    public String getDeploymentId() {
+        return deploymentId;
+    }
 
-  public void setGenerated(boolean generated) {
-    this.generated = generated;
-  }
+    public void setDeploymentId(String deploymentId) {
+        this.deploymentId = deploymentId;
+    }
 
-  /**
-   * Indicated whether or not the resource has been generated while deploying rather than being actual part of the deployment.
-   */
-  public boolean isGenerated() {
-    return generated;
-  }
+    public Object getPersistentState() {
+        return ResourceEntityImpl.class;
+    }
 
-  // common methods //////////////////////////////////////////////////////////
+    public void setGenerated(boolean generated) {
+        this.generated = generated;
+    }
 
-  @Override
-  public String toString() {
-    return "ResourceEntity[id=" + id + ", name=" + name + "]";
-  }
+    /**
+     * Indicated whether or not the resource has been generated while deploying rather than being actual part of the deployment.
+     */
+    public boolean isGenerated() {
+        return generated;
+    }
+
+    // common methods //////////////////////////////////////////////////////////
+
+    @Override
+    public String toString() {
+        return "ResourceEntity[id=" + id + ", name=" + name + "]";
+    }
 }

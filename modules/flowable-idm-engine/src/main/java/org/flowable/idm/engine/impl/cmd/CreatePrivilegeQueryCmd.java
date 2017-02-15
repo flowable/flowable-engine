@@ -24,9 +24,9 @@ import org.flowable.idm.engine.impl.interceptor.CommandContext;
  */
 public class CreatePrivilegeQueryCmd implements Command<PrivilegeQuery>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public PrivilegeQuery execute(CommandContext commandContext) {
-    return commandContext.getPrivilegeEntityManager().createNewPrivilegeQuery();
-  }
+    public PrivilegeQuery execute(CommandContext commandContext) {
+        return commandContext.getPrivilegeEntityManager().createNewPrivilegeQuery();
+    }
 }

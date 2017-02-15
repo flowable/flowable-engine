@@ -27,30 +27,30 @@ import org.flowable.form.engine.impl.persistence.entity.data.FormInstanceDataMan
  * @author Tijs Rademakers
  */
 public class MybatisFormInstanceDataManager extends AbstractDataManager<FormInstanceEntity> implements FormInstanceDataManager {
-  
-  public MybatisFormInstanceDataManager(FormEngineConfiguration formEngineConfiguration) {
-    super(formEngineConfiguration);
-  }
 
-  @Override
-  public Class<? extends FormInstanceEntity> getManagedEntityClass() {
-    return FormInstanceEntityImpl.class;
-  }
-  
-  @Override
-  public FormInstanceEntity create() {
-    return new FormInstanceEntityImpl();
-  }
-  
-  @Override
-  public long findFormInstanceCountByQueryCriteria(FormInstanceQueryImpl formInstanceQuery) {
-    return (Long) getDbSqlSession().selectOne("selectFormInstanceCountByQueryCriteria", formInstanceQuery);
-  }
+    public MybatisFormInstanceDataManager(FormEngineConfiguration formEngineConfiguration) {
+        super(formEngineConfiguration);
+    }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<FormInstance> findFormInstancesByQueryCriteria(FormInstanceQueryImpl formInstanceQuery, Page page) {
-    final String query = "selectFormInstancesByQueryCriteria";
-    return getDbSqlSession().selectList(query, formInstanceQuery, page);
-  }
+    @Override
+    public Class<? extends FormInstanceEntity> getManagedEntityClass() {
+        return FormInstanceEntityImpl.class;
+    }
+
+    @Override
+    public FormInstanceEntity create() {
+        return new FormInstanceEntityImpl();
+    }
+
+    @Override
+    public long findFormInstanceCountByQueryCriteria(FormInstanceQueryImpl formInstanceQuery) {
+        return (Long) getDbSqlSession().selectOne("selectFormInstanceCountByQueryCriteria", formInstanceQuery);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<FormInstance> findFormInstancesByQueryCriteria(FormInstanceQueryImpl formInstanceQuery, Page page) {
+        final String query = "selectFormInstancesByQueryCriteria";
+        return getDbSqlSession().selectList(query, formInstanceQuery, page);
+    }
 }

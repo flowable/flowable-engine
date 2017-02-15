@@ -25,22 +25,22 @@ import org.flowable.engine.impl.HistoricVariableInstanceQueryImpl;
  */
 public interface HistoricVariableInstanceEntityManager extends EntityManager<HistoricVariableInstanceEntity> {
 
-  HistoricVariableInstanceEntity copyAndInsert(VariableInstanceEntity variableInstance);
+    HistoricVariableInstanceEntity copyAndInsert(VariableInstanceEntity variableInstance);
 
-  void copyVariableValue(HistoricVariableInstanceEntity historicVariableInstance, VariableInstanceEntity variableInstance);
+    void copyVariableValue(HistoricVariableInstanceEntity historicVariableInstance, VariableInstanceEntity variableInstance);
 
-  List<HistoricVariableInstance> findHistoricVariableInstancesByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery, Page page);
+    List<HistoricVariableInstance> findHistoricVariableInstancesByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery, Page page);
 
-  HistoricVariableInstanceEntity findHistoricVariableInstanceByVariableInstanceId(String variableInstanceId);
+    HistoricVariableInstanceEntity findHistoricVariableInstanceByVariableInstanceId(String variableInstanceId);
 
-  long findHistoricVariableInstanceCountByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery);
+    long findHistoricVariableInstanceCountByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery);
 
-  List<HistoricVariableInstance> findHistoricVariableInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<HistoricVariableInstance> findHistoricVariableInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
 
-  long findHistoricVariableInstanceCountByNativeQuery(Map<String, Object> parameterMap);
-  
-  void deleteHistoricVariableInstancesByTaskId(String taskId);
-  
-  void deleteHistoricVariableInstanceByProcessInstanceId(String historicProcessInstanceId);
+    long findHistoricVariableInstanceCountByNativeQuery(Map<String, Object> parameterMap);
+
+    void deleteHistoricVariableInstancesByTaskId(String taskId);
+
+    void deleteHistoricVariableInstanceByProcessInstanceId(String historicProcessInstanceId);
 
 }

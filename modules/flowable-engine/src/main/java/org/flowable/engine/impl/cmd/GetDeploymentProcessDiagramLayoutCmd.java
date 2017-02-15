@@ -31,20 +31,20 @@ import org.flowable.engine.repository.DiagramLayout;
  */
 public class GetDeploymentProcessDiagramLayoutCmd implements Command<DiagramLayout>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String processDefinitionId;
+    private static final long serialVersionUID = 1L;
+    protected String processDefinitionId;
 
-  public GetDeploymentProcessDiagramLayoutCmd(String processDefinitionId) {
-    if (processDefinitionId == null || processDefinitionId.length() < 1) {
-      throw new FlowableException("The process definition id is mandatory, but '" + processDefinitionId + "' has been provided.");
+    public GetDeploymentProcessDiagramLayoutCmd(String processDefinitionId) {
+        if (processDefinitionId == null || processDefinitionId.length() < 1) {
+            throw new FlowableException("The process definition id is mandatory, but '" + processDefinitionId + "' has been provided.");
+        }
+        this.processDefinitionId = processDefinitionId;
     }
-    this.processDefinitionId = processDefinitionId;
-  }
 
-  public DiagramLayout execute(CommandContext commandContext) {
-    InputStream processModelStream = new GetDeploymentProcessModelCmd(processDefinitionId).execute(commandContext);
-    InputStream processDiagramStream = new GetDeploymentProcessDiagramCmd(processDefinitionId).execute(commandContext);
-    return new ProcessDiagramLayoutFactory().getProcessDiagramLayout(processModelStream, processDiagramStream);
-  }
+    public DiagramLayout execute(CommandContext commandContext) {
+        InputStream processModelStream = new GetDeploymentProcessModelCmd(processDefinitionId).execute(commandContext);
+        InputStream processDiagramStream = new GetDeploymentProcessDiagramCmd(processDefinitionId).execute(commandContext);
+        return new ProcessDiagramLayoutFactory().getProcessDiagramLayout(processModelStream, processDiagramStream);
+    }
 
 }

@@ -18,9 +18,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.flowable.app.model.common.RemoteToken;
 
 public interface FlowableCookieFilterCallback {
-  
-  void onValidTokenFound(HttpServletRequest request, HttpServletResponse response, RemoteToken token);
-  
-  void onFilterCleanup(HttpServletRequest request, HttpServletResponse response);
+
+    void onValidTokenFound(HttpServletRequest request, HttpServletResponse response, RemoteToken token);
+
+    void onFilterCleanup(HttpServletRequest request, HttpServletResponse response);
 
 }

@@ -34,126 +34,126 @@ import org.flowable.form.model.FormModel;
  */
 public class FormDeploymentBuilderImpl implements FormDeploymentBuilder, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected static final String DEFAULT_ENCODING = "UTF-8";
+    private static final long serialVersionUID = 1L;
+    protected static final String DEFAULT_ENCODING = "UTF-8";
 
-  protected transient FormRepositoryServiceImpl repositoryService;
-  protected transient ResourceEntityManager resourceEntityManager;
+    protected transient FormRepositoryServiceImpl repositoryService;
+    protected transient ResourceEntityManager resourceEntityManager;
 
-  protected FormDeploymentEntity deployment;
-  protected boolean isDuplicateFilterEnabled;
+    protected FormDeploymentEntity deployment;
+    protected boolean isDuplicateFilterEnabled;
 
-  public FormDeploymentBuilderImpl() {
-    FormEngineConfiguration formEngineConfiguration = Context.getFormEngineConfiguration();
-    this.repositoryService = (FormRepositoryServiceImpl) formEngineConfiguration.getFormRepositoryService();
-    this.deployment = formEngineConfiguration.getDeploymentEntityManager().create();
-    this.resourceEntityManager = formEngineConfiguration.getResourceEntityManager();
-  }
-
-  public FormDeploymentBuilder addInputStream(String resourceName, InputStream inputStream) {
-    if (inputStream == null) {
-      throw new FlowableException("inputStream for resource '" + resourceName + "' is null");
+    public FormDeploymentBuilderImpl() {
+        FormEngineConfiguration formEngineConfiguration = Context.getFormEngineConfiguration();
+        this.repositoryService = (FormRepositoryServiceImpl) formEngineConfiguration.getFormRepositoryService();
+        this.deployment = formEngineConfiguration.getDeploymentEntityManager().create();
+        this.resourceEntityManager = formEngineConfiguration.getResourceEntityManager();
     }
 
-    byte[] bytes = null;
-    try {
-      bytes = IOUtils.toByteArray(inputStream);
-    } catch (Exception e) {
-      throw new FlowableException("could not get byte array from resource '" + resourceName + "'");
+    public FormDeploymentBuilder addInputStream(String resourceName, InputStream inputStream) {
+        if (inputStream == null) {
+            throw new FlowableException("inputStream for resource '" + resourceName + "' is null");
+        }
+
+        byte[] bytes = null;
+        try {
+            bytes = IOUtils.toByteArray(inputStream);
+        } catch (Exception e) {
+            throw new FlowableException("could not get byte array from resource '" + resourceName + "'");
+        }
+
+        if (bytes == null) {
+            throw new FlowableException("byte array for resource '" + resourceName + "' is null");
+        }
+
+        ResourceEntity resource = resourceEntityManager.create();
+        resource.setName(resourceName);
+        resource.setBytes(bytes);
+        deployment.addResource(resource);
+        return this;
     }
 
-    if (bytes == null) {
-      throw new FlowableException("byte array for resource '" + resourceName + "' is null");
+    public FormDeploymentBuilder addClasspathResource(String resource) {
+        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource);
+        if (inputStream == null) {
+            throw new FlowableException("resource '" + resource + "' not found");
+        }
+        return addInputStream(resource, inputStream);
     }
 
-    ResourceEntity resource = resourceEntityManager.create();
-    resource.setName(resourceName);
-    resource.setBytes(bytes);
-    deployment.addResource(resource);
-    return this;
-  }
+    public FormDeploymentBuilder addString(String resourceName, String text) {
+        if (text == null) {
+            throw new FlowableException("text is null");
+        }
 
-  public FormDeploymentBuilder addClasspathResource(String resource) {
-    InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource);
-    if (inputStream == null) {
-      throw new FlowableException("resource '" + resource + "' not found");
-    }
-    return addInputStream(resource, inputStream);
-  }
-
-  public FormDeploymentBuilder addString(String resourceName, String text) {
-    if (text == null) {
-      throw new FlowableException("text is null");
+        ResourceEntity resource = resourceEntityManager.create();
+        resource.setName(resourceName);
+        try {
+            resource.setBytes(text.getBytes(DEFAULT_ENCODING));
+        } catch (UnsupportedEncodingException e) {
+            throw new FlowableException("Unable to get process bytes.", e);
+        }
+        deployment.addResource(resource);
+        return this;
     }
 
-    ResourceEntity resource = resourceEntityManager.create();
-    resource.setName(resourceName);
-    try {
-      resource.setBytes(text.getBytes(DEFAULT_ENCODING));
-    } catch (UnsupportedEncodingException e) {
-      throw new FlowableException("Unable to get process bytes.", e);
-    }
-    deployment.addResource(resource);
-    return this;
-  }
+    public FormDeploymentBuilder addFormBytes(String resourceName, byte[] formBytes) {
+        if (formBytes == null) {
+            throw new FlowableException("form bytes is null");
+        }
 
-  public FormDeploymentBuilder addFormBytes(String resourceName, byte[] formBytes) {
-    if (formBytes == null) {
-      throw new FlowableException("form bytes is null");
+        ResourceEntity resource = resourceEntityManager.create();
+        resource.setName(resourceName);
+        resource.setBytes(formBytes);
+        deployment.addResource(resource);
+        return this;
     }
 
-    ResourceEntity resource = resourceEntityManager.create();
-    resource.setName(resourceName);
-    resource.setBytes(formBytes);
-    deployment.addResource(resource);
-    return this;
-  }
+    public FormDeploymentBuilder addFormDefinition(String resourceName, FormModel formDefinition) {
+        FormJsonConverter formConverter = new FormJsonConverter();
+        String formJson = formConverter.convertToJson(formDefinition);
+        addString(resourceName, formJson);
 
-  public FormDeploymentBuilder addFormDefinition(String resourceName, FormModel formDefinition) {
-    FormJsonConverter formConverter = new FormJsonConverter();
-    String formJson = formConverter.convertToJson(formDefinition);
-    addString(resourceName, formJson);
+        return this;
+    }
 
-    return this;
-  }
+    public FormDeploymentBuilder name(String name) {
+        deployment.setName(name);
+        return this;
+    }
 
-  public FormDeploymentBuilder name(String name) {
-    deployment.setName(name);
-    return this;
-  }
+    public FormDeploymentBuilder category(String category) {
+        deployment.setCategory(category);
+        return this;
+    }
 
-  public FormDeploymentBuilder category(String category) {
-    deployment.setCategory(category);
-    return this;
-  }
+    public FormDeploymentBuilder tenantId(String tenantId) {
+        deployment.setTenantId(tenantId);
+        return this;
+    }
 
-  public FormDeploymentBuilder tenantId(String tenantId) {
-    deployment.setTenantId(tenantId);
-    return this;
-  }
-  
-  public FormDeploymentBuilder parentDeploymentId(String parentDeploymentId) {
-    deployment.setParentDeploymentId(parentDeploymentId);
-    return this;
-  }
-  
-  public FormDeploymentBuilder enableDuplicateFiltering() {
-    this.isDuplicateFilterEnabled = true;
-    return this;
-  }
+    public FormDeploymentBuilder parentDeploymentId(String parentDeploymentId) {
+        deployment.setParentDeploymentId(parentDeploymentId);
+        return this;
+    }
 
-  public FormDeployment deploy() {
-    return repositoryService.deploy(this);
-  }
+    public FormDeploymentBuilder enableDuplicateFiltering() {
+        this.isDuplicateFilterEnabled = true;
+        return this;
+    }
 
-  // getters and setters
-  // //////////////////////////////////////////////////////
+    public FormDeployment deploy() {
+        return repositoryService.deploy(this);
+    }
 
-  public FormDeploymentEntity getDeployment() {
-    return deployment;
-  }
+    // getters and setters
+    // //////////////////////////////////////////////////////
 
-  public boolean isDuplicateFilterEnabled() {
-    return isDuplicateFilterEnabled;
-  }
+    public FormDeploymentEntity getDeployment() {
+        return deployment;
+    }
+
+    public boolean isDuplicateFilterEnabled() {
+        return isDuplicateFilterEnabled;
+    }
 }

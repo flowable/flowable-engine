@@ -18,23 +18,22 @@ import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.InclusiveGateway;
 
-
 /**
  * @author Joram Barrez
  */
 public class InclusiveGatewayParseHandler extends AbstractActivityBpmnParseHandler<InclusiveGateway> {
-  
-  public Class< ? extends BaseElement> getHandledType() {
-    return InclusiveGateway.class;
-  }
-  
-  protected void executeParse(BpmnParse bpmnParse, InclusiveGateway gateway) {
-    ActivityImpl activity = createActivityOnCurrentScope(bpmnParse, gateway, BpmnXMLConstants.ELEMENT_GATEWAY_INCLUSIVE);
-    
-    activity.setAsync(gateway.isAsynchronous());
-    activity.setExclusive(!gateway.isNotExclusive());
-    
-    activity.setActivityBehavior(bpmnParse.getActivityBehaviorFactory().createInclusiveGatewayActivityBehavior(gateway));
-  }
+
+    public Class<? extends BaseElement> getHandledType() {
+        return InclusiveGateway.class;
+    }
+
+    protected void executeParse(BpmnParse bpmnParse, InclusiveGateway gateway) {
+        ActivityImpl activity = createActivityOnCurrentScope(bpmnParse, gateway, BpmnXMLConstants.ELEMENT_GATEWAY_INCLUSIVE);
+
+        activity.setAsync(gateway.isAsynchronous());
+        activity.setExclusive(!gateway.isNotExclusive());
+
+        activity.setActivityBehavior(bpmnParse.getActivityBehaviorFactory().createInclusiveGatewayActivityBehavior(gateway));
+    }
 
 }

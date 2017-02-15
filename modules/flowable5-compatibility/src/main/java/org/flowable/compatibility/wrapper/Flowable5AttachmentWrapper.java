@@ -25,79 +25,79 @@ import org.flowable.engine.task.Attachment;
  */
 public class Flowable5AttachmentWrapper implements Attachment {
 
-  private org.activiti.engine.task.Attachment activiti5Attachment;
-  
-  public Flowable5AttachmentWrapper(org.activiti.engine.task.Attachment activit5Attachment) {
-    this.activiti5Attachment = activit5Attachment;
-  }
-  
-  @Override
-  public String getId() {
-    return activiti5Attachment.getId();
-  }
+    private org.activiti.engine.task.Attachment activiti5Attachment;
 
-  @Override
-  public String getName() {
-    return activiti5Attachment.getName();
-  }
+    public Flowable5AttachmentWrapper(org.activiti.engine.task.Attachment activit5Attachment) {
+        this.activiti5Attachment = activit5Attachment;
+    }
 
-  @Override
-  public void setName(String name) {
-    activiti5Attachment.setName(name);
-  }
+    @Override
+    public String getId() {
+        return activiti5Attachment.getId();
+    }
 
-  @Override
-  public String getDescription() {
-    return activiti5Attachment.getDescription();
-  }
+    @Override
+    public String getName() {
+        return activiti5Attachment.getName();
+    }
 
-  @Override
-  public void setDescription(String description) {
-    activiti5Attachment.setDescription(description);
-  }
+    @Override
+    public void setName(String name) {
+        activiti5Attachment.setName(name);
+    }
 
-  @Override
-  public String getType() {
-    return activiti5Attachment.getType();
-  }
+    @Override
+    public String getDescription() {
+        return activiti5Attachment.getDescription();
+    }
 
-  @Override
-  public String getTaskId() {
-    return activiti5Attachment.getTaskId();
-  }
+    @Override
+    public void setDescription(String description) {
+        activiti5Attachment.setDescription(description);
+    }
 
-  @Override
-  public String getProcessInstanceId() {
-    return activiti5Attachment.getProcessInstanceId();
-  }
+    @Override
+    public String getType() {
+        return activiti5Attachment.getType();
+    }
 
-  @Override
-  public String getUrl() {
-    return activiti5Attachment.getUrl();
-  }
+    @Override
+    public String getTaskId() {
+        return activiti5Attachment.getTaskId();
+    }
 
-  @Override
-  public String getUserId() {
-    return activiti5Attachment.getUserId();
-  }
+    @Override
+    public String getProcessInstanceId() {
+        return activiti5Attachment.getProcessInstanceId();
+    }
 
-  @Override
-  public Date getTime() {
-    return activiti5Attachment.getTime();
-  }
+    @Override
+    public String getUrl() {
+        return activiti5Attachment.getUrl();
+    }
 
-  @Override
-  public void setTime(Date time) {
-    activiti5Attachment.setTime(time);
-  }
-  
-  @Override
-  public String getContentId() {
-    return ((AttachmentEntity) activiti5Attachment).getContentId();
-  }
+    @Override
+    public String getUserId() {
+        return activiti5Attachment.getUserId();
+    }
 
-  public org.activiti.engine.task.Attachment getRawObject() {
-    return activiti5Attachment;
-  }
+    @Override
+    public Date getTime() {
+        return activiti5Attachment.getTime();
+    }
+
+    @Override
+    public void setTime(Date time) {
+        activiti5Attachment.setTime(time);
+    }
+
+    @Override
+    public String getContentId() {
+        return ((AttachmentEntity) activiti5Attachment).getContentId();
+    }
+
+    public org.activiti.engine.task.Attachment getRawObject() {
+        return activiti5Attachment;
+    }
 
 }

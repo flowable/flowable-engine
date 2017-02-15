@@ -22,13 +22,13 @@ import org.flowable.engine.impl.bpmn.parser.factory.DefaultListenerFactory;
  */
 public class CustomListenerFactory extends DefaultListenerFactory {
 
-  @Override
-  public TaskListener createExpressionTaskListener(FlowableListener activitiListener) {
-    return new TaskListener() {
-      public void notify(DelegateTask delegateTask) {
-        CustomListenerFactoryTest.COUNTER.addAndGet(100);
-      }
-    };
-  }
+    @Override
+    public TaskListener createExpressionTaskListener(FlowableListener activitiListener) {
+        return new TaskListener() {
+            public void notify(DelegateTask delegateTask) {
+                CustomListenerFactoryTest.COUNTER.addAndGet(100);
+            }
+        };
+    }
 
 }

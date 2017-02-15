@@ -23,20 +23,20 @@ import org.flowable.engine.impl.interceptor.CommandContext;
  */
 public class DeleteModelCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  String modelId;
+    private static final long serialVersionUID = 1L;
+    String modelId;
 
-  public DeleteModelCmd(String modelId) {
-    this.modelId = modelId;
-  }
-
-  public Void execute(CommandContext commandContext) {
-    if (modelId == null) {
-      throw new FlowableIllegalArgumentException("modelId is null");
+    public DeleteModelCmd(String modelId) {
+        this.modelId = modelId;
     }
-    commandContext.getModelEntityManager().delete(modelId);
 
-    return null;
-  }
+    public Void execute(CommandContext commandContext) {
+        if (modelId == null) {
+            throw new FlowableIllegalArgumentException("modelId is null");
+        }
+        commandContext.getModelEntityManager().delete(modelId);
+
+        return null;
+    }
 
 }

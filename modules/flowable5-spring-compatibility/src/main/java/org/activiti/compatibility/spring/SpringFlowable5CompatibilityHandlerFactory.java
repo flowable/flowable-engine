@@ -22,35 +22,35 @@ import org.slf4j.LoggerFactory;
  */
 public class SpringFlowable5CompatibilityHandlerFactory implements Flowable5CompatibilityHandlerFactory {
 
-  private static final Logger logger = LoggerFactory.getLogger(SpringFlowable5CompatibilityHandlerFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(SpringFlowable5CompatibilityHandlerFactory.class);
 
-  protected String compatibilityHandlerClassName;
+    protected String compatibilityHandlerClassName;
 
-  @Override
-  public Flowable5CompatibilityHandler createFlowable5CompatibilityHandler() {
+    @Override
+    public Flowable5CompatibilityHandler createFlowable5CompatibilityHandler() {
 
-    if (compatibilityHandlerClassName != null) {
-      try {
-        Flowable5CompatibilityHandler handler = (Flowable5CompatibilityHandler) Class.forName(compatibilityHandlerClassName).newInstance();
-        return handler;
-      } catch (Exception e) {
-        logger.info("Flowable 5 compatibility handler implementation not found or error during instantiation : {}. Flowable 5 backwards compatibility disabled.",
-                e.getMessage());
-      }
-      
-    } else {
-      return new DefaultFlowable5SpringCompatibilityHandler();
+        if (compatibilityHandlerClassName != null) {
+            try {
+                Flowable5CompatibilityHandler handler = (Flowable5CompatibilityHandler) Class.forName(compatibilityHandlerClassName).newInstance();
+                return handler;
+            } catch (Exception e) {
+                logger.info("Flowable 5 compatibility handler implementation not found or error during instantiation : {}. Flowable 5 backwards compatibility disabled.",
+                        e.getMessage());
+            }
+
+        } else {
+            return new DefaultFlowable5SpringCompatibilityHandler();
+        }
+
+        return null;
     }
-    
-    return null;
-  }
 
-  public String getCompatibilityHandlerClassName() {
-    return compatibilityHandlerClassName;
-  }
+    public String getCompatibilityHandlerClassName() {
+        return compatibilityHandlerClassName;
+    }
 
-  public void setCompatibilityHandlerClassName(String compatibilityHandlerClassName) {
-    this.compatibilityHandlerClassName = compatibilityHandlerClassName;
-  }
+    public void setCompatibilityHandlerClassName(String compatibilityHandlerClassName) {
+        this.compatibilityHandlerClassName = compatibilityHandlerClassName;
+    }
 
 }

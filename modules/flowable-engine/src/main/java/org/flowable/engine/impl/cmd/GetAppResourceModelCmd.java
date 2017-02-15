@@ -26,20 +26,20 @@ import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
  */
 public class GetAppResourceModelCmd implements Command<AppModel>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String deploymentId;
+    protected String deploymentId;
 
-  public GetAppResourceModelCmd(String deploymentId) {
-    this.deploymentId = deploymentId;
-  }
-
-  public AppModel execute(CommandContext commandContext) {
-    if (deploymentId == null) {
-      throw new FlowableIllegalArgumentException("deploymentId is null");
+    public GetAppResourceModelCmd(String deploymentId) {
+        this.deploymentId = deploymentId;
     }
 
-    DeploymentManager deploymentManager = Context.getProcessEngineConfiguration().getDeploymentManager();
-    return deploymentManager.getAppResourceModel(deploymentId);
-  }
+    public AppModel execute(CommandContext commandContext) {
+        if (deploymentId == null) {
+            throw new FlowableIllegalArgumentException("deploymentId is null");
+        }
+
+        DeploymentManager deploymentManager = Context.getProcessEngineConfiguration().getDeploymentManager();
+        return deploymentManager.getAppResourceModel(deploymentId);
+    }
 }

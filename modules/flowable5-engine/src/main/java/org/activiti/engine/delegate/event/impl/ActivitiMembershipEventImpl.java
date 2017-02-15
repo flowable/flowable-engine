@@ -23,26 +23,26 @@ import org.flowable.idm.engine.delegate.event.impl.FlowableIdmEventImpl;
  */
 public class ActivitiMembershipEventImpl extends FlowableIdmEventImpl implements FlowableIdmMembershipEvent {
 
-	protected String userId;
-	protected String groupId;
-	
-	public ActivitiMembershipEventImpl(FlowableIdmEventType type) {
-	  super(type);
-  }
-	
-	public void setUserId(String userId) {
-	  this.userId = userId;
-  }
-	
-	public String getUserId() {
-	  return userId;
-  }
-	
-	public void setGroupId(String groupId) {
-	  this.groupId = groupId;
-  }
-	
-	public String getGroupId() {
-	  return groupId;
-  }
+    protected String userId;
+    protected String groupId;
+
+    public ActivitiMembershipEventImpl(FlowableIdmEventType type) {
+        super(type);
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
 }

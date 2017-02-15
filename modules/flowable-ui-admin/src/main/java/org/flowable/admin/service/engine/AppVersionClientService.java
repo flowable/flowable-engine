@@ -20,19 +20,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class AppVersionClientService extends AbstractEncryptingService {
 
-	@Autowired
+    @Autowired
     protected FlowableClientService clientUtil;
 
     public String getEndpointTypeUsingEncryptedPassword(String contextRoot, String restRoot,
-                                  String serverAddress, Integer port,
-                                  String userName, String encryptedPassword) {
+            String serverAddress, Integer port,
+            String userName, String encryptedPassword) {
         String decryptedPassword = decrypt(encryptedPassword);
         return getEndpointType(contextRoot, restRoot, serverAddress, port, userName, decryptedPassword);
     }
 
     public String getEndpointType(String contextRoot, String restRoot,
-                                  String serverAddress, Integer port,
-                                  String userName, String password) {
+            String serverAddress, Integer port,
+            String userName, String password) {
         String result = null;
         HttpGet get = new HttpGet(clientUtil.getServerUrl(contextRoot, restRoot, serverAddress, port, "enterprise/app-version"));
 

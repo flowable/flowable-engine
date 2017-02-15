@@ -29,47 +29,47 @@ import org.flowable.engine.impl.util.Flowable5Util;
  */
 public class TriggerCmd extends NeedsActiveExecutionCmd<Object> {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected Map<String, Object> processVariables;
-  protected Map<String, Object> transientVariables;
+    protected Map<String, Object> processVariables;
+    protected Map<String, Object> transientVariables;
 
-  public TriggerCmd(String executionId, Map<String, Object> processVariables) {
-    super(executionId);
-    this.processVariables = processVariables;
-  }
-  
-  public TriggerCmd(String executionId, Map<String, Object> processVariables, Map<String, Object> transientVariables) {
-    this(executionId, processVariables);
-    this.transientVariables = transientVariables;
-  }
-
-  protected Object execute(CommandContext commandContext, ExecutionEntity execution) {
-    if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      compatibilityHandler.trigger(executionId, processVariables, transientVariables);
-      return null;
+    public TriggerCmd(String executionId, Map<String, Object> processVariables) {
+        super(executionId);
+        this.processVariables = processVariables;
     }
-    
-    if (processVariables != null) {
-      execution.setVariables(processVariables);
-    }
-    
-    if (transientVariables != null) {
-      execution.setTransientVariables(transientVariables);
-    }
-    
-    Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-        FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, execution.getCurrentActivityId(), null, 
-            null, execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId()));
-    
-    commandContext.getAgenda().planTriggerExecutionOperation(execution);
-    return null;
-  }
 
-  @Override
-  protected String getSuspendedExceptionMessage() {
-    return "Cannot trigger an execution that is suspended";
-  }
+    public TriggerCmd(String executionId, Map<String, Object> processVariables, Map<String, Object> transientVariables) {
+        this(executionId, processVariables);
+        this.transientVariables = transientVariables;
+    }
+
+    protected Object execute(CommandContext commandContext, ExecutionEntity execution) {
+        if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
+            Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+            compatibilityHandler.trigger(executionId, processVariables, transientVariables);
+            return null;
+        }
+
+        if (processVariables != null) {
+            execution.setVariables(processVariables);
+        }
+
+        if (transientVariables != null) {
+            execution.setTransientVariables(transientVariables);
+        }
+
+        Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, execution.getCurrentActivityId(), null,
+                        null, execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId()));
+
+        commandContext.getAgenda().planTriggerExecutionOperation(execution);
+        return null;
+    }
+
+    @Override
+    protected String getSuspendedExceptionMessage() {
+        return "Cannot trigger an execution that is suspended";
+    }
 
 }

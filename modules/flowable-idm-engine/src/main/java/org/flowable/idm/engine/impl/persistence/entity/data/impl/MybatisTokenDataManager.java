@@ -28,36 +28,36 @@ import org.flowable.idm.engine.impl.persistence.entity.data.TokenDataManager;
  * @author Tijs Rademakers
  */
 public class MybatisTokenDataManager extends AbstractDataManager<TokenEntity> implements TokenDataManager {
-  
-  public MybatisTokenDataManager(IdmEngineConfiguration idmEngineConfiguration) {
-    super(idmEngineConfiguration);
-  }
 
-  @Override
-  public Class<? extends TokenEntity> getManagedEntityClass() {
-    return TokenEntityImpl.class;
-  }
-  
-  @Override
-  public TokenEntity create() {
-    return new TokenEntityImpl();
-  }
-  
-  @SuppressWarnings("unchecked")
-  public List<Token> findTokenByQueryCriteria(TokenQueryImpl query, Page page) {
-    return getDbSqlSession().selectList("selectTokenByQueryCriteria", query, page);
-  }
+    public MybatisTokenDataManager(IdmEngineConfiguration idmEngineConfiguration) {
+        super(idmEngineConfiguration);
+    }
 
-  public long findTokenCountByQueryCriteria(TokenQueryImpl query) {
-    return (Long) getDbSqlSession().selectOne("selectTokenCountByQueryCriteria", query);
-  }
+    @Override
+    public Class<? extends TokenEntity> getManagedEntityClass() {
+        return TokenEntityImpl.class;
+    }
 
-  @SuppressWarnings("unchecked")
-  public List<Token> findTokensByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return getDbSqlSession().selectListWithRawParameter("selectTokenByNativeQuery", parameterMap, firstResult, maxResults);
-  }
+    @Override
+    public TokenEntity create() {
+        return new TokenEntityImpl();
+    }
 
-  public long findTokenCountByNativeQuery(Map<String, Object> parameterMap) {
-    return (Long) getDbSqlSession().selectOne("selectTokenCountByNativeQuery", parameterMap);
-  }
+    @SuppressWarnings("unchecked")
+    public List<Token> findTokenByQueryCriteria(TokenQueryImpl query, Page page) {
+        return getDbSqlSession().selectList("selectTokenByQueryCriteria", query, page);
+    }
+
+    public long findTokenCountByQueryCriteria(TokenQueryImpl query) {
+        return (Long) getDbSqlSession().selectOne("selectTokenCountByQueryCriteria", query);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Token> findTokensByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
+        return getDbSqlSession().selectListWithRawParameter("selectTokenByNativeQuery", parameterMap, firstResult, maxResults);
+    }
+
+    public long findTokenCountByNativeQuery(Map<String, Object> parameterMap) {
+        return (Long) getDbSqlSession().selectOne("selectTokenCountByNativeQuery", parameterMap);
+    }
 }

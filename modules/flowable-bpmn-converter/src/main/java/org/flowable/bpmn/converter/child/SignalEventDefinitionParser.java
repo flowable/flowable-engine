@@ -26,24 +26,24 @@ import org.flowable.bpmn.model.SignalEventDefinition;
  */
 public class SignalEventDefinitionParser extends BaseChildElementParser {
 
-  public String getElementName() {
-    return ELEMENT_EVENT_SIGNALDEFINITION;
-  }
-
-  public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-    if (!(parentElement instanceof Event))
-      return;
-
-    SignalEventDefinition eventDefinition = new SignalEventDefinition();
-    BpmnXMLUtil.addXMLLocation(eventDefinition, xtr);
-    eventDefinition.setSignalRef(xtr.getAttributeValue(null, ATTRIBUTE_SIGNAL_REF));
-    eventDefinition.setSignalExpression(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_SIGNAL_EXPRESSION, xtr));
-    if (StringUtils.isNotEmpty(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_ACTIVITY_ASYNCHRONOUS, xtr))) {
-      eventDefinition.setAsync(Boolean.parseBoolean(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_ACTIVITY_ASYNCHRONOUS, xtr)));
+    public String getElementName() {
+        return ELEMENT_EVENT_SIGNALDEFINITION;
     }
 
-    BpmnXMLUtil.parseChildElements(ELEMENT_EVENT_SIGNALDEFINITION, eventDefinition, xtr, model);
+    public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
+        if (!(parentElement instanceof Event))
+            return;
 
-    ((Event) parentElement).getEventDefinitions().add(eventDefinition);
-  }
+        SignalEventDefinition eventDefinition = new SignalEventDefinition();
+        BpmnXMLUtil.addXMLLocation(eventDefinition, xtr);
+        eventDefinition.setSignalRef(xtr.getAttributeValue(null, ATTRIBUTE_SIGNAL_REF));
+        eventDefinition.setSignalExpression(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_SIGNAL_EXPRESSION, xtr));
+        if (StringUtils.isNotEmpty(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_ACTIVITY_ASYNCHRONOUS, xtr))) {
+            eventDefinition.setAsync(Boolean.parseBoolean(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_ACTIVITY_ASYNCHRONOUS, xtr)));
+        }
+
+        BpmnXMLUtil.parseChildElements(ELEMENT_EVENT_SIGNALDEFINITION, eventDefinition, xtr, model);
+
+        ((Event) parentElement).getEventDefinitions().add(eventDefinition);
+    }
 }

@@ -33,144 +33,141 @@ import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.impl.bpmn.data.AbstractDataAssociation;
 import org.flowable.engine.repository.ProcessDefinition;
 
-
 /**
- * Implementation of the BPMN 2.0 call activity
- * (limited currently to calling a subprocess and not (yet) a global task).
+ * Implementation of the BPMN 2.0 call activity (limited currently to calling a subprocess and not (yet) a global task).
  * 
  * @author Joram Barrez
  */
 public class CallActivityBehavior extends AbstractBpmnActivityBehavior implements SubProcessActivityBehavior {
-  
-  protected String processDefinitonKey;
-  private List<AbstractDataAssociation> dataInputAssociations = new ArrayList<AbstractDataAssociation>();
-  private List<AbstractDataAssociation> dataOutputAssociations = new ArrayList<AbstractDataAssociation>();
-  private Expression processDefinitionExpression;
-  protected List<MapExceptionEntry> mapExceptions;
-  protected boolean inheritVariables;
 
-  public CallActivityBehavior(String processDefinitionKey, List<MapExceptionEntry> mapExceptions) {
-    this.processDefinitonKey = processDefinitionKey;
-    this.mapExceptions = mapExceptions;
-  }
-  
-  public CallActivityBehavior(Expression processDefinitionExpression, List<MapExceptionEntry> mapExceptions) {
-    super();
-    this.processDefinitionExpression = processDefinitionExpression;
-    this.mapExceptions = mapExceptions;
-  }
+    protected String processDefinitonKey;
+    private List<AbstractDataAssociation> dataInputAssociations = new ArrayList<AbstractDataAssociation>();
+    private List<AbstractDataAssociation> dataOutputAssociations = new ArrayList<AbstractDataAssociation>();
+    private Expression processDefinitionExpression;
+    protected List<MapExceptionEntry> mapExceptions;
+    protected boolean inheritVariables;
 
-  public void addDataInputAssociation(AbstractDataAssociation dataInputAssociation) {
-    this.dataInputAssociations.add(dataInputAssociation);
-  }
-
-  public void addDataOutputAssociation(AbstractDataAssociation dataOutputAssociation) {
-    this.dataOutputAssociations.add(dataOutputAssociation);
-  }
-
-  public void execute(DelegateExecution execution) {
-    
-	String processDefinitonKey = this.processDefinitonKey;
-    if (processDefinitionExpression != null) {
-      processDefinitonKey = (String) processDefinitionExpression.getValue(execution);
+    public CallActivityBehavior(String processDefinitionKey, List<MapExceptionEntry> mapExceptions) {
+        this.processDefinitonKey = processDefinitionKey;
+        this.mapExceptions = mapExceptions;
     }
 
-    DeploymentManager deploymentManager = Context.getProcessEngineConfiguration().getDeploymentManager();
-    
-    ProcessDefinition processDefinition = null;
-    if (execution.getTenantId() == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(execution.getTenantId())) {
-    	processDefinition = deploymentManager.findDeployedLatestProcessDefinitionByKey(processDefinitonKey);
-    } else {
-    	processDefinition = deploymentManager.findDeployedLatestProcessDefinitionByKeyAndTenantId(processDefinitonKey, execution.getTenantId());
+    public CallActivityBehavior(Expression processDefinitionExpression, List<MapExceptionEntry> mapExceptions) {
+        super();
+        this.processDefinitionExpression = processDefinitionExpression;
+        this.mapExceptions = mapExceptions;
     }
 
-    // Do not start a process instance if the process definition is suspended
-    if (deploymentManager.isProcessDefinitionSuspended(processDefinition.getId())) {
-      throw new ActivitiException("Cannot start process instance. Process definition "
-          + processDefinition.getName() + " (id = " + processDefinition.getId() + ") is suspended");
+    public void addDataInputAssociation(AbstractDataAssociation dataInputAssociation) {
+        this.dataInputAssociations.add(dataInputAssociation);
     }
-    
-    ActivityExecution activityExecution = (ActivityExecution) execution;
-    PvmProcessInstance subProcessInstance = activityExecution.createSubProcessInstance((ProcessDefinitionEntity) processDefinition);
-    
-    if (inheritVariables) {
-      Map<String, Object> variables = execution.getVariables();
-      for (Map.Entry<String, Object> entry : variables.entrySet()) {
-        subProcessInstance.setVariable(entry.getKey(), entry.getValue());
-      }
+
+    public void addDataOutputAssociation(AbstractDataAssociation dataOutputAssociation) {
+        this.dataOutputAssociations.add(dataOutputAssociation);
     }
-    
-    // copy process variables
-    for (AbstractDataAssociation dataInputAssociation : dataInputAssociations) {
-      Object value = null;
-      if (dataInputAssociation.getSourceExpression()!=null) {
-        value = dataInputAssociation.getSourceExpression().getValue(execution);
-      }
-      else {
-        value = execution.getVariable(dataInputAssociation.getSource());
-      }
-      subProcessInstance.setVariable(dataInputAssociation.getTarget(), value);
-    }
-    
-    try {
-      subProcessInstance.start();
-    } catch (RuntimeException e) {
-      
-      Throwable cause = e;
-      BpmnError error = null;
-      while (cause != null) {
-        if (cause instanceof BpmnError) {
-          error = (BpmnError) cause;
-          break;
-          
-        } else if (cause instanceof RuntimeException) {
-          if (ErrorPropagation.mapException((RuntimeException) cause, activityExecution, mapExceptions)) {
-            return;
-          }
+
+    public void execute(DelegateExecution execution) {
+
+        String processDefinitonKey = this.processDefinitonKey;
+        if (processDefinitionExpression != null) {
+            processDefinitonKey = (String) processDefinitionExpression.getValue(execution);
         }
-        cause = cause.getCause();
-      }
 
-      if (error != null) {
-        ErrorPropagation.propagateError(error, activityExecution);
-      } else {
-        throw e;
-      }
+        DeploymentManager deploymentManager = Context.getProcessEngineConfiguration().getDeploymentManager();
+
+        ProcessDefinition processDefinition = null;
+        if (execution.getTenantId() == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(execution.getTenantId())) {
+            processDefinition = deploymentManager.findDeployedLatestProcessDefinitionByKey(processDefinitonKey);
+        } else {
+            processDefinition = deploymentManager.findDeployedLatestProcessDefinitionByKeyAndTenantId(processDefinitonKey, execution.getTenantId());
+        }
+
+        // Do not start a process instance if the process definition is suspended
+        if (deploymentManager.isProcessDefinitionSuspended(processDefinition.getId())) {
+            throw new ActivitiException("Cannot start process instance. Process definition "
+                    + processDefinition.getName() + " (id = " + processDefinition.getId() + ") is suspended");
+        }
+
+        ActivityExecution activityExecution = (ActivityExecution) execution;
+        PvmProcessInstance subProcessInstance = activityExecution.createSubProcessInstance((ProcessDefinitionEntity) processDefinition);
+
+        if (inheritVariables) {
+            Map<String, Object> variables = execution.getVariables();
+            for (Map.Entry<String, Object> entry : variables.entrySet()) {
+                subProcessInstance.setVariable(entry.getKey(), entry.getValue());
+            }
+        }
+
+        // copy process variables
+        for (AbstractDataAssociation dataInputAssociation : dataInputAssociations) {
+            Object value = null;
+            if (dataInputAssociation.getSourceExpression() != null) {
+                value = dataInputAssociation.getSourceExpression().getValue(execution);
+            } else {
+                value = execution.getVariable(dataInputAssociation.getSource());
+            }
+            subProcessInstance.setVariable(dataInputAssociation.getTarget(), value);
+        }
+
+        try {
+            subProcessInstance.start();
+        } catch (RuntimeException e) {
+
+            Throwable cause = e;
+            BpmnError error = null;
+            while (cause != null) {
+                if (cause instanceof BpmnError) {
+                    error = (BpmnError) cause;
+                    break;
+
+                } else if (cause instanceof RuntimeException) {
+                    if (ErrorPropagation.mapException((RuntimeException) cause, activityExecution, mapExceptions)) {
+                        return;
+                    }
+                }
+                cause = cause.getCause();
+            }
+
+            if (error != null) {
+                ErrorPropagation.propagateError(error, activityExecution);
+            } else {
+                throw e;
+            }
+        }
     }
-  }
-  
-  public void completing(DelegateExecution execution, DelegateExecution subProcessInstance) throws Exception {
-    // only data.  no control flow available on this execution.
 
-    // copy process variables
-    for (AbstractDataAssociation dataOutputAssociation : dataOutputAssociations) {
-      Object value = null;
-      if (dataOutputAssociation.getSourceExpression()!=null) {
-        value = dataOutputAssociation.getSourceExpression().getValue(subProcessInstance);
-        
-      } else {
-        value = subProcessInstance.getVariable(dataOutputAssociation.getSource());
-      }
-      
-      execution.setVariable(dataOutputAssociation.getTarget(), value);
+    public void completing(DelegateExecution execution, DelegateExecution subProcessInstance) throws Exception {
+        // only data. no control flow available on this execution.
+
+        // copy process variables
+        for (AbstractDataAssociation dataOutputAssociation : dataOutputAssociations) {
+            Object value = null;
+            if (dataOutputAssociation.getSourceExpression() != null) {
+                value = dataOutputAssociation.getSourceExpression().getValue(subProcessInstance);
+
+            } else {
+                value = subProcessInstance.getVariable(dataOutputAssociation.getSource());
+            }
+
+            execution.setVariable(dataOutputAssociation.getTarget(), value);
+        }
     }
-  }
 
-  public void completed(ActivityExecution execution) throws Exception {
-    // only control flow.  no sub process instance data available
-    leave(execution);
-  }
-  
-  public void setProcessDefinitonKey(String processDefinitonKey) {
-    this.processDefinitonKey = processDefinitonKey;
-  }
-  
-  public String getProcessDefinitonKey() {
-    return processDefinitonKey;
-  }
-  
-  public void setInheritVariables(boolean inheritVariables) {
-    this.inheritVariables = inheritVariables;
-  }
+    public void completed(ActivityExecution execution) throws Exception {
+        // only control flow. no sub process instance data available
+        leave(execution);
+    }
+
+    public void setProcessDefinitonKey(String processDefinitonKey) {
+        this.processDefinitonKey = processDefinitonKey;
+    }
+
+    public String getProcessDefinitonKey() {
+        return processDefinitonKey;
+    }
+
+    public void setInheritVariables(boolean inheritVariables) {
+        this.inheritVariables = inheritVariables;
+    }
 
 }

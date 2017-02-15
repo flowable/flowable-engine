@@ -23,14 +23,14 @@ import org.flowable.bpmn.model.TextAnnotation;
  */
 public class TextAnnotationTextParser extends BaseChildElementParser {
 
-  public String getElementName() {
-    return ELEMENT_TEXT_ANNOTATION_TEXT;
-  }
+    public String getElementName() {
+        return ELEMENT_TEXT_ANNOTATION_TEXT;
+    }
 
-  public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-    if (!(parentElement instanceof TextAnnotation))
-      return;
+    public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
+        if (!(parentElement instanceof TextAnnotation))
+            return;
 
-    ((TextAnnotation) parentElement).setText(xtr.getElementText());
-  }
+        ((TextAnnotation) parentElement).setText(xtr.getElementText());
+    }
 }

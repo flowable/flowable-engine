@@ -25,38 +25,38 @@ import org.flowable.engine.task.DelegationState;
  */
 public class ResolveTaskCmd extends NeedsActiveTaskCmd<Void> {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected Map<String, Object> variables;
-  protected Map<String, Object> transientVariables;
+    protected Map<String, Object> variables;
+    protected Map<String, Object> transientVariables;
 
-  public ResolveTaskCmd(String taskId, Map<String, Object> variables) {
-    super(taskId);
-    this.variables = variables;
-  }
-  
-  public ResolveTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {
-    this(taskId, variables);
-    this.transientVariables = transientVariables;
-  }
-
-  protected Void execute(CommandContext commandContext, TaskEntity task) {
-    if (variables != null) {
-      task.setVariables(variables);
+    public ResolveTaskCmd(String taskId, Map<String, Object> variables) {
+        super(taskId);
+        this.variables = variables;
     }
-    if (transientVariables != null) {
-      task.setTransientVariables(transientVariables);
-    }
-    
-    task.setDelegationState(DelegationState.RESOLVED);
-    commandContext.getTaskEntityManager().changeTaskAssignee(task, task.getOwner());
-    
-    return null;
-  }
 
-  @Override
-  protected String getSuspendedTaskException() {
-    return "Cannot resolve a suspended task";
-  }
+    public ResolveTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {
+        this(taskId, variables);
+        this.transientVariables = transientVariables;
+    }
+
+    protected Void execute(CommandContext commandContext, TaskEntity task) {
+        if (variables != null) {
+            task.setVariables(variables);
+        }
+        if (transientVariables != null) {
+            task.setTransientVariables(transientVariables);
+        }
+
+        task.setDelegationState(DelegationState.RESOLVED);
+        commandContext.getTaskEntityManager().changeTaskAssignee(task, task.getOwner());
+
+        return null;
+    }
+
+    @Override
+    protected String getSuspendedTaskException() {
+        return "Cannot resolve a suspended task";
+    }
 
 }

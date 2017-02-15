@@ -32,101 +32,101 @@ import org.flowable.engine.test.Deployment;
  */
 public class AttachmentEventsTest extends PluggableFlowableTestCase {
 
-	private TestFlowableEntityEventListener listener;
+    private TestFlowableEntityEventListener listener;
 
-	/**
-	 * Test create, update and delete events of attachments on a task/process.
-	 */
-	@Deployment(resources = { "org/activiti/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
-	public void testAttachmentEntityEvents() throws Exception {
-		
-		if(processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-			ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-			
-			Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-			assertNotNull(task);
-			
-			// Create link-attachment
-			Attachment attachment = taskService.createAttachment("test", task.getId(), processInstance.getId(), "attachment name", "description", "http://activiti.org");
-			assertNull(attachment.getUserId());
-			assertEquals(2, listener.getEventsReceived().size());
-			FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
-			assertEquals(processInstance.getId(), event.getProcessInstanceId());
-			assertEquals(processInstance.getId(), event.getExecutionId());
-			assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
-			org.activiti.engine.task.Attachment attachmentFromEvent = (org.activiti.engine.task.Attachment) event.getEntity();
-			assertEquals(attachment.getId(), attachmentFromEvent.getId());
-			event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
-			assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
-			assertEquals(processInstance.getId(), event.getProcessInstanceId());
-			assertEquals(processInstance.getId(), event.getExecutionId());
-			assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
-			attachmentFromEvent = (org.activiti.engine.task.Attachment) event.getEntity();
-			assertEquals(attachment.getId(), attachmentFromEvent.getId());
-			listener.clearEventsReceived();
-			
-			// Create binary attachment
-			Authentication.setAuthenticatedUserId("testuser");
-			attachment = taskService.createAttachment("test", task.getId(), processInstance.getId(), "attachment name", "description", new ByteArrayInputStream("test".getBytes()));
-			assertNotNull(attachment.getUserId());
-			assertEquals("testuser", attachment.getUserId());
-			assertEquals(2, listener.getEventsReceived().size());
-			event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
-			assertEquals(processInstance.getId(), event.getProcessInstanceId());
-			assertEquals(processInstance.getId(), event.getExecutionId());
-			assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
-			attachmentFromEvent = (org.activiti.engine.task.Attachment) event.getEntity();
-			assertEquals(attachment.getId(), attachmentFromEvent.getId());
-			
-			event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
-			assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
-			listener.clearEventsReceived();
-			
-			// Update attachment
-			attachment = taskService.getAttachment(attachment.getId());
-			attachment.setDescription("Description");
-			taskService.saveAttachment(attachment);
-			
-			assertEquals(1, listener.getEventsReceived().size());
-			event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
-			assertEquals(processInstance.getId(), event.getProcessInstanceId());
-			assertEquals(processInstance.getId(), event.getExecutionId());
-			assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
-			attachmentFromEvent = (org.activiti.engine.task.Attachment) event.getEntity();
-			assertEquals(attachment.getId(), attachmentFromEvent.getId());
-			assertEquals("Description", attachmentFromEvent.getDescription());
-			listener.clearEventsReceived();
-			
-			// Finally, delete attachment
-			taskService.deleteAttachment(attachment.getId());
-			assertEquals(1, listener.getEventsReceived().size());
-			event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
-			assertEquals(processInstance.getId(), event.getProcessInstanceId());
-			assertEquals(processInstance.getId(), event.getExecutionId());
-			assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
-			attachmentFromEvent = (org.activiti.engine.task.Attachment) event.getEntity();
-			assertEquals(attachment.getId(), attachmentFromEvent.getId());
-		}
-	}
+    /**
+     * Test create, update and delete events of attachments on a task/process.
+     */
+    @Deployment(resources = { "org/activiti/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testAttachmentEntityEvents() throws Exception {
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		
-		listener = new TestFlowableEntityEventListener(org.activiti.engine.task.Attachment.class);
-		processEngineConfiguration.getEventDispatcher().addEventListener(listener);
-	}
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertNotNull(task);
 
-		if (listener != null) {
-		  processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
-		}
-	}
+            // Create link-attachment
+            Attachment attachment = taskService.createAttachment("test", task.getId(), processInstance.getId(), "attachment name", "description", "http://activiti.org");
+            assertNull(attachment.getUserId());
+            assertEquals(2, listener.getEventsReceived().size());
+            FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
+            assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
+            assertEquals(processInstance.getId(), event.getProcessInstanceId());
+            assertEquals(processInstance.getId(), event.getExecutionId());
+            assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+            org.activiti.engine.task.Attachment attachmentFromEvent = (org.activiti.engine.task.Attachment) event.getEntity();
+            assertEquals(attachment.getId(), attachmentFromEvent.getId());
+            event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
+            assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+            assertEquals(processInstance.getId(), event.getProcessInstanceId());
+            assertEquals(processInstance.getId(), event.getExecutionId());
+            assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+            attachmentFromEvent = (org.activiti.engine.task.Attachment) event.getEntity();
+            assertEquals(attachment.getId(), attachmentFromEvent.getId());
+            listener.clearEventsReceived();
+
+            // Create binary attachment
+            Authentication.setAuthenticatedUserId("testuser");
+            attachment = taskService.createAttachment("test", task.getId(), processInstance.getId(), "attachment name", "description", new ByteArrayInputStream("test".getBytes()));
+            assertNotNull(attachment.getUserId());
+            assertEquals("testuser", attachment.getUserId());
+            assertEquals(2, listener.getEventsReceived().size());
+            event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
+            assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
+            assertEquals(processInstance.getId(), event.getProcessInstanceId());
+            assertEquals(processInstance.getId(), event.getExecutionId());
+            assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+            attachmentFromEvent = (org.activiti.engine.task.Attachment) event.getEntity();
+            assertEquals(attachment.getId(), attachmentFromEvent.getId());
+
+            event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
+            assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+            listener.clearEventsReceived();
+
+            // Update attachment
+            attachment = taskService.getAttachment(attachment.getId());
+            attachment.setDescription("Description");
+            taskService.saveAttachment(attachment);
+
+            assertEquals(1, listener.getEventsReceived().size());
+            event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
+            assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
+            assertEquals(processInstance.getId(), event.getProcessInstanceId());
+            assertEquals(processInstance.getId(), event.getExecutionId());
+            assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+            attachmentFromEvent = (org.activiti.engine.task.Attachment) event.getEntity();
+            assertEquals(attachment.getId(), attachmentFromEvent.getId());
+            assertEquals("Description", attachmentFromEvent.getDescription());
+            listener.clearEventsReceived();
+
+            // Finally, delete attachment
+            taskService.deleteAttachment(attachment.getId());
+            assertEquals(1, listener.getEventsReceived().size());
+            event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
+            assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
+            assertEquals(processInstance.getId(), event.getProcessInstanceId());
+            assertEquals(processInstance.getId(), event.getExecutionId());
+            assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+            attachmentFromEvent = (org.activiti.engine.task.Attachment) event.getEntity();
+            assertEquals(attachment.getId(), attachmentFromEvent.getId());
+        }
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        listener = new TestFlowableEntityEventListener(org.activiti.engine.task.Attachment.class);
+        processEngineConfiguration.getEventDispatcher().addEventListener(listener);
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+
+        if (listener != null) {
+            processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
+        }
+    }
 }

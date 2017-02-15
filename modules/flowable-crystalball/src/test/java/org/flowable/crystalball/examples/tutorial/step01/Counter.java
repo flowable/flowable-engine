@@ -18,5 +18,5 @@ import java.util.concurrent.atomic.AtomicLong;
  * Simple counter implementation
  */
 public class Counter {
-  public static AtomicLong value = new AtomicLong(0);
+    public static AtomicLong value = new AtomicLong(0);
 }

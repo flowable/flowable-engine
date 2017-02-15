@@ -25,18 +25,18 @@ import static org.junit.Assert.*;
  */
 public class ThreadContextAssociationTest extends CdiFlowableTestCase {
 
-  @Test
-  @Deployment
-  public void testBusinessProcessScopedWithJobExecutor() throws InterruptedException {
-    String pid = runtimeService.startProcessInstanceByKey("processkey").getId();
+    @Test
+    @Deployment
+    public void testBusinessProcessScopedWithJobExecutor() throws InterruptedException {
+        String pid = runtimeService.startProcessInstanceByKey("processkey").getId();
 
-    waitForJobExecutorToProcessAllJobs(50000000L, 100L);
+        waitForJobExecutorToProcessAllJobs(50000000L, 100L);
 
-    assertNull(managementService.createJobQuery().singleResult());
+        assertNull(managementService.createJobQuery().singleResult());
 
-    ProcessScopedMessageBean messageBean = (ProcessScopedMessageBean) runtimeService.getVariable(pid, "processScopedMessageBean");
-    assertEquals("test", messageBean.getMessage());
+        ProcessScopedMessageBean messageBean = (ProcessScopedMessageBean) runtimeService.getVariable(pid, "processScopedMessageBean");
+        assertEquals("test", messageBean.getMessage());
 
-  }
+    }
 
 }

@@ -21,12 +21,12 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
  */
 public interface ByteArrayEntity extends Entity, HasRevision {
 
-  byte[] getBytes();
+    byte[] getBytes();
 
-  String getName();
+    String getName();
 
-  void setName(String name);
+    void setName(String name);
 
-  void setBytes(byte[] bytes);
+    void setBytes(byte[] bytes);
 
 }

@@ -29,42 +29,42 @@ import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntity;
  */
 public class SetDeploymentTenantIdCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String deploymentId;
-  protected String newTenantId;
+    protected String deploymentId;
+    protected String newTenantId;
 
-  public SetDeploymentTenantIdCmd(String deploymentId, String newTenantId) {
-    this.deploymentId = deploymentId;
-    this.newTenantId = newTenantId;
-  }
-
-  public Void execute(CommandContext commandContext) {
-    if (deploymentId == null) {
-      throw new FlowableIllegalArgumentException("deploymentId is null");
+    public SetDeploymentTenantIdCmd(String deploymentId, String newTenantId) {
+        this.deploymentId = deploymentId;
+        this.newTenantId = newTenantId;
     }
 
-    // Update all entities
+    public Void execute(CommandContext commandContext) {
+        if (deploymentId == null) {
+            throw new FlowableIllegalArgumentException("deploymentId is null");
+        }
 
-    FormDeploymentEntity deployment = commandContext.getDeploymentEntityManager().findById(deploymentId);
-    if (deployment == null) {
-      throw new FlowableObjectNotFoundException("Could not find deployment with id " + deploymentId);
+        // Update all entities
+
+        FormDeploymentEntity deployment = commandContext.getDeploymentEntityManager().findById(deploymentId);
+        if (deployment == null) {
+            throw new FlowableObjectNotFoundException("Could not find deployment with id " + deploymentId);
+        }
+
+        deployment.setTenantId(newTenantId);
+
+        commandContext.getFormDefinitionEntityManager().updateFormDefinitionTenantIdForDeployment(deploymentId, newTenantId);
+
+        // Doing decision tables in memory, cause we need to clear the decision table cache
+        List<FormDefinition> formDefinitions = new FormDefinitionQueryImpl().deploymentId(deploymentId).list();
+        for (FormDefinition formDefinition : formDefinitions) {
+            commandContext.getFormEngineConfiguration().getFormDefinitionCache().remove(formDefinition.getId());
+        }
+
+        commandContext.getDeploymentEntityManager().update(deployment);
+
+        return null;
+
     }
-    
-    deployment.setTenantId(newTenantId);
-
-    commandContext.getFormDefinitionEntityManager().updateFormDefinitionTenantIdForDeployment(deploymentId, newTenantId);
-
-    // Doing decision tables in memory, cause we need to clear the decision table cache
-    List<FormDefinition> formDefinitions = new FormDefinitionQueryImpl().deploymentId(deploymentId).list();
-    for (FormDefinition formDefinition : formDefinitions) {
-      commandContext.getFormEngineConfiguration().getFormDefinitionCache().remove(formDefinition.getId());
-    }
-    
-    commandContext.getDeploymentEntityManager().update(deployment);
-
-    return null;
-
-  }
 
 }

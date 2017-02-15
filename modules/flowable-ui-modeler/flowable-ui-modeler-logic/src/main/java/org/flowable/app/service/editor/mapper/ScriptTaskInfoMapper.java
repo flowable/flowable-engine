@@ -17,14 +17,14 @@ import org.flowable.bpmn.model.ScriptTask;
 
 public class ScriptTaskInfoMapper extends AbstractInfoMapper {
 
-	protected void mapProperties(Object element) {
-		ScriptTask scriptTask = (ScriptTask) element;
-		if (StringUtils.isNotEmpty(scriptTask.getScriptFormat())) {
-		    createPropertyNode("Script format", scriptTask.getScriptFormat());
-		}
-		if (StringUtils.isNotEmpty(scriptTask.getScript())) {
+    protected void mapProperties(Object element) {
+        ScriptTask scriptTask = (ScriptTask) element;
+        if (StringUtils.isNotEmpty(scriptTask.getScriptFormat())) {
+            createPropertyNode("Script format", scriptTask.getScriptFormat());
+        }
+        if (StringUtils.isNotEmpty(scriptTask.getScript())) {
             createPropertyNode("Script", scriptTask.getScript());
         }
-		createListenerPropertyNodes("Execution listeners", scriptTask.getExecutionListeners());
-	}
+        createListenerPropertyNodes("Execution listeners", scriptTask.getExecutionListeners());
+    }
 }

@@ -25,39 +25,39 @@ import org.flowable.form.engine.impl.persistence.entity.ResourceEntityManager;
  * @author Joram Barrez
  */
 public abstract class AbstractManager {
-  
-  protected FormEngineConfiguration formEngineConfiguration;
-  
-  public AbstractManager(FormEngineConfiguration formEngineConfiguration) {
-    this.formEngineConfiguration = formEngineConfiguration;
-  }
-  
-  // Command scoped 
-  
-  protected CommandContext getCommandContext() {
-    return Context.getCommandContext();
-  }
 
-  protected <T> T getSession(Class<T> sessionClass) {
-    return getCommandContext().getSession(sessionClass);
-  }
-  
-  // Engine scoped
-  
-  protected FormEngineConfiguration getFormEngineConfiguration() {
-    return formEngineConfiguration;
-  }
+    protected FormEngineConfiguration formEngineConfiguration;
 
-  protected FormDeploymentEntityManager getDeploymentEntityManager() {
-    return getFormEngineConfiguration().getDeploymentEntityManager();
-  }
-  
-  protected FormDefinitionEntityManager getFormDefinitionEntityManager() {
-    return getFormEngineConfiguration().getFormDefinitionEntityManager();
-  }
+    public AbstractManager(FormEngineConfiguration formEngineConfiguration) {
+        this.formEngineConfiguration = formEngineConfiguration;
+    }
 
-  protected ResourceEntityManager getResourceEntityManager() {
-    return getFormEngineConfiguration().getResourceEntityManager();
-  }
+    // Command scoped
+
+    protected CommandContext getCommandContext() {
+        return Context.getCommandContext();
+    }
+
+    protected <T> T getSession(Class<T> sessionClass) {
+        return getCommandContext().getSession(sessionClass);
+    }
+
+    // Engine scoped
+
+    protected FormEngineConfiguration getFormEngineConfiguration() {
+        return formEngineConfiguration;
+    }
+
+    protected FormDeploymentEntityManager getDeploymentEntityManager() {
+        return getFormEngineConfiguration().getDeploymentEntityManager();
+    }
+
+    protected FormDefinitionEntityManager getFormDefinitionEntityManager() {
+        return getFormEngineConfiguration().getFormDefinitionEntityManager();
+    }
+
+    protected ResourceEntityManager getResourceEntityManager() {
+        return getFormEngineConfiguration().getResourceEntityManager();
+    }
 
 }

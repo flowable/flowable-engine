@@ -25,19 +25,19 @@ import org.flowable.idm.engine.impl.interceptor.CommandContext;
  */
 public class CreateTokenCmd implements Command<Token>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String tokenId;
+    protected String tokenId;
 
-  public CreateTokenCmd(String tokenId) {
-    if (tokenId == null) {
-      throw new FlowableIllegalArgumentException("tokenId is null");
+    public CreateTokenCmd(String tokenId) {
+        if (tokenId == null) {
+            throw new FlowableIllegalArgumentException("tokenId is null");
+        }
+        this.tokenId = tokenId;
     }
-    this.tokenId = tokenId;
-  }
 
-  public Token execute(CommandContext commandContext) {
-    return commandContext.getTokenEntityManager().createNewToken(tokenId);
-  }
+    public Token execute(CommandContext commandContext) {
+        return commandContext.getTokenEntityManager().createNewToken(tokenId);
+    }
 
 }

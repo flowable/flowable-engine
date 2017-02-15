@@ -19,11 +19,11 @@ package org.flowable.engine.impl.persistence.entity;
  */
 public class SuspendedJobEntityImpl extends AbstractJobEntityImpl implements SuspendedJobEntity {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  @Override
-  public String toString() {
-    return "SuspendedJobEntity [id=" + id + "]";
-  }
+    @Override
+    public String toString() {
+        return "SuspendedJobEntity [id=" + id + "]";
+    }
 
 }

@@ -19,11 +19,11 @@ import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntit
  * @author Joram Barrez
  */
 public class HistoricVariableInstanceByTaskIdMatcher extends CachedEntityMatcherAdapter<HistoricVariableInstanceEntity> {
- 
-  @Override
-  public boolean isRetained(HistoricVariableInstanceEntity historicVariableInstanceEntity, Object parameter) {
-    return historicVariableInstanceEntity.getTaskId() != null 
-        && historicVariableInstanceEntity.getTaskId().equals((String) parameter);
-  }
-  
+
+    @Override
+    public boolean isRetained(HistoricVariableInstanceEntity historicVariableInstanceEntity, Object parameter) {
+        return historicVariableInstanceEntity.getTaskId() != null
+                && historicVariableInstanceEntity.getTaskId().equals((String) parameter);
+    }
+
 }

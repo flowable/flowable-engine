@@ -26,157 +26,156 @@ import org.flowable.engine.common.api.query.Query;
  */
 public interface FormDefinitionQuery extends Query<FormDefinitionQuery, FormDefinition> {
 
-  /** Only select form with the given id. */
-  FormDefinitionQuery formId(String formId);
-  
-  /** Only select forms with the given ids. */
-  FormDefinitionQuery formIds(Set<String> formIds);
-  
-  /** Only select forms with the given category. */
-  FormDefinitionQuery formCategory(String formCategory);
+    /** Only select form with the given id. */
+    FormDefinitionQuery formId(String formId);
 
-  /**
-   * Only select forms where the category matches the given parameter. The syntax that should be used is the same as in SQL, eg. %test%
-   */
-  FormDefinitionQuery formCategoryLike(String formCategoryLike);
+    /** Only select forms with the given ids. */
+    FormDefinitionQuery formIds(Set<String> formIds);
 
-  /**
-   * Only select deployments that have a different category then the given one.
-   * 
-   * @see FormDeploymentBuilder#category(String)
-   */
-  FormDefinitionQuery formCategoryNotEquals(String categoryNotEquals);
+    /** Only select forms with the given category. */
+    FormDefinitionQuery formCategory(String formCategory);
 
-  /** Only select forms with the given name. */
-  FormDefinitionQuery formName(String formName);
+    /**
+     * Only select forms where the category matches the given parameter. The syntax that should be used is the same as in SQL, eg. %test%
+     */
+    FormDefinitionQuery formCategoryLike(String formCategoryLike);
 
-  /**
-   * Only select forms where the name matches the given parameter. The syntax that should be used is the same as in SQL, eg. %test%
-   */
-  FormDefinitionQuery formNameLike(String formNameLike);
+    /**
+     * Only select deployments that have a different category then the given one.
+     * 
+     * @see FormDeploymentBuilder#category(String)
+     */
+    FormDefinitionQuery formCategoryNotEquals(String categoryNotEquals);
 
-  /**
-   * Only select forms that are deployed in a deployment with the given deployment id
-   */
-  FormDefinitionQuery deploymentId(String deploymentId);
+    /** Only select forms with the given name. */
+    FormDefinitionQuery formName(String formName);
 
-  /**
-   * Select forms that are deployed in deployments with the given set of ids
-   */
-  FormDefinitionQuery deploymentIds(Set<String> deploymentIds);
-  
-  /**
-   * Only select forms that have the given parent deployment id
-   */
-  FormDefinitionQuery parentDeploymentId(String parentDeploymentId);
-  
-  /**
-   * Only select forms that have a parent deployment id like the given parameter
-   */
-  FormDefinitionQuery parentDeploymentIdLike(String parentDeploymentIdLike);
+    /**
+     * Only select forms where the name matches the given parameter. The syntax that should be used is the same as in SQL, eg. %test%
+     */
+    FormDefinitionQuery formNameLike(String formNameLike);
 
-  /**
-   * Only select form with the given key.
-   */
-  FormDefinitionQuery formDefinitionKey(String formDefinitionKey);
+    /**
+     * Only select forms that are deployed in a deployment with the given deployment id
+     */
+    FormDefinitionQuery deploymentId(String deploymentId);
 
-  /**
-   * Only select forms where the key matches the given parameter. The syntax that should be used is the same as in SQL, eg. %test%
-   */
-  FormDefinitionQuery formDefinitionKeyLike(String formDefinitionKeyLike);
+    /**
+     * Select forms that are deployed in deployments with the given set of ids
+     */
+    FormDefinitionQuery deploymentIds(Set<String> deploymentIds);
 
-  /**
-   * Only select form with a certain version. Particularly useful when used in combination with {@link #formDefinitionKey(String)}
-   */
-  FormDefinitionQuery formVersion(Integer formVersion);
-  
-  /**
-   * Only select forms which version are greater than a certain version.
-   */
-  FormDefinitionQuery formVersionGreaterThan(Integer formVersion);
-  
-  /**
-   * Only select forms which version are greater than or equals a certain version.
-   */
-  FormDefinitionQuery formVersionGreaterThanOrEquals(Integer formVersion);
-  
-  /**
-   * Only select forms which version are lower than a certain version.
-   */
-  FormDefinitionQuery formVersionLowerThan(Integer formVersion);
-  
-  /**
-   * Only select forms which version are lower than or equals a certain version.
-   */
-  FormDefinitionQuery formVersionLowerThanOrEquals(Integer formVersion);
+    /**
+     * Only select forms that have the given parent deployment id
+     */
+    FormDefinitionQuery parentDeploymentId(String parentDeploymentId);
 
-  /**
-   * Only select the forms which are the latest deployed (ie. which have the highest version number for the given key).
-   * 
-   * Can also be used without any other criteria (ie. query.latest().list()),
-   * which will then give all the latest versions of all the deployed decision tables.
-   * 
-   * @throws FlowableIllegalArgumentException
-   *           if used in combination with {@link #groupId(string)}, {@link #formVersion(int)} or {@link #deploymentId(String)}
-   */
-  FormDefinitionQuery latestVersion();
+    /**
+     * Only select forms that have a parent deployment id like the given parameter
+     */
+    FormDefinitionQuery parentDeploymentIdLike(String parentDeploymentIdLike);
 
-  /** Only select form with the given resource name. */
-  FormDefinitionQuery formResourceName(String resourceName);
+    /**
+     * Only select form with the given key.
+     */
+    FormDefinitionQuery formDefinitionKey(String formDefinitionKey);
 
-  /** Only select form with a resource name like the given . */
-  FormDefinitionQuery formResourceNameLike(String resourceNameLike);
+    /**
+     * Only select forms where the key matches the given parameter. The syntax that should be used is the same as in SQL, eg. %test%
+     */
+    FormDefinitionQuery formDefinitionKeyLike(String formDefinitionKeyLike);
 
-  /**
-   * Only select forms that have the given tenant id.
-   */
-  FormDefinitionQuery formTenantId(String tenantId);
+    /**
+     * Only select form with a certain version. Particularly useful when used in combination with {@link #formDefinitionKey(String)}
+     */
+    FormDefinitionQuery formVersion(Integer formVersion);
 
-  /**
-   * Only select forms with a tenant id like the given one.
-   */
-  FormDefinitionQuery formTenantIdLike(String tenantIdLike);
+    /**
+     * Only select forms which version are greater than a certain version.
+     */
+    FormDefinitionQuery formVersionGreaterThan(Integer formVersion);
 
-  /**
-   * Only select forms that do not have a tenant id.
-   */
-  FormDefinitionQuery formWithoutTenantId();
+    /**
+     * Only select forms which version are greater than or equals a certain version.
+     */
+    FormDefinitionQuery formVersionGreaterThanOrEquals(Integer formVersion);
 
-  // ordering ////////////////////////////////////////////////////////////
+    /**
+     * Only select forms which version are lower than a certain version.
+     */
+    FormDefinitionQuery formVersionLowerThan(Integer formVersion);
 
-  /**
-   * Order by the category of the forms (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  FormDefinitionQuery orderByFormCategory();
+    /**
+     * Only select forms which version are lower than or equals a certain version.
+     */
+    FormDefinitionQuery formVersionLowerThanOrEquals(Integer formVersion);
 
-  /**
-   * Order by form definition key (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  FormDefinitionQuery orderByFormDefinitionKey();
+    /**
+     * Only select the forms which are the latest deployed (ie. which have the highest version number for the given key).
+     * 
+     * Can also be used without any other criteria (ie. query.latest().list()), which will then give all the latest versions of all the deployed decision tables.
+     * 
+     * @throws FlowableIllegalArgumentException
+     *             if used in combination with {@link #groupId(string)}, {@link #formVersion(int)} or {@link #deploymentId(String)}
+     */
+    FormDefinitionQuery latestVersion();
 
-  /**
-   * Order by the id of the forms (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  FormDefinitionQuery orderByFormId();
+    /** Only select form with the given resource name. */
+    FormDefinitionQuery formResourceName(String resourceName);
 
-  /**
-   * Order by the version of the forms (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  FormDefinitionQuery orderByFormVersion();
+    /** Only select form with a resource name like the given . */
+    FormDefinitionQuery formResourceNameLike(String resourceNameLike);
 
-  /**
-   * Order by the name of the forms (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  FormDefinitionQuery orderByFormName();
+    /**
+     * Only select forms that have the given tenant id.
+     */
+    FormDefinitionQuery formTenantId(String tenantId);
 
-  /**
-   * Order by deployment id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  FormDefinitionQuery orderByDeploymentId();
+    /**
+     * Only select forms with a tenant id like the given one.
+     */
+    FormDefinitionQuery formTenantIdLike(String tenantIdLike);
 
-  /**
-   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  FormDefinitionQuery orderByTenantId();
+    /**
+     * Only select forms that do not have a tenant id.
+     */
+    FormDefinitionQuery formWithoutTenantId();
+
+    // ordering ////////////////////////////////////////////////////////////
+
+    /**
+     * Order by the category of the forms (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    FormDefinitionQuery orderByFormCategory();
+
+    /**
+     * Order by form definition key (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    FormDefinitionQuery orderByFormDefinitionKey();
+
+    /**
+     * Order by the id of the forms (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    FormDefinitionQuery orderByFormId();
+
+    /**
+     * Order by the version of the forms (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    FormDefinitionQuery orderByFormVersion();
+
+    /**
+     * Order by the name of the forms (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    FormDefinitionQuery orderByFormName();
+
+    /**
+     * Order by deployment id (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    FormDefinitionQuery orderByDeploymentId();
+
+    /**
+     * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    FormDefinitionQuery orderByTenantId();
 
 }

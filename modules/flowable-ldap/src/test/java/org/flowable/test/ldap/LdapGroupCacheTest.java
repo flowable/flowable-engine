@@ -23,130 +23,130 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration("classpath:flowable-context-ldap-group-cache.xml")
 public class LdapGroupCacheTest extends LDAPTestCase {
 
-  protected TestLDAPGroupCacheListener cacheListener;
+    protected TestLDAPGroupCacheListener cacheListener;
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
 
-    // Set test cache listener
-    LDAPGroupCache ldapGroupCache = ((LDAPIdentityServiceImpl) processEngineConfiguration.getIdmIdentityService()).getLdapGroupCache();
-    ldapGroupCache.clear();
+        // Set test cache listener
+        LDAPGroupCache ldapGroupCache = ((LDAPIdentityServiceImpl) processEngineConfiguration.getIdmIdentityService()).getLdapGroupCache();
+        ldapGroupCache.clear();
 
-    cacheListener = new TestLDAPGroupCacheListener();
-    ldapGroupCache.setLdapCacheListener(cacheListener);
+        cacheListener = new TestLDAPGroupCacheListener();
+        ldapGroupCache.setLdapCacheListener(cacheListener);
 
-  }
-
-  @Deployment
-  public void testLdapGroupCacheUsage() {
-    runtimeService.startProcessInstanceByKey("testLdapGroupCache");
-
-    // First task is for Kermit -> cache miss
-    assertEquals(1, taskService.createTaskQuery().taskCandidateUser("kermit").count());
-    assertEquals("kermit", cacheListener.getLastCacheMiss());
-
-    // Second task is for Pepe -> cache miss
-    taskService.complete(taskService.createTaskQuery().singleResult().getId());
-    assertEquals(1, taskService.createTaskQuery().taskCandidateUser("pepe").count());
-    assertEquals("pepe", cacheListener.getLastCacheMiss());
-
-    // Third task is again for kermit -> cache hit
-    taskService.complete(taskService.createTaskQuery().singleResult().getId());
-    assertEquals(1, taskService.createTaskQuery().taskCandidateUser("kermit").count());
-    assertEquals("kermit", cacheListener.getLastCacheHit());
-
-    // Fourth task is for fozzie -> cache miss + cache eviction of pepe
-    // (LRU)
-    taskService.complete(taskService.createTaskQuery().singleResult().getId());
-    assertEquals(1, taskService.createTaskQuery().taskCandidateUser("fozzie").count());
-    assertEquals("fozzie", cacheListener.getLastCacheMiss());
-    assertEquals("pepe", cacheListener.getLastCacheEviction());
-  }
-
-  public void testLdapGroupCacheExpiration() {
-    assertEquals(0, taskService.createTaskQuery().taskCandidateUser("kermit").count());
-    assertEquals("kermit", cacheListener.getLastCacheMiss());
-
-    assertEquals(0, taskService.createTaskQuery().taskCandidateUser("pepe").count());
-    assertEquals("pepe", cacheListener.getLastCacheMiss());
-
-    assertEquals(0, taskService.createTaskQuery().taskCandidateUser("kermit").count());
-    assertEquals("kermit", cacheListener.getLastCacheHit());
-
-    // Test the expiration time of the cache
-    Date now = new Date();
-    processEngineConfiguration.getClock().setCurrentTime(now);
-
-    assertEquals(0, taskService.createTaskQuery().taskCandidateUser("fozzie").count());
-    assertEquals("fozzie", cacheListener.getLastCacheMiss());
-    assertEquals("pepe", cacheListener.getLastCacheEviction());
-
-    // Moving the clock forward two 45 minutes should trigger cache eviction
-    // (configured to 30 mins)
-    processEngineConfiguration.getClock().setCurrentTime(new Date(now.getTime() + (45 * 60 * 1000)));
-    assertEquals(0, taskService.createTaskQuery().taskCandidateUser("fozzie").count());
-    assertEquals("fozzie", cacheListener.getLastCacheExpiration());
-    assertEquals("fozzie", cacheListener.getLastCacheEviction());
-    assertEquals("fozzie", cacheListener.getLastCacheMiss());
-  }
-
-  // Test cache listener
-  static class TestLDAPGroupCacheListener implements LDAPGroupCacheListener {
-
-    protected String lastCacheMiss;
-    protected String lastCacheHit;
-    protected String lastCacheEviction;
-    protected String lastCacheExpiration;
-
-    public void cacheMiss(String userId) {
-      this.lastCacheMiss = userId;
     }
 
-    public void cacheHit(String userId) {
-      this.lastCacheHit = userId;
+    @Deployment
+    public void testLdapGroupCacheUsage() {
+        runtimeService.startProcessInstanceByKey("testLdapGroupCache");
+
+        // First task is for Kermit -> cache miss
+        assertEquals(1, taskService.createTaskQuery().taskCandidateUser("kermit").count());
+        assertEquals("kermit", cacheListener.getLastCacheMiss());
+
+        // Second task is for Pepe -> cache miss
+        taskService.complete(taskService.createTaskQuery().singleResult().getId());
+        assertEquals(1, taskService.createTaskQuery().taskCandidateUser("pepe").count());
+        assertEquals("pepe", cacheListener.getLastCacheMiss());
+
+        // Third task is again for kermit -> cache hit
+        taskService.complete(taskService.createTaskQuery().singleResult().getId());
+        assertEquals(1, taskService.createTaskQuery().taskCandidateUser("kermit").count());
+        assertEquals("kermit", cacheListener.getLastCacheHit());
+
+        // Fourth task is for fozzie -> cache miss + cache eviction of pepe
+        // (LRU)
+        taskService.complete(taskService.createTaskQuery().singleResult().getId());
+        assertEquals(1, taskService.createTaskQuery().taskCandidateUser("fozzie").count());
+        assertEquals("fozzie", cacheListener.getLastCacheMiss());
+        assertEquals("pepe", cacheListener.getLastCacheEviction());
     }
 
-    public void cacheExpired(String userId) {
-      this.lastCacheExpiration = userId;
+    public void testLdapGroupCacheExpiration() {
+        assertEquals(0, taskService.createTaskQuery().taskCandidateUser("kermit").count());
+        assertEquals("kermit", cacheListener.getLastCacheMiss());
+
+        assertEquals(0, taskService.createTaskQuery().taskCandidateUser("pepe").count());
+        assertEquals("pepe", cacheListener.getLastCacheMiss());
+
+        assertEquals(0, taskService.createTaskQuery().taskCandidateUser("kermit").count());
+        assertEquals("kermit", cacheListener.getLastCacheHit());
+
+        // Test the expiration time of the cache
+        Date now = new Date();
+        processEngineConfiguration.getClock().setCurrentTime(now);
+
+        assertEquals(0, taskService.createTaskQuery().taskCandidateUser("fozzie").count());
+        assertEquals("fozzie", cacheListener.getLastCacheMiss());
+        assertEquals("pepe", cacheListener.getLastCacheEviction());
+
+        // Moving the clock forward two 45 minutes should trigger cache eviction
+        // (configured to 30 mins)
+        processEngineConfiguration.getClock().setCurrentTime(new Date(now.getTime() + (45 * 60 * 1000)));
+        assertEquals(0, taskService.createTaskQuery().taskCandidateUser("fozzie").count());
+        assertEquals("fozzie", cacheListener.getLastCacheExpiration());
+        assertEquals("fozzie", cacheListener.getLastCacheEviction());
+        assertEquals("fozzie", cacheListener.getLastCacheMiss());
     }
 
-    public void cacheEviction(String userId) {
-      this.lastCacheEviction = userId;
-    }
+    // Test cache listener
+    static class TestLDAPGroupCacheListener implements LDAPGroupCacheListener {
 
-    public String getLastCacheMiss() {
-      return lastCacheMiss;
-    }
+        protected String lastCacheMiss;
+        protected String lastCacheHit;
+        protected String lastCacheEviction;
+        protected String lastCacheExpiration;
 
-    public void setLastCacheMiss(String lastCacheMiss) {
-      this.lastCacheMiss = lastCacheMiss;
-    }
+        public void cacheMiss(String userId) {
+            this.lastCacheMiss = userId;
+        }
 
-    public String getLastCacheHit() {
-      return lastCacheHit;
-    }
+        public void cacheHit(String userId) {
+            this.lastCacheHit = userId;
+        }
 
-    public void setLastCacheHit(String lastCacheHit) {
-      this.lastCacheHit = lastCacheHit;
-    }
+        public void cacheExpired(String userId) {
+            this.lastCacheExpiration = userId;
+        }
 
-    public String getLastCacheExpiration() {
-      return lastCacheExpiration;
-    }
+        public void cacheEviction(String userId) {
+            this.lastCacheEviction = userId;
+        }
 
-    public void setLastCacheExpiration(String lastCacheExpiration) {
-      this.lastCacheExpiration = lastCacheExpiration;
-    }
+        public String getLastCacheMiss() {
+            return lastCacheMiss;
+        }
 
-    public String getLastCacheEviction() {
-      return lastCacheEviction;
-    }
+        public void setLastCacheMiss(String lastCacheMiss) {
+            this.lastCacheMiss = lastCacheMiss;
+        }
 
-    public void setLastCacheEviction(String lastCacheEviction) {
-      this.lastCacheEviction = lastCacheEviction;
-    }
+        public String getLastCacheHit() {
+            return lastCacheHit;
+        }
 
-  }
+        public void setLastCacheHit(String lastCacheHit) {
+            this.lastCacheHit = lastCacheHit;
+        }
+
+        public String getLastCacheExpiration() {
+            return lastCacheExpiration;
+        }
+
+        public void setLastCacheExpiration(String lastCacheExpiration) {
+            this.lastCacheExpiration = lastCacheExpiration;
+        }
+
+        public String getLastCacheEviction() {
+            return lastCacheEviction;
+        }
+
+        public void setLastCacheEviction(String lastCacheEviction) {
+            this.lastCacheEviction = lastCacheEviction;
+        }
+
+    }
 
 }

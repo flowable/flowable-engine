@@ -47,127 +47,127 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class FlowableProcessInstanceService {
 
-  private static final Logger logger = LoggerFactory.getLogger(FlowableProcessInstanceService.class);
+    private static final Logger logger = LoggerFactory.getLogger(FlowableProcessInstanceService.class);
 
-  @Autowired
-  protected RepositoryService repositoryService;
+    @Autowired
+    protected RepositoryService repositoryService;
 
-  @Autowired
-  protected HistoryService historyService;
+    @Autowired
+    protected HistoryService historyService;
 
-  @Autowired
-  protected RuntimeService runtimeService;
-  
-  @Autowired
-  protected FormService formService;
-  
-  @Autowired
-  protected FormRepositoryService formRepositoryService;
+    @Autowired
+    protected RuntimeService runtimeService;
 
-  @Autowired
-  protected PermissionService permissionService;
-  
-  @Autowired
-  protected ContentService contentService;
-  
-  @Autowired
-  protected FlowableCommentService commentService;
+    @Autowired
+    protected FormService formService;
 
-  @Autowired
-  protected UserCache userCache;
+    @Autowired
+    protected FormRepositoryService formRepositoryService;
 
-  public ProcessInstanceRepresentation getProcessInstance(String processInstanceId, HttpServletResponse response) {
+    @Autowired
+    protected PermissionService permissionService;
 
-    HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+    @Autowired
+    protected ContentService contentService;
 
-    if (!permissionService.hasReadPermissionOnProcessInstance(SecurityUtils.getCurrentUserObject(), processInstance, processInstanceId)) {
-      throw new NotFoundException("Process with id: " + processInstanceId + " does not exist or is not available for this user");
+    @Autowired
+    protected FlowableCommentService commentService;
+
+    @Autowired
+    protected UserCache userCache;
+
+    public ProcessInstanceRepresentation getProcessInstance(String processInstanceId, HttpServletResponse response) {
+
+        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+
+        if (!permissionService.hasReadPermissionOnProcessInstance(SecurityUtils.getCurrentUserObject(), processInstance, processInstanceId)) {
+            throw new NotFoundException("Process with id: " + processInstanceId + " does not exist or is not available for this user");
+        }
+
+        ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
+
+        User userRep = null;
+        if (processInstance.getStartUserId() != null) {
+            CachedUser user = userCache.getUser(processInstance.getStartUserId());
+            if (user != null && user.getUser() != null) {
+                userRep = user.getUser();
+            }
+        }
+
+        ProcessInstanceRepresentation processInstanceResult = new ProcessInstanceRepresentation(processInstance, processDefinition, processDefinition.isGraphicalNotationDefined(), userRep);
+
+        if (processDefinition.hasStartFormKey()) {
+            FormModel formModel = runtimeService.getStartFormModel(processInstance.getProcessDefinitionId(), processInstance.getId());
+            if (formModel != null) {
+                processInstanceResult.setStartFormDefined(true);
+            }
+        }
+
+        return processInstanceResult;
     }
 
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
+    public FormModel getProcessInstanceStartForm(String processInstanceId, HttpServletResponse response) {
 
-    User userRep = null;
-    if (processInstance.getStartUserId() != null) {
-      CachedUser user = userCache.getUser(processInstance.getStartUserId());
-      if (user != null && user.getUser() != null) {
-        userRep = user.getUser();
-      }
+        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+
+        if (!permissionService.hasReadPermissionOnProcessInstance(SecurityUtils.getCurrentUserObject(), processInstance, processInstanceId)) {
+            throw new NotFoundException("Process with id: " + processInstanceId + " does not exist or is not available for this user");
+        }
+
+        return runtimeService.getStartFormModel(processInstance.getProcessDefinitionId(), processInstance.getId());
     }
 
-    ProcessInstanceRepresentation processInstanceResult = new ProcessInstanceRepresentation(processInstance, processDefinition, processDefinition.isGraphicalNotationDefined(), userRep);
+    public ProcessInstanceRepresentation startNewProcessInstance(CreateProcessInstanceRepresentation startRequest) {
+        if (StringUtils.isEmpty(startRequest.getProcessDefinitionId())) {
+            throw new BadRequestException("Process definition id is required");
+        }
 
-    if (processDefinition.hasStartFormKey()) {
-      FormModel formModel = runtimeService.getStartFormModel(processInstance.getProcessDefinitionId(), processInstance.getId());
-      if (formModel != null) {
-        processInstanceResult.setStartFormDefined(true);
-      }
+        ProcessDefinition processDefinition = repositoryService.getProcessDefinition(startRequest.getProcessDefinitionId());
+        ProcessInstance processInstance = runtimeService.startProcessInstanceWithForm(startRequest.getProcessDefinitionId(),
+                startRequest.getOutcome(), startRequest.getValues(), startRequest.getName());
+
+        User user = null;
+        if (processInstance.getStartUserId() != null) {
+            CachedUser cachedUser = userCache.getUser(processInstance.getStartUserId());
+            if (cachedUser != null && cachedUser.getUser() != null) {
+                user = cachedUser.getUser();
+            }
+        }
+        return new ProcessInstanceRepresentation(processInstance, processDefinition,
+                ((ProcessDefinitionEntity) processDefinition).isGraphicalNotationDefined(), user);
+
     }
 
-    return processInstanceResult;
-  }
+    public void deleteProcessInstance(String processInstanceId) {
 
-  public FormModel getProcessInstanceStartForm(String processInstanceId, HttpServletResponse response) {
+        User currentUser = SecurityUtils.getCurrentUserObject();
 
-    HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .startedBy(String.valueOf(currentUser.getId())) // Permission
+                .singleResult();
 
-    if (!permissionService.hasReadPermissionOnProcessInstance(SecurityUtils.getCurrentUserObject(), processInstance, processInstanceId)) {
-      throw new NotFoundException("Process with id: " + processInstanceId + " does not exist or is not available for this user");
+        if (processInstance == null) {
+            throw new NotFoundException("Process with id: " + processInstanceId + " does not exist or is not started by this user");
+        }
+
+        if (processInstance.getEndTime() != null) {
+            // Check if a hard delete of process instance is allowed
+            if (!permissionService.canDeleteProcessInstance(currentUser, processInstance)) {
+                throw new NotFoundException("Process with id: " + processInstanceId + " is already completed and can't be deleted");
+            }
+
+            // Delete all content related to the process instance
+            contentService.deleteContentItemsByProcessInstanceId(processInstanceId);
+
+            // Delete all comments on tasks and process instances
+            commentService.deleteAllCommentsForProcessInstance(processInstanceId);
+
+            // Finally, delete all history for this instance in the engine
+            historyService.deleteHistoricProcessInstance(processInstanceId);
+
+        } else {
+            runtimeService.deleteProcessInstance(processInstanceId, "Cancelled by " + SecurityUtils.getCurrentUserId());
+        }
     }
-    
-    return runtimeService.getStartFormModel(processInstance.getProcessDefinitionId(), processInstance.getId());
-  }
-  
-  public ProcessInstanceRepresentation startNewProcessInstance(CreateProcessInstanceRepresentation startRequest) {
-    if (StringUtils.isEmpty(startRequest.getProcessDefinitionId())) {
-      throw new BadRequestException("Process definition id is required");
-    }
-    
-    ProcessDefinition processDefinition = repositoryService.getProcessDefinition(startRequest.getProcessDefinitionId());
-    ProcessInstance processInstance = runtimeService.startProcessInstanceWithForm(startRequest.getProcessDefinitionId(), 
-        startRequest.getOutcome(), startRequest.getValues(), startRequest.getName());
-    
-    User user = null;
-    if (processInstance.getStartUserId() != null) {
-      CachedUser cachedUser = userCache.getUser(processInstance.getStartUserId());
-      if (cachedUser != null && cachedUser.getUser() != null) {
-        user = cachedUser.getUser();
-      }
-    }
-    return new ProcessInstanceRepresentation(processInstance, processDefinition, 
-        ((ProcessDefinitionEntity) processDefinition).isGraphicalNotationDefined(), user);
-
-  }
-
-  public void deleteProcessInstance(String processInstanceId) {
-
-    User currentUser = SecurityUtils.getCurrentUserObject();
-
-    HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
-        .processInstanceId(processInstanceId)
-        .startedBy(String.valueOf(currentUser.getId())) // Permission
-        .singleResult();
-
-    if (processInstance == null) {
-      throw new NotFoundException("Process with id: " + processInstanceId + " does not exist or is not started by this user");
-    }
-
-    if (processInstance.getEndTime() != null) {
-      // Check if a hard delete of process instance is allowed
-      if (!permissionService.canDeleteProcessInstance(currentUser, processInstance)) {
-        throw new NotFoundException("Process with id: " + processInstanceId + " is already completed and can't be deleted");
-      }
-
-      // Delete all content related to the process instance
-      contentService.deleteContentItemsByProcessInstanceId(processInstanceId);
-      
-      // Delete all comments on tasks and process instances
-      commentService.deleteAllCommentsForProcessInstance(processInstanceId);
-      
-      // Finally, delete all history for this instance in the engine
-      historyService.deleteHistoricProcessInstance(processInstanceId);
-
-    } else {
-      runtimeService.deleteProcessInstance(processInstanceId, "Cancelled by " + SecurityUtils.getCurrentUserId());
-    }
-  }
 }

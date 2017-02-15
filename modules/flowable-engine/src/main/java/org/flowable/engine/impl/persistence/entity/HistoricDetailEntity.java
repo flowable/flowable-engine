@@ -24,18 +24,18 @@ import org.flowable.engine.history.HistoricDetail;
  */
 public interface HistoricDetailEntity extends HistoricDetail, Entity {
 
-  void setProcessInstanceId(String processInstanceId);
+    void setProcessInstanceId(String processInstanceId);
 
-  void setActivityInstanceId(String activityInstanceId);
+    void setActivityInstanceId(String activityInstanceId);
 
-  void setTaskId(String taskId);
+    void setTaskId(String taskId);
 
-  void setExecutionId(String executionId);
+    void setExecutionId(String executionId);
 
-  void setTime(Date time);
+    void setTime(Date time);
 
-  String getDetailType();
-  
-  void setDetailType(String detailType);
-  
+    String getDetailType();
+
+    void setDetailType(String detailType);
+
 }

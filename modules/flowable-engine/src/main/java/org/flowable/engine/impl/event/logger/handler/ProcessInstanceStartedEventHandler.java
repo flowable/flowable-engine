@@ -25,30 +25,30 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
  */
 public class ProcessInstanceStartedEventHandler extends AbstractDatabaseEventLoggerEventHandler {
 
-  private static final String TYPE = "PROCESSINSTANCE_START";
+    private static final String TYPE = "PROCESSINSTANCE_START";
 
-  @Override
-  public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
+    @Override
+    public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
 
-    FlowableEntityWithVariablesEvent eventWithVariables = (FlowableEntityWithVariablesEvent) event;
-    ExecutionEntity processInstanceEntity = (ExecutionEntity) eventWithVariables.getEntity();
+        FlowableEntityWithVariablesEvent eventWithVariables = (FlowableEntityWithVariablesEvent) event;
+        ExecutionEntity processInstanceEntity = (ExecutionEntity) eventWithVariables.getEntity();
 
-    Map<String, Object> data = new HashMap<String, Object>();
-    putInMapIfNotNull(data, Fields.ID, processInstanceEntity.getId());
-    putInMapIfNotNull(data, Fields.BUSINESS_KEY, processInstanceEntity.getBusinessKey());
-    putInMapIfNotNull(data, Fields.PROCESS_DEFINITION_ID, processInstanceEntity.getProcessDefinitionId());
-    putInMapIfNotNull(data, Fields.NAME, processInstanceEntity.getName());
-    putInMapIfNotNull(data, Fields.CREATE_TIME, timeStamp);
+        Map<String, Object> data = new HashMap<String, Object>();
+        putInMapIfNotNull(data, Fields.ID, processInstanceEntity.getId());
+        putInMapIfNotNull(data, Fields.BUSINESS_KEY, processInstanceEntity.getBusinessKey());
+        putInMapIfNotNull(data, Fields.PROCESS_DEFINITION_ID, processInstanceEntity.getProcessDefinitionId());
+        putInMapIfNotNull(data, Fields.NAME, processInstanceEntity.getName());
+        putInMapIfNotNull(data, Fields.CREATE_TIME, timeStamp);
 
-    if (eventWithVariables.getVariables() != null && !eventWithVariables.getVariables().isEmpty()) {
-      Map<String, Object> variableMap = new HashMap<String, Object>();
-      for (Object variableName : eventWithVariables.getVariables().keySet()) {
-        putInMapIfNotNull(variableMap, (String) variableName, eventWithVariables.getVariables().get(variableName));
-      }
-      putInMapIfNotNull(data, Fields.VARIABLES, variableMap);
+        if (eventWithVariables.getVariables() != null && !eventWithVariables.getVariables().isEmpty()) {
+            Map<String, Object> variableMap = new HashMap<String, Object>();
+            for (Object variableName : eventWithVariables.getVariables().keySet()) {
+                putInMapIfNotNull(variableMap, (String) variableName, eventWithVariables.getVariables().get(variableName));
+            }
+            putInMapIfNotNull(data, Fields.VARIABLES, variableMap);
+        }
+
+        return createEventLogEntry(TYPE, processInstanceEntity.getProcessDefinitionId(), processInstanceEntity.getId(), null, null, data);
     }
-
-    return createEventLogEntry(TYPE, processInstanceEntity.getProcessDefinitionId(), processInstanceEntity.getId(), null, null, data);
-  }
 
 }

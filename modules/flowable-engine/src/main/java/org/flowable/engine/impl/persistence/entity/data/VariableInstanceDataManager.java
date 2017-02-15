@@ -24,20 +24,20 @@ import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
  */
 public interface VariableInstanceDataManager extends DataManager<VariableInstanceEntity> {
 
-  List<VariableInstanceEntity> findVariableInstancesByTaskId(String taskId);
-  
-  List<VariableInstanceEntity> findVariableInstancesByTaskIds(Set<String> taskIds);
-  
-  List<VariableInstanceEntity> findVariableInstancesByExecutionId(String executionId);
-  
-  List<VariableInstanceEntity> findVariableInstancesByExecutionIds(Set<String> executionIds);
+    List<VariableInstanceEntity> findVariableInstancesByTaskId(String taskId);
 
-  VariableInstanceEntity findVariableInstanceByExecutionAndName(String executionId, String variableName);
+    List<VariableInstanceEntity> findVariableInstancesByTaskIds(Set<String> taskIds);
 
-  List<VariableInstanceEntity> findVariableInstancesByExecutionAndNames(String executionId, Collection<String> names);
+    List<VariableInstanceEntity> findVariableInstancesByExecutionId(String executionId);
 
-  VariableInstanceEntity findVariableInstanceByTaskAndName(String taskId, String variableName);
+    List<VariableInstanceEntity> findVariableInstancesByExecutionIds(Set<String> executionIds);
 
-  List<VariableInstanceEntity> findVariableInstancesByTaskAndNames(String taskId, Collection<String> names);
-  
+    VariableInstanceEntity findVariableInstanceByExecutionAndName(String executionId, String variableName);
+
+    List<VariableInstanceEntity> findVariableInstancesByExecutionAndNames(String executionId, Collection<String> names);
+
+    VariableInstanceEntity findVariableInstanceByTaskAndName(String taskId, String variableName);
+
+    List<VariableInstanceEntity> findVariableInstancesByTaskAndNames(String taskId, Collection<String> names);
+
 }

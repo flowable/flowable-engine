@@ -24,26 +24,26 @@ import org.flowable.engine.runtime.EventSubscription;
  * @author Tijs Rademakers
  */
 public interface EventSubscriptionEntity extends EventSubscription, Entity, HasRevision {
-  
-  void setEventType(String eventType);
 
-  void setEventName(String eventName);
+    void setEventType(String eventType);
 
-  void setExecutionId(String executionId);
-  
-  ExecutionEntity getExecution();
+    void setEventName(String eventName);
 
-  void setExecution(ExecutionEntity execution);
+    void setExecutionId(String executionId);
 
-  void setProcessInstanceId(String processInstanceId);
+    ExecutionEntity getExecution();
 
-  void setConfiguration(String configuration);
+    void setExecution(ExecutionEntity execution);
 
-  void setActivityId(String activityId);
+    void setProcessInstanceId(String processInstanceId);
 
-  void setCreated(Date created);
+    void setConfiguration(String configuration);
 
-  void setProcessDefinitionId(String processDefinitionId);
+    void setActivityId(String activityId);
 
-  void setTenantId(String tenantId);
+    void setCreated(Date created);
+
+    void setProcessDefinitionId(String processDefinitionId);
+
+    void setTenantId(String tenantId);
 }

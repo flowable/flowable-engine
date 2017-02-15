@@ -27,61 +27,61 @@ import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
  * @author Tijs Rademakers
  */
 public abstract class AbstractDataManager<EntityImpl extends Entity> extends AbstractManager implements DataManager<EntityImpl> {
-  
-  public AbstractDataManager(DmnEngineConfiguration dmnEngineConfiguration) {
-    super(dmnEngineConfiguration);
-  }
 
-  public abstract Class<? extends EntityImpl> getManagedEntityClass();
-  
-  public List<Class<? extends EntityImpl>> getManagedEntitySubClasses() {
-    return null;
-  }
-  
-  protected DbSqlSession getDbSqlSession() {
-    return getSession(DbSqlSession.class);
-  }
-  
-  @Override
-  public EntityImpl findById(String entityId) {
-    if (entityId == null) {
-      return null;
+    public AbstractDataManager(DmnEngineConfiguration dmnEngineConfiguration) {
+        super(dmnEngineConfiguration);
     }
-    
-    // Database
-    return getDbSqlSession().selectById(getManagedEntityClass(), entityId);
-  }
 
-  @Override
-  public void insert(EntityImpl entity) {
-    getDbSqlSession().insert(entity);
-  }
-  
-  public EntityImpl update(EntityImpl entity) {
-    getDbSqlSession().update(entity);
-    return entity;
-  }
-  
-  @Override
-  public void delete(String id) {
-    EntityImpl entity = findById(id);
-    delete(entity);
-  }
-  
-  @Override
-  public void delete(EntityImpl entity) {
-    getDbSqlSession().delete(entity);
-  }
-  
-  @SuppressWarnings("unchecked")
-  protected EntityImpl findByQuery(String selectQuery, Object parameter) {
-    return (EntityImpl) getDbSqlSession().selectOne(selectQuery, parameter);
-  }
-  
-  @SuppressWarnings("unchecked")
-  protected List<EntityImpl> getList(String dbQueryName, Object parameter) {
-    Collection<EntityImpl> result = getDbSqlSession().selectList(dbQueryName, parameter);
-    return new ArrayList<EntityImpl>(result);
-  }
+    public abstract Class<? extends EntityImpl> getManagedEntityClass();
+
+    public List<Class<? extends EntityImpl>> getManagedEntitySubClasses() {
+        return null;
+    }
+
+    protected DbSqlSession getDbSqlSession() {
+        return getSession(DbSqlSession.class);
+    }
+
+    @Override
+    public EntityImpl findById(String entityId) {
+        if (entityId == null) {
+            return null;
+        }
+
+        // Database
+        return getDbSqlSession().selectById(getManagedEntityClass(), entityId);
+    }
+
+    @Override
+    public void insert(EntityImpl entity) {
+        getDbSqlSession().insert(entity);
+    }
+
+    public EntityImpl update(EntityImpl entity) {
+        getDbSqlSession().update(entity);
+        return entity;
+    }
+
+    @Override
+    public void delete(String id) {
+        EntityImpl entity = findById(id);
+        delete(entity);
+    }
+
+    @Override
+    public void delete(EntityImpl entity) {
+        getDbSqlSession().delete(entity);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected EntityImpl findByQuery(String selectQuery, Object parameter) {
+        return (EntityImpl) getDbSqlSession().selectOne(selectQuery, parameter);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected List<EntityImpl> getList(String dbQueryName, Object parameter) {
+        Collection<EntityImpl> result = getDbSqlSession().selectList(dbQueryName, parameter);
+        return new ArrayList<EntityImpl>(result);
+    }
 
 }

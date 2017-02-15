@@ -22,14 +22,14 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class DmnJsonConverterUtil {
 
-  protected static final Logger logger = LoggerFactory.getLogger(DmnJsonConverterUtil.class);
+    protected static final Logger logger = LoggerFactory.getLogger(DmnJsonConverterUtil.class);
 
-  public static String getValueAsString(String name, JsonNode objectNode) {
-    String propertyValue = null;
-    JsonNode jsonNode = objectNode.get(name);
-    if (jsonNode != null && !jsonNode.isNull()) {
-      propertyValue = jsonNode.asText();
+    public static String getValueAsString(String name, JsonNode objectNode) {
+        String propertyValue = null;
+        JsonNode jsonNode = objectNode.get(name);
+        if (jsonNode != null && !jsonNode.isNull()) {
+            propertyValue = jsonNode.asText();
+        }
+        return propertyValue;
     }
-    return propertyValue;
-  }
 }

@@ -23,11 +23,11 @@ import org.flowable.camel.CamelBehavior;
  */
 public class CamelBehaviorBodyAsMapImpl extends CamelBehavior {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  @Override
-  protected void setPropertTargetVariable(FlowableEndpoint endpoint) {
-    toTargetType = TargetType.BODY_AS_MAP;
-  }
+    @Override
+    protected void setPropertTargetVariable(FlowableEndpoint endpoint) {
+        toTargetType = TargetType.BODY_AS_MAP;
+    }
 
 }

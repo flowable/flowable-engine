@@ -26,35 +26,35 @@ import java.util.List;
  */
 public class DeployClasspathResourcesEventHandler implements SimulationEventHandler {
 
-  private static Logger log = LoggerFactory.getLogger(DeployClasspathResourcesEventHandler.class);
+    private static Logger log = LoggerFactory.getLogger(DeployClasspathResourcesEventHandler.class);
 
-  /**
-   * process to start key
-   */
-  protected String resourcesKey;
+    /**
+     * process to start key
+     */
+    protected String resourcesKey;
 
-  public DeployClasspathResourcesEventHandler(String resourcesKey) {
-    this.resourcesKey = resourcesKey;
-  }
-
-  @Override
-  public void init() {
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public void handle(SimulationEvent event) {
-
-    List<String> resources = (List<String>) event.getProperty(resourcesKey);
-
-    DeploymentBuilder deploymentBuilder = SimulationRunContext.getRepositoryService().createDeployment();
-
-    for (String resource : resources) {
-      log.debug("adding resource [{}] to repository {}", resource, SimulationRunContext.getRepositoryService());
-      deploymentBuilder.addClasspathResource(resource);
+    public DeployClasspathResourcesEventHandler(String resourcesKey) {
+        this.resourcesKey = resourcesKey;
     }
 
-    deploymentBuilder.deploy();
-  }
+    @Override
+    public void init() {
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void handle(SimulationEvent event) {
+
+        List<String> resources = (List<String>) event.getProperty(resourcesKey);
+
+        DeploymentBuilder deploymentBuilder = SimulationRunContext.getRepositoryService().createDeployment();
+
+        for (String resource : resources) {
+            log.debug("adding resource [{}] to repository {}", resource, SimulationRunContext.getRepositoryService());
+            deploymentBuilder.addClasspathResource(resource);
+        }
+
+        deploymentBuilder.deploy();
+    }
 
 }

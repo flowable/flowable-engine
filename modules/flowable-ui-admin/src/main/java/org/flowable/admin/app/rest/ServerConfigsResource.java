@@ -41,70 +41,68 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ServerConfigsResource {
 
-  @Autowired
-  protected ServerConfigService serverConfigService;
+    @Autowired
+    protected ServerConfigService serverConfigService;
 
-  @Autowired
-  protected Environment env;
+    @Autowired
+    protected Environment env;
 
-  @RequestMapping(value = "/rest/server-configs", method = RequestMethod.GET, produces = "application/json")
-  public List<ServerConfigRepresentation> getServers() {
-    return serverConfigService.findAll();
-  }
-
-  @RequestMapping(value = "/rest/server-configs/default/{endpointTypeCode}", method = RequestMethod.GET, produces = "application/json")
-  @ResponseStatus(value = HttpStatus.OK)
-  @ResponseBody
-  public ServerConfigRepresentation getDefaultServerConfig(@PathVariable Integer endpointTypeCode) {
-    EndpointType endpointType = EndpointType.valueOf(endpointTypeCode);
-
-    if (endpointType == null) {
-      throw new IllegalArgumentException("Unknown endpoint type code: " + endpointTypeCode);
+    @RequestMapping(value = "/rest/server-configs", method = RequestMethod.GET, produces = "application/json")
+    public List<ServerConfigRepresentation> getServers() {
+        return serverConfigService.findAll();
     }
 
-    return new ServerConfigRepresentation(serverConfigService.getDefaultServerConfig(endpointType));
-  }
+    @RequestMapping(value = "/rest/server-configs/default/{endpointTypeCode}", method = RequestMethod.GET, produces = "application/json")
+    @ResponseStatus(value = HttpStatus.OK)
+    @ResponseBody
+    public ServerConfigRepresentation getDefaultServerConfig(@PathVariable Integer endpointTypeCode) {
+        EndpointType endpointType = EndpointType.valueOf(endpointTypeCode);
 
+        if (endpointType == null) {
+            throw new IllegalArgumentException("Unknown endpoint type code: " + endpointTypeCode);
+        }
 
-
-  @RequestMapping(value = "/rest/server-configs/{serverId}", method = RequestMethod.PUT, produces = "application/json")
-  @ResponseStatus(value = HttpStatus.OK)
-  public void updateServer(@PathVariable String serverId, @RequestBody ServerConfigRepresentation configRepresentation) {
-    ServerConfig config = serverConfigService.findOne(serverId);
-
-    if (config == null) {
-      throw new BadRequestException("Server with id '" + serverId + "' does not exist");
+        return new ServerConfigRepresentation(serverConfigService.getDefaultServerConfig(endpointType));
     }
 
-    boolean updatePassword = false;
-    if (StringUtils.isNotEmpty(configRepresentation.getPassword())) {
-      config.setPassword(configRepresentation.getPassword());
-      updatePassword = true;
-    } else {
-      configRepresentation.setPassword(serverConfigService.getServerConfigDecryptedPassword(config));
+    @RequestMapping(value = "/rest/server-configs/{serverId}", method = RequestMethod.PUT, produces = "application/json")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void updateServer(@PathVariable String serverId, @RequestBody ServerConfigRepresentation configRepresentation) {
+        ServerConfig config = serverConfigService.findOne(serverId);
+
+        if (config == null) {
+            throw new BadRequestException("Server with id '" + serverId + "' does not exist");
+        }
+
+        boolean updatePassword = false;
+        if (StringUtils.isNotEmpty(configRepresentation.getPassword())) {
+            config.setPassword(configRepresentation.getPassword());
+            updatePassword = true;
+        } else {
+            configRepresentation.setPassword(serverConfigService.getServerConfigDecryptedPassword(config));
+        }
+
+        config.setContextRoot(configRepresentation.getContextRoot());
+        config.setDescription(configRepresentation.getDescription());
+        config.setName(configRepresentation.getName());
+        config.setPort(configRepresentation.getServerPort());
+        config.setRestRoot(configRepresentation.getRestRoot());
+        config.setServerAddress(configRepresentation.getServerAddress());
+        config.setUserName(configRepresentation.getUserName());
+
+        serverConfigService.save(config, updatePassword);
     }
 
-    config.setContextRoot(configRepresentation.getContextRoot());
-    config.setDescription(configRepresentation.getDescription());
-    config.setName(configRepresentation.getName());
-    config.setPort(configRepresentation.getServerPort());
-    config.setRestRoot(configRepresentation.getRestRoot());
-    config.setServerAddress(configRepresentation.getServerAddress());
-    config.setUserName(configRepresentation.getUserName());
-
-    serverConfigService.save(config, updatePassword);
-  }
-
-  protected ServerConfigRepresentation createServerConfigRepresentation(ServerConfig serverConfig) {
-    ServerConfigRepresentation serverRepresentation = new ServerConfigRepresentation();
-    serverRepresentation.setId(serverConfig.getId());
-    serverRepresentation.setName(serverConfig.getName());
-    serverRepresentation.setDescription(serverConfig.getDescription());
-    serverRepresentation.setServerAddress(serverConfig.getServerAddress());
-    serverRepresentation.setServerPort(serverConfig.getPort());
-    serverRepresentation.setContextRoot(serverConfig.getContextRoot());
-    serverRepresentation.setRestRoot(serverConfig.getRestRoot());
-    serverRepresentation.setUserName(serverConfig.getUserName());
-    return serverRepresentation;
-  }
+    protected ServerConfigRepresentation createServerConfigRepresentation(ServerConfig serverConfig) {
+        ServerConfigRepresentation serverRepresentation = new ServerConfigRepresentation();
+        serverRepresentation.setId(serverConfig.getId());
+        serverRepresentation.setName(serverConfig.getName());
+        serverRepresentation.setDescription(serverConfig.getDescription());
+        serverRepresentation.setServerAddress(serverConfig.getServerAddress());
+        serverRepresentation.setServerPort(serverConfig.getPort());
+        serverRepresentation.setContextRoot(serverConfig.getContextRoot());
+        serverRepresentation.setRestRoot(serverConfig.getRestRoot());
+        serverRepresentation.setUserName(serverConfig.getUserName());
+        return serverRepresentation;
+    }
 }

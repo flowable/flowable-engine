@@ -16,17 +16,15 @@ import org.activiti.engine.impl.bpmn.parser.BpmnParse;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.FlowNode;
 
-
 /**
  * @author Joram Barrez
  */
 public abstract class AbstractFlowNodeBpmnParseHandler<T extends FlowNode> extends AbstractBpmnParseHandler<T> {
-  
-  @Override
-  public void parse(BpmnParse bpmnParse, BaseElement element) {
-    super.parse(bpmnParse, element);
-    createExecutionListenersOnScope(bpmnParse, ((FlowNode) element).getExecutionListeners(), findActivity(bpmnParse, element.getId()));
-  }
-  
-  
+
+    @Override
+    public void parse(BpmnParse bpmnParse, BaseElement element) {
+        super.parse(bpmnParse, element);
+        createExecutionListenersOnScope(bpmnParse, ((FlowNode) element).getExecutionListeners(), findActivity(bpmnParse, element.getId()));
+    }
+
 }

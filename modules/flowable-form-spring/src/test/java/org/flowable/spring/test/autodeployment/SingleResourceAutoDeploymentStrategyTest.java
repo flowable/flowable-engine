@@ -40,56 +40,56 @@ import org.springframework.core.io.Resource;
 @RunWith(MockitoJUnitRunner.class)
 public class SingleResourceAutoDeploymentStrategyTest extends AbstractAutoDeploymentStrategyTest {
 
-  private SingleResourceAutoDeploymentStrategy classUnderTest;
+    private SingleResourceAutoDeploymentStrategy classUnderTest;
 
-  @Before
-  public void before() throws Exception {
-    super.before();
-    classUnderTest = new SingleResourceAutoDeploymentStrategy();
-    assertNotNull(classUnderTest);
-  }
+    @Before
+    public void before() throws Exception {
+        super.before();
+        classUnderTest = new SingleResourceAutoDeploymentStrategy();
+        assertNotNull(classUnderTest);
+    }
 
-  @Test
-  public void testHandlesMode() {
-    assertTrue(classUnderTest.handlesMode(SingleResourceAutoDeploymentStrategy.DEPLOYMENT_MODE));
-    assertFalse(classUnderTest.handlesMode("other-mode"));
-    assertFalse(classUnderTest.handlesMode(null));
-  }
+    @Test
+    public void testHandlesMode() {
+        assertTrue(classUnderTest.handlesMode(SingleResourceAutoDeploymentStrategy.DEPLOYMENT_MODE));
+        assertFalse(classUnderTest.handlesMode("other-mode"));
+        assertFalse(classUnderTest.handlesMode(null));
+    }
 
-  @Test
-  public void testDeployResources() {
-    final Resource[] resources = new Resource[] { resourceMock1, resourceMock2, resourceMock3 };
-    classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
+    @Test
+    public void testDeployResources() {
+        final Resource[] resources = new Resource[] { resourceMock1, resourceMock2, resourceMock3 };
+        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
 
-    verify(repositoryServiceMock, times(3)).createDeployment();
-    verify(deploymentBuilderMock, times(3)).enableDuplicateFiltering();
-    verify(deploymentBuilderMock, times(1)).name(resourceName1);
-    verify(deploymentBuilderMock, times(1)).name(resourceName2);
-    verify(deploymentBuilderMock, times(1)).name(resourceName3);
-    verify(deploymentBuilderMock, times(1)).addInputStream(eq(resourceName1), isA(InputStream.class));
-    verify(deploymentBuilderMock, times(1)).addInputStream(eq(resourceName2), isA(InputStream.class));
-    verify(deploymentBuilderMock, times(3)).deploy();
-  }
+        verify(repositoryServiceMock, times(3)).createDeployment();
+        verify(deploymentBuilderMock, times(3)).enableDuplicateFiltering();
+        verify(deploymentBuilderMock, times(1)).name(resourceName1);
+        verify(deploymentBuilderMock, times(1)).name(resourceName2);
+        verify(deploymentBuilderMock, times(1)).name(resourceName3);
+        verify(deploymentBuilderMock, times(1)).addInputStream(eq(resourceName1), isA(InputStream.class));
+        verify(deploymentBuilderMock, times(1)).addInputStream(eq(resourceName2), isA(InputStream.class));
+        verify(deploymentBuilderMock, times(3)).deploy();
+    }
 
-  @Test
-  public void testDeployResourcesNoResources() {
-    final Resource[] resources = new Resource[] {};
-    classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
+    @Test
+    public void testDeployResourcesNoResources() {
+        final Resource[] resources = new Resource[] {};
+        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
 
-    verify(repositoryServiceMock, never()).createDeployment();
-    verify(deploymentBuilderMock, never()).enableDuplicateFiltering();
-    verify(deploymentBuilderMock, never()).name(deploymentNameHint);
-    verify(deploymentBuilderMock, never()).addInputStream(isA(String.class), isA(InputStream.class));
-    verify(deploymentBuilderMock, never()).addInputStream(eq(resourceName2), isA(InputStream.class));
-    verify(deploymentBuilderMock, never()).deploy();
-  }
+        verify(repositoryServiceMock, never()).createDeployment();
+        verify(deploymentBuilderMock, never()).enableDuplicateFiltering();
+        verify(deploymentBuilderMock, never()).name(deploymentNameHint);
+        verify(deploymentBuilderMock, never()).addInputStream(isA(String.class), isA(InputStream.class));
+        verify(deploymentBuilderMock, never()).addInputStream(eq(resourceName2), isA(InputStream.class));
+        verify(deploymentBuilderMock, never()).deploy();
+    }
 
-  @Test(expected = FlowableException.class)
-  public void testDeployResourcesIOExceptionYieldsFlowableException() throws Exception {
-    when(resourceMock3.getInputStream()).thenThrow(new IOException());
+    @Test(expected = FlowableException.class)
+    public void testDeployResourcesIOExceptionYieldsFlowableException() throws Exception {
+        when(resourceMock3.getInputStream()).thenThrow(new IOException());
 
-    final Resource[] resources = new Resource[] { resourceMock3 };
-    classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
-  }
+        final Resource[] resources = new Resource[] { resourceMock3 };
+        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
+    }
 
 }

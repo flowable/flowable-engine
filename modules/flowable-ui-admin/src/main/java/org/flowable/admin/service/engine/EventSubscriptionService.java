@@ -35,74 +35,74 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Service
 public class EventSubscriptionService {
 
-	private final Logger log = LoggerFactory.getLogger(EventSubscriptionService.class);
+    private final Logger log = LoggerFactory.getLogger(EventSubscriptionService.class);
 
-	@Autowired
-	protected FlowableClientService clientUtil;
+    @Autowired
+    protected FlowableClientService clientUtil;
 
-	public JsonNode listEventSubscriptions(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
+    public JsonNode listEventSubscriptions(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
 
-		URIBuilder builder = null;
-		try {
-			builder = new URIBuilder("runtime/event-subscriptions");
-		} catch (Exception e) {
-			log.error("Error building uri", e);
-			throw new FlowableServiceException("Error building uri", e);
-		}
+        URIBuilder builder = null;
+        try {
+            builder = new URIBuilder("runtime/event-subscriptions");
+        } catch (Exception e) {
+            log.error("Error building uri", e);
+            throw new FlowableServiceException("Error building uri", e);
+        }
 
-		for (String name : parameterMap.keySet()) {
-			builder.addParameter(name, parameterMap.get(name)[0]);
-		}
-		HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder.toString()));
-		return clientUtil.executeRequest(get, serverConfig);
-	}
-
-	public JsonNode getEventSubscription(ServerConfig serverConfig, String eventSubscriptionId) {
-		HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "runtime/event-subscriptions/" + eventSubscriptionId));
-		return clientUtil.executeRequest(get, serverConfig);
-	}
-
-	public void triggerExecutionEvent(ServerConfig serverConfig, String eventType, String eventName, String executionId) {
-	  ObjectNode node = JsonNodeFactory.instance.objectNode();
-	  if ("message".equals(eventType)) {
-	    node.put("action", "messageEventReceived");
-	    node.put("messageName", eventName);
-	    
-	  } else if ("signal".equals(eventType)) {
-	    node.put("action", "signalEventReceived");
-	    node.put("signalName", eventName);
-    
-	  } else {
-	    throw new FlowableServiceException("Unsupported event type " + eventType);
-	  }
-	  
-	  HttpPut put = clientUtil.createPut("runtime/executions/" + executionId, serverConfig);
-    put.setEntity(clientUtil.createStringEntity(node));
-	  
-		clientUtil.executeRequest(put, serverConfig);
-	}
-	
-	public void triggerMessageEvent(ServerConfig serverConfig, String eventName, String tenantId) {
-    ObjectNode node = JsonNodeFactory.instance.objectNode();
-    node.put("message", eventName);
-    if (tenantId != null && tenantId.length() > 0) {
-      node.put("tenantId", tenantId);
+        for (String name : parameterMap.keySet()) {
+            builder.addParameter(name, parameterMap.get(name)[0]);
+        }
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder.toString()));
+        return clientUtil.executeRequest(get, serverConfig);
     }
-    
-    HttpPost post = clientUtil.createPost("runtime/process-instances", serverConfig);
-    post.setEntity(clientUtil.createStringEntity(node));
 
-    clientUtil.executeRequest(post, serverConfig);
-  }
-	
-	public void triggerSignalEvent(ServerConfig serverConfig, String eventName) {
-    ObjectNode node = JsonNodeFactory.instance.objectNode();
-    node.put("action", "signalEventReceived");
-    node.put("signalName", eventName);
-    
-    HttpPut put = clientUtil.createPut("runtime/executions", serverConfig);
-    put.setEntity(clientUtil.createStringEntity(node));
+    public JsonNode getEventSubscription(ServerConfig serverConfig, String eventSubscriptionId) {
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "runtime/event-subscriptions/" + eventSubscriptionId));
+        return clientUtil.executeRequest(get, serverConfig);
+    }
 
-    clientUtil.executeRequest(put, serverConfig);
-  }
+    public void triggerExecutionEvent(ServerConfig serverConfig, String eventType, String eventName, String executionId) {
+        ObjectNode node = JsonNodeFactory.instance.objectNode();
+        if ("message".equals(eventType)) {
+            node.put("action", "messageEventReceived");
+            node.put("messageName", eventName);
+
+        } else if ("signal".equals(eventType)) {
+            node.put("action", "signalEventReceived");
+            node.put("signalName", eventName);
+
+        } else {
+            throw new FlowableServiceException("Unsupported event type " + eventType);
+        }
+
+        HttpPut put = clientUtil.createPut("runtime/executions/" + executionId, serverConfig);
+        put.setEntity(clientUtil.createStringEntity(node));
+
+        clientUtil.executeRequest(put, serverConfig);
+    }
+
+    public void triggerMessageEvent(ServerConfig serverConfig, String eventName, String tenantId) {
+        ObjectNode node = JsonNodeFactory.instance.objectNode();
+        node.put("message", eventName);
+        if (tenantId != null && tenantId.length() > 0) {
+            node.put("tenantId", tenantId);
+        }
+
+        HttpPost post = clientUtil.createPost("runtime/process-instances", serverConfig);
+        post.setEntity(clientUtil.createStringEntity(node));
+
+        clientUtil.executeRequest(post, serverConfig);
+    }
+
+    public void triggerSignalEvent(ServerConfig serverConfig, String eventName) {
+        ObjectNode node = JsonNodeFactory.instance.objectNode();
+        node.put("action", "signalEventReceived");
+        node.put("signalName", eventName);
+
+        HttpPut put = clientUtil.createPut("runtime/executions", serverConfig);
+        put.setEntity(clientUtil.createStringEntity(node));
+
+        clientUtil.executeRequest(put, serverConfig);
+    }
 }

@@ -25,45 +25,45 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
  */
 public class ReplaySimulationRun extends AbstractSimulationRun {
 
-  private final EventCalendar eventCalendar;
+    private final EventCalendar eventCalendar;
 
-  public ReplaySimulationRun(ProcessEngine processEngine, Map<String, SimulationEventHandler> customEventHandlerMap) {
-    this(processEngine, new SimpleEventCalendar(processEngine.getProcessEngineConfiguration().getClock(), new SimulationEventComparator()), customEventHandlerMap);
-  }
+    public ReplaySimulationRun(ProcessEngine processEngine, Map<String, SimulationEventHandler> customEventHandlerMap) {
+        this(processEngine, new SimpleEventCalendar(processEngine.getProcessEngineConfiguration().getClock(), new SimulationEventComparator()), customEventHandlerMap);
+    }
 
-  public ReplaySimulationRun(ProcessEngine processEngine, EventCalendar eventCalendar, Map<String, SimulationEventHandler> customEventHandlerMap) {
-    super(customEventHandlerMap);
-    this.processEngine = processEngine;
-    this.eventCalendar = eventCalendar;
-  }
+    public ReplaySimulationRun(ProcessEngine processEngine, EventCalendar eventCalendar, Map<String, SimulationEventHandler> customEventHandlerMap) {
+        super(customEventHandlerMap);
+        this.processEngine = processEngine;
+        this.eventCalendar = eventCalendar;
+    }
 
-  @Override
-  protected void initSimulationRunContext(VariableScope execution) {
-    SimulationRunContext.setEventCalendar(eventCalendar);
-    SimulationRunContext.setProcessEngine(processEngine);
-    ProcessEngineConfigurationImpl configuration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
-    SimulationRunContext.setSimulationRunId(configuration.getIdGenerator().getNextId());
-  }
+    @Override
+    protected void initSimulationRunContext(VariableScope execution) {
+        SimulationRunContext.setEventCalendar(eventCalendar);
+        SimulationRunContext.setProcessEngine(processEngine);
+        ProcessEngineConfigurationImpl configuration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+        SimulationRunContext.setSimulationRunId(configuration.getIdGenerator().getNextId());
+    }
 
-  /**
-   * simulation does not end - it can live forever.
-   * 
-   * @param event
-   *          - is it end of the simulation run?
-   * @return false
-   */
-  @Override
-  protected boolean simulationEnd(SimulationEvent event) {
-    return false;
-  }
+    /**
+     * simulation does not end - it can live forever.
+     * 
+     * @param event
+     *            - is it end of the simulation run?
+     * @return false
+     */
+    @Override
+    protected boolean simulationEnd(SimulationEvent event) {
+        return false;
+    }
 
-  /**
-   * do not affect existing engine
-   */
-  @Override
-  public void close() {
-    SimulationRunContext.getEventCalendar().clear();
-    SimulationRunContext.removeEventCalendar();
-    SimulationRunContext.removeProcessEngine();
-  }
+    /**
+     * do not affect existing engine
+     */
+    @Override
+    public void close() {
+        SimulationRunContext.getEventCalendar().clear();
+        SimulationRunContext.removeEventCalendar();
+        SimulationRunContext.removeProcessEngine();
+    }
 }

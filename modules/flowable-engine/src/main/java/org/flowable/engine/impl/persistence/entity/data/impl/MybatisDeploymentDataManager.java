@@ -29,55 +29,55 @@ import org.flowable.engine.repository.Deployment;
  */
 public class MybatisDeploymentDataManager extends AbstractDataManager<DeploymentEntity> implements DeploymentDataManager {
 
-  public MybatisDeploymentDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    super(processEngineConfiguration);
-  }
-
-  @Override
-  public Class<? extends DeploymentEntity> getManagedEntityClass() {
-    return DeploymentEntityImpl.class;
-  }
-  
-  @Override
-  public DeploymentEntity create() {
-    return new DeploymentEntityImpl();
-  }
-  
-  @Override
-  public DeploymentEntity findLatestDeploymentByName(String deploymentName) {
-    List<?> list = getDbSqlSession().selectList("selectDeploymentsByName", deploymentName, 0, 1);
-    if (list != null && !list.isEmpty()) {
-      return (DeploymentEntity) list.get(0);
+    public MybatisDeploymentDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
     }
-    return null;
-  }
 
-  @Override
-  public long findDeploymentCountByQueryCriteria(DeploymentQueryImpl deploymentQuery) {
-    return (Long) getDbSqlSession().selectOne("selectDeploymentCountByQueryCriteria", deploymentQuery);
-  }
+    @Override
+    public Class<? extends DeploymentEntity> getManagedEntityClass() {
+        return DeploymentEntityImpl.class;
+    }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery, Page page) {
-    final String query = "selectDeploymentsByQueryCriteria";
-    return getDbSqlSession().selectList(query, deploymentQuery, page);
-  }
+    @Override
+    public DeploymentEntity create() {
+        return new DeploymentEntityImpl();
+    }
 
-  @Override
-  public List<String> getDeploymentResourceNames(String deploymentId) {
-    return getDbSqlSession().getSqlSession().selectList("selectResourceNamesByDeploymentId", deploymentId);
-  }
+    @Override
+    public DeploymentEntity findLatestDeploymentByName(String deploymentName) {
+        List<?> list = getDbSqlSession().selectList("selectDeploymentsByName", deploymentName, 0, 1);
+        if (list != null && !list.isEmpty()) {
+            return (DeploymentEntity) list.get(0);
+        }
+        return null;
+    }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<Deployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return getDbSqlSession().selectListWithRawParameter("selectDeploymentByNativeQuery", parameterMap, firstResult, maxResults);
-  }
+    @Override
+    public long findDeploymentCountByQueryCriteria(DeploymentQueryImpl deploymentQuery) {
+        return (Long) getDbSqlSession().selectOne("selectDeploymentCountByQueryCriteria", deploymentQuery);
+    }
 
-  @Override
-  public long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap) {
-    return (Long) getDbSqlSession().selectOne("selectDeploymentCountByNativeQuery", parameterMap);
-  }
-  
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery, Page page) {
+        final String query = "selectDeploymentsByQueryCriteria";
+        return getDbSqlSession().selectList(query, deploymentQuery, page);
+    }
+
+    @Override
+    public List<String> getDeploymentResourceNames(String deploymentId) {
+        return getDbSqlSession().getSqlSession().selectList("selectResourceNamesByDeploymentId", deploymentId);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Deployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
+        return getDbSqlSession().selectListWithRawParameter("selectDeploymentByNativeQuery", parameterMap, firstResult, maxResults);
+    }
+
+    @Override
+    public long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap) {
+        return (Long) getDbSqlSession().selectOne("selectDeploymentCountByNativeQuery", parameterMap);
+    }
+
 }

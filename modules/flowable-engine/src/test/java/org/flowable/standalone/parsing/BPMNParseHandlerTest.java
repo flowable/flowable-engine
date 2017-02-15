@@ -21,14 +21,14 @@ import org.flowable.engine.test.Deployment;
  */
 public class BPMNParseHandlerTest extends ResourceFlowableTestCase {
 
-  public BPMNParseHandlerTest() {
-    super("org/flowable/standalone/parsing/bpmn.parse.listener.flowable.cfg.xml");
-  }
+    public BPMNParseHandlerTest() {
+        super("org/flowable/standalone/parsing/bpmn.parse.listener.flowable.cfg.xml");
+    }
 
-  @Deployment
-  public void testAlterProcessDefinitionKeyWhenDeploying() throws Exception {
-    // Check if process-definition has different key
-    assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").count());
-    assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess-modified").count());
-  }
+    @Deployment
+    public void testAlterProcessDefinitionKeyWhenDeploying() throws Exception {
+        // Check if process-definition has different key
+        assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").count());
+        assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess-modified").count());
+    }
 }

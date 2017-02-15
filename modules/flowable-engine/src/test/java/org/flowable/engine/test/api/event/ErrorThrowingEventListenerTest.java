@@ -28,107 +28,107 @@ import org.flowable.engine.test.Deployment;
  */
 public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
 
-  @Deployment
-  public void testThrowError() throws Exception {
-    ErrorThrowingEventListener listener = null;
-    try {
-      listener = new ErrorThrowingEventListener();
+    @Deployment
+    public void testThrowError() throws Exception {
+        ErrorThrowingEventListener listener = null;
+        try {
+            listener = new ErrorThrowingEventListener();
 
-      processEngineConfiguration.getEventDispatcher().addEventListener(listener, FlowableEngineEventType.TASK_ASSIGNED);
+            processEngineConfiguration.getEventDispatcher().addEventListener(listener, FlowableEngineEventType.TASK_ASSIGNED);
 
-      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testError");
-      assertNotNull(processInstance);
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testError");
+            assertNotNull(processInstance);
 
-      // Fetch the task and assign it. Should cause error-event to be
-      // dispatched
-      Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
-      assertNotNull(task);
-      taskService.setAssignee(task.getId(), "kermit");
+            // Fetch the task and assign it. Should cause error-event to be
+            // dispatched
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
+            assertNotNull(task);
+            taskService.setAssignee(task.getId(), "kermit");
 
-      // Error-handling should have been called, and "escalate" task
-      // should be available instead of original one
-      task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask").singleResult();
-      assertNotNull(task);
+            // Error-handling should have been called, and "escalate" task
+            // should be available instead of original one
+            task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask").singleResult();
+            assertNotNull(task);
 
-    } finally {
-      processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
+        } finally {
+            processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
+        }
     }
-  }
 
-  @Deployment
-  public void testThrowErrorDefinedInProcessDefinition() throws Exception {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testError");
-    assertNotNull(processInstance);
+    @Deployment
+    public void testThrowErrorDefinedInProcessDefinition() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testError");
+        assertNotNull(processInstance);
 
-    // Fetch the task and assign it. Should cause error-event to be
-    // dispatched
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
-    assertNotNull(task);
-    taskService.setAssignee(task.getId(), "kermit");
+        // Fetch the task and assign it. Should cause error-event to be
+        // dispatched
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
+        assertNotNull(task);
+        taskService.setAssignee(task.getId(), "kermit");
 
-    // Error-handling should have been called, and "escalate" task should be
-    // available instead of original one
-    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask").singleResult();
-    assertNotNull(task);
-  }
-
-  @Deployment
-  public void testThrowErrorWithErrorcode() throws Exception {
-    ErrorThrowingEventListener listener = null;
-    try {
-      listener = new ErrorThrowingEventListener();
-      listener.setErrorCode("123");
-
-      processEngineConfiguration.getEventDispatcher().addEventListener(listener, FlowableEngineEventType.TASK_ASSIGNED);
-
-      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testError");
-      assertNotNull(processInstance);
-
-      // Fetch the task and assign it. Should cause error-event to be
-      // dispatched
-      Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
-      assertNotNull(task);
-      taskService.setAssignee(task.getId(), "kermit");
-
-      // Error-handling should have been called, and "escalate" task
-      // should be available instead of original one
-      task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask").singleResult();
-      assertNotNull(task);
-
-      // Try with a different error-code, resulting in a different task
-      // being created
-      listener.setErrorCode("456");
-
-      processInstance = runtimeService.startProcessInstanceByKey("testError");
-      assertNotNull(processInstance);
-
-      // Fetch the task and assign it. Should cause error-event to be
-      // dispatched
-      task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
-      assertNotNull(task);
-      taskService.setAssignee(task.getId(), "kermit");
-
-      task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask2").singleResult();
-      assertNotNull(task);
-    } finally {
-      processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
+        // Error-handling should have been called, and "escalate" task should be
+        // available instead of original one
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask").singleResult();
+        assertNotNull(task);
     }
-  }
 
-  @Deployment
-  public void testThrowErrorWithErrorcodeDefinedInProcessDefinition() throws Exception {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testError");
-    assertNotNull(processInstance);
+    @Deployment
+    public void testThrowErrorWithErrorcode() throws Exception {
+        ErrorThrowingEventListener listener = null;
+        try {
+            listener = new ErrorThrowingEventListener();
+            listener.setErrorCode("123");
 
-    // Fetch the task and assign it. Should cause error-event to be
-    // dispatched
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
-    assertNotNull(task);
-    taskService.setAssignee(task.getId(), "kermit");
+            processEngineConfiguration.getEventDispatcher().addEventListener(listener, FlowableEngineEventType.TASK_ASSIGNED);
 
-    // Error-handling should have been called, and "escalate" task should be
-    // available instead of original one
-    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask").singleResult();
-    assertNotNull(task);
-  }
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testError");
+            assertNotNull(processInstance);
+
+            // Fetch the task and assign it. Should cause error-event to be
+            // dispatched
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
+            assertNotNull(task);
+            taskService.setAssignee(task.getId(), "kermit");
+
+            // Error-handling should have been called, and "escalate" task
+            // should be available instead of original one
+            task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask").singleResult();
+            assertNotNull(task);
+
+            // Try with a different error-code, resulting in a different task
+            // being created
+            listener.setErrorCode("456");
+
+            processInstance = runtimeService.startProcessInstanceByKey("testError");
+            assertNotNull(processInstance);
+
+            // Fetch the task and assign it. Should cause error-event to be
+            // dispatched
+            task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
+            assertNotNull(task);
+            taskService.setAssignee(task.getId(), "kermit");
+
+            task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask2").singleResult();
+            assertNotNull(task);
+        } finally {
+            processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
+        }
+    }
+
+    @Deployment
+    public void testThrowErrorWithErrorcodeDefinedInProcessDefinition() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testError");
+        assertNotNull(processInstance);
+
+        // Fetch the task and assign it. Should cause error-event to be
+        // dispatched
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
+        assertNotNull(task);
+        taskService.setAssignee(task.getId(), "kermit");
+
+        // Error-handling should have been called, and "escalate" task should be
+        // available instead of original one
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask").singleResult();
+        assertNotNull(task);
+    }
 }

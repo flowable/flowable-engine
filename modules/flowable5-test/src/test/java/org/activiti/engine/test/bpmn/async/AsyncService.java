@@ -20,9 +20,9 @@ import org.flowable.engine.delegate.JavaDelegate;
  * @author Daniel Meyer
  */
 public class AsyncService implements JavaDelegate {
-  
-  public void execute(DelegateExecution execution) {
-    AsyncTaskTest.INVOCATION = true;
-  }
+
+    public void execute(DelegateExecution execution) {
+        AsyncTaskTest.INVOCATION = true;
+    }
 
 }

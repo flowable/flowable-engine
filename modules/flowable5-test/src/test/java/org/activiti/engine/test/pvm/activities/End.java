@@ -17,15 +17,14 @@ import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 
-
 /**
  * @author Tom Baeyens
  */
 public class End implements ActivityBehavior {
 
-  public void execute(DelegateExecution execution) {
-    ActivityExecution activityExecution = (ActivityExecution) execution;
-    activityExecution.end();
-  }
+    public void execute(DelegateExecution execution) {
+        ActivityExecution activityExecution = (ActivityExecution) execution;
+        activityExecution.end();
+    }
 
 }

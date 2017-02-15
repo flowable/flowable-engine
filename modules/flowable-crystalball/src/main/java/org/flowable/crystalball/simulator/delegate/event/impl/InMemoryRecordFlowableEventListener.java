@@ -26,20 +26,20 @@ import java.util.List;
  */
 public class InMemoryRecordFlowableEventListener extends AbstractRecordFlowableEventListener {
 
-  private Collection<SimulationEvent> events;
+    private Collection<SimulationEvent> events;
 
-  public InMemoryRecordFlowableEventListener(List<Function<FlowableEvent, SimulationEvent>> transformers) {
-    super(transformers);
-    events = new HashSet<SimulationEvent>();
-  }
+    public InMemoryRecordFlowableEventListener(List<Function<FlowableEvent, SimulationEvent>> transformers) {
+        super(transformers);
+        events = new HashSet<SimulationEvent>();
+    }
 
-  public Collection<SimulationEvent> getSimulationEvents() {
-    return events;
-  }
+    public Collection<SimulationEvent> getSimulationEvents() {
+        return events;
+    }
 
-  @Override
-  protected void store(Collection<SimulationEvent> simulationEvents) {
-    events.addAll(simulationEvents);
-  }
+    @Override
+    protected void store(Collection<SimulationEvent> simulationEvents) {
+        events.addAll(simulationEvents);
+    }
 
 }

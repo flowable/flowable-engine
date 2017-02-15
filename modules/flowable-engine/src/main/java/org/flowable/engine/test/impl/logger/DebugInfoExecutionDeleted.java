@@ -20,15 +20,15 @@ import org.slf4j.Logger;
  */
 public class DebugInfoExecutionDeleted extends AbstractDebugInfo {
 
-  protected ExecutionEntity executionEntity;
+    protected ExecutionEntity executionEntity;
 
-  public DebugInfoExecutionDeleted(ExecutionEntity executionEntity) {
-    this.executionEntity = executionEntity;
-  }
+    public DebugInfoExecutionDeleted(ExecutionEntity executionEntity) {
+        this.executionEntity = executionEntity;
+    }
 
-  @Override
-  public void printOut(Logger logger) {
-    logger.info("Execution {} deleted", executionEntity.getId());
-  }
+    @Override
+    public void printOut(Logger logger) {
+        logger.info("Execution {} deleted", executionEntity.getId());
+    }
 
 }

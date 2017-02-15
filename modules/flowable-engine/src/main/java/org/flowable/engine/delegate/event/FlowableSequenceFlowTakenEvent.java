@@ -22,21 +22,21 @@ import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
  */
 public interface FlowableSequenceFlowTakenEvent extends FlowableEngineEvent {
 
-  String getId();
+    String getId();
 
-  String getSourceActivityId();
+    String getSourceActivityId();
 
-  String getSourceActivityName();
+    String getSourceActivityName();
 
-  String getSourceActivityType();
-  
-  String getSourceActivityBehaviorClass();
+    String getSourceActivityType();
 
-  String getTargetActivityId();
+    String getSourceActivityBehaviorClass();
 
-  String getTargetActivityName();
+    String getTargetActivityId();
 
-  String getTargetActivityType();
-  
-  String getTargetActivityBehaviorClass();
+    String getTargetActivityName();
+
+    String getTargetActivityType();
+
+    String getTargetActivityBehaviorClass();
 }

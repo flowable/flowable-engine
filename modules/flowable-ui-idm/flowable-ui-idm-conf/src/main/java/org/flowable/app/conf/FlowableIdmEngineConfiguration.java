@@ -28,46 +28,46 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@ComponentScan(basePackages= {
-		"org.flowable.idm.extension.conf", // For custom configuration classes
-		"org.flowable.idm.extension.bean" // For custom beans
+@ComponentScan(basePackages = {
+        "org.flowable.idm.extension.conf", // For custom configuration classes
+        "org.flowable.idm.extension.bean" // For custom beans
 })
 public class FlowableIdmEngineConfiguration {
 
     @Autowired
     private DataSource dataSource;
-    
+
     @Autowired
     private PlatformTransactionManager transactionManager;
-    
-    @Bean(name="idmEngine")
+
+    @Bean(name = "idmEngine")
     public IdmEngine idmEngine() {
         return idmEngineConfiguration().buildIdmEngine();
     }
-    
-    @Bean(name="idmEngineConfiguration")
+
+    @Bean(name = "idmEngineConfiguration")
     public IdmEngineConfiguration idmEngineConfiguration() {
-      SpringIdmEngineConfiguration idmEngineConfiguration = new SpringIdmEngineConfiguration();
-      idmEngineConfiguration.setDataSource(dataSource);
-      idmEngineConfiguration.setDatabaseSchemaUpdate(IdmEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
-      idmEngineConfiguration.setTransactionManager(transactionManager);
-    	
-    	return idmEngineConfiguration;
+        SpringIdmEngineConfiguration idmEngineConfiguration = new SpringIdmEngineConfiguration();
+        idmEngineConfiguration.setDataSource(dataSource);
+        idmEngineConfiguration.setDatabaseSchemaUpdate(IdmEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+        idmEngineConfiguration.setTransactionManager(transactionManager);
+
+        return idmEngineConfiguration;
     }
-    
-    @Bean(name="clock")
+
+    @Bean(name = "clock")
     @DependsOn("idmEngine")
     public Clock getClock() {
-    	return idmEngineConfiguration().getClock();
+        return idmEngineConfiguration().getClock();
     }
-    
+
     @Bean
     public IdmIdentityService idmIdentityService() {
-    	return idmEngine().getIdmIdentityService();
+        return idmEngine().getIdmIdentityService();
     }
-    
+
     @Bean
     public IdmManagementService idmManagementService() {
-    	return idmEngine().getIdmManagementService();
+        return idmEngine().getIdmManagementService();
     }
 }

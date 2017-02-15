@@ -39,26 +39,26 @@ import org.flowable.form.api.FormInstanceQuery;
  */
 public class FormInstanceQueryProperty implements QueryProperty {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private static final Map<String, FormInstanceQueryProperty> properties = new HashMap<String, FormInstanceQueryProperty>();
+    private static final Map<String, FormInstanceQueryProperty> properties = new HashMap<String, FormInstanceQueryProperty>();
 
-  public static final FormInstanceQueryProperty SUBMITTED_DATE = new FormInstanceQueryProperty("RES.SUBMITTED_DATE_");
-  public static final FormInstanceQueryProperty TENANT_ID = new FormInstanceQueryProperty("RES.TENANT_ID_");
+    public static final FormInstanceQueryProperty SUBMITTED_DATE = new FormInstanceQueryProperty("RES.SUBMITTED_DATE_");
+    public static final FormInstanceQueryProperty TENANT_ID = new FormInstanceQueryProperty("RES.TENANT_ID_");
 
-  private String name;
+    private String name;
 
-  public FormInstanceQueryProperty(String name) {
-    this.name = name;
-    properties.put(name, this);
-  }
+    public FormInstanceQueryProperty(String name) {
+        this.name = name;
+        properties.put(name, this);
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public static FormInstanceQueryProperty findByName(String propertyName) {
-    return properties.get(propertyName);
-  }
+    public static FormInstanceQueryProperty findByName(String propertyName) {
+        return properties.get(propertyName);
+    }
 
 }

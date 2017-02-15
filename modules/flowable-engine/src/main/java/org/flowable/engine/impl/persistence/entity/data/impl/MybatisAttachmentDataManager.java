@@ -20,36 +20,35 @@ import org.flowable.engine.impl.persistence.entity.AttachmentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
 import org.flowable.engine.impl.persistence.entity.data.AttachmentDataManager;
 
-
 /**
  * @author Joram Barrez
  */
 public class MybatisAttachmentDataManager extends AbstractDataManager<AttachmentEntity> implements AttachmentDataManager {
-  
-  public MybatisAttachmentDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    super(processEngineConfiguration);
-  }
 
-  @Override
-  public Class<? extends AttachmentEntity> getManagedEntityClass() {
-    return AttachmentEntityImpl.class;
-  }
-  
-  @Override
-  public AttachmentEntity create() {
-    return new AttachmentEntityImpl();
-  }
-  
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<AttachmentEntity> findAttachmentsByProcessInstanceId(String processInstanceId) {
-    return getDbSqlSession().selectList("selectAttachmentsByProcessInstanceId", processInstanceId);
-  }
-  
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<AttachmentEntity> findAttachmentsByTaskId(String taskId) {
-    return getDbSqlSession().selectList("selectAttachmentsByTaskId", taskId);
-  }
+    public MybatisAttachmentDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
+
+    @Override
+    public Class<? extends AttachmentEntity> getManagedEntityClass() {
+        return AttachmentEntityImpl.class;
+    }
+
+    @Override
+    public AttachmentEntity create() {
+        return new AttachmentEntityImpl();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<AttachmentEntity> findAttachmentsByProcessInstanceId(String processInstanceId) {
+        return getDbSqlSession().selectList("selectAttachmentsByProcessInstanceId", processInstanceId);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<AttachmentEntity> findAttachmentsByTaskId(String taskId) {
+        return getDbSqlSession().selectList("selectAttachmentsByTaskId", taskId);
+    }
 
 }

@@ -29,175 +29,173 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.common.api.FlowableException;
 
 /**
- * This class has been modified to be consistent with the changes to CamelBehavior and its implementations. The set of changes
- * significantly increases the flexibility of our Camel integration, as you can either choose one of three "out-of-the-box" modes,
- * or you can choose to create your own. Please reference the comments for the "CamelBehavior" class for more information on the 
- * out-of-the-box implementation class options.  
+ * This class has been modified to be consistent with the changes to CamelBehavior and its implementations. The set of changes significantly increases the flexibility of our Camel integration, as you
+ * can either choose one of three "out-of-the-box" modes, or you can choose to create your own. Please reference the comments for the "CamelBehavior" class for more information on the out-of-the-box
+ * implementation class options.
  * 
  * @author Ryan Johnston (@rjfsu), Tijs Rademakers, Arnold Schrijver
  */
 public class FlowableEndpoint extends DefaultEndpoint {
 
-  protected IdentityService identityService;
+    protected IdentityService identityService;
 
-  protected RuntimeService runtimeService;
-  
-  protected RepositoryService repositoryService;
+    protected RuntimeService runtimeService;
 
-  protected FlowableConsumer flowableConsumer;
+    protected RepositoryService repositoryService;
 
-  protected boolean copyVariablesToProperties;
+    protected FlowableConsumer flowableConsumer;
 
-  protected boolean copyVariablesToBodyAsMap;
+    protected boolean copyVariablesToProperties;
 
-  protected boolean copyCamelBodyToBody;
-  
-  protected String copyVariablesFromProperties;
+    protected boolean copyVariablesToBodyAsMap;
 
-  protected String copyVariablesFromHeader;
-  
-  protected boolean copyCamelBodyToBodyAsString;
-  
-  protected String processInitiatorHeaderName;
-  
-  protected Map<String, Object> returnVarMap = new HashMap<String, Object>();
-  
-  protected long timeout = 5000;
-  
-  protected int timeResolution = 100;
+    protected boolean copyCamelBodyToBody;
 
-  public FlowableEndpoint(String uri, CamelContext camelContext) {
-    super();
-    setCamelContext(camelContext);
-    setEndpointUri(uri);
-  }
+    protected String copyVariablesFromProperties;
 
-  public void process(Exchange ex) throws Exception {
-    if (flowableConsumer == null) {
-      throw new FlowableException("Consumer not defined for " + getEndpointUri());
+    protected String copyVariablesFromHeader;
+
+    protected boolean copyCamelBodyToBodyAsString;
+
+    protected String processInitiatorHeaderName;
+
+    protected Map<String, Object> returnVarMap = new HashMap<String, Object>();
+
+    protected long timeout = 5000;
+
+    protected int timeResolution = 100;
+
+    public FlowableEndpoint(String uri, CamelContext camelContext) {
+        super();
+        setCamelContext(camelContext);
+        setEndpointUri(uri);
     }
-    flowableConsumer.getProcessor().process(ex);
-  }
 
-  public Producer createProducer() throws Exception {
-    FlowableProducer producer = new FlowableProducer(this, getTimeout(), getTimeResolution());
-    producer.setRuntimeService(runtimeService);
-    producer.setIdentityService(identityService);
-    producer.setRepositoryService(repositoryService);
-    return producer;
-  }
-
-  public Consumer createConsumer(Processor processor) throws Exception {
-    return new FlowableConsumer(this, processor);
-  }
-  
-  protected void addConsumer(FlowableConsumer consumer) {
-    if (flowableConsumer != null) {
-      throw new FlowableException("Consumer already defined for " + getEndpointUri() + "!");
+    public void process(Exchange ex) throws Exception {
+        if (flowableConsumer == null) {
+            throw new FlowableException("Consumer not defined for " + getEndpointUri());
+        }
+        flowableConsumer.getProcessor().process(ex);
     }
-    flowableConsumer = consumer;
-  }
-  
-  protected void removeConsumer() {
-    flowableConsumer = null;
-  }
 
-  public boolean isSingleton() {
-    return true;
-  }
-  
-  public void setIdentityService(IdentityService identityService) {
-    this.identityService = identityService;
-  }
+    public Producer createProducer() throws Exception {
+        FlowableProducer producer = new FlowableProducer(this, getTimeout(), getTimeResolution());
+        producer.setRuntimeService(runtimeService);
+        producer.setIdentityService(identityService);
+        producer.setRepositoryService(repositoryService);
+        return producer;
+    }
 
-  public void setRuntimeService(RuntimeService runtimeService) {
-    this.runtimeService = runtimeService;
-  }
-  
-  public void setRepositoryService(RepositoryService repositoryService) {
-    this.repositoryService = repositoryService;
-  }
+    public Consumer createConsumer(Processor processor) throws Exception {
+        return new FlowableConsumer(this, processor);
+    }
 
-  public boolean isCopyVariablesToProperties() {
-    return copyVariablesToProperties;
-  }
+    protected void addConsumer(FlowableConsumer consumer) {
+        if (flowableConsumer != null) {
+            throw new FlowableException("Consumer already defined for " + getEndpointUri() + "!");
+        }
+        flowableConsumer = consumer;
+    }
 
-  public void setCopyVariablesToProperties(boolean copyVariablesToProperties) {
-    this.copyVariablesToProperties = copyVariablesToProperties;
-  }
+    protected void removeConsumer() {
+        flowableConsumer = null;
+    }
 
-  public boolean isCopyCamelBodyToBody() {
-    return copyCamelBodyToBody;
-  }
+    public boolean isSingleton() {
+        return true;
+    }
 
-  public void setCopyCamelBodyToBody(boolean copyCamelBodyToBody) {
-    this.copyCamelBodyToBody = copyCamelBodyToBody;
-  }
+    public void setIdentityService(IdentityService identityService) {
+        this.identityService = identityService;
+    }
 
-  public boolean isCopyVariablesToBodyAsMap() {
-    return copyVariablesToBodyAsMap;
-  }
+    public void setRuntimeService(RuntimeService runtimeService) {
+        this.runtimeService = runtimeService;
+    }
 
-  public void setCopyVariablesToBodyAsMap(boolean copyVariablesToBodyAsMap) {
-    this.copyVariablesToBodyAsMap = copyVariablesToBodyAsMap;
-  }
+    public void setRepositoryService(RepositoryService repositoryService) {
+        this.repositoryService = repositoryService;
+    }
 
-  public String getCopyVariablesFromProperties() {
-    return copyVariablesFromProperties ;
-  }
+    public boolean isCopyVariablesToProperties() {
+        return copyVariablesToProperties;
+    }
 
-  
-  public void setCopyVariablesFromProperties(String copyVariablesFromProperties) {
-    this.copyVariablesFromProperties = copyVariablesFromProperties;
-  }
+    public void setCopyVariablesToProperties(boolean copyVariablesToProperties) {
+        this.copyVariablesToProperties = copyVariablesToProperties;
+    }
 
-  public String getCopyVariablesFromHeader() {
-    return copyVariablesFromHeader;
-  }
-  
-  public void setCopyVariablesFromHeader(String copyVariablesFromHeader) {
-    this.copyVariablesFromHeader = copyVariablesFromHeader;
-  }
-  
-  public boolean isCopyCamelBodyToBodyAsString() {
-    return copyCamelBodyToBodyAsString;
-  }
-  
-  public void setCopyCamelBodyToBodyAsString(boolean copyCamelBodyToBodyAsString) {
-    this.copyCamelBodyToBodyAsString = copyCamelBodyToBodyAsString;
-  }
-  
-  public boolean isSetProcessInitiator() {
-    return StringUtils.isNotEmpty(getProcessInitiatorHeaderName());
-  }
-  
-  public Map<String, Object> getReturnVarMap() {
-    return returnVarMap;
-  }
+    public boolean isCopyCamelBodyToBody() {
+        return copyCamelBodyToBody;
+    }
 
-  public void setReturnVarMap(Map<String, Object> returnVarMap) {
-    this.returnVarMap = returnVarMap;
-  }
-  
-  public String getProcessInitiatorHeaderName() {
-    return processInitiatorHeaderName;
-  }
-  
-  public void setProcessInitiatorHeaderName(String processInitiatorHeaderName) {
-    this.processInitiatorHeaderName = processInitiatorHeaderName;
-  }
-  
-  @Override
-  public boolean isLenientProperties() {
-    return true;
-  }
-  
-  public long getTimeout() {
-    return timeout;
-  }
-  
-  public int getTimeResolution() {
-    return timeResolution;
-  }
+    public void setCopyCamelBodyToBody(boolean copyCamelBodyToBody) {
+        this.copyCamelBodyToBody = copyCamelBodyToBody;
+    }
+
+    public boolean isCopyVariablesToBodyAsMap() {
+        return copyVariablesToBodyAsMap;
+    }
+
+    public void setCopyVariablesToBodyAsMap(boolean copyVariablesToBodyAsMap) {
+        this.copyVariablesToBodyAsMap = copyVariablesToBodyAsMap;
+    }
+
+    public String getCopyVariablesFromProperties() {
+        return copyVariablesFromProperties;
+    }
+
+    public void setCopyVariablesFromProperties(String copyVariablesFromProperties) {
+        this.copyVariablesFromProperties = copyVariablesFromProperties;
+    }
+
+    public String getCopyVariablesFromHeader() {
+        return copyVariablesFromHeader;
+    }
+
+    public void setCopyVariablesFromHeader(String copyVariablesFromHeader) {
+        this.copyVariablesFromHeader = copyVariablesFromHeader;
+    }
+
+    public boolean isCopyCamelBodyToBodyAsString() {
+        return copyCamelBodyToBodyAsString;
+    }
+
+    public void setCopyCamelBodyToBodyAsString(boolean copyCamelBodyToBodyAsString) {
+        this.copyCamelBodyToBodyAsString = copyCamelBodyToBodyAsString;
+    }
+
+    public boolean isSetProcessInitiator() {
+        return StringUtils.isNotEmpty(getProcessInitiatorHeaderName());
+    }
+
+    public Map<String, Object> getReturnVarMap() {
+        return returnVarMap;
+    }
+
+    public void setReturnVarMap(Map<String, Object> returnVarMap) {
+        this.returnVarMap = returnVarMap;
+    }
+
+    public String getProcessInitiatorHeaderName() {
+        return processInitiatorHeaderName;
+    }
+
+    public void setProcessInitiatorHeaderName(String processInitiatorHeaderName) {
+        this.processInitiatorHeaderName = processInitiatorHeaderName;
+    }
+
+    @Override
+    public boolean isLenientProperties() {
+        return true;
+    }
+
+    public long getTimeout() {
+        return timeout;
+    }
+
+    public int getTimeResolution() {
+        return timeResolution;
+    }
 
 }

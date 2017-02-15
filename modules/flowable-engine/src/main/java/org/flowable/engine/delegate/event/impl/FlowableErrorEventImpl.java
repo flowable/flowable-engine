@@ -22,28 +22,28 @@ import org.flowable.engine.delegate.event.FlowableErrorEvent;
  */
 public class FlowableErrorEventImpl extends FlowableActivityEventImpl implements FlowableErrorEvent {
 
-  protected String errorId;
-  protected String errorCode;
+    protected String errorId;
+    protected String errorCode;
 
-  public FlowableErrorEventImpl(FlowableEngineEventType type) {
-    super(type);
-  }
-  
-  public String getErrorId() {
-    return errorId;
-  }
+    public FlowableErrorEventImpl(FlowableEngineEventType type) {
+        super(type);
+    }
 
-  public void setErrorId(String errorId) {
-    this.errorId = errorId;
-  }
+    public String getErrorId() {
+        return errorId;
+    }
 
-  public void setErrorCode(String errorCode) {
-    this.errorCode = errorCode;
-  }
+    public void setErrorId(String errorId) {
+        this.errorId = errorId;
+    }
 
-  @Override
-  public String getErrorCode() {
-    return errorCode;
-  }
+    public void setErrorCode(String errorCode) {
+        this.errorCode = errorCode;
+    }
+
+    @Override
+    public String getErrorCode() {
+        return errorCode;
+    }
 
 }

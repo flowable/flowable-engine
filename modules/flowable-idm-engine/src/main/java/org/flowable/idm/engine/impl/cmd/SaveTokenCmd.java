@@ -26,28 +26,28 @@ import org.flowable.idm.engine.impl.persistence.entity.TokenEntity;
  */
 public class SaveTokenCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected Token token;
+    private static final long serialVersionUID = 1L;
+    protected Token token;
 
-  public SaveTokenCmd(Token token) {
-    this.token = token;
-  }
-
-  public Void execute(CommandContext commandContext) {
-    if (token == null) {
-      throw new FlowableIllegalArgumentException("token is null");
-    }
-    
-    if (commandContext.getTokenEntityManager().isNewToken(token)) {
-      if (token instanceof TokenEntity) {
-        commandContext.getTokenEntityManager().insert((TokenEntity) token, true);
-      } else {
-        commandContext.getDbSqlSession().insert((Entity) token);
-      }
-    } else {
-      commandContext.getTokenEntityManager().updateToken(token);
+    public SaveTokenCmd(Token token) {
+        this.token = token;
     }
 
-    return null;
-  }
+    public Void execute(CommandContext commandContext) {
+        if (token == null) {
+            throw new FlowableIllegalArgumentException("token is null");
+        }
+
+        if (commandContext.getTokenEntityManager().isNewToken(token)) {
+            if (token instanceof TokenEntity) {
+                commandContext.getTokenEntityManager().insert((TokenEntity) token, true);
+            } else {
+                commandContext.getDbSqlSession().insert((Entity) token);
+            }
+        } else {
+            commandContext.getTokenEntityManager().updateToken(token);
+        }
+
+        return null;
+    }
 }

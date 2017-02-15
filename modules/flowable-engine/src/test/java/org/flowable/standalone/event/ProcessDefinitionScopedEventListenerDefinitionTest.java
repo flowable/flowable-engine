@@ -33,119 +33,119 @@ import org.flowable.engine.test.api.event.TestFlowableEventListener;
  */
 public class ProcessDefinitionScopedEventListenerDefinitionTest extends ResourceFlowableTestCase {
 
-  public ProcessDefinitionScopedEventListenerDefinitionTest() {
-    super("org/flowable/standalone/event/flowable-eventlistener.cfg.xml");
-  }
-
-  protected TestFlowableEventListener testListenerBean;
-
-  /**
-   * Test to verify listeners defined in the BPMN xml are added to the process definition and are active.
-   */
-  @Deployment
-  public void testProcessDefinitionListenerDefinition() throws Exception {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testEventListeners");
-    assertNotNull(testListenerBean);
-
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    taskService.complete(task.getId());
-
-    // Check if the listener (defined as bean) received events (only creation, not other events)
-    assertFalse(testListenerBean.getEventsReceived().isEmpty());
-    for (FlowableEvent event : testListenerBean.getEventsReceived()) {
-      assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
+    public ProcessDefinitionScopedEventListenerDefinitionTest() {
+        super("org/flowable/standalone/event/flowable-eventlistener.cfg.xml");
     }
 
-    // First event received should be creation of Process-instance
-    assertTrue(testListenerBean.getEventsReceived().get(0) instanceof FlowableEntityEvent);
-    FlowableEntityEvent event = (FlowableEntityEvent) testListenerBean.getEventsReceived().get(0);
-    assertTrue(event.getEntity() instanceof ProcessInstance);
-    assertEquals(processInstance.getId(), ((ProcessInstance) event.getEntity()).getId());
+    protected TestFlowableEventListener testListenerBean;
 
-    // Check if listener, defined by classname, received all events
-    List<FlowableEvent> events = StaticTestFlowableEventListener.getEventsReceived();
-    assertFalse(events.isEmpty());
+    /**
+     * Test to verify listeners defined in the BPMN xml are added to the process definition and are active.
+     */
+    @Deployment
+    public void testProcessDefinitionListenerDefinition() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testEventListeners");
+        assertNotNull(testListenerBean);
 
-    boolean insertFound = false;
-    boolean deleteFound = false;
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
 
-    for (FlowableEvent e : events) {
-      if (FlowableEngineEventType.ENTITY_CREATED == e.getType()) {
-        insertFound = true;
-      } else if (FlowableEngineEventType.ENTITY_DELETED == e.getType()) {
-        deleteFound = true;
-      }
+        // Check if the listener (defined as bean) received events (only creation, not other events)
+        assertFalse(testListenerBean.getEventsReceived().isEmpty());
+        for (FlowableEvent event : testListenerBean.getEventsReceived()) {
+            assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
+        }
+
+        // First event received should be creation of Process-instance
+        assertTrue(testListenerBean.getEventsReceived().get(0) instanceof FlowableEntityEvent);
+        FlowableEntityEvent event = (FlowableEntityEvent) testListenerBean.getEventsReceived().get(0);
+        assertTrue(event.getEntity() instanceof ProcessInstance);
+        assertEquals(processInstance.getId(), ((ProcessInstance) event.getEntity()).getId());
+
+        // Check if listener, defined by classname, received all events
+        List<FlowableEvent> events = StaticTestFlowableEventListener.getEventsReceived();
+        assertFalse(events.isEmpty());
+
+        boolean insertFound = false;
+        boolean deleteFound = false;
+
+        for (FlowableEvent e : events) {
+            if (FlowableEngineEventType.ENTITY_CREATED == e.getType()) {
+                insertFound = true;
+            } else if (FlowableEngineEventType.ENTITY_DELETED == e.getType()) {
+                deleteFound = true;
+            }
+        }
+        assertTrue(insertFound);
+        assertTrue(deleteFound);
     }
-    assertTrue(insertFound);
-    assertTrue(deleteFound);
-  }
 
-  /**
-   * Test to verify listeners defined in the BPMN xml with invalid class/delegateExpression values cause an exception when process is started.
-   */
-  public void testProcessDefinitionListenerDefinitionError() throws Exception {
+    /**
+     * Test to verify listeners defined in the BPMN xml with invalid class/delegateExpression values cause an exception when process is started.
+     */
+    public void testProcessDefinitionListenerDefinitionError() throws Exception {
 
-    // Deploy process with expression which references an unexisting bean
-    org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/standalone/event/invalidEventListenerExpression.bpmn20.xml").deploy();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testInvalidEventExpression");
-    assertNotNull(processInstance);
-    repositoryService.deleteDeployment(deployment.getId(), true);
-
-    // Deploy process with listener which references an unexisting class
-    deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/standalone/event/invalidEventListenerClass.bpmn20.xml").deploy();
-    processInstance = runtimeService.startProcessInstanceByKey("testInvalidEventClass");
-    repositoryService.deleteDeployment(deployment.getId(), true);
-  }
-
-  /**
-   * Test to verify if event listeners defined in the BPMN XML which have illegal event-types cause an exception on deploy.
-   */
-  public void testProcessDefinitionListenerDefinitionIllegalType() throws Exception {
-    // In case deployment doesn't fail, we delete the deployment in the
-    // finally block to
-    // ensure clean DB for subsequent tests
-    org.flowable.engine.repository.Deployment deployment = null;
-    try {
-
-      deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/standalone/event/invalidEventListenerType.bpmn20.xml").deploy();
-
-      fail("Exception expected");
-
-    } catch (FlowableException ae) {
-      assertTrue(ae instanceof FlowableIllegalArgumentException);
-      assertEquals("Invalid event-type: invalid", ae.getMessage());
-    } finally {
-      if (deployment != null) {
+        // Deploy process with expression which references an unexisting bean
+        org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/standalone/event/invalidEventListenerExpression.bpmn20.xml").deploy();
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testInvalidEventExpression");
+        assertNotNull(processInstance);
         repositoryService.deleteDeployment(deployment.getId(), true);
-      }
+
+        // Deploy process with listener which references an unexisting class
+        deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/standalone/event/invalidEventListenerClass.bpmn20.xml").deploy();
+        processInstance = runtimeService.startProcessInstanceByKey("testInvalidEventClass");
+        repositoryService.deleteDeployment(deployment.getId(), true);
     }
-  }
 
-  /**
-   * Test to verify listeners defined in the BPMN xml are added to the process definition and are active, for all entity types
-   */
-  @Deployment
-  public void testProcessDefinitionListenerDefinitionEntities() throws Exception {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testEventListeners");
-    assertNotNull(processInstance);
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertNotNull(task);
+    /**
+     * Test to verify if event listeners defined in the BPMN XML which have illegal event-types cause an exception on deploy.
+     */
+    public void testProcessDefinitionListenerDefinitionIllegalType() throws Exception {
+        // In case deployment doesn't fail, we delete the deployment in the
+        // finally block to
+        // ensure clean DB for subsequent tests
+        org.flowable.engine.repository.Deployment deployment = null;
+        try {
 
-    // Attachment entity
-    TestFlowableEventListener theListener = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("testAttachmentEventListener");
-    assertNotNull(theListener);
-    assertEquals(0, theListener.getEventsReceived().size());
+            deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/standalone/event/invalidEventListenerType.bpmn20.xml").deploy();
 
-    taskService.createAttachment("test", task.getId(), processInstance.getId(), "test", "test", "url");
-    assertEquals(2, theListener.getEventsReceived().size());
-    assertEquals(FlowableEngineEventType.ENTITY_CREATED, theListener.getEventsReceived().get(0).getType());
-    assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, theListener.getEventsReceived().get(1).getType());
+            fail("Exception expected");
 
-  }
+        } catch (FlowableException ae) {
+            assertTrue(ae instanceof FlowableIllegalArgumentException);
+            assertEquals("Invalid event-type: invalid", ae.getMessage());
+        } finally {
+            if (deployment != null) {
+                repositoryService.deleteDeployment(deployment.getId(), true);
+            }
+        }
+    }
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-    testListenerBean = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("testEventListener");
-  }
+    /**
+     * Test to verify listeners defined in the BPMN xml are added to the process definition and are active, for all entity types
+     */
+    @Deployment
+    public void testProcessDefinitionListenerDefinitionEntities() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testEventListeners");
+        assertNotNull(processInstance);
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+
+        // Attachment entity
+        TestFlowableEventListener theListener = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("testAttachmentEventListener");
+        assertNotNull(theListener);
+        assertEquals(0, theListener.getEventsReceived().size());
+
+        taskService.createAttachment("test", task.getId(), processInstance.getId(), "test", "test", "url");
+        assertEquals(2, theListener.getEventsReceived().size());
+        assertEquals(FlowableEngineEventType.ENTITY_CREATED, theListener.getEventsReceived().get(0).getType());
+        assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, theListener.getEventsReceived().get(1).getType());
+
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        testListenerBean = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("testEventListener");
+    }
 }

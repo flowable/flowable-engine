@@ -66,7 +66,7 @@ public class DmnDefinition extends NamedElement {
     public void addDecision(Decision decision) {
         this.decisions.add(decision);
     }
-    
+
     public Decision getDecisionById(String id) {
         for (Decision decision : decisions) {
             if (id.equals(decision.getId())) {

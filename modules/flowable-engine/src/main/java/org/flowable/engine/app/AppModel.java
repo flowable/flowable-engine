@@ -14,49 +14,49 @@ package org.flowable.engine.app;
 
 public class AppModel {
 
-  protected String key;
-  protected String name;
-  protected String description;
-  protected String theme;
-  protected String icon;
+    protected String key;
+    protected String name;
+    protected String description;
+    protected String theme;
+    protected String icon;
 
-  public String getKey() {
-    return key;
-  }
+    public String getKey() {
+        return key;
+    }
 
-  public void setKey(String key) {
-    this.key = key;
-  }
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public String getDescription() {
-    return description;
-  }
+    public String getDescription() {
+        return description;
+    }
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-  public String getTheme() {
-    return theme;
-  }
+    public String getTheme() {
+        return theme;
+    }
 
-  public void setTheme(String theme) {
-    this.theme = theme;
-  }
+    public void setTheme(String theme) {
+        this.theme = theme;
+    }
 
-  public String getIcon() {
-    return icon;
-  }
+    public String getIcon() {
+        return icon;
+    }
 
-  public void setIcon(String icon) {
-    this.icon = icon;
-  }
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
 }

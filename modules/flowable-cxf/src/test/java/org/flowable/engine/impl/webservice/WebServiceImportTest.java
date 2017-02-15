@@ -23,9 +23,9 @@ public class WebServiceImportTest extends AbstractWebServiceTaskTest {
 
     @Deployment
     public void testImport() throws Exception {
-      
-      processEngine.getRuntimeService().startProcessInstanceByKey("webServiceInvocationImport");
-      waitForJobExecutorToProcessAllJobs(10000L, 250L);
+
+        processEngine.getRuntimeService().startProcessInstanceByKey("webServiceInvocationImport");
+        waitForJobExecutorToProcessAllJobs(10000L, 250L);
 
     }
 

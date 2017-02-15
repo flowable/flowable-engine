@@ -27,36 +27,36 @@ public interface FormRepositoryService {
     FormDeploymentBuilder createDeployment();
 
     void deleteDeployment(String deploymentId);
-    
+
     FormDefinitionQuery createFormDefinitionQuery();
-    
+
     NativeFormDefinitionQuery createNativeFormDefinitionQuery();
 
     void setDeploymentCategory(String deploymentId, String category);
-    
+
     void setDeploymentTenantId(String deploymentId, String newTenantId);
 
     List<String> getDeploymentResourceNames(String deploymentId);
 
     InputStream getResourceAsStream(String deploymentId, String resourceName);
-    
+
     FormDeploymentQuery createDeploymentQuery();
-    
+
     NativeFormDeploymentQuery createNativeDeploymentQuery();
-    
+
     FormDefinition getFormDefinition(String formDefinitionId);
 
     FormModel getFormModelById(String formDefinitionId);
-    
+
     FormModel getFormModelByKey(String formDefinitionKey);
-    
+
     FormModel getFormModelByKey(String formDefinitionKey, String tenantId);
-    
+
     FormModel getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId);
-    
+
     FormModel getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String tenantId);
-    
+
     InputStream getFormDefinitionResource(String formDefinitionId);
-    
+
     void setFormDefinitionCategory(String formDefinitionId, String category);
 }

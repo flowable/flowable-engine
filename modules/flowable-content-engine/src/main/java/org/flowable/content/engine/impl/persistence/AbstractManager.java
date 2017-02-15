@@ -22,26 +22,26 @@ import org.flowable.content.engine.impl.interceptor.CommandContext;
  * @author Joram Barrez
  */
 public abstract class AbstractManager {
-  
-  protected ContentEngineConfiguration contentEngineConfiguration;
-  
-  public AbstractManager(ContentEngineConfiguration contentEngineConfiguration) {
-    this.contentEngineConfiguration = contentEngineConfiguration;
-  }
-  
-  // Command scoped 
-  
-  protected CommandContext getCommandContext() {
-    return Context.getCommandContext();
-  }
 
-  protected <T> T getSession(Class<T> sessionClass) {
-    return getCommandContext().getSession(sessionClass);
-  }
-  
-  // Engine scoped
-  
-  protected ContentEngineConfiguration getContentEngineConfiguration() {
-    return contentEngineConfiguration;
-  }
+    protected ContentEngineConfiguration contentEngineConfiguration;
+
+    public AbstractManager(ContentEngineConfiguration contentEngineConfiguration) {
+        this.contentEngineConfiguration = contentEngineConfiguration;
+    }
+
+    // Command scoped
+
+    protected CommandContext getCommandContext() {
+        return Context.getCommandContext();
+    }
+
+    protected <T> T getSession(Class<T> sessionClass) {
+        return getCommandContext().getSession(sessionClass);
+    }
+
+    // Engine scoped
+
+    protected ContentEngineConfiguration getContentEngineConfiguration() {
+        return contentEngineConfiguration;
+    }
 }

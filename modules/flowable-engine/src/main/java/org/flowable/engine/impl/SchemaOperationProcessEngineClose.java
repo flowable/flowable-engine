@@ -21,8 +21,8 @@ import org.flowable.engine.impl.interceptor.CommandContext;
  */
 public class SchemaOperationProcessEngineClose implements Command<Void> {
 
-  public Void execute(CommandContext commandContext) {
-    commandContext.getDbSqlSession().performSchemaOperationsProcessEngineClose();
-    return null;
-  }
+    public Void execute(CommandContext commandContext) {
+        commandContext.getDbSqlSession().performSchemaOperationsProcessEngineClose();
+        return null;
+    }
 }

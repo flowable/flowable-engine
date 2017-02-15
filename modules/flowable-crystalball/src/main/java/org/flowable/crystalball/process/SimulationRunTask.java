@@ -24,16 +24,16 @@ import org.flowable.engine.delegate.JavaDelegate;
  */
 public class SimulationRunTask implements JavaDelegate {
 
-  private Expression simulationRunExpression;
+    private Expression simulationRunExpression;
 
-  @Override
-  public void execute(DelegateExecution execution) {
-    SimulationRun simulationRun = (SimulationRun) simulationRunExpression.getValue(execution);
-    simulationRun.execute(execution);
-  }
+    @Override
+    public void execute(DelegateExecution execution) {
+        SimulationRun simulationRun = (SimulationRun) simulationRunExpression.getValue(execution);
+        simulationRun.execute(execution);
+    }
 
-  @SuppressWarnings("UnusedDeclaration")
-  public void setSimulationRun(Expression simulationRun) {
-    this.simulationRunExpression = simulationRun;
-  }
+    @SuppressWarnings("UnusedDeclaration")
+    public void setSimulationRun(Expression simulationRun) {
+        this.simulationRunExpression = simulationRun;
+    }
 }

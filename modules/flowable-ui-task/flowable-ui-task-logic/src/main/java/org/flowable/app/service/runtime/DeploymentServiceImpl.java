@@ -29,18 +29,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class DeploymentServiceImpl implements DeploymentService {
 
-  @Autowired
-  protected RepositoryService repositoryService;
- 
+    @Autowired
+    protected RepositoryService repositoryService;
 
-  @Override
-  public void deleteAppDefinition(Long appDefinitionId) {
-    // First test if deployment is still there, otherwise the transaction will be rolled back
-    List<Deployment> deployments = repositoryService.createDeploymentQuery().deploymentKey(String.valueOf(appDefinitionId)).list();
-    if (deployments != null) {
-      for (Deployment deployment : deployments) {
-        repositoryService.deleteDeployment(deployment.getId(), true);
-      }
+    @Override
+    public void deleteAppDefinition(Long appDefinitionId) {
+        // First test if deployment is still there, otherwise the transaction will be rolled back
+        List<Deployment> deployments = repositoryService.createDeploymentQuery().deploymentKey(String.valueOf(appDefinitionId)).list();
+        if (deployments != null) {
+            for (Deployment deployment : deployments) {
+                repositoryService.deleteDeployment(deployment.getId(), true);
+            }
+        }
     }
-  }
 }

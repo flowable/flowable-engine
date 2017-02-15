@@ -21,57 +21,57 @@ import org.flowable.engine.common.impl.db.HasRevision;
  */
 public abstract class AbstractEntity implements Entity, HasRevision {
 
-  protected String id;
-  protected int revision = 1;
-  
-  protected boolean isInserted;
-  protected boolean isUpdated;
-  protected boolean isDeleted;
-  
-  @Override
-  public String getId() {
-    return id;
-  }
-  
-  @Override
-  public void setId(String id) {
-    this.id = id;
-  }
-  
-  public int getRevisionNext() {
-    return revision + 1;
-  }
+    protected String id;
+    protected int revision = 1;
 
-  public int getRevision() {
-    return revision;
-  }
+    protected boolean isInserted;
+    protected boolean isUpdated;
+    protected boolean isDeleted;
 
-  public void setRevision(int revision) {
-    this.revision = revision;
-  }
+    @Override
+    public String getId() {
+        return id;
+    }
 
-  public boolean isInserted() {
-    return isInserted;
-  }
+    @Override
+    public void setId(String id) {
+        this.id = id;
+    }
 
-  public void setInserted(boolean isInserted) {
-    this.isInserted = isInserted;
-  }
+    public int getRevisionNext() {
+        return revision + 1;
+    }
 
-  public boolean isUpdated() {
-    return isUpdated;
-  }
+    public int getRevision() {
+        return revision;
+    }
 
-  public void setUpdated(boolean isUpdated) {
-    this.isUpdated = isUpdated;
-  }
+    public void setRevision(int revision) {
+        this.revision = revision;
+    }
 
-  public boolean isDeleted() {
-    return isDeleted;
-  }
+    public boolean isInserted() {
+        return isInserted;
+    }
 
-  public void setDeleted(boolean isDeleted) {
-    this.isDeleted = isDeleted;
-  }
-  
+    public void setInserted(boolean isInserted) {
+        this.isInserted = isInserted;
+    }
+
+    public boolean isUpdated() {
+        return isUpdated;
+    }
+
+    public void setUpdated(boolean isUpdated) {
+        this.isUpdated = isUpdated;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
 }

@@ -22,9 +22,9 @@ import org.flowable.engine.event.EventLogEntry;
  * @author martin.grofcik
  */
 public abstract class EventLog2SimulationEventFunction implements Function<EventLogEntry, SimulationEvent> {
-  protected final String simulationEventType;
+    protected final String simulationEventType;
 
-  public EventLog2SimulationEventFunction(String simulationEventType) {
-    this.simulationEventType = simulationEventType;
-  }
+    public EventLog2SimulationEventFunction(String simulationEventType) {
+        this.simulationEventType = simulationEventType;
+    }
 }

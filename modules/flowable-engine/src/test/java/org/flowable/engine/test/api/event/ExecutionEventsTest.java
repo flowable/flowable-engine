@@ -27,121 +27,121 @@ import org.flowable.engine.test.Deployment;
  */
 public class ExecutionEventsTest extends PluggableFlowableTestCase {
 
-  private TestFlowableEntityEventListener listener;
+    private TestFlowableEntityEventListener listener;
 
-  /**
-   * Test create, update and delete events of process instances.
-   */
-  @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
-  public void testExecutionEvents() throws Exception {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    /**
+     * Test create, update and delete events of process instances.
+     */
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testExecutionEvents() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-    assertNotNull(processInstance);
+        assertNotNull(processInstance);
 
-    // Check create-event
-    assertEquals(6, listener.getEventsReceived().size());
-    assertTrue(listener.getEventsReceived().get(0) instanceof FlowableEntityEvent);
+        // Check create-event
+        assertEquals(6, listener.getEventsReceived().size());
+        assertTrue(listener.getEventsReceived().get(0) instanceof FlowableEntityEvent);
 
-    FlowableEntityEvent event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
-    assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
-    assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
+        FlowableEntityEvent event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+        assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
+        assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
 
-    event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
-    assertEquals(FlowableEngineEventType.PROCESS_CREATED, event.getType());
-    assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
+        assertEquals(FlowableEngineEventType.PROCESS_CREATED, event.getType());
+        assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
 
-    event = (FlowableEntityEvent) listener.getEventsReceived().get(2);
-    assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
-    assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
-    
-    event = (FlowableEntityEvent) listener.getEventsReceived().get(3);
-    assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
-    assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(2);
+        assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+        assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
 
-    event = (FlowableEntityEvent) listener.getEventsReceived().get(4);
-    assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
-    assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
-    listener.clearEventsReceived();
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(3);
+        assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
+        assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
 
-    // Check update event when suspended/activated
-    runtimeService.suspendProcessInstanceById(processInstance.getId());
-    runtimeService.activateProcessInstanceById(processInstance.getId());
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(4);
+        assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+        assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
+        listener.clearEventsReceived();
 
-    assertEquals(4, listener.getEventsReceived().size());
-    event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
-    assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
-    assertEquals(FlowableEngineEventType.ENTITY_SUSPENDED, event.getType());
-    
-    event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
-    assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
-    assertEquals(FlowableEngineEventType.ENTITY_SUSPENDED, event.getType());
-    
-    event = (FlowableEntityEvent) listener.getEventsReceived().get(2);
-    assertEquals(FlowableEngineEventType.ENTITY_ACTIVATED, event.getType());
-    assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
-    
-    event = (FlowableEntityEvent) listener.getEventsReceived().get(3);
-    assertEquals(FlowableEngineEventType.ENTITY_ACTIVATED, event.getType());
-    assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
-    
-    listener.clearEventsReceived();
+        // Check update event when suspended/activated
+        runtimeService.suspendProcessInstanceById(processInstance.getId());
+        runtimeService.activateProcessInstanceById(processInstance.getId());
 
-    // Check update event when process-definition is suspended (should
-    // cascade suspend/activate all process instances)
-    repositoryService.suspendProcessDefinitionById(processInstance.getProcessDefinitionId(), true, null);
-    repositoryService.activateProcessDefinitionById(processInstance.getProcessDefinitionId(), true, null);
+        assertEquals(4, listener.getEventsReceived().size());
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+        assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
+        assertEquals(FlowableEngineEventType.ENTITY_SUSPENDED, event.getType());
 
-    assertEquals(4, listener.getEventsReceived().size());
-    
-    event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
-    assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
-    assertEquals(FlowableEngineEventType.ENTITY_SUSPENDED, event.getType());
-    
-    event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
-    assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
-    assertEquals(FlowableEngineEventType.ENTITY_SUSPENDED, event.getType());
-    
-    event = (FlowableEntityEvent) listener.getEventsReceived().get(2);
-    assertEquals(FlowableEngineEventType.ENTITY_ACTIVATED, event.getType());
-    assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
-    
-    event = (FlowableEntityEvent) listener.getEventsReceived().get(3);
-    assertEquals(FlowableEngineEventType.ENTITY_ACTIVATED, event.getType());
-    assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
-    
-    listener.clearEventsReceived();
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
+        assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
+        assertEquals(FlowableEngineEventType.ENTITY_SUSPENDED, event.getType());
 
-    // Check update-event when business-key is updated
-    runtimeService.updateBusinessKey(processInstance.getId(), "thekey");
-    assertEquals(1, listener.getEventsReceived().size());
-    event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
-    assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getId());
-    assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
-    listener.clearEventsReceived();
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(2);
+        assertEquals(FlowableEngineEventType.ENTITY_ACTIVATED, event.getType());
+        assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
 
-    runtimeService.deleteProcessInstance(processInstance.getId(), "Testing events");
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(3);
+        assertEquals(FlowableEngineEventType.ENTITY_ACTIVATED, event.getType());
+        assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
 
-    event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
-    assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
-    assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
-    listener.clearEventsReceived();
-  }
+        listener.clearEventsReceived();
 
-  @Override
-  protected void initializeServices() {
-    super.initializeServices();
+        // Check update event when process-definition is suspended (should
+        // cascade suspend/activate all process instances)
+        repositoryService.suspendProcessDefinitionById(processInstance.getProcessDefinitionId(), true, null);
+        repositoryService.activateProcessDefinitionById(processInstance.getProcessDefinitionId(), true, null);
 
-    listener = new TestFlowableEntityEventListener(Execution.class);
-    processEngineConfiguration.getEventDispatcher().addEventListener(listener);
-  }
+        assertEquals(4, listener.getEventsReceived().size());
 
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+        assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
+        assertEquals(FlowableEngineEventType.ENTITY_SUSPENDED, event.getType());
 
-    if (listener != null) {
-      listener.clearEventsReceived();
-      processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
+        assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
+        assertEquals(FlowableEngineEventType.ENTITY_SUSPENDED, event.getType());
+
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(2);
+        assertEquals(FlowableEngineEventType.ENTITY_ACTIVATED, event.getType());
+        assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
+
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(3);
+        assertEquals(FlowableEngineEventType.ENTITY_ACTIVATED, event.getType());
+        assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
+
+        listener.clearEventsReceived();
+
+        // Check update-event when business-key is updated
+        runtimeService.updateBusinessKey(processInstance.getId(), "thekey");
+        assertEquals(1, listener.getEventsReceived().size());
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+        assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getId());
+        assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
+        listener.clearEventsReceived();
+
+        runtimeService.deleteProcessInstance(processInstance.getId(), "Testing events");
+
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+        assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
+        assertEquals(processInstance.getId(), ((Execution) event.getEntity()).getProcessInstanceId());
+        listener.clearEventsReceived();
     }
-  }
+
+    @Override
+    protected void initializeServices() {
+        super.initializeServices();
+
+        listener = new TestFlowableEntityEventListener(Execution.class);
+        processEngineConfiguration.getEventDispatcher().addEventListener(listener);
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+
+        if (listener != null) {
+            listener.clearEventsReceived();
+            processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
+        }
+    }
 }

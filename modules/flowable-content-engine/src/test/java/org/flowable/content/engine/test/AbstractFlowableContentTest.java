@@ -30,23 +30,23 @@ import org.junit.Rule;
  */
 public class AbstractFlowableContentTest {
 
-  public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowablecontent;DB_CLOSE_DELAY=1000";
+    public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowablecontent;DB_CLOSE_DELAY=1000";
 
-  @Rule
-  public FlowableContentRule rule = new FlowableContentRule();
+    @Rule
+    public FlowableContentRule rule = new FlowableContentRule();
 
-  protected static ContentEngine cachedContentEngine;
-  protected ContentEngineConfiguration contentEngineConfiguration;
-  protected ContentService contentService;
+    protected static ContentEngine cachedContentEngine;
+    protected ContentEngineConfiguration contentEngineConfiguration;
+    protected ContentService contentService;
 
-  @Before
-  public void initFormEngine() {
-    if (cachedContentEngine == null) {
-      cachedContentEngine = rule.getContentEngine();
+    @Before
+    public void initFormEngine() {
+        if (cachedContentEngine == null) {
+            cachedContentEngine = rule.getContentEngine();
+        }
+
+        this.contentEngineConfiguration = cachedContentEngine.getContentEngineConfiguration();
+        this.contentService = cachedContentEngine.getContentService();
     }
-
-    this.contentEngineConfiguration = cachedContentEngine.getContentEngineConfiguration();
-    this.contentService = cachedContentEngine.getContentService();
-  }
 
 }

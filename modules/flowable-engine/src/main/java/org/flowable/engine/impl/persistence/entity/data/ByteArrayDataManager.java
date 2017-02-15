@@ -21,9 +21,9 @@ import org.flowable.engine.impl.persistence.entity.ByteArrayEntity;
  * @author Joram Barrez
  */
 public interface ByteArrayDataManager extends DataManager<ByteArrayEntity> {
-  
-  List<ByteArrayEntity> findAll();
-  
-  void deleteByteArrayNoRevisionCheck(String byteArrayEntityId);
-  
+
+    List<ByteArrayEntity> findAll();
+
+    void deleteByteArrayNoRevisionCheck(String byteArrayEntityId);
+
 }

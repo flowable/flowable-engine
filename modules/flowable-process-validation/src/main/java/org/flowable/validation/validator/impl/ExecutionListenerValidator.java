@@ -29,26 +29,26 @@ import org.flowable.validation.validator.ProcessLevelValidator;
  */
 public class ExecutionListenerValidator extends ProcessLevelValidator {
 
-  @Override
-  protected void executeValidation(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
+    @Override
+    protected void executeValidation(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
 
-    validateListeners(process, process, process.getExecutionListeners(), errors);
+        validateListeners(process, process, process.getExecutionListeners(), errors);
 
-    for (FlowElement flowElement : process.getFlowElements()) {
-      validateListeners(process, flowElement, flowElement.getExecutionListeners(), errors);
-    }
-  }
-
-  protected void validateListeners(Process process, BaseElement baseElement, List<FlowableListener> listeners, List<ValidationError> errors) {
-    if (listeners != null) {
-      for (FlowableListener listener : listeners) {
-        if (listener.getImplementation() == null || listener.getImplementationType() == null) {
-          addError(errors, Problems.EXECUTION_LISTENER_IMPLEMENTATION_MISSING, process, baseElement, "Element 'class' or 'expression' is mandatory on executionListener");
+        for (FlowElement flowElement : process.getFlowElements()) {
+            validateListeners(process, flowElement, flowElement.getExecutionListeners(), errors);
         }
-        if (listener.getOnTransaction() != null && ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equals(listener.getImplementationType())) {
-          addError(errors, Problems.EXECUTION_LISTENER_INVALID_IMPLEMENTATION_TYPE, process, baseElement, "Expression cannot be used when using 'onTransaction'");
-        }
-      }
     }
-  }
+
+    protected void validateListeners(Process process, BaseElement baseElement, List<FlowableListener> listeners, List<ValidationError> errors) {
+        if (listeners != null) {
+            for (FlowableListener listener : listeners) {
+                if (listener.getImplementation() == null || listener.getImplementationType() == null) {
+                    addError(errors, Problems.EXECUTION_LISTENER_IMPLEMENTATION_MISSING, process, baseElement, "Element 'class' or 'expression' is mandatory on executionListener");
+                }
+                if (listener.getOnTransaction() != null && ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equals(listener.getImplementationType())) {
+                    addError(errors, Problems.EXECUTION_LISTENER_INVALID_IMPLEMENTATION_TYPE, process, baseElement, "Expression cannot be used when using 'onTransaction'");
+                }
+            }
+        }
+    }
 }

@@ -23,36 +23,36 @@ import org.springframework.stereotype.Service;
 @Service
 public class BaseFlowableModelService {
 
-  protected static final String PROCESS_NOT_FOUND_MESSAGE_KEY = "PROCESS.ERROR.NOT-FOUND";
+    protected static final String PROCESS_NOT_FOUND_MESSAGE_KEY = "PROCESS.ERROR.NOT-FOUND";
 
-  @Autowired
-  protected ModelRepository modelRepository;
+    @Autowired
+    protected ModelRepository modelRepository;
 
-  @Autowired
-  protected ModelHistoryRepository modelHistoryRepository;
+    @Autowired
+    protected ModelHistoryRepository modelHistoryRepository;
 
-  protected Model getModel(String modelId, boolean checkRead, boolean checkEdit) {
-    Model model = modelRepository.get(modelId);
+    protected Model getModel(String modelId, boolean checkRead, boolean checkEdit) {
+        Model model = modelRepository.get(modelId);
 
-    if (model == null) {
-      NotFoundException processNotFound = new NotFoundException("No model found with the given id: " + modelId);
-      processNotFound.setMessageKey(PROCESS_NOT_FOUND_MESSAGE_KEY);
-      throw processNotFound;
+        if (model == null) {
+            NotFoundException processNotFound = new NotFoundException("No model found with the given id: " + modelId);
+            processNotFound.setMessageKey(PROCESS_NOT_FOUND_MESSAGE_KEY);
+            throw processNotFound;
+        }
+
+        return model;
     }
 
-    return model;
-  }
+    protected ModelHistory getModelHistory(String modelId, String modelHistoryId, boolean checkRead, boolean checkEdit) {
+        // Check if the user has read-rights on the process-model in order to fetch history
+        Model model = getModel(modelId, checkRead, checkEdit);
+        ModelHistory modelHistory = modelHistoryRepository.get(modelHistoryId);
 
-  protected ModelHistory getModelHistory(String modelId, String modelHistoryId, boolean checkRead, boolean checkEdit) {
-    // Check if the user has read-rights on the process-model in order to fetch history
-    Model model = getModel(modelId, checkRead, checkEdit);
-    ModelHistory modelHistory = modelHistoryRepository.get(modelHistoryId);
-
-    // Check if history corresponds to the current model and is not deleted
-    if (modelHistory == null || modelHistory.getRemovalDate() != null || !modelHistory.getModelId().equals(model.getId())) {
-      throw new NotFoundException("Model history not found: " + modelHistoryId);
+        // Check if history corresponds to the current model and is not deleted
+        if (modelHistory == null || modelHistory.getRemovalDate() != null || !modelHistory.getModelId().equals(model.getId())) {
+            throw new NotFoundException("Model history not found: " + modelHistoryId);
+        }
+        return modelHistory;
     }
-    return modelHistory;
-  }
-  
+
 }

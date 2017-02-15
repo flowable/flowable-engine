@@ -43,84 +43,84 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Transactional
 public class FlowableFormService {
 
-  private static final Logger logger = LoggerFactory.getLogger(FlowableFormService.class);
+    private static final Logger logger = LoggerFactory.getLogger(FlowableFormService.class);
 
-  @Autowired
-  protected ModelService modelService;
+    @Autowired
+    protected ModelService modelService;
 
-  @Autowired
-  protected ObjectMapper objectMapper;
+    @Autowired
+    protected ObjectMapper objectMapper;
 
-  public FormRepresentation getForm(String formId) {
-    Model model = modelService.getModel(formId);
-    FormRepresentation form = createFormRepresentation(model);
-    return form;
-  }
-  
-  public FormRepresentation getFormHistory(String formId, String formHistoryId) {
-    ModelHistory model = modelService.getModelHistory(formId, formHistoryId);
-    FormRepresentation form = createFormRepresentation(model);
-    return form;
-  }
-  
-  public List<FormRepresentation> getForms(String[] formIds) {
-    List<FormRepresentation> formRepresentations = new ArrayList<FormRepresentation>();
-
-    if (formIds == null || formIds.length == 0) {
-      throw new BadRequestException("No formIds provided in the request");
+    public FormRepresentation getForm(String formId) {
+        Model model = modelService.getModel(formId);
+        FormRepresentation form = createFormRepresentation(model);
+        return form;
     }
 
-    for (String formId : formIds) {
-      Model model = modelService.getModel(formId);
-
-      FormRepresentation form = createFormRepresentation(model);
-      formRepresentations.add(form);
+    public FormRepresentation getFormHistory(String formId, String formHistoryId) {
+        ModelHistory model = modelService.getModelHistory(formId, formHistoryId);
+        FormRepresentation form = createFormRepresentation(model);
+        return form;
     }
 
-    return formRepresentations;
-  }
-  
-  public FormRepresentation saveForm(String formId, FormSaveRepresentation saveRepresentation) {
-    User user = SecurityUtils.getCurrentUserObject();
-    Model model = modelService.getModel(formId);
-    
-    String formKey = saveRepresentation.getFormRepresentation().getKey();
-    ModelKeyRepresentation modelKeyInfo = modelService.validateModelKey(model, model.getModelType(), formKey);
-    if (modelKeyInfo.isKeyAlreadyExists()) {
-      throw new BadRequestException("Model with provided key already exists " + formKey);
+    public List<FormRepresentation> getForms(String[] formIds) {
+        List<FormRepresentation> formRepresentations = new ArrayList<FormRepresentation>();
+
+        if (formIds == null || formIds.length == 0) {
+            throw new BadRequestException("No formIds provided in the request");
+        }
+
+        for (String formId : formIds) {
+            Model model = modelService.getModel(formId);
+
+            FormRepresentation form = createFormRepresentation(model);
+            formRepresentations.add(form);
+        }
+
+        return formRepresentations;
     }
 
-    model.setName(saveRepresentation.getFormRepresentation().getName());
-    model.setKey(formKey);
-    model.setDescription(saveRepresentation.getFormRepresentation().getDescription());
+    public FormRepresentation saveForm(String formId, FormSaveRepresentation saveRepresentation) {
+        User user = SecurityUtils.getCurrentUserObject();
+        Model model = modelService.getModel(formId);
 
-    String editorJson = null;
-    try {
-      editorJson = objectMapper.writeValueAsString(saveRepresentation.getFormRepresentation().getFormDefinition());
-    } catch (Exception e) {
-      logger.error("Error while processing form json", e);
-      throw new InternalServerErrorException("Form could not be saved " + formId);
+        String formKey = saveRepresentation.getFormRepresentation().getKey();
+        ModelKeyRepresentation modelKeyInfo = modelService.validateModelKey(model, model.getModelType(), formKey);
+        if (modelKeyInfo.isKeyAlreadyExists()) {
+            throw new BadRequestException("Model with provided key already exists " + formKey);
+        }
+
+        model.setName(saveRepresentation.getFormRepresentation().getName());
+        model.setKey(formKey);
+        model.setDescription(saveRepresentation.getFormRepresentation().getDescription());
+
+        String editorJson = null;
+        try {
+            editorJson = objectMapper.writeValueAsString(saveRepresentation.getFormRepresentation().getFormDefinition());
+        } catch (Exception e) {
+            logger.error("Error while processing form json", e);
+            throw new InternalServerErrorException("Form could not be saved " + formId);
+        }
+
+        String filteredImageString = saveRepresentation.getFormImageBase64().replace("data:image/png;base64,", "");
+        byte[] imageBytes = Base64.decodeBase64(filteredImageString);
+        model = modelService.saveModel(model, editorJson, imageBytes, saveRepresentation.isNewVersion(), saveRepresentation.getComment(), user);
+        FormRepresentation result = new FormRepresentation(model);
+        result.setFormDefinition(saveRepresentation.getFormRepresentation().getFormDefinition());
+        return result;
     }
 
-    String filteredImageString = saveRepresentation.getFormImageBase64().replace("data:image/png;base64,", "");
-    byte[] imageBytes = Base64.decodeBase64(filteredImageString);
-    model = modelService.saveModel(model, editorJson, imageBytes, saveRepresentation.isNewVersion(), saveRepresentation.getComment(), user);
-    FormRepresentation result = new FormRepresentation(model);
-    result.setFormDefinition(saveRepresentation.getFormRepresentation().getFormDefinition());
-    return result;
-  }
-  
-  protected FormRepresentation createFormRepresentation(AbstractModel model) {
-    FormModel formDefinition = null;
-    try {
-      formDefinition = objectMapper.readValue(model.getModelEditorJson(), FormModel.class);
-    } catch (Exception e) {
-      logger.error("Error deserializing form", e);
-      throw new InternalServerErrorException("Could not deserialize form definition");
+    protected FormRepresentation createFormRepresentation(AbstractModel model) {
+        FormModel formDefinition = null;
+        try {
+            formDefinition = objectMapper.readValue(model.getModelEditorJson(), FormModel.class);
+        } catch (Exception e) {
+            logger.error("Error deserializing form", e);
+            throw new InternalServerErrorException("Could not deserialize form definition");
+        }
+
+        FormRepresentation result = new FormRepresentation(model);
+        result.setFormDefinition(formDefinition);
+        return result;
     }
-    
-    FormRepresentation result = new FormRepresentation(model);
-    result.setFormDefinition(formDefinition);
-    return result;
-  }
 }

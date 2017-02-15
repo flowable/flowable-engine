@@ -17,7 +17,7 @@ package org.flowable.engine.common.impl.interceptor;
  */
 public interface Session {
 
-  void flush();
+    void flush();
 
-  void close();
+    void close();
 }

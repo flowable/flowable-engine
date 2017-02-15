@@ -21,24 +21,24 @@ import org.slf4j.LoggerFactory;
  * @author Joram Barrez
  */
 public class CommandInvoker extends AbstractCommandInterceptor {
-  
-  private static final Logger logger = LoggerFactory.getLogger(CommandInvoker.class);
 
-  @Override
-  public <T> T execute(final CommandConfig config, final Command<T> command) {
-    final CommandContext commandContext = Context.getCommandContext();
-    T result = command.execute(commandContext);
-    return result;
-  }
+    private static final Logger logger = LoggerFactory.getLogger(CommandInvoker.class);
 
-  @Override
-  public CommandInterceptor getNext() {
-    return null;
-  }
+    @Override
+    public <T> T execute(final CommandConfig config, final Command<T> command) {
+        final CommandContext commandContext = Context.getCommandContext();
+        T result = command.execute(commandContext);
+        return result;
+    }
 
-  @Override
-  public void setNext(CommandInterceptor next) {
-    throw new UnsupportedOperationException("CommandInvoker must be the last interceptor in the chain");
-  }
+    @Override
+    public CommandInterceptor getNext() {
+        return null;
+    }
+
+    @Override
+    public void setNext(CommandInterceptor next) {
+        throw new UnsupportedOperationException("CommandInvoker must be the last interceptor in the chain");
+    }
 
 }

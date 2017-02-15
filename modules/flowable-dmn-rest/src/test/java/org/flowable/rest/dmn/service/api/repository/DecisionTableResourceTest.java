@@ -27,32 +27,32 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class DecisionTableResourceTest extends BaseSpringDmnRestTestCase {
 
-  @DmnDeploymentAnnotation(resources = { "org/flowable/rest/dmn/service/api/repository/simple.dmn" })
-  public void testGetDecisionTable() throws Exception {
+    @DmnDeploymentAnnotation(resources = { "org/flowable/rest/dmn/service/api/repository/simple.dmn" })
+    public void testGetDecisionTable() throws Exception {
 
-    DmnDecisionTable decisionTable = dmnRepositoryService.createDecisionTableQuery().singleResult();
+        DmnDecisionTable decisionTable = dmnRepositoryService.createDecisionTableQuery().singleResult();
 
-    HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE, decisionTable.getId()));
-    CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
-    JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-    closeResponse(response);
-    assertEquals(decisionTable.getId(), responseNode.get("id").textValue());
-    assertEquals(decisionTable.getKey(), responseNode.get("key").textValue());
-    assertEquals(decisionTable.getCategory(), responseNode.get("category").textValue());
-    assertEquals(decisionTable.getVersion(), responseNode.get("version").intValue());
-    assertEquals(decisionTable.getDescription(), responseNode.get("description").textValue());
-    assertEquals(decisionTable.getName(), responseNode.get("name").textValue());
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE, decisionTable.getId()));
+        CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertEquals(decisionTable.getId(), responseNode.get("id").textValue());
+        assertEquals(decisionTable.getKey(), responseNode.get("key").textValue());
+        assertEquals(decisionTable.getCategory(), responseNode.get("category").textValue());
+        assertEquals(decisionTable.getVersion(), responseNode.get("version").intValue());
+        assertEquals(decisionTable.getDescription(), responseNode.get("description").textValue());
+        assertEquals(decisionTable.getName(), responseNode.get("name").textValue());
 
-    // Check URL's
-    assertEquals(httpGet.getURI().toString(), responseNode.get("url").asText());
-    assertEquals(decisionTable.getDeploymentId(), responseNode.get("deploymentId").textValue());
-  }
+        // Check URL's
+        assertEquals(httpGet.getURI().toString(), responseNode.get("url").asText());
+        assertEquals(decisionTable.getDeploymentId(), responseNode.get("deploymentId").textValue());
+    }
 
-  @DmnDeploymentAnnotation(resources = { "org/flowable/rest/dmn/service/api/repository/simple.dmn" })
-  public void testGetUnexistingDecisionTable() throws Exception {
-    HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE, "unexisting"));
-    CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
-    closeResponse(response);
-  }
+    @DmnDeploymentAnnotation(resources = { "org/flowable/rest/dmn/service/api/repository/simple.dmn" })
+    public void testGetUnexistingDecisionTable() throws Exception {
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE, "unexisting"));
+        CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
+        closeResponse(response);
+    }
 
 }

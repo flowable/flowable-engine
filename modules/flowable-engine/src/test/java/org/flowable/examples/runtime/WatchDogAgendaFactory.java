@@ -20,100 +20,99 @@ import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
- * This class is a simple watchdog agenda implementation. It throws exception in
- * the case when watchdog limit is exceeded for fetching operations from agenda.
+ * This class is a simple watchdog agenda implementation. It throws exception in the case when watchdog limit is exceeded for fetching operations from agenda.
  */
 public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
 
-  @Override
-  public FlowableEngineAgenda createAgenda(CommandContext commandContext) {
-    return new WatchDogAgenda(new DefaultFlowableEngineAgenda(commandContext));
-  }
-
-  private static class WatchDogAgenda implements FlowableEngineAgenda {
-
-    private static final int WATCH_DOG_LIMIT = 10;
-
-    private final FlowableEngineAgenda agenda;
-    private int counter;
-
     @Override
-    public Runnable getNextOperation() {
-      if (counter < WATCH_DOG_LIMIT) {
-        counter++;
-        return agenda.getNextOperation();
-      }
-      throw new FlowableException("WatchDog limit exceeded.");
+    public FlowableEngineAgenda createAgenda(CommandContext commandContext) {
+        return new WatchDogAgenda(new DefaultFlowableEngineAgenda(commandContext));
     }
 
-    @Override
-    public Runnable peekOperation() {
-      return agenda.peekOperation();
-    }
+    private static class WatchDogAgenda implements FlowableEngineAgenda {
 
-    @Override
-    public void planOperation(Runnable operation, ExecutionEntity executionEntity) {
-      agenda.planOperation(operation, executionEntity);
-    }
+        private static final int WATCH_DOG_LIMIT = 10;
 
-    @Override
-    public void planContinueProcessOperation(ExecutionEntity execution) {
-      agenda.planContinueProcessOperation(execution);
-    }
+        private final FlowableEngineAgenda agenda;
+        private int counter;
 
-    @Override
-    public void planContinueProcessSynchronousOperation(ExecutionEntity execution) {
-      agenda.planContinueProcessSynchronousOperation(execution);
-    }
+        @Override
+        public Runnable getNextOperation() {
+            if (counter < WATCH_DOG_LIMIT) {
+                counter++;
+                return agenda.getNextOperation();
+            }
+            throw new FlowableException("WatchDog limit exceeded.");
+        }
 
-    @Override
-    public void planContinueProcessInCompensation(ExecutionEntity execution) {
-      agenda.planContinueProcessInCompensation(execution);
-    }
+        @Override
+        public Runnable peekOperation() {
+            return agenda.peekOperation();
+        }
 
-    @Override
-    public void planContinueMultiInstanceOperation(ExecutionEntity execution) {
-      agenda.planContinueMultiInstanceOperation(execution);
-    }
+        @Override
+        public void planOperation(Runnable operation, ExecutionEntity executionEntity) {
+            agenda.planOperation(operation, executionEntity);
+        }
 
-    @Override
-    public void planTakeOutgoingSequenceFlowsOperation(ExecutionEntity execution, boolean evaluateConditions) {
-      agenda.planTakeOutgoingSequenceFlowsOperation(execution, evaluateConditions);
-    }
+        @Override
+        public void planContinueProcessOperation(ExecutionEntity execution) {
+            agenda.planContinueProcessOperation(execution);
+        }
 
-    @Override
-    public void planEndExecutionOperation(ExecutionEntity execution) {
-      agenda.planEndExecutionOperation(execution);
-    }
+        @Override
+        public void planContinueProcessSynchronousOperation(ExecutionEntity execution) {
+            agenda.planContinueProcessSynchronousOperation(execution);
+        }
 
-    @Override
-    public void planTriggerExecutionOperation(ExecutionEntity execution) {
-      agenda.planTriggerExecutionOperation(execution);
-    }
+        @Override
+        public void planContinueProcessInCompensation(ExecutionEntity execution) {
+            agenda.planContinueProcessInCompensation(execution);
+        }
 
-    @Override
-    public void planDestroyScopeOperation(ExecutionEntity execution) {
-      agenda.planDestroyScopeOperation(execution);
-    }
+        @Override
+        public void planContinueMultiInstanceOperation(ExecutionEntity execution) {
+            agenda.planContinueMultiInstanceOperation(execution);
+        }
 
-    @Override
-    public void planExecuteInactiveBehaviorsOperation() {
-      agenda.planExecuteInactiveBehaviorsOperation();
-    }
+        @Override
+        public void planTakeOutgoingSequenceFlowsOperation(ExecutionEntity execution, boolean evaluateConditions) {
+            agenda.planTakeOutgoingSequenceFlowsOperation(execution, evaluateConditions);
+        }
 
-    private WatchDogAgenda(FlowableEngineAgenda agenda) {
-      this.agenda = agenda;
-    }
+        @Override
+        public void planEndExecutionOperation(ExecutionEntity execution) {
+            agenda.planEndExecutionOperation(execution);
+        }
 
-    @Override
-    public boolean isEmpty() {
-      return agenda.isEmpty();
-    }
+        @Override
+        public void planTriggerExecutionOperation(ExecutionEntity execution) {
+            agenda.planTriggerExecutionOperation(execution);
+        }
 
-    @Override
-    public void planOperation(Runnable operation) {
-      agenda.planOperation(operation);
-    }
+        @Override
+        public void planDestroyScopeOperation(ExecutionEntity execution) {
+            agenda.planDestroyScopeOperation(execution);
+        }
 
-  }
+        @Override
+        public void planExecuteInactiveBehaviorsOperation() {
+            agenda.planExecuteInactiveBehaviorsOperation();
+        }
+
+        private WatchDogAgenda(FlowableEngineAgenda agenda) {
+            this.agenda = agenda;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return agenda.isEmpty();
+        }
+
+        @Override
+        public void planOperation(Runnable operation) {
+            agenda.planOperation(operation);
+        }
+
+    }
 }

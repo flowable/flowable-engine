@@ -27,81 +27,81 @@ import org.flowable.engine.runtime.ProcessInstance;
  */
 public interface HistoricProcessInstance {
 
-  /**
-   * The process instance id (== as the id for the runtime {@link ProcessInstance process instance}).
-   */
-  String getId();
+    /**
+     * The process instance id (== as the id for the runtime {@link ProcessInstance process instance}).
+     */
+    String getId();
 
-  /** The user provided unique reference to this process instance. */
-  String getBusinessKey();
+    /** The user provided unique reference to this process instance. */
+    String getBusinessKey();
 
-  /** The process definition reference. */
-  String getProcessDefinitionId();
-  
-  /** The name of the process definition of the process instance. */
-  String getProcessDefinitionName();
-  
-  /** The key of the process definition of the process instance. */
-  String getProcessDefinitionKey();
-  
-  /** The version of the process definition of the process instance. */
-  Integer getProcessDefinitionVersion();
-  
-  /**
-   * The deployment id of the process definition of the process instance.
-   */
-  String getDeploymentId();
+    /** The process definition reference. */
+    String getProcessDefinitionId();
 
-  /** The time the process was started. */
-  Date getStartTime();
+    /** The name of the process definition of the process instance. */
+    String getProcessDefinitionName();
 
-  /** The time the process was ended. */
-  Date getEndTime();
+    /** The key of the process definition of the process instance. */
+    String getProcessDefinitionKey();
 
-  /**
-   * The difference between {@link #getEndTime()} and {@link #getStartTime()} .
-   */
-  Long getDurationInMillis();
+    /** The version of the process definition of the process instance. */
+    Integer getProcessDefinitionVersion();
 
-  /**
-   * Reference to the activity in which this process instance ended. Note that a process instance can have multiple end events, in this case it might not be deterministic which activity id will be
-   * referenced here. Use a {@link HistoricActivityInstanceQuery} instead to query for end events of the process instance (use the activityTYpe attribute)
-   * */
-  String getEndActivityId();
+    /**
+     * The deployment id of the process definition of the process instance.
+     */
+    String getDeploymentId();
 
-  /**
-   * The authenticated user that started this process instance.
-   * 
-   * @see IdentityService#setAuthenticatedUserId(String)
-   */
-  String getStartUserId();
+    /** The time the process was started. */
+    Date getStartTime();
 
-  /** The start activity. */
-  String getStartActivityId();
+    /** The time the process was ended. */
+    Date getEndTime();
 
-  /** Obtains the reason for the process instance's deletion. */
-  String getDeleteReason();
+    /**
+     * The difference between {@link #getEndTime()} and {@link #getStartTime()} .
+     */
+    Long getDurationInMillis();
 
-  /**
-   * The process instance id of a potential super process instance or null if no super process instance exists
-   */
-  String getSuperProcessInstanceId();
+    /**
+     * Reference to the activity in which this process instance ended. Note that a process instance can have multiple end events, in this case it might not be deterministic which activity id will be
+     * referenced here. Use a {@link HistoricActivityInstanceQuery} instead to query for end events of the process instance (use the activityTYpe attribute)
+     */
+    String getEndActivityId();
 
-  /**
-   * The tenant identifier for the process instance.
-   */
-  String getTenantId();
+    /**
+     * The authenticated user that started this process instance.
+     * 
+     * @see IdentityService#setAuthenticatedUserId(String)
+     */
+    String getStartUserId();
 
-  /**
-   * The name for the process instance.
-   */
-  String getName();
+    /** The start activity. */
+    String getStartActivityId();
 
-  /**
-   * The description for the process instance.
-   */
-  String getDescription();
-  
-  /** Returns the process variables if requested in the process instance query */
-  Map<String, Object> getProcessVariables();
+    /** Obtains the reason for the process instance's deletion. */
+    String getDeleteReason();
+
+    /**
+     * The process instance id of a potential super process instance or null if no super process instance exists
+     */
+    String getSuperProcessInstanceId();
+
+    /**
+     * The tenant identifier for the process instance.
+     */
+    String getTenantId();
+
+    /**
+     * The name for the process instance.
+     */
+    String getName();
+
+    /**
+     * The description for the process instance.
+     */
+    String getDescription();
+
+    /** Returns the process variables if requested in the process instance query */
+    Map<String, Object> getProcessVariables();
 }

@@ -20,8 +20,8 @@ package org.flowable.rest.application;
  */
 public interface ContentTypeResolver {
 
-  /**
-   * @return the content type resolved from the given resource name. Returns null if the content type cannot be resolved.
-   */
-  String resolveContentType(String resourceName);
+    /**
+     * @return the content type resolved from the given resource name. Returns null if the content type cannot be resolved.
+     */
+    String resolveContentType(String resourceName);
 }

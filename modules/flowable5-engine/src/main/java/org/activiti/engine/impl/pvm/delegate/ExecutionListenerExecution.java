@@ -15,15 +15,14 @@ package org.activiti.engine.impl.pvm.delegate;
 import org.activiti.engine.impl.pvm.PvmProcessElement;
 import org.flowable.engine.delegate.DelegateExecution;
 
-
 /**
  * @author Tom Baeyens
  */
 public interface ExecutionListenerExecution extends DelegateExecution {
-  
-  String getEventName();
 
-  PvmProcessElement getEventSource();
+    String getEventName();
 
-  String getDeleteReason();
+    PvmProcessElement getEventSource();
+
+    String getDeleteReason();
 }

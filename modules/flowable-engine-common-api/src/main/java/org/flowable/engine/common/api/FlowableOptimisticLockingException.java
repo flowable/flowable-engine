@@ -20,10 +20,10 @@ package org.flowable.engine.common.api;
  */
 public class FlowableOptimisticLockingException extends FlowableException {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public FlowableOptimisticLockingException(String message) {
-    super(message);
-  }
+    public FlowableOptimisticLockingException(String message) {
+        super(message);
+    }
 
 }

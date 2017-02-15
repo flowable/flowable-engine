@@ -28,42 +28,42 @@ import org.slf4j.LoggerFactory;
  */
 public class MoveJobToDeadLetterJobCmd implements Command<DeadLetterJobEntity>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private static Logger log = LoggerFactory.getLogger(MoveJobToDeadLetterJobCmd.class);
+    private static Logger log = LoggerFactory.getLogger(MoveJobToDeadLetterJobCmd.class);
 
-  protected String jobId;
-  
-  public MoveJobToDeadLetterJobCmd(String jobId) {
-    this.jobId = jobId;
-  }
+    protected String jobId;
 
-  public DeadLetterJobEntity execute(CommandContext commandContext) {
-
-    if (jobId == null) {
-      throw new FlowableIllegalArgumentException("jobId and job is null");
+    public MoveJobToDeadLetterJobCmd(String jobId) {
+        this.jobId = jobId;
     }
 
-    AbstractJobEntity job = commandContext.getTimerJobEntityManager().findById(jobId);
-    if (job == null) {
-      job = commandContext.getJobEntityManager().findById(jobId);
+    public DeadLetterJobEntity execute(CommandContext commandContext) {
+
+        if (jobId == null) {
+            throw new FlowableIllegalArgumentException("jobId and job is null");
+        }
+
+        AbstractJobEntity job = commandContext.getTimerJobEntityManager().findById(jobId);
+        if (job == null) {
+            job = commandContext.getJobEntityManager().findById(jobId);
+        }
+
+        if (job == null) {
+            throw new JobNotFoundException(jobId);
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Moving job to deadletter job table {}", job.getId());
+        }
+
+        DeadLetterJobEntity deadLetterJob = commandContext.getJobManager().moveJobToDeadLetterJob(job);
+
+        return deadLetterJob;
     }
 
-    if (job == null) {
-      throw new JobNotFoundException(jobId);
+    public String getJobId() {
+        return jobId;
     }
 
-    if (log.isDebugEnabled()) {
-      log.debug("Moving job to deadletter job table {}", job.getId());
-    }
-    
-    DeadLetterJobEntity deadLetterJob = commandContext.getJobManager().moveJobToDeadLetterJob(job);
-
-    return deadLetterJob;
-  }
-
-  public String getJobId() {
-    return jobId;
-  }
-  
 }

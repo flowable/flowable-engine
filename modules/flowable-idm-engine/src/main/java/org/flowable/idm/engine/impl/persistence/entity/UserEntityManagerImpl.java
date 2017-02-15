@@ -30,119 +30,119 @@ import org.flowable.idm.engine.impl.persistence.entity.data.UserDataManager;
  * @author Joram Barrez
  */
 public class UserEntityManagerImpl extends AbstractEntityManager<UserEntity> implements UserEntityManager {
-  
-  protected UserDataManager userDataManager;
-  
-  public UserEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, UserDataManager userDataManager) {
-    super(idmEngineConfiguration);
-    this.userDataManager = userDataManager;
-  }
-  
-  @Override
-  protected DataManager<UserEntity> getDataManager() {
-    return userDataManager;
-  }
-  
-  @Override
-  public UserEntity findById(String entityId) {
-    return userDataManager.findById(entityId);
-  }
 
-  public User createNewUser(String userId) {
-    UserEntity userEntity = create();
-    userEntity.setId(userId);
-    userEntity.setRevision(0); // needed as users can be transient
-    return userEntity;
-  }
+    protected UserDataManager userDataManager;
 
-  public void updateUser(User updatedUser) {
-    super.update((UserEntity) updatedUser);
-  }
-
-  public void delete(UserEntity userEntity) {
-    super.delete(userEntity);
-    deletePicture(userEntity);
-  }
-  
-  @Override
-  public void deletePicture(User user) {
-    UserEntity userEntity = (UserEntity) user;
-    if (userEntity.getPictureByteArrayRef() != null) {
-      userEntity.getPictureByteArrayRef().delete();
-    }
-  }
-
-  public void delete(String userId) {
-    UserEntity user = findById(userId);
-    if (user != null) {
-      List<IdentityInfoEntity> identityInfos = getIdentityInfoEntityManager().findIdentityInfoByUserId(userId);
-      for (IdentityInfoEntity identityInfo : identityInfos) {
-        getIdentityInfoEntityManager().delete(identityInfo);
-      }
-      getMembershipEntityManager().deleteMembershipByUserId(userId);
-      delete(user);
-    }
-  }
-
-  public List<User> findUserByQueryCriteria(UserQueryImpl query, Page page) {
-    return userDataManager.findUserByQueryCriteria(query, page);
-  }
-
-  public long findUserCountByQueryCriteria(UserQueryImpl query) {
-    return userDataManager.findUserCountByQueryCriteria(query);
-  }
-
-  public UserQuery createNewUserQuery() {
-    return new UserQueryImpl(getCommandExecutor());
-  }
-
-  public Boolean checkPassword(String userId, String password) {
-    User user = null;
-    
-    if (userId != null) {
-      user = findById(userId);
+    public UserEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, UserDataManager userDataManager) {
+        super(idmEngineConfiguration);
+        this.userDataManager = userDataManager;
     }
 
-    return (user != null) && (password != null) && (password.equals(user.getPassword()));
-  }
+    @Override
+    protected DataManager<UserEntity> getDataManager() {
+        return userDataManager;
+    }
 
-  public List<User> findUsersByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return userDataManager.findUsersByNativeQuery(parameterMap, firstResult, maxResults);
-  }
+    @Override
+    public UserEntity findById(String entityId) {
+        return userDataManager.findById(entityId);
+    }
 
-  public long findUserCountByNativeQuery(Map<String, Object> parameterMap) {
-    return userDataManager.findUserCountByNativeQuery(parameterMap);
-  }
+    public User createNewUser(String userId) {
+        UserEntity userEntity = create();
+        userEntity.setId(userId);
+        userEntity.setRevision(0); // needed as users can be transient
+        return userEntity;
+    }
 
-  @Override
-  public boolean isNewUser(User user) {
-    return ((UserEntity) user).getRevision() == 0;
-  }
+    public void updateUser(User updatedUser) {
+        super.update((UserEntity) updatedUser);
+    }
 
-  @Override
-  public Picture getUserPicture(User user) {
-    UserEntity userEntity = (UserEntity) user;
-    return userEntity.getPicture();
-  }
+    public void delete(UserEntity userEntity) {
+        super.delete(userEntity);
+        deletePicture(userEntity);
+    }
 
-  @Override
-  public void setUserPicture(User user, Picture picture) {
-    UserEntity userEntity = (UserEntity) user;
-    userEntity.setPicture(picture);
-    userDataManager.update(userEntity);
-  }
-  
-  @Override
-  public List<User> findUsersByPrivilegeId(String name) {
-    return userDataManager.findUsersByPrivilegeId(name);
-  }
+    @Override
+    public void deletePicture(User user) {
+        UserEntity userEntity = (UserEntity) user;
+        if (userEntity.getPictureByteArrayRef() != null) {
+            userEntity.getPictureByteArrayRef().delete();
+        }
+    }
 
-  public UserDataManager getUserDataManager() {
-    return userDataManager;
-  }
+    public void delete(String userId) {
+        UserEntity user = findById(userId);
+        if (user != null) {
+            List<IdentityInfoEntity> identityInfos = getIdentityInfoEntityManager().findIdentityInfoByUserId(userId);
+            for (IdentityInfoEntity identityInfo : identityInfos) {
+                getIdentityInfoEntityManager().delete(identityInfo);
+            }
+            getMembershipEntityManager().deleteMembershipByUserId(userId);
+            delete(user);
+        }
+    }
 
-  public void setUserDataManager(UserDataManager userDataManager) {
-    this.userDataManager = userDataManager;
-  }
-  
+    public List<User> findUserByQueryCriteria(UserQueryImpl query, Page page) {
+        return userDataManager.findUserByQueryCriteria(query, page);
+    }
+
+    public long findUserCountByQueryCriteria(UserQueryImpl query) {
+        return userDataManager.findUserCountByQueryCriteria(query);
+    }
+
+    public UserQuery createNewUserQuery() {
+        return new UserQueryImpl(getCommandExecutor());
+    }
+
+    public Boolean checkPassword(String userId, String password) {
+        User user = null;
+
+        if (userId != null) {
+            user = findById(userId);
+        }
+
+        return (user != null) && (password != null) && (password.equals(user.getPassword()));
+    }
+
+    public List<User> findUsersByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
+        return userDataManager.findUsersByNativeQuery(parameterMap, firstResult, maxResults);
+    }
+
+    public long findUserCountByNativeQuery(Map<String, Object> parameterMap) {
+        return userDataManager.findUserCountByNativeQuery(parameterMap);
+    }
+
+    @Override
+    public boolean isNewUser(User user) {
+        return ((UserEntity) user).getRevision() == 0;
+    }
+
+    @Override
+    public Picture getUserPicture(User user) {
+        UserEntity userEntity = (UserEntity) user;
+        return userEntity.getPicture();
+    }
+
+    @Override
+    public void setUserPicture(User user, Picture picture) {
+        UserEntity userEntity = (UserEntity) user;
+        userEntity.setPicture(picture);
+        userDataManager.update(userEntity);
+    }
+
+    @Override
+    public List<User> findUsersByPrivilegeId(String name) {
+        return userDataManager.findUsersByPrivilegeId(name);
+    }
+
+    public UserDataManager getUserDataManager() {
+        return userDataManager;
+    }
+
+    public void setUserDataManager(UserDataManager userDataManager) {
+        this.userDataManager = userDataManager;
+    }
+
 }

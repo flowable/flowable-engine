@@ -33,21 +33,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/rest/decision-table-models")
 public class DecisionTablesResource {
 
-  @Autowired
-  protected FlowableDecisionTableService decisionTableService;
+    @Autowired
+    protected FlowableDecisionTableService decisionTableService;
 
-  @RequestMapping(method = RequestMethod.GET, produces = "application/json")
-  public ResultListDataRepresentation getDecisionTables(HttpServletRequest request) {
-    // need to parse the filterText parameter ourselves, due to encoding issues with the default parsing.
-    String filter = null;
-    List<NameValuePair> params = URLEncodedUtils.parse(request.getQueryString(), Charset.forName("UTF-8"));
-    if (params != null) {
-      for (NameValuePair nameValuePair : params) {
-        if ("filter".equalsIgnoreCase(nameValuePair.getName())) {
-          filter = nameValuePair.getValue();
+    @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+    public ResultListDataRepresentation getDecisionTables(HttpServletRequest request) {
+        // need to parse the filterText parameter ourselves, due to encoding issues with the default parsing.
+        String filter = null;
+        List<NameValuePair> params = URLEncodedUtils.parse(request.getQueryString(), Charset.forName("UTF-8"));
+        if (params != null) {
+            for (NameValuePair nameValuePair : params) {
+                if ("filter".equalsIgnoreCase(nameValuePair.getName())) {
+                    filter = nameValuePair.getValue();
+                }
+            }
         }
-      }
+        return decisionTableService.getDecisionTables(filter);
     }
-    return decisionTableService.getDecisionTables(filter);
-  }
 }

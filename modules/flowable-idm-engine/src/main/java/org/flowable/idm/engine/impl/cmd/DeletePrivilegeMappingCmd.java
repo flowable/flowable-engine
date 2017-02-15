@@ -21,26 +21,26 @@ import org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntityMan
 
 public class DeletePrivilegeMappingCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String privilegeId;
-  protected String userId;
-  protected String groupId;
+    protected String privilegeId;
+    protected String userId;
+    protected String groupId;
 
-  public DeletePrivilegeMappingCmd(String privilegeId, String userId, String groupId) {
-    this.privilegeId = privilegeId;
-    this.userId = userId;
-    this.groupId = groupId;
-  }
-
-  public Void execute(CommandContext commandContext) {
-    PrivilegeMappingEntityManager privilegeMappingEntityManager = commandContext.gePrivilegeMappingEntityManager();
-    if (userId != null) {
-      privilegeMappingEntityManager.deleteByPrivilegeIdAndUserId(privilegeId, userId);
-    } else if (groupId != null) {
-      privilegeMappingEntityManager.deleteByPrivilegeIdAndGroupId(privilegeId, groupId);
+    public DeletePrivilegeMappingCmd(String privilegeId, String userId, String groupId) {
+        this.privilegeId = privilegeId;
+        this.userId = userId;
+        this.groupId = groupId;
     }
-    
-    return null;
-  }
+
+    public Void execute(CommandContext commandContext) {
+        PrivilegeMappingEntityManager privilegeMappingEntityManager = commandContext.gePrivilegeMappingEntityManager();
+        if (userId != null) {
+            privilegeMappingEntityManager.deleteByPrivilegeIdAndUserId(privilegeId, userId);
+        } else if (groupId != null) {
+            privilegeMappingEntityManager.deleteByPrivilegeIdAndGroupId(privilegeId, groupId);
+        }
+
+        return null;
+    }
 }

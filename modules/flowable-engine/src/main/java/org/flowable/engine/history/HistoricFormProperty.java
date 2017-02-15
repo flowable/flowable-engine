@@ -20,10 +20,10 @@ package org.flowable.engine.history;
  */
 public interface HistoricFormProperty extends HistoricDetail {
 
-  /** the id or key of the property */
-  String getPropertyId();
+    /** the id or key of the property */
+    String getPropertyId();
 
-  /** the submitted value */
-  String getPropertyValue();
+    /** the submitted value */
+    String getPropertyValue();
 
 }

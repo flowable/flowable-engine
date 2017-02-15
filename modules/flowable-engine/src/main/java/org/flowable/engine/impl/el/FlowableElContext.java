@@ -25,23 +25,23 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
  */
 public class FlowableElContext extends ELContext {
 
-  protected ELResolver elResolver;
-  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    protected ELResolver elResolver;
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-  public FlowableElContext(ELResolver elResolver, ProcessEngineConfigurationImpl processEngineConfiguration) {
-    this.elResolver = elResolver;
-    this.processEngineConfiguration = processEngineConfiguration;
-  }
+    public FlowableElContext(ELResolver elResolver, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        this.elResolver = elResolver;
+        this.processEngineConfiguration = processEngineConfiguration;
+    }
 
-  public ELResolver getELResolver() {
-    return elResolver;
-  }
+    public ELResolver getELResolver() {
+        return elResolver;
+    }
 
-  public FunctionMapper getFunctionMapper() {
-    return new FlowableFunctionMapper(processEngineConfiguration);
-  }
+    public FunctionMapper getFunctionMapper() {
+        return new FlowableFunctionMapper(processEngineConfiguration);
+    }
 
-  public VariableMapper getVariableMapper() {
-    return null;
-  }
+    public VariableMapper getVariableMapper() {
+        return null;
+    }
 }

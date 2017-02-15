@@ -25,16 +25,16 @@ import org.flowable.bpmn.model.Event;
  */
 public class CancelEventDefinitionParser extends BaseChildElementParser {
 
-  public String getElementName() {
-    return ELEMENT_EVENT_CANCELDEFINITION;
-  }
+    public String getElementName() {
+        return ELEMENT_EVENT_CANCELDEFINITION;
+    }
 
-  public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-    if (!(parentElement instanceof Event))
-      return;
+    public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
+        if (!(parentElement instanceof Event))
+            return;
 
-    CancelEventDefinition eventDefinition = new CancelEventDefinition();
-    BpmnXMLUtil.addXMLLocation(eventDefinition, xtr);
-    ((Event) parentElement).getEventDefinitions().add(eventDefinition);
-  }
+        CancelEventDefinition eventDefinition = new CancelEventDefinition();
+        BpmnXMLUtil.addXMLLocation(eventDefinition, xtr);
+        ((Event) parentElement).getEventDefinitions().add(eventDefinition);
+    }
 }

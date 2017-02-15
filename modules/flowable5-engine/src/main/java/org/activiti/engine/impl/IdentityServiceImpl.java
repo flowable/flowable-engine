@@ -25,99 +25,98 @@ import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
 
-
 /**
  * @author Tom Baeyens
  */
 public class IdentityServiceImpl extends ServiceImpl implements IdentityService {
-  
-  public IdentityServiceImpl() {
-    
-  }
-  
-  public IdentityServiceImpl(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    super(processEngineConfiguration);
-  }
-  
-  public Group newGroup(String groupId) {
-    return processEngineConfiguration.getIdmIdentityService().newGroup(groupId);
-  }
 
-  public User newUser(String userId) {
-    return processEngineConfiguration.getIdmIdentityService().newUser(userId);
-  }
+    public IdentityServiceImpl() {
 
-  public void saveGroup(Group group) {
-    processEngineConfiguration.getIdmIdentityService().saveGroup(group);
-  }
+    }
 
-  public void saveUser(User user) {
-    processEngineConfiguration.getIdmIdentityService().saveUser(user);
-  }
-  
-  public UserQuery createUserQuery() {
-    return processEngineConfiguration.getIdmIdentityService().createUserQuery();
-  }
+    public IdentityServiceImpl(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
 
-  @Override
-  public NativeUserQuery createNativeUserQuery() {
-    return processEngineConfiguration.getIdmIdentityService().createNativeUserQuery();
-  }
+    public Group newGroup(String groupId) {
+        return processEngineConfiguration.getIdmIdentityService().newGroup(groupId);
+    }
 
-  public GroupQuery createGroupQuery() {
-    return processEngineConfiguration.getIdmIdentityService().createGroupQuery();
-  }
+    public User newUser(String userId) {
+        return processEngineConfiguration.getIdmIdentityService().newUser(userId);
+    }
 
-  @Override
-  public NativeGroupQuery createNativeGroupQuery() {
-    return processEngineConfiguration.getIdmIdentityService().createNativeGroupQuery();
-  }
+    public void saveGroup(Group group) {
+        processEngineConfiguration.getIdmIdentityService().saveGroup(group);
+    }
 
-  public void createMembership(String userId, String groupId) {
-    processEngineConfiguration.getIdmIdentityService().createMembership(userId, groupId);
-  }
+    public void saveUser(User user) {
+        processEngineConfiguration.getIdmIdentityService().saveUser(user);
+    }
 
-  public void deleteGroup(String groupId) {
-    processEngineConfiguration.getIdmIdentityService().deleteGroup(groupId);
-  }
+    public UserQuery createUserQuery() {
+        return processEngineConfiguration.getIdmIdentityService().createUserQuery();
+    }
 
-  public void deleteMembership(String userId, String groupId) {
-    processEngineConfiguration.getIdmIdentityService().deleteMembership(userId, groupId);
-  }
+    @Override
+    public NativeUserQuery createNativeUserQuery() {
+        return processEngineConfiguration.getIdmIdentityService().createNativeUserQuery();
+    }
 
-  public boolean checkPassword(String userId, String password) {
-    return processEngineConfiguration.getIdmIdentityService().checkPassword(userId, password);
-  }
+    public GroupQuery createGroupQuery() {
+        return processEngineConfiguration.getIdmIdentityService().createGroupQuery();
+    }
 
-  public void deleteUser(String userId) {
-    processEngineConfiguration.getIdmIdentityService().deleteUser(userId);
-  }
+    @Override
+    public NativeGroupQuery createNativeGroupQuery() {
+        return processEngineConfiguration.getIdmIdentityService().createNativeGroupQuery();
+    }
 
-  public void setUserPicture(String userId, Picture picture) {
-    processEngineConfiguration.getIdmIdentityService().setUserPicture(userId, picture);
-  }
+    public void createMembership(String userId, String groupId) {
+        processEngineConfiguration.getIdmIdentityService().createMembership(userId, groupId);
+    }
 
-  public Picture getUserPicture(String userId) {
-    return processEngineConfiguration.getIdmIdentityService().getUserPicture(userId);
-  }
+    public void deleteGroup(String groupId) {
+        processEngineConfiguration.getIdmIdentityService().deleteGroup(groupId);
+    }
 
-  public void setAuthenticatedUserId(String authenticatedUserId) {
-    Authentication.setAuthenticatedUserId(authenticatedUserId);
-  }
+    public void deleteMembership(String userId, String groupId) {
+        processEngineConfiguration.getIdmIdentityService().deleteMembership(userId, groupId);
+    }
 
-  public String getUserInfo(String userId, String key) {
-    return processEngineConfiguration.getIdmIdentityService().getUserInfo(userId, key);
-  }
+    public boolean checkPassword(String userId, String password) {
+        return processEngineConfiguration.getIdmIdentityService().checkPassword(userId, password);
+    }
 
-  public List<String> getUserInfoKeys(String userId) {
-    return processEngineConfiguration.getIdmIdentityService().getUserInfoKeys(userId);
-  }
+    public void deleteUser(String userId) {
+        processEngineConfiguration.getIdmIdentityService().deleteUser(userId);
+    }
 
-  public void setUserInfo(String userId, String key, String value) {
-    processEngineConfiguration.getIdmIdentityService().setUserInfo(userId, key, value);
-  }
+    public void setUserPicture(String userId, Picture picture) {
+        processEngineConfiguration.getIdmIdentityService().setUserPicture(userId, picture);
+    }
 
-  public void deleteUserInfo(String userId, String key) {
-    processEngineConfiguration.getIdmIdentityService().deleteUserInfo(userId, key);
-  }
+    public Picture getUserPicture(String userId) {
+        return processEngineConfiguration.getIdmIdentityService().getUserPicture(userId);
+    }
+
+    public void setAuthenticatedUserId(String authenticatedUserId) {
+        Authentication.setAuthenticatedUserId(authenticatedUserId);
+    }
+
+    public String getUserInfo(String userId, String key) {
+        return processEngineConfiguration.getIdmIdentityService().getUserInfo(userId, key);
+    }
+
+    public List<String> getUserInfoKeys(String userId) {
+        return processEngineConfiguration.getIdmIdentityService().getUserInfoKeys(userId);
+    }
+
+    public void setUserInfo(String userId, String key, String value) {
+        processEngineConfiguration.getIdmIdentityService().setUserInfo(userId, key, value);
+    }
+
+    public void deleteUserInfo(String userId, String key) {
+        processEngineConfiguration.getIdmIdentityService().deleteUserInfo(userId, key);
+    }
 }

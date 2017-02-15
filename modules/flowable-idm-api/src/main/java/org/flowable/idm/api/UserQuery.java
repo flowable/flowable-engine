@@ -24,84 +24,85 @@ import org.flowable.engine.common.api.query.Query;
  */
 public interface UserQuery extends Query<UserQuery, User> {
 
-  /** Only select {@link User}s with the given id/ */
-  UserQuery userId(String id);
-  
-  /** Only select {@link User}s with the given ids/ */
-  UserQuery userIds(List<String> ids);
-  
-  /** Only select {@link User}s with the given id (ignoring case) / */
-  UserQuery userIdIgnoreCase(String id);
+    /** Only select {@link User}s with the given id/ */
+    UserQuery userId(String id);
 
-  /** Only select {@link User}s with the given firstName. */
-  UserQuery userFirstName(String firstName);
+    /** Only select {@link User}s with the given ids/ */
+    UserQuery userIds(List<String> ids);
 
-  /**
-   * Only select {@link User}s where the first name matches the given parameter. The syntax is that of SQL, eg. %name%.
-   */
-  UserQuery userFirstNameLike(String firstNameLike);
-  
-  /**
-   * Only select {@link User}s where the first name matches the given parameter (ignoring case). The syntax is that of SQL, eg. %name%.
-   */
-  UserQuery userFirstNameLikeIgnoreCase(String firstNameLikeIgnoreCase);
+    /** Only select {@link User}s with the given id (ignoring case) / */
+    UserQuery userIdIgnoreCase(String id);
 
-  /** Only select {@link User}s with the given lastName. */
-  UserQuery userLastName(String lastName);
+    /** Only select {@link User}s with the given firstName. */
+    UserQuery userFirstName(String firstName);
 
-  /**
-   * Only select {@link User}s where the last name matches the given parameter. The syntax is that of SQL, eg. %name%.
-   */
-  UserQuery userLastNameLike(String lastNameLike);
-  
-  /**
-   * Only select {@link User}s where the last name matches the given parameter (ignoring case). The syntax is that of SQL, eg. %name%.
-   */
-  UserQuery userLastNameLikeIgnoreCase(String lastNameLikeIgnoreCase);
+    /**
+     * Only select {@link User}s where the first name matches the given parameter. The syntax is that of SQL, eg. %name%.
+     */
+    UserQuery userFirstNameLike(String firstNameLike);
 
-  /**
-   * Only select {@link User}s where the full name matches the given parameters. Both the first name and last name will be tried, ie in semi-sql: where firstName like xxx or lastname like xxx
-   */
-  UserQuery userFullNameLike(String fullNameLike);
-  
-  /**
-   * Only select {@link User}s where the full name matches the given parameters (ignoring case). Both the first name and last name will be tried, ie in semi-sql: where firstName like xxx or lastname like xxx
-   */
-  UserQuery userFullNameLikeIgnoreCase(String fullNameLikeIgnoreCase);
+    /**
+     * Only select {@link User}s where the first name matches the given parameter (ignoring case). The syntax is that of SQL, eg. %name%.
+     */
+    UserQuery userFirstNameLikeIgnoreCase(String firstNameLikeIgnoreCase);
 
-  /** Only those {@link User}s with the given email address. */
-  UserQuery userEmail(String email);
+    /** Only select {@link User}s with the given lastName. */
+    UserQuery userLastName(String lastName);
 
-  /**
-   * Only select {@link User}s where the email matches the given parameter. The syntax is that of SQL, eg. %test%.
-   */
-  UserQuery userEmailLike(String emailLike);
+    /**
+     * Only select {@link User}s where the last name matches the given parameter. The syntax is that of SQL, eg. %name%.
+     */
+    UserQuery userLastNameLike(String lastNameLike);
 
-  /** Only select {@link User}s that belong to the given group. */
-  UserQuery memberOfGroup(String groupId);
-  
-  /** Only select {@link User}s that belong to the given groups. */
-  UserQuery memberOfGroups(List<String> groupIds);
+    /**
+     * Only select {@link User}s where the last name matches the given parameter (ignoring case). The syntax is that of SQL, eg. %name%.
+     */
+    UserQuery userLastNameLikeIgnoreCase(String lastNameLikeIgnoreCase);
 
-  // sorting ////////////////////////////////////////////////////////
+    /**
+     * Only select {@link User}s where the full name matches the given parameters. Both the first name and last name will be tried, ie in semi-sql: where firstName like xxx or lastname like xxx
+     */
+    UserQuery userFullNameLike(String fullNameLike);
 
-  /**
-   * Order by user id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  UserQuery orderByUserId();
+    /**
+     * Only select {@link User}s where the full name matches the given parameters (ignoring case). Both the first name and last name will be tried, ie in semi-sql: where firstName like xxx or lastname
+     * like xxx
+     */
+    UserQuery userFullNameLikeIgnoreCase(String fullNameLikeIgnoreCase);
 
-  /**
-   * Order by user first name (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  UserQuery orderByUserFirstName();
+    /** Only those {@link User}s with the given email address. */
+    UserQuery userEmail(String email);
 
-  /**
-   * Order by user last name (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  UserQuery orderByUserLastName();
+    /**
+     * Only select {@link User}s where the email matches the given parameter. The syntax is that of SQL, eg. %test%.
+     */
+    UserQuery userEmailLike(String emailLike);
 
-  /**
-   * Order by user email (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  UserQuery orderByUserEmail();
+    /** Only select {@link User}s that belong to the given group. */
+    UserQuery memberOfGroup(String groupId);
+
+    /** Only select {@link User}s that belong to the given groups. */
+    UserQuery memberOfGroups(List<String> groupIds);
+
+    // sorting ////////////////////////////////////////////////////////
+
+    /**
+     * Order by user id (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    UserQuery orderByUserId();
+
+    /**
+     * Order by user first name (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    UserQuery orderByUserFirstName();
+
+    /**
+     * Order by user last name (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    UserQuery orderByUserLastName();
+
+    /**
+     * Order by user email (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    UserQuery orderByUserEmail();
 }

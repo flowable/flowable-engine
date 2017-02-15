@@ -19,13 +19,13 @@ import org.flowable.compatibility.testdata.Flowable5TestDataGenerator;
 
 public class ParseHandlerTestDataGenerator implements Flowable5TestDataGenerator {
 
-  @Override
-  public void generateTestData(ProcessEngine processEngine) {
-    RepositoryService repositoryService = processEngine.getRepositoryService();
-    repositoryService.createDeployment().addClasspathResource("parseHandlerProcess.bpmn20.xml").deploy();
-    
-    RuntimeService runtimeService = processEngine.getRuntimeService();
-    runtimeService.startProcessInstanceByKey("parseHandlerTestProcess");
-  }
+    @Override
+    public void generateTestData(ProcessEngine processEngine) {
+        RepositoryService repositoryService = processEngine.getRepositoryService();
+        repositoryService.createDeployment().addClasspathResource("parseHandlerProcess.bpmn20.xml").deploy();
+
+        RuntimeService runtimeService = processEngine.getRuntimeService();
+        runtimeService.startProcessInstanceByKey("parseHandlerTestProcess");
+    }
 
 }

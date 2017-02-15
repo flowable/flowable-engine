@@ -22,13 +22,13 @@ import org.flowable.engine.impl.persistence.entity.EventLogEntryEntity;
  * @author Joram Barrez
  */
 public interface EventLogEntryDataManager extends DataManager<EventLogEntryEntity> {
-  
-  List<EventLogEntry> findAllEventLogEntries();
 
-  List<EventLogEntry> findEventLogEntries(long startLogNr, long pageSize);
+    List<EventLogEntry> findAllEventLogEntries();
 
-  List<EventLogEntry> findEventLogEntriesByProcessInstanceId(String processInstanceId);
+    List<EventLogEntry> findEventLogEntries(long startLogNr, long pageSize);
 
-  void deleteEventLogEntry(long logNr);
+    List<EventLogEntry> findEventLogEntriesByProcessInstanceId(String processInstanceId);
+
+    void deleteEventLogEntry(long logNr);
 
 }

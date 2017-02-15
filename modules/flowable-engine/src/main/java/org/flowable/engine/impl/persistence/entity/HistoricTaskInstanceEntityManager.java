@@ -23,19 +23,19 @@ import org.flowable.engine.impl.HistoricTaskInstanceQueryImpl;
  * @author Joram Barrez
  */
 public interface HistoricTaskInstanceEntityManager extends EntityManager<HistoricTaskInstanceEntity> {
-  
-  HistoricTaskInstanceEntity create(TaskEntity task, ExecutionEntity execution);
 
-  long findHistoricTaskInstanceCountByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery);
+    HistoricTaskInstanceEntity create(TaskEntity task, ExecutionEntity execution);
 
-  List<HistoricTaskInstance> findHistoricTaskInstancesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery);
+    long findHistoricTaskInstanceCountByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery);
 
-  List<HistoricTaskInstance> findHistoricTaskInstancesAndVariablesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery);
+    List<HistoricTaskInstance> findHistoricTaskInstancesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery);
 
-  List<HistoricTaskInstance> findHistoricTaskInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<HistoricTaskInstance> findHistoricTaskInstancesAndVariablesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery);
 
-  long findHistoricTaskInstanceCountByNativeQuery(Map<String, Object> parameterMap);
-  
-  void deleteHistoricTaskInstancesByProcessInstanceId(String processInstanceId);
+    List<HistoricTaskInstance> findHistoricTaskInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+
+    long findHistoricTaskInstanceCountByNativeQuery(Map<String, Object> parameterMap);
+
+    void deleteHistoricTaskInstancesByProcessInstanceId(String processInstanceId);
 
 }

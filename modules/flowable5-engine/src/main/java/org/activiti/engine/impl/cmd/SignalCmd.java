@@ -23,40 +23,40 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
  */
 public class SignalCmd extends NeedsActiveExecutionCmd<Object> {
 
-  private static final long serialVersionUID = 1L;
-  
-  protected String signalName;
-  protected Object signalData;
-  protected final Map<String, Object> processVariables;
-  protected Map<String, Object> transientVariables;
-  
-  public SignalCmd(String executionId, String signalName, Object signalData, Map<String, Object> processVariables) {
-    super(executionId);
-    this.signalName = signalName;
-    this.signalData = signalData;
-    this.processVariables = processVariables;
-  }
-  
-  public SignalCmd(String executionId, Map<String, Object> processVariables, Map<String, Object> transientVariables) {
-    super(executionId);
-    this.processVariables = processVariables;
-    this.transientVariables = transientVariables;
-  }
-  
-  protected Object execute(CommandContext commandContext, ExecutionEntity execution) {
-    if(processVariables != null) {
-      execution.setVariables(processVariables);
+    private static final long serialVersionUID = 1L;
+
+    protected String signalName;
+    protected Object signalData;
+    protected final Map<String, Object> processVariables;
+    protected Map<String, Object> transientVariables;
+
+    public SignalCmd(String executionId, String signalName, Object signalData, Map<String, Object> processVariables) {
+        super(executionId);
+        this.signalName = signalName;
+        this.signalData = signalData;
+        this.processVariables = processVariables;
     }
-    if (transientVariables != null) {
-      execution.setTransientVariables(transientVariables);
+
+    public SignalCmd(String executionId, Map<String, Object> processVariables, Map<String, Object> transientVariables) {
+        super(executionId);
+        this.processVariables = processVariables;
+        this.transientVariables = transientVariables;
     }
-    execution.signal(signalName, signalData);
-    return null;
-  }
-  
-  @Override
-  protected String getSuspendedExceptionMessage() {
-    return "Cannot signal an execution that is suspended";
-  }
+
+    protected Object execute(CommandContext commandContext, ExecutionEntity execution) {
+        if (processVariables != null) {
+            execution.setVariables(processVariables);
+        }
+        if (transientVariables != null) {
+            execution.setTransientVariables(transientVariables);
+        }
+        execution.signal(signalName, signalData);
+        return null;
+    }
+
+    @Override
+    protected String getSuspendedExceptionMessage() {
+        return "Cannot signal an execution that is suspended";
+    }
 
 }

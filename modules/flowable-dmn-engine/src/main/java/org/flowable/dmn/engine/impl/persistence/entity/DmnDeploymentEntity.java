@@ -26,27 +26,27 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
  */
 public interface DmnDeploymentEntity extends DmnDeployment, Entity {
 
-  void addResource(ResourceEntity resource);
-  
-  Map<String, ResourceEntity> getResources();
+    void addResource(ResourceEntity resource);
 
-  void addDeployedArtifact(Object deployedArtifact);
+    Map<String, ResourceEntity> getResources();
 
-  <T> List<T> getDeployedArtifacts(Class<T> clazz);
+    void addDeployedArtifact(Object deployedArtifact);
 
-  void setName(String name);
+    <T> List<T> getDeployedArtifacts(Class<T> clazz);
 
-  void setCategory(String category);
+    void setName(String name);
 
-  void setTenantId(String tenantId);
-  
-  void setParentDeploymentId(String parentDeploymentId);
+    void setCategory(String category);
 
-  void setResources(Map<String, ResourceEntity> resources);
+    void setTenantId(String tenantId);
 
-  void setDeploymentTime(Date deploymentTime);
+    void setParentDeploymentId(String parentDeploymentId);
 
-  boolean isNew();
+    void setResources(Map<String, ResourceEntity> resources);
 
-  void setNew(boolean isNew);
+    void setDeploymentTime(Date deploymentTime);
+
+    boolean isNew();
+
+    void setNew(boolean isNew);
 }

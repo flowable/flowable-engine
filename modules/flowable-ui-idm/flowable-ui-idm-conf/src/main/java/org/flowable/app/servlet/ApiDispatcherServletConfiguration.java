@@ -29,15 +29,15 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import java.util.List;
 
 @Configuration
-@ComponentScan(value = {"org.flowable.app.rest.api", "org.flowable.app.rest.exception"})
+@ComponentScan(value = { "org.flowable.app.rest.api", "org.flowable.app.rest.exception" })
 @EnableAsync
 public class ApiDispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
-	@Autowired
+    @Autowired
     protected ObjectMapper objectMapper;
-    
-	@Autowired
-	protected Environment environment;
+
+    @Autowired
+    protected Environment environment;
 
     @Bean
     public SessionLocaleResolver localeResolver() {
@@ -52,11 +52,11 @@ public class ApiDispatcherServletConfiguration extends WebMvcConfigurationSuppor
         requestMappingHandlerMapping.setInterceptors(getInterceptors());
         return requestMappingHandlerMapping;
     }
-    
+
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         addDefaultHttpMessageConverters(converters);
-        for (HttpMessageConverter<?> converter: converters) {
+        for (HttpMessageConverter<?> converter : converters) {
             if (converter instanceof MappingJackson2HttpMessageConverter) {
                 MappingJackson2HttpMessageConverter jackson2HttpMessageConverter = (MappingJackson2HttpMessageConverter) converter;
                 jackson2HttpMessageConverter.setObjectMapper(objectMapper);

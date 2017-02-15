@@ -25,12 +25,12 @@ import org.flowable.engine.impl.variable.VariableType;
  */
 public interface HistoricDetailVariableInstanceUpdateEntity extends HistoricDetailEntity, ValueFields, HistoricVariableUpdate, Entity, HasRevision {
 
-  void setName(String name);
-  
-  ByteArrayRef getByteArrayRef();
-  
-  VariableType getVariableType();
+    void setName(String name);
 
-  void setVariableType(VariableType variableType);
-  
+    ByteArrayRef getByteArrayRef();
+
+    VariableType getVariableType();
+
+    void setVariableType(VariableType variableType);
+
 }

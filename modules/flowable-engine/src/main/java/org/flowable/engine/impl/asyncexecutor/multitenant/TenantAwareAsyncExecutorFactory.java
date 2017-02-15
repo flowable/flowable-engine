@@ -15,17 +15,16 @@ package org.flowable.engine.impl.asyncexecutor.multitenant;
 import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
 
 /**
- * Factory used by the {@link ExecutorPerTenantAsyncExecutor} async executor.
- * This factory will be called when a new {@link AsyncExecutor} for a tenant needs to be created
- * and can be used to create special implementations for specific tenants.
+ * Factory used by the {@link ExecutorPerTenantAsyncExecutor} async executor. This factory will be called when a new {@link AsyncExecutor} for a tenant needs to be created and can be used to create
+ * special implementations for specific tenants.
  * 
  * @author Joram Barrez
  */
 public interface TenantAwareAsyncExecutorFactory {
 
-  /**
-   * Allows to create an {@link AsyncExecutor} specifically for a tenant. 
-   */
-  AsyncExecutor createAsyncExecutor(String tenantId);
+    /**
+     * Allows to create an {@link AsyncExecutor} specifically for a tenant.
+     */
+    AsyncExecutor createAsyncExecutor(String tenantId);
 
 }

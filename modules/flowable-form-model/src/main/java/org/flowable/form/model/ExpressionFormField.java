@@ -18,15 +18,15 @@ package org.flowable.form.model;
  */
 public class ExpressionFormField extends FormField {
 
-  private static final long serialVersionUID = 1L;
-  
-  protected String expression;
+    private static final long serialVersionUID = 1L;
 
-  public String getExpression() {
-    return expression;
-  }
+    protected String expression;
 
-  public void setExpression(String expression) {
-    this.expression = expression;
-  }
+    public String getExpression() {
+        return expression;
+    }
+
+    public void setExpression(String expression) {
+        this.expression = expression;
+    }
 }

@@ -26,18 +26,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ApiGroupsResource {
-  
-  @Autowired
-  protected GroupService groupService;
-  
-  @RequestMapping(value = "/idm/groups", method = RequestMethod.GET, produces = {"application/json"})
-  public List<GroupRepresentation> findGroupsByFilter(@RequestParam("filter") String filter) {
-    List<GroupRepresentation> result = new ArrayList<GroupRepresentation>();
-    List<Group> groups = groupService.getGroups(filter);
-    for (Group group : groups) {
-      result.add(new GroupRepresentation(group));
+
+    @Autowired
+    protected GroupService groupService;
+
+    @RequestMapping(value = "/idm/groups", method = RequestMethod.GET, produces = { "application/json" })
+    public List<GroupRepresentation> findGroupsByFilter(@RequestParam("filter") String filter) {
+        List<GroupRepresentation> result = new ArrayList<GroupRepresentation>();
+        List<Group> groups = groupService.getGroups(filter);
+        for (Group group : groups) {
+            result.add(new GroupRepresentation(group));
+        }
+        return result;
     }
-    return result;
-  }
 
 }

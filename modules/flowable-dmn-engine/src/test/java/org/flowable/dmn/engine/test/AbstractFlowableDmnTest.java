@@ -25,8 +25,7 @@ import org.junit.Rule;
  * 
  * Boots up a dmn engine and caches it.
  * 
- * When using H2 and the default schema name, it will also boot the H2 webapp
- * (reachable with browser on http://localhost:8082/)
+ * When using H2 and the default schema name, it will also boot the H2 webapp (reachable with browser on http://localhost:8082/)
  * 
  * @author Joram Barrez
  * @author Tijs Rademakers

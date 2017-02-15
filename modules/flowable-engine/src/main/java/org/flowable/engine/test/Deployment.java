@@ -60,9 +60,9 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Deployment {
 
-  /** Specify resources that make up the process definition. */
-  public String[] resources() default {};
-  
-  /** Specify tenantId to deploy for */
-  public String tenantId() default "";
+    /** Specify resources that make up the process definition. */
+    public String[] resources() default {};
+
+    /** Specify tenantId to deploy for */
+    public String tenantId() default "";
 }

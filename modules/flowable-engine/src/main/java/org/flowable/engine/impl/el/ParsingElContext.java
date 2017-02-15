@@ -31,23 +31,23 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
  * @author Joram Barrez
  */
 public class ParsingElContext extends ELContext {
-  
-  protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-  public ParsingElContext(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    this.processEngineConfiguration = processEngineConfiguration;
-  }
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-  public ELResolver getELResolver() {
-    return null;
-  }
+    public ParsingElContext(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        this.processEngineConfiguration = processEngineConfiguration;
+    }
 
-  public FunctionMapper getFunctionMapper() {
-    return new FlowableFunctionMapper(processEngineConfiguration);
-  }
+    public ELResolver getELResolver() {
+        return null;
+    }
 
-  public VariableMapper getVariableMapper() {
-    return null;
-  }
+    public FunctionMapper getFunctionMapper() {
+        return new FlowableFunctionMapper(processEngineConfiguration);
+    }
+
+    public VariableMapper getVariableMapper() {
+        return null;
+    }
 
 }

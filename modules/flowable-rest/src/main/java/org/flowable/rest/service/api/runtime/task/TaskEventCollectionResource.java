@@ -33,17 +33,17 @@ import java.util.List;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
 public class TaskEventCollectionResource extends TaskBaseResource {
 
-  @ApiOperation(value = "Get all events for a task", tags = {"Tasks"})
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Indicates the task was found and the events are returned."),
-          @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
-  })
-  @RequestMapping(value = "/runtime/tasks/{taskId}/events", method = RequestMethod.GET, produces = "application/json")
-  public List<EventResponse> getEvents(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
-    HistoricTaskInstance task = getHistoricTaskFromRequest(taskId);
-    return restResponseFactory.createEventResponseList(taskService.getTaskEvents(task.getId()));
-  }
+    @ApiOperation(value = "Get all events for a task", tags = { "Tasks" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the task was found and the events are returned."),
+            @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
+    })
+    @RequestMapping(value = "/runtime/tasks/{taskId}/events", method = RequestMethod.GET, produces = "application/json")
+    public List<EventResponse> getEvents(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
+        HistoricTaskInstance task = getHistoricTaskFromRequest(taskId);
+        return restResponseFactory.createEventResponseList(taskService.getTaskEvents(task.getId()));
+    }
 }

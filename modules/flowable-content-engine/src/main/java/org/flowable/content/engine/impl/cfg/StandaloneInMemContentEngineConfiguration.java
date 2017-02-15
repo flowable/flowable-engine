@@ -17,7 +17,7 @@ package org.flowable.content.engine.impl.cfg;
  */
 public class StandaloneInMemContentEngineConfiguration extends StandaloneContentEngineConfiguration {
 
-  public StandaloneInMemContentEngineConfiguration() {
-    this.jdbcUrl = "jdbc:h2:mem:flowable";
-  }
+    public StandaloneInMemContentEngineConfiguration() {
+        this.jdbcUrl = "jdbc:h2:mem:flowable";
+    }
 }

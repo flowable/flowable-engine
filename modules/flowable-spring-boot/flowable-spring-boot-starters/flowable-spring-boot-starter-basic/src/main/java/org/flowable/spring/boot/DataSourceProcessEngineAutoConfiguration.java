@@ -36,26 +36,26 @@ import org.springframework.transaction.PlatformTransactionManager;
 @AutoConfigureAfter(DataSourceAutoConfiguration.class)
 public class DataSourceProcessEngineAutoConfiguration {
 
-  @Configuration
-  @ConditionalOnMissingClass(name= "javax.persistence.EntityManagerFactory")
-  @EnableConfigurationProperties(FlowableProperties.class)
-  public static class DataSourceProcessEngineConfiguration extends AbstractProcessEngineAutoConfiguration {
+    @Configuration
+    @ConditionalOnMissingClass(name = "javax.persistence.EntityManagerFactory")
+    @EnableConfigurationProperties(FlowableProperties.class)
+    public static class DataSourceProcessEngineConfiguration extends AbstractProcessEngineAutoConfiguration {
 
-    @Bean
-    @ConditionalOnMissingBean
-    public PlatformTransactionManager transactionManager(DataSource dataSource) {
-      return new DataSourceTransactionManager(dataSource);
-    }
+        @Bean
+        @ConditionalOnMissingBean
+        public PlatformTransactionManager transactionManager(DataSource dataSource) {
+            return new DataSourceTransactionManager(dataSource);
+        }
 
-    @Bean
-    @ConditionalOnMissingBean
-    public SpringProcessEngineConfiguration springProcessEngineConfiguration(
-            DataSource dataSource,
-            PlatformTransactionManager transactionManager,
-            SpringAsyncExecutor springAsyncExecutor) throws IOException {
-      
-      return this.baseSpringProcessEngineConfiguration(dataSource, transactionManager, springAsyncExecutor);
+        @Bean
+        @ConditionalOnMissingBean
+        public SpringProcessEngineConfiguration springProcessEngineConfiguration(
+                DataSource dataSource,
+                PlatformTransactionManager transactionManager,
+                SpringAsyncExecutor springAsyncExecutor) throws IOException {
+
+            return this.baseSpringProcessEngineConfiguration(dataSource, transactionManager, springAsyncExecutor);
+        }
     }
-  }
 
 }

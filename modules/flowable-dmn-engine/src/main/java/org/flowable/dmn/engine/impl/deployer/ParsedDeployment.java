@@ -23,60 +23,57 @@ import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnDefinition;
 
 /**
- * An intermediate representation of a DeploymentEntity which keeps track of all of the entity's
- * DecisionTableEntities and resources, and BPMN parses, models, and processes associated
- * with each DecisionTableEntity - all produced by parsing the deployment.
+ * An intermediate representation of a DeploymentEntity which keeps track of all of the entity's DecisionTableEntities and resources, and BPMN parses, models, and processes associated with each
+ * DecisionTableEntity - all produced by parsing the deployment.
  * 
- * The DecisionTableEntities are expected to be "not fully set-up" - they may be inconsistent with the 
- * DeploymentEntity and/or the persisted versions, and if the deployment is new, they will not yet be persisted.
+ * The DecisionTableEntities are expected to be "not fully set-up" - they may be inconsistent with the DeploymentEntity and/or the persisted versions, and if the deployment is new, they will not yet
+ * be persisted.
  */
 public class ParsedDeployment {
-  
-  protected DmnDeploymentEntity deploymentEntity;
 
-  protected List<DecisionTableEntity> decisionTables;
-  protected Map<DecisionTableEntity, DmnParse> mapDecisionTablesToParses;
-  protected Map<DecisionTableEntity, ResourceEntity> mapDecisionTablesToResources;
-  
-  public ParsedDeployment(
-      DmnDeploymentEntity entity, List<DecisionTableEntity> decisionTables,
-      Map<DecisionTableEntity, DmnParse> mapDecisionTablesToParses,
-      Map<DecisionTableEntity, ResourceEntity> mapDecisionTablesToResources) {
-    
-    this.deploymentEntity = entity;
-    this.decisionTables = decisionTables;
-    this.mapDecisionTablesToParses = mapDecisionTablesToParses;
-    this.mapDecisionTablesToResources = mapDecisionTablesToResources;
-  }
+    protected DmnDeploymentEntity deploymentEntity;
 
-  
-  public DmnDeploymentEntity getDeployment() {
-    return deploymentEntity;
-  }
+    protected List<DecisionTableEntity> decisionTables;
+    protected Map<DecisionTableEntity, DmnParse> mapDecisionTablesToParses;
+    protected Map<DecisionTableEntity, ResourceEntity> mapDecisionTablesToResources;
 
-  public List<DecisionTableEntity> getAllDecisionTables() {
-    return decisionTables;
-  }
+    public ParsedDeployment(
+            DmnDeploymentEntity entity, List<DecisionTableEntity> decisionTables,
+            Map<DecisionTableEntity, DmnParse> mapDecisionTablesToParses,
+            Map<DecisionTableEntity, ResourceEntity> mapDecisionTablesToResources) {
 
-  public ResourceEntity getResourceForDecisionTable(DecisionTableEntity decisionTable) {
-    return mapDecisionTablesToResources.get(decisionTable);
-  }
+        this.deploymentEntity = entity;
+        this.decisionTables = decisionTables;
+        this.mapDecisionTablesToParses = mapDecisionTablesToParses;
+        this.mapDecisionTablesToResources = mapDecisionTablesToResources;
+    }
 
-  public DmnParse getDmnParseForDecisionTable(DecisionTableEntity decisionTable) {
-    return mapDecisionTablesToParses.get(decisionTable);
-  }
+    public DmnDeploymentEntity getDeployment() {
+        return deploymentEntity;
+    }
 
-  public DmnDefinition getDmnDefinitionForDecisionTable(DecisionTableEntity decisionTable) {
-    DmnParse parse = getDmnParseForDecisionTable(decisionTable);
-    
-    return (parse == null ? null : parse.getDmnDefinition());
-  }
-  
-  public Decision getDecisionForDecisionTable(DecisionTableEntity decisionTable) {
-    DmnDefinition dmnDefinition = getDmnDefinitionForDecisionTable(decisionTable);
+    public List<DecisionTableEntity> getAllDecisionTables() {
+        return decisionTables;
+    }
 
-    return (dmnDefinition == null ? null : dmnDefinition.getDecisionById(decisionTable.getKey()));
-  }
-  
+    public ResourceEntity getResourceForDecisionTable(DecisionTableEntity decisionTable) {
+        return mapDecisionTablesToResources.get(decisionTable);
+    }
+
+    public DmnParse getDmnParseForDecisionTable(DecisionTableEntity decisionTable) {
+        return mapDecisionTablesToParses.get(decisionTable);
+    }
+
+    public DmnDefinition getDmnDefinitionForDecisionTable(DecisionTableEntity decisionTable) {
+        DmnParse parse = getDmnParseForDecisionTable(decisionTable);
+
+        return (parse == null ? null : parse.getDmnDefinition());
+    }
+
+    public Decision getDecisionForDecisionTable(DecisionTableEntity decisionTable) {
+        DmnDefinition dmnDefinition = getDmnDefinitionForDecisionTable(decisionTable);
+
+        return (dmnDefinition == null ? null : dmnDefinition.getDecisionById(decisionTable.getKey()));
+    }
+
 }
-

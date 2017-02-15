@@ -17,33 +17,32 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 
 /**
- * Base implementation of a {@link FlowableEventListener}, used when creating event-listeners
- * that are part of a BPMN definition.
+ * Base implementation of a {@link FlowableEventListener}, used when creating event-listeners that are part of a BPMN definition.
  * 
  * @author Frederik Heremans
  */
 public abstract class BaseDelegateEventListener implements FlowableEventListener {
 
-	protected Class<?> entityClass;
-	
-	public void setEntityClass(Class<?> entityClass) {
-	  this.entityClass = entityClass;
-  }
-	
-	protected boolean isValidEvent(FlowableEvent event) {
-		boolean valid = false;
-	  if(entityClass != null) {
-	  	if(event instanceof FlowableEntityEvent) {
-	  		Object entity = ((FlowableEntityEvent) event).getEntity();
-	  		if(entity != null) {
-	  			valid = entityClass.isAssignableFrom(entity.getClass());
-	  		}
-	  	}
-	  } else {
-	  	// If no class is specified, all events are valid
-	  	valid = true;
-	  }
-	  return valid;
-  }
-	
+    protected Class<?> entityClass;
+
+    public void setEntityClass(Class<?> entityClass) {
+        this.entityClass = entityClass;
+    }
+
+    protected boolean isValidEvent(FlowableEvent event) {
+        boolean valid = false;
+        if (entityClass != null) {
+            if (event instanceof FlowableEntityEvent) {
+                Object entity = ((FlowableEntityEvent) event).getEntity();
+                if (entity != null) {
+                    valid = entityClass.isAssignableFrom(entity.getClass());
+                }
+            }
+        } else {
+            // If no class is specified, all events are valid
+            valid = true;
+        }
+        return valid;
+    }
+
 }

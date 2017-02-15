@@ -19,53 +19,51 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 
 /**
- * An {@link FlowableEventListener} implementation which uses a classname to
- * create a delegate {@link FlowableEventListener} instance to use for event notification.
- * <br><br>
+ * An {@link FlowableEventListener} implementation which uses a classname to create a delegate {@link FlowableEventListener} instance to use for event notification. <br>
+ * <br>
  * 
- * In case an entityClass was passed in the constructor, only events that are {@link FlowableEntityEvent}'s
- * that target an entity of the given type, are dispatched to the delegate.
- *  
+ * In case an entityClass was passed in the constructor, only events that are {@link FlowableEntityEvent}'s that target an entity of the given type, are dispatched to the delegate.
+ * 
  * @author Frederik Heremans
  */
 public class DelegateActivitiEventListener extends BaseDelegateEventListener {
 
-	protected String className;
-	protected FlowableEventListener delegateInstance;
-	protected boolean failOnException = true;
+    protected String className;
+    protected FlowableEventListener delegateInstance;
+    protected boolean failOnException = true;
 
-	public DelegateActivitiEventListener(String className, Class<?> entityClass) {
-		this.className = className;
-		setEntityClass(entityClass);
-	}
+    public DelegateActivitiEventListener(String className, Class<?> entityClass) {
+        this.className = className;
+        setEntityClass(entityClass);
+    }
 
-	@Override
-	public void onEvent(FlowableEvent event) {
-		if (isValidEvent(event)) {
-			getDelegateInstance().onEvent(event);
-		}
-	}
+    @Override
+    public void onEvent(FlowableEvent event) {
+        if (isValidEvent(event)) {
+            getDelegateInstance().onEvent(event);
+        }
+    }
 
-	@Override
-	public boolean isFailOnException() {
-		if (delegateInstance != null) {
-			return delegateInstance.isFailOnException();
-		}
-		return failOnException;
-	}
-	
-	protected FlowableEventListener getDelegateInstance() {
-		if (delegateInstance == null) {
-			Object instance = ReflectUtil.instantiate(className);
-			if (instance instanceof FlowableEventListener) {
-				delegateInstance = (FlowableEventListener) instance;
-			} else {
-				// Force failing of the listener invocation, since the delegate cannot be created
-				failOnException = true;
-				throw new ActivitiIllegalArgumentException("Class " + className
-				    + " does not implement " + FlowableEventListener.class.getName());
-			}
-		}
-		return delegateInstance;
-	}
+    @Override
+    public boolean isFailOnException() {
+        if (delegateInstance != null) {
+            return delegateInstance.isFailOnException();
+        }
+        return failOnException;
+    }
+
+    protected FlowableEventListener getDelegateInstance() {
+        if (delegateInstance == null) {
+            Object instance = ReflectUtil.instantiate(className);
+            if (instance instanceof FlowableEventListener) {
+                delegateInstance = (FlowableEventListener) instance;
+            } else {
+                // Force failing of the listener invocation, since the delegate cannot be created
+                failOnException = true;
+                throw new ActivitiIllegalArgumentException("Class " + className
+                        + " does not implement " + FlowableEventListener.class.getName());
+            }
+        }
+        return delegateInstance;
+    }
 }

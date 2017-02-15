@@ -35,75 +35,75 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 @RestController
 public class JobClientResource extends AbstractClientResource {
-  
-  private static final Logger logger = LoggerFactory.getLogger(JobClientResource.class);
 
-	@Autowired
-	protected JobService clientService;
+    private static final Logger logger = LoggerFactory.getLogger(JobClientResource.class);
 
-	/**
-	 * GET /rest/admin/jobs/{jobId} -> return job data
-	 */
-	@RequestMapping(value = "/rest/admin/jobs/{jobId}", method = RequestMethod.GET, produces = "application/json")
-	public JsonNode getJob(@PathVariable String jobId) throws BadRequestException {
+    @Autowired
+    protected JobService clientService;
 
-		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-		try {
-			return clientService.getJob(serverConfig, jobId);
-		} catch (FlowableServiceException e) {
-		  logger.error("Error getting job {}", jobId, e);
-			throw new BadRequestException(e.getMessage());
-		}
-	}
+    /**
+     * GET /rest/admin/jobs/{jobId} -> return job data
+     */
+    @RequestMapping(value = "/rest/admin/jobs/{jobId}", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getJob(@PathVariable String jobId) throws BadRequestException {
 
-	/**
-	 * DELETE /rest/admin/jobs/{jobId} -> delete job
-	 */
-	@RequestMapping(value = "/rest/admin/jobs/{jobId}", method = RequestMethod.DELETE, produces = "application/json")
-	@ResponseStatus(value = HttpStatus.OK)
-	public void deleteJob(@PathVariable String jobId) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            return clientService.getJob(serverConfig, jobId);
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting job {}", jobId, e);
+            throw new BadRequestException(e.getMessage());
+        }
+    }
 
-		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-		try {
-			clientService.deleteJob(serverConfig, jobId);
-		} catch (FlowableServiceException e) {
-		  logger.error("Error deleting job {}", jobId, e);
-			throw new BadRequestException(e.getMessage());
-		}
-	}
+    /**
+     * DELETE /rest/admin/jobs/{jobId} -> delete job
+     */
+    @RequestMapping(value = "/rest/admin/jobs/{jobId}", method = RequestMethod.DELETE, produces = "application/json")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void deleteJob(@PathVariable String jobId) throws BadRequestException {
 
-	/**
-	 * POST /rest/admin/jobs/{jobId} -> execute job
-	 */
-	@RequestMapping(value = "/rest/admin/jobs/{jobId}", method = RequestMethod.POST, produces = "application/json")
-	@ResponseStatus(value = HttpStatus.OK)
-	public void executeJob(@PathVariable String jobId) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            clientService.deleteJob(serverConfig, jobId);
+        } catch (FlowableServiceException e) {
+            logger.error("Error deleting job {}", jobId, e);
+            throw new BadRequestException(e.getMessage());
+        }
+    }
 
-		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-		try {
-			 clientService.executeJob(serverConfig, jobId);
-		} catch (FlowableServiceException e) {
-		  logger.error("Error executing job {}", jobId, e);
-			throw new BadRequestException(e.getMessage());
-		}
-	}
+    /**
+     * POST /rest/admin/jobs/{jobId} -> execute job
+     */
+    @RequestMapping(value = "/rest/admin/jobs/{jobId}", method = RequestMethod.POST, produces = "application/json")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void executeJob(@PathVariable String jobId) throws BadRequestException {
 
-	/**
-	 * GET /rest/admin/jobs/{jobId}/exception-stracktrace -> return job stacktrace
-	 */
-	@RequestMapping(value = "/rest/admin/jobs/{jobId}/stacktrace", method = RequestMethod.GET, produces = "text/plain")
-	public String getJobStacktrace(@PathVariable String jobId) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            clientService.executeJob(serverConfig, jobId);
+        } catch (FlowableServiceException e) {
+            logger.error("Error executing job {}", jobId, e);
+            throw new BadRequestException(e.getMessage());
+        }
+    }
 
-		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-		try {
-			String trace =  clientService.getJobStacktrace(serverConfig, jobId);
-			if(trace != null) {
-				trace = StringUtils.trim(trace);
-			}
-			return trace;
-		} catch (FlowableServiceException e) {
-		  logger.error("Error getting job stacktrace {}", jobId, e);
-			throw new BadRequestException(e.getMessage());
-		}
-	}
+    /**
+     * GET /rest/admin/jobs/{jobId}/exception-stracktrace -> return job stacktrace
+     */
+    @RequestMapping(value = "/rest/admin/jobs/{jobId}/stacktrace", method = RequestMethod.GET, produces = "text/plain")
+    public String getJobStacktrace(@PathVariable String jobId) throws BadRequestException {
+
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            String trace = clientService.getJobStacktrace(serverConfig, jobId);
+            if (trace != null) {
+                trace = StringUtils.trim(trace);
+            }
+            return trace;
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting job stacktrace {}", jobId, e);
+            throw new BadRequestException(e.getMessage());
+        }
+    }
 }

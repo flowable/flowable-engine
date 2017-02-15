@@ -22,34 +22,35 @@ import java.io.Serializable;
  */
 public abstract class DiagramElement implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-  
-  protected String id;
+    private static final long serialVersionUID = 1L;
 
-  public DiagramElement() {
-  }
+    protected String id;
 
-  public DiagramElement(String id) {
-    this.id = id;
-  }
+    public DiagramElement() {
+    }
 
-  /**
-   * Id of the diagram element.
-   */
-  public String getId() {
-    return id;
-  }
+    public DiagramElement(String id) {
+        this.id = id;
+    }
 
-  public void setId(String id) {
-    this.id = id;
-  }
-  
-  @Override
-  public String toString() {
-    return "id=" + getId();
-  }
+    /**
+     * Id of the diagram element.
+     */
+    public String getId() {
+        return id;
+    }
 
-  public abstract boolean isNode();
-  public abstract boolean isEdge();
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "id=" + getId();
+    }
+
+    public abstract boolean isNode();
+
+    public abstract boolean isEdge();
 
 }

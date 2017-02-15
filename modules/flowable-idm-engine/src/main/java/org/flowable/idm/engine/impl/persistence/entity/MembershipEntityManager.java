@@ -20,12 +20,12 @@ import org.flowable.engine.common.impl.persistence.entity.EntityManager;
  */
 public interface MembershipEntityManager extends EntityManager<MembershipEntity> {
 
-  void createMembership(String userId, String groupId);
+    void createMembership(String userId, String groupId);
 
-  void deleteMembership(String userId, String groupId);
-  
-  void deleteMembershipByGroupId(String groupId);
-  
-  void deleteMembershipByUserId(String userId);
+    void deleteMembership(String userId, String groupId);
+
+    void deleteMembershipByGroupId(String groupId);
+
+    void deleteMembershipByUserId(String userId);
 
 }

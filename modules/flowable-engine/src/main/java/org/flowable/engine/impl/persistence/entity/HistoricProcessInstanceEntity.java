@@ -23,44 +23,44 @@ import org.flowable.engine.history.HistoricProcessInstance;
  */
 public interface HistoricProcessInstanceEntity extends HistoricScopeInstanceEntity, HistoricProcessInstance {
 
-  void setEndActivityId(String endActivityId);
+    void setEndActivityId(String endActivityId);
 
-  void setBusinessKey(String businessKey);
+    void setBusinessKey(String businessKey);
 
-  void setStartUserId(String startUserId);
+    void setStartUserId(String startUserId);
 
-  void setStartActivityId(String startUserId);
+    void setStartActivityId(String startUserId);
 
-  void setSuperProcessInstanceId(String superProcessInstanceId);
+    void setSuperProcessInstanceId(String superProcessInstanceId);
 
-  void setTenantId(String tenantId);
+    void setTenantId(String tenantId);
 
-  void setName(String name);
-  
-  void setLocalizedName(String localizedName);
-  
-  void setDescription(String description);
-  
-  void setLocalizedDescription(String localizedDescription);
-  
-  String getProcessDefinitionKey();
+    void setName(String name);
 
-  void setProcessDefinitionKey(String processDefinitionKey);
+    void setLocalizedName(String localizedName);
 
-  String getProcessDefinitionName();
+    void setDescription(String description);
 
-  void setProcessDefinitionName(String processDefinitionName);
+    void setLocalizedDescription(String localizedDescription);
 
-  Integer getProcessDefinitionVersion();
+    String getProcessDefinitionKey();
 
-  void setProcessDefinitionVersion(Integer processDefinitionVersion);
+    void setProcessDefinitionKey(String processDefinitionKey);
 
-  String getDeploymentId();
+    String getProcessDefinitionName();
 
-  void setDeploymentId(String deploymentId);
+    void setProcessDefinitionName(String processDefinitionName);
 
-  List<HistoricVariableInstanceEntity> getQueryVariables();
+    Integer getProcessDefinitionVersion();
 
-  void setQueryVariables(List<HistoricVariableInstanceEntity> queryVariables);
+    void setProcessDefinitionVersion(Integer processDefinitionVersion);
+
+    String getDeploymentId();
+
+    void setDeploymentId(String deploymentId);
+
+    List<HistoricVariableInstanceEntity> getQueryVariables();
+
+    void setQueryVariables(List<HistoricVariableInstanceEntity> queryVariables);
 
 }

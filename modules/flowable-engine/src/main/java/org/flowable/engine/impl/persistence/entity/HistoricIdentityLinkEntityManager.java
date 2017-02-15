@@ -21,12 +21,12 @@ import org.flowable.engine.common.impl.persistence.entity.EntityManager;
  */
 public interface HistoricIdentityLinkEntityManager extends EntityManager<HistoricIdentityLinkEntity> {
 
-  List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByTaskId(String taskId);
+    List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByTaskId(String taskId);
 
-  List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByProcessInstanceId(String processInstanceId);
+    List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByProcessInstanceId(String processInstanceId);
 
-  void deleteHistoricIdentityLinksByTaskId(String taskId);
+    void deleteHistoricIdentityLinksByTaskId(String taskId);
 
-  void deleteHistoricIdentityLinksByProcInstance(String processInstanceId);
+    void deleteHistoricIdentityLinksByProcInstance(String processInstanceId);
 
 }

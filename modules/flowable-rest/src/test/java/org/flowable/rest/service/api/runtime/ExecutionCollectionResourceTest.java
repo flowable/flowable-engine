@@ -35,154 +35,154 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class ExecutionCollectionResourceTest extends BaseSpringRestTestCase {
 
-  /**
-   * Test getting a list of executions, using all possible filters.
-   */
-  @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml" })
-  public void testGetExecutions() throws Exception {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne", "myBusinessKey");
-    String id = processInstance.getId();
-    runtimeService.addUserIdentityLink(id, "kermit", "whatever");
+    /**
+     * Test getting a list of executions, using all possible filters.
+     */
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml" })
+    public void testGetExecutions() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne", "myBusinessKey");
+        String id = processInstance.getId();
+        runtimeService.addUserIdentityLink(id, "kermit", "whatever");
 
-    Execution childExecutionInTask = runtimeService.createExecutionQuery().activityId("processTask").singleResult();
-    assertNotNull(childExecutionInTask);
-    
-    Execution childExecutionInSubProcess = runtimeService.createExecutionQuery().activityId("subProcess").singleResult();
-    assertNotNull(childExecutionInSubProcess);
+        Execution childExecutionInTask = runtimeService.createExecutionQuery().activityId("processTask").singleResult();
+        assertNotNull(childExecutionInTask);
 
-    // Test without any parameters
-    String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION);
-    assertResultsPresentInDataResponse(url, id, childExecutionInTask.getId(), childExecutionInSubProcess.getId());
+        Execution childExecutionInSubProcess = runtimeService.createExecutionQuery().activityId("subProcess").singleResult();
+        assertNotNull(childExecutionInSubProcess);
 
-    // Process instance id
-    url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?id=" + id;
-    assertResultsPresentInDataResponse(url, id);
+        // Test without any parameters
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION);
+        assertResultsPresentInDataResponse(url, id, childExecutionInTask.getId(), childExecutionInSubProcess.getId());
 
-    url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?id=anotherId";
-    assertResultsPresentInDataResponse(url);
+        // Process instance id
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?id=" + id;
+        assertResultsPresentInDataResponse(url, id);
 
-    // Process instance business key
-    url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?processInstanceBusinessKey=myBusinessKey";
-    assertResultsPresentInDataResponse(url, id);
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?id=anotherId";
+        assertResultsPresentInDataResponse(url);
 
-    url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?processInstanceBusinessKey=anotherBusinessKey";
-    assertResultsPresentInDataResponse(url);
+        // Process instance business key
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?processInstanceBusinessKey=myBusinessKey";
+        assertResultsPresentInDataResponse(url, id);
 
-    // Process definition key
-    url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?processDefinitionKey=processOne";
-    assertResultsPresentInDataResponse(url, id, childExecutionInTask.getId(), childExecutionInSubProcess.getId());
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?processInstanceBusinessKey=anotherBusinessKey";
+        assertResultsPresentInDataResponse(url);
 
-    url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?processDefinitionKey=processTwo";
-    assertResultsPresentInDataResponse(url);
+        // Process definition key
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?processDefinitionKey=processOne";
+        assertResultsPresentInDataResponse(url, id, childExecutionInTask.getId(), childExecutionInSubProcess.getId());
 
-    // Process definition id
-    url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?processDefinitionId=" + processInstance.getProcessDefinitionId();
-    assertResultsPresentInDataResponse(url, id, childExecutionInTask.getId(), childExecutionInSubProcess.getId());
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?processDefinitionKey=processTwo";
+        assertResultsPresentInDataResponse(url);
 
-    url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?processDefinitionId=anotherId";
-    assertResultsPresentInDataResponse(url);
+        // Process definition id
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?processDefinitionId=" + processInstance.getProcessDefinitionId();
+        assertResultsPresentInDataResponse(url, id, childExecutionInTask.getId(), childExecutionInSubProcess.getId());
 
-    // Parent id
-    url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?parentId=" + id;
-    assertResultsPresentInDataResponse(url, childExecutionInSubProcess.getId());
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?processDefinitionId=anotherId";
+        assertResultsPresentInDataResponse(url);
 
-    url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?parentId=anotherId";
-    assertResultsPresentInDataResponse(url);
+        // Parent id
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?parentId=" + id;
+        assertResultsPresentInDataResponse(url, childExecutionInSubProcess.getId());
 
-    // Activity id
-    url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?activityId=processTask";
-    assertResultsPresentInDataResponse(url, childExecutionInTask.getId());
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?parentId=anotherId";
+        assertResultsPresentInDataResponse(url);
 
-    url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?activityId=anotherId";
-    assertResultsPresentInDataResponse(url);
+        // Activity id
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?activityId=processTask";
+        assertResultsPresentInDataResponse(url, childExecutionInTask.getId());
 
-    // Without tenant ID, before tenant is set
-    url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?withoutTenantId=true";
-    assertResultsPresentInDataResponse(url, id, childExecutionInTask.getId(), childExecutionInSubProcess.getId());
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?activityId=anotherId";
+        assertResultsPresentInDataResponse(url);
 
-    // Update the tenant for the deployment
-    managementService.executeCommand(new ChangeDeploymentTenantIdCmd(deploymentId, "myTenant"));
+        // Without tenant ID, before tenant is set
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?withoutTenantId=true";
+        assertResultsPresentInDataResponse(url, id, childExecutionInTask.getId(), childExecutionInSubProcess.getId());
 
-    // Without tenant ID, after tenant is set
-    url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?withoutTenantId=true";
-    assertResultsPresentInDataResponse(url);
+        // Update the tenant for the deployment
+        managementService.executeCommand(new ChangeDeploymentTenantIdCmd(deploymentId, "myTenant"));
 
-    // Tenant id
-    url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?tenantId=myTenant";
-    assertResultsPresentInDataResponse(url, id, childExecutionInTask.getId(), childExecutionInSubProcess.getId());
+        // Without tenant ID, after tenant is set
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?withoutTenantId=true";
+        assertResultsPresentInDataResponse(url);
 
-    url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?tenantId=myTenant2";
-    assertResultsPresentInDataResponse(url);
+        // Tenant id
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?tenantId=myTenant";
+        assertResultsPresentInDataResponse(url, id, childExecutionInTask.getId(), childExecutionInSubProcess.getId());
 
-    // Tenant id like
-    url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?tenantIdLike=" + encode("%enant");
-    assertResultsPresentInDataResponse(url, id, childExecutionInTask.getId(), childExecutionInSubProcess.getId());
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?tenantId=myTenant2";
+        assertResultsPresentInDataResponse(url);
 
-    url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?tenantIdLike=" + encode("%whatever");
-    assertResultsPresentInDataResponse(url);
-  }
+        // Tenant id like
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?tenantIdLike=" + encode("%enant");
+        assertResultsPresentInDataResponse(url, id, childExecutionInTask.getId(), childExecutionInSubProcess.getId());
 
-  /**
-   * Test signalling all executions
-   */
-  @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-signal-event.bpmn20.xml" })
-  public void testSignalEventExecutions() throws Exception {
-    Execution signalExecution = runtimeService.startProcessInstanceByKey("processOne");
-    assertNotNull(signalExecution);
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?tenantIdLike=" + encode("%whatever");
+        assertResultsPresentInDataResponse(url);
+    }
 
-    ObjectNode requestNode = objectMapper.createObjectNode();
-    requestNode.put("action", "signalEventReceived");
-    requestNode.put("signalName", "alert");
+    /**
+     * Test signalling all executions
+     */
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-signal-event.bpmn20.xml" })
+    public void testSignalEventExecutions() throws Exception {
+        Execution signalExecution = runtimeService.startProcessInstanceByKey("processOne");
+        assertNotNull(signalExecution);
 
-    Execution waitingExecution = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
-    assertNotNull(waitingExecution);
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("action", "signalEventReceived");
+        requestNode.put("signalName", "alert");
 
-    // Sending signal event causes the execution to end (scope-execution for
-    // the catching event)
-    HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION));
-    httpPut.setEntity(new StringEntity(requestNode.toString()));
-    closeResponse(executeRequest(httpPut, HttpStatus.SC_NO_CONTENT));
+        Execution waitingExecution = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
+        assertNotNull(waitingExecution);
 
-    // Check if process is moved on to the other wait-state
-    waitingExecution = runtimeService.createExecutionQuery().activityId("anotherWaitState").singleResult();
-    assertNotNull(waitingExecution);
-  }
+        // Sending signal event causes the execution to end (scope-execution for
+        // the catching event)
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_NO_CONTENT));
 
-  /**
-   * Test signalling all executions with variables
-   */
-  @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-signal-event.bpmn20.xml" })
-  public void testSignalEventExecutionsWithvariables() throws Exception {
-    Execution signalExecution = runtimeService.startProcessInstanceByKey("processOne");
-    assertNotNull(signalExecution);
+        // Check if process is moved on to the other wait-state
+        waitingExecution = runtimeService.createExecutionQuery().activityId("anotherWaitState").singleResult();
+        assertNotNull(waitingExecution);
+    }
 
-    ArrayNode variables = objectMapper.createArrayNode();
-    ObjectNode requestNode = objectMapper.createObjectNode();
-    requestNode.put("action", "signalEventReceived");
-    requestNode.put("signalName", "alert");
-    requestNode.set("variables", variables);
+    /**
+     * Test signalling all executions with variables
+     */
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-signal-event.bpmn20.xml" })
+    public void testSignalEventExecutionsWithvariables() throws Exception {
+        Execution signalExecution = runtimeService.startProcessInstanceByKey("processOne");
+        assertNotNull(signalExecution);
 
-    ObjectNode varNode = objectMapper.createObjectNode();
-    variables.add(varNode);
-    varNode.put("name", "myVar");
-    varNode.put("value", "Variable set when signal event is received");
+        ArrayNode variables = objectMapper.createArrayNode();
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("action", "signalEventReceived");
+        requestNode.put("signalName", "alert");
+        requestNode.set("variables", variables);
 
-    Execution waitingExecution = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
-    assertNotNull(waitingExecution);
+        ObjectNode varNode = objectMapper.createObjectNode();
+        variables.add(varNode);
+        varNode.put("name", "myVar");
+        varNode.put("value", "Variable set when signal event is received");
 
-    // Sending signal event causes the execution to end (scope-execution for
-    // the catching event)
-    HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION));
-    httpPut.setEntity(new StringEntity(requestNode.toString()));
-    closeResponse(executeRequest(httpPut, HttpStatus.SC_NO_CONTENT));
+        Execution waitingExecution = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
+        assertNotNull(waitingExecution);
 
-    // Check if process is moved on to the other wait-state
-    waitingExecution = runtimeService.createExecutionQuery().activityId("anotherWaitState").singleResult();
-    assertNotNull(waitingExecution);
+        // Sending signal event causes the execution to end (scope-execution for
+        // the catching event)
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_NO_CONTENT));
 
-    Map<String, Object> vars = runtimeService.getVariables(waitingExecution.getId());
-    assertEquals(1, vars.size());
+        // Check if process is moved on to the other wait-state
+        waitingExecution = runtimeService.createExecutionQuery().activityId("anotherWaitState").singleResult();
+        assertNotNull(waitingExecution);
 
-    assertEquals("Variable set when signal event is received", vars.get("myVar"));
-  }
+        Map<String, Object> vars = runtimeService.getVariables(waitingExecution.getId());
+        assertEquals(1, vars.size());
+
+        assertEquals("Variable set when signal event is received", vars.get("myVar"));
+    }
 }

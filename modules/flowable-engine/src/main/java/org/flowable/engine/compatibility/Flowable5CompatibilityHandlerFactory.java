@@ -17,6 +17,6 @@ package org.flowable.engine.compatibility;
  */
 public interface Flowable5CompatibilityHandlerFactory {
 
-  Flowable5CompatibilityHandler createFlowable5CompatibilityHandler();
+    Flowable5CompatibilityHandler createFlowable5CompatibilityHandler();
 
 }

@@ -30,41 +30,41 @@ import org.flowable.idm.api.User;
  */
 public class GetPotentialStarterUsersCmd implements Command<List<User>>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  
-  protected String processDefinitionId;
+    private static final long serialVersionUID = 1L;
 
-  public GetPotentialStarterUsersCmd(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
+    protected String processDefinitionId;
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public List<User> execute(CommandContext commandContext) {
-    ProcessDefinitionEntity processDefinition = commandContext.getProcessDefinitionEntityManager().findById(processDefinitionId);
-
-    if (processDefinition == null) {
-      throw new FlowableObjectNotFoundException("Cannot find process definition with id " + processDefinitionId, ProcessDefinition.class);
+    public GetPotentialStarterUsersCmd(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
     }
-    
-    IdentityService identityService = commandContext.getProcessEngineConfiguration().getIdentityService();
 
-    List<String> userIds = new ArrayList<String>();
-    List<IdentityLink> identityLinks = (List) processDefinition.getIdentityLinks();
-    for (IdentityLink identityLink : identityLinks) {
-      if (identityLink.getUserId() != null && identityLink.getUserId().length() > 0) {
-        
-        if (!userIds.contains(identityLink.getUserId())) {
-          userIds.add(identityLink.getUserId());
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public List<User> execute(CommandContext commandContext) {
+        ProcessDefinitionEntity processDefinition = commandContext.getProcessDefinitionEntityManager().findById(processDefinitionId);
+
+        if (processDefinition == null) {
+            throw new FlowableObjectNotFoundException("Cannot find process definition with id " + processDefinitionId, ProcessDefinition.class);
         }
-      }
+
+        IdentityService identityService = commandContext.getProcessEngineConfiguration().getIdentityService();
+
+        List<String> userIds = new ArrayList<String>();
+        List<IdentityLink> identityLinks = (List) processDefinition.getIdentityLinks();
+        for (IdentityLink identityLink : identityLinks) {
+            if (identityLink.getUserId() != null && identityLink.getUserId().length() > 0) {
+
+                if (!userIds.contains(identityLink.getUserId())) {
+                    userIds.add(identityLink.getUserId());
+                }
+            }
+        }
+
+        if (userIds.size() > 0) {
+            return identityService.createUserQuery().userIds(userIds).list();
+
+        } else {
+            return new ArrayList<User>();
+        }
     }
-    
-    if (userIds.size() > 0) {
-      return identityService.createUserQuery().userIds(userIds).list();
-      
-    } else {
-      return new ArrayList<User>();
-    }
-  }
 
 }

@@ -24,7 +24,6 @@ import org.activiti.engine.impl.persistence.entity.JobEntity;
 import org.activiti.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
-
 /**
  * Send job cancelled event and delete job
  *
@@ -32,46 +31,46 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
  */
 public class CancelJobsCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  List<String> jobIds;
-  
-  public CancelJobsCmd(List<String> jobIds) {
-    this.jobIds = jobIds;
-  }
+    private static final long serialVersionUID = 1L;
+    List<String> jobIds;
 
-  public CancelJobsCmd(String jobId) {
-    this.jobIds = new ArrayList<String>();
-    jobIds.add(jobId);
-  }
-
-  public Void execute(CommandContext commandContext) {
-    JobEntity jobToDelete = null;
-    for (String jobId: jobIds) {
-      jobToDelete = commandContext
-        .getJobEntityManager()
-        .findJobById(jobId);
-      
-      if (jobToDelete != null) {
-        if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-          commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
-        }
-
-        jobToDelete.delete();
-      
-      } else {
-        TimerJobEntity timerJobToDelete = commandContext.getTimerJobEntityManager().findJobById(jobId);
-
-        if (timerJobToDelete != null) {
-          if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerJobToDelete));
-          }
-
-          timerJobToDelete.delete();
-        }
-      }
+    public CancelJobsCmd(List<String> jobIds) {
+        this.jobIds = jobIds;
     }
-    return null;
-  }
+
+    public CancelJobsCmd(String jobId) {
+        this.jobIds = new ArrayList<String>();
+        jobIds.add(jobId);
+    }
+
+    public Void execute(CommandContext commandContext) {
+        JobEntity jobToDelete = null;
+        for (String jobId : jobIds) {
+            jobToDelete = commandContext
+                    .getJobEntityManager()
+                    .findJobById(jobId);
+
+            if (jobToDelete != null) {
+                if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+                    commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
+                }
+
+                jobToDelete.delete();
+
+            } else {
+                TimerJobEntity timerJobToDelete = commandContext.getTimerJobEntityManager().findJobById(jobId);
+
+                if (timerJobToDelete != null) {
+                    if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+                        commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                                ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerJobToDelete));
+                    }
+
+                    timerJobToDelete.delete();
+                }
+            }
+        }
+        return null;
+    }
 }

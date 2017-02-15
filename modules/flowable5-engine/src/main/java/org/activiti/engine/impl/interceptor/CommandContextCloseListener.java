@@ -6,9 +6,9 @@ package org.activiti.engine.impl.interceptor;
  * @author Joram Barrez
  */
 public interface CommandContextCloseListener {
-	
-	void closing(CommandContext commandContext);
-	
-	void closed(CommandContext commandContext);
+
+    void closing(CommandContext commandContext);
+
+    void closed(CommandContext commandContext);
 
 }

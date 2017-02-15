@@ -23,16 +23,15 @@ public interface ContentObject {
      * @return a unique identifier for this instance.
      */
     String getId();
-    
+
     /**
      * @return the size of the content, in bytes.
      */
     long getContentLength();
-    
+
     /**
-     * @return the inputstream to read the content from. Multiple calls to this method on the same
-     * instance should return the same {@link InputStream} instance. Caller should close the inputstream after usage
-     * to prevent resources leaking.
+     * @return the inputstream to read the content from. Multiple calls to this method on the same instance should return the same {@link InputStream} instance. Caller should close the inputstream
+     *         after usage to prevent resources leaking.
      */
-    InputStream getContent(); 
+    InputStream getContent();
 }

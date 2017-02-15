@@ -32,35 +32,35 @@ import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntit
  */
 public class MessageThrowingEventListener extends BaseDelegateEventListener {
 
-  protected String messageName;
-  protected Class<?> entityClass;
+    protected String messageName;
+    protected Class<?> entityClass;
 
-  @Override
-  public void onEvent(FlowableEvent event) {
-    if (isValidEvent(event) && event instanceof FlowableEngineEvent) {
-      
-      FlowableEngineEvent engineEvent = (FlowableEngineEvent) event;
+    @Override
+    public void onEvent(FlowableEvent event) {
+        if (isValidEvent(event) && event instanceof FlowableEngineEvent) {
 
-      if (engineEvent.getProcessInstanceId() == null) {
-        throw new FlowableIllegalArgumentException("Cannot throw process-instance scoped message, since the dispatched event is not part of an ongoing process instance");
-      }
+            FlowableEngineEvent engineEvent = (FlowableEngineEvent) event;
 
-      EventSubscriptionEntityManager eventSubscriptionEntityManager = Context.getCommandContext().getEventSubscriptionEntityManager();
-      List<MessageEventSubscriptionEntity> subscriptionEntities = eventSubscriptionEntityManager.findMessageEventSubscriptionsByProcessInstanceAndEventName(
-          engineEvent.getProcessInstanceId(), messageName);
-      
-      for (EventSubscriptionEntity messageEventSubscriptionEntity : subscriptionEntities) {
-        eventSubscriptionEntityManager.eventReceived(messageEventSubscriptionEntity, null, false);
-      }
+            if (engineEvent.getProcessInstanceId() == null) {
+                throw new FlowableIllegalArgumentException("Cannot throw process-instance scoped message, since the dispatched event is not part of an ongoing process instance");
+            }
+
+            EventSubscriptionEntityManager eventSubscriptionEntityManager = Context.getCommandContext().getEventSubscriptionEntityManager();
+            List<MessageEventSubscriptionEntity> subscriptionEntities = eventSubscriptionEntityManager.findMessageEventSubscriptionsByProcessInstanceAndEventName(
+                    engineEvent.getProcessInstanceId(), messageName);
+
+            for (EventSubscriptionEntity messageEventSubscriptionEntity : subscriptionEntities) {
+                eventSubscriptionEntityManager.eventReceived(messageEventSubscriptionEntity, null, false);
+            }
+        }
     }
-  }
 
-  public void setMessageName(String messageName) {
-    this.messageName = messageName;
-  }
+    public void setMessageName(String messageName) {
+        this.messageName = messageName;
+    }
 
-  @Override
-  public boolean isFailOnException() {
-    return true;
-  }
+    @Override
+    public boolean isFailOnException() {
+        return true;
+    }
 }

@@ -11,9 +11,9 @@
  * limitations under the License.
  */
 package org.flowable.app.service.exception;
+
 /**
- * Exception thrown when the request that is performed need authorization, but no valid ticket
- * has been passed along with it.
+ * Exception thrown when the request that is performed need authorization, but no valid ticket has been passed along with it.
  * 
  * @author Frederik Heremans
  */

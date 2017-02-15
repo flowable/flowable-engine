@@ -26,8 +26,8 @@ import javax.el.FunctionMapper;
  */
 public class FlowableFormFunctionMapper extends FunctionMapper {
 
-  public Method resolveFunction(String prefix, String localName) {
-    return null;
-  }
+    public Method resolveFunction(String prefix, String localName) {
+        return null;
+    }
 
 }

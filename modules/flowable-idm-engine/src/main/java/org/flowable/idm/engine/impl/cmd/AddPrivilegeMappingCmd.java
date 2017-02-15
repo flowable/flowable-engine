@@ -22,29 +22,29 @@ import org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntityMan
 
 public class AddPrivilegeMappingCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String privilegeId;
-  protected String userId;
-  protected String groupId;
+    protected String privilegeId;
+    protected String userId;
+    protected String groupId;
 
-  public AddPrivilegeMappingCmd(String privilegeId, String userId, String groupId) {
-    this.privilegeId = privilegeId;
-    this.userId = userId;
-    this.groupId = groupId;
-  }
-
-  public Void execute(CommandContext commandContext) {
-    PrivilegeMappingEntityManager privilegeMappingEntityManager = commandContext.gePrivilegeMappingEntityManager();
-    PrivilegeMappingEntity entity = privilegeMappingEntityManager.create();
-    entity.setPrivilegeId(privilegeId);
-    if (userId != null) {
-      entity.setUserId(userId);
-    } else if (groupId != null) {
-      entity.setGroupId(groupId);
+    public AddPrivilegeMappingCmd(String privilegeId, String userId, String groupId) {
+        this.privilegeId = privilegeId;
+        this.userId = userId;
+        this.groupId = groupId;
     }
-    privilegeMappingEntityManager.insert(entity);
-    
-    return null;
-  }
+
+    public Void execute(CommandContext commandContext) {
+        PrivilegeMappingEntityManager privilegeMappingEntityManager = commandContext.gePrivilegeMappingEntityManager();
+        PrivilegeMappingEntity entity = privilegeMappingEntityManager.create();
+        entity.setPrivilegeId(privilegeId);
+        if (userId != null) {
+            entity.setUserId(userId);
+        } else if (groupId != null) {
+            entity.setGroupId(groupId);
+        }
+        privilegeMappingEntityManager.insert(entity);
+
+        return null;
+    }
 }

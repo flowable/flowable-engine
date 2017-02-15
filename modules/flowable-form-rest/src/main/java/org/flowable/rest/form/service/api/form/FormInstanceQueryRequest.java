@@ -19,130 +19,130 @@ import org.flowable.rest.api.PaginateRequest;
  */
 public class FormInstanceQueryRequest extends PaginateRequest {
 
-  private String id;
-  private String formDefinitionId;
-  private String formDefinitionIdLike;
-  private String taskId;
-  private String taskIdLike;
-  private String processInstanceId;
-  private String processInstanceIdLike;
-  private String processDefinitionId;
-  private String processDefinitionIdLike;
-  private String submittedBy;
-  private String submittedByLike;
-  private String tenantId;
-  private String tenantIdLike;
-  private Boolean withoutTenantId;
+    private String id;
+    private String formDefinitionId;
+    private String formDefinitionIdLike;
+    private String taskId;
+    private String taskIdLike;
+    private String processInstanceId;
+    private String processInstanceIdLike;
+    private String processDefinitionId;
+    private String processDefinitionIdLike;
+    private String submittedBy;
+    private String submittedByLike;
+    private String tenantId;
+    private String tenantIdLike;
+    private Boolean withoutTenantId;
 
-  public String getId() {
-    return id;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public void setId(String id) {
-    this.id = id;
-  }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-  public String getFormDefinitionId() {
-    return formDefinitionId;
-  }
+    public String getFormDefinitionId() {
+        return formDefinitionId;
+    }
 
-  public void setFormDefinitionId(String formDefinitionId) {
-    this.formDefinitionId = formDefinitionId;
-  }
+    public void setFormDefinitionId(String formDefinitionId) {
+        this.formDefinitionId = formDefinitionId;
+    }
 
-  public String getFormDefinitionIdLike() {
-    return formDefinitionIdLike;
-  }
+    public String getFormDefinitionIdLike() {
+        return formDefinitionIdLike;
+    }
 
-  public void setFormDefinitionIdLike(String formDefinitionIdLike) {
-    this.formDefinitionIdLike = formDefinitionIdLike;
-  }
+    public void setFormDefinitionIdLike(String formDefinitionIdLike) {
+        this.formDefinitionIdLike = formDefinitionIdLike;
+    }
 
-  public String getTaskId() {
-    return taskId;
-  }
+    public String getTaskId() {
+        return taskId;
+    }
 
-  public void setTaskId(String taskId) {
-    this.taskId = taskId;
-  }
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
 
-  public String getTaskIdLike() {
-    return taskIdLike;
-  }
+    public String getTaskIdLike() {
+        return taskIdLike;
+    }
 
-  public void setTaskIdLike(String taskIdLike) {
-    this.taskIdLike = taskIdLike;
-  }
+    public void setTaskIdLike(String taskIdLike) {
+        this.taskIdLike = taskIdLike;
+    }
 
-  public String getProcessInstanceId() {
-    return processInstanceId;
-  }
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
 
-  public void setProcessInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
 
-  public String getProcessInstanceIdLike() {
-    return processInstanceIdLike;
-  }
+    public String getProcessInstanceIdLike() {
+        return processInstanceIdLike;
+    }
 
-  public void setProcessInstanceIdLike(String processInstanceIdLike) {
-    this.processInstanceIdLike = processInstanceIdLike;
-  }
+    public void setProcessInstanceIdLike(String processInstanceIdLike) {
+        this.processInstanceIdLike = processInstanceIdLike;
+    }
 
-  public String getProcessDefinitionId() {
-    return processDefinitionId;
-  }
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
 
-  public void setProcessDefinitionId(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
+    public void setProcessDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
 
-  public String getProcessDefinitionIdLike() {
-    return processDefinitionIdLike;
-  }
+    public String getProcessDefinitionIdLike() {
+        return processDefinitionIdLike;
+    }
 
-  public void setProcessDefinitionIdLike(String processDefinitionIdLike) {
-    this.processDefinitionIdLike = processDefinitionIdLike;
-  }
+    public void setProcessDefinitionIdLike(String processDefinitionIdLike) {
+        this.processDefinitionIdLike = processDefinitionIdLike;
+    }
 
-  public String getSubmittedBy() {
-    return submittedBy;
-  }
+    public String getSubmittedBy() {
+        return submittedBy;
+    }
 
-  public void setSubmittedBy(String submittedBy) {
-    this.submittedBy = submittedBy;
-  }
+    public void setSubmittedBy(String submittedBy) {
+        this.submittedBy = submittedBy;
+    }
 
-  public String getSubmittedByLike() {
-    return submittedByLike;
-  }
+    public String getSubmittedByLike() {
+        return submittedByLike;
+    }
 
-  public void setSubmittedByLike(String submittedByLike) {
-    this.submittedByLike = submittedByLike;
-  }
+    public void setSubmittedByLike(String submittedByLike) {
+        this.submittedByLike = submittedByLike;
+    }
 
-  public String getTenantId() {
-    return tenantId;
-  }
+    public String getTenantId() {
+        return tenantId;
+    }
 
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
-  }
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
 
-  public String getTenantIdLike() {
-    return tenantIdLike;
-  }
+    public String getTenantIdLike() {
+        return tenantIdLike;
+    }
 
-  public void setTenantIdLike(String tenantIdLike) {
-    this.tenantIdLike = tenantIdLike;
-  }
+    public void setTenantIdLike(String tenantIdLike) {
+        this.tenantIdLike = tenantIdLike;
+    }
 
-  public Boolean isWithoutTenantId() {
-    return withoutTenantId;
-  }
+    public Boolean isWithoutTenantId() {
+        return withoutTenantId;
+    }
 
-  public void setWithoutTenantId(Boolean withoutTenantId) {
-    this.withoutTenantId = withoutTenantId;
-  }
+    public void setWithoutTenantId(Boolean withoutTenantId) {
+        this.withoutTenantId = withoutTenantId;
+    }
 }

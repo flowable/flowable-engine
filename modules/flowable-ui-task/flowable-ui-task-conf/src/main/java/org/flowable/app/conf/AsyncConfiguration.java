@@ -44,9 +44,9 @@ public class AsyncConfiguration implements AsyncConfigurer {
         executor.initialize();
         return executor;
     }
-    
+
     @Override
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
-		return new SimpleAsyncUncaughtExceptionHandler();
+        return new SimpleAsyncUncaughtExceptionHandler();
     }
 }

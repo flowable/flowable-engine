@@ -26,146 +26,146 @@ import org.flowable.app.model.common.AbstractRepresentation;
  */
 public class ModelRepresentation extends AbstractRepresentation {
 
-  protected String id;
-  protected String name;
-  protected String key;
-  protected String description;
-  protected String createdBy;
-  protected String lastUpdatedBy;
-  protected Date lastUpdated;
-  protected boolean latestVersion;
-  protected int version;
-  protected String comment;
-  protected Integer modelType;
+    protected String id;
+    protected String name;
+    protected String key;
+    protected String description;
+    protected String createdBy;
+    protected String lastUpdatedBy;
+    protected Date lastUpdated;
+    protected boolean latestVersion;
+    protected int version;
+    protected String comment;
+    protected Integer modelType;
 
-  public ModelRepresentation(AbstractModel model) {
-    initialize(model);
-  }
-
-  public ModelRepresentation() {
-
-  }
-
-  public void initialize(AbstractModel model) {
-    this.id = model.getId();
-    this.name = model.getName();
-    this.key = model.getKey();
-    this.description = model.getDescription();
-    this.createdBy = model.getCreatedBy();
-    this.lastUpdated = model.getLastUpdated();
-    this.version = model.getVersion();
-    this.lastUpdatedBy = model.getLastUpdatedBy();
-    this.comment = model.getComment();
-    this.modelType = model.getModelType();
-
-    // When based on a ProcessModel and not history, this is always the latest version
-    if (model instanceof Model) {
-      this.setLatestVersion(true);
-    } else if (model instanceof ModelHistory) {
-      this.setLatestVersion(false);
+    public ModelRepresentation(AbstractModel model) {
+        initialize(model);
     }
-  }
 
-  public String getId() {
-    return id;
-  }
+    public ModelRepresentation() {
 
-  public void setId(String id) {
-    this.id = id;
-  }
+    }
 
-  public String getName() {
-    return name;
-  }
+    public void initialize(AbstractModel model) {
+        this.id = model.getId();
+        this.name = model.getName();
+        this.key = model.getKey();
+        this.description = model.getDescription();
+        this.createdBy = model.getCreatedBy();
+        this.lastUpdated = model.getLastUpdated();
+        this.version = model.getVersion();
+        this.lastUpdatedBy = model.getLastUpdatedBy();
+        this.comment = model.getComment();
+        this.modelType = model.getModelType();
 
-  public void setName(String name) {
-    this.name = name;
-  }
+        // When based on a ProcessModel and not history, this is always the latest version
+        if (model instanceof Model) {
+            this.setLatestVersion(true);
+        } else if (model instanceof ModelHistory) {
+            this.setLatestVersion(false);
+        }
+    }
 
-  public String getKey() {
-    return key;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public void setKey(String key) {
-    this.key = key;
-  }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-  public String getDescription() {
-    return description;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public Date getLastUpdated() {
-    return lastUpdated;
-  }
+    public String getKey() {
+        return key;
+    }
 
-  public void setLastUpdated(Date lastUpdated) {
-    this.lastUpdated = lastUpdated;
-  }
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-  public String getCreatedBy() {
-    return createdBy;
-  }
+    public String getDescription() {
+        return description;
+    }
 
-  public void setCreatedBy(String createdBy) {
-    this.createdBy = createdBy;
-  }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-  public void setLatestVersion(boolean latestVersion) {
-    this.latestVersion = latestVersion;
-  }
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
 
-  public boolean isLatestVersion() {
-    return latestVersion;
-  }
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
 
-  public int getVersion() {
-    return version;
-  }
+    public String getCreatedBy() {
+        return createdBy;
+    }
 
-  public void setVersion(int version) {
-    this.version = version;
-  }
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
 
-  public String getLastUpdatedBy() {
-    return lastUpdatedBy;
-  }
+    public void setLatestVersion(boolean latestVersion) {
+        this.latestVersion = latestVersion;
+    }
 
-  public void setLastUpdatedBy(String lastUpdatedBy) {
-    this.lastUpdatedBy = lastUpdatedBy;
-  }
+    public boolean isLatestVersion() {
+        return latestVersion;
+    }
 
-  public void setComment(String comment) {
-    this.comment = comment;
-  }
+    public int getVersion() {
+        return version;
+    }
 
-  public String getComment() {
-    return comment;
-  }
+    public void setVersion(int version) {
+        this.version = version;
+    }
 
-  public Integer getModelType() {
-    return modelType;
-  }
+    public String getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
 
-  public void setModelType(Integer modelType) {
-    this.modelType = modelType;
-  }
+    public void setLastUpdatedBy(String lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
+    }
 
-  public Model toModel() {
-    Model model = new Model();
-    model.setName(name);
-    model.setDescription(description);
-    return model;
-  }
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
 
-  /**
-   * Update all editable properties of the given {@link Model} based on the values in this instance.
-   */
-  public void updateModel(Model model) {
-    model.setDescription(this.description);
-    model.setName(this.name);
-  }
+    public String getComment() {
+        return comment;
+    }
+
+    public Integer getModelType() {
+        return modelType;
+    }
+
+    public void setModelType(Integer modelType) {
+        this.modelType = modelType;
+    }
+
+    public Model toModel() {
+        Model model = new Model();
+        model.setName(name);
+        model.setDescription(description);
+        return model;
+    }
+
+    /**
+     * Update all editable properties of the given {@link Model} based on the values in this instance.
+     */
+    public void updateModel(Model model) {
+        model.setDescription(this.description);
+        model.setName(this.name);
+    }
 }

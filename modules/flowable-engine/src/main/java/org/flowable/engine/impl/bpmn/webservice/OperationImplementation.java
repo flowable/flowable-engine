@@ -24,26 +24,26 @@ import javax.xml.namespace.QName;
  */
 public interface OperationImplementation {
 
-  /**
-   * @return the id of this implementation
-   */
-  String getId();
+    /**
+     * @return the id of this implementation
+     */
+    String getId();
 
-  /**
-   * @return the name of this implementation
-   */
-  String getName();
+    /**
+     * @return the name of this implementation
+     */
+    String getName();
 
-  /**
-   * Sends the message on behalf of operation
-   * 
-   * @param message
-   *          the message to be sent
-   * @param operation
-   *          the operation that is interested on sending the message
-   * @param overriddenEndpointAddresses
-   *          a not null map of overridden endpoint addresses. The key is the endpoint qualified name.
-   * @return the resulting message
-   */
-  MessageInstance sendFor(MessageInstance message, Operation operation, ConcurrentMap<QName, URL> overriddenEndpointAddresses) throws Exception;
+    /**
+     * Sends the message on behalf of operation
+     * 
+     * @param message
+     *            the message to be sent
+     * @param operation
+     *            the operation that is interested on sending the message
+     * @param overriddenEndpointAddresses
+     *            a not null map of overridden endpoint addresses. The key is the endpoint qualified name.
+     * @return the resulting message
+     */
+    MessageInstance sendFor(MessageInstance message, Operation operation, ConcurrentMap<QName, URL> overriddenEndpointAddresses) throws Exception;
 }

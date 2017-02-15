@@ -19,8 +19,7 @@ public class DatatypeConverter {
      *            A string containing lexical representation of xsd:date.
      * @return A date ({@link Date}) value represented by the string argument.
      * @throws IllegalArgumentException
-     *             if string parameter does not conform to lexical value space defined in XML Schema Part 2: Datatypes
-     *             for xsd:date.
+     *             if string parameter does not conform to lexical value space defined in XML Schema Part 2: Datatypes for xsd:date.
      */
     public static java.util.Date parseDate(final String lexicalXSDDate) {
         final Calendar calendar = javax.xml.bind.DatatypeConverter.parseDate(lexicalXSDDate);
@@ -51,8 +50,7 @@ public class DatatypeConverter {
      *            A string containing lexical representation of xsd:time.
      * @return A time ({@link Date}) value represented by the string argument.
      * @throws IllegalArgumentException
-     *             if string parameter does not conform to lexical value space defined in XML Schema Part 2: Datatypes
-     *             for xsd:time.
+     *             if string parameter does not conform to lexical value space defined in XML Schema Part 2: Datatypes for xsd:time.
      */
     public static java.util.Date parseTime(final String lexicalXSDTime) {
         final Calendar calendar = javax.xml.bind.DatatypeConverter.parseTime(lexicalXSDTime);
@@ -83,8 +81,7 @@ public class DatatypeConverter {
      *            A string containing lexical representation of xsd:dateTime.
      * @return A date/time ({@link Date}) value represented by the string argument.
      * @throws IllegalArgumentException
-     *             if string parameter does not conform to lexical value space defined in XML Schema Part 2: Datatypes
-     *             for xsd:date/Time.
+     *             if string parameter does not conform to lexical value space defined in XML Schema Part 2: Datatypes for xsd:date/Time.
      */
     public static java.util.Date parseDateTime(final String lexicalXSDDateTime) {
         final Calendar calendar = javax.xml.bind.DatatypeConverter.parseDateTime(lexicalXSDDateTime);

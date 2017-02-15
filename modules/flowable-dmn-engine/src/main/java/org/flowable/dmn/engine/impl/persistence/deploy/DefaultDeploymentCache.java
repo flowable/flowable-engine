@@ -37,8 +37,7 @@ public class DefaultDeploymentCache<T> implements DeploymentCache<T> {
     }
 
     /**
-     * Cache which has a hard limit: no more elements will be cached than the
-     * limit.
+     * Cache which has a hard limit: no more elements will be cached than the limit.
      */
     public DefaultDeploymentCache(final int limit) {
         this.cache = Collections.synchronizedMap(new LinkedHashMap<String, T>(limit + 1, 0.75f, true) { // +1 is needed, because the entry is inserted first, before it is removed

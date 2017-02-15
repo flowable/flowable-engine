@@ -16,11 +16,11 @@ import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntity;
 
 public interface PrivilegeMappingDataManager extends DataManager<PrivilegeMappingEntity> {
-  
-  void deleteByPrivilegeId(String privilegeId);
-  
-  void deleteByPrivilegeIdAndUserId(String privilegeId, String userId);
-  
-  void deleteByPrivilegeIdAndGroupId(String privilegeId, String groupId);
+
+    void deleteByPrivilegeId(String privilegeId);
+
+    void deleteByPrivilegeIdAndUserId(String privilegeId, String userId);
+
+    void deleteByPrivilegeIdAndGroupId(String privilegeId, String groupId);
 
 }

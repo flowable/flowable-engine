@@ -25,22 +25,22 @@ import org.flowable.engine.repository.ProcessDefinition;
  */
 public class IsFlowable5ProcessDefinitionCmd implements Command<Boolean>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String processDefinitionId;
+    private static final long serialVersionUID = 1L;
+    protected String processDefinitionId;
 
-  public IsFlowable5ProcessDefinitionCmd(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
-
-  public Boolean execute(CommandContext commandContext) {
-    ProcessDefinition processDefinition = commandContext.getProcessEngineConfiguration()
-        .getDeploymentManager()
-        .findDeployedProcessDefinitionById(processDefinitionId);
-    
-    if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
-      return true;
+    public IsFlowable5ProcessDefinitionCmd(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
     }
-    
-    return false;
-  }
+
+    public Boolean execute(CommandContext commandContext) {
+        ProcessDefinition processDefinition = commandContext.getProcessEngineConfiguration()
+                .getDeploymentManager()
+                .findDeployedProcessDefinitionById(processDefinitionId);
+
+        if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
+            return true;
+        }
+
+        return false;
+    }
 }

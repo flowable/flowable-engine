@@ -28,64 +28,64 @@ import java.util.Map;
  */
 public class BaseFormInstanceResource {
 
-  private static Map<String, QueryProperty> allowedSortProperties = new HashMap<>();
+    private static Map<String, QueryProperty> allowedSortProperties = new HashMap<>();
 
-  static {
-    allowedSortProperties.put("submittedDate", FormInstanceQueryProperty.SUBMITTED_DATE);
-    allowedSortProperties.put("tenantId", FormInstanceQueryProperty.TENANT_ID);
-  }
-
-  @Autowired
-  protected FormService formService;
-
-  @Autowired
-  protected FormRestResponseFactory restResponseFactory;
-
-  protected DataResponse getQueryResponse(FormInstanceQueryRequest queryRequest, Map<String, String> requestParams) {
-
-    FormInstanceQuery query = formService.createFormInstanceQuery();
-
-    if (queryRequest.getFormDefinitionId() != null) {
-      query.formDefinitionId(queryRequest.getFormDefinitionId());
-    }
-    if (queryRequest.getFormDefinitionIdLike() != null) {
-      query.formDefinitionIdLike(queryRequest.getFormDefinitionIdLike());
-    }
-    if (queryRequest.getTaskId() != null) {
-      query.taskId(queryRequest.getTaskId());
-    }
-    if (queryRequest.getTaskIdLike() != null) {
-      query.taskIdLike(queryRequest.getTaskIdLike());
-    }
-    if (queryRequest.getProcessInstanceId() != null) {
-      query.processInstanceId(queryRequest.getProcessInstanceId());
-    }
-    if (queryRequest.getProcessInstanceIdLike() != null) {
-      query.processInstanceIdLike(queryRequest.getProcessInstanceIdLike());
-    }
-    if (queryRequest.getProcessDefinitionId() != null) {
-      query.processDefinitionId(queryRequest.getProcessDefinitionId());
-    }
-    if (queryRequest.getProcessDefinitionIdLike() != null) {
-      query.processDefinitionIdLike(queryRequest.getProcessDefinitionIdLike());
-    }
-    if (queryRequest.getSubmittedBy() != null) {
-      query.submittedBy(queryRequest.getSubmittedBy());
-    }
-    if (queryRequest.getSubmittedByLike() != null) {
-      query.submittedByLike(queryRequest.getSubmittedByLike());
-    }
-    if (queryRequest.getTenantId() != null) {
-      query.deploymentTenantId(queryRequest.getTenantId());
-    }
-    if (queryRequest.getTenantIdLike() != null) {
-      query.deploymentTenantIdLike(queryRequest.getTenantIdLike());
-    }
-    if (Boolean.TRUE.equals(queryRequest.isWithoutTenantId())) {
-      query.deploymentWithoutTenantId();
+    static {
+        allowedSortProperties.put("submittedDate", FormInstanceQueryProperty.SUBMITTED_DATE);
+        allowedSortProperties.put("tenantId", FormInstanceQueryProperty.TENANT_ID);
     }
 
-    return new FormInstancePaginateList(restResponseFactory).paginateList(requestParams, queryRequest, query, "submittedDate", allowedSortProperties);
-  }
+    @Autowired
+    protected FormService formService;
+
+    @Autowired
+    protected FormRestResponseFactory restResponseFactory;
+
+    protected DataResponse getQueryResponse(FormInstanceQueryRequest queryRequest, Map<String, String> requestParams) {
+
+        FormInstanceQuery query = formService.createFormInstanceQuery();
+
+        if (queryRequest.getFormDefinitionId() != null) {
+            query.formDefinitionId(queryRequest.getFormDefinitionId());
+        }
+        if (queryRequest.getFormDefinitionIdLike() != null) {
+            query.formDefinitionIdLike(queryRequest.getFormDefinitionIdLike());
+        }
+        if (queryRequest.getTaskId() != null) {
+            query.taskId(queryRequest.getTaskId());
+        }
+        if (queryRequest.getTaskIdLike() != null) {
+            query.taskIdLike(queryRequest.getTaskIdLike());
+        }
+        if (queryRequest.getProcessInstanceId() != null) {
+            query.processInstanceId(queryRequest.getProcessInstanceId());
+        }
+        if (queryRequest.getProcessInstanceIdLike() != null) {
+            query.processInstanceIdLike(queryRequest.getProcessInstanceIdLike());
+        }
+        if (queryRequest.getProcessDefinitionId() != null) {
+            query.processDefinitionId(queryRequest.getProcessDefinitionId());
+        }
+        if (queryRequest.getProcessDefinitionIdLike() != null) {
+            query.processDefinitionIdLike(queryRequest.getProcessDefinitionIdLike());
+        }
+        if (queryRequest.getSubmittedBy() != null) {
+            query.submittedBy(queryRequest.getSubmittedBy());
+        }
+        if (queryRequest.getSubmittedByLike() != null) {
+            query.submittedByLike(queryRequest.getSubmittedByLike());
+        }
+        if (queryRequest.getTenantId() != null) {
+            query.deploymentTenantId(queryRequest.getTenantId());
+        }
+        if (queryRequest.getTenantIdLike() != null) {
+            query.deploymentTenantIdLike(queryRequest.getTenantIdLike());
+        }
+        if (Boolean.TRUE.equals(queryRequest.isWithoutTenantId())) {
+            query.deploymentWithoutTenantId();
+        }
+
+        return new FormInstancePaginateList(restResponseFactory).paginateList(requestParams, queryRequest, query, "submittedDate", allowedSortProperties);
+    }
 
 }

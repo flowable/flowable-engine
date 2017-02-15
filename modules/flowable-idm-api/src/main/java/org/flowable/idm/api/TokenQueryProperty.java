@@ -25,26 +25,26 @@ import org.flowable.engine.common.api.query.QueryProperty;
  */
 public class TokenQueryProperty implements QueryProperty {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private static final Map<String, TokenQueryProperty> properties = new HashMap<String, TokenQueryProperty>();
+    private static final Map<String, TokenQueryProperty> properties = new HashMap<String, TokenQueryProperty>();
 
-  public static final TokenQueryProperty TOKEN_ID = new TokenQueryProperty("RES.ID_");
-  public static final TokenQueryProperty TOKEN_DATE = new TokenQueryProperty("RES.TOKEN_DATE_");
+    public static final TokenQueryProperty TOKEN_ID = new TokenQueryProperty("RES.ID_");
+    public static final TokenQueryProperty TOKEN_DATE = new TokenQueryProperty("RES.TOKEN_DATE_");
 
-  private String name;
+    private String name;
 
-  public TokenQueryProperty(String name) {
-    this.name = name;
-    properties.put(name, this);
-  }
+    public TokenQueryProperty(String name) {
+        this.name = name;
+        properties.put(name, this);
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public static TokenQueryProperty findByName(String propertyName) {
-    return properties.get(propertyName);
-  }
+    public static TokenQueryProperty findByName(String propertyName) {
+        return properties.get(propertyName);
+    }
 
 }

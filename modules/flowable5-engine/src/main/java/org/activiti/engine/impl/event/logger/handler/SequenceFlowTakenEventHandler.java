@@ -23,26 +23,26 @@ import org.flowable.engine.delegate.event.FlowableSequenceFlowTakenEvent;
  * @author Joram Barrez
  */
 public class SequenceFlowTakenEventHandler extends AbstractDatabaseEventLoggerEventHandler {
-	
-	@Override
-	public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
-		FlowableSequenceFlowTakenEvent sequenceFlowTakenEvent = (FlowableSequenceFlowTakenEvent) event;
-		
-		Map<String, Object> data = new HashMap<String, Object>();
-		putInMapIfNotNull(data, Fields.ID, sequenceFlowTakenEvent.getId());
-		
-		putInMapIfNotNull(data, Fields.SOURCE_ACTIVITY_ID, sequenceFlowTakenEvent.getSourceActivityId());
-		putInMapIfNotNull(data, Fields.SOURCE_ACTIVITY_NAME, sequenceFlowTakenEvent.getSourceActivityName());
-		putInMapIfNotNull(data, Fields.SOURCE_ACTIVITY_TYPE, sequenceFlowTakenEvent.getSourceActivityType());
-		putInMapIfNotNull(data, Fields.SOURCE_ACTIVITY_BEHAVIOR_CLASS, sequenceFlowTakenEvent.getSourceActivityBehaviorClass());
-		
-		putInMapIfNotNull(data, Fields.TARGET_ACTIVITY_ID, sequenceFlowTakenEvent.getTargetActivityId());
-		putInMapIfNotNull(data, Fields.TARGET_ACTIVITY_NAME, sequenceFlowTakenEvent.getTargetActivityName());
-		putInMapIfNotNull(data, Fields.TARGET_ACTIVITY_TYPE, sequenceFlowTakenEvent.getTargetActivityType());
-		putInMapIfNotNull(data, Fields.TARGET_ACTIVITY_BEHAVIOR_CLASS, sequenceFlowTakenEvent.getTargetActivityBehaviorClass());
-		
-		return createEventLogEntry(sequenceFlowTakenEvent.getProcessDefinitionId(), sequenceFlowTakenEvent.getProcessInstanceId(), 
-		    sequenceFlowTakenEvent.getExecutionId(), null, data);
-	}
+
+    @Override
+    public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
+        FlowableSequenceFlowTakenEvent sequenceFlowTakenEvent = (FlowableSequenceFlowTakenEvent) event;
+
+        Map<String, Object> data = new HashMap<String, Object>();
+        putInMapIfNotNull(data, Fields.ID, sequenceFlowTakenEvent.getId());
+
+        putInMapIfNotNull(data, Fields.SOURCE_ACTIVITY_ID, sequenceFlowTakenEvent.getSourceActivityId());
+        putInMapIfNotNull(data, Fields.SOURCE_ACTIVITY_NAME, sequenceFlowTakenEvent.getSourceActivityName());
+        putInMapIfNotNull(data, Fields.SOURCE_ACTIVITY_TYPE, sequenceFlowTakenEvent.getSourceActivityType());
+        putInMapIfNotNull(data, Fields.SOURCE_ACTIVITY_BEHAVIOR_CLASS, sequenceFlowTakenEvent.getSourceActivityBehaviorClass());
+
+        putInMapIfNotNull(data, Fields.TARGET_ACTIVITY_ID, sequenceFlowTakenEvent.getTargetActivityId());
+        putInMapIfNotNull(data, Fields.TARGET_ACTIVITY_NAME, sequenceFlowTakenEvent.getTargetActivityName());
+        putInMapIfNotNull(data, Fields.TARGET_ACTIVITY_TYPE, sequenceFlowTakenEvent.getTargetActivityType());
+        putInMapIfNotNull(data, Fields.TARGET_ACTIVITY_BEHAVIOR_CLASS, sequenceFlowTakenEvent.getTargetActivityBehaviorClass());
+
+        return createEventLogEntry(sequenceFlowTakenEvent.getProcessDefinitionId(), sequenceFlowTakenEvent.getProcessInstanceId(),
+                sequenceFlowTakenEvent.getExecutionId(), null, data);
+    }
 
 }

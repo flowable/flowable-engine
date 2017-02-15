@@ -23,10 +23,10 @@ import org.flowable.camel.CamelBehavior;
  */
 public class CamelBehaviorDefaultImpl extends CamelBehavior {
 
-  private static final long serialVersionUID = 003L;
+    private static final long serialVersionUID = 003L;
 
-  @Override
-  protected void setPropertTargetVariable(FlowableEndpoint endpoint) {
-    toTargetType = TargetType.PROPERTIES;
-  }
+    @Override
+    protected void setPropertTargetVariable(FlowableEndpoint endpoint) {
+        toTargetType = TargetType.PROPERTIES;
+    }
 }

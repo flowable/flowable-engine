@@ -34,64 +34,64 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
  */
 public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public void execute(DelegateExecution execution) {
-    SubProcess subProcess = getSubProcessFromExecution(execution);
+    public void execute(DelegateExecution execution) {
+        SubProcess subProcess = getSubProcessFromExecution(execution);
 
-    FlowElement startElement = null;
-    if (CollectionUtil.isNotEmpty(subProcess.getFlowElements())) {
-      for (FlowElement subElement : subProcess.getFlowElements()) {
-        if (subElement instanceof StartEvent) {
-          StartEvent startEvent = (StartEvent) subElement;
+        FlowElement startElement = null;
+        if (CollectionUtil.isNotEmpty(subProcess.getFlowElements())) {
+            for (FlowElement subElement : subProcess.getFlowElements()) {
+                if (subElement instanceof StartEvent) {
+                    StartEvent startEvent = (StartEvent) subElement;
 
-          // start none event
-          if (CollectionUtil.isEmpty(startEvent.getEventDefinitions())) {
-            startElement = startEvent;
-            break;
-          }
+                    // start none event
+                    if (CollectionUtil.isEmpty(startEvent.getEventDefinitions())) {
+                        startElement = startEvent;
+                        break;
+                    }
+                }
+            }
         }
-      }
+
+        if (startElement == null) {
+            throw new FlowableException("No initial activity found for subprocess " + subProcess.getId());
+        }
+
+        ExecutionEntity executionEntity = (ExecutionEntity) execution;
+        executionEntity.setScope(true);
+
+        // initialize the template-defined data objects as variables
+        Map<String, Object> dataObjectVars = processDataObjects(subProcess.getDataObjects());
+        if (dataObjectVars != null) {
+            executionEntity.setVariablesLocal(dataObjectVars);
+        }
+
+        ExecutionEntity startSubProcessExecution = Context.getCommandContext().getExecutionEntityManager()
+                .createChildExecution(executionEntity);
+        startSubProcessExecution.setCurrentFlowElement(startElement);
+        Context.getAgenda().planContinueProcessOperation(startSubProcessExecution);
     }
 
-    if (startElement == null) {
-      throw new FlowableException("No initial activity found for subprocess " + subProcess.getId());
-    }
-    
-    ExecutionEntity executionEntity = (ExecutionEntity) execution;
-    executionEntity.setScope(true);
-
-    // initialize the template-defined data objects as variables
-    Map<String, Object> dataObjectVars = processDataObjects(subProcess.getDataObjects());
-    if (dataObjectVars != null) {
-      executionEntity.setVariablesLocal(dataObjectVars);
+    protected SubProcess getSubProcessFromExecution(DelegateExecution execution) {
+        FlowElement flowElement = execution.getCurrentFlowElement();
+        SubProcess subProcess = null;
+        if (flowElement instanceof SubProcess) {
+            subProcess = (SubProcess) flowElement;
+        } else {
+            throw new FlowableException("Programmatic error: sub process behaviour can only be applied" + " to a SubProcess instance, but got an instance of " + flowElement);
+        }
+        return subProcess;
     }
 
-    ExecutionEntity startSubProcessExecution = Context.getCommandContext().getExecutionEntityManager()
-        .createChildExecution(executionEntity); 
-    startSubProcessExecution.setCurrentFlowElement(startElement);
-    Context.getAgenda().planContinueProcessOperation(startSubProcessExecution);
-  }
-
-  protected SubProcess getSubProcessFromExecution(DelegateExecution execution) {
-    FlowElement flowElement = execution.getCurrentFlowElement();
-    SubProcess subProcess = null;
-    if (flowElement instanceof SubProcess) {
-      subProcess = (SubProcess) flowElement;
-    } else {
-      throw new FlowableException("Programmatic error: sub process behaviour can only be applied" + " to a SubProcess instance, but got an instance of " + flowElement);
+    protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {
+        Map<String, Object> variablesMap = new HashMap<String, Object>();
+        // convert data objects to process variables
+        if (dataObjects != null) {
+            for (ValuedDataObject dataObject : dataObjects) {
+                variablesMap.put(dataObject.getName(), dataObject.getValue());
+            }
+        }
+        return variablesMap;
     }
-    return subProcess;
-  }
-
-  protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {
-    Map<String, Object> variablesMap = new HashMap<String, Object>();
-    // convert data objects to process variables
-    if (dataObjects != null) {
-      for (ValuedDataObject dataObject : dataObjects) {
-        variablesMap.put(dataObject.getName(), dataObject.getValue());
-      }
-    }
-    return variablesMap;
-  }
 }

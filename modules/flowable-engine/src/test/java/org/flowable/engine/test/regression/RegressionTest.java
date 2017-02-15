@@ -21,18 +21,18 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
  */
 public class RegressionTest extends PluggableFlowableTestCase {
 
-  // https://jira.codehaus.org/browse/ACT-1623
-  // NPE when eventbased gateway is after referenced event
-  public void testAct1623() throws Exception {
+    // https://jira.codehaus.org/browse/ACT-1623
+    // NPE when eventbased gateway is after referenced event
+    public void testAct1623() throws Exception {
 
-    // Deploy processes
-    String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/regression/act1623-processOne.bpmn")
-        .addClasspathResource("org/flowable/engine/test/regression/act1623-processTwo.bpmn").deploy().getId();
+        // Deploy processes
+        String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/regression/act1623-processOne.bpmn")
+                .addClasspathResource("org/flowable/engine/test/regression/act1623-processTwo.bpmn").deploy().getId();
 
-    runtimeService.startProcessInstanceByKey("ProcessOne");
+        runtimeService.startProcessInstanceByKey("ProcessOne");
 
-    // Clean
-    repositoryService.deleteDeployment(deploymentId, true);
-  }
+        // Clean
+        repositoryService.deleteDeployment(deploymentId, true);
+    }
 
 }

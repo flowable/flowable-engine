@@ -26,60 +26,60 @@ import java.util.Map;
  */
 public class CurrentActivityTransactionDependentExecutionListener implements TransactionDependentExecutionListener {
 
-  protected static List<CurrentActivity> currentActivities = new ArrayList<>();
+    protected static List<CurrentActivity> currentActivities = new ArrayList<>();
 
-  @Override
-  public void notify(String processInstanceId, String executionId, FlowElement currentFlowElement, Map<String, Object> executionVariables, Map<String, Object> customPropertiesMap) {
-    currentActivities.add(new CurrentActivity(processInstanceId, executionId, currentFlowElement.getId(), currentFlowElement.getName(), executionVariables, customPropertiesMap));
-  }
-
-  public static class CurrentActivity {
-    private final String processInstanceId;
-    private final String executionId;
-    private final String activityId;
-    private final String activityName;
-    private final Map<String, Object> executionVariables;
-    private final Map<String, Object> customPropertiesMap;
-
-    public CurrentActivity(String processInstanceId, String executionId, String activityId, String activityName, Map<String, Object> executionVariables, Map<String, Object> customPropertiesMap) {
-      this.processInstanceId = processInstanceId;
-      this.executionId = executionId;
-      this.activityId = activityId;
-      this.activityName = activityName;
-      this.executionVariables = executionVariables;
-      this.customPropertiesMap = customPropertiesMap;
+    @Override
+    public void notify(String processInstanceId, String executionId, FlowElement currentFlowElement, Map<String, Object> executionVariables, Map<String, Object> customPropertiesMap) {
+        currentActivities.add(new CurrentActivity(processInstanceId, executionId, currentFlowElement.getId(), currentFlowElement.getName(), executionVariables, customPropertiesMap));
     }
 
-    public String getProcessInstanceId() {
-      return processInstanceId;
+    public static class CurrentActivity {
+        private final String processInstanceId;
+        private final String executionId;
+        private final String activityId;
+        private final String activityName;
+        private final Map<String, Object> executionVariables;
+        private final Map<String, Object> customPropertiesMap;
+
+        public CurrentActivity(String processInstanceId, String executionId, String activityId, String activityName, Map<String, Object> executionVariables, Map<String, Object> customPropertiesMap) {
+            this.processInstanceId = processInstanceId;
+            this.executionId = executionId;
+            this.activityId = activityId;
+            this.activityName = activityName;
+            this.executionVariables = executionVariables;
+            this.customPropertiesMap = customPropertiesMap;
+        }
+
+        public String getProcessInstanceId() {
+            return processInstanceId;
+        }
+
+        public String getExecutionId() {
+            return executionId;
+        }
+
+        public String getActivityId() {
+            return activityId;
+        }
+
+        public String getActivityName() {
+            return activityName;
+        }
+
+        public Map<String, Object> getExecutionVariables() {
+            return executionVariables;
+        }
+
+        public Map<String, Object> getCustomPropertiesMap() {
+            return customPropertiesMap;
+        }
     }
 
-    public String getExecutionId() {
-      return executionId;
+    public static List<CurrentActivity> getCurrentActivities() {
+        return currentActivities;
     }
 
-    public String getActivityId() {
-      return activityId;
+    public static void clear() {
+        currentActivities.clear();
     }
-
-    public String getActivityName() {
-      return activityName;
-    }
-
-    public Map<String, Object> getExecutionVariables() {
-      return executionVariables;
-    }
-
-    public Map<String, Object> getCustomPropertiesMap() {
-      return customPropertiesMap;
-    }
-  }
-
-  public static List<CurrentActivity> getCurrentActivities() {
-    return currentActivities;
-  }
-
-  public static void clear() {
-    currentActivities.clear();
-  }
 }

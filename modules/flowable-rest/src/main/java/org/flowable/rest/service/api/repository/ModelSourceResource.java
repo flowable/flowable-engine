@@ -39,56 +39,55 @@ import javax.servlet.http.HttpServletResponse;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Models" }, description = "Manage Models", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Models" }, description = "Manage Models", authorizations = { @Authorization(value = "basicAuth") })
 public class ModelSourceResource extends BaseModelSourceResource {
 
-  @ResponseBody
-  @RequestMapping(value = "/repository/models/{modelId}/source", method = RequestMethod.GET)
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Indicates the model was found and source is returned."),
-          @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
-  })
-  @ApiOperation(value = "Get the editor source for a model", tags = {"Models"},
-          notes = "Response body contains the model’s raw editor source. The response’s content-type is set to application/octet-stream, regardless of the content of the source.")
-  protected
-  byte[] getModelBytes(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletResponse response) {
-    byte[] editorSource = repositoryService.getModelEditorSource(modelId);
-    if (editorSource == null) {
-      throw new FlowableObjectNotFoundException("Model with id '" + modelId + "' does not have source available.", String.class);
+    @ResponseBody
+    @RequestMapping(value = "/repository/models/{modelId}/source", method = RequestMethod.GET)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the model was found and source is returned."),
+            @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
+    })
+    @ApiOperation(value = "Get the editor source for a model", tags = {
+            "Models" }, notes = "Response body contains the model’s raw editor source. The response’s content-type is set to application/octet-stream, regardless of the content of the source.")
+    protected byte[] getModelBytes(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletResponse response) {
+        byte[] editorSource = repositoryService.getModelEditorSource(modelId);
+        if (editorSource == null) {
+            throw new FlowableObjectNotFoundException("Model with id '" + modelId + "' does not have source available.", String.class);
+        }
+        response.setContentType("application/octet-stream");
+        return editorSource;
     }
-    response.setContentType("application/octet-stream");
-    return editorSource;
-  }
 
-  @ApiOperation(value = "Set the editor source for a model", tags = {"Models"}, consumes = "multipart/form-data",
-          notes = "Response body contains the model’s raw editor source. The response’s content-type is set to application/octet-stream, regardless of the content of the source.")
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Indicates the model was found and the source has been updated."),
-          @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
-  })
-  @RequestMapping(value = "/repository/models/{modelId}/source", method = RequestMethod.PUT)
-  protected void setModelSource(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletRequest request, HttpServletResponse response) {
-    Model model = getModelFromRequest(modelId);
-    if (model != null) {
+    @ApiOperation(value = "Set the editor source for a model", tags = {
+            "Models" }, consumes = "multipart/form-data", notes = "Response body contains the model’s raw editor source. The response’s content-type is set to application/octet-stream, regardless of the content of the source.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the model was found and the source has been updated."),
+            @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
+    })
+    @RequestMapping(value = "/repository/models/{modelId}/source", method = RequestMethod.PUT)
+    protected void setModelSource(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletRequest request, HttpServletResponse response) {
+        Model model = getModelFromRequest(modelId);
+        if (model != null) {
 
-      if (!(request instanceof MultipartHttpServletRequest)) {
-        throw new FlowableIllegalArgumentException("Multipart request is required");
-      }
+            if (!(request instanceof MultipartHttpServletRequest)) {
+                throw new FlowableIllegalArgumentException("Multipart request is required");
+            }
 
-      MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+            MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
 
-      if (multipartRequest.getFileMap().size() == 0) {
-        throw new FlowableIllegalArgumentException("Multipart request with file content is required");
-      }
+            if (multipartRequest.getFileMap().size() == 0) {
+                throw new FlowableIllegalArgumentException("Multipart request with file content is required");
+            }
 
-      MultipartFile file = multipartRequest.getFileMap().values().iterator().next();
+            MultipartFile file = multipartRequest.getFileMap().values().iterator().next();
 
-      try {
-        repositoryService.addModelEditorSource(modelId, file.getBytes());
-        response.setStatus(HttpStatus.NO_CONTENT.value());
-      } catch (Exception e) {
-        throw new FlowableException("Error adding model editor source extra", e);
-      }
+            try {
+                repositoryService.addModelEditorSource(modelId, file.getBytes());
+                response.setStatus(HttpStatus.NO_CONTENT.value());
+            } catch (Exception e) {
+                throw new FlowableException("Error adding model editor source extra", e);
+            }
+        }
     }
-  }
 }

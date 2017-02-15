@@ -12,15 +12,14 @@
  */
 package org.activiti.standalone.escapeclause;
 
-
 public class AbstractEscapeClauseTestCase extends org.activiti.engine.impl.test.ResourceFlowableTestCase {
 
-  public AbstractEscapeClauseTestCase() {
-    this(null);
-  }
-  
-  public AbstractEscapeClauseTestCase(String activitiConfigurationResource) {
-    super("org/activiti/standalone/escapeclause/flowable.cfg.xml");
-  }
-  
+    public AbstractEscapeClauseTestCase() {
+        this(null);
+    }
+
+    public AbstractEscapeClauseTestCase(String activitiConfigurationResource) {
+        super("org/activiti/standalone/escapeclause/flowable.cfg.xml");
+    }
+
 }

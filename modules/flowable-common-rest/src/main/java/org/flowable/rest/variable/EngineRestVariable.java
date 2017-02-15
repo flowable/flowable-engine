@@ -21,43 +21,43 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 public class EngineRestVariable {
 
-  private String name;
-  private String type;
-  private Object value;
-  private String valueUrl;
+    private String name;
+    private String type;
+    private Object value;
+    private String valueUrl;
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  public String getType() {
-    return type;
-  }
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public String getType() {
+        return type;
+    }
 
-  public void setType(String type) {
-    this.type = type;
-  }
+    public void setType(String type) {
+        this.type = type;
+    }
 
-  public Object getValue() {
-    return value;
-  }
+    public Object getValue() {
+        return value;
+    }
 
-  public void setValue(Object value) {
-    this.value = value;
-  }
+    public void setValue(Object value) {
+        this.value = value;
+    }
 
-  public void setValueUrl(String valueUrl) {
-    this.valueUrl = valueUrl;
-  }
+    public void setValueUrl(String valueUrl) {
+        this.valueUrl = valueUrl;
+    }
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  public String getValueUrl() {
-    return valueUrl;
-  }
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public String getValueUrl() {
+        return valueUrl;
+    }
 
 }

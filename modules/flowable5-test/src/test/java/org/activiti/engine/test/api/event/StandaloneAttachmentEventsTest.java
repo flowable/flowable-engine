@@ -29,132 +29,132 @@ import org.flowable.engine.task.Task;
  */
 public class StandaloneAttachmentEventsTest extends PluggableFlowableTestCase {
 
-	private TestFlowable6EntityEventListener listener;
+    private TestFlowable6EntityEventListener listener;
 
-	/**
-	 * Test create, update and delete events of users.
-	 */
-	public void testAttachmentEntityEventsStandaloneTask() throws Exception {
-		if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-			Task task = null;
-			try {
-				task = taskService.newTask();
-				taskService.saveTask(task);
-				assertNotNull(task);
-				
-				// Create link-attachment
-				Attachment attachment = taskService.createAttachment("test", task.getId(), null, "attachment name", "description", "http://activiti.org");
-				assertEquals(2, listener.getEventsReceived().size());
-				FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-				assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
-				assertNull(event.getProcessInstanceId());
-				assertNull(event.getExecutionId());
-				assertNull(event.getProcessDefinitionId());
-				Attachment attachmentFromEvent = (Attachment) event.getEntity();
-				assertEquals(attachment.getId(), attachmentFromEvent.getId());
-				event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
-				assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
-				listener.clearEventsReceived();
-				
-				// Create binary attachment
-				attachment = taskService.createAttachment("test", task.getId(), null, "attachment name", "description", new ByteArrayInputStream("test".getBytes()));
-				assertEquals(2, listener.getEventsReceived().size());
-				event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-				assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
-				assertNull(event.getProcessInstanceId());
-				assertNull(event.getExecutionId());
-				assertNull(event.getProcessDefinitionId());
-				attachmentFromEvent = (Attachment) event.getEntity();
-				assertEquals(attachment.getId(), attachmentFromEvent.getId());
-				
-				event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
-				assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
-				listener.clearEventsReceived();
-				
-				// Update attachment
-				attachment = taskService.getAttachment(attachment.getId());
-				attachment.setDescription("Description");
-				taskService.saveAttachment(attachment);
-				
-				assertEquals(1, listener.getEventsReceived().size());
-				event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-				assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
-				assertNull(event.getProcessInstanceId());
-				assertNull(event.getExecutionId());
-				assertNull(event.getProcessDefinitionId());
-				attachmentFromEvent = (Attachment) event.getEntity();
-				assertEquals(attachment.getId(), attachmentFromEvent.getId());
-				assertEquals("Description", attachmentFromEvent.getDescription());
-				listener.clearEventsReceived();
-				
-				// Finally, delete attachment
-				taskService.deleteAttachment(attachment.getId());
-				assertEquals(1, listener.getEventsReceived().size());
-				event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-				assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
-				assertNull(event.getProcessInstanceId());
-				assertNull(event.getExecutionId());
-				assertNull(event.getProcessDefinitionId());
-				attachmentFromEvent = (Attachment) event.getEntity();
-				assertEquals(attachment.getId(), attachmentFromEvent.getId());
-				
-			} finally {
-				if(task != null && task.getId() != null) {
-					taskService.deleteTask(task.getId());
-					historyService.deleteHistoricTaskInstance(task.getId());
-				}
-			}
-		}
-	}
-	
-	public void testAttachmentEntityEventsOnHistoricTaskDelete() throws Exception {
-		if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-			Task task = null;
-			try {
-				task = taskService.newTask();
-				taskService.saveTask(task);
-				assertNotNull(task);
-				
-				// Create link-attachment
-				Attachment attachment = taskService.createAttachment("test", task.getId(), null, "attachment name", "description", "http://activiti.org");
-				listener.clearEventsReceived();
-				
-				// Delete task and historic task
-				taskService.deleteTask(task.getId());
-				historyService.deleteHistoricTaskInstance(task.getId());
-				
-				assertEquals(1, listener.getEventsReceived().size());
-				FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-				assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
-				assertNull(event.getProcessInstanceId());
-				assertNull(event.getExecutionId());
-				assertNull(event.getProcessDefinitionId());
-				Attachment attachmentFromEvent = (Attachment) event.getEntity();
-				assertEquals(attachment.getId(), attachmentFromEvent.getId());
-				
-			} finally {
-				if(task != null && task.getId() != null) {
-					taskService.deleteTask(task.getId());
-					historyService.deleteHistoricTaskInstance(task.getId());
-				}
-			}
-		}
-	}
+    /**
+     * Test create, update and delete events of users.
+     */
+    public void testAttachmentEntityEventsStandaloneTask() throws Exception {
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            Task task = null;
+            try {
+                task = taskService.newTask();
+                taskService.saveTask(task);
+                assertNotNull(task);
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		
-		listener = new TestFlowable6EntityEventListener(Attachment.class);
-		processEngineConfiguration.getEventDispatcher().addEventListener(listener);
-	}
+                // Create link-attachment
+                Attachment attachment = taskService.createAttachment("test", task.getId(), null, "attachment name", "description", "http://activiti.org");
+                assertEquals(2, listener.getEventsReceived().size());
+                FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
+                assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
+                assertNull(event.getProcessInstanceId());
+                assertNull(event.getExecutionId());
+                assertNull(event.getProcessDefinitionId());
+                Attachment attachmentFromEvent = (Attachment) event.getEntity();
+                assertEquals(attachment.getId(), attachmentFromEvent.getId());
+                event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
+                assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+                listener.clearEventsReceived();
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
+                // Create binary attachment
+                attachment = taskService.createAttachment("test", task.getId(), null, "attachment name", "description", new ByteArrayInputStream("test".getBytes()));
+                assertEquals(2, listener.getEventsReceived().size());
+                event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
+                assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
+                assertNull(event.getProcessInstanceId());
+                assertNull(event.getExecutionId());
+                assertNull(event.getProcessDefinitionId());
+                attachmentFromEvent = (Attachment) event.getEntity();
+                assertEquals(attachment.getId(), attachmentFromEvent.getId());
 
-		if (listener != null) {
-		  processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
-		}
-	}
+                event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
+                assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+                listener.clearEventsReceived();
+
+                // Update attachment
+                attachment = taskService.getAttachment(attachment.getId());
+                attachment.setDescription("Description");
+                taskService.saveAttachment(attachment);
+
+                assertEquals(1, listener.getEventsReceived().size());
+                event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
+                assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
+                assertNull(event.getProcessInstanceId());
+                assertNull(event.getExecutionId());
+                assertNull(event.getProcessDefinitionId());
+                attachmentFromEvent = (Attachment) event.getEntity();
+                assertEquals(attachment.getId(), attachmentFromEvent.getId());
+                assertEquals("Description", attachmentFromEvent.getDescription());
+                listener.clearEventsReceived();
+
+                // Finally, delete attachment
+                taskService.deleteAttachment(attachment.getId());
+                assertEquals(1, listener.getEventsReceived().size());
+                event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
+                assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
+                assertNull(event.getProcessInstanceId());
+                assertNull(event.getExecutionId());
+                assertNull(event.getProcessDefinitionId());
+                attachmentFromEvent = (Attachment) event.getEntity();
+                assertEquals(attachment.getId(), attachmentFromEvent.getId());
+
+            } finally {
+                if (task != null && task.getId() != null) {
+                    taskService.deleteTask(task.getId());
+                    historyService.deleteHistoricTaskInstance(task.getId());
+                }
+            }
+        }
+    }
+
+    public void testAttachmentEntityEventsOnHistoricTaskDelete() throws Exception {
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            Task task = null;
+            try {
+                task = taskService.newTask();
+                taskService.saveTask(task);
+                assertNotNull(task);
+
+                // Create link-attachment
+                Attachment attachment = taskService.createAttachment("test", task.getId(), null, "attachment name", "description", "http://activiti.org");
+                listener.clearEventsReceived();
+
+                // Delete task and historic task
+                taskService.deleteTask(task.getId());
+                historyService.deleteHistoricTaskInstance(task.getId());
+
+                assertEquals(1, listener.getEventsReceived().size());
+                FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
+                assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
+                assertNull(event.getProcessInstanceId());
+                assertNull(event.getExecutionId());
+                assertNull(event.getProcessDefinitionId());
+                Attachment attachmentFromEvent = (Attachment) event.getEntity();
+                assertEquals(attachment.getId(), attachmentFromEvent.getId());
+
+            } finally {
+                if (task != null && task.getId() != null) {
+                    taskService.deleteTask(task.getId());
+                    historyService.deleteHistoricTaskInstance(task.getId());
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        listener = new TestFlowable6EntityEventListener(Attachment.class);
+        processEngineConfiguration.getEventDispatcher().addEventListener(listener);
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+
+        if (listener != null) {
+            processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
+        }
+    }
 }

@@ -22,27 +22,27 @@ import org.flowable.engine.test.Deployment;
  */
 public class CustomActivityBehaviorFactoryTest extends ResourceFlowableTestCase {
 
-  public CustomActivityBehaviorFactoryTest() {
-    super("org/flowable/standalone/parsing/custom.activitybehaviorfactory.flowable.cfg.xml");
-  }
-
-  // The custom activity factory will change this value
-  public static AtomicInteger COUNTER = new AtomicInteger(0);
-
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-    COUNTER.set(0);
-  }
-
-  @Deployment
-  public void testCustomActivityBehaviorFactory() {
-    int nrOfProcessInstances = 6;
-    for (int i = 0; i < nrOfProcessInstances; i++) {
-      runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    public CustomActivityBehaviorFactoryTest() {
+        super("org/flowable/standalone/parsing/custom.activitybehaviorfactory.flowable.cfg.xml");
     }
 
-    assertEquals(nrOfProcessInstances, COUNTER.get());
-  }
+    // The custom activity factory will change this value
+    public static AtomicInteger COUNTER = new AtomicInteger(0);
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        COUNTER.set(0);
+    }
+
+    @Deployment
+    public void testCustomActivityBehaviorFactory() {
+        int nrOfProcessInstances = 6;
+        for (int i = 0; i < nrOfProcessInstances; i++) {
+            runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        }
+
+        assertEquals(nrOfProcessInstances, COUNTER.get());
+    }
 
 }

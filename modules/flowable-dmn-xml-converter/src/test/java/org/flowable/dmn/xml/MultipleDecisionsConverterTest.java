@@ -47,7 +47,7 @@ public class MultipleDecisionsConverterTest extends AbstractConverterTest {
     private void validateModel(DmnDefinition model) {
         List<Decision> decisions = model.getDecisions();
         assertEquals(2, decisions.size());
-        
+
         DecisionTable decisionTable1 = (DecisionTable) decisions.get(0).getExpression();
         assertNotNull(decisionTable1);
 

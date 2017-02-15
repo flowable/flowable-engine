@@ -19,5 +19,5 @@ package org.flowable.engine.impl.bpmn.data;
  */
 public enum ItemKind {
 
-  Information, Physical
+    Information, Physical
 }

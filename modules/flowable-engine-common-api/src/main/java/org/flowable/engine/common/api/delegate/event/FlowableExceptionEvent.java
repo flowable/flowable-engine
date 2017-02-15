@@ -19,8 +19,8 @@ package org.flowable.engine.common.api.delegate.event;
  */
 public interface FlowableExceptionEvent {
 
-  /**
-   * @return the throwable that caused this event to be dispatched.
-   */
-  Throwable getCause();
+    /**
+     * @return the throwable that caused this event to be dispatched.
+     */
+    Throwable getCause();
 }

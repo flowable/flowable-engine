@@ -26,160 +26,159 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
-
 /**
  * @author Daniel Meyer
  */
 public class CompensateEventTest extends PluggableFlowableTestCase {
-  
-  @Deployment
-  public void testCompensateSubprocess() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
-    
-    assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
-    
-    runtimeService.trigger(processInstance.getId());    
-    assertProcessEnded(processInstance.getId());
-    
-  }
-  
-  @Deployment
-  public void testCompensateMiSubprocess() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
-    
-    assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
-    
-    runtimeService.trigger(processInstance.getId());    
-    assertProcessEnded(processInstance.getId());
-    
-  }
-  
-  @Deployment
-  public void testCompensateScope() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
-    
-    assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
-    assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookFlight"));
-    
-    runtimeService.trigger(processInstance.getId());    
-    assertProcessEnded(processInstance.getId());
-    
-  }
-  
-  @Deployment(resources = {"org/activiti/engine/test/bpmn/event/compensate/CompensateEventTest.SubProcess1.bpmn20.xml",
-        "org/activiti/engine/test/bpmn/event/compensate/CompensateEventTest.SubProcess2.bpmn20.xml",
-        "org/activiti/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensateTwoSubprocesses.bpmn20.xml" })
-  public void testCompensateTwoSubprocesses() {
-  
-    Map<String, Object> initialVariables = new HashMap<String, Object>();
-    initialVariables.put("test", "begin");
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess", initialVariables);
-    
-    assertNotNull(processInstance);
-    
-    // get task from first subprocess
-    Task task = taskService.createTaskQuery().singleResult();
-    
-    Map<String, String> taskFormVariables = new HashMap<String, String>();
-    taskFormVariables.put("test", "begin");
-    formService.submitTaskFormData(task.getId(), new HashMap<String, String>());
-    
-    // get task from second subprocess
-    task = taskService.createTaskQuery().singleResult();
-    
-    formService.submitTaskFormData(task.getId(), new HashMap<String, String>());
-    
-    // get first task from main process
-    task = taskService.createTaskQuery().singleResult();
-    
-    Object testVariable2 = runtimeService.getVariable(processInstance.getId(), "test2");
-    assertNotNull(testVariable2);
-    assertEquals("compensated2", testVariable2.toString());
-    
-    Object testVariable1 = runtimeService.getVariable(processInstance.getId(), "test1");
-    assertNotNull(testVariable1);
-    assertEquals("compensated1", testVariable1.toString());
-  }
-  
-  @Deployment(resources={
-          "org/activiti/engine/test/bpmn/event/compensate/CompensateEventTest.testCallActivityCompensationHandler.bpmn20.xml",
-          "org/activiti/engine/test/bpmn/event/compensate/CompensationHandler.bpmn20.xml"          
-  })
-  public void testCallActivityCompensationHandler() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
-    if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-      assertEquals(5, historyService.createHistoricActivityInstanceQuery()
-              .activityId("undoBookHotel")
-              .count());
-    }
-    
-    runtimeService.trigger(processInstance.getId());    
-    assertProcessEnded(processInstance.getId());
-    
-    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-    
-    if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-      assertEquals(6, historyService.createHistoricProcessInstanceQuery().count());
-    }
-    
-  }
-  
-  @Deployment
-  public void testCompensateMiSubprocessVariableSnapshots() {
-    // see referenced java delegates in the process definition. 
-    
-    SetVariablesDelegate.variablesMap.clear();    
-    
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
-    
-    if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-      assertEquals(5, historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").count());
-    }
-    
-    assertProcessEnded(processInstance.getId());
-    
-  }
-  
-  public void testMultipleCompensationCatchEventsFails() {
-    try {
-      repositoryService.createDeployment()
-        .addClasspathResource("org/activiti/engine/test/bpmn/event/compensate/CompensateEventTest.testMultipleCompensationCatchEventsFails.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
-        .deploy();
-      fail("exception expected");
-    } catch (Exception e) {
-    }    
-  }
-  
-  public void testInvalidActivityRefFails() {    
-    try {
-      repositoryService.createDeployment()
-        .addClasspathResource("org/activiti/engine/test/bpmn/event/compensate/CompensateEventTest.testInvalidActivityRefFails.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
-        .deploy();
-      fail("exception expected");
-    } catch (Exception e) {
-      if(!e.getMessage().contains("Invalid attribute value for 'activityRef':")) {
-        fail("different exception expected");
-      }
-    }    
-  }
+    @Deployment
+    public void testCompensateSubprocess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
-  @Deployment(resources = {"org/activiti/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationStepEndRecorded.bpmn20.xml"})
-  public void testCompensationStepEndTimeRecorded() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensationStepEndRecordedProcess");
-    assertProcessEnded(processInstance.getId());
-    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+        assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
 
-    if (!processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-      return;
+        runtimeService.trigger(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
+
     }
-    final HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery().activityId("compensationScriptTask");
-    assertEquals(1, query.count());
-    final HistoricActivityInstance compensationScriptTask = query.singleResult();
-    assertNotNull(compensationScriptTask);
-    assertNotNull(compensationScriptTask.getEndTime());
-    assertNotNull(compensationScriptTask.getDurationInMillis());
-  }
+
+    @Deployment
+    public void testCompensateMiSubprocess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+
+        assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
+
+        runtimeService.trigger(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
+
+    }
+
+    @Deployment
+    public void testCompensateScope() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+
+        assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
+        assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookFlight"));
+
+        runtimeService.trigger(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
+
+    }
+
+    @Deployment(resources = { "org/activiti/engine/test/bpmn/event/compensate/CompensateEventTest.SubProcess1.bpmn20.xml",
+            "org/activiti/engine/test/bpmn/event/compensate/CompensateEventTest.SubProcess2.bpmn20.xml",
+            "org/activiti/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensateTwoSubprocesses.bpmn20.xml" })
+    public void testCompensateTwoSubprocesses() {
+
+        Map<String, Object> initialVariables = new HashMap<String, Object>();
+        initialVariables.put("test", "begin");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess", initialVariables);
+
+        assertNotNull(processInstance);
+
+        // get task from first subprocess
+        Task task = taskService.createTaskQuery().singleResult();
+
+        Map<String, String> taskFormVariables = new HashMap<String, String>();
+        taskFormVariables.put("test", "begin");
+        formService.submitTaskFormData(task.getId(), new HashMap<String, String>());
+
+        // get task from second subprocess
+        task = taskService.createTaskQuery().singleResult();
+
+        formService.submitTaskFormData(task.getId(), new HashMap<String, String>());
+
+        // get first task from main process
+        task = taskService.createTaskQuery().singleResult();
+
+        Object testVariable2 = runtimeService.getVariable(processInstance.getId(), "test2");
+        assertNotNull(testVariable2);
+        assertEquals("compensated2", testVariable2.toString());
+
+        Object testVariable1 = runtimeService.getVariable(processInstance.getId(), "test1");
+        assertNotNull(testVariable1);
+        assertEquals("compensated1", testVariable1.toString());
+    }
+
+    @Deployment(resources = {
+            "org/activiti/engine/test/bpmn/event/compensate/CompensateEventTest.testCallActivityCompensationHandler.bpmn20.xml",
+            "org/activiti/engine/test/bpmn/event/compensate/CompensationHandler.bpmn20.xml"
+    })
+    public void testCallActivityCompensationHandler() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            assertEquals(5, historyService.createHistoricActivityInstanceQuery()
+                    .activityId("undoBookHotel")
+                    .count());
+        }
+
+        runtimeService.trigger(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
+
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            assertEquals(6, historyService.createHistoricProcessInstanceQuery().count());
+        }
+
+    }
+
+    @Deployment
+    public void testCompensateMiSubprocessVariableSnapshots() {
+        // see referenced java delegates in the process definition.
+
+        SetVariablesDelegate.variablesMap.clear();
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            assertEquals(5, historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").count());
+        }
+
+        assertProcessEnded(processInstance.getId());
+
+    }
+
+    public void testMultipleCompensationCatchEventsFails() {
+        try {
+            repositoryService.createDeployment()
+                    .addClasspathResource("org/activiti/engine/test/bpmn/event/compensate/CompensateEventTest.testMultipleCompensationCatchEventsFails.bpmn20.xml")
+                    .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
+                    .deploy();
+            fail("exception expected");
+        } catch (Exception e) {
+        }
+    }
+
+    public void testInvalidActivityRefFails() {
+        try {
+            repositoryService.createDeployment()
+                    .addClasspathResource("org/activiti/engine/test/bpmn/event/compensate/CompensateEventTest.testInvalidActivityRefFails.bpmn20.xml")
+                    .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
+                    .deploy();
+            fail("exception expected");
+        } catch (Exception e) {
+            if (!e.getMessage().contains("Invalid attribute value for 'activityRef':")) {
+                fail("different exception expected");
+            }
+        }
+    }
+
+    @Deployment(resources = { "org/activiti/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationStepEndRecorded.bpmn20.xml" })
+    public void testCompensationStepEndTimeRecorded() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensationStepEndRecordedProcess");
+        assertProcessEnded(processInstance.getId());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+        if (!processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            return;
+        }
+        final HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery().activityId("compensationScriptTask");
+        assertEquals(1, query.count());
+        final HistoricActivityInstance compensationScriptTask = query.singleResult();
+        assertNotNull(compensationScriptTask);
+        assertNotNull(compensationScriptTask.getEndTime());
+        assertNotNull(compensationScriptTask.getDurationInMillis());
+    }
 }

@@ -22,18 +22,18 @@ import org.flowable.scripting.secure.impl.SecureJavascriptUtil;
  */
 public class SecureJavascriptExecutionListener extends ScriptExecutionListener {
 
-  @Override
-  public void notify(DelegateExecution execution) {
-    validateParameters();
-    if (SecureJavascriptTaskParseHandler.LANGUAGE_JAVASCRIPT.equalsIgnoreCase(language.getValue(execution).toString())) {
-      Object result = SecureJavascriptUtil.evaluateScript(execution, script.getExpressionText());
-      
-      if (resultVariable != null) {
-        execution.setVariable(resultVariable.getExpressionText(), result);
-      }
-    } else {
-      super.notify(execution);
+    @Override
+    public void notify(DelegateExecution execution) {
+        validateParameters();
+        if (SecureJavascriptTaskParseHandler.LANGUAGE_JAVASCRIPT.equalsIgnoreCase(language.getValue(execution).toString())) {
+            Object result = SecureJavascriptUtil.evaluateScript(execution, script.getExpressionText());
+
+            if (resultVariable != null) {
+                execution.setVariable(resultVariable.getExpressionText(), result);
+            }
+        } else {
+            super.notify(execution);
+        }
     }
-  }
-  
+
 }

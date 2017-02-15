@@ -25,21 +25,21 @@ import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity
  * @author Joram Barrez
  */
 public interface HistoricProcessInstanceDataManager extends DataManager<HistoricProcessInstanceEntity> {
-  
-  HistoricProcessInstanceEntity create(ExecutionEntity processInstanceExecutionEntity);
 
-  List<String> findHistoricProcessInstanceIdsByProcessDefinitionId(String processDefinitionId);
-  
-  List<HistoricProcessInstanceEntity> findHistoricProcessInstancesBySuperProcessInstanceId(String superProcessInstanceId);
- 
-  long findHistoricProcessInstanceCountByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery);
+    HistoricProcessInstanceEntity create(ExecutionEntity processInstanceExecutionEntity);
 
-  List<HistoricProcessInstance> findHistoricProcessInstancesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery);
-  
-  List<HistoricProcessInstance> findHistoricProcessInstancesAndVariablesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery);
+    List<String> findHistoricProcessInstanceIdsByProcessDefinitionId(String processDefinitionId);
 
-  List<HistoricProcessInstance> findHistoricProcessInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<HistoricProcessInstanceEntity> findHistoricProcessInstancesBySuperProcessInstanceId(String superProcessInstanceId);
 
-  long findHistoricProcessInstanceCountByNativeQuery(Map<String, Object> parameterMap);
-  
+    long findHistoricProcessInstanceCountByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery);
+
+    List<HistoricProcessInstance> findHistoricProcessInstancesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery);
+
+    List<HistoricProcessInstance> findHistoricProcessInstancesAndVariablesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery);
+
+    List<HistoricProcessInstance> findHistoricProcessInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+
+    long findHistoricProcessInstanceCountByNativeQuery(Map<String, Object> parameterMap);
+
 }

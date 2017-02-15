@@ -12,10 +12,8 @@
  */
 package org.activiti.engine;
 
-
 /**
- * Exception that is thrown when the Activiti engine discovers a mismatch between the 
- * database schema version and the engine version.
+ * Exception that is thrown when the Activiti engine discovers a mismatch between the database schema version and the engine version.
  * 
  * The check is done when the engine is created in {@link org.activiti.engine.impl.db.DbSqlSession#dbSchemaCheckVersion()}.
  * 
@@ -23,28 +21,29 @@ package org.activiti.engine;
  */
 public class ActivitiWrongDbException extends ActivitiException {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  String libraryVersion;
-  String dbVersion;
-  
-  public ActivitiWrongDbException(String libraryVersion, String dbVersion) {
-    super("version mismatch: activiti library version is '"+libraryVersion+"', db version is "+dbVersion +" Hint: Set <property name=\"databaseSchemaUpdate\" to value=\"true\" or value=\"create-drop\" (use create-drop for testing only!) in bean processEngineConfiguration in flowable.cfg.xml for automatic schema creation");
-    this.libraryVersion = libraryVersion;
-    this.dbVersion = dbVersion;
-  }
+    String libraryVersion;
+    String dbVersion;
 
-  /**
-   * The version of the Activiti library used.
-   */
-  public String getLibraryVersion() {
-    return libraryVersion;
-  }
-  
-  /**
-   * The version of the Activiti library that was used to create the database schema.
-   */
-  public String getDbVersion() {
-    return dbVersion;
-  }
+    public ActivitiWrongDbException(String libraryVersion, String dbVersion) {
+        super("version mismatch: activiti library version is '" + libraryVersion + "', db version is " + dbVersion
+                + " Hint: Set <property name=\"databaseSchemaUpdate\" to value=\"true\" or value=\"create-drop\" (use create-drop for testing only!) in bean processEngineConfiguration in flowable.cfg.xml for automatic schema creation");
+        this.libraryVersion = libraryVersion;
+        this.dbVersion = dbVersion;
+    }
+
+    /**
+     * The version of the Activiti library used.
+     */
+    public String getLibraryVersion() {
+        return libraryVersion;
+    }
+
+    /**
+     * The version of the Activiti library that was used to create the database schema.
+     */
+    public String getDbVersion() {
+        return dbVersion;
+    }
 }

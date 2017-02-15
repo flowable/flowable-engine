@@ -23,20 +23,20 @@ import org.flowable.engine.test.Deployment;
  */
 public class SimulationRunTaskTest extends ResourceFlowableTestCase {
 
-  public SimulationRunTaskTest() {
-    super("org/flowable/crystalball/process/SimulationRunTaskTest.cfg.xml");
-  }
+    public SimulationRunTaskTest() {
+        super("org/flowable/crystalball/process/SimulationRunTaskTest.cfg.xml");
+    }
 
-  @Deployment
-  public void testBasicSimulationRun() {
-    runtimeService.startProcessInstanceByKey("basicSimulationRun");
-    // all executions are finished
-    assertEquals(0, runtimeService.createExecutionQuery().count());
-  }
+    @Deployment
+    public void testBasicSimulationRun() {
+        runtimeService.startProcessInstanceByKey("basicSimulationRun");
+        // all executions are finished
+        assertEquals(0, runtimeService.createExecutionQuery().count());
+    }
 
-  @Override
-  protected void closeDownProcessEngine() {
-    super.closeDownProcessEngine();
-    ProcessEngines.destroy();
-  }
+    @Override
+    protected void closeDownProcessEngine() {
+        super.closeDownProcessEngine();
+        ProcessEngines.destroy();
+    }
 }

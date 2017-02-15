@@ -21,24 +21,24 @@ import org.joda.time.Period;
 
 public class DueDateBusinessCalendar extends BusinessCalendarImpl {
 
-  public static final String NAME = "dueDate";
+    public static final String NAME = "dueDate";
 
-  public DueDateBusinessCalendar(ClockReader clockReader) {
-    super(clockReader);
-  }
-
-  @Override
-  public Date resolveDuedate(String duedate, int maxIterations) {
-    try {
-      // check if due period was specified
-      if(duedate.startsWith("P")){
-        return new DateTime(clockReader.getCurrentTime()).plus(Period.parse(duedate)).toDate();
-      }
-
-      return DateTime.parse(duedate).toDate();
-
-    } catch (Exception e) {
-      throw new FlowableException("couldn't resolve duedate: " + e.getMessage(), e);
+    public DueDateBusinessCalendar(ClockReader clockReader) {
+        super(clockReader);
     }
-  }
+
+    @Override
+    public Date resolveDuedate(String duedate, int maxIterations) {
+        try {
+            // check if due period was specified
+            if (duedate.startsWith("P")) {
+                return new DateTime(clockReader.getCurrentTime()).plus(Period.parse(duedate)).toDate();
+            }
+
+            return DateTime.parse(duedate).toDate();
+
+        } catch (Exception e) {
+            throw new FlowableException("couldn't resolve duedate: " + e.getMessage(), e);
+        }
+    }
 }

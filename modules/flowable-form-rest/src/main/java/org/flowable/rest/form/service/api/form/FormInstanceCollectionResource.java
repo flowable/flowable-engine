@@ -39,30 +39,30 @@ import io.swagger.annotations.Authorization;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Form Instances" }, description = "Manage Form Instances", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Form Instances" }, description = "Manage Form Instances", authorizations = { @Authorization(value = "basicAuth") })
 public class FormInstanceCollectionResource extends BaseFormInstanceResource {
 
-    @ApiOperation(value = "List of form instances", tags = {"Form Instances"})
+    @ApiOperation(value = "List of form instances", tags = { "Form Instances" })
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", dataType = "string", value = "Only return form instances with the given id.", paramType = "query"),
-        @ApiImplicitParam(name = "formDefinitionId", dataType = "string", value = "Only return form instances with the given form definition id.", paramType = "query"),
-        @ApiImplicitParam(name = "formDefinitionIdLike", dataType = "string", value = "Only return form instances with a form definition id like the given value.", paramType = "query"),
-        @ApiImplicitParam(name = "taskId", dataType = "string", value = "Only return form instances with the given task id.", paramType = "query"),
-        @ApiImplicitParam(name = "taskIdLike", dataType = "string", value = "Only return form instances with a task id like the given value.", paramType = "query"),
-        @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "Only return form instances with the given process instance id.", paramType = "query"),
-        @ApiImplicitParam(name = "processInstanceIdLike", dataType = "string", value = "Only return form instances with a process instance id like the given value.", paramType = "query"),
-        @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "Only return form instances with the given process definition id.", paramType = "query"),
-        @ApiImplicitParam(name = "processDefinitionIdLike", dataType = "string", value = "Only return form instances with a process definition id like the given value.", paramType = "query"),
-        @ApiImplicitParam(name = "submittedBy", dataType = "string", value = "Only return form instances submitted by the given value.", paramType = "query"),
-        @ApiImplicitParam(name = "submittedByLike", dataType = "string", value = "Only return form instances submitted by like the given value.", paramType = "query"),
-        @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return form instances with the given tenantId.", paramType = "query"),
-        @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return form instances with a tenantId like the given value.", paramType = "query"),
-        @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns form instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
-        @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues ="submittedDate,tenantId", paramType = "query"),
+            @ApiImplicitParam(name = "id", dataType = "string", value = "Only return form instances with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "formDefinitionId", dataType = "string", value = "Only return form instances with the given form definition id.", paramType = "query"),
+            @ApiImplicitParam(name = "formDefinitionIdLike", dataType = "string", value = "Only return form instances with a form definition id like the given value.", paramType = "query"),
+            @ApiImplicitParam(name = "taskId", dataType = "string", value = "Only return form instances with the given task id.", paramType = "query"),
+            @ApiImplicitParam(name = "taskIdLike", dataType = "string", value = "Only return form instances with a task id like the given value.", paramType = "query"),
+            @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "Only return form instances with the given process instance id.", paramType = "query"),
+            @ApiImplicitParam(name = "processInstanceIdLike", dataType = "string", value = "Only return form instances with a process instance id like the given value.", paramType = "query"),
+            @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "Only return form instances with the given process definition id.", paramType = "query"),
+            @ApiImplicitParam(name = "processDefinitionIdLike", dataType = "string", value = "Only return form instances with a process definition id like the given value.", paramType = "query"),
+            @ApiImplicitParam(name = "submittedBy", dataType = "string", value = "Only return form instances submitted by the given value.", paramType = "query"),
+            @ApiImplicitParam(name = "submittedByLike", dataType = "string", value = "Only return form instances submitted by like the given value.", paramType = "query"),
+            @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return form instances with the given tenantId.", paramType = "query"),
+            @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return form instances with a tenantId like the given value.", paramType = "query"),
+            @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns form instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
+            @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "submittedDate,tenantId", paramType = "query"),
     })
     @ApiResponses(value = {
-        @ApiResponse(code = 204, message = "Indicates request was successful and the form instances are returned"),
-        @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
+            @ApiResponse(code = 204, message = "Indicates request was successful and the form instances are returned"),
+            @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
     @RequestMapping(value = "/form/form-instances", method = RequestMethod.GET, produces = "application/json")
     public DataResponse getFormInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
@@ -70,7 +70,7 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
         FormInstanceQueryRequest queryRequest = new FormInstanceQueryRequest();
 
         if (allRequestParams.containsKey("id")) {
-          queryRequest.setId(allRequestParams.get("id"));
+            queryRequest.setId(allRequestParams.get("id"));
         }
         if (allRequestParams.containsKey("formDefinitionId")) {
             queryRequest.setFormDefinitionId(allRequestParams.get("formDefinitionId"));
@@ -116,40 +116,38 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
 
         return getQueryResponse(queryRequest, allRequestParams);
     }
-    
-    @ApiOperation(value = "Store a form instance", tags = {"Form Instances"}, nickname = "storeFormInstance", notes = "Provide either a FormDefinitionKey or a FormDefinitionId together with the other properties.")
+
+    @ApiOperation(value = "Store a form instance", tags = { "Form Instances" }, nickname = "storeFormInstance", notes = "Provide either a FormDefinitionKey or a FormDefinitionId together with the other properties.")
     @ApiResponses(value = {
-        @ApiResponse(code = 201, message = "Indicates the form instance was stored."),
-        @ApiResponse(code = 404, message = "Indicates the related form model was not found.")
+            @ApiResponse(code = 201, message = "Indicates the form instance was stored."),
+            @ApiResponse(code = 404, message = "Indicates the related form model was not found.")
     })
     @RequestMapping(value = "/form/form-instances", method = RequestMethod.POST, produces = "application/json")
     public void storeFormInstance(@RequestBody FormRequest formRequest, HttpServletRequest request) {
 
-      FormModel formModel;
+        FormModel formModel;
 
-      if (formRequest.getFormDefinitionKey() != null) {
-        formModel = formService.getFormModelWithVariablesByKey(
-            formRequest.getFormDefinitionKey(),
-            formRequest.getProcessInstanceId(),
-            formRequest.getVariables(),
-            formRequest.getTenantId()
-        );
-      } else if (formRequest.getFormDefinitionId() != null) {
-        formModel = formService.getFormModelWithVariablesById(
-            formRequest.getFormDefinitionId(),
-            formRequest.getProcessInstanceId(),
-            formRequest.getVariables(),
-            formRequest.getTenantId()
-        );
-      } else {
-        throw new FlowableIllegalArgumentException("Either form definition key or form definition id must be provided in the request");
-      }
+        if (formRequest.getFormDefinitionKey() != null) {
+            formModel = formService.getFormModelWithVariablesByKey(
+                    formRequest.getFormDefinitionKey(),
+                    formRequest.getProcessInstanceId(),
+                    formRequest.getVariables(),
+                    formRequest.getTenantId());
+        } else if (formRequest.getFormDefinitionId() != null) {
+            formModel = formService.getFormModelWithVariablesById(
+                    formRequest.getFormDefinitionId(),
+                    formRequest.getProcessInstanceId(),
+                    formRequest.getVariables(),
+                    formRequest.getTenantId());
+        } else {
+            throw new FlowableIllegalArgumentException("Either form definition key or form definition id must be provided in the request");
+        }
 
-      if (formModel == null) {
-        throw new FlowableObjectNotFoundException("Could not find a form definition");
-      }
+        if (formModel == null) {
+            throw new FlowableObjectNotFoundException("Could not find a form definition");
+        }
 
-      formService.createFormInstance(formRequest.getVariables(), formModel, formRequest.getTaskId(),
-          formRequest.getProcessInstanceId());
+        formService.createFormInstance(formRequest.getVariables(), formModel, formRequest.getTaskId(),
+                formRequest.getProcessInstanceId());
     }
 }

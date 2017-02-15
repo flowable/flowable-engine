@@ -17,35 +17,34 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 
-
 /**
  * @author Saeid Mirzaei
  */
 public class ThrowCustomExceptionDelegate implements JavaDelegate {
 
-  @Override
-  public void execute(DelegateExecution execution) {
-    Object exceptionClassVar = execution.getVariable("exceptionClass");
-    if (exceptionClassVar == null)
-      return;
-              
-    String exceptionClassName = exceptionClassVar.toString();
-    
-    if (StringUtils.isNotEmpty(exceptionClassName))  {
-      try {
-        Class<?> clazz = Class.forName(exceptionClassName);
-        RuntimeException exception = (RuntimeException) clazz.newInstance();
-        throw exception;
-        
-      } catch (RuntimeException e) {
-        throw e;
-        
-      } catch (Exception e) {
-        throw new ActivitiException(e.getMessage(), e);
-      }   
-              
+    @Override
+    public void execute(DelegateExecution execution) {
+        Object exceptionClassVar = execution.getVariable("exceptionClass");
+        if (exceptionClassVar == null)
+            return;
+
+        String exceptionClassName = exceptionClassVar.toString();
+
+        if (StringUtils.isNotEmpty(exceptionClassName)) {
+            try {
+                Class<?> clazz = Class.forName(exceptionClassName);
+                RuntimeException exception = (RuntimeException) clazz.newInstance();
+                throw exception;
+
+            } catch (RuntimeException e) {
+                throw e;
+
+            } catch (Exception e) {
+                throw new ActivitiException(e.getMessage(), e);
+            }
+
+        }
+
     }
-    
-  }
 
 }

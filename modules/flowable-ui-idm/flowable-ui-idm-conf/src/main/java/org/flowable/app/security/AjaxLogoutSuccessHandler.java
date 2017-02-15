@@ -31,7 +31,7 @@ public class AjaxLogoutSuccessHandler extends AbstractAuthenticationTargetUrlReq
 
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response,
-                                Authentication authentication)
+            Authentication authentication)
             throws IOException, ServletException {
 
         response.setStatus(HttpServletResponse.SC_OK);

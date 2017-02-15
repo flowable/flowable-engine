@@ -25,23 +25,23 @@ import org.flowable.engine.test.api.event.TestFlowableEventListener;
  */
 public class EventListenersConfigurationTest extends ResourceFlowableTestCase {
 
-  public EventListenersConfigurationTest() {
-    super("org/flowable/standalone/event/flowable-eventlistener.cfg.xml");
-  }
+    public EventListenersConfigurationTest() {
+        super("org/flowable/standalone/event/flowable-eventlistener.cfg.xml");
+    }
 
-  public void testEventListenerConfiguration() {
-    // Fetch the listener to check received events
-    TestFlowableEventListener listener = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("eventListener");
-    assertNotNull(listener);
+    public void testEventListenerConfiguration() {
+        // Fetch the listener to check received events
+        TestFlowableEventListener listener = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("eventListener");
+        assertNotNull(listener);
 
-    // Clear any events received (eg. engine initialisation)
-    listener.clearEventsReceived();
+        // Clear any events received (eg. engine initialisation)
+        listener.clearEventsReceived();
 
-    // Dispatch a custom event
-    FlowableEvent event = new FlowableEventImpl(FlowableEngineEventType.CUSTOM);
-    processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
+        // Dispatch a custom event
+        FlowableEvent event = new FlowableEventImpl(FlowableEngineEventType.CUSTOM);
+        processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
 
-    assertEquals(1, listener.getEventsReceived().size());
-    assertEquals(event, listener.getEventsReceived().get(0));
-  }
+        assertEquals(1, listener.getEventsReceived().size());
+        assertEquals(event, listener.getEventsReceived().get(0));
+    }
 }

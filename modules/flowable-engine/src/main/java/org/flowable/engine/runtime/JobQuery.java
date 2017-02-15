@@ -25,100 +25,100 @@ import org.flowable.engine.common.api.query.Query;
  */
 public interface JobQuery extends Query<JobQuery, Job> {
 
-  /** Only select jobs with the given id */
-  JobQuery jobId(String jobId);
+    /** Only select jobs with the given id */
+    JobQuery jobId(String jobId);
 
-  /** Only select jobs which exist for the given process instance. **/
-  JobQuery processInstanceId(String processInstanceId);
+    /** Only select jobs which exist for the given process instance. **/
+    JobQuery processInstanceId(String processInstanceId);
 
-  /** Only select jobs which exist for the given execution */
-  JobQuery executionId(String executionId);
+    /** Only select jobs which exist for the given execution */
+    JobQuery executionId(String executionId);
 
-  /** Only select jobs which exist for the given process definition id */
-  JobQuery processDefinitionId(String processDefinitionid);
+    /** Only select jobs which exist for the given process definition id */
+    JobQuery processDefinitionId(String processDefinitionid);
 
-  /**
-   * Only select jobs that are timers. Cannot be used together with {@link #messages()}
-   */
-  JobQuery timers();
+    /**
+     * Only select jobs that are timers. Cannot be used together with {@link #messages()}
+     */
+    JobQuery timers();
 
-  /**
-   * Only select jobs that are messages. Cannot be used together with {@link #timers()}
-   */
-  JobQuery messages();
+    /**
+     * Only select jobs that are messages. Cannot be used together with {@link #timers()}
+     */
+    JobQuery messages();
 
-  /** Only select jobs where the duedate is lower than the given date. */
-  JobQuery duedateLowerThan(Date date);
+    /** Only select jobs where the duedate is lower than the given date. */
+    JobQuery duedateLowerThan(Date date);
 
-  /** Only select jobs where the duedate is higher then the given date. */
-  JobQuery duedateHigherThan(Date date);
+    /** Only select jobs where the duedate is higher then the given date. */
+    JobQuery duedateHigherThan(Date date);
 
-  /** Only select jobs that failed due to an exception. */
-  JobQuery withException();
+    /** Only select jobs that failed due to an exception. */
+    JobQuery withException();
 
-  /** Only select jobs that failed due to an exception with the given message. */
-  JobQuery exceptionMessage(String exceptionMessage);
+    /** Only select jobs that failed due to an exception with the given message. */
+    JobQuery exceptionMessage(String exceptionMessage);
 
-  /**
-   * Only select jobs that have the given tenant id.
-   */
-  JobQuery jobTenantId(String tenantId);
+    /**
+     * Only select jobs that have the given tenant id.
+     */
+    JobQuery jobTenantId(String tenantId);
 
-  /**
-   * Only select jobs with a tenant id like the given one.
-   */
-  JobQuery jobTenantIdLike(String tenantIdLike);
+    /**
+     * Only select jobs with a tenant id like the given one.
+     */
+    JobQuery jobTenantIdLike(String tenantIdLike);
 
-  /**
-   * Only select jobs that do not have a tenant id.
-   */
-  JobQuery jobWithoutTenantId();
-  
-  /**
-   * Only return jobs with the given lock owner.
-   */
-  JobQuery lockOwner(String lockOwner);
-  
-  /**
-   * Only return jobs that are locked (i.e. they are acquired by an executor).
-   */
-  JobQuery locked();
-  
-  /**
-   * Only return jobs that are not locked.
-   */
-  JobQuery unlocked();
+    /**
+     * Only select jobs that do not have a tenant id.
+     */
+    JobQuery jobWithoutTenantId();
 
-  // sorting //////////////////////////////////////////
+    /**
+     * Only return jobs with the given lock owner.
+     */
+    JobQuery lockOwner(String lockOwner);
 
-  /**
-   * Order by job id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  JobQuery orderByJobId();
+    /**
+     * Only return jobs that are locked (i.e. they are acquired by an executor).
+     */
+    JobQuery locked();
 
-  /**
-   * Order by duedate (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  JobQuery orderByJobDuedate();
+    /**
+     * Only return jobs that are not locked.
+     */
+    JobQuery unlocked();
 
-  /**
-   * Order by retries (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  JobQuery orderByJobRetries();
+    // sorting //////////////////////////////////////////
 
-  /**
-   * Order by process instance id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  JobQuery orderByProcessInstanceId();
+    /**
+     * Order by job id (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    JobQuery orderByJobId();
 
-  /**
-   * Order by execution id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  JobQuery orderByExecutionId();
+    /**
+     * Order by duedate (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    JobQuery orderByJobDuedate();
 
-  /**
-   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  JobQuery orderByTenantId();
+    /**
+     * Order by retries (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    JobQuery orderByJobRetries();
+
+    /**
+     * Order by process instance id (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    JobQuery orderByProcessInstanceId();
+
+    /**
+     * Order by execution id (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    JobQuery orderByExecutionId();
+
+    /**
+     * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    JobQuery orderByTenantId();
 
 }

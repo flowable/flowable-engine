@@ -25,17 +25,17 @@ import org.flowable.engine.repository.Deployment;
  * @author Joram Barrez
  */
 public interface DeploymentDataManager extends DataManager<DeploymentEntity> {
-  
-  DeploymentEntity findLatestDeploymentByName(String deploymentName);
 
-  long findDeploymentCountByQueryCriteria(DeploymentQueryImpl deploymentQuery);
+    DeploymentEntity findLatestDeploymentByName(String deploymentName);
 
-  List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery, Page page);
+    long findDeploymentCountByQueryCriteria(DeploymentQueryImpl deploymentQuery);
 
-  List<String> getDeploymentResourceNames(String deploymentId);
+    List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery, Page page);
 
-  List<Deployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<String> getDeploymentResourceNames(String deploymentId);
 
-  long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap);
+    List<Deployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+
+    long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap);
 
 }

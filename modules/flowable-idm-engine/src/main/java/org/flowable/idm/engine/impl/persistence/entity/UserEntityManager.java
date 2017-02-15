@@ -28,30 +28,30 @@ import org.flowable.idm.engine.impl.UserQueryImpl;
  */
 public interface UserEntityManager extends EntityManager<UserEntity> {
 
-  User createNewUser(String userId);
+    User createNewUser(String userId);
 
-  void updateUser(User updatedUser);
+    void updateUser(User updatedUser);
 
-  List<User> findUserByQueryCriteria(UserQueryImpl query, Page page);
+    List<User> findUserByQueryCriteria(UserQueryImpl query, Page page);
 
-  long findUserCountByQueryCriteria(UserQueryImpl query);
+    long findUserCountByQueryCriteria(UserQueryImpl query);
 
-  UserQuery createNewUserQuery();
+    UserQuery createNewUserQuery();
 
-  Boolean checkPassword(String userId, String password);
+    Boolean checkPassword(String userId, String password);
 
-  List<User> findUsersByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<User> findUsersByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
 
-  long findUserCountByNativeQuery(Map<String, Object> parameterMap);
+    long findUserCountByNativeQuery(Map<String, Object> parameterMap);
 
-  boolean isNewUser(User user);
+    boolean isNewUser(User user);
 
-  Picture getUserPicture(User user);
+    Picture getUserPicture(User user);
 
-  void setUserPicture(User user, Picture picture);
-  
-  void deletePicture(User user);
-  
-  List<User> findUsersByPrivilegeId(String privilegeId);
+    void setUserPicture(User user, Picture picture);
+
+    void deletePicture(User user);
+
+    List<User> findUsersByPrivilegeId(String privilegeId);
 
 }

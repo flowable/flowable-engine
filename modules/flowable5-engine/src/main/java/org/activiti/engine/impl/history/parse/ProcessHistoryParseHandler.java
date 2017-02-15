@@ -18,20 +18,19 @@ import org.activiti.engine.impl.history.handler.ProcessInstanceEndHandler;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.Process;
 
-
 /**
  * @author Joram Barrez
  */
 public class ProcessHistoryParseHandler extends AbstractBpmnParseHandler<Process> {
-  
-  protected static final ProcessInstanceEndHandler PROCESS_INSTANCE_END_HANDLER = new ProcessInstanceEndHandler();
-  
-  protected Class< ? extends BaseElement> getHandledType() {
-    return Process.class;
-  }
-  
-  protected void executeParse(BpmnParse bpmnParse, Process element) {
-    bpmnParse.getCurrentProcessDefinition().addExecutionListener(org.activiti.engine.impl.pvm.PvmEvent.EVENTNAME_END, PROCESS_INSTANCE_END_HANDLER);
-  }
+
+    protected static final ProcessInstanceEndHandler PROCESS_INSTANCE_END_HANDLER = new ProcessInstanceEndHandler();
+
+    protected Class<? extends BaseElement> getHandledType() {
+        return Process.class;
+    }
+
+    protected void executeParse(BpmnParse bpmnParse, Process element) {
+        bpmnParse.getCurrentProcessDefinition().addExecutionListener(org.activiti.engine.impl.pvm.PvmEvent.EVENTNAME_END, PROCESS_INSTANCE_END_HANDLER);
+    }
 
 }

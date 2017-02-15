@@ -31,36 +31,36 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-  @Bean
-  public FlowableCookieFilter flowableCookieFilter() {
-    FlowableCookieFilter filter = new FlowableCookieFilter();
-    filter.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_ADMIN));
-    return filter;
-  }
-
-  @Configuration
-  public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
-
-    @Autowired
-    protected FlowableCookieFilter flowableCookieFilter;
-
-    @Autowired
-    private AjaxLogoutSuccessHandler ajaxLogoutSuccessHandler;
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-      http
-        .addFilterBefore(flowableCookieFilter, UsernamePasswordAuthenticationFilter.class)
-        .logout()
-            .logoutUrl("/app/logout")
-            .logoutSuccessHandler(ajaxLogoutSuccessHandler)
-            .addLogoutHandler(new ClearFlowableCookieLogoutHandler())
-            .deleteCookies(CookieConstants.COOKIE_NAME)
-            .and()
-        .csrf()
-            .disable()
-        .authorizeRequests()
-            .antMatchers("/app/rest/**").hasAuthority(DefaultPrivileges.ACCESS_ADMIN);
+    @Bean
+    public FlowableCookieFilter flowableCookieFilter() {
+        FlowableCookieFilter filter = new FlowableCookieFilter();
+        filter.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_ADMIN));
+        return filter;
     }
-  }
+
+    @Configuration
+    public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
+
+        @Autowired
+        protected FlowableCookieFilter flowableCookieFilter;
+
+        @Autowired
+        private AjaxLogoutSuccessHandler ajaxLogoutSuccessHandler;
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            http
+                    .addFilterBefore(flowableCookieFilter, UsernamePasswordAuthenticationFilter.class)
+                    .logout()
+                    .logoutUrl("/app/logout")
+                    .logoutSuccessHandler(ajaxLogoutSuccessHandler)
+                    .addLogoutHandler(new ClearFlowableCookieLogoutHandler())
+                    .deleteCookies(CookieConstants.COOKIE_NAME)
+                    .and()
+                    .csrf()
+                    .disable()
+                    .authorizeRequests()
+                    .antMatchers("/app/rest/**").hasAuthority(DefaultPrivileges.ACCESS_ADMIN);
+        }
+    }
 }

@@ -21,13 +21,13 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
  */
 public interface FlowableIdmMembershipEvent extends FlowableEvent {
 
-  /**
-   * @return related user. Returns null, if not related to a single user but rather to all members of the group.
-   */
-  String getUserId();
+    /**
+     * @return related user. Returns null, if not related to a single user but rather to all members of the group.
+     */
+    String getUserId();
 
-  /**
-   * @return related group
-   */
-  String getGroupId();
+    /**
+     * @return related group
+     */
+    String getGroupId();
 }

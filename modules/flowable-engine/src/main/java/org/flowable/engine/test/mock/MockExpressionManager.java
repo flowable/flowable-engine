@@ -27,20 +27,20 @@ import org.flowable.engine.impl.el.VariableScopeElResolver;
 
 public class MockExpressionManager extends ExpressionManager {
 
-  public MockExpressionManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    super(processEngineConfiguration);
-  }
-  
-  @Override
-  protected ELResolver createElResolver(VariableScope variableScope) {
-    CompositeELResolver compositeElResolver = new CompositeELResolver();
-    compositeElResolver.add(new VariableScopeElResolver(variableScope));
-    compositeElResolver.add(new MockElResolver());
-    compositeElResolver.add(new ArrayELResolver());
-    compositeElResolver.add(new ListELResolver());
-    compositeElResolver.add(new MapELResolver());
-    compositeElResolver.add(new BeanELResolver());
-    return compositeElResolver;
-  }
+    public MockExpressionManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
+
+    @Override
+    protected ELResolver createElResolver(VariableScope variableScope) {
+        CompositeELResolver compositeElResolver = new CompositeELResolver();
+        compositeElResolver.add(new VariableScopeElResolver(variableScope));
+        compositeElResolver.add(new MockElResolver());
+        compositeElResolver.add(new ArrayELResolver());
+        compositeElResolver.add(new ListELResolver());
+        compositeElResolver.add(new MapELResolver());
+        compositeElResolver.add(new BeanELResolver());
+        return compositeElResolver;
+    }
 
 }

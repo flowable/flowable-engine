@@ -29,50 +29,50 @@ import org.springframework.context.ApplicationContextAware;
  */
 public class FormEngineFactoryBean implements FactoryBean<FormEngine>, DisposableBean, ApplicationContextAware {
 
-  protected FormEngineConfiguration formEngineConfiguration;
+    protected FormEngineConfiguration formEngineConfiguration;
 
-  protected ApplicationContext applicationContext;
-  protected FormEngine formEngine;
+    protected ApplicationContext applicationContext;
+    protected FormEngine formEngine;
 
-  public void destroy() throws Exception {
-    if (formEngine != null) {
-      formEngine.close();
+    public void destroy() throws Exception {
+        if (formEngine != null) {
+            formEngine.close();
+        }
     }
-  }
 
-  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-    this.applicationContext = applicationContext;
-  }
-
-  public FormEngine getObject() throws Exception {
-    configureExternallyManagedTransactions();
-
-    this.formEngine = formEngineConfiguration.buildFormEngine();
-    return this.formEngine;
-  }
-
-  protected void configureExternallyManagedTransactions() {
-    if (formEngineConfiguration instanceof SpringFormEngineConfiguration) { // remark: any config can be injected, so we cannot have SpringConfiguration as member
-      SpringFormEngineConfiguration engineConfiguration = (SpringFormEngineConfiguration) formEngineConfiguration;
-      if (engineConfiguration.getTransactionManager() != null) {
-        formEngineConfiguration.setTransactionsExternallyManaged(true);
-      }
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
-  }
 
-  public Class<FormEngine> getObjectType() {
-    return FormEngine.class;
-  }
+    public FormEngine getObject() throws Exception {
+        configureExternallyManagedTransactions();
 
-  public boolean isSingleton() {
-    return true;
-  }
+        this.formEngine = formEngineConfiguration.buildFormEngine();
+        return this.formEngine;
+    }
 
-  public FormEngineConfiguration getFormEngineConfiguration() {
-    return formEngineConfiguration;
-  }
+    protected void configureExternallyManagedTransactions() {
+        if (formEngineConfiguration instanceof SpringFormEngineConfiguration) { // remark: any config can be injected, so we cannot have SpringConfiguration as member
+            SpringFormEngineConfiguration engineConfiguration = (SpringFormEngineConfiguration) formEngineConfiguration;
+            if (engineConfiguration.getTransactionManager() != null) {
+                formEngineConfiguration.setTransactionsExternallyManaged(true);
+            }
+        }
+    }
 
-  public void setFormEngineConfiguration(FormEngineConfiguration formEngineConfiguration) {
-    this.formEngineConfiguration = formEngineConfiguration;
-  }
+    public Class<FormEngine> getObjectType() {
+        return FormEngine.class;
+    }
+
+    public boolean isSingleton() {
+        return true;
+    }
+
+    public FormEngineConfiguration getFormEngineConfiguration() {
+        return formEngineConfiguration;
+    }
+
+    public void setFormEngineConfiguration(FormEngineConfiguration formEngineConfiguration) {
+        this.formEngineConfiguration = formEngineConfiguration;
+    }
 }

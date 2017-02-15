@@ -28,147 +28,144 @@ import org.slf4j.LoggerFactory;
 
 public class ChangeTaskCountConfigAndRebootEngineTest extends ResourceFlowableTestCase {
 
-  private static final Logger logger = LoggerFactory.getLogger(ChangeTaskCountConfigAndRebootEngineTest.class);
-  
-  protected boolean newTaskRelationshipCountValue;
-  
-  public ChangeTaskCountConfigAndRebootEngineTest() {
+    private static final Logger logger = LoggerFactory.getLogger(ChangeTaskCountConfigAndRebootEngineTest.class);
 
-    // Simply boot up the same engine with the usual config file
-    // This way, database tests work. the only thing we have to make
-    // sure is to give the process engine a name so it is
-    // registered and unregistered separately.
-    super("flowable.cfg.xml", ChangeTaskCountConfigAndRebootEngineTest.class.getName());
-  }
-  
-  @Override
-  protected void additionalConfiguration(ProcessEngineConfiguration processEngineConfiguration) {
-    logger.info("Applying additional config: setting schema update to true and enabling task relationship count");
-    processEngineConfiguration.setDatabaseSchemaUpdate("true");
-    ((ProcessEngineConfigurationImpl) processEngineConfiguration).setEnableTaskRelationshipCounts(newTaskRelationshipCountValue);
-  }
+    protected boolean newTaskRelationshipCountValue;
 
-  protected void rebootEngine(boolean newTaskRelationshipCountValue) {
-    logger.info("Rebooting engine");
-    this.newTaskRelationshipCountValue = newTaskRelationshipCountValue;
-    closeDownProcessEngine();
-    initializeProcessEngine();
-    initializeServices();
-  }
-  
+    public ChangeTaskCountConfigAndRebootEngineTest() {
 
+        // Simply boot up the same engine with the usual config file
+        // This way, database tests work. the only thing we have to make
+        // sure is to give the process engine a name so it is
+        // registered and unregistered separately.
+        super("flowable.cfg.xml", ChangeTaskCountConfigAndRebootEngineTest.class.getName());
+    }
 
-  @Deployment
-  public void testChangeTaskCountSettingAndRebootengine() {
-    
-    rebootFlagNotChanged(true);
- 
-    rebootFlagNotChanged(false);
+    @Override
+    protected void additionalConfiguration(ProcessEngineConfiguration processEngineConfiguration) {
+        logger.info("Applying additional config: setting schema update to true and enabling task relationship count");
+        processEngineConfiguration.setDatabaseSchemaUpdate("true");
+        ((ProcessEngineConfigurationImpl) processEngineConfiguration).setEnableTaskRelationshipCounts(newTaskRelationshipCountValue);
+    }
 
-    checkEnableFlagBetweenTasks();
-    
-    checkDisableFlagBetweenTasks();
-    
-  }
+    protected void rebootEngine(boolean newTaskRelationshipCountValue) {
+        logger.info("Rebooting engine");
+        this.newTaskRelationshipCountValue = newTaskRelationshipCountValue;
+        closeDownProcessEngine();
+        initializeProcessEngine();
+        initializeServices();
+    }
 
-  private void checkEnableFlagBetweenTasks() {
-    rebootEngine(false);
-    assertConfigProperty(false);
-    
-    // Start a new process
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
-    Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertTaskCountFlag(firstTask, false);
+    @Deployment
+    public void testChangeTaskCountSettingAndRebootengine() {
 
-    // Reboot, enabling the config property. however, the task won't get the flag now
-    rebootEngine(true);
-    assertConfigProperty(true);
-    
-    //re-fetch the task
-    firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertTaskCountFlag(firstTask, false);
-    
-    //complete the first task, move to the next one
-    taskService.complete(firstTask.getId());
-    
-    //second task created with the new flag (true)
-    Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertTaskCountFlag(secondTask, true);
-    
-    finishProcessInstance(processInstance);
-  }
-  
-  private void checkDisableFlagBetweenTasks() {
-    rebootEngine(true);
-    assertConfigProperty(true);
-    
-    // Start a new process
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
-    Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertTaskCountFlag(firstTask, true);
+        rebootFlagNotChanged(true);
 
-    // Reboot, disabling the config property. The existing task will have the flag updated. 
-    rebootEngine(false);
-    assertConfigProperty(false);
-    
-    firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertTaskCountFlag(firstTask, false);
-    
-    //complete the first task, move to the next one
-    taskService.complete(firstTask.getId());
-    
-    //second task created with flag false
-    Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertTaskCountFlag(secondTask, false);
-    
-    finishProcessInstance(processInstance);
-  }
+        rebootFlagNotChanged(false);
 
-  private void rebootFlagNotChanged(boolean enableTaskCountFlag) {
-    rebootEngine(enableTaskCountFlag);
-    assertConfigProperty(enableTaskCountFlag);
-    
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
-    Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    
-    assertTaskCountFlag(firstTask, enableTaskCountFlag);
-    
-    // Reboot with same settings. Nothing should have changed
-    rebootEngine(enableTaskCountFlag);
-    assertConfigProperty(enableTaskCountFlag);
-    assertTaskCountFlag(firstTask, enableTaskCountFlag);
-    
-    // The second task should have the same count flag
-    taskService.complete(firstTask.getId());
-    Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertTaskCountFlag(secondTask, enableTaskCountFlag);
-    
-    // See if we can finish the process
-    finishProcessInstance(processInstance);
-  }
-  
+        checkEnableFlagBetweenTasks();
 
-  /**
-   * Check the DB property against Process Engine flag.
-   */
-  protected void assertConfigProperty(boolean expectedValue) {
-    PropertyEntity propertyEntity = managementService.executeCommand(new Command<PropertyEntity>() {
-      @Override
-      public PropertyEntity execute(CommandContext commandContext) {
-        return commandContext.getPropertyEntityManager().findById(
-            ValidateTaskRelatedEntityCountCfgCmd.PROPERTY_TASK_RELATED_ENTITY_COUNT);
-      }
-    });
-    assertEquals(expectedValue, Boolean.parseBoolean(propertyEntity.getValue()));
-  }
-  
-  protected void assertTaskCountFlag(Task task, boolean enableTaskCountFlag){
-    assertEquals(((CountingTaskEntity)task).isCountEnabled(), enableTaskCountFlag);
-  }
-  
-  protected void finishProcessInstance(ProcessInstance processInstance) {
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    taskService.complete(task.getId());
-    assertProcessEnded(processInstance.getId());
-  }
+        checkDisableFlagBetweenTasks();
+
+    }
+
+    private void checkEnableFlagBetweenTasks() {
+        rebootEngine(false);
+        assertConfigProperty(false);
+
+        // Start a new process
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
+        Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertTaskCountFlag(firstTask, false);
+
+        // Reboot, enabling the config property. however, the task won't get the flag now
+        rebootEngine(true);
+        assertConfigProperty(true);
+
+        // re-fetch the task
+        firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertTaskCountFlag(firstTask, false);
+
+        // complete the first task, move to the next one
+        taskService.complete(firstTask.getId());
+
+        // second task created with the new flag (true)
+        Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertTaskCountFlag(secondTask, true);
+
+        finishProcessInstance(processInstance);
+    }
+
+    private void checkDisableFlagBetweenTasks() {
+        rebootEngine(true);
+        assertConfigProperty(true);
+
+        // Start a new process
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
+        Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertTaskCountFlag(firstTask, true);
+
+        // Reboot, disabling the config property. The existing task will have the flag updated.
+        rebootEngine(false);
+        assertConfigProperty(false);
+
+        firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertTaskCountFlag(firstTask, false);
+
+        // complete the first task, move to the next one
+        taskService.complete(firstTask.getId());
+
+        // second task created with flag false
+        Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertTaskCountFlag(secondTask, false);
+
+        finishProcessInstance(processInstance);
+    }
+
+    private void rebootFlagNotChanged(boolean enableTaskCountFlag) {
+        rebootEngine(enableTaskCountFlag);
+        assertConfigProperty(enableTaskCountFlag);
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
+        Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        assertTaskCountFlag(firstTask, enableTaskCountFlag);
+
+        // Reboot with same settings. Nothing should have changed
+        rebootEngine(enableTaskCountFlag);
+        assertConfigProperty(enableTaskCountFlag);
+        assertTaskCountFlag(firstTask, enableTaskCountFlag);
+
+        // The second task should have the same count flag
+        taskService.complete(firstTask.getId());
+        Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertTaskCountFlag(secondTask, enableTaskCountFlag);
+
+        // See if we can finish the process
+        finishProcessInstance(processInstance);
+    }
+
+    /**
+     * Check the DB property against Process Engine flag.
+     */
+    protected void assertConfigProperty(boolean expectedValue) {
+        PropertyEntity propertyEntity = managementService.executeCommand(new Command<PropertyEntity>() {
+            @Override
+            public PropertyEntity execute(CommandContext commandContext) {
+                return commandContext.getPropertyEntityManager().findById(
+                        ValidateTaskRelatedEntityCountCfgCmd.PROPERTY_TASK_RELATED_ENTITY_COUNT);
+            }
+        });
+        assertEquals(expectedValue, Boolean.parseBoolean(propertyEntity.getValue()));
+    }
+
+    protected void assertTaskCountFlag(Task task, boolean enableTaskCountFlag) {
+        assertEquals(((CountingTaskEntity) task).isCountEnabled(), enableTaskCountFlag);
+    }
+
+    protected void finishProcessInstance(ProcessInstance processInstance) {
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
 }

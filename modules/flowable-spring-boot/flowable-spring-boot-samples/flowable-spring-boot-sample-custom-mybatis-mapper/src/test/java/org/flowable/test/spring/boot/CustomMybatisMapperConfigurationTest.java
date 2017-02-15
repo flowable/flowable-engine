@@ -1,6 +1,5 @@
 package org.flowable.test.spring.boot;
 
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
@@ -22,7 +21,6 @@ import flowable.mappers.CustomMybatisMapper;
  * @author Dominik Bartos
  */
 public class CustomMybatisMapperConfigurationTest {
-
 
     @Test
     public void executeCustomMybatisMapperQuery() throws Exception {
@@ -51,8 +49,7 @@ public class CustomMybatisMapperConfigurationTest {
     }
 
     private AnnotationConfigApplicationContext context(Class<?>... clzz) throws Exception {
-        AnnotationConfigApplicationContext annotationConfigApplicationContext
-                = new AnnotationConfigApplicationContext();
+        AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext();
         annotationConfigApplicationContext.register(clzz);
 
         URL propertiesUrl = this.getClass().getClassLoader().getResource("config/application.properties");

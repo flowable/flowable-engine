@@ -18,55 +18,53 @@ import org.flowable.engine.impl.variable.ValueFields;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
-
 /**
  * @author Tijs Rademakers
  */
 public class LongJsonType extends SerializableType {
 
-  protected final int minLength;
-  protected ObjectMapper objectMapper;
-  
-  public LongJsonType(int minLength, ObjectMapper objectMapper) {
-    this.minLength = minLength;
-    this.objectMapper = objectMapper;
-  }
+    protected final int minLength;
+    protected ObjectMapper objectMapper;
 
-  public String getTypeName() {
-    return "longJson";
-  }
+    public LongJsonType(int minLength, ObjectMapper objectMapper) {
+        this.minLength = minLength;
+        this.objectMapper = objectMapper;
+    }
 
-  public boolean isAbleToStore(Object value) {
-    if (value == null) {
-      return true;
+    public String getTypeName() {
+        return "longJson";
     }
-    if (JsonNode.class.isAssignableFrom(value.getClass())) {
-      JsonNode jsonValue = (JsonNode) value;
-      return jsonValue.toString().length() >= minLength;
+
+    public boolean isAbleToStore(Object value) {
+        if (value == null) {
+            return true;
+        }
+        if (JsonNode.class.isAssignableFrom(value.getClass())) {
+            JsonNode jsonValue = (JsonNode) value;
+            return jsonValue.toString().length() >= minLength;
+        }
+        return false;
     }
-    return false;
-  }
-  
-  public byte[] serialize(Object value, ValueFields valueFields) {
-    if (value == null) {
-      return null;
+
+    public byte[] serialize(Object value, ValueFields valueFields) {
+        if (value == null) {
+            return null;
+        }
+        JsonNode valueNode = (JsonNode) value;
+        try {
+            return valueNode.toString().getBytes("utf-8");
+        } catch (Exception e) {
+            throw new ActivitiException("Error getting bytes from json variable", e);
+        }
     }
-    JsonNode valueNode = (JsonNode) value;
-    try {
-      return valueNode.toString().getBytes("utf-8");
-    } catch (Exception e) {
-      throw new ActivitiException("Error getting bytes from json variable", e);
+
+    public Object deserialize(byte[] bytes, ValueFields valueFields) {
+        JsonNode valueNode = null;
+        try {
+            valueNode = objectMapper.readTree(bytes);
+        } catch (Exception e) {
+            throw new ActivitiException("Error reading json variable", e);
+        }
+        return valueNode;
     }
-  }
-  
-  public Object deserialize(byte[] bytes, ValueFields valueFields) {
-    JsonNode valueNode = null;
-    try {
-      valueNode = objectMapper.readTree(bytes);
-    } catch (Exception e) {
-      throw new ActivitiException("Error reading json variable", e);
-    }
-    return valueNode;
-  }
 }

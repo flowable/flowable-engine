@@ -16,21 +16,22 @@ import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.interceptor.CommandExecutor;
 
 public abstract class ServiceImpl {
-    
-  protected ContentEngineConfiguration engineConfig;
-  protected CommandExecutor commandExecutor;
-  
-  public ServiceImpl() {}
 
-  public ServiceImpl(ContentEngineConfiguration engineConfig) {
-    this.engineConfig = engineConfig;
-  }
-  
-  public CommandExecutor getCommandExecutor() {
-    return commandExecutor;
-  }
+    protected ContentEngineConfiguration engineConfig;
+    protected CommandExecutor commandExecutor;
 
-  public void setCommandExecutor(CommandExecutor commandExecutor) {
-    this.commandExecutor = commandExecutor;
-  }
+    public ServiceImpl() {
+    }
+
+    public ServiceImpl(ContentEngineConfiguration engineConfig) {
+        this.engineConfig = engineConfig;
+    }
+
+    public CommandExecutor getCommandExecutor() {
+        return commandExecutor;
+    }
+
+    public void setCommandExecutor(CommandExecutor commandExecutor) {
+        this.commandExecutor = commandExecutor;
+    }
 }

@@ -18,20 +18,20 @@ import org.flowable.app.domain.editor.Model;
 
 public interface ModelRepository {
 
-  void save(Model model);
+    void save(Model model);
 
-  void delete(Model model);
-  
-  Model get(String id);
+    void delete(Model model);
 
-  List<Model> findByModelType(Integer modelType, String sort);
-  
-  List<Model> findByModelTypeAndFilter(Integer modelType, String filter, String sort);
-  
-  List<Model> findByKeyAndType(String key, Integer modelType);
-  
-  List<Model> findByParentModelId(String parentModelId);
-  
-  Long countByModelTypeAndCreatedBy(int modelType, String createdBy);
-  
+    Model get(String id);
+
+    List<Model> findByModelType(Integer modelType, String sort);
+
+    List<Model> findByModelTypeAndFilter(Integer modelType, String filter, String sort);
+
+    List<Model> findByKeyAndType(String key, Integer modelType);
+
+    List<Model> findByParentModelId(String parentModelId);
+
+    Long countByModelTypeAndCreatedBy(int modelType, String createdBy);
+
 }

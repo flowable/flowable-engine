@@ -20,23 +20,23 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 public class UserInfoRequest {
 
-  protected String key;
-  protected String value;
+    protected String key;
+    protected String value;
 
-  public void setKey(String key) {
-    this.key = key;
-  }
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-  public String getKey() {
-    return key;
-  }
+    public String getKey() {
+        return key;
+    }
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  public void setValue(String value) {
-    this.value = value;
-  }
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public void setValue(String value) {
+        this.value = value;
+    }
 
-  public String getValue() {
-    return value;
-  }
+    public String getValue() {
+        return value;
+    }
 }

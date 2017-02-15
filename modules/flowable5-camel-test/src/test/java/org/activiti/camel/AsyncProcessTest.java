@@ -32,39 +32,39 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class AsyncProcessTest extends SpringFlowableTestCase {
 
-  @Autowired
-  protected CamelContext camelContext;
+    @Autowired
+    protected CamelContext camelContext;
 
-  public void setUp() throws Exception {
-    camelContext.addRoutes(new RouteBuilder() {
+    public void setUp() throws Exception {
+        camelContext.addRoutes(new RouteBuilder() {
 
-      @Override
-      public void configure() throws Exception {
-        from("flowable:asyncCamelProcess:serviceTaskAsync1").setHeader("destination", constant("flowable:asyncCamelProcess:receive1")).to("seda:asyncQueue");
-        from("flowable:asyncCamelProcess:serviceTaskAsync2").setHeader("destination", constant("flowable:asyncCamelProcess:receive2")).to("seda:asyncQueue2");
-        from("seda:asyncQueue").to("bean:sleepBean?method=sleep").to("seda:receiveQueue");
+            @Override
+            public void configure() throws Exception {
+                from("flowable:asyncCamelProcess:serviceTaskAsync1").setHeader("destination", constant("flowable:asyncCamelProcess:receive1")).to("seda:asyncQueue");
+                from("flowable:asyncCamelProcess:serviceTaskAsync2").setHeader("destination", constant("flowable:asyncCamelProcess:receive2")).to("seda:asyncQueue2");
+                from("seda:asyncQueue").to("bean:sleepBean?method=sleep").to("seda:receiveQueue");
 
-        from("seda:asyncQueue2").to("bean:sleepBean?method=sleep").to("seda:receiveQueue");
+                from("seda:asyncQueue2").to("bean:sleepBean?method=sleep").to("seda:receiveQueue");
 
-        from("seda:receiveQueue").recipientList(header("destination"));
-      }
-    });
-  }
-
-  public void tearDown() throws Exception {
-    List<Route> routes = camelContext.getRoutes();
-    for (Route r : routes) {
-      camelContext.stopRoute(r.getId());
-      camelContext.removeRoute(r.getId());
+                from("seda:receiveQueue").recipientList(header("destination"));
+            }
+        });
     }
-  }
 
-  @Deployment(resources = { "process/async.bpmn20.xml" })
-  public void testRunProcess() throws Exception {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncCamelProcess");
-    List<Execution> executionList = runtimeService.createExecutionQuery().list();
-    assertEquals(3, executionList.size());
-    Thread.sleep(4000);
-    assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
-  }
+    public void tearDown() throws Exception {
+        List<Route> routes = camelContext.getRoutes();
+        for (Route r : routes) {
+            camelContext.stopRoute(r.getId());
+            camelContext.removeRoute(r.getId());
+        }
+    }
+
+    @Deployment(resources = { "process/async.bpmn20.xml" })
+    public void testRunProcess() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncCamelProcess");
+        List<Execution> executionList = runtimeService.createExecutionQuery().list();
+        assertEquals(3, executionList.size());
+        Thread.sleep(4000);
+        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+    }
 }

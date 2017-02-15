@@ -20,12 +20,12 @@ import org.activiti.engine.delegate.JavaDelegate;
  * @author Joram Barrez
  */
 public class DelegateWithExpression implements JavaDelegate {
-  
-  private Expression param;
-  
-  @Override
-  public void execute(DelegateExecution execution) throws Exception {
-    execution.setVariable("testVar", param.getValue(execution));
-  }
+
+    private Expression param;
+
+    @Override
+    public void execute(DelegateExecution execution) throws Exception {
+        execution.setVariable("testVar", param.getValue(execution));
+    }
 
 }

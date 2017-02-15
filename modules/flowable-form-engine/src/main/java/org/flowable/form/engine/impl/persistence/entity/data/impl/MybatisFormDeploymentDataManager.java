@@ -30,55 +30,55 @@ import org.flowable.form.engine.impl.persistence.entity.data.FormDeploymentDataM
  */
 public class MybatisFormDeploymentDataManager extends AbstractDataManager<FormDeploymentEntity> implements FormDeploymentDataManager {
 
-  public MybatisFormDeploymentDataManager(FormEngineConfiguration formEngineConfiguration) {
-    super(formEngineConfiguration);
-  }
-
-  @Override
-  public Class<? extends FormDeploymentEntity> getManagedEntityClass() {
-    return FormDeploymentEntityImpl.class;
-  }
-  
-  @Override
-  public FormDeploymentEntity create() {
-    return new FormDeploymentEntityImpl();
-  }
-  
-  @Override
-  public FormDeploymentEntity findLatestDeploymentByName(String deploymentName) {
-    List<?> list = getDbSqlSession().selectList("selectDeploymentsByName", deploymentName, 0, 1);
-    if (list != null && !list.isEmpty()) {
-      return (FormDeploymentEntity) list.get(0);
+    public MybatisFormDeploymentDataManager(FormEngineConfiguration formEngineConfiguration) {
+        super(formEngineConfiguration);
     }
-    return null;
-  }
 
-  @Override
-  public long findDeploymentCountByQueryCriteria(FormDeploymentQueryImpl deploymentQuery) {
-    return (Long) getDbSqlSession().selectOne("selectDeploymentCountByQueryCriteria", deploymentQuery);
-  }
+    @Override
+    public Class<? extends FormDeploymentEntity> getManagedEntityClass() {
+        return FormDeploymentEntityImpl.class;
+    }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<FormDeployment> findDeploymentsByQueryCriteria(FormDeploymentQueryImpl deploymentQuery, Page page) {
-    final String query = "selectDeploymentsByQueryCriteria";
-    return getDbSqlSession().selectList(query, deploymentQuery, page);
-  }
+    @Override
+    public FormDeploymentEntity create() {
+        return new FormDeploymentEntityImpl();
+    }
 
-  @Override
-  public List<String> getDeploymentResourceNames(String deploymentId) {
-    return getDbSqlSession().getSqlSession().selectList("selectResourceNamesByDeploymentId", deploymentId);
-  }
+    @Override
+    public FormDeploymentEntity findLatestDeploymentByName(String deploymentName) {
+        List<?> list = getDbSqlSession().selectList("selectDeploymentsByName", deploymentName, 0, 1);
+        if (list != null && !list.isEmpty()) {
+            return (FormDeploymentEntity) list.get(0);
+        }
+        return null;
+    }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<FormDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return getDbSqlSession().selectListWithRawParameter("selectDeploymentByNativeQuery", parameterMap, firstResult, maxResults);
-  }
+    @Override
+    public long findDeploymentCountByQueryCriteria(FormDeploymentQueryImpl deploymentQuery) {
+        return (Long) getDbSqlSession().selectOne("selectDeploymentCountByQueryCriteria", deploymentQuery);
+    }
 
-  @Override
-  public long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap) {
-    return (Long) getDbSqlSession().selectOne("selectDeploymentCountByNativeQuery", parameterMap);
-  }
-  
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<FormDeployment> findDeploymentsByQueryCriteria(FormDeploymentQueryImpl deploymentQuery, Page page) {
+        final String query = "selectDeploymentsByQueryCriteria";
+        return getDbSqlSession().selectList(query, deploymentQuery, page);
+    }
+
+    @Override
+    public List<String> getDeploymentResourceNames(String deploymentId) {
+        return getDbSqlSession().getSqlSession().selectList("selectResourceNamesByDeploymentId", deploymentId);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<FormDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
+        return getDbSqlSession().selectListWithRawParameter("selectDeploymentByNativeQuery", parameterMap, firstResult, maxResults);
+    }
+
+    @Override
+    public long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap) {
+        return (Long) getDbSqlSession().selectOne("selectDeploymentCountByNativeQuery", parameterMap);
+    }
+
 }

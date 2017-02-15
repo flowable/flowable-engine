@@ -13,55 +13,55 @@ import org.junit.Test;
  */
 public class UserEntityTest {
 
-  @Test
-  public void testSetPicture_pictureShouldBeSavedWhenNotNull() {
-    TestableUserEntity userEntity = new TestableUserEntity();
-    Picture picture = new Picture(null, null);
-    // even though parameters were null, picture object is not null
-    userEntity.setPicture(picture);
-    assertTrue(userEntity.getHasSavePictureBeenCalled());
-    assertFalse(userEntity.getHasDeletePictureBeenCalled());
-  }
-
-  @Test
-  public void testSetPicture_pictureShouldBeDeletedWhenNull() {
-    TestableUserEntity userEntity = new TestableUserEntity();
-    userEntity.setPicture(null);
-    assertTrue(userEntity.getHasDeletePictureBeenCalled());
-  }
-
-  @SuppressWarnings("serial")
-  class TestableUserEntity extends UserEntityImpl {
-
-    private boolean hasSavePictureBeenCalled;
-    private boolean hasDeletePictureBeenCalled;
-
-    @Override
-    protected void savePicture(Picture picture) {
-      setHasSavePictureBeenCalled(true);
+    @Test
+    public void testSetPicture_pictureShouldBeSavedWhenNotNull() {
+        TestableUserEntity userEntity = new TestableUserEntity();
+        Picture picture = new Picture(null, null);
+        // even though parameters were null, picture object is not null
+        userEntity.setPicture(picture);
+        assertTrue(userEntity.getHasSavePictureBeenCalled());
+        assertFalse(userEntity.getHasDeletePictureBeenCalled());
     }
 
-    @Override
-    protected void deletePicture() {
-      setHasDeletePictureBeenCalled(true);
+    @Test
+    public void testSetPicture_pictureShouldBeDeletedWhenNull() {
+        TestableUserEntity userEntity = new TestableUserEntity();
+        userEntity.setPicture(null);
+        assertTrue(userEntity.getHasDeletePictureBeenCalled());
     }
 
-    public boolean getHasSavePictureBeenCalled() {
-      return hasSavePictureBeenCalled;
-    }
+    @SuppressWarnings("serial")
+    class TestableUserEntity extends UserEntityImpl {
 
-    public void setHasSavePictureBeenCalled(boolean hasSavePictureBeenCalled) {
-      this.hasSavePictureBeenCalled = hasSavePictureBeenCalled;
-    }
+        private boolean hasSavePictureBeenCalled;
+        private boolean hasDeletePictureBeenCalled;
 
-    public boolean getHasDeletePictureBeenCalled() {
-      return hasDeletePictureBeenCalled;
-    }
+        @Override
+        protected void savePicture(Picture picture) {
+            setHasSavePictureBeenCalled(true);
+        }
 
-    public void setHasDeletePictureBeenCalled(boolean hasDeletePictureBeenCalled) {
-      this.hasDeletePictureBeenCalled = hasDeletePictureBeenCalled;
-    }
+        @Override
+        protected void deletePicture() {
+            setHasDeletePictureBeenCalled(true);
+        }
 
-  }
+        public boolean getHasSavePictureBeenCalled() {
+            return hasSavePictureBeenCalled;
+        }
+
+        public void setHasSavePictureBeenCalled(boolean hasSavePictureBeenCalled) {
+            this.hasSavePictureBeenCalled = hasSavePictureBeenCalled;
+        }
+
+        public boolean getHasDeletePictureBeenCalled() {
+            return hasDeletePictureBeenCalled;
+        }
+
+        public void setHasDeletePictureBeenCalled(boolean hasDeletePictureBeenCalled) {
+            this.hasDeletePictureBeenCalled = hasDeletePictureBeenCalled;
+        }
+
+    }
 
 }

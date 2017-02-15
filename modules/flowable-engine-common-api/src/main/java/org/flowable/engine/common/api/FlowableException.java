@@ -19,13 +19,13 @@ package org.flowable.engine.common.api;
  */
 public class FlowableException extends RuntimeException {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public FlowableException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public FlowableException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-  public FlowableException(String message) {
-    super(message);
-  }
+    public FlowableException(String message) {
+        super(message);
+    }
 }

@@ -20,19 +20,19 @@ import java.sql.Connection;
  * @author Joram Barrez
  */
 public class ConnectionHolder {
-  
-  protected static ThreadLocal<Connection> connectionHolder = new ThreadLocal<Connection>();
-  
-  public static Connection get() {
-    return connectionHolder.get();
-  }
-  
-  public static void setConnection(Connection connection) {
-    connectionHolder.set(connection);
-  }
-  
-  public static void clear() {
-    connectionHolder.remove();
-  }
+
+    protected static ThreadLocal<Connection> connectionHolder = new ThreadLocal<Connection>();
+
+    public static Connection get() {
+        return connectionHolder.get();
+    }
+
+    public static void setConnection(Connection connection) {
+        connectionHolder.set(connection);
+    }
+
+    public static void clear() {
+        connectionHolder.remove();
+    }
 
 }

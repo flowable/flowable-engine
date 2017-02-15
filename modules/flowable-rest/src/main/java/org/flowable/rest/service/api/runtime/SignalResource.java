@@ -42,56 +42,56 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Runtime" }, description = "Manage Runtime", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Runtime" }, description = "Manage Runtime", authorizations = { @Authorization(value = "basicAuth") })
 public class SignalResource {
 
-  @Autowired
-  protected RestResponseFactory restResponseFactory;
+    @Autowired
+    protected RestResponseFactory restResponseFactory;
 
-  @Autowired
-  protected RuntimeService runtimeService;
+    @Autowired
+    protected RuntimeService runtimeService;
 
-  @ApiOperation(value = "Signal event received", tags = {"Runtime"})
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Indicated signal has been processed and no errors occurred."),
-          @ApiResponse(code = 202, message = "Indicated signal processing is queued as a job, ready to be executed."),
-          @ApiResponse(code = 400, message = "Signal not processed. The signal name is missing or variables are used together with async, which is not allowed. Response body contains additional information about the error.")
-  })
-  @RequestMapping(value = "/runtime/signals", method = RequestMethod.POST)
-  public void signalEventReceived(@RequestBody SignalEventReceivedRequest signalRequest, HttpServletResponse response) {
-    if (signalRequest.getSignalName() == null) {
-      throw new FlowableIllegalArgumentException("signalName is required");
-    }
-
-    Map<String, Object> signalVariables = null;
-    if (signalRequest.getVariables() != null) {
-      signalVariables = new HashMap<String, Object>();
-      for (RestVariable variable : signalRequest.getVariables()) {
-        if (variable.getName() == null) {
-          throw new FlowableIllegalArgumentException("Variable name is required.");
+    @ApiOperation(value = "Signal event received", tags = { "Runtime" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicated signal has been processed and no errors occurred."),
+            @ApiResponse(code = 202, message = "Indicated signal processing is queued as a job, ready to be executed."),
+            @ApiResponse(code = 400, message = "Signal not processed. The signal name is missing or variables are used together with async, which is not allowed. Response body contains additional information about the error.")
+    })
+    @RequestMapping(value = "/runtime/signals", method = RequestMethod.POST)
+    public void signalEventReceived(@RequestBody SignalEventReceivedRequest signalRequest, HttpServletResponse response) {
+        if (signalRequest.getSignalName() == null) {
+            throw new FlowableIllegalArgumentException("signalName is required");
         }
-        signalVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
-      }
-    }
 
-    if (signalRequest.isAsync()) {
-      if (signalVariables != null) {
-        throw new FlowableIllegalArgumentException("Async signals cannot take variables as payload");
-      }
+        Map<String, Object> signalVariables = null;
+        if (signalRequest.getVariables() != null) {
+            signalVariables = new HashMap<String, Object>();
+            for (RestVariable variable : signalRequest.getVariables()) {
+                if (variable.getName() == null) {
+                    throw new FlowableIllegalArgumentException("Variable name is required.");
+                }
+                signalVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
+            }
+        }
 
-      if (signalRequest.isCustomTenantSet()) {
-        runtimeService.signalEventReceivedAsyncWithTenantId(signalRequest.getSignalName(), signalRequest.getTenantId());
-      } else {
-        runtimeService.signalEventReceivedAsync(signalRequest.getSignalName());
-      }
-      response.setStatus(HttpStatus.ACCEPTED.value());
-    } else {
-      if (signalRequest.isCustomTenantSet()) {
-        runtimeService.signalEventReceivedWithTenantId(signalRequest.getSignalName(), signalVariables, signalRequest.getTenantId());
-      } else {
-        runtimeService.signalEventReceived(signalRequest.getSignalName(), signalVariables);
-      }
-      response.setStatus(HttpStatus.NO_CONTENT.value());
+        if (signalRequest.isAsync()) {
+            if (signalVariables != null) {
+                throw new FlowableIllegalArgumentException("Async signals cannot take variables as payload");
+            }
+
+            if (signalRequest.isCustomTenantSet()) {
+                runtimeService.signalEventReceivedAsyncWithTenantId(signalRequest.getSignalName(), signalRequest.getTenantId());
+            } else {
+                runtimeService.signalEventReceivedAsync(signalRequest.getSignalName());
+            }
+            response.setStatus(HttpStatus.ACCEPTED.value());
+        } else {
+            if (signalRequest.isCustomTenantSet()) {
+                runtimeService.signalEventReceivedWithTenantId(signalRequest.getSignalName(), signalVariables, signalRequest.getTenantId());
+            } else {
+                runtimeService.signalEventReceived(signalRequest.getSignalName(), signalVariables);
+            }
+            response.setStatus(HttpStatus.NO_CONTENT.value());
+        }
     }
-  }
 }

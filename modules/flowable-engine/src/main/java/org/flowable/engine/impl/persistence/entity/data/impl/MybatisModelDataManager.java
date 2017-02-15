@@ -28,41 +28,41 @@ import org.flowable.engine.repository.Model;
  * @author Joram Barrez
  */
 public class MybatisModelDataManager extends AbstractDataManager<ModelEntity> implements ModelDataManager {
-  
-  public MybatisModelDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    super(processEngineConfiguration);
-  }
 
-  @Override
-  public Class<? extends ModelEntity> getManagedEntityClass() {
-    return ModelEntityImpl.class;
-  }
-  
-  @Override
-  public ModelEntity create() {
-    return new ModelEntityImpl();
-  }
-  
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<Model> findModelsByQueryCriteria(ModelQueryImpl query, Page page) {
-    return getDbSqlSession().selectList("selectModelsByQueryCriteria", query, page);
-  }
+    public MybatisModelDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
 
-  @Override
-  public long findModelCountByQueryCriteria(ModelQueryImpl query) {
-    return (Long) getDbSqlSession().selectOne("selectModelCountByQueryCriteria", query);
-  }
+    @Override
+    public Class<? extends ModelEntity> getManagedEntityClass() {
+        return ModelEntityImpl.class;
+    }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<Model> findModelsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return getDbSqlSession().selectListWithRawParameter("selectModelByNativeQuery", parameterMap, firstResult, maxResults);
-  }
+    @Override
+    public ModelEntity create() {
+        return new ModelEntityImpl();
+    }
 
-  @Override
-  public long findModelCountByNativeQuery(Map<String, Object> parameterMap) {
-    return (Long) getDbSqlSession().selectOne("selectModelCountByNativeQuery", parameterMap);
-  }
-  
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Model> findModelsByQueryCriteria(ModelQueryImpl query, Page page) {
+        return getDbSqlSession().selectList("selectModelsByQueryCriteria", query, page);
+    }
+
+    @Override
+    public long findModelCountByQueryCriteria(ModelQueryImpl query) {
+        return (Long) getDbSqlSession().selectOne("selectModelCountByQueryCriteria", query);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Model> findModelsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
+        return getDbSqlSession().selectListWithRawParameter("selectModelByNativeQuery", parameterMap, firstResult, maxResults);
+    }
+
+    @Override
+    public long findModelCountByNativeQuery(Map<String, Object> parameterMap) {
+        return (Long) getDbSqlSession().selectOne("selectModelCountByNativeQuery", parameterMap);
+    }
+
 }

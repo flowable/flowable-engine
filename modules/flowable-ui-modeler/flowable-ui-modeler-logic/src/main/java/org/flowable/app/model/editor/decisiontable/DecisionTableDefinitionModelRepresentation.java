@@ -24,7 +24,7 @@ public class DecisionTableDefinitionModelRepresentation {
     public DecisionTableDefinitionRepresentation getDecisionTableDefinition() {
         return decisionTableDefinition;
     }
-    
+
     public void setDecisionTableDefinition(DecisionTableDefinitionRepresentation decisionTableDefinition) {
         this.decisionTableDefinition = decisionTableDefinition;
     }

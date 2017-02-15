@@ -40,82 +40,82 @@ import java.util.List;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessDefinitionIdentityLinkResource extends BaseProcessDefinitionResource {
 
-  @ApiOperation(value = "Get a candidate starter from a process definition", tags = {"Process Definitions"})
-  @ApiResponses(value = {
-          @ApiResponse(code = 204, message = "Indicates the process definition was found and the identity link was returned."),
-          @ApiResponse(code = 404, message = "Indicates the requested process definition was not found or the process definition doesn’t have an identity-link that matches the url.")
-  })
-  @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/identitylinks/{family}/{identityId}", method = RequestMethod.GET, produces = "application/json")
-  public RestIdentityLink getIdentityLink(@ApiParam(name = "processDefinitionId") @PathVariable("processDefinitionId") String processDefinitionId,
-          @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
-      HttpServletRequest request) {
+    @ApiOperation(value = "Get a candidate starter from a process definition", tags = { "Process Definitions" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Indicates the process definition was found and the identity link was returned."),
+            @ApiResponse(code = 404, message = "Indicates the requested process definition was not found or the process definition doesn’t have an identity-link that matches the url.")
+    })
+    @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/identitylinks/{family}/{identityId}", method = RequestMethod.GET, produces = "application/json")
+    public RestIdentityLink getIdentityLink(@ApiParam(name = "processDefinitionId") @PathVariable("processDefinitionId") String processDefinitionId,
+            @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
+            HttpServletRequest request) {
 
-    ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
 
-    validateIdentityLinkArguments(family, identityId);
+        validateIdentityLinkArguments(family, identityId);
 
-    // Check if identitylink to get exists
-    IdentityLink link = getIdentityLink(family, identityId, processDefinition.getId());
+        // Check if identitylink to get exists
+        IdentityLink link = getIdentityLink(family, identityId, processDefinition.getId());
 
-    return restResponseFactory.createRestIdentityLink(link);
-  }
-
-  @ApiOperation(value = "Delete a candidate starter from a process definition", tags = {"Process Definitions"})
-  @ApiResponses(value = {
-          @ApiResponse(code = 204, message = "Indicates the process definition was found and the identity link was removed. The response body is intentionally empty."),
-          @ApiResponse(code = 404, message = "Indicates the requested process definition was not found or the process definition doesn’t have an identity-link that matches the url.")
-  })
-  @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/identitylinks/{family}/{identityId}", method = RequestMethod.DELETE)
-  public void deleteIdentityLink(@ApiParam(name = "processDefinitionId") @PathVariable("processDefinitionId") String processDefinitionId,
-          @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
-      HttpServletResponse response) {
-
-    ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
-
-    validateIdentityLinkArguments(family, identityId);
-
-    // Check if identitylink to delete exists
-    IdentityLink link = getIdentityLink(family, identityId, processDefinition.getId());
-    if (link.getUserId() != null) {
-      repositoryService.deleteCandidateStarterUser(processDefinition.getId(), link.getUserId());
-    } else {
-      repositoryService.deleteCandidateStarterGroup(processDefinition.getId(), link.getGroupId());
+        return restResponseFactory.createRestIdentityLink(link);
     }
 
-    response.setStatus(HttpStatus.NO_CONTENT.value());
-  }
+    @ApiOperation(value = "Delete a candidate starter from a process definition", tags = { "Process Definitions" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Indicates the process definition was found and the identity link was removed. The response body is intentionally empty."),
+            @ApiResponse(code = 404, message = "Indicates the requested process definition was not found or the process definition doesn’t have an identity-link that matches the url.")
+    })
+    @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/identitylinks/{family}/{identityId}", method = RequestMethod.DELETE)
+    public void deleteIdentityLink(@ApiParam(name = "processDefinitionId") @PathVariable("processDefinitionId") String processDefinitionId,
+            @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
+            HttpServletResponse response) {
 
-  protected void validateIdentityLinkArguments(String family, String identityId) {
-    if (family == null || (!RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS.equals(family) && !RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS.equals(family))) {
-      throw new FlowableIllegalArgumentException("Identity link family should be 'users' or 'groups'.");
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+
+        validateIdentityLinkArguments(family, identityId);
+
+        // Check if identitylink to delete exists
+        IdentityLink link = getIdentityLink(family, identityId, processDefinition.getId());
+        if (link.getUserId() != null) {
+            repositoryService.deleteCandidateStarterUser(processDefinition.getId(), link.getUserId());
+        } else {
+            repositoryService.deleteCandidateStarterGroup(processDefinition.getId(), link.getGroupId());
+        }
+
+        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
-    if (identityId == null) {
-      throw new FlowableIllegalArgumentException("IdentityId is required.");
+
+    protected void validateIdentityLinkArguments(String family, String identityId) {
+        if (family == null || (!RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS.equals(family) && !RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS.equals(family))) {
+            throw new FlowableIllegalArgumentException("Identity link family should be 'users' or 'groups'.");
+        }
+        if (identityId == null) {
+            throw new FlowableIllegalArgumentException("IdentityId is required.");
+        }
     }
-  }
 
-  protected IdentityLink getIdentityLink(String family, String identityId, String processDefinitionId) {
-    boolean isUser = family.equals(RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS);
+    protected IdentityLink getIdentityLink(String family, String identityId, String processDefinitionId) {
+        boolean isUser = family.equals(RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS);
 
-    // Perhaps it would be better to offer getting a single identitylink
-    // from
-    // the API
-    List<IdentityLink> allLinks = repositoryService.getIdentityLinksForProcessDefinition(processDefinitionId);
-    for (IdentityLink link : allLinks) {
-      boolean rightIdentity = false;
-      if (isUser) {
-        rightIdentity = identityId.equals(link.getUserId());
-      } else {
-        rightIdentity = identityId.equals(link.getGroupId());
-      }
+        // Perhaps it would be better to offer getting a single identitylink
+        // from
+        // the API
+        List<IdentityLink> allLinks = repositoryService.getIdentityLinksForProcessDefinition(processDefinitionId);
+        for (IdentityLink link : allLinks) {
+            boolean rightIdentity = false;
+            if (isUser) {
+                rightIdentity = identityId.equals(link.getUserId());
+            } else {
+                rightIdentity = identityId.equals(link.getGroupId());
+            }
 
-      if (rightIdentity && link.getType().equals(IdentityLinkType.CANDIDATE)) {
-        return link;
-      }
+            if (rightIdentity && link.getType().equals(IdentityLinkType.CANDIDATE)) {
+                return link;
+            }
+        }
+        throw new FlowableObjectNotFoundException("Could not find the requested identity link.", IdentityLink.class);
     }
-    throw new FlowableObjectNotFoundException("Could not find the requested identity link.", IdentityLink.class);
-  }
 }

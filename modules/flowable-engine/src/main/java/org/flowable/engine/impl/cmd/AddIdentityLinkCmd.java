@@ -24,81 +24,81 @@ import org.flowable.engine.task.IdentityLinkType;
  */
 public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
 
-  private static final long serialVersionUID = 1L;
-  
-  public static int IDENTITY_USER = 1;
-  public static int IDENTITY_GROUP = 2;
+    private static final long serialVersionUID = 1L;
 
-  protected String identityId;
+    public static int IDENTITY_USER = 1;
+    public static int IDENTITY_GROUP = 2;
 
-  protected int identityIdType;
+    protected String identityId;
 
-  protected String identityType;
+    protected int identityIdType;
 
-  public AddIdentityLinkCmd(String taskId, String identityId, int identityIdType, String identityType) {
-    super(taskId);
-    validateParams(taskId, identityId, identityIdType, identityType);
-    this.taskId = taskId;
-    this.identityId = identityId;
-    this.identityIdType = identityIdType;
-    this.identityType = identityType;
-  }
+    protected String identityType;
 
-  protected void validateParams(String taskId, String identityId, int identityIdType, String identityType) {
-    if (taskId == null) {
-      throw new FlowableIllegalArgumentException("taskId is null");
+    public AddIdentityLinkCmd(String taskId, String identityId, int identityIdType, String identityType) {
+        super(taskId);
+        validateParams(taskId, identityId, identityIdType, identityType);
+        this.taskId = taskId;
+        this.identityId = identityId;
+        this.identityIdType = identityIdType;
+        this.identityType = identityType;
     }
 
-    if (identityType == null) {
-      throw new FlowableIllegalArgumentException("type is required when adding a new task identity link");
+    protected void validateParams(String taskId, String identityId, int identityIdType, String identityType) {
+        if (taskId == null) {
+            throw new FlowableIllegalArgumentException("taskId is null");
+        }
+
+        if (identityType == null) {
+            throw new FlowableIllegalArgumentException("type is required when adding a new task identity link");
+        }
+
+        if (identityId == null && (identityIdType == IDENTITY_GROUP ||
+                (!IdentityLinkType.ASSIGNEE.equals(identityType) && !IdentityLinkType.OWNER.equals(identityType)))) {
+
+            throw new FlowableIllegalArgumentException("identityId is null");
+        }
+
+        if (identityIdType != IDENTITY_USER && identityIdType != IDENTITY_GROUP) {
+            throw new FlowableIllegalArgumentException("identityIdType allowed values are 1 and 2");
+        }
     }
 
-    if (identityId == null && (identityIdType == IDENTITY_GROUP || 
-        (!IdentityLinkType.ASSIGNEE.equals(identityType) && !IdentityLinkType.OWNER.equals(identityType)))) {
-      
-      throw new FlowableIllegalArgumentException("identityId is null");
-    }
-    
-    if (identityIdType != IDENTITY_USER && identityIdType != IDENTITY_GROUP) {
-      throw new FlowableIllegalArgumentException("identityIdType allowed values are 1 and 2");
-    }
-  }
+    protected Void execute(CommandContext commandContext, TaskEntity task) {
 
-  protected Void execute(CommandContext commandContext, TaskEntity task) {
+        if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
+            Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+            compatibilityHandler.addIdentityLink(taskId, identityId, identityIdType, identityType);
+            return null;
+        }
 
-    if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      compatibilityHandler.addIdentityLink(taskId, identityId, identityIdType, identityType);
-      return null;
-    }
-    
-    boolean assignedToNoOne = false;
-    if (IdentityLinkType.ASSIGNEE.equals(identityType)) {
-      commandContext.getTaskEntityManager().changeTaskAssignee(task, identityId);
-      assignedToNoOne = identityId == null;
-    } else if (IdentityLinkType.OWNER.equals(identityType)) {
-      commandContext.getTaskEntityManager().changeTaskOwner(task, identityId);
-    } else if (IDENTITY_USER == identityIdType) {
-      task.addUserIdentityLink(identityId, identityType);
-    } else if (IDENTITY_GROUP == identityIdType) {      
-      task.addGroupIdentityLink(identityId, identityType);
-    }
+        boolean assignedToNoOne = false;
+        if (IdentityLinkType.ASSIGNEE.equals(identityType)) {
+            commandContext.getTaskEntityManager().changeTaskAssignee(task, identityId);
+            assignedToNoOne = identityId == null;
+        } else if (IdentityLinkType.OWNER.equals(identityType)) {
+            commandContext.getTaskEntityManager().changeTaskOwner(task, identityId);
+        } else if (IDENTITY_USER == identityIdType) {
+            task.addUserIdentityLink(identityId, identityType);
+        } else if (IDENTITY_GROUP == identityIdType) {
+            task.addGroupIdentityLink(identityId, identityType);
+        }
 
-    boolean forceNullUserId = false;
-    if (assignedToNoOne) {
-      // ACT-1317: Special handling when assignee is set to NULL, a
-      // CommentEntity notifying of assignee-delete should be created
-      forceNullUserId = true;
-      
-    }
-    
-    if (IDENTITY_USER == identityIdType) {
-      commandContext.getHistoryManager().createUserIdentityLinkComment(taskId, identityId, identityType, true, forceNullUserId);
-    } else {
-      commandContext.getHistoryManager().createGroupIdentityLinkComment(taskId, identityId, identityType, true);
-    }
+        boolean forceNullUserId = false;
+        if (assignedToNoOne) {
+            // ACT-1317: Special handling when assignee is set to NULL, a
+            // CommentEntity notifying of assignee-delete should be created
+            forceNullUserId = true;
 
-    return null;
-  }
+        }
+
+        if (IDENTITY_USER == identityIdType) {
+            commandContext.getHistoryManager().createUserIdentityLinkComment(taskId, identityId, identityType, true, forceNullUserId);
+        } else {
+            commandContext.getHistoryManager().createGroupIdentityLinkComment(taskId, identityId, identityType, true);
+        }
+
+        return null;
+    }
 
 }

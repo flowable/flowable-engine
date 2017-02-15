@@ -28,23 +28,23 @@ import org.flowable.engine.runtime.Execution;
  */
 public class GetActiveAdhocSubProcessesCmd implements Command<List<Execution>>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String processInstanceId;
+    private static final long serialVersionUID = 1L;
+    protected String processInstanceId;
 
-  public GetActiveAdhocSubProcessesCmd(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
-
-  public List<Execution> execute(CommandContext commandContext) {
-    List<Execution> adhocExecutions = new ArrayList<Execution>();
-    List<ExecutionEntity> executions = commandContext.getExecutionEntityManager().findChildExecutionsByProcessInstanceId(processInstanceId);
-    for (Execution execution : executions) {
-      if (execution.getCurrentFlowElement() instanceof AdhocSubProcess) {
-        adhocExecutions.add(execution);
-      }
+    public GetActiveAdhocSubProcessesCmd(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
     }
-    
-    return adhocExecutions;
-  }
-  
+
+    public List<Execution> execute(CommandContext commandContext) {
+        List<Execution> adhocExecutions = new ArrayList<Execution>();
+        List<ExecutionEntity> executions = commandContext.getExecutionEntityManager().findChildExecutionsByProcessInstanceId(processInstanceId);
+        for (Execution execution : executions) {
+            if (execution.getCurrentFlowElement() instanceof AdhocSubProcess) {
+                adhocExecutions.add(execution);
+            }
+        }
+
+        return adhocExecutions;
+    }
+
 }

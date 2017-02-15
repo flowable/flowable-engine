@@ -37,63 +37,63 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
  */
 public class EventSubProcessTimerStartEventActivityBehavior extends AbstractBpmnActivityBehavior {
 
-  private static final long serialVersionUID = 1L;
-  
-  protected TimerEventDefinition timerEventDefinition;
-  
-  public EventSubProcessTimerStartEventActivityBehavior(TimerEventDefinition timerEventDefinition) {
-    this.timerEventDefinition = timerEventDefinition;
-  }
+    private static final long serialVersionUID = 1L;
 
-  public void execute(DelegateExecution execution) {
-    StartEvent startEvent = (StartEvent) execution.getCurrentFlowElement();
-    EventSubProcess eventSubProcess = (EventSubProcess) startEvent.getSubProcess();
+    protected TimerEventDefinition timerEventDefinition;
 
-    execution.setScope(true);
-
-    // initialize the template-defined data objects as variables
-    Map<String, Object> dataObjectVars = processDataObjects(eventSubProcess.getDataObjects());
-    if (dataObjectVars != null) {
-      execution.setVariablesLocal(dataObjectVars);
+    public EventSubProcessTimerStartEventActivityBehavior(TimerEventDefinition timerEventDefinition) {
+        this.timerEventDefinition = timerEventDefinition;
     }
-  }
-  
-  @Override
-  public void trigger(DelegateExecution execution, String triggerName, Object triggerData) {
-    CommandContext commandContext = Context.getCommandContext();
-    ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
-    ExecutionEntity executionEntity = (ExecutionEntity) execution;
-    
-    StartEvent startEvent = (StartEvent) execution.getCurrentFlowElement();
-    if (startEvent.isInterrupting()) {  
-      List<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByParentExecutionId(executionEntity.getParentId());
-      for (ExecutionEntity childExecution : childExecutions) {
-        if (!childExecution.getId().equals(executionEntity.getId())) {
-          executionEntityManager.deleteExecutionAndRelatedData(childExecution, 
-              DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")", false);
+
+    public void execute(DelegateExecution execution) {
+        StartEvent startEvent = (StartEvent) execution.getCurrentFlowElement();
+        EventSubProcess eventSubProcess = (EventSubProcess) startEvent.getSubProcess();
+
+        execution.setScope(true);
+
+        // initialize the template-defined data objects as variables
+        Map<String, Object> dataObjectVars = processDataObjects(eventSubProcess.getDataObjects());
+        if (dataObjectVars != null) {
+            execution.setVariablesLocal(dataObjectVars);
         }
-      } 
     }
-    
-    ExecutionEntity newSubProcessExecution = executionEntityManager.createChildExecution(executionEntity.getParent());
-    newSubProcessExecution.setCurrentFlowElement((SubProcess) executionEntity.getCurrentFlowElement().getParentContainer());
-    newSubProcessExecution.setEventScope(false);
-    newSubProcessExecution.setScope(true);
-    
-    ExecutionEntity outgoingFlowExecution = executionEntityManager.createChildExecution(newSubProcessExecution);
-    outgoingFlowExecution.setCurrentFlowElement(startEvent);
-    
-    leave(outgoingFlowExecution);
-  }
 
-  protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {
-    Map<String, Object> variablesMap = new HashMap<String, Object>();
-    // convert data objects to process variables
-    if (dataObjects != null) {
-      for (ValuedDataObject dataObject : dataObjects) {
-        variablesMap.put(dataObject.getName(), dataObject.getValue());
-      }
+    @Override
+    public void trigger(DelegateExecution execution, String triggerName, Object triggerData) {
+        CommandContext commandContext = Context.getCommandContext();
+        ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
+        ExecutionEntity executionEntity = (ExecutionEntity) execution;
+
+        StartEvent startEvent = (StartEvent) execution.getCurrentFlowElement();
+        if (startEvent.isInterrupting()) {
+            List<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByParentExecutionId(executionEntity.getParentId());
+            for (ExecutionEntity childExecution : childExecutions) {
+                if (!childExecution.getId().equals(executionEntity.getId())) {
+                    executionEntityManager.deleteExecutionAndRelatedData(childExecution,
+                            DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")", false);
+                }
+            }
+        }
+
+        ExecutionEntity newSubProcessExecution = executionEntityManager.createChildExecution(executionEntity.getParent());
+        newSubProcessExecution.setCurrentFlowElement((SubProcess) executionEntity.getCurrentFlowElement().getParentContainer());
+        newSubProcessExecution.setEventScope(false);
+        newSubProcessExecution.setScope(true);
+
+        ExecutionEntity outgoingFlowExecution = executionEntityManager.createChildExecution(newSubProcessExecution);
+        outgoingFlowExecution.setCurrentFlowElement(startEvent);
+
+        leave(outgoingFlowExecution);
     }
-    return variablesMap;
-  }
+
+    protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {
+        Map<String, Object> variablesMap = new HashMap<String, Object>();
+        // convert data objects to process variables
+        if (dataObjects != null) {
+            for (ValuedDataObject dataObject : dataObjects) {
+                variablesMap.put(dataObject.getName(), dataObject.getValue());
+            }
+        }
+        return variablesMap;
+    }
 }

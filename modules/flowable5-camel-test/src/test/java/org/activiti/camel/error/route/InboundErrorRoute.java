@@ -22,12 +22,12 @@ import org.apache.camel.builder.RouteBuilder;
  */
 public class InboundErrorRoute extends RouteBuilder {
 
-  @Override
-  public void configure() throws Exception {
-    from("seda:inbound").routeId("inbound")
-    // give Activiti some time to reach synchronization point
-        .bean(TimeConsumingService.class).log(LoggingLevel.INFO, "Returning result ...").to("flowable:ErrorHandling:ReceiveResult");
+    @Override
+    public void configure() throws Exception {
+        from("seda:inbound").routeId("inbound")
+                // give Activiti some time to reach synchronization point
+                .bean(TimeConsumingService.class).log(LoggingLevel.INFO, "Returning result ...").to("flowable:ErrorHandling:ReceiveResult");
 
-    from("seda:dlq").routeId("dlq").log(LoggingLevel.INFO, "Error handled by camel ...");
-  }
+        from("seda:dlq").routeId("dlq").log(LoggingLevel.INFO, "Error handled by camel ...");
+    }
 }

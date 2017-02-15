@@ -28,34 +28,34 @@ import org.flowable.engine.runtime.ProcessInstance;
  */
 public class DeleteProcessInstanceCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String processInstanceId;
-  protected String deleteReason;
+    private static final long serialVersionUID = 1L;
+    protected String processInstanceId;
+    protected String deleteReason;
 
-  public DeleteProcessInstanceCmd(String processInstanceId, String deleteReason) {
-    this.processInstanceId = processInstanceId;
-    this.deleteReason = deleteReason;
-  }
-
-  public Void execute(CommandContext commandContext) {
-    if (processInstanceId == null) {
-      throw new FlowableIllegalArgumentException("processInstanceId is null");
+    public DeleteProcessInstanceCmd(String processInstanceId, String deleteReason) {
+        this.processInstanceId = processInstanceId;
+        this.deleteReason = deleteReason;
     }
 
-    ExecutionEntity processInstanceEntity = commandContext.getExecutionEntityManager().findById(processInstanceId);
-    
-    if (processInstanceEntity == null) {
-      throw new FlowableObjectNotFoundException("No process instance found for id '" + processInstanceId + "'", ProcessInstance.class);
-    }
-    
-    if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processInstanceEntity.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      compatibilityHandler.deleteProcessInstance(processInstanceId, deleteReason);
-    } else {
-      commandContext.getExecutionEntityManager().deleteProcessInstance(processInstanceEntity.getProcessInstanceId(), deleteReason, false);
-    }
+    public Void execute(CommandContext commandContext) {
+        if (processInstanceId == null) {
+            throw new FlowableIllegalArgumentException("processInstanceId is null");
+        }
 
-    return null;
-  }
+        ExecutionEntity processInstanceEntity = commandContext.getExecutionEntityManager().findById(processInstanceId);
+
+        if (processInstanceEntity == null) {
+            throw new FlowableObjectNotFoundException("No process instance found for id '" + processInstanceId + "'", ProcessInstance.class);
+        }
+
+        if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processInstanceEntity.getProcessDefinitionId())) {
+            Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+            compatibilityHandler.deleteProcessInstance(processInstanceId, deleteReason);
+        } else {
+            commandContext.getExecutionEntityManager().deleteProcessInstance(processInstanceEntity.getProcessInstanceId(), deleteReason, false);
+        }
+
+        return null;
+    }
 
 }

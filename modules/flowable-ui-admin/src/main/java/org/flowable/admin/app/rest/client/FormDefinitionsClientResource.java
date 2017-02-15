@@ -36,26 +36,26 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RestController
 public class FormDefinitionsClientResource extends AbstractClientResource {
 
-  private static final Logger logger = LoggerFactory.getLogger(FormDefinitionsClientResource.class);
+    private static final Logger logger = LoggerFactory.getLogger(FormDefinitionsClientResource.class);
 
-  @Autowired
-  protected FormDefinitionService clientService;
+    @Autowired
+    protected FormDefinitionService clientService;
 
-  /**
-   * GET a list of deployed form definitions.
-   */
-  @RequestMapping(value = "/rest/admin/form-definitions", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode listFormDefinitions(HttpServletRequest request) {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
-    Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
-    return clientService.listForms(serverConfig, parameterMap);
-  }
+    /**
+     * GET a list of deployed form definitions.
+     */
+    @RequestMapping(value = "/rest/admin/form-definitions", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode listFormDefinitions(HttpServletRequest request) {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+        Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
+        return clientService.listForms(serverConfig, parameterMap);
+    }
 
-  /**
-   * GET process definition's list of deployed form definitions.
-   */
-  @RequestMapping(value = "/rest/admin/process-definition-form-definitions/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode getProcessDefinitionForms(@PathVariable String processDefinitionId, HttpServletRequest request) {
-    return clientService.getProcessDefinitionForms(retrieveServerConfig(EndpointType.PROCESS), processDefinitionId);
-  }
+    /**
+     * GET process definition's list of deployed form definitions.
+     */
+    @RequestMapping(value = "/rest/admin/process-definition-form-definitions/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getProcessDefinitionForms(@PathVariable String processDefinitionId, HttpServletRequest request) {
+        return clientService.getProcessDefinitionForms(retrieveServerConfig(EndpointType.PROCESS), processDefinitionId);
+    }
 }

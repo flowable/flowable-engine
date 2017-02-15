@@ -21,29 +21,29 @@ import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
  */
 public class FormDefinitionCacheEntry implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected FormDefinitionEntity formDefinitionEntity;
-  protected String formDefinitionJson;
+    protected FormDefinitionEntity formDefinitionEntity;
+    protected String formDefinitionJson;
 
-  public FormDefinitionCacheEntry(FormDefinitionEntity formDefinitionEntity, String formDefinitionJson) {
-    this.formDefinitionEntity = formDefinitionEntity;
-    this.formDefinitionJson = formDefinitionJson;
-  }
+    public FormDefinitionCacheEntry(FormDefinitionEntity formDefinitionEntity, String formDefinitionJson) {
+        this.formDefinitionEntity = formDefinitionEntity;
+        this.formDefinitionJson = formDefinitionJson;
+    }
 
-  public FormDefinitionEntity getFormDefinitionEntity() {
-    return formDefinitionEntity;
-  }
+    public FormDefinitionEntity getFormDefinitionEntity() {
+        return formDefinitionEntity;
+    }
 
-  public void setFormDefinitionEntity(FormDefinitionEntity formDefinitionEntity) {
-    this.formDefinitionEntity = formDefinitionEntity;
-  }
+    public void setFormDefinitionEntity(FormDefinitionEntity formDefinitionEntity) {
+        this.formDefinitionEntity = formDefinitionEntity;
+    }
 
-  public String getFormDefinitionJson() {
-    return formDefinitionJson;
-  }
+    public String getFormDefinitionJson() {
+        return formDefinitionJson;
+    }
 
-  public void setFormDefinitionJson(String formDefinitionJson) {
-    this.formDefinitionJson = formDefinitionJson;
-  }
+    public void setFormDefinitionJson(String formDefinitionJson) {
+        this.formDefinitionJson = formDefinitionJson;
+    }
 }

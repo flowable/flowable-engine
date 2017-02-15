@@ -26,54 +26,54 @@ import org.slf4j.LoggerFactory;
  */
 public class DmnEngineImpl implements DmnEngine {
 
-  private static Logger log = LoggerFactory.getLogger(DmnEngineImpl.class);
+    private static Logger log = LoggerFactory.getLogger(DmnEngineImpl.class);
 
-  protected String name;
-  protected DmnManagementService dmnManagementService;
-  protected DmnRepositoryService dmnRepositoryService;
-  protected DmnRuleService dmnRuleService;
-  protected DmnEngineConfiguration dmnEngineConfiguration;
+    protected String name;
+    protected DmnManagementService dmnManagementService;
+    protected DmnRepositoryService dmnRepositoryService;
+    protected DmnRuleService dmnRuleService;
+    protected DmnEngineConfiguration dmnEngineConfiguration;
 
-  public DmnEngineImpl(DmnEngineConfiguration dmnEngineConfiguration) {
-    this.dmnEngineConfiguration = dmnEngineConfiguration;
-    this.name = dmnEngineConfiguration.getEngineName();
-    this.dmnManagementService = dmnEngineConfiguration.getDmnManagementService();
-    this.dmnRepositoryService = dmnEngineConfiguration.getDmnRepositoryService();
-    this.dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
+    public DmnEngineImpl(DmnEngineConfiguration dmnEngineConfiguration) {
+        this.dmnEngineConfiguration = dmnEngineConfiguration;
+        this.name = dmnEngineConfiguration.getEngineName();
+        this.dmnManagementService = dmnEngineConfiguration.getDmnManagementService();
+        this.dmnRepositoryService = dmnEngineConfiguration.getDmnRepositoryService();
+        this.dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
 
-    if (name == null) {
-      log.info("default flowable DmnEngine created");
-    } else {
-      log.info("DmnEngine {} created", name);
+        if (name == null) {
+            log.info("default flowable DmnEngine created");
+        } else {
+            log.info("DmnEngine {} created", name);
+        }
+
+        DmnEngines.registerDmnEngine(this);
     }
 
-    DmnEngines.registerDmnEngine(this);
-  }
+    public void close() {
+        DmnEngines.unregister(this);
+    }
 
-  public void close() {
-    DmnEngines.unregister(this);
-  }
+    // getters and setters
+    // //////////////////////////////////////////////////////
 
-  // getters and setters
-  // //////////////////////////////////////////////////////
+    public String getName() {
+        return name;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public DmnManagementService getDmnManagementService() {
+        return dmnManagementService;
+    }
 
-  public DmnManagementService getDmnManagementService() {
-    return dmnManagementService;
-  }
+    public DmnRepositoryService getDmnRepositoryService() {
+        return dmnRepositoryService;
+    }
 
-  public DmnRepositoryService getDmnRepositoryService() {
-    return dmnRepositoryService;
-  }
+    public DmnRuleService getDmnRuleService() {
+        return dmnRuleService;
+    }
 
-  public DmnRuleService getDmnRuleService() {
-    return dmnRuleService;
-  }
-
-  public DmnEngineConfiguration getDmnEngineConfiguration() {
-    return dmnEngineConfiguration;
-  }
+    public DmnEngineConfiguration getDmnEngineConfiguration() {
+        return dmnEngineConfiguration;
+    }
 }

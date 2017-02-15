@@ -24,21 +24,21 @@ import org.flowable.idm.engine.impl.interceptor.CommandContext;
  */
 public class DeletePrivilegeCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String id;
+    protected String id;
 
-  public DeletePrivilegeCmd(String id) {
-    if (id == null) {
-      throw new FlowableIllegalArgumentException("id is null");
+    public DeletePrivilegeCmd(String id) {
+        if (id == null) {
+            throw new FlowableIllegalArgumentException("id is null");
+        }
+
+        this.id = id;
     }
-    
-    this.id = id;
-  }
 
-  public Void execute(CommandContext commandContext) {
-    commandContext.gePrivilegeMappingEntityManager().deleteByPrivilegeId(id);
-    commandContext.getPrivilegeEntityManager().delete(id);
-    return null;
-  }
+    public Void execute(CommandContext commandContext) {
+        commandContext.gePrivilegeMappingEntityManager().deleteByPrivilegeId(id);
+        commandContext.getPrivilegeEntityManager().delete(id);
+        return null;
+    }
 }

@@ -21,14 +21,14 @@ import org.flowable.engine.common.api.FlowableException;
  */
 public interface Transformer {
 
-  /**
-   * Transforms anObject into a different object
-   * 
-   * @param anObject
-   *          the object to be transformed
-   * @return the transformed object
-   * @throws FlowableException
-   *           if the transformation could not be applied
-   */
-  Object transform(Object anObject);
+    /**
+     * Transforms anObject into a different object
+     * 
+     * @param anObject
+     *            the object to be transformed
+     * @return the transformed object
+     * @throws FlowableException
+     *             if the transformation could not be applied
+     */
+    Object transform(Object anObject);
 }

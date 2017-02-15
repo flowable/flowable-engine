@@ -27,27 +27,27 @@ import org.flowable.idm.engine.impl.interceptor.CommandContext;
  */
 public class GetUserPictureCmd implements Command<Picture>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String userId;
+    private static final long serialVersionUID = 1L;
+    protected String userId;
 
-  public GetUserPictureCmd(String userId) {
-    this.userId = userId;
-  }
+    public GetUserPictureCmd(String userId) {
+        this.userId = userId;
+    }
 
-  public Picture execute(CommandContext commandContext) {
-    if (userId == null) {
-      throw new FlowableIllegalArgumentException("userId is null");
+    public Picture execute(CommandContext commandContext) {
+        if (userId == null) {
+            throw new FlowableIllegalArgumentException("userId is null");
+        }
+
+        User user = commandContext.getIdmEngineConfiguration().getIdmIdentityService()
+                .createUserQuery().userId(userId)
+                .singleResult();
+
+        if (user == null) {
+            throw new FlowableObjectNotFoundException("user " + userId + " doesn't exist", User.class);
+        }
+
+        return commandContext.getUserEntityManager().getUserPicture(user);
     }
-    
-    User user = commandContext.getIdmEngineConfiguration().getIdmIdentityService()
-        .createUserQuery().userId(userId)
-        .singleResult();
-    
-    if (user == null) {
-      throw new FlowableObjectNotFoundException("user " + userId + " doesn't exist", User.class);
-    }
-    
-    return commandContext.getUserEntityManager().getUserPicture(user);
-  }
 
 }

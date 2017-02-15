@@ -20,24 +20,24 @@ import io.swagger.annotations.ApiModelProperty;
  */
 public class ProcessInstanceChangeActivityStateRequest {
 
-  protected String cancelActivityId;
-  protected String startActivityId;
-  
-  public String getCancelActivityId() {
-    return cancelActivityId;
-  }
-  
-  @ApiModelProperty(value = "activityId to be canceled")
-  public void setCancelActivityId(String cancelActivityId) {
-    this.cancelActivityId = cancelActivityId;
-  }
-  
-  public String getStartActivityId() {
-    return startActivityId;
-  }
-  
-  @ApiModelProperty(value = "activityId to be started")
-  public void setStartActivityId(String startActivityId) {
-    this.startActivityId = startActivityId;
-  }
+    protected String cancelActivityId;
+    protected String startActivityId;
+
+    public String getCancelActivityId() {
+        return cancelActivityId;
+    }
+
+    @ApiModelProperty(value = "activityId to be canceled")
+    public void setCancelActivityId(String cancelActivityId) {
+        this.cancelActivityId = cancelActivityId;
+    }
+
+    public String getStartActivityId() {
+        return startActivityId;
+    }
+
+    @ApiModelProperty(value = "activityId to be started")
+    public void setStartActivityId(String startActivityId) {
+        this.startActivityId = startActivityId;
+    }
 }

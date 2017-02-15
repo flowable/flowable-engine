@@ -21,8 +21,8 @@ import org.flowable.idm.api.Token;
  */
 public interface TokenEntity extends Token, Entity, HasRevision {
 
-  void setId(String id);
-  
-  Object getPersistentState();
+    void setId(String id);
+
+    Object getPersistentState();
 
 }

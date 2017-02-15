@@ -58,7 +58,7 @@ public class ContentItemsClientResource extends AbstractClientResource {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CONTENT);
 
         Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
-        String[] processInstanceIds = {processInstanceId};
+        String[] processInstanceIds = { processInstanceId };
         parameterMap.put("processInstanceId", processInstanceIds);
 
         return clientService.listContentItems(serverConfig, parameterMap);

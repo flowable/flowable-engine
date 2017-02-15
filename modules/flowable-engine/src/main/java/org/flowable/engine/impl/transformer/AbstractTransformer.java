@@ -21,24 +21,24 @@ import org.flowable.engine.common.api.FlowableException;
  */
 public abstract class AbstractTransformer implements Transformer {
 
-  /**
-   * {@inheritDoc}
-   */
-  public Object transform(Object anObject) {
-    try {
-      return this.primTransform(anObject);
-    } catch (Exception e) {
+    /**
+     * {@inheritDoc}
+     */
+    public Object transform(Object anObject) {
+        try {
+            return this.primTransform(anObject);
+        } catch (Exception e) {
 
-      throw new FlowableException("Error while executing transformation from object: " + anObject + " using transformer " + this);
+            throw new FlowableException("Error while executing transformation from object: " + anObject + " using transformer " + this);
+        }
     }
-  }
 
-  /**
-   * Transforms anObject into a different object
-   * 
-   * @param anObject
-   *          the object to be transformed
-   * @return the transformed object
-   */
-  protected abstract Object primTransform(Object anObject) throws Exception;
+    /**
+     * Transforms anObject into a different object
+     * 
+     * @param anObject
+     *            the object to be transformed
+     * @return the transformed object
+     */
+    protected abstract Object primTransform(Object anObject) throws Exception;
 }

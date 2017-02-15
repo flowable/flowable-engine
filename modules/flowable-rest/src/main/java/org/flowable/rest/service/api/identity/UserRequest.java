@@ -20,52 +20,52 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class UserRequest extends UserResponse {
 
-  protected boolean firstNameChanged;
-  protected boolean lastNameChanged;
-  protected boolean passwordChanged;
-  protected boolean emailChanged;
+    protected boolean firstNameChanged;
+    protected boolean lastNameChanged;
+    protected boolean passwordChanged;
+    protected boolean emailChanged;
 
-  @Override
-  public void setEmail(String email) {
-    super.setEmail(email);
-    emailChanged = true;
-  }
+    @Override
+    public void setEmail(String email) {
+        super.setEmail(email);
+        emailChanged = true;
+    }
 
-  @Override
-  public void setFirstName(String firstName) {
-    super.setFirstName(firstName);
-    firstNameChanged = true;
-  }
+    @Override
+    public void setFirstName(String firstName) {
+        super.setFirstName(firstName);
+        firstNameChanged = true;
+    }
 
-  @Override
-  public void setLastName(String lastName) {
-    super.setLastName(lastName);
-    lastNameChanged = true;
-  }
+    @Override
+    public void setLastName(String lastName) {
+        super.setLastName(lastName);
+        lastNameChanged = true;
+    }
 
-  @Override
-  public void setPassword(String passWord) {
-    super.setPassword(passWord);
-    passwordChanged = true;
-  }
+    @Override
+    public void setPassword(String passWord) {
+        super.setPassword(passWord);
+        passwordChanged = true;
+    }
 
-  @JsonIgnore
-  public boolean isEmailChanged() {
-    return emailChanged;
-  }
+    @JsonIgnore
+    public boolean isEmailChanged() {
+        return emailChanged;
+    }
 
-  @JsonIgnore
-  public boolean isFirstNameChanged() {
-    return firstNameChanged;
-  }
+    @JsonIgnore
+    public boolean isFirstNameChanged() {
+        return firstNameChanged;
+    }
 
-  @JsonIgnore
-  public boolean isLastNameChanged() {
-    return lastNameChanged;
-  }
+    @JsonIgnore
+    public boolean isLastNameChanged() {
+        return lastNameChanged;
+    }
 
-  @JsonIgnore
-  public boolean isPasswordChanged() {
-    return passwordChanged;
-  }
+    @JsonIgnore
+    public boolean isPasswordChanged() {
+        return passwordChanged;
+    }
 }

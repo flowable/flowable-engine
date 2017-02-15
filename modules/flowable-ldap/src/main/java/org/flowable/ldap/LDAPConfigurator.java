@@ -38,403 +38,403 @@ import org.flowable.ldap.LDAPGroupCache.LDAPGroupCacheListener;
  */
 public class LDAPConfigurator extends AbstractProcessEngineConfigurator {
 
-  /* Server connection params */
+    /* Server connection params */
 
-  protected String server;
-  protected int port;
-  protected String user;
-  protected String password;
-  protected String initialContextFactory = "com.sun.jndi.ldap.LdapCtxFactory";
-  protected String securityAuthentication = "simple";
+    protected String server;
+    protected int port;
+    protected String user;
+    protected String password;
+    protected String initialContextFactory = "com.sun.jndi.ldap.LdapCtxFactory";
+    protected String securityAuthentication = "simple";
 
-  // For parameters like connection pooling settings, etc.
-  protected Map<String, String> customConnectionParameters = new HashMap<String, String>();
+    // For parameters like connection pooling settings, etc.
+    protected Map<String, String> customConnectionParameters = new HashMap<String, String>();
 
-  // Query configuration
-  protected String baseDn;
-  protected String userBaseDn;
-  protected String groupBaseDn;
-  protected int searchTimeLimit = 0; // Default '0' == wait forever
+    // Query configuration
+    protected String baseDn;
+    protected String userBaseDn;
+    protected String groupBaseDn;
+    protected int searchTimeLimit = 0; // Default '0' == wait forever
 
-  protected String queryUserByUserId;
-  protected String queryGroupsForUser;
-  protected String queryUserByFullNameLike;
+    protected String queryUserByUserId;
+    protected String queryGroupsForUser;
+    protected String queryUserByFullNameLike;
 
-  // Attribute names
-  protected String userIdAttribute;
-  protected String userFirstNameAttribute;
-  protected String userLastNameAttribute;
-  protected String userEmailAttribute;
+    // Attribute names
+    protected String userIdAttribute;
+    protected String userFirstNameAttribute;
+    protected String userLastNameAttribute;
+    protected String userEmailAttribute;
 
-  protected String groupIdAttribute;
-  protected String groupNameAttribute;
-  protected String groupTypeAttribute;
+    protected String groupIdAttribute;
+    protected String groupNameAttribute;
+    protected String groupTypeAttribute;
 
-  // Pluggable query helper bean
-  protected LDAPQueryBuilder ldapQueryBuilder = new LDAPQueryBuilder();
+    // Pluggable query helper bean
+    protected LDAPQueryBuilder ldapQueryBuilder = new LDAPQueryBuilder();
 
-  // Group caching
-  protected int groupCacheSize = -1;
-  protected long groupCacheExpirationTime = 3600000L; // default: one hour
+    // Group caching
+    protected int groupCacheSize = -1;
+    protected long groupCacheExpirationTime = 3600000L; // default: one hour
 
-  // Cache listener (experimental)
-  protected LDAPGroupCacheListener groupCacheListener;
+    // Cache listener (experimental)
+    protected LDAPGroupCacheListener groupCacheListener;
 
-  @Override
-  public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    // Nothing to do
-  }
-
-  @Override
-  public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    
-    LDAPGroupCache ldapGroupCache = null;
-    if (getGroupCacheSize() > 0) {
-      ldapGroupCache = new LDAPGroupCache(getGroupCacheSize(), getGroupCacheExpirationTime(), processEngineConfiguration.getClock());
-      if (groupCacheListener != null) {
-        ldapGroupCache.setLdapCacheListener(groupCacheListener);
-      }
+    @Override
+    public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        // Nothing to do
     }
-    
-    processEngineConfiguration.setIdmIdentityService(new LDAPIdentityServiceImpl(processEngineConfiguration, this, ldapGroupCache));
-  }
 
-  // Getters and Setters //////////////////////////////////////////////////
+    @Override
+    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
 
-  public String getServer() {
-    return server;
-  }
+        LDAPGroupCache ldapGroupCache = null;
+        if (getGroupCacheSize() > 0) {
+            ldapGroupCache = new LDAPGroupCache(getGroupCacheSize(), getGroupCacheExpirationTime(), processEngineConfiguration.getClock());
+            if (groupCacheListener != null) {
+                ldapGroupCache.setLdapCacheListener(groupCacheListener);
+            }
+        }
 
-  /**
-   * The server on which the LDAP system can be reached. For example 'ldap://localhost:33389'.
-   */
-  public void setServer(String server) {
-    this.server = server;
-  }
+        processEngineConfiguration.setIdmIdentityService(new LDAPIdentityServiceImpl(processEngineConfiguration, this, ldapGroupCache));
+    }
 
-  public int getPort() {
-    return port;
-  }
+    // Getters and Setters //////////////////////////////////////////////////
 
-  /**
-   * The port on which the LDAP system is running.
-   */
-  public void setPort(int port) {
-    this.port = port;
-  }
+    public String getServer() {
+        return server;
+    }
 
-  public String getUser() {
-    return user;
-  }
+    /**
+     * The server on which the LDAP system can be reached. For example 'ldap://localhost:33389'.
+     */
+    public void setServer(String server) {
+        this.server = server;
+    }
 
-  /**
-   * The user id that is used to connect to the LDAP system.
-   */
-  public void setUser(String user) {
-    this.user = user;
-  }
+    public int getPort() {
+        return port;
+    }
 
-  public String getPassword() {
-    return password;
-  }
+    /**
+     * The port on which the LDAP system is running.
+     */
+    public void setPort(int port) {
+        this.port = port;
+    }
 
-  /**
-   * The password that is used to connect to the LDAP system.
-   */
-  public void setPassword(String password) {
-    this.password = password;
-  }
+    public String getUser() {
+        return user;
+    }
 
-  public String getInitialContextFactory() {
-    return initialContextFactory;
-  }
+    /**
+     * The user id that is used to connect to the LDAP system.
+     */
+    public void setUser(String user) {
+        this.user = user;
+    }
 
-  /**
-   * The {@link InitialContextFactory} name used to connect to the LDAP system.
-   * 
-   * By default set to 'com.sun.jndi.ldap.LdapCtxFactory'.
-   */
-  public void setInitialContextFactory(String initialContextFactory) {
-    this.initialContextFactory = initialContextFactory;
-  }
+    public String getPassword() {
+        return password;
+    }
 
-  public String getSecurityAuthentication() {
-    return securityAuthentication;
-  }
+    /**
+     * The password that is used to connect to the LDAP system.
+     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-  /**
-   * The value that is used for the 'java.naming.security.authentication' property used to connect to the LDAP system.
-   * 
-   * By default set to 'simple'.
-   */
-  public void setSecurityAuthentication(String securityAuthentication) {
-    this.securityAuthentication = securityAuthentication;
-  }
+    public String getInitialContextFactory() {
+        return initialContextFactory;
+    }
 
-  public Map<String, String> getCustomConnectionParameters() {
-    return customConnectionParameters;
-  }
+    /**
+     * The {@link InitialContextFactory} name used to connect to the LDAP system.
+     * 
+     * By default set to 'com.sun.jndi.ldap.LdapCtxFactory'.
+     */
+    public void setInitialContextFactory(String initialContextFactory) {
+        this.initialContextFactory = initialContextFactory;
+    }
 
-  /**
-   * Allows to set all LDAP connection parameters which do not have a dedicated setter. See for example http://docs.oracle.com/javase/tutorial/jndi/ldap/jndi.html for custom properties. Such
-   * properties are for example to configure connection pooling, specific security settings, etc.
-   * 
-   * All the provided parameters will be provided when creating a {@link InitialDirContext}, ie when a connection to the LDAP system is established.
-   */
-  public void setCustomConnectionParameters(Map<String, String> customConnectionParameters) {
-    this.customConnectionParameters = customConnectionParameters;
-  }
+    public String getSecurityAuthentication() {
+        return securityAuthentication;
+    }
 
-  public String getBaseDn() {
-    return baseDn;
-  }
+    /**
+     * The value that is used for the 'java.naming.security.authentication' property used to connect to the LDAP system.
+     * 
+     * By default set to 'simple'.
+     */
+    public void setSecurityAuthentication(String securityAuthentication) {
+        this.securityAuthentication = securityAuthentication;
+    }
 
-  /**
-   * The base 'distinguished name' (DN) from which the searches for users and groups are started.
-   * 
-   * Use {@link #setUserBaseDn(String)} or {@link #setGroupBaseDn(String)} when needing to differentiate between user and group base DN.
-   */
-  public void setBaseDn(String baseDn) {
-    this.baseDn = baseDn;
-  }
+    public Map<String, String> getCustomConnectionParameters() {
+        return customConnectionParameters;
+    }
 
-  public String getUserBaseDn() {
-    return userBaseDn;
-  }
+    /**
+     * Allows to set all LDAP connection parameters which do not have a dedicated setter. See for example http://docs.oracle.com/javase/tutorial/jndi/ldap/jndi.html for custom properties. Such
+     * properties are for example to configure connection pooling, specific security settings, etc.
+     * 
+     * All the provided parameters will be provided when creating a {@link InitialDirContext}, ie when a connection to the LDAP system is established.
+     */
+    public void setCustomConnectionParameters(Map<String, String> customConnectionParameters) {
+        this.customConnectionParameters = customConnectionParameters;
+    }
 
-  /**
-   * The base 'distinguished name' (DN) from which the searches for users are started.
-   */
-  public void setUserBaseDn(String userBaseDn) {
-    this.userBaseDn = userBaseDn;
-  }
+    public String getBaseDn() {
+        return baseDn;
+    }
 
-  public String getGroupBaseDn() {
-    return groupBaseDn;
-  }
+    /**
+     * The base 'distinguished name' (DN) from which the searches for users and groups are started.
+     * 
+     * Use {@link #setUserBaseDn(String)} or {@link #setGroupBaseDn(String)} when needing to differentiate between user and group base DN.
+     */
+    public void setBaseDn(String baseDn) {
+        this.baseDn = baseDn;
+    }
 
-  /**
-   * The base 'distinguished name' (DN) from which the searches for groups are started.
-   */
-  public void setGroupBaseDn(String groupBaseDn) {
-    this.groupBaseDn = groupBaseDn;
-  }
+    public String getUserBaseDn() {
+        return userBaseDn;
+    }
 
-  public int getSearchTimeLimit() {
-    return searchTimeLimit;
-  }
+    /**
+     * The base 'distinguished name' (DN) from which the searches for users are started.
+     */
+    public void setUserBaseDn(String userBaseDn) {
+        this.userBaseDn = userBaseDn;
+    }
 
-  /**
-   * The timeout that is used when doing a search in LDAP. By default set to '0', which means 'wait forever'.
-   */
-  public void setSearchTimeLimit(int searchTimeLimit) {
-    this.searchTimeLimit = searchTimeLimit;
-  }
+    public String getGroupBaseDn() {
+        return groupBaseDn;
+    }
 
-  public String getQueryUserByUserId() {
-    return queryUserByUserId;
-  }
+    /**
+     * The base 'distinguished name' (DN) from which the searches for groups are started.
+     */
+    public void setGroupBaseDn(String groupBaseDn) {
+        this.groupBaseDn = groupBaseDn;
+    }
 
-  /**
-   * The query that is executed when searching for a user by userId.
-   * 
-   * For example: (&amp;(objectClass=inetOrgPerson)(uid={0}))
-   * 
-   * Here, all the objects in LDAP with the class 'inetOrgPerson' and who have the matching 'uid' attribute value will be returned.
-   * 
-   * As shown in the example, the user id is injected by the typical {@link MessageFormat}, ie by using <i>{0}</i>
-   * 
-   * If setting the query alone is insufficient for your specific LDAP setup, you can alternatively plug in a different {@link LDAPQueryBuilder}, which allows for more customization than only the
-   * query.
-   */
-  public void setQueryUserByUserId(String queryUserByUserId) {
-    this.queryUserByUserId = queryUserByUserId;
-  }
+    public int getSearchTimeLimit() {
+        return searchTimeLimit;
+    }
 
-  public String getQueryGroupsForUser() {
-    return queryGroupsForUser;
-  }
+    /**
+     * The timeout that is used when doing a search in LDAP. By default set to '0', which means 'wait forever'.
+     */
+    public void setSearchTimeLimit(int searchTimeLimit) {
+        this.searchTimeLimit = searchTimeLimit;
+    }
 
-  public String getQueryUserByFullNameLike() {
-    return queryUserByFullNameLike;
-  }
+    public String getQueryUserByUserId() {
+        return queryUserByUserId;
+    }
 
-  /**
-   * The query that is executed when searching for a user by full name.
-   * 
-   * For example: (&amp;(objectClass=inetOrgPerson)(|({0}=*{1}*)({2}={3})))
-   * 
-   * Here, all the objects in LDAP with the class 'inetOrgPerson' and who have the matching first name or last name will be returned
-   * 
-   * Several things will be injected in the expression: {0} : the first name attribute {1} : the search text {2} : the last name attribute {3} : the search text
-   * 
-   * If setting the query alone is insufficient for your specific LDAP setup, you can alternatively plug in a different {@link LDAPQueryBuilder}, which allows for more customization than only the
-   * query.
-   */
-  public void setQueryUserByFullNameLike(String queryUserByFullNameLike) {
-    this.queryUserByFullNameLike = queryUserByFullNameLike;
-  }
+    /**
+     * The query that is executed when searching for a user by userId.
+     * 
+     * For example: (&amp;(objectClass=inetOrgPerson)(uid={0}))
+     * 
+     * Here, all the objects in LDAP with the class 'inetOrgPerson' and who have the matching 'uid' attribute value will be returned.
+     * 
+     * As shown in the example, the user id is injected by the typical {@link MessageFormat}, ie by using <i>{0}</i>
+     * 
+     * If setting the query alone is insufficient for your specific LDAP setup, you can alternatively plug in a different {@link LDAPQueryBuilder}, which allows for more customization than only the
+     * query.
+     */
+    public void setQueryUserByUserId(String queryUserByUserId) {
+        this.queryUserByUserId = queryUserByUserId;
+    }
 
-  /**
-   * The query that is executed when searching for the groups of a specific user.
-   * 
-   * For example: (&amp;(objectClass=groupOfUniqueNames)(uniqueMember={0}))
-   * 
-   * Here, all the objects in LDAP with the class 'groupOfUniqueNames' and where the provided DN is a 'uniqueMember' are returned.
-   * 
-   * As shown in the example, the user id is injected by the typical {@link MessageFormat}, ie by using <i>{0}</i>
-   * 
-   * If setting the query alone is insufficient for your specific LDAP setup, you can alternatively plug in a different {@link LDAPQueryBuilder}, which allows for more customization than only the
-   * query.
-   */
-  public void setQueryGroupsForUser(String queryGroupsForUser) {
-    this.queryGroupsForUser = queryGroupsForUser;
-  }
+    public String getQueryGroupsForUser() {
+        return queryGroupsForUser;
+    }
 
-  public String getUserIdAttribute() {
-    return userIdAttribute;
-  }
+    public String getQueryUserByFullNameLike() {
+        return queryUserByFullNameLike;
+    }
 
-  /**
-   * Name of the attribute that matches the user id.
-   * 
-   * This property is used when looking for a {@link User} object and the mapping between the LDAP object and the Flowable {@link User} object is done.
-   * 
-   * This property is optional and is only needed if searching for {@link User} objects using the Flowable API.
-   */
-  public void setUserIdAttribute(String userIdAttribute) {
-    this.userIdAttribute = userIdAttribute;
-  }
+    /**
+     * The query that is executed when searching for a user by full name.
+     * 
+     * For example: (&amp;(objectClass=inetOrgPerson)(|({0}=*{1}*)({2}={3})))
+     * 
+     * Here, all the objects in LDAP with the class 'inetOrgPerson' and who have the matching first name or last name will be returned
+     * 
+     * Several things will be injected in the expression: {0} : the first name attribute {1} : the search text {2} : the last name attribute {3} : the search text
+     * 
+     * If setting the query alone is insufficient for your specific LDAP setup, you can alternatively plug in a different {@link LDAPQueryBuilder}, which allows for more customization than only the
+     * query.
+     */
+    public void setQueryUserByFullNameLike(String queryUserByFullNameLike) {
+        this.queryUserByFullNameLike = queryUserByFullNameLike;
+    }
 
-  public String getUserFirstNameAttribute() {
-    return userFirstNameAttribute;
-  }
+    /**
+     * The query that is executed when searching for the groups of a specific user.
+     * 
+     * For example: (&amp;(objectClass=groupOfUniqueNames)(uniqueMember={0}))
+     * 
+     * Here, all the objects in LDAP with the class 'groupOfUniqueNames' and where the provided DN is a 'uniqueMember' are returned.
+     * 
+     * As shown in the example, the user id is injected by the typical {@link MessageFormat}, ie by using <i>{0}</i>
+     * 
+     * If setting the query alone is insufficient for your specific LDAP setup, you can alternatively plug in a different {@link LDAPQueryBuilder}, which allows for more customization than only the
+     * query.
+     */
+    public void setQueryGroupsForUser(String queryGroupsForUser) {
+        this.queryGroupsForUser = queryGroupsForUser;
+    }
 
-  /**
-   * Name of the attribute that matches the user first name.
-   * 
-   * This property is used when looking for a {@link User} object and the mapping between the LDAP object and the Flowable {@link User} object is done.
-   */
-  public void setUserFirstNameAttribute(String userFirstNameAttribute) {
-    this.userFirstNameAttribute = userFirstNameAttribute;
-  }
+    public String getUserIdAttribute() {
+        return userIdAttribute;
+    }
 
-  public String getUserLastNameAttribute() {
-    return userLastNameAttribute;
-  }
+    /**
+     * Name of the attribute that matches the user id.
+     * 
+     * This property is used when looking for a {@link User} object and the mapping between the LDAP object and the Flowable {@link User} object is done.
+     * 
+     * This property is optional and is only needed if searching for {@link User} objects using the Flowable API.
+     */
+    public void setUserIdAttribute(String userIdAttribute) {
+        this.userIdAttribute = userIdAttribute;
+    }
 
-  /**
-   * Name of the attribute that matches the user last name.
-   * 
-   * This property is used when looking for a {@link User} object and the mapping between the LDAP object and the Flowable {@link User} object is done.
-   */
-  public void setUserLastNameAttribute(String userLastNameAttribute) {
-    this.userLastNameAttribute = userLastNameAttribute;
-  }
+    public String getUserFirstNameAttribute() {
+        return userFirstNameAttribute;
+    }
 
-  public String getUserEmailAttribute() {
-    return userEmailAttribute;
-  }
+    /**
+     * Name of the attribute that matches the user first name.
+     * 
+     * This property is used when looking for a {@link User} object and the mapping between the LDAP object and the Flowable {@link User} object is done.
+     */
+    public void setUserFirstNameAttribute(String userFirstNameAttribute) {
+        this.userFirstNameAttribute = userFirstNameAttribute;
+    }
 
-  /**
-   * Name of the attribute that matches the user email.
-   * 
-   * This property is used when looking for a {@link User} object and the mapping between the LDAP object and the Flowable {@link User} object is done.
-   */
-  public void setUserEmailAttribute(String userEmailAttribute) {
-    this.userEmailAttribute = userEmailAttribute;
-  }
+    public String getUserLastNameAttribute() {
+        return userLastNameAttribute;
+    }
 
-  public String getGroupIdAttribute() {
-    return groupIdAttribute;
-  }
+    /**
+     * Name of the attribute that matches the user last name.
+     * 
+     * This property is used when looking for a {@link User} object and the mapping between the LDAP object and the Flowable {@link User} object is done.
+     */
+    public void setUserLastNameAttribute(String userLastNameAttribute) {
+        this.userLastNameAttribute = userLastNameAttribute;
+    }
 
-  /**
-   * Name of the attribute that matches the group id.
-   * 
-   * This property is used when looking for a {@link Group} object and the mapping between the LDAP object and the Flowable {@link Group} object is done.
-   */
-  public void setGroupIdAttribute(String groupIdAttribute) {
-    this.groupIdAttribute = groupIdAttribute;
-  }
+    public String getUserEmailAttribute() {
+        return userEmailAttribute;
+    }
 
-  public String getGroupNameAttribute() {
-    return groupNameAttribute;
-  }
+    /**
+     * Name of the attribute that matches the user email.
+     * 
+     * This property is used when looking for a {@link User} object and the mapping between the LDAP object and the Flowable {@link User} object is done.
+     */
+    public void setUserEmailAttribute(String userEmailAttribute) {
+        this.userEmailAttribute = userEmailAttribute;
+    }
 
-  /**
-   * Name of the attribute that matches the group name.
-   * 
-   * This property is used when looking for a {@link Group} object and the mapping between the LDAP object and the Flowable {@link Group} object is done.
-   */
-  public void setGroupNameAttribute(String groupNameAttribute) {
-    this.groupNameAttribute = groupNameAttribute;
-  }
+    public String getGroupIdAttribute() {
+        return groupIdAttribute;
+    }
 
-  public String getGroupTypeAttribute() {
-    return groupTypeAttribute;
-  }
+    /**
+     * Name of the attribute that matches the group id.
+     * 
+     * This property is used when looking for a {@link Group} object and the mapping between the LDAP object and the Flowable {@link Group} object is done.
+     */
+    public void setGroupIdAttribute(String groupIdAttribute) {
+        this.groupIdAttribute = groupIdAttribute;
+    }
 
-  /**
-   * Name of the attribute that matches the group type.
-   * 
-   * This property is used when looking for a {@link Group} object and the mapping between the LDAP object and the Flowable {@link Group} object is done.
-   */
-  public void setGroupTypeAttribute(String groupTypeAttribute) {
-    this.groupTypeAttribute = groupTypeAttribute;
-  }
+    public String getGroupNameAttribute() {
+        return groupNameAttribute;
+    }
 
-  /**
-   * Set a custom {@link LDAPQueryBuilder} if the default implementation is not suitable. The {@link LDAPQueryBuilder} instance is used when the {@link LDAPUserManager} or {@link LDAPGroupManager}
-   * does an actual query against the LDAP system.
-   * 
-   * The default implementation uses the properties as set on this instance such as {@link #setQueryGroupsForUser(String)} and {@link #setQueryUserByUserId(String)}.
-   */
-  public LDAPQueryBuilder getLdapQueryBuilder() {
-    return ldapQueryBuilder;
-  }
+    /**
+     * Name of the attribute that matches the group name.
+     * 
+     * This property is used when looking for a {@link Group} object and the mapping between the LDAP object and the Flowable {@link Group} object is done.
+     */
+    public void setGroupNameAttribute(String groupNameAttribute) {
+        this.groupNameAttribute = groupNameAttribute;
+    }
 
-  public void setLdapQueryBuilder(LDAPQueryBuilder ldapQueryBuilder) {
-    this.ldapQueryBuilder = ldapQueryBuilder;
-  }
+    public String getGroupTypeAttribute() {
+        return groupTypeAttribute;
+    }
 
-  public int getGroupCacheSize() {
-    return groupCacheSize;
-  }
+    /**
+     * Name of the attribute that matches the group type.
+     * 
+     * This property is used when looking for a {@link Group} object and the mapping between the LDAP object and the Flowable {@link Group} object is done.
+     */
+    public void setGroupTypeAttribute(String groupTypeAttribute) {
+        this.groupTypeAttribute = groupTypeAttribute;
+    }
 
-  /**
-   * Allows to set the size of the {@link LDAPGroupCache}. This is an LRU cache that caches groups for users and thus avoids hitting the LDAP system each time the groups of a user needs to be known.
-   * 
-   * The cache will not be instantiated if the value is less then zero. By default set to -1, so no caching is done.
-   * 
-   * Note that the group cache is instantiated on the {@link LDAPGroupManagerFactory}. As such, if you have a custom implementation of the {@link LDAPGroupManagerFactory}, do not forget to add the
-   * group cache functionality.
-   */
-  public void setGroupCacheSize(int groupCacheSize) {
-    this.groupCacheSize = groupCacheSize;
-  }
+    /**
+     * Set a custom {@link LDAPQueryBuilder} if the default implementation is not suitable. The {@link LDAPQueryBuilder} instance is used when the {@link LDAPUserManager} or {@link LDAPGroupManager}
+     * does an actual query against the LDAP system.
+     * 
+     * The default implementation uses the properties as set on this instance such as {@link #setQueryGroupsForUser(String)} and {@link #setQueryUserByUserId(String)}.
+     */
+    public LDAPQueryBuilder getLdapQueryBuilder() {
+        return ldapQueryBuilder;
+    }
 
-  public long getGroupCacheExpirationTime() {
-    return groupCacheExpirationTime;
-  }
+    public void setLdapQueryBuilder(LDAPQueryBuilder ldapQueryBuilder) {
+        this.ldapQueryBuilder = ldapQueryBuilder;
+    }
 
-  /**
-   * Sets the expiration time of the {@link LDAPGroupCache} in milliseconds. When groups for a specific user are fetched, and if the group cache exists (see {@link #setGroupCacheSize(int)}), the
-   * groups will be stored in this cache for the time set in this property. ie. when the groups were fetched at 00:00 and the expiration time is 30 mins, any fetch of the groups for that user after
-   * 00:30 will not come from the cache, but do a fetch again from the LDAP system. Likewise, everything group fetch for that user done between 00:00 - 00:30 will come from the cache.
-   * 
-   * By default set to one hour.
-   */
-  public void setGroupCacheExpirationTime(long groupCacheExpirationTime) {
-    this.groupCacheExpirationTime = groupCacheExpirationTime;
-  }
+    public int getGroupCacheSize() {
+        return groupCacheSize;
+    }
 
-  public LDAPGroupCacheListener getGroupCacheListener() {
-    return groupCacheListener;
-  }
+    /**
+     * Allows to set the size of the {@link LDAPGroupCache}. This is an LRU cache that caches groups for users and thus avoids hitting the LDAP system each time the groups of a user needs to be known.
+     * 
+     * The cache will not be instantiated if the value is less then zero. By default set to -1, so no caching is done.
+     * 
+     * Note that the group cache is instantiated on the {@link LDAPGroupManagerFactory}. As such, if you have a custom implementation of the {@link LDAPGroupManagerFactory}, do not forget to add the
+     * group cache functionality.
+     */
+    public void setGroupCacheSize(int groupCacheSize) {
+        this.groupCacheSize = groupCacheSize;
+    }
 
-  public void setGroupCacheListener(LDAPGroupCacheListener groupCacheListener) {
-    this.groupCacheListener = groupCacheListener;
-  }
-  
+    public long getGroupCacheExpirationTime() {
+        return groupCacheExpirationTime;
+    }
+
+    /**
+     * Sets the expiration time of the {@link LDAPGroupCache} in milliseconds. When groups for a specific user are fetched, and if the group cache exists (see {@link #setGroupCacheSize(int)}), the
+     * groups will be stored in this cache for the time set in this property. ie. when the groups were fetched at 00:00 and the expiration time is 30 mins, any fetch of the groups for that user after
+     * 00:30 will not come from the cache, but do a fetch again from the LDAP system. Likewise, everything group fetch for that user done between 00:00 - 00:30 will come from the cache.
+     * 
+     * By default set to one hour.
+     */
+    public void setGroupCacheExpirationTime(long groupCacheExpirationTime) {
+        this.groupCacheExpirationTime = groupCacheExpirationTime;
+    }
+
+    public LDAPGroupCacheListener getGroupCacheListener() {
+        return groupCacheListener;
+    }
+
+    public void setGroupCacheListener(LDAPGroupCacheListener groupCacheListener) {
+        this.groupCacheListener = groupCacheListener;
+    }
+
 }

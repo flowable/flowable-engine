@@ -28,62 +28,62 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
  * @author Joram Barrez
  */
 public class ContentEngineConfigurator extends AbstractProcessEngineConfigurator {
-  
-  protected ContentEngineConfiguration contentEngineConfiguration;
-  
-  @Override
-  public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    if (contentEngineConfiguration == null) {
-      contentEngineConfiguration = new StandaloneContentEngineConfiguration();
-    
-      if (processEngineConfiguration.getDataSource() != null) {
-        DataSource originalDatasource = processEngineConfiguration.getDataSource();
-        if (processEngineConfiguration.isTransactionsExternallyManaged()) {
-          contentEngineConfiguration.setDataSource(originalDatasource);
-        } else {
-          contentEngineConfiguration.setDataSource(new TransactionContextAwareDataSource(originalDatasource));
+
+    protected ContentEngineConfiguration contentEngineConfiguration;
+
+    @Override
+    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        if (contentEngineConfiguration == null) {
+            contentEngineConfiguration = new StandaloneContentEngineConfiguration();
+
+            if (processEngineConfiguration.getDataSource() != null) {
+                DataSource originalDatasource = processEngineConfiguration.getDataSource();
+                if (processEngineConfiguration.isTransactionsExternallyManaged()) {
+                    contentEngineConfiguration.setDataSource(originalDatasource);
+                } else {
+                    contentEngineConfiguration.setDataSource(new TransactionContextAwareDataSource(originalDatasource));
+                }
+
+            } else {
+                throw new FlowableException("A datasource is required for initializing the Content engine ");
+            }
+
+            contentEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
+            contentEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
+            contentEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
+            contentEngineConfiguration.setDatabaseTablePrefix(processEngineConfiguration.getDatabaseTablePrefix());
+            contentEngineConfiguration.setDatabaseWildcardEscapeCharacter(processEngineConfiguration.getDatabaseWildcardEscapeCharacter());
+
+            if (processEngineConfiguration.isTransactionsExternallyManaged()) {
+                contentEngineConfiguration.setTransactionsExternallyManaged(true);
+            } else {
+                contentEngineConfiguration.setTransactionFactory(
+                        new TransactionContextAwareTransactionFactory<org.flowable.content.engine.impl.cfg.TransactionContext>(
+                                org.flowable.content.engine.impl.cfg.TransactionContext.class));
+            }
+
         }
-        
-      } else {
-        throw new FlowableException("A datasource is required for initializing the Content engine ");
-      }
-      
-      contentEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
-      contentEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
-      contentEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
-      contentEngineConfiguration.setDatabaseTablePrefix(processEngineConfiguration.getDatabaseTablePrefix());
-      contentEngineConfiguration.setDatabaseWildcardEscapeCharacter(processEngineConfiguration.getDatabaseWildcardEscapeCharacter());
-      
-      if (processEngineConfiguration.isTransactionsExternallyManaged()) {
-        contentEngineConfiguration.setTransactionsExternallyManaged(true);
-       } else {
-         contentEngineConfiguration.setTransactionFactory(
-             new TransactionContextAwareTransactionFactory<org.flowable.content.engine.impl.cfg.TransactionContext>(
-                   org.flowable.content.engine.impl.cfg.TransactionContext.class));
-       }
-      
+
+        ContentEngine contentEngine = initContentEngine();
+        processEngineConfiguration.setContentEngineInitialized(true);
+        processEngineConfiguration.setContentService(contentEngine.getContentService());
     }
-    
-    ContentEngine contentEngine = initContentEngine();
-    processEngineConfiguration.setContentEngineInitialized(true);
-    processEngineConfiguration.setContentService(contentEngine.getContentService());
-  }
 
-  protected synchronized ContentEngine initContentEngine() {
-    if (contentEngineConfiguration == null) {
-      throw new FlowableException("ContentEngineConfiguration is required");
+    protected synchronized ContentEngine initContentEngine() {
+        if (contentEngineConfiguration == null) {
+            throw new FlowableException("ContentEngineConfiguration is required");
+        }
+
+        return contentEngineConfiguration.buildContentEngine();
     }
-    
-    return contentEngineConfiguration.buildContentEngine();
-  }
 
-  public ContentEngineConfiguration getContentEngineConfiguration() {
-    return contentEngineConfiguration;
-  }
+    public ContentEngineConfiguration getContentEngineConfiguration() {
+        return contentEngineConfiguration;
+    }
 
-  public ContentEngineConfigurator setContentEngineConfiguration(ContentEngineConfiguration contentEngineConfiguration) {
-    this.contentEngineConfiguration = contentEngineConfiguration;
-    return this;
-  }
+    public ContentEngineConfigurator setContentEngineConfiguration(ContentEngineConfiguration contentEngineConfiguration) {
+        this.contentEngineConfiguration = contentEngineConfiguration;
+        return this;
+    }
 
 }

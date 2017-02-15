@@ -23,15 +23,15 @@ import org.flowable.rest.service.api.RestResponseFactory;
  */
 public class EventSubscriptionPaginateList extends AbstractPaginateList {
 
-  protected RestResponseFactory restResponseFactory;
+    protected RestResponseFactory restResponseFactory;
 
-  public EventSubscriptionPaginateList(RestResponseFactory restResponseFactory) {
-    this.restResponseFactory = restResponseFactory;
-  }
+    public EventSubscriptionPaginateList(RestResponseFactory restResponseFactory) {
+        this.restResponseFactory = restResponseFactory;
+    }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  @Override
-  protected List processList(List list) {
-    return restResponseFactory.createEventSubscriptionResponseList(list);
-  }
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
+    protected List processList(List list) {
+        return restResponseFactory.createEventSubscriptionResponseList(list);
+    }
 }

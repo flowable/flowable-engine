@@ -24,171 +24,171 @@ import org.flowable.engine.test.Deployment;
  */
 public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
 
-  @Deployment
-  public void testInterruptingUnderProcessDefinition() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    @Deployment
+    public void testInterruptingUnderProcessDefinition() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
-    // the process instance must have a timer job:
-    Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertNotNull(job);
+        // the process instance must have a timer job:
+        Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(job);
 
-    // if we trigger the usertask, the process terminates and the timer job is removed:
-    Task task = taskService.createTaskQuery().singleResult();
-    assertEquals("task", task.getTaskDefinitionKey());
-    taskService.complete(task.getId());
-    
-    assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
-    assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
-    assertProcessEnded(processInstance.getId());
+        // if we trigger the usertask, the process terminates and the timer job is removed:
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("task", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
 
-    // now we start a new instance but this time we trigger the timer job:
-    processInstance = runtimeService.startProcessInstanceByKey("process");
-    job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertNotNull(job);
-    job = managementService.moveTimerToExecutableJob(job.getId());
-    managementService.executeJob(job.getId());
+        assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertProcessEnded(processInstance.getId());
 
-    task = taskService.createTaskQuery().singleResult();
-    assertEquals("eventSubProcessTask", task.getTaskDefinitionKey());
-    taskService.complete(task.getId());
-    assertProcessEnded(processInstance.getId());
-    assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
-    assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
-  }
+        // now we start a new instance but this time we trigger the timer job:
+        processInstance = runtimeService.startProcessInstanceByKey("process");
+        job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(job);
+        job = managementService.moveTimerToExecutableJob(job.getId());
+        managementService.executeJob(job.getId());
 
-  @Deployment
-  public void testNonInterruptingUnderProcessDefinition() {
+        task = taskService.createTaskQuery().singleResult();
+        assertEquals("eventSubProcessTask", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+        assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+    }
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    @Deployment
+    public void testNonInterruptingUnderProcessDefinition() {
 
-    // the process instance must have a timer job:
-    Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertNotNull(job);
-    assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
-    // if we trigger the usertask, the process terminates and the event subscription is removed:
-    Task task = taskService.createTaskQuery().singleResult();
-    assertEquals("task", task.getTaskDefinitionKey());
-    taskService.complete(task.getId());
-    assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
-    assertEquals(0, runtimeService.createExecutionQuery().count());
+        // the process instance must have a timer job:
+        Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(job);
+        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
 
-    // now we start a new instance but this time we trigger the event subprocess:
-    processInstance = runtimeService.startProcessInstanceByKey("process");
-    job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertNotNull(job);
-    job = managementService.moveTimerToExecutableJob(job.getId());
-    managementService.executeJob(job.getId());
+        // if we trigger the usertask, the process terminates and the event subscription is removed:
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("task", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+        assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(0, runtimeService.createExecutionQuery().count());
 
-    assertEquals(2, taskService.createTaskQuery().count());
+        // now we start a new instance but this time we trigger the event subprocess:
+        processInstance = runtimeService.startProcessInstanceByKey("process");
+        job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(job);
+        job = managementService.moveTimerToExecutableJob(job.getId());
+        managementService.executeJob(job.getId());
 
-    // now let's first complete the task in the main flow:
-    task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
-    taskService.complete(task.getId());
-    
-    // we still have 3 executions:
-    assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(2, taskService.createTaskQuery().count());
 
-    // now let's complete the task in the event subprocess
-    task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
-    taskService.complete(task.getId());
-    
-    // done!
-    assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        // now let's first complete the task in the main flow:
+        task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
+        taskService.complete(task.getId());
 
-    // #################### again, the other way around:
+        // we still have 3 executions:
+        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
 
-    processInstance = runtimeService.startProcessInstanceByKey("process");
-    job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertNotNull(job);
-    job = managementService.moveTimerToExecutableJob(job.getId());
-    managementService.executeJob(job.getId());
+        // now let's complete the task in the event subprocess
+        task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
+        taskService.complete(task.getId());
 
-    assertEquals(2, taskService.createTaskQuery().count());
+        // done!
+        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
 
-    task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
-    taskService.complete(task.getId());
-    
-    assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
-    
-    // we still have 3 executions:
-    assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        // #################### again, the other way around:
 
-    task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
-    taskService.complete(task.getId());
-    
-    // done!
-    assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
-  }
-  
-  @Deployment
-  public void testNonInterruptingSubProcess() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
-    assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
-    
-    Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertNotNull(job);
-    assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
-    
-    job = managementService.moveTimerToExecutableJob(job.getId());
-    managementService.executeJob(job.getId());
-    assertEquals(6, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        processInstance = runtimeService.startProcessInstanceByKey("process");
+        job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(job);
+        job = managementService.moveTimerToExecutableJob(job.getId());
+        managementService.executeJob(job.getId());
 
-    assertEquals(2, taskService.createTaskQuery().count());
-    assertEquals(1, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
-    
-    job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-    job = managementService.moveTimerToExecutableJob(job.getId());
-    managementService.executeJob(job.getId());
-    assertEquals(9, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
-    
-    assertEquals(3, taskService.createTaskQuery().count());
-    assertEquals(1, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(2, taskService.createTaskQuery().count());
 
-    // now let's first complete the task in the main flow:
-    Task task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
-    taskService.complete(task.getId());
-    
-    assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
-    
-    // we still have 7 executions:
-    assertEquals(7, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
+        taskService.complete(task.getId());
 
-    // now let's complete the first task in the event subprocess
-    task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").list().get(0);
-    taskService.complete(task.getId());
-    
-    assertEquals(4, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
-    
-    // complete the second task in the event subprocess
-    task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
-    taskService.complete(task.getId());
-    
-    // done!
-    assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
-  }
-  
-  @Deployment
-  public void testInterruptingSubProcess() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
-    assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
-    
-    Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertNotNull(job);
-    assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
-    
-    job = managementService.moveTimerToExecutableJob(job.getId());
-    managementService.executeJob(job.getId());
-    assertEquals(5, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
 
-    assertEquals(1, taskService.createTaskQuery().count());
-    assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        // we still have 3 executions:
+        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
 
-    // now let's complete the task in the event subprocess
-    Task task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").list().get(0);
-    taskService.complete(task.getId());
-    
-    // done!
-    assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
-  }
+        task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
+        taskService.complete(task.getId());
+
+        // done!
+        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+    }
+
+    @Deployment
+    public void testNonInterruptingSubProcess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+
+        Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(job);
+        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+
+        job = managementService.moveTimerToExecutableJob(job.getId());
+        managementService.executeJob(job.getId());
+        assertEquals(6, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+
+        assertEquals(2, taskService.createTaskQuery().count());
+        assertEquals(1, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+
+        job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        job = managementService.moveTimerToExecutableJob(job.getId());
+        managementService.executeJob(job.getId());
+        assertEquals(9, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+
+        assertEquals(3, taskService.createTaskQuery().count());
+        assertEquals(1, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+
+        // now let's first complete the task in the main flow:
+        Task task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
+        taskService.complete(task.getId());
+
+        assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+
+        // we still have 7 executions:
+        assertEquals(7, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+
+        // now let's complete the first task in the event subprocess
+        task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").list().get(0);
+        taskService.complete(task.getId());
+
+        assertEquals(4, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+
+        // complete the second task in the event subprocess
+        task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
+        taskService.complete(task.getId());
+
+        // done!
+        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+    }
+
+    @Deployment
+    public void testInterruptingSubProcess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+
+        Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(job);
+        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+
+        job = managementService.moveTimerToExecutableJob(job.getId());
+        managementService.executeJob(job.getId());
+        assertEquals(5, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+
+        assertEquals(1, taskService.createTaskQuery().count());
+        assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+
+        // now let's complete the task in the event subprocess
+        Task task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").list().get(0);
+        taskService.complete(task.getId());
+
+        // done!
+        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+    }
 }

@@ -29,44 +29,44 @@ import org.flowable.engine.runtime.Execution;
  */
 public class GetExecutionVariableCmd implements Command<Object>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String executionId;
-  protected String variableName;
-  protected boolean isLocal;
+    private static final long serialVersionUID = 1L;
+    protected String executionId;
+    protected String variableName;
+    protected boolean isLocal;
 
-  public GetExecutionVariableCmd(String executionId, String variableName, boolean isLocal) {
-    this.executionId = executionId;
-    this.variableName = variableName;
-    this.isLocal = isLocal;
-  }
-
-  public Object execute(CommandContext commandContext) {
-    if (executionId == null) {
-      throw new FlowableIllegalArgumentException("executionId is null");
-    }
-    if (variableName == null) {
-      throw new FlowableIllegalArgumentException("variableName is null");
+    public GetExecutionVariableCmd(String executionId, String variableName, boolean isLocal) {
+        this.executionId = executionId;
+        this.variableName = variableName;
+        this.isLocal = isLocal;
     }
 
-    ExecutionEntity execution = commandContext.getExecutionEntityManager().findById(executionId);
+    public Object execute(CommandContext commandContext) {
+        if (executionId == null) {
+            throw new FlowableIllegalArgumentException("executionId is null");
+        }
+        if (variableName == null) {
+            throw new FlowableIllegalArgumentException("variableName is null");
+        }
 
-    if (execution == null) {
-      throw new FlowableObjectNotFoundException("execution " + executionId + " doesn't exist", Execution.class);
+        ExecutionEntity execution = commandContext.getExecutionEntityManager().findById(executionId);
+
+        if (execution == null) {
+            throw new FlowableObjectNotFoundException("execution " + executionId + " doesn't exist", Execution.class);
+        }
+
+        if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
+            Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+            return compatibilityHandler.getExecutionVariable(executionId, variableName, isLocal);
+        }
+
+        Object value;
+
+        if (isLocal) {
+            value = execution.getVariableLocal(variableName, false);
+        } else {
+            value = execution.getVariable(variableName, false);
+        }
+
+        return value;
     }
-    
-    if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      return compatibilityHandler.getExecutionVariable(executionId, variableName, isLocal);
-    }
-
-    Object value;
-
-    if (isLocal) {
-      value = execution.getVariableLocal(variableName, false);
-    } else {
-      value = execution.getVariable(variableName, false);
-    }
-
-    return value;
-  }
 }

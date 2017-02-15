@@ -26,11 +26,11 @@ import org.flowable.idm.engine.impl.persistence.entity.TokenEntity;
  */
 public interface TokenDataManager extends DataManager<TokenEntity> {
 
-  List<Token> findTokenByQueryCriteria(TokenQueryImpl query, Page page);
+    List<Token> findTokenByQueryCriteria(TokenQueryImpl query, Page page);
 
-  long findTokenCountByQueryCriteria(TokenQueryImpl query);
+    long findTokenCountByQueryCriteria(TokenQueryImpl query);
 
-  List<Token> findTokensByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<Token> findTokensByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
 
-  long findTokenCountByNativeQuery(Map<String, Object> parameterMap);
+    long findTokenCountByNativeQuery(Map<String, Object> parameterMap);
 }

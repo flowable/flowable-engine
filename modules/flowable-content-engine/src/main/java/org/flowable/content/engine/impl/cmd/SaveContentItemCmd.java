@@ -32,71 +32,71 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
  */
 public class SaveContentItemCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  
-  protected ContentItem contentItem;
-  protected InputStream inputStream;
+    private static final long serialVersionUID = 1L;
 
-  public SaveContentItemCmd(ContentItem contentItem) {
-    this.contentItem = contentItem;
-  }
-  
-  public SaveContentItemCmd(ContentItem contentItem, InputStream inputStream) {
-    this.contentItem = contentItem;
-    this.inputStream = inputStream;
-  }
+    protected ContentItem contentItem;
+    protected InputStream inputStream;
 
-  public Void execute(CommandContext commandContext) {
-    if (contentItem == null) {
-      throw new FlowableIllegalArgumentException("contentItem is null");
+    public SaveContentItemCmd(ContentItem contentItem) {
+        this.contentItem = contentItem;
     }
-    
-    if (!(contentItem instanceof ContentItemEntity)) {
-      throw new FlowableIllegalArgumentException("contentItem is not of type ContentItemEntity");
+
+    public SaveContentItemCmd(ContentItem contentItem, InputStream inputStream) {
+        this.contentItem = contentItem;
+        this.inputStream = inputStream;
     }
-    
-    ContentItemEntity contentItemEntity = (ContentItemEntity) contentItem;
-    
-    ContentEngineConfiguration contentEngineConfiguration = commandContext.getContentEngineConfiguration();
-    
-    if (inputStream != null) {
-      // Stream given, write to store and save a reference to the content object
-      Map<String, Object> metaData = new HashMap<String, Object>();
-      if (contentItem.getTaskId() != null) {
-        metaData.put(ContentMetaDataKeys.TASK_ID, contentItem.getTaskId());
-      } else {
-        if (contentItem.getProcessInstanceId() != null) {
-          metaData.put(ContentMetaDataKeys.PROCESS_INSTANCE_ID, contentItem.getProcessInstanceId());
+
+    public Void execute(CommandContext commandContext) {
+        if (contentItem == null) {
+            throw new FlowableIllegalArgumentException("contentItem is null");
         }
-      }
-      
-      ContentStorage contentStorage = contentEngineConfiguration.getContentStorage();
-      ContentObject createContentObject = contentStorage.createContentObject(inputStream, metaData);
-      contentItemEntity.setContentStoreId(createContentObject.getId());
-      contentItemEntity.setContentStoreName(contentStorage.getContentStoreName());
-      contentItemEntity.setContentAvailable(true);
 
-      // After storing the stream, store the length to be accessible without having to consult the
-      // underlying content storage to get file size
-      contentItemEntity.setContentSize(createContentObject.getContentLength());
-    }
-    
-    if (contentItemEntity.getLastModified() == null) {
-      contentItemEntity.setLastModified(contentEngineConfiguration.getClock().getCurrentTime());
-    }
+        if (!(contentItem instanceof ContentItemEntity)) {
+            throw new FlowableIllegalArgumentException("contentItem is not of type ContentItemEntity");
+        }
 
-    if (contentItem.getId() == null) {
-      if (contentItemEntity.getCreated() == null) {
-        contentItemEntity.setCreated(contentEngineConfiguration.getClock().getCurrentTime());
-      }
-      
-      commandContext.getContentItemEntityManager().insert(contentItemEntity);
-      
-    } else {
-      commandContext.getContentItemEntityManager().update(contentItemEntity);
+        ContentItemEntity contentItemEntity = (ContentItemEntity) contentItem;
+
+        ContentEngineConfiguration contentEngineConfiguration = commandContext.getContentEngineConfiguration();
+
+        if (inputStream != null) {
+            // Stream given, write to store and save a reference to the content object
+            Map<String, Object> metaData = new HashMap<String, Object>();
+            if (contentItem.getTaskId() != null) {
+                metaData.put(ContentMetaDataKeys.TASK_ID, contentItem.getTaskId());
+            } else {
+                if (contentItem.getProcessInstanceId() != null) {
+                    metaData.put(ContentMetaDataKeys.PROCESS_INSTANCE_ID, contentItem.getProcessInstanceId());
+                }
+            }
+
+            ContentStorage contentStorage = contentEngineConfiguration.getContentStorage();
+            ContentObject createContentObject = contentStorage.createContentObject(inputStream, metaData);
+            contentItemEntity.setContentStoreId(createContentObject.getId());
+            contentItemEntity.setContentStoreName(contentStorage.getContentStoreName());
+            contentItemEntity.setContentAvailable(true);
+
+            // After storing the stream, store the length to be accessible without having to consult the
+            // underlying content storage to get file size
+            contentItemEntity.setContentSize(createContentObject.getContentLength());
+        }
+
+        if (contentItemEntity.getLastModified() == null) {
+            contentItemEntity.setLastModified(contentEngineConfiguration.getClock().getCurrentTime());
+        }
+
+        if (contentItem.getId() == null) {
+            if (contentItemEntity.getCreated() == null) {
+                contentItemEntity.setCreated(contentEngineConfiguration.getClock().getCurrentTime());
+            }
+
+            commandContext.getContentItemEntityManager().insert(contentItemEntity);
+
+        } else {
+            commandContext.getContentItemEntityManager().update(contentItemEntity);
+        }
+
+        return null;
     }
-    
-    return null;
-  }
 
 }

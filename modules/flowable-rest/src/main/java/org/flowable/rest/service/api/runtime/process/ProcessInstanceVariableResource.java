@@ -44,98 +44,99 @@ import javax.servlet.http.HttpServletResponse;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Instances" }, description = "Manage Process Instances", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Process Instances" }, description = "Manage Process Instances", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceVariableResource extends BaseExecutionVariableResource {
 
-  @Autowired
-  protected ObjectMapper objectMapper;
+    @Autowired
+    protected ObjectMapper objectMapper;
 
-  @ApiOperation(value = "Get a variable for a process instance", tags = { "Process Instances" }, nickname = "getProcessInstanceVariable")
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Indicates both the process instance and variable were found and variable is returned."),
-          @ApiResponse(code = 404, message = "Indicates the requested process instance was not found or the process instance does not have a variable with the given name. Status description contains additional information about the error.")
-  })
-  @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/variables/{variableName}", method = RequestMethod.GET, produces = "application/json")
-  public RestVariable getVariable(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
-      @RequestParam(value = "scope", required = false) String scope, HttpServletRequest request) {
+    @ApiOperation(value = "Get a variable for a process instance", tags = { "Process Instances" }, nickname = "getProcessInstanceVariable")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates both the process instance and variable were found and variable is returned."),
+            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found or the process instance does not have a variable with the given name. Status description contains additional information about the error.")
+    })
+    @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/variables/{variableName}", method = RequestMethod.GET, produces = "application/json")
+    public RestVariable getVariable(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
+            @RequestParam(value = "scope", required = false) String scope, HttpServletRequest request) {
 
-    Execution execution = getProcessInstanceFromRequest(processInstanceId);
-    return getVariableFromRequest(execution, variableName, scope, false);
-  }
-
-  @ApiOperation(value = "Update a single variable on a process instance", tags = { "Process Instances" }, nickname = "updateProcessInstanceVariable")
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Indicates both the process instance and variable were found and variable is updated."),
-          @ApiResponse(code = 404, message = "Indicates the requested process instance was not found or the process instance does not have a variable with the given name. Status description contains additional information about the error.")
-  })
-  @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/variables/{variableName}", method = RequestMethod.PUT, produces = "application/json")
-  public RestVariable updateVariable(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName, HttpServletRequest request) {
-
-    Execution execution = getProcessInstanceFromRequest(processInstanceId);
-
-    RestVariable result = null;
-    if (request instanceof MultipartHttpServletRequest) {
-      result = setBinaryVariable((MultipartHttpServletRequest) request, execution, RestResponseFactory.VARIABLE_PROCESS, false);
-
-      if (!result.getName().equals(variableName)) {
-        throw new FlowableIllegalArgumentException("Variable name in the body should be equal to the name used in the requested URL.");
-      }
-
-    } else {
-      RestVariable restVariable = null;
-      try {
-        restVariable = objectMapper.readValue(request.getInputStream(), RestVariable.class);
-      } catch (Exception e) {
-        throw new FlowableIllegalArgumentException("request body could not be transformed to a RestVariable instance.");
-      }
-
-      if (restVariable == null) {
-        throw new FlowableException("Invalid body was supplied");
-      }
-      if (!restVariable.getName().equals(variableName)) {
-        throw new FlowableIllegalArgumentException("Variable name in the body should be equal to the name used in the requested URL.");
-      }
-
-      result = setSimpleVariable(restVariable, execution, false);
-    }
-    return result;
-  }
-
-  //FIXME Documentation
-  @ApiOperation(value = "Delete a variable", tags = {"Process Instances"}, nickname = "deleteProcessInstanceVariable")
-  @ApiResponses(value = {
-          @ApiResponse(code = 204, message = "Indicates the variable was found and has been deleted. Response-body is intentionally empty."),
-          @ApiResponse(code = 404, message = "Indicates the requested variable was not found.")
-  })
-  @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/variables/{variableName}", method = RequestMethod.DELETE)
-  public void deleteVariable(@ApiParam(name = "processInstanceId")  @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
-      @RequestParam(value = "scope", required = false) String scope, HttpServletResponse response) {
-
-    Execution execution = getProcessInstanceFromRequest(processInstanceId);
-    // Determine scope
-    RestVariableScope variableScope = RestVariableScope.LOCAL;
-    if (scope != null) {
-      variableScope = RestVariable.getScopeFromString(scope);
+        Execution execution = getProcessInstanceFromRequest(processInstanceId);
+        return getVariableFromRequest(execution, variableName, scope, false);
     }
 
-    if (!hasVariableOnScope(execution, variableName, variableScope)) {
-      throw new FlowableObjectNotFoundException("Execution '" + execution.getId() + "' doesn't have a variable '" + variableName + "' in scope " + variableScope.name().toLowerCase(),
-          VariableInstanceEntity.class);
+    @ApiOperation(value = "Update a single variable on a process instance", tags = { "Process Instances" }, nickname = "updateProcessInstanceVariable")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates both the process instance and variable were found and variable is updated."),
+            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found or the process instance does not have a variable with the given name. Status description contains additional information about the error.")
+    })
+    @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/variables/{variableName}", method = RequestMethod.PUT, produces = "application/json")
+    public RestVariable updateVariable(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
+            HttpServletRequest request) {
+
+        Execution execution = getProcessInstanceFromRequest(processInstanceId);
+
+        RestVariable result = null;
+        if (request instanceof MultipartHttpServletRequest) {
+            result = setBinaryVariable((MultipartHttpServletRequest) request, execution, RestResponseFactory.VARIABLE_PROCESS, false);
+
+            if (!result.getName().equals(variableName)) {
+                throw new FlowableIllegalArgumentException("Variable name in the body should be equal to the name used in the requested URL.");
+            }
+
+        } else {
+            RestVariable restVariable = null;
+            try {
+                restVariable = objectMapper.readValue(request.getInputStream(), RestVariable.class);
+            } catch (Exception e) {
+                throw new FlowableIllegalArgumentException("request body could not be transformed to a RestVariable instance.");
+            }
+
+            if (restVariable == null) {
+                throw new FlowableException("Invalid body was supplied");
+            }
+            if (!restVariable.getName().equals(variableName)) {
+                throw new FlowableIllegalArgumentException("Variable name in the body should be equal to the name used in the requested URL.");
+            }
+
+            result = setSimpleVariable(restVariable, execution, false);
+        }
+        return result;
     }
 
-    if (variableScope == RestVariableScope.LOCAL) {
-      runtimeService.removeVariableLocal(execution.getId(), variableName);
-    } else {
-      // Safe to use parentId, as the hasVariableOnScope would have
-      // stopped a global-var update on a root-execution
-      runtimeService.removeVariable(execution.getParentId(), variableName);
+    // FIXME Documentation
+    @ApiOperation(value = "Delete a variable", tags = { "Process Instances" }, nickname = "deleteProcessInstanceVariable")
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Indicates the variable was found and has been deleted. Response-body is intentionally empty."),
+            @ApiResponse(code = 404, message = "Indicates the requested variable was not found.")
+    })
+    @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/variables/{variableName}", method = RequestMethod.DELETE)
+    public void deleteVariable(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
+            @RequestParam(value = "scope", required = false) String scope, HttpServletResponse response) {
+
+        Execution execution = getProcessInstanceFromRequest(processInstanceId);
+        // Determine scope
+        RestVariableScope variableScope = RestVariableScope.LOCAL;
+        if (scope != null) {
+            variableScope = RestVariable.getScopeFromString(scope);
+        }
+
+        if (!hasVariableOnScope(execution, variableName, variableScope)) {
+            throw new FlowableObjectNotFoundException("Execution '" + execution.getId() + "' doesn't have a variable '" + variableName + "' in scope " + variableScope.name().toLowerCase(),
+                    VariableInstanceEntity.class);
+        }
+
+        if (variableScope == RestVariableScope.LOCAL) {
+            runtimeService.removeVariableLocal(execution.getId(), variableName);
+        } else {
+            // Safe to use parentId, as the hasVariableOnScope would have
+            // stopped a global-var update on a root-execution
+            runtimeService.removeVariable(execution.getParentId(), variableName);
+        }
+        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
-    response.setStatus(HttpStatus.NO_CONTENT.value());
-  }
 
-  @Override
-  protected RestVariable constructRestVariable(String variableName, Object value, RestVariableScope variableScope, String executionId, boolean includeBinary) {
+    @Override
+    protected RestVariable constructRestVariable(String variableName, Object value, RestVariableScope variableScope, String executionId, boolean includeBinary) {
 
-    return restResponseFactory.createRestVariable(variableName, value, null, executionId, RestResponseFactory.VARIABLE_PROCESS, includeBinary);
-  }
+        return restResponseFactory.createRestVariable(variableName, value, null, executionId, RestResponseFactory.VARIABLE_PROCESS, includeBinary);
+    }
 }

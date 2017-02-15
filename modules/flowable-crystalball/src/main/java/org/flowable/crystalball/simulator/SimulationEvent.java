@@ -24,119 +24,119 @@ import java.util.Map;
  */
 public class SimulationEvent {
 
-  private final long simulationTime;
-  private final String type;
-  private final Map<String, Object> properties;
-  private final int priority;
+    private final long simulationTime;
+    private final String type;
+    private final Map<String, Object> properties;
+    private final int priority;
 
-  protected SimulationEvent(Builder builder) {
-    this.simulationTime = builder.simulationTime;
-    this.type = builder.type;
-    this.properties = builder.properties;
-    this.priority = builder.priority;
+    protected SimulationEvent(Builder builder) {
+        this.simulationTime = builder.simulationTime;
+        this.type = builder.type;
+        this.properties = builder.properties;
+        this.priority = builder.priority;
 
-  }
-
-  public Object getProperty() {
-    return properties.entrySet().iterator().next().getValue();
-  }
-
-  public Object getProperty(String name) {
-    return properties.get(name);
-  }
-
-  public long getSimulationTime() {
-    return simulationTime;
-  }
-
-  public String getType() {
-    return type;
-  }
-
-  public int getPriority() {
-    return priority;
-  }
-
-  @Override
-  public String toString() {
-    String date = hasSimulationTime() ? (new Date(simulationTime)).toString() + ", " : "now ";
-    return date + type + ", " + priority + ", " + properties;
-  }
-
-  public Map<String, Object> getProperties() {
-    return properties;
-  }
-
-  public boolean hasSimulationTime() {
-    return this.simulationTime != Long.MIN_VALUE;
-  }
-
-  public static class Builder {
-    // required
-    private long simulationTime;
-    private String type;
-
-    // optional
-    private Map<String, Object> properties;
-    private Object property;
-    private int priority;
-
-    public Builder(String type) {
-      this.type = type;
-      this.simulationTime = Long.MIN_VALUE;
     }
 
-    public Builder simulationTime(long simulationTime) {
-      this.simulationTime = simulationTime;
-      return this;
+    public Object getProperty() {
+        return properties.entrySet().iterator().next().getValue();
     }
 
-    public Builder properties(Map<String, Object> properties) {
-      this.properties = properties;
-      return this;
+    public Object getProperty(String name) {
+        return properties.get(name);
     }
 
-    public Builder property(Object property) {
-      this.property = property;
-      return this;
+    public long getSimulationTime() {
+        return simulationTime;
     }
 
-    public Builder priority(int priority) {
-      this.priority = priority;
-      return this;
+    public String getType() {
+        return type;
     }
 
-    public SimulationEvent build() {
-      return new SimulationEvent(this);
-    }
-  }
-
-  public static class Factory implements FactoryBean<SimulationEvent> {
-    private long simulationTime;
-    private String type;
-    private Map<String, Object> properties;
-    private int priority;
-
-    public Factory(String type, long simulationTime, Map<String, Object> properties) {
-      this.type = type;
-      this.simulationTime = simulationTime;
-      this.properties = properties;
+    public int getPriority() {
+        return priority;
     }
 
     @Override
-    public SimulationEvent getObject() throws Exception {
-      return new Builder(this.type).simulationTime(this.simulationTime).properties(this.properties).priority(this.priority).build();
+    public String toString() {
+        String date = hasSimulationTime() ? (new Date(simulationTime)).toString() + ", " : "now ";
+        return date + type + ", " + priority + ", " + properties;
     }
 
-    @Override
-    public Class<?> getObjectType() {
-      return SimulationEvent.class;
+    public Map<String, Object> getProperties() {
+        return properties;
     }
 
-    @Override
-    public boolean isSingleton() {
-      return false;
+    public boolean hasSimulationTime() {
+        return this.simulationTime != Long.MIN_VALUE;
     }
-  }
+
+    public static class Builder {
+        // required
+        private long simulationTime;
+        private String type;
+
+        // optional
+        private Map<String, Object> properties;
+        private Object property;
+        private int priority;
+
+        public Builder(String type) {
+            this.type = type;
+            this.simulationTime = Long.MIN_VALUE;
+        }
+
+        public Builder simulationTime(long simulationTime) {
+            this.simulationTime = simulationTime;
+            return this;
+        }
+
+        public Builder properties(Map<String, Object> properties) {
+            this.properties = properties;
+            return this;
+        }
+
+        public Builder property(Object property) {
+            this.property = property;
+            return this;
+        }
+
+        public Builder priority(int priority) {
+            this.priority = priority;
+            return this;
+        }
+
+        public SimulationEvent build() {
+            return new SimulationEvent(this);
+        }
+    }
+
+    public static class Factory implements FactoryBean<SimulationEvent> {
+        private long simulationTime;
+        private String type;
+        private Map<String, Object> properties;
+        private int priority;
+
+        public Factory(String type, long simulationTime, Map<String, Object> properties) {
+            this.type = type;
+            this.simulationTime = simulationTime;
+            this.properties = properties;
+        }
+
+        @Override
+        public SimulationEvent getObject() throws Exception {
+            return new Builder(this.type).simulationTime(this.simulationTime).properties(this.properties).priority(this.priority).build();
+        }
+
+        @Override
+        public Class<?> getObjectType() {
+            return SimulationEvent.class;
+        }
+
+        @Override
+        public boolean isSingleton() {
+            return false;
+        }
+    }
 
 }

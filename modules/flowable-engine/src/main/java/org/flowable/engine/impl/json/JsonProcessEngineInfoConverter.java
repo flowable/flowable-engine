@@ -22,15 +22,15 @@ import org.flowable.engine.impl.util.json.JSONObject;
  */
 public class JsonProcessEngineInfoConverter extends JsonObjectConverter<EngineInfo> {
 
-  public JSONObject toJsonObject(EngineInfo processEngineInfo) {
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put("name", processEngineInfo.getName());
-    jsonObject.put("resourceUrl", processEngineInfo.getResourceUrl());
-    jsonObject.put("exception", processEngineInfo.getException());
-    return jsonObject;
-  }
+    public JSONObject toJsonObject(EngineInfo processEngineInfo) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("name", processEngineInfo.getName());
+        jsonObject.put("resourceUrl", processEngineInfo.getResourceUrl());
+        jsonObject.put("exception", processEngineInfo.getException());
+        return jsonObject;
+    }
 
-  public EngineInfo toObject(Reader reader) {
-    return null;
-  }
+    public EngineInfo toObject(Reader reader) {
+        return null;
+    }
 }

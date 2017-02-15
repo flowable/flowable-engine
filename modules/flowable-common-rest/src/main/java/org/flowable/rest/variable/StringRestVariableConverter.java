@@ -20,37 +20,37 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
  */
 public class StringRestVariableConverter implements RestVariableConverter {
 
-  @Override
-  public String getRestTypeName() {
-    return "string";
-  }
-
-  @Override
-  public Class<?> getVariableType() {
-    return String.class;
-  }
-
-  @Override
-  public Object getVariableValue(EngineRestVariable result) {
-    if (result.getValue() != null) {
-      if (!(result.getValue() instanceof String)) {
-        throw new FlowableIllegalArgumentException("Converter can only convert strings");
-      }
-      return result.getValue();
+    @Override
+    public String getRestTypeName() {
+        return "string";
     }
-    return null;
-  }
 
-  @Override
-  public void convertVariableValue(Object variableValue, EngineRestVariable result) {
-    if (variableValue != null) {
-      if (!(variableValue instanceof String)) {
-        throw new FlowableIllegalArgumentException("Converter can only convert strings");
-      }
-      result.setValue(variableValue);
-    } else {
-      result.setValue(null);
+    @Override
+    public Class<?> getVariableType() {
+        return String.class;
     }
-  }
+
+    @Override
+    public Object getVariableValue(EngineRestVariable result) {
+        if (result.getValue() != null) {
+            if (!(result.getValue() instanceof String)) {
+                throw new FlowableIllegalArgumentException("Converter can only convert strings");
+            }
+            return result.getValue();
+        }
+        return null;
+    }
+
+    @Override
+    public void convertVariableValue(Object variableValue, EngineRestVariable result) {
+        if (variableValue != null) {
+            if (!(variableValue instanceof String)) {
+                throw new FlowableIllegalArgumentException("Converter can only convert strings");
+            }
+            result.setValue(variableValue);
+        } else {
+            result.setValue(null);
+        }
+    }
 
 }

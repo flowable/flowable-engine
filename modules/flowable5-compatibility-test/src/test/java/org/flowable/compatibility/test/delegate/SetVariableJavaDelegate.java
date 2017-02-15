@@ -21,10 +21,10 @@ import org.flowable.engine.delegate.JavaDelegate;
  * @author Joram Barrez
  */
 public class SetVariableJavaDelegate implements JavaDelegate {
-  
-  @Override
-  public void execute(DelegateExecution execution) {
-    execution.setVariable("testVarFromActiviti6", new Random().nextInt(100));
-  }
+
+    @Override
+    public void execute(DelegateExecution execution) {
+        execution.setVariable("testVarFromActiviti6", new Random().nextInt(100));
+    }
 
 }

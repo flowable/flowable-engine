@@ -51,127 +51,127 @@ import com.fasterxml.jackson.databind.JsonNode;
 @Service
 public class DeploymentService {
 
-	private final Logger log = LoggerFactory.getLogger(DeploymentService.class);
+    private final Logger log = LoggerFactory.getLogger(DeploymentService.class);
 
-	@Autowired
-	protected FlowableClientService clientUtil;
+    @Autowired
+    protected FlowableClientService clientUtil;
 
-	@Autowired
-	protected ObjectMapper objectMapper;
+    @Autowired
+    protected ObjectMapper objectMapper;
 
-	public JsonNode listDeployments(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
+    public JsonNode listDeployments(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
 
-		URIBuilder builder = null;
-		try {
-			builder = new URIBuilder("repository/deployments");
-		} catch (Exception e) {
-			log.error("Error building uri", e);
-			throw new FlowableServiceException("Error building uri", e);
-		}
+        URIBuilder builder = null;
+        try {
+            builder = new URIBuilder("repository/deployments");
+        } catch (Exception e) {
+            log.error("Error building uri", e);
+            throw new FlowableServiceException("Error building uri", e);
+        }
 
-		for (String name : parameterMap.keySet()) {
-			builder.addParameter(name, parameterMap.get(name)[0]);
-		}
-		HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder.toString()));
-		return clientUtil.executeRequest(get, serverConfig);
-	}
+        for (String name : parameterMap.keySet()) {
+            builder.addParameter(name, parameterMap.get(name)[0]);
+        }
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder.toString()));
+        return clientUtil.executeRequest(get, serverConfig);
+    }
 
-	public JsonNode getDeployment(ServerConfig serverConfig, String deploymentId) {
-		HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "repository/deployments/" + deploymentId));
-		return clientUtil.executeRequest(get, serverConfig);
-	}
+    public JsonNode getDeployment(ServerConfig serverConfig, String deploymentId) {
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "repository/deployments/" + deploymentId));
+        return clientUtil.executeRequest(get, serverConfig);
+    }
 
-//	public JsonNode uploadDeployment(ServerConfig serverConfig, String name, String bpmn20Xml) throws IOException {
-//		HttpPost post = new HttpPost(getServerUrl(serverConfig, "repository/deployments"));
-//		HttpEntity reqEntity = MultipartEntityBuilder.create()
-//				.addBinaryBody(name, bpmn20Xml.getBytes(), ContentType.APPLICATION_XML, name)
-//				.build();
-//		post.setEntity(reqEntity);
-//		return executeRequest(post, serverConfig, 201);
-//	}
+    // public JsonNode uploadDeployment(ServerConfig serverConfig, String name, String bpmn20Xml) throws IOException {
+    // HttpPost post = new HttpPost(getServerUrl(serverConfig, "repository/deployments"));
+    // HttpEntity reqEntity = MultipartEntityBuilder.create()
+    // .addBinaryBody(name, bpmn20Xml.getBytes(), ContentType.APPLICATION_XML, name)
+    // .build();
+    // post.setEntity(reqEntity);
+    // return executeRequest(post, serverConfig, 201);
+    // }
 
-	public JsonNode uploadDeployment(ServerConfig serverConfig, String name, InputStream inputStream) throws IOException {
+    public JsonNode uploadDeployment(ServerConfig serverConfig, String name, InputStream inputStream) throws IOException {
 
-		String deploymentKey = null;
-		String deploymentName = null;
+        String deploymentKey = null;
+        String deploymentName = null;
 
-		byte[] inputStreamByteArray = IOUtils.toByteArray(inputStream);
+        byte[] inputStreamByteArray = IOUtils.toByteArray(inputStream);
 
-		// special handling for exported bar files
-		if (name != null && (name.endsWith(".zip") || name.endsWith(".bar"))) {
-			JsonNode appDefinitionJson = getAppDefinitionJson(new ByteArrayInputStream(inputStreamByteArray));
+        // special handling for exported bar files
+        if (name != null && (name.endsWith(".zip") || name.endsWith(".bar"))) {
+            JsonNode appDefinitionJson = getAppDefinitionJson(new ByteArrayInputStream(inputStreamByteArray));
 
-			if (appDefinitionJson!= null) {
-				if (appDefinitionJson.has("key") && appDefinitionJson.get("key") != null) {
-					deploymentKey = appDefinitionJson.get("key").asText();
-				}
-				if (appDefinitionJson.has("name") && appDefinitionJson.get("name") != null) {
-					deploymentName = appDefinitionJson.get("name").asText();
-				}
-			}
-		}
+            if (appDefinitionJson != null) {
+                if (appDefinitionJson.has("key") && appDefinitionJson.get("key") != null) {
+                    deploymentKey = appDefinitionJson.get("key").asText();
+                }
+                if (appDefinitionJson.has("name") && appDefinitionJson.get("name") != null) {
+                    deploymentName = appDefinitionJson.get("name").asText();
+                }
+            }
+        }
 
-		URIBuilder uriBuilder = clientUtil.createUriBuilder("repository/deployments");
+        URIBuilder uriBuilder = clientUtil.createUriBuilder("repository/deployments");
 
-		if (StringUtils.isNotEmpty(deploymentKey)) {
-			uriBuilder.addParameter("deploymentKey", encode(deploymentKey));
-		}
-		if (StringUtils.isNotEmpty(deploymentName)) {
-			uriBuilder.addParameter("deploymentName", encode(deploymentName));
-		}
+        if (StringUtils.isNotEmpty(deploymentKey)) {
+            uriBuilder.addParameter("deploymentKey", encode(deploymentKey));
+        }
+        if (StringUtils.isNotEmpty(deploymentName)) {
+            uriBuilder.addParameter("deploymentName", encode(deploymentName));
+        }
 
-		HttpPost post = new HttpPost(clientUtil.getServerUrl(serverConfig, uriBuilder));
-		HttpEntity reqEntity = MultipartEntityBuilder.create()
-				.addBinaryBody(name, inputStreamByteArray, ContentType.APPLICATION_OCTET_STREAM, name)
-				.build();
-		post.setEntity(reqEntity);
-		return clientUtil.executeRequest(post, serverConfig, 201);
-	}
-	
-	public void deleteDeployment(ServerConfig serverConfig, HttpServletResponse httpResponse, String appDeploymentId) {
+        HttpPost post = new HttpPost(clientUtil.getServerUrl(serverConfig, uriBuilder));
+        HttpEntity reqEntity = MultipartEntityBuilder.create()
+                .addBinaryBody(name, inputStreamByteArray, ContentType.APPLICATION_OCTET_STREAM, name)
+                .build();
+        post.setEntity(reqEntity);
+        return clientUtil.executeRequest(post, serverConfig, 201);
+    }
+
+    public void deleteDeployment(ServerConfig serverConfig, HttpServletResponse httpResponse, String appDeploymentId) {
         HttpDelete delete = new HttpDelete(clientUtil.getServerUrl(serverConfig, clientUtil.createUriBuilder("repository/deployments/" + appDeploymentId)));
         clientUtil.execute(delete, httpResponse, serverConfig);
-	}
+    }
 
-	protected JsonNode getAppDefinitionJson(ByteArrayInputStream bais) throws IOException {
+    protected JsonNode getAppDefinitionJson(ByteArrayInputStream bais) throws IOException {
 
-		ZipInputStream zipIS = new ZipInputStream(bais);
-		ZipEntry entry;
-		JsonNode appDefinitionJson = null;
+        ZipInputStream zipIS = new ZipInputStream(bais);
+        ZipEntry entry;
+        JsonNode appDefinitionJson = null;
 
-		while ((entry = zipIS.getNextEntry()) != null) {
-			// check if entry is app definition
-			if (entry.getName() != null && entry.getName().endsWith(".app")) {
+        while ((entry = zipIS.getNextEntry()) != null) {
+            // check if entry is app definition
+            if (entry.getName() != null && entry.getName().endsWith(".app")) {
 
-				BufferedReader reader = new BufferedReader(new InputStreamReader(zipIS));
-				String line = "";
-				StringBuilder js = new StringBuilder();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(zipIS));
+                String line = "";
+                StringBuilder js = new StringBuilder();
 
-				while ((line = reader.readLine()) != null) {
-					js.append(line).append("\n");
-				}
+                while ((line = reader.readLine()) != null) {
+                    js.append(line).append("\n");
+                }
 
-				String json = js.toString();
-				appDefinitionJson = objectMapper.readTree(json);
+                String json = js.toString();
+                appDefinitionJson = objectMapper.readTree(json);
 
-				reader.close();
-				break;
-			}
-		}
+                reader.close();
+                break;
+            }
+        }
 
-		zipIS.close();
+        zipIS.close();
 
-		return appDefinitionJson;
-	}
+        return appDefinitionJson;
+    }
 
-	protected String encode(String string) {
-		if (string != null) {
-			try {
-				return URLEncoder.encode(string, "UTF-8");
-			} catch (UnsupportedEncodingException uee) {
-				throw new IllegalStateException("JVM does not support UTF-8 encoding.", uee);
-			}
-		}
-		return null;
-	}
+    protected String encode(String string) {
+        if (string != null) {
+            try {
+                return URLEncoder.encode(string, "UTF-8");
+            } catch (UnsupportedEncodingException uee) {
+                throw new IllegalStateException("JVM does not support UTF-8 encoding.", uee);
+            }
+        }
+        return null;
+    }
 }

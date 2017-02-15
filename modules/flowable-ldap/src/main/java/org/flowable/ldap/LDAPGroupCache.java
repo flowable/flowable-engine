@@ -32,146 +32,146 @@ import org.flowable.idm.api.Group;
  */
 public class LDAPGroupCache {
 
-  private final ClockReader clockReader;
-  protected Map<String, LDAPGroupCacheEntry> groupCache;
-  protected long expirationTime;
+    private final ClockReader clockReader;
+    protected Map<String, LDAPGroupCacheEntry> groupCache;
+    protected long expirationTime;
 
-  protected LDAPGroupCacheListener ldapCacheListener;
+    protected LDAPGroupCacheListener ldapCacheListener;
 
-  public LDAPGroupCache(final int cacheSize, final long expirationTime, final ClockReader clockReader) {
-    this.clockReader = clockReader;
+    public LDAPGroupCache(final int cacheSize, final long expirationTime, final ClockReader clockReader) {
+        this.clockReader = clockReader;
 
-    // From
-    // http://stackoverflow.com/questions/224868/easy-simple-to-use-lru-cache-in-java
-    this.groupCache = new LinkedHashMap<String, LDAPGroupCache.LDAPGroupCacheEntry>(cacheSize + 1, 0.75f, true) {
+        // From
+        // http://stackoverflow.com/questions/224868/easy-simple-to-use-lru-cache-in-java
+        this.groupCache = new LinkedHashMap<String, LDAPGroupCache.LDAPGroupCacheEntry>(cacheSize + 1, 0.75f, true) {
 
-      private static final long serialVersionUID = 5207574193173514579L;
+            private static final long serialVersionUID = 5207574193173514579L;
 
-      protected boolean removeEldestEntry(Map.Entry<String, LDAPGroupCacheEntry> eldest) {
-        boolean removeEldest = size() > cacheSize;
+            protected boolean removeEldestEntry(Map.Entry<String, LDAPGroupCacheEntry> eldest) {
+                boolean removeEldest = size() > cacheSize;
 
-        if (removeEldest && ldapCacheListener != null) {
-          ldapCacheListener.cacheEviction(eldest.getKey());
+                if (removeEldest && ldapCacheListener != null) {
+                    ldapCacheListener.cacheEviction(eldest.getKey());
+                }
+
+                return removeEldest;
+            }
+
+        };
+        this.expirationTime = expirationTime;
+    }
+
+    public void add(String userId, List<Group> groups) {
+        this.groupCache.put(userId, new LDAPGroupCacheEntry(clockReader.getCurrentTime(), groups));
+    }
+
+    public List<Group> get(String userId) {
+        LDAPGroupCacheEntry cacheEntry = groupCache.get(userId);
+        if (cacheEntry != null) {
+            if ((clockReader.getCurrentTime().getTime() - cacheEntry.getTimestamp().getTime()) < expirationTime) {
+
+                if (ldapCacheListener != null) {
+                    ldapCacheListener.cacheHit(userId);
+                }
+
+                return cacheEntry.getGroups();
+
+            } else {
+
+                this.groupCache.remove(userId);
+
+                if (ldapCacheListener != null) {
+                    ldapCacheListener.cacheExpired(userId);
+                    ldapCacheListener.cacheEviction(userId);
+                }
+
+            }
         }
-
-        return removeEldest;
-      }
-
-    };
-    this.expirationTime = expirationTime;
-  }
-
-  public void add(String userId, List<Group> groups) {
-    this.groupCache.put(userId, new LDAPGroupCacheEntry(clockReader.getCurrentTime(), groups));
-  }
-
-  public List<Group> get(String userId) {
-    LDAPGroupCacheEntry cacheEntry = groupCache.get(userId);
-    if (cacheEntry != null) {
-      if ((clockReader.getCurrentTime().getTime() - cacheEntry.getTimestamp().getTime()) < expirationTime) {
 
         if (ldapCacheListener != null) {
-          ldapCacheListener.cacheHit(userId);
+            ldapCacheListener.cacheMiss(userId);
         }
 
-        return cacheEntry.getGroups();
+        return null;
+    }
 
-      } else {
+    public void clear() {
+        groupCache.clear();
+    }
 
-        this.groupCache.remove(userId);
+    public Map<String, LDAPGroupCacheEntry> getGroupCache() {
+        return groupCache;
+    }
 
-        if (ldapCacheListener != null) {
-          ldapCacheListener.cacheExpired(userId);
-          ldapCacheListener.cacheEviction(userId);
+    public void setGroupCache(Map<String, LDAPGroupCacheEntry> groupCache) {
+        this.groupCache = groupCache;
+    }
+
+    public long getExpirationTime() {
+        return expirationTime;
+    }
+
+    public void setExpirationTime(long expirationTime) {
+        this.expirationTime = expirationTime;
+    }
+
+    public LDAPGroupCacheListener getLdapCacheListener() {
+        return ldapCacheListener;
+    }
+
+    public void setLdapCacheListener(LDAPGroupCacheListener ldapCacheListener) {
+        this.ldapCacheListener = ldapCacheListener;
+    }
+
+    // Helper classes ////////////////////////////////////
+
+    static class LDAPGroupCacheEntry {
+
+        protected Date timestamp;
+        protected List<Group> groups;
+
+        public LDAPGroupCacheEntry() {
+
         }
 
-      }
-    }
+        public LDAPGroupCacheEntry(Date timestamp, List<Group> groups) {
+            this.timestamp = timestamp;
+            this.groups = groups;
+        }
 
-    if (ldapCacheListener != null) {
-      ldapCacheListener.cacheMiss(userId);
-    }
+        public Date getTimestamp() {
+            return timestamp;
+        }
 
-    return null;
-  }
+        public void setTimestamp(Date timestamp) {
+            this.timestamp = timestamp;
+        }
 
-  public void clear() {
-    groupCache.clear();
-  }
+        public List<Group> getGroups() {
+            return groups;
+        }
 
-  public Map<String, LDAPGroupCacheEntry> getGroupCache() {
-    return groupCache;
-  }
-
-  public void setGroupCache(Map<String, LDAPGroupCacheEntry> groupCache) {
-    this.groupCache = groupCache;
-  }
-
-  public long getExpirationTime() {
-    return expirationTime;
-  }
-
-  public void setExpirationTime(long expirationTime) {
-    this.expirationTime = expirationTime;
-  }
-
-  public LDAPGroupCacheListener getLdapCacheListener() {
-    return ldapCacheListener;
-  }
-
-  public void setLdapCacheListener(LDAPGroupCacheListener ldapCacheListener) {
-    this.ldapCacheListener = ldapCacheListener;
-  }
-
-  // Helper classes ////////////////////////////////////
-
-  static class LDAPGroupCacheEntry {
-
-    protected Date timestamp;
-    protected List<Group> groups;
-
-    public LDAPGroupCacheEntry() {
+        public void setGroups(List<Group> groups) {
+            this.groups = groups;
+        }
 
     }
 
-    public LDAPGroupCacheEntry(Date timestamp, List<Group> groups) {
-      this.timestamp = timestamp;
-      this.groups = groups;
+    // Cache listeners. Currently not yet exposed (only programmatically for the
+    // moment)
+
+    // Experimental stuff!
+
+    public static interface LDAPGroupCacheListener {
+
+        void cacheHit(String userId);
+
+        void cacheMiss(String userId);
+
+        void cacheEviction(String userId);
+
+        void cacheExpired(String userId);
+
     }
-
-    public Date getTimestamp() {
-      return timestamp;
-    }
-
-    public void setTimestamp(Date timestamp) {
-      this.timestamp = timestamp;
-    }
-
-    public List<Group> getGroups() {
-      return groups;
-    }
-
-    public void setGroups(List<Group> groups) {
-      this.groups = groups;
-    }
-
-  }
-
-  // Cache listeners. Currently not yet exposed (only programmatically for the
-  // moment)
-
-  // Experimental stuff!
-
-  public static interface LDAPGroupCacheListener {
-
-    void cacheHit(String userId);
-
-    void cacheMiss(String userId);
-
-    void cacheEviction(String userId);
-
-    void cacheExpired(String userId);
-
-  }
 
 }

@@ -25,31 +25,31 @@ import org.flowable.dmn.model.DmnDefinition;
  */
 public interface DmnRepositoryService {
 
-  DmnDeploymentBuilder createDeployment();
+    DmnDeploymentBuilder createDeployment();
 
-  void deleteDeployment(String deploymentId);
+    void deleteDeployment(String deploymentId);
 
-  DmnDecisionTableQuery createDecisionTableQuery();
+    DmnDecisionTableQuery createDecisionTableQuery();
 
-  NativeDecisionTableQuery createNativeDecisionTableQuery();
+    NativeDecisionTableQuery createNativeDecisionTableQuery();
 
-  void setDeploymentCategory(String deploymentId, String category);
+    void setDeploymentCategory(String deploymentId, String category);
 
-  void setDeploymentTenantId(String deploymentId, String newTenantId);
+    void setDeploymentTenantId(String deploymentId, String newTenantId);
 
-  List<String> getDeploymentResourceNames(String deploymentId);
+    List<String> getDeploymentResourceNames(String deploymentId);
 
-  InputStream getResourceAsStream(String deploymentId, String resourceName);
+    InputStream getResourceAsStream(String deploymentId, String resourceName);
 
-  DmnDeploymentQuery createDeploymentQuery();
+    DmnDeploymentQuery createDeploymentQuery();
 
-  NativeDmnDeploymentQuery createNativeDeploymentQuery();
+    NativeDmnDeploymentQuery createNativeDeploymentQuery();
 
-  DmnDecisionTable getDecisionTable(String decisionTableId);
+    DmnDecisionTable getDecisionTable(String decisionTableId);
 
-  InputStream getDmnResource(String decisionTableId);
+    InputStream getDmnResource(String decisionTableId);
 
-  void setDecisionTableCategory(String decisionTableId, String category);
+    void setDecisionTableCategory(String decisionTableId, String category);
 
-  DmnDefinition getDmnDefinition(String decisionTableId);
+    DmnDefinition getDmnDefinition(String decisionTableId);
 }

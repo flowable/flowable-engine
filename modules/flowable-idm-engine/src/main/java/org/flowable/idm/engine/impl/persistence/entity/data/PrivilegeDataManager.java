@@ -25,13 +25,13 @@ import org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntity;
  * @author Joram Barrez
  */
 public interface PrivilegeDataManager extends DataManager<PrivilegeEntity> {
-  
-  List<Privilege> findPrivilegeByQueryCriteria(PrivilegeQueryImpl query , Page page);
 
-  long findPrivilegeCountByQueryCriteria(PrivilegeQueryImpl query);
+    List<Privilege> findPrivilegeByQueryCriteria(PrivilegeQueryImpl query, Page page);
 
-  List<Privilege> findPrivilegeByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    long findPrivilegeCountByQueryCriteria(PrivilegeQueryImpl query);
 
-  long findPrivilegeCountByNativeQuery(Map<String, Object> parameterMap);
+    List<Privilege> findPrivilegeByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+
+    long findPrivilegeCountByNativeQuery(Map<String, Object> parameterMap);
 
 }

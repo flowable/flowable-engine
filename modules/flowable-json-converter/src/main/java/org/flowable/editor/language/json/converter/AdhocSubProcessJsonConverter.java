@@ -27,72 +27,71 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Tijs Rademakers
  */
-public class AdhocSubProcessJsonConverter extends BaseBpmnJsonConverter implements FormAwareConverter, FormKeyAwareConverter, 
-    DecisionTableAwareConverter, DecisionTableKeyAwareConverter {
-  
-  protected Map<String, String> formMap;
-  protected Map<String, ModelInfo> formKeyMap;
-  protected Map<String, String> decisionTableMap;
-  protected Map<String, ModelInfo> decisionTableKeyMap;
+public class AdhocSubProcessJsonConverter extends BaseBpmnJsonConverter implements FormAwareConverter, FormKeyAwareConverter,
+        DecisionTableAwareConverter, DecisionTableKeyAwareConverter {
 
-  public static void fillTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap, Map<Class<? extends BaseElement>, 
-      Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
+    protected Map<String, String> formMap;
+    protected Map<String, ModelInfo> formKeyMap;
+    protected Map<String, String> decisionTableMap;
+    protected Map<String, ModelInfo> decisionTableKeyMap;
 
-    fillJsonTypes(convertersToBpmnMap);
-    fillBpmnTypes(convertersToJsonMap);
-  }
+    public static void fillTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap, Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
 
-  public static void fillJsonTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap) {
-    convertersToBpmnMap.put(STENCIL_ADHOC_SUB_PROCESS, AdhocSubProcessJsonConverter.class);
-  }
+        fillJsonTypes(convertersToBpmnMap);
+        fillBpmnTypes(convertersToJsonMap);
+    }
 
-  public static void fillBpmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
-    convertersToJsonMap.put(AdhocSubProcess.class, AdhocSubProcessJsonConverter.class);
-  }
+    public static void fillJsonTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap) {
+        convertersToBpmnMap.put(STENCIL_ADHOC_SUB_PROCESS, AdhocSubProcessJsonConverter.class);
+    }
 
-  protected String getStencilId(BaseElement baseElement) {
-    return STENCIL_ADHOC_SUB_PROCESS;
-  }
+    public static void fillBpmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
+        convertersToJsonMap.put(AdhocSubProcess.class, AdhocSubProcessJsonConverter.class);
+    }
 
-  protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
-    AdhocSubProcess subProcess = (AdhocSubProcess) baseElement;
-    propertiesNode.put("completioncondition", subProcess.getCompletionCondition());
-    propertiesNode.put("ordering", subProcess.getOrdering());
-    propertiesNode.put("cancelremaininginstances", subProcess.isCancelRemainingInstances());
-    ArrayNode subProcessShapesArrayNode = objectMapper.createArrayNode();
-    GraphicInfo graphicInfo = model.getGraphicInfo(subProcess.getId());
-    processor.processFlowElements(subProcess, model, subProcessShapesArrayNode, formKeyMap, 
-        decisionTableKeyMap, graphicInfo.getX(), graphicInfo.getY());
-    flowElementNode.set("childShapes", subProcessShapesArrayNode);
-  }
+    protected String getStencilId(BaseElement baseElement) {
+        return STENCIL_ADHOC_SUB_PROCESS;
+    }
 
-  protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
-    AdhocSubProcess subProcess = new AdhocSubProcess();
-    subProcess.setCompletionCondition(getPropertyValueAsString("completioncondition", elementNode));
-    subProcess.setOrdering(getPropertyValueAsString("ordering", elementNode));
-    subProcess.setCancelRemainingInstances(getPropertyValueAsBoolean("cancelremaininginstances", elementNode));
-    JsonNode childShapesArray = elementNode.get(EDITOR_CHILD_SHAPES);
-    processor.processJsonElements(childShapesArray, modelNode, subProcess, shapeMap, formMap, decisionTableMap, model);
-    return subProcess;
-  }
-  
-  @Override
-  public void setFormMap(Map<String, String> formMap) {
-    this.formMap = formMap;
-  }
-  
-  @Override
-  public void setFormKeyMap(Map<String, ModelInfo> formKeyMap) {
-    this.formKeyMap = formKeyMap;
-  }
-  
-  @Override
-  public void setDecisionTableMap(Map<String, String> decisionTableMap) {
-    this.decisionTableMap = decisionTableMap;
-  }
-  
-  @Override
-  public void setDecisionTableKeyMap(Map<String, ModelInfo> decisionTableKeyMap) {
-    this.decisionTableKeyMap = decisionTableKeyMap;
-  }
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+        AdhocSubProcess subProcess = (AdhocSubProcess) baseElement;
+        propertiesNode.put("completioncondition", subProcess.getCompletionCondition());
+        propertiesNode.put("ordering", subProcess.getOrdering());
+        propertiesNode.put("cancelremaininginstances", subProcess.isCancelRemainingInstances());
+        ArrayNode subProcessShapesArrayNode = objectMapper.createArrayNode();
+        GraphicInfo graphicInfo = model.getGraphicInfo(subProcess.getId());
+        processor.processFlowElements(subProcess, model, subProcessShapesArrayNode, formKeyMap,
+                decisionTableKeyMap, graphicInfo.getX(), graphicInfo.getY());
+        flowElementNode.set("childShapes", subProcessShapesArrayNode);
+    }
+
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+        AdhocSubProcess subProcess = new AdhocSubProcess();
+        subProcess.setCompletionCondition(getPropertyValueAsString("completioncondition", elementNode));
+        subProcess.setOrdering(getPropertyValueAsString("ordering", elementNode));
+        subProcess.setCancelRemainingInstances(getPropertyValueAsBoolean("cancelremaininginstances", elementNode));
+        JsonNode childShapesArray = elementNode.get(EDITOR_CHILD_SHAPES);
+        processor.processJsonElements(childShapesArray, modelNode, subProcess, shapeMap, formMap, decisionTableMap, model);
+        return subProcess;
+    }
+
+    @Override
+    public void setFormMap(Map<String, String> formMap) {
+        this.formMap = formMap;
+    }
+
+    @Override
+    public void setFormKeyMap(Map<String, ModelInfo> formKeyMap) {
+        this.formKeyMap = formKeyMap;
+    }
+
+    @Override
+    public void setDecisionTableMap(Map<String, String> decisionTableMap) {
+        this.decisionTableMap = decisionTableMap;
+    }
+
+    @Override
+    public void setDecisionTableKeyMap(Map<String, ModelInfo> decisionTableKeyMap) {
+        this.decisionTableKeyMap = decisionTableKeyMap;
+    }
 }

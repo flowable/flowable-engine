@@ -21,25 +21,25 @@ import java.io.Serializable;
  */
 public interface User extends Serializable {
 
-  String getId();
+    String getId();
 
-  void setId(String id);
+    void setId(String id);
 
-  String getFirstName();
+    String getFirstName();
 
-  void setFirstName(String firstName);
+    void setFirstName(String firstName);
 
-  void setLastName(String lastName);
+    void setLastName(String lastName);
 
-  String getLastName();
+    String getLastName();
 
-  void setEmail(String email);
+    void setEmail(String email);
 
-  String getEmail();
+    String getEmail();
 
-  String getPassword();
+    String getPassword();
 
-  void setPassword(String string);
+    void setPassword(String string);
 
-  boolean isPictureSet();
+    boolean isPictureSet();
 }

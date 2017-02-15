@@ -26,25 +26,25 @@ import org.flowable.engine.history.HistoricVariableInstanceQuery;
  */
 public class HistoricVariableInstanceQueryProperty implements QueryProperty {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private static final Map<String, HistoricVariableInstanceQueryProperty> properties = new HashMap<String, HistoricVariableInstanceQueryProperty>();
+    private static final Map<String, HistoricVariableInstanceQueryProperty> properties = new HashMap<String, HistoricVariableInstanceQueryProperty>();
 
-  public static final HistoricVariableInstanceQueryProperty PROCESS_INSTANCE_ID = new HistoricVariableInstanceQueryProperty("PROC_INST_ID_");
-  public static final HistoricVariableInstanceQueryProperty VARIABLE_NAME = new HistoricVariableInstanceQueryProperty("NAME_");
+    public static final HistoricVariableInstanceQueryProperty PROCESS_INSTANCE_ID = new HistoricVariableInstanceQueryProperty("PROC_INST_ID_");
+    public static final HistoricVariableInstanceQueryProperty VARIABLE_NAME = new HistoricVariableInstanceQueryProperty("NAME_");
 
-  private String name;
+    private String name;
 
-  public HistoricVariableInstanceQueryProperty(String name) {
-    this.name = name;
-    properties.put(name, this);
-  }
+    public HistoricVariableInstanceQueryProperty(String name) {
+        this.name = name;
+        properties.put(name, this);
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public static HistoricVariableInstanceQueryProperty findByName(String propertyName) {
-    return properties.get(propertyName);
-  }
+    public static HistoricVariableInstanceQueryProperty findByName(String propertyName) {
+        return properties.get(propertyName);
+    }
 }

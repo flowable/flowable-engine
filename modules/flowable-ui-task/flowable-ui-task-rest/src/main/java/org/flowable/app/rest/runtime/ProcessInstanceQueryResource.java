@@ -24,13 +24,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @RestController
 public class ProcessInstanceQueryResource {
-  
-  @Autowired
-  protected FlowableProcessInstanceQueryService processInstanceQueryService;
-    
-	@RequestMapping(value = "/rest/query/process-instances", method = RequestMethod.POST, produces = "application/json")
-  public ResultListDataRepresentation getProcessInstances(@RequestBody ObjectNode requestNode) {
-	  return processInstanceQueryService.getProcessInstances(requestNode);
-  }
-	
+
+    @Autowired
+    protected FlowableProcessInstanceQueryService processInstanceQueryService;
+
+    @RequestMapping(value = "/rest/query/process-instances", method = RequestMethod.POST, produces = "application/json")
+    public ResultListDataRepresentation getProcessInstances(@RequestBody ObjectNode requestNode) {
+        return processInstanceQueryService.getProcessInstances(requestNode);
+    }
+
 }

@@ -25,19 +25,19 @@ import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntit
  * @author Joram Barrez
  */
 public interface HistoricActivityInstanceDataManager extends DataManager<HistoricActivityInstanceEntity> {
-  
-  List<HistoricActivityInstanceEntity> findUnfinishedHistoricActivityInstancesByExecutionAndActivityId(String executionId, String activityId);
-  
-  List<HistoricActivityInstanceEntity> findUnfinishedHistoricActivityInstancesByProcessInstanceId(String processInstanceId);
 
-  void deleteHistoricActivityInstancesByProcessInstanceId(String historicProcessInstanceId);
+    List<HistoricActivityInstanceEntity> findUnfinishedHistoricActivityInstancesByExecutionAndActivityId(String executionId, String activityId);
 
-  long findHistoricActivityInstanceCountByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery);
+    List<HistoricActivityInstanceEntity> findUnfinishedHistoricActivityInstancesByProcessInstanceId(String processInstanceId);
 
-  List<HistoricActivityInstance> findHistoricActivityInstancesByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery, Page page);
+    void deleteHistoricActivityInstancesByProcessInstanceId(String historicProcessInstanceId);
 
-  List<HistoricActivityInstance> findHistoricActivityInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    long findHistoricActivityInstanceCountByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery);
 
-  long findHistoricActivityInstanceCountByNativeQuery(Map<String, Object> parameterMap);
-  
+    List<HistoricActivityInstance> findHistoricActivityInstancesByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery, Page page);
+
+    List<HistoricActivityInstance> findHistoricActivityInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+
+    long findHistoricActivityInstanceCountByNativeQuery(Map<String, Object> parameterMap);
+
 }

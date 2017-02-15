@@ -23,12 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ProcessInstancesResource {
-  
-  @Autowired
-  protected FlowableProcessInstanceService processInstanceService;
 
-	@RequestMapping(value = "/rest/process-instances", method = RequestMethod.POST)
+    @Autowired
+    protected FlowableProcessInstanceService processInstanceService;
+
+    @RequestMapping(value = "/rest/process-instances", method = RequestMethod.POST)
     public ProcessInstanceRepresentation startNewProcessInstance(@RequestBody CreateProcessInstanceRepresentation startRequest) {
-		return processInstanceService.startNewProcessInstance(startRequest);
-	}
+        return processInstanceService.startNewProcessInstance(startRequest);
+    }
 }

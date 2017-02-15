@@ -17,13 +17,13 @@ package org.flowable.bpmn.model;
  */
 public class ReceiveTask extends Task {
 
-  public ReceiveTask clone() {
-    ReceiveTask clone = new ReceiveTask();
-    clone.setValues(this);
-    return clone;
-  }
+    public ReceiveTask clone() {
+        ReceiveTask clone = new ReceiveTask();
+        clone.setValues(this);
+        return clone;
+    }
 
-  public void setValues(ManualTask otherElement) {
-    super.setValues(otherElement);
-  }
+    public void setValues(ManualTask otherElement) {
+        super.setValues(otherElement);
+    }
 }

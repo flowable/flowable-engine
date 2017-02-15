@@ -26,129 +26,129 @@ import org.flowable.engine.runtime.ProcessInstance;
  */
 public class Flowable5ProcessInstanceWrapper implements ProcessInstance {
 
-  private org.activiti.engine.runtime.ProcessInstance activiti5ProcessInstance;
-  
-  public Flowable5ProcessInstanceWrapper(org.activiti.engine.runtime.ProcessInstance activiti5ProcessInstance) {
-    this.activiti5ProcessInstance = activiti5ProcessInstance;
-  }
+    private org.activiti.engine.runtime.ProcessInstance activiti5ProcessInstance;
 
-  @Override
-  public String getId() {
-    return activiti5ProcessInstance.getId();
-  }
+    public Flowable5ProcessInstanceWrapper(org.activiti.engine.runtime.ProcessInstance activiti5ProcessInstance) {
+        this.activiti5ProcessInstance = activiti5ProcessInstance;
+    }
 
-  @Override
-  public boolean isEnded() {
-    return activiti5ProcessInstance.isEnded();
-  }
+    @Override
+    public String getId() {
+        return activiti5ProcessInstance.getId();
+    }
 
-  @Override
-  public String getActivityId() {
-    return activiti5ProcessInstance.getActivityId();
-  }
+    @Override
+    public boolean isEnded() {
+        return activiti5ProcessInstance.isEnded();
+    }
 
-  @Override
-  public String getProcessInstanceId() {
-    return activiti5ProcessInstance.getProcessInstanceId();
-  }
-  
-  @Override
-  public String getRootProcessInstanceId() {
-    return null;
-  }
-  
-  @Override
-  public FlowElement getCurrentFlowElement() {
-    return null;
-  }
+    @Override
+    public String getActivityId() {
+        return activiti5ProcessInstance.getActivityId();
+    }
 
-  @Override
-  public String getParentId() {
-    return activiti5ProcessInstance.getParentId();
-  }
-  
-  @Override
-  public String getSuperExecutionId() {
-    return activiti5ProcessInstance.getSuperExecutionId();
-  }
+    @Override
+    public String getProcessInstanceId() {
+        return activiti5ProcessInstance.getProcessInstanceId();
+    }
 
-  @Override
-  public String getProcessDefinitionId() {
-    return activiti5ProcessInstance.getProcessDefinitionId();
-  }
+    @Override
+    public String getRootProcessInstanceId() {
+        return null;
+    }
 
-  @Override
-  public String getProcessDefinitionName() {
-    return activiti5ProcessInstance.getProcessDefinitionName();
-  }
+    @Override
+    public FlowElement getCurrentFlowElement() {
+        return null;
+    }
 
-  @Override
-  public String getProcessDefinitionKey() {
-    return activiti5ProcessInstance.getProcessDefinitionKey();
-  }
+    @Override
+    public String getParentId() {
+        return activiti5ProcessInstance.getParentId();
+    }
 
-  @Override
-  public Integer getProcessDefinitionVersion() {
-    return activiti5ProcessInstance.getProcessDefinitionVersion();
-  }
+    @Override
+    public String getSuperExecutionId() {
+        return activiti5ProcessInstance.getSuperExecutionId();
+    }
 
-  @Override
-  public String getDeploymentId() {
-    return activiti5ProcessInstance.getDeploymentId();
-  }
+    @Override
+    public String getProcessDefinitionId() {
+        return activiti5ProcessInstance.getProcessDefinitionId();
+    }
 
-  @Override
-  public String getBusinessKey() {
-    return activiti5ProcessInstance.getBusinessKey();
-  }
+    @Override
+    public String getProcessDefinitionName() {
+        return activiti5ProcessInstance.getProcessDefinitionName();
+    }
 
-  @Override
-  public boolean isSuspended() {
-    return activiti5ProcessInstance.isSuspended();
-  }
+    @Override
+    public String getProcessDefinitionKey() {
+        return activiti5ProcessInstance.getProcessDefinitionKey();
+    }
 
-  @Override
-  public Map<String, Object> getProcessVariables() {
-    return activiti5ProcessInstance.getProcessVariables();
-  }
+    @Override
+    public Integer getProcessDefinitionVersion() {
+        return activiti5ProcessInstance.getProcessDefinitionVersion();
+    }
 
-  @Override
-  public String getTenantId() {
-    return activiti5ProcessInstance.getTenantId();
-  }
+    @Override
+    public String getDeploymentId() {
+        return activiti5ProcessInstance.getDeploymentId();
+    }
 
-  @Override
-  public String getName() {
-    return activiti5ProcessInstance.getName();
-  }
-  
-  @Override
-  public String getDescription() {
-    return activiti5ProcessInstance.getDescription();
-  }
+    @Override
+    public String getBusinessKey() {
+        return activiti5ProcessInstance.getBusinessKey();
+    }
 
-  @Override
-  public String getLocalizedName() {
-    return activiti5ProcessInstance.getLocalizedName();
-  }
+    @Override
+    public boolean isSuspended() {
+        return activiti5ProcessInstance.isSuspended();
+    }
 
-  @Override
-  public String getLocalizedDescription() {
-    return activiti5ProcessInstance.getLocalizedDescription();
-  }
+    @Override
+    public Map<String, Object> getProcessVariables() {
+        return activiti5ProcessInstance.getProcessVariables();
+    }
 
-  public org.activiti.engine.runtime.ProcessInstance getRawObject() {
-    return activiti5ProcessInstance;
-  }
+    @Override
+    public String getTenantId() {
+        return activiti5ProcessInstance.getTenantId();
+    }
 
-  @Override
-  public Date getStartTime() {
-    return null;
-  }
+    @Override
+    public String getName() {
+        return activiti5ProcessInstance.getName();
+    }
 
-  @Override
-  public String getStartUserId() {
-    return null;
-  }
+    @Override
+    public String getDescription() {
+        return activiti5ProcessInstance.getDescription();
+    }
+
+    @Override
+    public String getLocalizedName() {
+        return activiti5ProcessInstance.getLocalizedName();
+    }
+
+    @Override
+    public String getLocalizedDescription() {
+        return activiti5ProcessInstance.getLocalizedDescription();
+    }
+
+    public org.activiti.engine.runtime.ProcessInstance getRawObject() {
+        return activiti5ProcessInstance;
+    }
+
+    @Override
+    public Date getStartTime() {
+        return null;
+    }
+
+    @Override
+    public String getStartUserId() {
+        return null;
+    }
 
 }

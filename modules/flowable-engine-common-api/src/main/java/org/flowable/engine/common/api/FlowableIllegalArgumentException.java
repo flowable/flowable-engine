@@ -21,13 +21,13 @@ package org.flowable.engine.common.api;
  */
 public class FlowableIllegalArgumentException extends FlowableException {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public FlowableIllegalArgumentException(String message) {
-    super(message);
-  }
+    public FlowableIllegalArgumentException(String message) {
+        super(message);
+    }
 
-  public FlowableIllegalArgumentException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public FlowableIllegalArgumentException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

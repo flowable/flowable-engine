@@ -42,81 +42,81 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Josh Long
  */
 public abstract class AbstractProcessEngineConfiguration {
-	
-	private static final Logger logger = LoggerFactory.getLogger(AbstractProcessEngineConfiguration.class);
 
-  public ProcessEngineFactoryBean springProcessEngineBean(SpringProcessEngineConfiguration configuration) {
-    ProcessEngineFactoryBean processEngineFactoryBean = new ProcessEngineFactoryBean();
-    processEngineFactoryBean.setProcessEngineConfiguration(configuration);
-    return processEngineFactoryBean;
-  }
+    private static final Logger logger = LoggerFactory.getLogger(AbstractProcessEngineConfiguration.class);
 
-  public SpringProcessEngineConfiguration processEngineConfigurationBean(Resource[] processDefinitions,
-                                                                         DataSource dataSource,
-                                                                         PlatformTransactionManager transactionManager,
-                                                                         SpringAsyncExecutor springAsyncExecutor)
-        throws IOException {
-
-    SpringProcessEngineConfiguration engine = new SpringProcessEngineConfiguration();
-    if (processDefinitions != null && processDefinitions.length > 0) {
-      engine.setDeploymentResources(processDefinitions);
-    }
-    engine.setDataSource(dataSource);
-    engine.setTransactionManager(transactionManager);
-
-    if (null != springAsyncExecutor) {
-      engine.setAsyncExecutor(springAsyncExecutor);
+    public ProcessEngineFactoryBean springProcessEngineBean(SpringProcessEngineConfiguration configuration) {
+        ProcessEngineFactoryBean processEngineFactoryBean = new ProcessEngineFactoryBean();
+        processEngineFactoryBean.setProcessEngineConfiguration(configuration);
+        return processEngineFactoryBean;
     }
 
-    return engine;
-  }
+    public SpringProcessEngineConfiguration processEngineConfigurationBean(Resource[] processDefinitions,
+            DataSource dataSource,
+            PlatformTransactionManager transactionManager,
+            SpringAsyncExecutor springAsyncExecutor)
+            throws IOException {
 
-  public List<Resource> discoverProcessDefinitionResources(ResourcePatternResolver applicationContext, String prefix, List<String> suffixes, boolean checkPDs) throws IOException {
-    if (checkPDs) {
+        SpringProcessEngineConfiguration engine = new SpringProcessEngineConfiguration();
+        if (processDefinitions != null && processDefinitions.length > 0) {
+            engine.setDeploymentResources(processDefinitions);
+        }
+        engine.setDataSource(dataSource);
+        engine.setTransactionManager(transactionManager);
 
-    	List<Resource> result = new ArrayList<Resource>();
-    	for (String suffix : suffixes) {
-    		String path = prefix + suffix;
-    		Resource[] resources = applicationContext.getResources(path);
-    		if (resources != null && resources.length > 0) {
-                Collections.addAll(result, resources);
-    		}
-    	}
-    	
-    	if (result.isEmpty()) {
-      	logger.info("No process definitions were found for autodeployment");
-    	}
-    	
-      return result;
+        if (null != springAsyncExecutor) {
+            engine.setAsyncExecutor(springAsyncExecutor);
+        }
+
+        return engine;
     }
-    return new ArrayList<Resource>();
-  }
 
-  public RuntimeService runtimeServiceBean(ProcessEngine processEngine) {
-    return processEngine.getRuntimeService();
-  }
+    public List<Resource> discoverProcessDefinitionResources(ResourcePatternResolver applicationContext, String prefix, List<String> suffixes, boolean checkPDs) throws IOException {
+        if (checkPDs) {
 
-  public RepositoryService repositoryServiceBean(ProcessEngine processEngine) {
-    return processEngine.getRepositoryService();
-  }
+            List<Resource> result = new ArrayList<Resource>();
+            for (String suffix : suffixes) {
+                String path = prefix + suffix;
+                Resource[] resources = applicationContext.getResources(path);
+                if (resources != null && resources.length > 0) {
+                    Collections.addAll(result, resources);
+                }
+            }
 
-  public TaskService taskServiceBean(ProcessEngine processEngine) {
-    return processEngine.getTaskService();
-  }
+            if (result.isEmpty()) {
+                logger.info("No process definitions were found for autodeployment");
+            }
 
-  public HistoryService historyServiceBean(ProcessEngine processEngine) {
-    return processEngine.getHistoryService();
-  }
+            return result;
+        }
+        return new ArrayList<Resource>();
+    }
 
-  public ManagementService managementServiceBeanBean(ProcessEngine processEngine) {
-    return processEngine.getManagementService();
-  }
+    public RuntimeService runtimeServiceBean(ProcessEngine processEngine) {
+        return processEngine.getRuntimeService();
+    }
 
-  public FormService formServiceBean(ProcessEngine processEngine) {
-    return processEngine.getFormService();
-  }
+    public RepositoryService repositoryServiceBean(ProcessEngine processEngine) {
+        return processEngine.getRepositoryService();
+    }
 
-  public IdentityService identityServiceBean(ProcessEngine processEngine) {
-    return processEngine.getIdentityService();
-  }
+    public TaskService taskServiceBean(ProcessEngine processEngine) {
+        return processEngine.getTaskService();
+    }
+
+    public HistoryService historyServiceBean(ProcessEngine processEngine) {
+        return processEngine.getHistoryService();
+    }
+
+    public ManagementService managementServiceBeanBean(ProcessEngine processEngine) {
+        return processEngine.getManagementService();
+    }
+
+    public FormService formServiceBean(ProcessEngine processEngine) {
+        return processEngine.getFormService();
+    }
+
+    public IdentityService identityServiceBean(ProcessEngine processEngine) {
+        return processEngine.getIdentityService();
+    }
 }

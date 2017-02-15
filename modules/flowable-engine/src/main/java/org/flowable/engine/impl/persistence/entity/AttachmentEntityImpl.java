@@ -25,108 +25,108 @@ import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
  */
 public class AttachmentEntityImpl extends AbstractEntity implements AttachmentEntity, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String name;
-  protected String description;
-  protected String type;
-  protected String taskId;
-  protected String processInstanceId;
-  protected String url;
-  protected String contentId;
-  protected ByteArrayEntity content;
-  protected String userId;
-  protected Date time;
+    protected String name;
+    protected String description;
+    protected String type;
+    protected String taskId;
+    protected String processInstanceId;
+    protected String url;
+    protected String contentId;
+    protected ByteArrayEntity content;
+    protected String userId;
+    protected Date time;
 
-  public AttachmentEntityImpl() {
-    
-  }
+    public AttachmentEntityImpl() {
 
-  public Object getPersistentState() {
-    Map<String, Object> persistentState = new HashMap<String, Object>();
-    persistentState.put("name", name);
-    persistentState.put("description", description);
-    return persistentState;
-  }
+    }
 
-  public String getName() {
-    return name;
-  }
+    public Object getPersistentState() {
+        Map<String, Object> persistentState = new HashMap<String, Object>();
+        persistentState.put("name", name);
+        persistentState.put("description", description);
+        return persistentState;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public String getDescription() {
-    return description;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
+    public String getDescription() {
+        return description;
+    }
 
-  public String getType() {
-    return type;
-  }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-  public void setType(String type) {
-    this.type = type;
-  }
+    public String getType() {
+        return type;
+    }
 
-  public String getTaskId() {
-    return taskId;
-  }
+    public void setType(String type) {
+        this.type = type;
+    }
 
-  public void setTaskId(String taskId) {
-    this.taskId = taskId;
-  }
+    public String getTaskId() {
+        return taskId;
+    }
 
-  public String getProcessInstanceId() {
-    return processInstanceId;
-  }
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
 
-  public void setProcessInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
 
-  public String getUrl() {
-    return url;
-  }
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
 
-  public void setUrl(String url) {
-    this.url = url;
-  }
+    public String getUrl() {
+        return url;
+    }
 
-  public String getContentId() {
-    return contentId;
-  }
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-  public void setContentId(String contentId) {
-    this.contentId = contentId;
-  }
+    public String getContentId() {
+        return contentId;
+    }
 
-  public ByteArrayEntity getContent() {
-    return content;
-  }
+    public void setContentId(String contentId) {
+        this.contentId = contentId;
+    }
 
-  public void setContent(ByteArrayEntity content) {
-    this.content = content;
-  }
+    public ByteArrayEntity getContent() {
+        return content;
+    }
 
-  public void setUserId(String userId) {
-    this.userId = userId;
-  }
+    public void setContent(ByteArrayEntity content) {
+        this.content = content;
+    }
 
-  public String getUserId() {
-    return userId;
-  }
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
-  public Date getTime() {
-    return time;
-  }
+    public String getUserId() {
+        return userId;
+    }
 
-  public void setTime(Date time) {
-    this.time = time;
-  }
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
 
 }

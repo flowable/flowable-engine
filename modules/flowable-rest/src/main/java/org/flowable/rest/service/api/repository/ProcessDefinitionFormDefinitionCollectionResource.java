@@ -32,21 +32,21 @@ import java.util.List;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessDefinitionFormDefinitionCollectionResource extends BaseProcessDefinitionResource {
 
-  @ApiOperation(value = "Get all form definitions for a process-definition", tags = {"Process Definitions"})
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Indicates the process definition was found and the form definitions are returned.", response = FormDefinition.class, responseContainer = "List"),
-      @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
-  })
-  @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/form-definitions", method = RequestMethod.GET, produces = "application/json")
-  public List<FormDefinitionResponse> getFormDefinitionsForProcessDefinition(
-      @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
-      HttpServletRequest request) {
+    @ApiOperation(value = "Get all form definitions for a process-definition", tags = { "Process Definitions" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the process definition was found and the form definitions are returned.", response = FormDefinition.class, responseContainer = "List"),
+            @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
+    })
+    @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/form-definitions", method = RequestMethod.GET, produces = "application/json")
+    public List<FormDefinitionResponse> getFormDefinitionsForProcessDefinition(
+            @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
+            HttpServletRequest request) {
 
-    List<FormDefinition> formDefinitions = repositoryService.getFormDefinitionsForProcessDefinition(processDefinitionId);
+        List<FormDefinition> formDefinitions = repositoryService.getFormDefinitionsForProcessDefinition(processDefinitionId);
 
-    return restResponseFactory.createFormDefinitionResponseList(formDefinitions, processDefinitionId);
-  }
+        return restResponseFactory.createFormDefinitionResponseList(formDefinitions, processDefinitionId);
+    }
 }

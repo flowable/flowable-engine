@@ -24,12 +24,12 @@ import org.flowable.engine.runtime.Job;
  * @author Tijs Rademakers
  */
 public interface DeadLetterJobDataManager extends DataManager<DeadLetterJobEntity> {
-  
-  List<DeadLetterJobEntity> findJobsByExecutionId(String executionId);
 
-  List<Job> findJobsByQueryCriteria(DeadLetterJobQueryImpl jobQuery, Page page);
+    List<DeadLetterJobEntity> findJobsByExecutionId(String executionId);
 
-  long findJobCountByQueryCriteria(DeadLetterJobQueryImpl jobQuery);
-  
-  void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
+    List<Job> findJobsByQueryCriteria(DeadLetterJobQueryImpl jobQuery, Page page);
+
+    long findJobCountByQueryCriteria(DeadLetterJobQueryImpl jobQuery);
+
+    void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
 }

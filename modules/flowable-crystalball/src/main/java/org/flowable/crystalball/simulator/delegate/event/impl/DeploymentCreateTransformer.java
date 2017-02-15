@@ -27,25 +27,25 @@ import java.util.Map;
  */
 public class DeploymentCreateTransformer extends Flowable2SimulationEventFunction {
 
-  public static final String PROCESS_INSTANCE_ID = "processInstanceId";
-  private final String resourcesKey;
+    public static final String PROCESS_INSTANCE_ID = "processInstanceId";
+    private final String resourcesKey;
 
-  public DeploymentCreateTransformer(String simulationEventType, String resourcesKey) {
-    super(simulationEventType);
-    this.resourcesKey = resourcesKey;
-  }
-
-  @Override
-  public SimulationEvent apply(FlowableEvent event) {
-    if (FlowableEngineEventType.ENTITY_CREATED == event.getType() && (event instanceof FlowableEntityEvent) && ((FlowableEntityEvent) event).getEntity() instanceof DeploymentEntity) {
-
-      DeploymentEntity deploymentEntity = (DeploymentEntity) ((FlowableEntityEvent) event).getEntity();
-
-      Map<String, Object> simEventProperties = new HashMap<String, Object>();
-      simEventProperties.put(resourcesKey, deploymentEntity.getResources());
-
-      return new SimulationEvent.Builder(simulationEventType).simulationTime(Context.getProcessEngineConfiguration().getClock().getCurrentTime().getTime()).properties(simEventProperties).priority(1).build();
+    public DeploymentCreateTransformer(String simulationEventType, String resourcesKey) {
+        super(simulationEventType);
+        this.resourcesKey = resourcesKey;
     }
-    return null;
-  }
+
+    @Override
+    public SimulationEvent apply(FlowableEvent event) {
+        if (FlowableEngineEventType.ENTITY_CREATED == event.getType() && (event instanceof FlowableEntityEvent) && ((FlowableEntityEvent) event).getEntity() instanceof DeploymentEntity) {
+
+            DeploymentEntity deploymentEntity = (DeploymentEntity) ((FlowableEntityEvent) event).getEntity();
+
+            Map<String, Object> simEventProperties = new HashMap<String, Object>();
+            simEventProperties.put(resourcesKey, deploymentEntity.getResources());
+
+            return new SimulationEvent.Builder(simulationEventType).simulationTime(Context.getProcessEngineConfiguration().getClock().getCurrentTime().getTime()).properties(simEventProperties).priority(1).build();
+        }
+        return null;
+    }
 }

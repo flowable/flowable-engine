@@ -18,5 +18,5 @@ package org.flowable.engine.delegate;
  */
 public interface TaskListener extends BaseTaskListener {
 
-  void notify(DelegateTask delegateTask);
+    void notify(DelegateTask delegateTask);
 }

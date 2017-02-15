@@ -7,11 +7,11 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 public class ActivityBehaviourBean implements ActivityBehavior {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  @Override
-  public void execute(DelegateExecution execution) {
-    execution.setVariable("visitedActivityBehaviour", true);
-    Context.getAgenda().planTakeOutgoingSequenceFlowsOperation((ExecutionEntity) execution, true);
-  }
+    @Override
+    public void execute(DelegateExecution execution) {
+        execution.setVariable("visitedActivityBehaviour", true);
+        Context.getAgenda().planTakeOutgoingSequenceFlowsOperation((ExecutionEntity) execution, true);
+    }
 }

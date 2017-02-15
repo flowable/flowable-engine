@@ -20,12 +20,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class TokenServiceImpl extends AbstractIdmService implements TokenService {
 
-  @Autowired
-  protected IdmIdentityService identityService;
-  
-  @Override
-  public Token findTokenById(String tokenId) {
-    return identityService.createTokenQuery().tokenId(tokenId).singleResult();
-  }
-  
+    @Autowired
+    protected IdmIdentityService identityService;
+
+    @Override
+    public Token findTokenById(String tokenId) {
+        return identityService.createTokenQuery().tokenId(tokenId).singleResult();
+    }
+
 }

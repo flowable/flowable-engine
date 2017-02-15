@@ -17,55 +17,53 @@ import org.flowable.engine.common.api.FlowableException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
-
 /**
  * @author Tijs Rademakers
  */
 public class LongJsonType extends SerializableType {
 
-  protected final int minLength;
-  protected ObjectMapper objectMapper;
+    protected final int minLength;
+    protected ObjectMapper objectMapper;
 
-  public LongJsonType(int minLength, ObjectMapper objectMapper) {
-    this.minLength = minLength;
-    this.objectMapper = objectMapper;
-  }
+    public LongJsonType(int minLength, ObjectMapper objectMapper) {
+        this.minLength = minLength;
+        this.objectMapper = objectMapper;
+    }
 
-  public String getTypeName() {
-    return "longJson";
-  }
+    public String getTypeName() {
+        return "longJson";
+    }
 
-  public boolean isAbleToStore(Object value) {
-    if (value == null) {
-      return true;
+    public boolean isAbleToStore(Object value) {
+        if (value == null) {
+            return true;
+        }
+        if (JsonNode.class.isAssignableFrom(value.getClass())) {
+            JsonNode jsonValue = (JsonNode) value;
+            return jsonValue.toString().length() >= minLength;
+        }
+        return false;
     }
-    if (JsonNode.class.isAssignableFrom(value.getClass())) {
-      JsonNode jsonValue = (JsonNode) value;
-      return jsonValue.toString().length() >= minLength;
+
+    public byte[] serialize(Object value, ValueFields valueFields) {
+        if (value == null) {
+            return null;
+        }
+        JsonNode valueNode = (JsonNode) value;
+        try {
+            return valueNode.toString().getBytes("utf-8");
+        } catch (Exception e) {
+            throw new FlowableException("Error getting bytes from json variable", e);
+        }
     }
-    return false;
-  }
-  
-  public byte[] serialize(Object value, ValueFields valueFields) {
-    if (value == null) {
-      return null;
+
+    public Object deserialize(byte[] bytes, ValueFields valueFields) {
+        JsonNode valueNode = null;
+        try {
+            valueNode = objectMapper.readTree(bytes);
+        } catch (Exception e) {
+            throw new FlowableException("Error reading json variable", e);
+        }
+        return valueNode;
     }
-    JsonNode valueNode = (JsonNode) value;
-    try {
-      return valueNode.toString().getBytes("utf-8");
-    } catch (Exception e) {
-      throw new FlowableException("Error getting bytes from json variable", e);
-    }
-  }
-  
-  public Object deserialize(byte[] bytes, ValueFields valueFields) {
-    JsonNode valueNode = null;
-    try {
-      valueNode = objectMapper.readTree(bytes);
-    } catch (Exception e) {
-      throw new FlowableException("Error reading json variable", e);
-    }
-    return valueNode;
-  }
 }

@@ -31,48 +31,48 @@ import org.slf4j.LoggerFactory;
  */
 public class CommandContext extends AbstractCommandContext {
 
-  private static Logger log = LoggerFactory.getLogger(CommandContext.class);
+    private static Logger log = LoggerFactory.getLogger(CommandContext.class);
 
-  protected DmnEngineConfiguration dmnEngineConfiguration;
-  
-  public CommandContext(Command<?> command, DmnEngineConfiguration dmnEngineConfiguration) {
-    super(command);
-    this.dmnEngineConfiguration = dmnEngineConfiguration;
-    sessionFactories = dmnEngineConfiguration.getSessionFactories();
-  }
-  
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public void addCloseListener(CommandContextCloseListener commandContextCloseListener) {
-    if (closeListeners == null) {
-      closeListeners = new ArrayList<BaseCommandContextCloseListener<AbstractCommandContext>>(1);
+    protected DmnEngineConfiguration dmnEngineConfiguration;
+
+    public CommandContext(Command<?> command, DmnEngineConfiguration dmnEngineConfiguration) {
+        super(command);
+        this.dmnEngineConfiguration = dmnEngineConfiguration;
+        sessionFactories = dmnEngineConfiguration.getSessionFactories();
     }
-    closeListeners.add((BaseCommandContextCloseListener) commandContextCloseListener);
-  }
 
-  public DbSqlSession getDbSqlSession() {
-    return getSession(DbSqlSession.class);
-  }
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public void addCloseListener(CommandContextCloseListener commandContextCloseListener) {
+        if (closeListeners == null) {
+            closeListeners = new ArrayList<BaseCommandContextCloseListener<AbstractCommandContext>>(1);
+        }
+        closeListeners.add((BaseCommandContextCloseListener) commandContextCloseListener);
+    }
 
-  public DmnDeploymentEntityManager getDeploymentEntityManager() {
-    return dmnEngineConfiguration.getDeploymentEntityManager();
-  }
-  
-  public DecisionTableEntityManager getDecisionTableEntityManager() {
-    return dmnEngineConfiguration.getDecisionTableEntityManager();
-  }
+    public DbSqlSession getDbSqlSession() {
+        return getSession(DbSqlSession.class);
+    }
 
-  public ResourceEntityManager getResourceEntityManager() {
-    return dmnEngineConfiguration.getResourceEntityManager();
-  }
-  
-  public TableDataManager getTableDataManager() {
-    return dmnEngineConfiguration.getTableDataManager();
-  }
+    public DmnDeploymentEntityManager getDeploymentEntityManager() {
+        return dmnEngineConfiguration.getDeploymentEntityManager();
+    }
 
-  // getters and setters
-  // //////////////////////////////////////////////////////
-  
-  public DmnEngineConfiguration getDmnEngineConfiguration() {
-    return dmnEngineConfiguration;
-  }
+    public DecisionTableEntityManager getDecisionTableEntityManager() {
+        return dmnEngineConfiguration.getDecisionTableEntityManager();
+    }
+
+    public ResourceEntityManager getResourceEntityManager() {
+        return dmnEngineConfiguration.getResourceEntityManager();
+    }
+
+    public TableDataManager getTableDataManager() {
+        return dmnEngineConfiguration.getTableDataManager();
+    }
+
+    // getters and setters
+    // //////////////////////////////////////////////////////
+
+    public DmnEngineConfiguration getDmnEngineConfiguration() {
+        return dmnEngineConfiguration;
+    }
 }

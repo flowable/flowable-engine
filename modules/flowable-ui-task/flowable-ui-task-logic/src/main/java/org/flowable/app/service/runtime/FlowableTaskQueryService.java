@@ -60,270 +60,270 @@ import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 @Transactional
 public class FlowableTaskQueryService {
 
-  private static final Logger logger = LoggerFactory.getLogger(FlowableTaskQueryService.class);
+    private static final Logger logger = LoggerFactory.getLogger(FlowableTaskQueryService.class);
 
-  private static final String SORT_CREATED_ASC = "created-asc";
-  private static final String SORT_CREATED_DESC = "created-desc";
-  private static final String SORT_DUE_ASC = "due-asc";
-  private static final String SORT_DUE_DESC = "due-desc";
+    private static final String SORT_CREATED_ASC = "created-asc";
+    private static final String SORT_CREATED_DESC = "created-desc";
+    private static final String SORT_DUE_ASC = "due-asc";
+    private static final String SORT_DUE_DESC = "due-desc";
 
-  private static final int DEFAULT_PAGE_SIZE = 25;
+    private static final int DEFAULT_PAGE_SIZE = 25;
 
-  @Autowired
-  protected RepositoryService repositoryService;
+    @Autowired
+    protected RepositoryService repositoryService;
 
-  @Autowired
-  protected TaskService taskService;
+    @Autowired
+    protected TaskService taskService;
 
-  @Autowired
-  protected RuntimeService runtimeService;
+    @Autowired
+    protected RuntimeService runtimeService;
 
-  @Autowired
-  protected HistoryService historyService;
+    @Autowired
+    protected HistoryService historyService;
 
-  @Autowired
-  protected UserCache userCache;
-  
-  protected ISO8601DateFormat iso8601DateFormat = new ISO8601DateFormat();
-  
-  public ResultListDataRepresentation listTasks(ObjectNode requestNode) {
+    @Autowired
+    protected UserCache userCache;
 
-    if (requestNode == null) {
-      throw new BadRequestException("No request found");
-    }
-    User currentUser = SecurityUtils.getCurrentUserObject();
+    protected ISO8601DateFormat iso8601DateFormat = new ISO8601DateFormat();
 
-    JsonNode stateNode = requestNode.get("state");
-    TaskInfoQueryWrapper taskInfoQueryWrapper = null;
-    if (stateNode != null && "completed".equals(stateNode.asText())) {
-      HistoricTaskInstanceQuery historicTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery();
-      historicTaskInstanceQuery.finished();
-      taskInfoQueryWrapper = new TaskInfoQueryWrapper(historicTaskInstanceQuery);
-    } else {
-      taskInfoQueryWrapper = new TaskInfoQueryWrapper(taskService.createTaskQuery());
-    }
+    public ResultListDataRepresentation listTasks(ObjectNode requestNode) {
 
-    JsonNode deploymentKeyNode = requestNode.get("deploymentKey");
-    if (deploymentKeyNode != null && !deploymentKeyNode.isNull()) {
-      List<Deployment> deployments = repositoryService.createDeploymentQuery().deploymentKey(deploymentKeyNode.asText()).list();
-      List<String> deploymentIds = new ArrayList<String>(deployments.size());
-      for (Deployment deployment : deployments) {
-        deploymentIds.add(deployment.getId());
-      }
-      
-      taskInfoQueryWrapper.getTaskInfoQuery().or()
-        .deploymentIdIn(deploymentIds)
-        .taskCategory(deploymentKeyNode.asText())
-        .endOr();
-    }
-
-    JsonNode processInstanceIdNode = requestNode.get("processInstanceId");
-    if (processInstanceIdNode != null && !processInstanceIdNode.isNull()) {
-      handleProcessInstanceFiltering(currentUser, taskInfoQueryWrapper, processInstanceIdNode);
-    }
-
-    JsonNode textNode = requestNode.get("text");
-    if (textNode != null && !textNode.isNull()) {
-      handleTextFiltering(taskInfoQueryWrapper, textNode);
-    }
-
-    JsonNode assignmentNode = requestNode.get("assignment");
-    if (assignmentNode != null && !assignmentNode.isNull()) {
-      handleAssignment(taskInfoQueryWrapper, assignmentNode, currentUser);
-    }
-
-    JsonNode processDefinitionNode = requestNode.get("processDefinitionId");
-    if (processDefinitionNode != null && !processDefinitionNode.isNull()) {
-      handleProcessDefinition(taskInfoQueryWrapper, processDefinitionNode);
-    }
-
-    JsonNode dueBeforeNode = requestNode.get("dueBefore");
-    if (dueBeforeNode != null && !dueBeforeNode.isNull()) {
-      handleDueBefore(taskInfoQueryWrapper, dueBeforeNode);
-    }
-
-    JsonNode dueAfterNode = requestNode.get("dueAfter");
-    if (dueAfterNode != null && !dueAfterNode.isNull()) {
-      handleDueAfter(taskInfoQueryWrapper, dueAfterNode);
-    }
-
-    JsonNode sortNode = requestNode.get("sort");
-    if (sortNode != null) {
-      handleSorting(taskInfoQueryWrapper, sortNode);
-    }
-
-    int page = 0;
-    JsonNode pageNode = requestNode.get("page");
-    if (pageNode != null && !pageNode.isNull()) {
-      page = pageNode.asInt(0);
-    }
-
-    int size = DEFAULT_PAGE_SIZE;
-    JsonNode sizeNode = requestNode.get("size");
-    if (sizeNode != null && !sizeNode.isNull()) {
-      size = sizeNode.asInt(DEFAULT_PAGE_SIZE);
-    }
-
-    List<? extends TaskInfo> tasks = taskInfoQueryWrapper.getTaskInfoQuery().listPage(page * size, size);
-
-    JsonNode includeProcessInstanceNode = requestNode.get("includeProcessInstance");
-    // todo Once a ProcessInstanceInfo class has been implement use it instead rather than just the name
-    Map<String, String> processInstancesNames = new HashMap<String, String>();
-    if (includeProcessInstanceNode != null) {
-      handleIncludeProcessInstance(taskInfoQueryWrapper, includeProcessInstanceNode, tasks, processInstancesNames);
-    }
-
-    ResultListDataRepresentation result = new ResultListDataRepresentation(convertTaskInfoList(tasks, processInstancesNames));
-
-    // In case we're not on the first page and the size exceeds the page size, we need to do an additional count for the total
-    if (page != 0 || tasks.size() == size) {
-      Long totalCount = taskInfoQueryWrapper.getTaskInfoQuery().count();
-      result.setTotal(Long.valueOf(totalCount.intValue()));
-      result.setStart(page * size);
-    }
-
-    return result;
-  }
-
-  protected void handleProcessInstanceFiltering(User currentUser, TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode processInstanceIdNode) {
-    String processInstanceId = processInstanceIdNode.asText();
-    taskInfoQueryWrapper.getTaskInfoQuery().processInstanceId(processInstanceId);
-  }
-
-  protected void handleTextFiltering(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode textNode) {
-    String text = textNode.asText();
-    taskInfoQueryWrapper.getTaskInfoQuery().taskNameLikeIgnoreCase("%" + text + "%");
-  }
-
-  protected void handleAssignment(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode assignmentNode, User currentUser) {
-    String assignment = assignmentNode.asText();
-    if (assignment.length() > 0) {
-      String currentUserId = String.valueOf(currentUser.getId());
-      if ("assignee".equals(assignment)) {
-        taskInfoQueryWrapper.getTaskInfoQuery().taskAssignee(currentUserId);
-        
-      } else if ("candidate".equals(assignment)) {
-        taskInfoQueryWrapper.getTaskInfoQuery().taskCandidateUser(currentUserId);
-        
-        List<String> userGroupIds = new ArrayList<>();
-        if (currentUser instanceof RemoteUser) {
-          RemoteUser remoteUser = (RemoteUser) currentUser;
-          List<RemoteGroup> remoteGroups = remoteUser.getGroups();
-          if (remoteGroups != null) {
-            for (RemoteGroup remoteGroup : remoteGroups) {
-              userGroupIds.add(remoteGroup.getId());
-            }
-          }
+        if (requestNode == null) {
+            throw new BadRequestException("No request found");
         }
-        
-        if (!userGroupIds.isEmpty()) {
-          taskInfoQueryWrapper.getTaskInfoQuery().taskCandidateGroupIn(userGroupIds);
-        }
-        
-      } else if (assignment.startsWith("group_")) {
-        String groupIdString = assignment.replace("group_", "");
-        try {
-          Long.valueOf(groupIdString);
-        } catch (NumberFormatException e) {
-          throw new BadRequestException("Invalid group id");
-        }
-        taskInfoQueryWrapper.getTaskInfoQuery().taskCandidateGroup(groupIdString);
-        
-      } else { // Default = involved
-        taskInfoQueryWrapper.getTaskInfoQuery().taskInvolvedUser(currentUserId);
-      }
-    }
-  }
+        User currentUser = SecurityUtils.getCurrentUserObject();
 
-  protected void handleProcessDefinition(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode processDefinitionIdNode) {
-    String processDefinitionId = processDefinitionIdNode.asText();
-    taskInfoQueryWrapper.getTaskInfoQuery().processDefinitionId(processDefinitionId);
-  }
-
-  protected void handleDueBefore(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode dueBeforeNode) {
-    String date = dueBeforeNode.asText();
-    try {
-      Date d = iso8601DateFormat.parse(date);
-      taskInfoQueryWrapper.getTaskInfoQuery().taskDueBefore(d);
-      
-    } catch (Exception e) {
-      logger.error("Error parsing due before date {}, ignoring it", date);
-    }
-  }
-
-  protected void handleDueAfter(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode dueAfterNode) {
-    String date = dueAfterNode.asText();
-    try {
-      Date d = iso8601DateFormat.parse(date);
-      taskInfoQueryWrapper.getTaskInfoQuery().taskDueAfter(d);
-      
-    } catch (Exception e) {
-      logger.error("Error parsing due after date {}, ignoring it", date);
-    }
-  }
-
-  protected void handleSorting(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode sortNode) {
-    String sort = sortNode.asText();
-
-    if (SORT_CREATED_ASC.equals(sort)) {
-      taskInfoQueryWrapper.getTaskInfoQuery().orderByTaskCreateTime().asc();
-    } else if (SORT_CREATED_DESC.equals(sort)) {
-      taskInfoQueryWrapper.getTaskInfoQuery().orderByTaskCreateTime().desc();
-    } else if (SORT_DUE_ASC.equals(sort)) {
-      taskInfoQueryWrapper.getTaskInfoQuery().orderByDueDateNullsLast().asc();
-    } else if (SORT_DUE_DESC.equals(sort)) {
-      taskInfoQueryWrapper.getTaskInfoQuery().orderByDueDateNullsLast().desc();
-    } else {
-      // Default
-      taskInfoQueryWrapper.getTaskInfoQuery().orderByTaskCreateTime().desc();
-    }
-  }
-
-  protected void handleIncludeProcessInstance(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode includeProcessInstanceNode, List<? extends TaskInfo> tasks, Map<String, String> processInstanceNames) {
-    if (includeProcessInstanceNode.asBoolean() && CollectionUtils.isNotEmpty(tasks)) {
-      Set<String> processInstanceIds = new HashSet<String>();
-      for (TaskInfo task : tasks) {
-        if (task.getProcessInstanceId() != null) {
-          processInstanceIds.add(task.getProcessInstanceId());
-        }
-      }
-      if (CollectionUtils.isNotEmpty(processInstanceIds)) {
-        if (taskInfoQueryWrapper.getTaskInfoQuery() instanceof HistoricTaskInstanceQuery) {
-          List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery().processInstanceIds(processInstanceIds).list();
-          for (HistoricProcessInstance processInstance : processInstances) {
-            processInstanceNames.put(processInstance.getId(), processInstance.getName());
-          }
+        JsonNode stateNode = requestNode.get("state");
+        TaskInfoQueryWrapper taskInfoQueryWrapper = null;
+        if (stateNode != null && "completed".equals(stateNode.asText())) {
+            HistoricTaskInstanceQuery historicTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery();
+            historicTaskInstanceQuery.finished();
+            taskInfoQueryWrapper = new TaskInfoQueryWrapper(historicTaskInstanceQuery);
         } else {
-          List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processInstanceIds(processInstanceIds).list();
-          for (ProcessInstance processInstance : processInstances) {
-            processInstanceNames.put(processInstance.getId(), processInstance.getName());
-          }
+            taskInfoQueryWrapper = new TaskInfoQueryWrapper(taskService.createTaskQuery());
         }
-      }
-    }
-  }
 
-  protected List<TaskRepresentation> convertTaskInfoList(List<? extends TaskInfo> tasks, Map<String, String> processInstanceNames) {
-    List<TaskRepresentation> result = new ArrayList<TaskRepresentation>();
-    if (CollectionUtils.isNotEmpty(tasks)) {
-      for (TaskInfo task : tasks) {
-        ProcessDefinitionEntity processDefinition = null;
-        if (task.getProcessDefinitionId() != null) {
-          processDefinition = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(task.getProcessDefinitionId());
+        JsonNode deploymentKeyNode = requestNode.get("deploymentKey");
+        if (deploymentKeyNode != null && !deploymentKeyNode.isNull()) {
+            List<Deployment> deployments = repositoryService.createDeploymentQuery().deploymentKey(deploymentKeyNode.asText()).list();
+            List<String> deploymentIds = new ArrayList<String>(deployments.size());
+            for (Deployment deployment : deployments) {
+                deploymentIds.add(deployment.getId());
+            }
+
+            taskInfoQueryWrapper.getTaskInfoQuery().or()
+                    .deploymentIdIn(deploymentIds)
+                    .taskCategory(deploymentKeyNode.asText())
+                    .endOr();
         }
-        TaskRepresentation representation = new TaskRepresentation(task, processDefinition, processInstanceNames.get(task.getProcessInstanceId()));
-        
-        if (StringUtils.isNotEmpty(task.getAssignee())) {
-          CachedUser cachedUser = userCache.getUser(task.getAssignee());
-          if (cachedUser != null && cachedUser.getUser() != null) {
-            User assignee = cachedUser.getUser();
-            representation.setAssignee(new UserRepresentation(assignee));
-          }
+
+        JsonNode processInstanceIdNode = requestNode.get("processInstanceId");
+        if (processInstanceIdNode != null && !processInstanceIdNode.isNull()) {
+            handleProcessInstanceFiltering(currentUser, taskInfoQueryWrapper, processInstanceIdNode);
         }
-        
-        result.add(representation);
-      }
+
+        JsonNode textNode = requestNode.get("text");
+        if (textNode != null && !textNode.isNull()) {
+            handleTextFiltering(taskInfoQueryWrapper, textNode);
+        }
+
+        JsonNode assignmentNode = requestNode.get("assignment");
+        if (assignmentNode != null && !assignmentNode.isNull()) {
+            handleAssignment(taskInfoQueryWrapper, assignmentNode, currentUser);
+        }
+
+        JsonNode processDefinitionNode = requestNode.get("processDefinitionId");
+        if (processDefinitionNode != null && !processDefinitionNode.isNull()) {
+            handleProcessDefinition(taskInfoQueryWrapper, processDefinitionNode);
+        }
+
+        JsonNode dueBeforeNode = requestNode.get("dueBefore");
+        if (dueBeforeNode != null && !dueBeforeNode.isNull()) {
+            handleDueBefore(taskInfoQueryWrapper, dueBeforeNode);
+        }
+
+        JsonNode dueAfterNode = requestNode.get("dueAfter");
+        if (dueAfterNode != null && !dueAfterNode.isNull()) {
+            handleDueAfter(taskInfoQueryWrapper, dueAfterNode);
+        }
+
+        JsonNode sortNode = requestNode.get("sort");
+        if (sortNode != null) {
+            handleSorting(taskInfoQueryWrapper, sortNode);
+        }
+
+        int page = 0;
+        JsonNode pageNode = requestNode.get("page");
+        if (pageNode != null && !pageNode.isNull()) {
+            page = pageNode.asInt(0);
+        }
+
+        int size = DEFAULT_PAGE_SIZE;
+        JsonNode sizeNode = requestNode.get("size");
+        if (sizeNode != null && !sizeNode.isNull()) {
+            size = sizeNode.asInt(DEFAULT_PAGE_SIZE);
+        }
+
+        List<? extends TaskInfo> tasks = taskInfoQueryWrapper.getTaskInfoQuery().listPage(page * size, size);
+
+        JsonNode includeProcessInstanceNode = requestNode.get("includeProcessInstance");
+        // todo Once a ProcessInstanceInfo class has been implement use it instead rather than just the name
+        Map<String, String> processInstancesNames = new HashMap<String, String>();
+        if (includeProcessInstanceNode != null) {
+            handleIncludeProcessInstance(taskInfoQueryWrapper, includeProcessInstanceNode, tasks, processInstancesNames);
+        }
+
+        ResultListDataRepresentation result = new ResultListDataRepresentation(convertTaskInfoList(tasks, processInstancesNames));
+
+        // In case we're not on the first page and the size exceeds the page size, we need to do an additional count for the total
+        if (page != 0 || tasks.size() == size) {
+            Long totalCount = taskInfoQueryWrapper.getTaskInfoQuery().count();
+            result.setTotal(Long.valueOf(totalCount.intValue()));
+            result.setStart(page * size);
+        }
+
+        return result;
     }
-    return result;
-  }
+
+    protected void handleProcessInstanceFiltering(User currentUser, TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode processInstanceIdNode) {
+        String processInstanceId = processInstanceIdNode.asText();
+        taskInfoQueryWrapper.getTaskInfoQuery().processInstanceId(processInstanceId);
+    }
+
+    protected void handleTextFiltering(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode textNode) {
+        String text = textNode.asText();
+        taskInfoQueryWrapper.getTaskInfoQuery().taskNameLikeIgnoreCase("%" + text + "%");
+    }
+
+    protected void handleAssignment(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode assignmentNode, User currentUser) {
+        String assignment = assignmentNode.asText();
+        if (assignment.length() > 0) {
+            String currentUserId = String.valueOf(currentUser.getId());
+            if ("assignee".equals(assignment)) {
+                taskInfoQueryWrapper.getTaskInfoQuery().taskAssignee(currentUserId);
+
+            } else if ("candidate".equals(assignment)) {
+                taskInfoQueryWrapper.getTaskInfoQuery().taskCandidateUser(currentUserId);
+
+                List<String> userGroupIds = new ArrayList<>();
+                if (currentUser instanceof RemoteUser) {
+                    RemoteUser remoteUser = (RemoteUser) currentUser;
+                    List<RemoteGroup> remoteGroups = remoteUser.getGroups();
+                    if (remoteGroups != null) {
+                        for (RemoteGroup remoteGroup : remoteGroups) {
+                            userGroupIds.add(remoteGroup.getId());
+                        }
+                    }
+                }
+
+                if (!userGroupIds.isEmpty()) {
+                    taskInfoQueryWrapper.getTaskInfoQuery().taskCandidateGroupIn(userGroupIds);
+                }
+
+            } else if (assignment.startsWith("group_")) {
+                String groupIdString = assignment.replace("group_", "");
+                try {
+                    Long.valueOf(groupIdString);
+                } catch (NumberFormatException e) {
+                    throw new BadRequestException("Invalid group id");
+                }
+                taskInfoQueryWrapper.getTaskInfoQuery().taskCandidateGroup(groupIdString);
+
+            } else { // Default = involved
+                taskInfoQueryWrapper.getTaskInfoQuery().taskInvolvedUser(currentUserId);
+            }
+        }
+    }
+
+    protected void handleProcessDefinition(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode processDefinitionIdNode) {
+        String processDefinitionId = processDefinitionIdNode.asText();
+        taskInfoQueryWrapper.getTaskInfoQuery().processDefinitionId(processDefinitionId);
+    }
+
+    protected void handleDueBefore(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode dueBeforeNode) {
+        String date = dueBeforeNode.asText();
+        try {
+            Date d = iso8601DateFormat.parse(date);
+            taskInfoQueryWrapper.getTaskInfoQuery().taskDueBefore(d);
+
+        } catch (Exception e) {
+            logger.error("Error parsing due before date {}, ignoring it", date);
+        }
+    }
+
+    protected void handleDueAfter(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode dueAfterNode) {
+        String date = dueAfterNode.asText();
+        try {
+            Date d = iso8601DateFormat.parse(date);
+            taskInfoQueryWrapper.getTaskInfoQuery().taskDueAfter(d);
+
+        } catch (Exception e) {
+            logger.error("Error parsing due after date {}, ignoring it", date);
+        }
+    }
+
+    protected void handleSorting(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode sortNode) {
+        String sort = sortNode.asText();
+
+        if (SORT_CREATED_ASC.equals(sort)) {
+            taskInfoQueryWrapper.getTaskInfoQuery().orderByTaskCreateTime().asc();
+        } else if (SORT_CREATED_DESC.equals(sort)) {
+            taskInfoQueryWrapper.getTaskInfoQuery().orderByTaskCreateTime().desc();
+        } else if (SORT_DUE_ASC.equals(sort)) {
+            taskInfoQueryWrapper.getTaskInfoQuery().orderByDueDateNullsLast().asc();
+        } else if (SORT_DUE_DESC.equals(sort)) {
+            taskInfoQueryWrapper.getTaskInfoQuery().orderByDueDateNullsLast().desc();
+        } else {
+            // Default
+            taskInfoQueryWrapper.getTaskInfoQuery().orderByTaskCreateTime().desc();
+        }
+    }
+
+    protected void handleIncludeProcessInstance(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode includeProcessInstanceNode, List<? extends TaskInfo> tasks, Map<String, String> processInstanceNames) {
+        if (includeProcessInstanceNode.asBoolean() && CollectionUtils.isNotEmpty(tasks)) {
+            Set<String> processInstanceIds = new HashSet<String>();
+            for (TaskInfo task : tasks) {
+                if (task.getProcessInstanceId() != null) {
+                    processInstanceIds.add(task.getProcessInstanceId());
+                }
+            }
+            if (CollectionUtils.isNotEmpty(processInstanceIds)) {
+                if (taskInfoQueryWrapper.getTaskInfoQuery() instanceof HistoricTaskInstanceQuery) {
+                    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery().processInstanceIds(processInstanceIds).list();
+                    for (HistoricProcessInstance processInstance : processInstances) {
+                        processInstanceNames.put(processInstance.getId(), processInstance.getName());
+                    }
+                } else {
+                    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processInstanceIds(processInstanceIds).list();
+                    for (ProcessInstance processInstance : processInstances) {
+                        processInstanceNames.put(processInstance.getId(), processInstance.getName());
+                    }
+                }
+            }
+        }
+    }
+
+    protected List<TaskRepresentation> convertTaskInfoList(List<? extends TaskInfo> tasks, Map<String, String> processInstanceNames) {
+        List<TaskRepresentation> result = new ArrayList<TaskRepresentation>();
+        if (CollectionUtils.isNotEmpty(tasks)) {
+            for (TaskInfo task : tasks) {
+                ProcessDefinitionEntity processDefinition = null;
+                if (task.getProcessDefinitionId() != null) {
+                    processDefinition = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(task.getProcessDefinitionId());
+                }
+                TaskRepresentation representation = new TaskRepresentation(task, processDefinition, processInstanceNames.get(task.getProcessInstanceId()));
+
+                if (StringUtils.isNotEmpty(task.getAssignee())) {
+                    CachedUser cachedUser = userCache.getUser(task.getAssignee());
+                    if (cachedUser != null && cachedUser.getUser() != null) {
+                        User assignee = cachedUser.getUser();
+                        representation.setAssignee(new UserRepresentation(assignee));
+                    }
+                }
+
+                result.add(representation);
+            }
+        }
+        return result;
+    }
 }

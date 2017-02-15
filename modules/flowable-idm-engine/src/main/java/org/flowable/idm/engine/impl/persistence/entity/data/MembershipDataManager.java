@@ -19,11 +19,11 @@ import org.flowable.idm.engine.impl.persistence.entity.MembershipEntity;
  * @author Joram Barrez
  */
 public interface MembershipDataManager extends DataManager<MembershipEntity> {
-  
-  void deleteMembership(String userId, String groupId);
-  
-  void deleteMembershipByGroupId(String groupId);
-  
-  void deleteMembershipByUserId(String userId);
+
+    void deleteMembership(String userId, String groupId);
+
+    void deleteMembershipByGroupId(String groupId);
+
+    void deleteMembershipByUserId(String userId);
 
 }

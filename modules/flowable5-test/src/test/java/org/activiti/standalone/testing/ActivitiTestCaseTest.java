@@ -17,20 +17,19 @@ import org.flowable.engine.task.Task;
 import org.flowable.engine.test.FlowableTestCase;
 import org.flowable.engine.test.Deployment;
 
-
 /**
  * @author Joram Barrez
  */
 public class ActivitiTestCaseTest extends FlowableTestCase {
-  
-  @Deployment
-  public void testSimpleProcess() {
-    runtimeService.startProcessInstanceByKey("simpleProcess");
-    
-    Task task = taskService.createTaskQuery().singleResult();
-    assertEquals("My Task", task.getName());
-    
-    taskService.complete(task.getId());
-    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-  }
+
+    @Deployment
+    public void testSimpleProcess() {
+        runtimeService.startProcessInstanceByKey("simpleProcess");
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("My Task", task.getName());
+
+        taskService.complete(task.getId());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+    }
 }

@@ -28,36 +28,37 @@ import org.slf4j.LoggerFactory;
  */
 public class FormDeployer implements Deployer {
 
-  private static final Logger log = LoggerFactory.getLogger(FormDeployer.class);
+    private static final Logger log = LoggerFactory.getLogger(FormDeployer.class);
 
-  @Override
-  public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
-    if (!deployment.isNew()) return;
-    
-    log.debug("FormDeployer: processing deployment {}", deployment.getName());
+    @Override
+    public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
+        if (!deployment.isNew())
+            return;
 
-    FormDeploymentBuilder formDeploymentBuilder = null;
-    
-    Map<String, ResourceEntity> resources = deployment.getResources();
-    for (String resourceName : resources.keySet()) {
-      if (resourceName.endsWith(".form")) {
-        log.info("FormDeployer: processing resource {}", resourceName);
-        if (formDeploymentBuilder == null) {
-          FormRepositoryService formRepositoryService = Context.getProcessEngineConfiguration().getFormEngineRepositoryService();
-          formDeploymentBuilder = formRepositoryService.createDeployment();
+        log.debug("FormDeployer: processing deployment {}", deployment.getName());
+
+        FormDeploymentBuilder formDeploymentBuilder = null;
+
+        Map<String, ResourceEntity> resources = deployment.getResources();
+        for (String resourceName : resources.keySet()) {
+            if (resourceName.endsWith(".form")) {
+                log.info("FormDeployer: processing resource {}", resourceName);
+                if (formDeploymentBuilder == null) {
+                    FormRepositoryService formRepositoryService = Context.getProcessEngineConfiguration().getFormEngineRepositoryService();
+                    formDeploymentBuilder = formRepositoryService.createDeployment();
+                }
+
+                formDeploymentBuilder.addFormBytes(resourceName, resources.get(resourceName).getBytes());
+            }
         }
-        
-        formDeploymentBuilder.addFormBytes(resourceName, resources.get(resourceName).getBytes());
-      }
+
+        if (formDeploymentBuilder != null) {
+            formDeploymentBuilder.parentDeploymentId(deployment.getId());
+            if (deployment.getTenantId() != null && deployment.getTenantId().length() > 0) {
+                formDeploymentBuilder.tenantId(deployment.getTenantId());
+            }
+
+            formDeploymentBuilder.deploy();
+        }
     }
-    
-    if (formDeploymentBuilder != null) {
-      formDeploymentBuilder.parentDeploymentId(deployment.getId());
-      if (deployment.getTenantId() != null && deployment.getTenantId().length() > 0) {
-        formDeploymentBuilder.tenantId(deployment.getTenantId());
-      }
-      
-      formDeploymentBuilder.deploy();
-    }
-  }
 }

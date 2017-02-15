@@ -33,66 +33,66 @@ import org.springframework.transaction.PlatformTransactionManager;
  */
 public class SpringIdmEngineConfiguration extends IdmEngineConfiguration implements ApplicationContextAware {
 
-  protected PlatformTransactionManager transactionManager;
-  protected ApplicationContext applicationContext;
-  protected Integer transactionSynchronizationAdapterOrder;
+    protected PlatformTransactionManager transactionManager;
+    protected ApplicationContext applicationContext;
+    protected Integer transactionSynchronizationAdapterOrder;
 
-  public SpringIdmEngineConfiguration() {
-    this.transactionsExternallyManaged = true;
-  }
-
-  public void setTransactionSynchronizationAdapterOrder(Integer transactionSynchronizationAdapterOrder) {
-    this.transactionSynchronizationAdapterOrder = transactionSynchronizationAdapterOrder;
-  }
-
-  @Override
-  public void initDefaultCommandConfig() {
-    if (defaultCommandConfig == null) {
-      defaultCommandConfig = new CommandConfig().setContextReusePossible(true);
-    }
-  }
-
-  @Override
-  public CommandInterceptor createTransactionInterceptor() {
-    if (transactionManager == null) {
-      throw new FlowableException("transactionManager is required property for SpringIdmEngineConfiguration, use " + StandaloneIdmEngineConfiguration.class.getName() + " otherwise");
+    public SpringIdmEngineConfiguration() {
+        this.transactionsExternallyManaged = true;
     }
 
-    return new SpringTransactionInterceptor(transactionManager);
-  }
-
-  @Override
-  public void initTransactionContextFactory() {
-    if (transactionContextFactory == null && transactionManager != null) {
-      transactionContextFactory = new SpringTransactionContextFactory(transactionManager, transactionSynchronizationAdapterOrder);
+    public void setTransactionSynchronizationAdapterOrder(Integer transactionSynchronizationAdapterOrder) {
+        this.transactionSynchronizationAdapterOrder = transactionSynchronizationAdapterOrder;
     }
-  }
-  
-  @Override
-  public IdmEngineConfiguration setDataSource(DataSource dataSource) {
-    if (dataSource instanceof TransactionAwareDataSourceProxy) {
-      return super.setDataSource(dataSource);
-    } else {
-      // Wrap datasource in Transaction-aware proxy
-      DataSource proxiedDataSource = new TransactionAwareDataSourceProxy(dataSource);
-      return super.setDataSource(proxiedDataSource);
+
+    @Override
+    public void initDefaultCommandConfig() {
+        if (defaultCommandConfig == null) {
+            defaultCommandConfig = new CommandConfig().setContextReusePossible(true);
+        }
     }
-  }
 
-  public PlatformTransactionManager getTransactionManager() {
-    return transactionManager;
-  }
+    @Override
+    public CommandInterceptor createTransactionInterceptor() {
+        if (transactionManager == null) {
+            throw new FlowableException("transactionManager is required property for SpringIdmEngineConfiguration, use " + StandaloneIdmEngineConfiguration.class.getName() + " otherwise");
+        }
 
-  public void setTransactionManager(PlatformTransactionManager transactionManager) {
-    this.transactionManager = transactionManager;
-  }
+        return new SpringTransactionInterceptor(transactionManager);
+    }
 
-  public ApplicationContext getApplicationContext() {
-    return applicationContext;
-  }
+    @Override
+    public void initTransactionContextFactory() {
+        if (transactionContextFactory == null && transactionManager != null) {
+            transactionContextFactory = new SpringTransactionContextFactory(transactionManager, transactionSynchronizationAdapterOrder);
+        }
+    }
 
-  @Override
-  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-    this.applicationContext = applicationContext;
-  }
+    @Override
+    public IdmEngineConfiguration setDataSource(DataSource dataSource) {
+        if (dataSource instanceof TransactionAwareDataSourceProxy) {
+            return super.setDataSource(dataSource);
+        } else {
+            // Wrap datasource in Transaction-aware proxy
+            DataSource proxiedDataSource = new TransactionAwareDataSourceProxy(dataSource);
+            return super.setDataSource(proxiedDataSource);
+        }
+    }
+
+    public PlatformTransactionManager getTransactionManager() {
+        return transactionManager;
+    }
+
+    public void setTransactionManager(PlatformTransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
+    }
+
+    public ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 }

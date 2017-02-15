@@ -21,47 +21,47 @@ import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
  * @author Joram Barrez
  */
 public class CustomDeploymentCache implements DeploymentCache<ProcessDefinitionCacheEntry> {
-  
-  protected String id;
-  
-  protected ProcessDefinitionCacheEntry processDefinition;
-  
-  @Override
-  public ProcessDefinitionCacheEntry get(String id) {
-    if (id.equals(this.id)) {
-      return processDefinition;
+
+    protected String id;
+
+    protected ProcessDefinitionCacheEntry processDefinition;
+
+    @Override
+    public ProcessDefinitionCacheEntry get(String id) {
+        if (id.equals(this.id)) {
+            return processDefinition;
+        }
+        return null;
     }
-    return null;
-  }
 
-  @Override
-  public void add(String id, ProcessDefinitionCacheEntry object) {
-    this.id = id;
-    this.processDefinition = object;
-  }
-
-  @Override
-  public void remove(String id) {
-    if (id.equals(this.id)) {
-      this.id = null;
-      this.processDefinition = null;
+    @Override
+    public void add(String id, ProcessDefinitionCacheEntry object) {
+        this.id = id;
+        this.processDefinition = object;
     }
-  }
 
-  @Override
-  public void clear() {
-    this.id = null;
-    this.processDefinition = null;
-  }
-  
-  // For testing purposes only
-  public ProcessDefinitionCacheEntry getCachedProcessDefinition() {
-    return processDefinition;
-  }
+    @Override
+    public void remove(String id) {
+        if (id.equals(this.id)) {
+            this.id = null;
+            this.processDefinition = null;
+        }
+    }
 
-  @Override
-  public boolean contains(String id) {
-    return id.equals(this.id);
-  }
+    @Override
+    public void clear() {
+        this.id = null;
+        this.processDefinition = null;
+    }
+
+    // For testing purposes only
+    public ProcessDefinitionCacheEntry getCachedProcessDefinition() {
+        return processDefinition;
+    }
+
+    @Override
+    public boolean contains(String id) {
+        return id.equals(this.id);
+    }
 
 }

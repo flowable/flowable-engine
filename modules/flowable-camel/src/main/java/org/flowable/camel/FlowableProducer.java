@@ -33,172 +33,172 @@ import org.flowable.engine.runtime.ProcessInstance;
  */
 public class FlowableProducer extends DefaultProducer {
 
-  protected IdentityService identityService;
+    protected IdentityService identityService;
 
-  protected RuntimeService runtimeService;
-  
-  protected RepositoryService repositoryService;
+    protected RuntimeService runtimeService;
 
-  public static final String PROCESS_KEY_PROPERTY = "PROCESS_KEY_PROPERTY";
+    protected RepositoryService repositoryService;
 
-  public static final String PROCESS_ID_PROPERTY = "PROCESS_ID_PROPERTY";
-  
-  public static final String EXECUTION_ID_PROPERTY = "EXECUTION_ID_PROPERTY";
-  
-  private final long timeout;
+    public static final String PROCESS_KEY_PROPERTY = "PROCESS_KEY_PROPERTY";
 
-  private final long timeResolution;
+    public static final String PROCESS_ID_PROPERTY = "PROCESS_ID_PROPERTY";
 
-  private String processKey;
+    public static final String EXECUTION_ID_PROPERTY = "EXECUTION_ID_PROPERTY";
 
-  private String activity;
+    private final long timeout;
 
-  public FlowableProducer(FlowableEndpoint endpoint, long timeout, long timeResolution) {
-    super(endpoint);
-    String[] path = endpoint.getEndpointKey().split(":");
-    processKey = path[1].replace("//", "");
-    if (path.length > 2) {
-      activity = path[2];
-    }
-    this.timeout = timeout;
-    this.timeResolution = timeResolution;
-  }
+    private final long timeResolution;
 
-  public void process(Exchange exchange) throws Exception {
-    if (shouldStartProcess()) {
-      ProcessInstance pi = startProcess(exchange);
-      copyResultToCamel(exchange, pi);
-    } else {
-      signal(exchange);
-    }
-  }
+    private String processKey;
 
-  protected void copyResultToCamel(Exchange exchange, ProcessInstance pi) {
-    exchange.setProperty(PROCESS_ID_PROPERTY, pi.getProcessInstanceId());
+    private String activity;
 
-    Map<String, Object> returnVars = getFlowableEndpoint().getReturnVarMap();
-
-    if (returnVars != null && returnVars.size() > 0) {
-
-      Map<String, Object> processVariables = null;
-      if (repositoryService.isFlowable5ProcessDefinition(pi.getProcessDefinitionId())) {
-        Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-        processVariables = compatibilityHandler.getVariables(pi);
-      } else {
-        processVariables = ((ExecutionEntity) pi).getVariables();
-      }
-      
-      if (processVariables != null) {
-        for (String variableName : returnVars.keySet()) {
-          if (processVariables.containsKey(variableName)) {
-            exchange.setProperty(variableName, processVariables.get(variableName));
-          }
+    public FlowableProducer(FlowableEndpoint endpoint, long timeout, long timeResolution) {
+        super(endpoint);
+        String[] path = endpoint.getEndpointKey().split(":");
+        processKey = path[1].replace("//", "");
+        if (path.length > 2) {
+            activity = path[2];
         }
-      }
-    }
-  }
-
-  protected boolean shouldStartProcess() {
-    return activity == null;
-  }
-
-  protected void signal(Exchange exchange) {
-    String processInstanceId = findProcessInstanceId(exchange);
-    String executionId = exchange.getProperty(EXECUTION_ID_PROPERTY, String.class);
-    
-    boolean firstTime = true; 
-    long initialTime  = System.currentTimeMillis();
-   
-    Execution execution = null;
-    while (firstTime || (timeout > 0 && (System.currentTimeMillis() - initialTime < timeout))) {
-      try {
-        Thread.sleep(timeResolution);
-      } catch (InterruptedException e) {
-        throw new FlowableException("error occurred while waiting for activity=" + activity + " for processInstanceId=" + processInstanceId);
-      }
-      firstTime = false;
-      
-      if (executionId != null) {
-        execution = runtimeService.createExecutionQuery()
-            .executionId(executionId)
-            .activityId(activity)
-            .singleResult();
-        
-      } else {
-        execution = runtimeService.createExecutionQuery()
-            .processDefinitionKey(processKey)
-            .processInstanceId(processInstanceId)
-            .activityId(activity)
-            .singleResult();
-      }
-       
-      if (execution != null) {
-        break;
-      }
-    }
-    if (execution == null) {
-      throw new FlowableException("Couldn't find activity "+activity+" for processId " + processInstanceId + " in defined timeout.");
+        this.timeout = timeout;
+        this.timeResolution = timeResolution;
     }
 
-    runtimeService.setVariables(execution.getId(), ExchangeUtils.prepareVariables(exchange, getFlowableEndpoint()));
-    runtimeService.trigger(execution.getId());
-  }
-
-  protected String findProcessInstanceId(Exchange exchange) {
-    String processInstanceId = exchange.getProperty(PROCESS_ID_PROPERTY, String.class);
-    if (processInstanceId != null) {
-      return processInstanceId;
+    public void process(Exchange exchange) throws Exception {
+        if (shouldStartProcess()) {
+            ProcessInstance pi = startProcess(exchange);
+            copyResultToCamel(exchange, pi);
+        } else {
+            signal(exchange);
+        }
     }
-    String key = exchange.getProperty(PROCESS_KEY_PROPERTY, String.class);
-    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(key).singleResult();
 
-    if (processInstance == null) {
-      throw new FlowableException("Could not start process instance with business key " + key);
+    protected void copyResultToCamel(Exchange exchange, ProcessInstance pi) {
+        exchange.setProperty(PROCESS_ID_PROPERTY, pi.getProcessInstanceId());
+
+        Map<String, Object> returnVars = getFlowableEndpoint().getReturnVarMap();
+
+        if (returnVars != null && returnVars.size() > 0) {
+
+            Map<String, Object> processVariables = null;
+            if (repositoryService.isFlowable5ProcessDefinition(pi.getProcessDefinitionId())) {
+                Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+                processVariables = compatibilityHandler.getVariables(pi);
+            } else {
+                processVariables = ((ExecutionEntity) pi).getVariables();
+            }
+
+            if (processVariables != null) {
+                for (String variableName : returnVars.keySet()) {
+                    if (processVariables.containsKey(variableName)) {
+                        exchange.setProperty(variableName, processVariables.get(variableName));
+                    }
+                }
+            }
+        }
     }
-    return processInstance.getId();
-  }
 
-  protected ProcessInstance startProcess(Exchange exchange) {
-    FlowableEndpoint endpoint = getFlowableEndpoint();
-    String key = exchange.getProperty(PROCESS_KEY_PROPERTY, String.class);
-    try {
-      if (endpoint.isSetProcessInitiator()) {
-        setProcessInitiator(ExchangeUtils.prepareInitiator(exchange, endpoint));
-      }
-
-      if (key == null) {
-        return runtimeService.startProcessInstanceByKey(processKey, ExchangeUtils.prepareVariables(exchange, endpoint));
-      } else {
-        return runtimeService.startProcessInstanceByKey(processKey, key, ExchangeUtils.prepareVariables(exchange, endpoint));
-      }
-
-    } finally {
-      if (endpoint.isSetProcessInitiator()) {
-        setProcessInitiator(null);
-      }
+    protected boolean shouldStartProcess() {
+        return activity == null;
     }
-  }
 
-  protected void setProcessInitiator(String processInitiator) {
-    if (identityService == null) {
-      throw new FlowableException("IdentityService is missing and must be provided to set process initiator.");
+    protected void signal(Exchange exchange) {
+        String processInstanceId = findProcessInstanceId(exchange);
+        String executionId = exchange.getProperty(EXECUTION_ID_PROPERTY, String.class);
+
+        boolean firstTime = true;
+        long initialTime = System.currentTimeMillis();
+
+        Execution execution = null;
+        while (firstTime || (timeout > 0 && (System.currentTimeMillis() - initialTime < timeout))) {
+            try {
+                Thread.sleep(timeResolution);
+            } catch (InterruptedException e) {
+                throw new FlowableException("error occurred while waiting for activity=" + activity + " for processInstanceId=" + processInstanceId);
+            }
+            firstTime = false;
+
+            if (executionId != null) {
+                execution = runtimeService.createExecutionQuery()
+                        .executionId(executionId)
+                        .activityId(activity)
+                        .singleResult();
+
+            } else {
+                execution = runtimeService.createExecutionQuery()
+                        .processDefinitionKey(processKey)
+                        .processInstanceId(processInstanceId)
+                        .activityId(activity)
+                        .singleResult();
+            }
+
+            if (execution != null) {
+                break;
+            }
+        }
+        if (execution == null) {
+            throw new FlowableException("Couldn't find activity " + activity + " for processId " + processInstanceId + " in defined timeout.");
+        }
+
+        runtimeService.setVariables(execution.getId(), ExchangeUtils.prepareVariables(exchange, getFlowableEndpoint()));
+        runtimeService.trigger(execution.getId());
     }
-    identityService.setAuthenticatedUserId(processInitiator);
-  }
 
-  protected FlowableEndpoint getFlowableEndpoint() {
-    return (FlowableEndpoint) getEndpoint();
-  }
-  
-  public void setIdentityService(IdentityService identityService) {
-    this.identityService = identityService;
-  }
+    protected String findProcessInstanceId(Exchange exchange) {
+        String processInstanceId = exchange.getProperty(PROCESS_ID_PROPERTY, String.class);
+        if (processInstanceId != null) {
+            return processInstanceId;
+        }
+        String key = exchange.getProperty(PROCESS_KEY_PROPERTY, String.class);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(key).singleResult();
 
-  public void setRuntimeService(RuntimeService runtimeService) {
-    this.runtimeService = runtimeService;
-  }
-  
-  public void setRepositoryService(RepositoryService repositoryService) {
-    this.repositoryService = repositoryService;
-  }
+        if (processInstance == null) {
+            throw new FlowableException("Could not start process instance with business key " + key);
+        }
+        return processInstance.getId();
+    }
+
+    protected ProcessInstance startProcess(Exchange exchange) {
+        FlowableEndpoint endpoint = getFlowableEndpoint();
+        String key = exchange.getProperty(PROCESS_KEY_PROPERTY, String.class);
+        try {
+            if (endpoint.isSetProcessInitiator()) {
+                setProcessInitiator(ExchangeUtils.prepareInitiator(exchange, endpoint));
+            }
+
+            if (key == null) {
+                return runtimeService.startProcessInstanceByKey(processKey, ExchangeUtils.prepareVariables(exchange, endpoint));
+            } else {
+                return runtimeService.startProcessInstanceByKey(processKey, key, ExchangeUtils.prepareVariables(exchange, endpoint));
+            }
+
+        } finally {
+            if (endpoint.isSetProcessInitiator()) {
+                setProcessInitiator(null);
+            }
+        }
+    }
+
+    protected void setProcessInitiator(String processInitiator) {
+        if (identityService == null) {
+            throw new FlowableException("IdentityService is missing and must be provided to set process initiator.");
+        }
+        identityService.setAuthenticatedUserId(processInitiator);
+    }
+
+    protected FlowableEndpoint getFlowableEndpoint() {
+        return (FlowableEndpoint) getEndpoint();
+    }
+
+    public void setIdentityService(IdentityService identityService) {
+        this.identityService = identityService;
+    }
+
+    public void setRuntimeService(RuntimeService runtimeService) {
+        this.runtimeService = runtimeService;
+    }
+
+    public void setRepositoryService(RepositoryService repositoryService) {
+        this.repositoryService = repositoryService;
+    }
 }

@@ -18,39 +18,39 @@ package org.flowable.app.domain.editor;
  * @author Joram Barrez
  */
 public class ModelInformation {
-	
-	private Long id;
-	private String name;
-	private Integer type;
-	
-	public ModelInformation(Long id, String name, Integer type) {
-		this.id = id;
-		this.name = name;
-		this.type = type;
-	}
 
-	public Long getId() {
-		return id;
-	}
+    private Long id;
+    private String name;
+    private Integer type;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public ModelInformation(Long id, String name, Integer type) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public Integer getType() {
-		return type;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setType(Integer type) {
-		this.type = type;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
 
 }

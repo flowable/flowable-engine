@@ -19,8 +19,8 @@ package org.flowable.engine.impl.transformer;
  */
 public class StringToInteger extends AbstractTransformer {
 
-  @Override
-  protected Object primTransform(Object anObject) throws Exception {
-    return Integer.valueOf((String) anObject);
-  }
+    @Override
+    protected Object primTransform(Object anObject) throws Exception {
+        return Integer.valueOf((String) anObject);
+    }
 }

@@ -32,80 +32,80 @@ import org.flowable.engine.impl.interceptor.CommandContext;
  */
 public class JtaTransactionContext implements TransactionContext {
 
-  protected final TransactionManager transactionManager;
+    protected final TransactionManager transactionManager;
 
-  public JtaTransactionContext(TransactionManager transactionManager) {
-    this.transactionManager = transactionManager;
-  }
-
-  public void commit() {
-    // managed transaction, ignore
-  }
-
-  public void rollback() {
-    // managed transaction, mark rollback-only if not done so already.
-    try {
-      Transaction transaction = getTransaction();
-      int status = transaction.getStatus();
-      if (status != Status.STATUS_NO_TRANSACTION && status != Status.STATUS_ROLLEDBACK) {
-        transaction.setRollbackOnly();
-      }
-    } catch (IllegalStateException e) {
-      throw new FlowableException("Unexpected IllegalStateException while marking transaction rollback only");
-    } catch (SystemException e) {
-      throw new FlowableException("SystemException while marking transaction rollback only");
-    }
-  }
-
-  protected Transaction getTransaction() {
-    try {
-      return transactionManager.getTransaction();
-    } catch (SystemException e) {
-      throw new FlowableException("SystemException while getting transaction ", e);
-    }
-  }
-
-  public void addTransactionListener(TransactionState transactionState, final TransactionListener transactionListener) {
-    
-    Transaction transaction = getTransaction();
-    CommandContext commandContext = Context.getCommandContext();
-    try {
-      transaction.registerSynchronization(new TransactionStateSynchronization(transactionState, transactionListener, commandContext));
-    } catch (IllegalStateException e) {
-      throw new FlowableException("IllegalStateException while registering synchronization ", e);
-    } catch (RollbackException e) {
-      throw new FlowableException("RollbackException while registering synchronization ", e);
-    } catch (SystemException e) {
-      throw new FlowableException("SystemException while registering synchronization ", e);
-    }
-  }
-
-  public static class TransactionStateSynchronization implements Synchronization {
-
-    protected final TransactionListener transactionListener;
-    protected final TransactionState transactionState;
-    private final CommandContext commandContext;
-
-    public TransactionStateSynchronization(TransactionState transactionState, TransactionListener transactionListener, CommandContext commandContext) {
-      this.transactionState = transactionState;
-      this.transactionListener = transactionListener;
-      this.commandContext = commandContext;
+    public JtaTransactionContext(TransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
     }
 
-    public void beforeCompletion() {
-      if (TransactionState.COMMITTING == transactionState || TransactionState.ROLLINGBACK == transactionState) {
-        transactionListener.execute(commandContext);
-      }
+    public void commit() {
+        // managed transaction, ignore
     }
 
-    public void afterCompletion(int status) {
-      if (Status.STATUS_ROLLEDBACK == status && TransactionState.ROLLED_BACK == transactionState) {
-        transactionListener.execute(commandContext);
-      } else if (Status.STATUS_COMMITTED == status && TransactionState.COMMITTED == transactionState) {
-        transactionListener.execute(commandContext);
-      }
+    public void rollback() {
+        // managed transaction, mark rollback-only if not done so already.
+        try {
+            Transaction transaction = getTransaction();
+            int status = transaction.getStatus();
+            if (status != Status.STATUS_NO_TRANSACTION && status != Status.STATUS_ROLLEDBACK) {
+                transaction.setRollbackOnly();
+            }
+        } catch (IllegalStateException e) {
+            throw new FlowableException("Unexpected IllegalStateException while marking transaction rollback only");
+        } catch (SystemException e) {
+            throw new FlowableException("SystemException while marking transaction rollback only");
+        }
     }
 
-  }
+    protected Transaction getTransaction() {
+        try {
+            return transactionManager.getTransaction();
+        } catch (SystemException e) {
+            throw new FlowableException("SystemException while getting transaction ", e);
+        }
+    }
+
+    public void addTransactionListener(TransactionState transactionState, final TransactionListener transactionListener) {
+
+        Transaction transaction = getTransaction();
+        CommandContext commandContext = Context.getCommandContext();
+        try {
+            transaction.registerSynchronization(new TransactionStateSynchronization(transactionState, transactionListener, commandContext));
+        } catch (IllegalStateException e) {
+            throw new FlowableException("IllegalStateException while registering synchronization ", e);
+        } catch (RollbackException e) {
+            throw new FlowableException("RollbackException while registering synchronization ", e);
+        } catch (SystemException e) {
+            throw new FlowableException("SystemException while registering synchronization ", e);
+        }
+    }
+
+    public static class TransactionStateSynchronization implements Synchronization {
+
+        protected final TransactionListener transactionListener;
+        protected final TransactionState transactionState;
+        private final CommandContext commandContext;
+
+        public TransactionStateSynchronization(TransactionState transactionState, TransactionListener transactionListener, CommandContext commandContext) {
+            this.transactionState = transactionState;
+            this.transactionListener = transactionListener;
+            this.commandContext = commandContext;
+        }
+
+        public void beforeCompletion() {
+            if (TransactionState.COMMITTING == transactionState || TransactionState.ROLLINGBACK == transactionState) {
+                transactionListener.execute(commandContext);
+            }
+        }
+
+        public void afterCompletion(int status) {
+            if (Status.STATUS_ROLLEDBACK == status && TransactionState.ROLLED_BACK == transactionState) {
+                transactionListener.execute(commandContext);
+            } else if (Status.STATUS_COMMITTED == status && TransactionState.COMMITTED == transactionState) {
+                transactionListener.execute(commandContext);
+            }
+        }
+
+    }
 
 }

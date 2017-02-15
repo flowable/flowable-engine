@@ -56,21 +56,21 @@ public class ProcessEngineInfoService {
 
         switch (endpointType) {
 
-            case PROCESS:
-                builder = clientUtil.createUriBuilder(PROCESS_ENGINE_INFO_URL);
-                break;
+        case PROCESS:
+            builder = clientUtil.createUriBuilder(PROCESS_ENGINE_INFO_URL);
+            break;
 
-            case DMN:
-                builder = clientUtil.createUriBuilder(DMN_ENGINE_INFO_URL);
-                break;
+        case DMN:
+            builder = clientUtil.createUriBuilder(DMN_ENGINE_INFO_URL);
+            break;
 
-            case FORM:
-                builder = clientUtil.createUriBuilder(FORM_ENGINE_INFO_URL);
-                break;
+        case FORM:
+            builder = clientUtil.createUriBuilder(FORM_ENGINE_INFO_URL);
+            break;
 
-            case CONTENT:
-                builder = clientUtil.createUriBuilder(CONTENT_ENGINE_INFO_URL);
-                break;
+        case CONTENT:
+            builder = clientUtil.createUriBuilder(CONTENT_ENGINE_INFO_URL);
+            break;
         }
 
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));

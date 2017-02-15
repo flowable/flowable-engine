@@ -17,44 +17,43 @@ import java.util.Stack;
 import org.flowable.engine.common.impl.cfg.BaseTransactionContext;
 
 /**
- * Holder for a threadlocal stack of {@link BaseTransactionContext} objects.
- * Different engines (process/idm/dmn/form/...) use this 'shared' object
- * to see if another engine has already started a transaction or not. 
+ * Holder for a threadlocal stack of {@link BaseTransactionContext} objects. Different engines (process/idm/dmn/form/...) use this 'shared' object to see if another engine has already started a
+ * transaction or not.
  * 
  * @author Joram Barrez
  */
 @SuppressWarnings("rawtypes")
 public class TransactionContextHolder {
-  
-  protected static ThreadLocal<Stack<BaseTransactionContext>> transactionContextThreadLocal = new ThreadLocal<Stack<BaseTransactionContext>>();
-  
-  public static BaseTransactionContext getTransactionContext() {
-    Stack<BaseTransactionContext> stack = getStack(transactionContextThreadLocal);
-    if (stack.isEmpty()) {
-      return null;
+
+    protected static ThreadLocal<Stack<BaseTransactionContext>> transactionContextThreadLocal = new ThreadLocal<Stack<BaseTransactionContext>>();
+
+    public static BaseTransactionContext getTransactionContext() {
+        Stack<BaseTransactionContext> stack = getStack(transactionContextThreadLocal);
+        if (stack.isEmpty()) {
+            return null;
+        }
+        return stack.peek();
     }
-    return stack.peek();
-  }
-  
-  public static void setTransactionContext(BaseTransactionContext transactionContext) {
-    getStack(transactionContextThreadLocal).push(transactionContext);
-  }
-  
-  public static void removeTransactionContext() {
-    getStack(transactionContextThreadLocal).pop();
-  }
-  
-  public static boolean isTransactionContextActive() {
-    return !getStack(transactionContextThreadLocal).isEmpty();
-  }
-  
-  protected static <T> Stack<T> getStack(ThreadLocal<Stack<T>> threadLocal) {
-    Stack<T> stack = threadLocal.get();
-    if (stack == null) {
-      stack = new Stack<T>();
-      threadLocal.set(stack);
+
+    public static void setTransactionContext(BaseTransactionContext transactionContext) {
+        getStack(transactionContextThreadLocal).push(transactionContext);
     }
-    return stack;
-  }
-  
+
+    public static void removeTransactionContext() {
+        getStack(transactionContextThreadLocal).pop();
+    }
+
+    public static boolean isTransactionContextActive() {
+        return !getStack(transactionContextThreadLocal).isEmpty();
+    }
+
+    protected static <T> Stack<T> getStack(ThreadLocal<Stack<T>> threadLocal) {
+        Stack<T> stack = threadLocal.get();
+        if (stack == null) {
+            stack = new Stack<T>();
+            threadLocal.set(stack);
+        }
+        return stack;
+    }
+
 }

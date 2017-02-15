@@ -24,21 +24,21 @@ import org.flowable.engine.runtime.Job;
  * @author Joram Barrez
  */
 public class TenantAwareExecuteAsyncRunnable extends ExecuteAsyncRunnable {
-  
-  protected TenantInfoHolder tenantInfoHolder;
-  protected String tenantId;
-  
-  public TenantAwareExecuteAsyncRunnable(Job job, ProcessEngineConfigurationImpl processEngineConfiguration, TenantInfoHolder tenantInfoHolder, String tenantId) {
-    super(job, processEngineConfiguration);
-    this.tenantInfoHolder = tenantInfoHolder;
-    this.tenantId = tenantId;
-  }
 
-  @Override
-  public void run() {
-    tenantInfoHolder.setCurrentTenantId(tenantId);
-    super.run();
-    tenantInfoHolder.clearCurrentTenantId();
-  }
+    protected TenantInfoHolder tenantInfoHolder;
+    protected String tenantId;
+
+    public TenantAwareExecuteAsyncRunnable(Job job, ProcessEngineConfigurationImpl processEngineConfiguration, TenantInfoHolder tenantInfoHolder, String tenantId) {
+        super(job, processEngineConfiguration);
+        this.tenantInfoHolder = tenantInfoHolder;
+        this.tenantId = tenantId;
+    }
+
+    @Override
+    public void run() {
+        tenantInfoHolder.setCurrentTenantId(tenantId);
+        super.run();
+        tenantInfoHolder.clearCurrentTenantId();
+    }
 
 }

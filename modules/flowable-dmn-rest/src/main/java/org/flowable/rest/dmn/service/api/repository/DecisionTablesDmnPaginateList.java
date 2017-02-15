@@ -28,7 +28,7 @@ public class DecisionTablesDmnPaginateList extends AbstractPaginateList {
         this.dmnRestResponseFactory = dmnRestResponseFactory;
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     protected List processList(List list) {
         return dmnRestResponseFactory.createDecisionTableResponseList(list);

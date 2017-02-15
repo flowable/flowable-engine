@@ -41,9 +41,9 @@ public class SecurityAutoConfigurationTest {
     }
 
     @Configuration
-    @Import({DataSourceAutoConfiguration.class, DataSourceProcessEngineAutoConfiguration.DataSourceProcessEngineConfiguration.class,
+    @Import({ DataSourceAutoConfiguration.class, DataSourceProcessEngineAutoConfiguration.DataSourceProcessEngineConfiguration.class,
             org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class,
-            SecurityAutoConfiguration.class})
+            SecurityAutoConfiguration.class })
     public static class SecurityConfiguration {
 
         @Autowired

@@ -27,26 +27,26 @@ import java.util.Map;
  */
 public class UserTaskCompleteTransformer extends Flowable2SimulationEventFunction {
 
-  public static final String PROCESS_INSTANCE_ID = "processInstanceId";
-  public static final String TASK_DEFINITION_KEY = "taskDefinitionKey";
-  public static final String TASK_VARIABLES = "taskVariables";
+    public static final String PROCESS_INSTANCE_ID = "processInstanceId";
+    public static final String TASK_DEFINITION_KEY = "taskDefinitionKey";
+    public static final String TASK_VARIABLES = "taskVariables";
 
-  public UserTaskCompleteTransformer(String simulationEventType) {
-    super(simulationEventType);
-  }
-
-  @Override
-  public SimulationEvent apply(FlowableEvent event) {
-    if (FlowableEngineEventType.TASK_COMPLETED == event.getType()) {
-      Task task = (Task) ((FlowableEntityEvent) event).getEntity();
-
-      Map<String, Object> properties = new HashMap<String, Object>();
-      properties.put("taskId", task.getId());
-      properties.put(TASK_DEFINITION_KEY, task.getTaskDefinitionKey());
-      properties.put(PROCESS_INSTANCE_ID, task.getProcessInstanceId());
-      properties.put(TASK_VARIABLES, task.getProcessVariables());
-      return new SimulationEvent.Builder(this.simulationEventType).simulationTime(Context.getProcessEngineConfiguration().getClock().getCurrentTime().getTime()).properties(properties).build();
+    public UserTaskCompleteTransformer(String simulationEventType) {
+        super(simulationEventType);
     }
-    return null;
-  }
+
+    @Override
+    public SimulationEvent apply(FlowableEvent event) {
+        if (FlowableEngineEventType.TASK_COMPLETED == event.getType()) {
+            Task task = (Task) ((FlowableEntityEvent) event).getEntity();
+
+            Map<String, Object> properties = new HashMap<String, Object>();
+            properties.put("taskId", task.getId());
+            properties.put(TASK_DEFINITION_KEY, task.getTaskDefinitionKey());
+            properties.put(PROCESS_INSTANCE_ID, task.getProcessInstanceId());
+            properties.put(TASK_VARIABLES, task.getProcessVariables());
+            return new SimulationEvent.Builder(this.simulationEventType).simulationTime(Context.getProcessEngineConfiguration().getClock().getCurrentTime().getTime()).properties(properties).build();
+        }
+        return null;
+    }
 }

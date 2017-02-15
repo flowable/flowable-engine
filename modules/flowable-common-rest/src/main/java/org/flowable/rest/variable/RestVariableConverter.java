@@ -18,23 +18,23 @@ package org.flowable.rest.variable;
  */
 public interface RestVariableConverter {
 
-  /**
-   * Simple type-name used by this converter.
-   */
-  String getRestTypeName();
+    /**
+     * Simple type-name used by this converter.
+     */
+    String getRestTypeName();
 
-  /**
-   * Type of variables this converter is able to convert.
-   */
-  Class<?> getVariableType();
+    /**
+     * Type of variables this converter is able to convert.
+     */
+    Class<?> getVariableType();
 
-  /**
-   * Extract the variable value to be used in the engine from the given {@link EngineRestVariable}.
-   */
-  Object getVariableValue(EngineRestVariable result);
+    /**
+     * Extract the variable value to be used in the engine from the given {@link EngineRestVariable}.
+     */
+    Object getVariableValue(EngineRestVariable result);
 
-  /**
-   * Converts the given value and sets the converted value in the given {@link EngineRestVariable}.
-   */
-  void convertVariableValue(Object variableValue, EngineRestVariable result);
+    /**
+     * Converts the given value and sets the converted value in the given {@link EngineRestVariable}.
+     */
+    void convertVariableValue(Object variableValue, EngineRestVariable result);
 }

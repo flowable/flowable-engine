@@ -33,76 +33,76 @@ import org.flowable.engine.impl.persistence.deploy.Deployer;
  * @author Joram Barrez
  */
 public class DmnEngineConfigurator extends AbstractProcessEngineConfigurator {
-  
-  protected DmnEngineConfiguration dmnEngineConfiguration;
-  
-  @Override
-  public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    
-    List<Deployer> deployers = null;
-    if (processEngineConfiguration.getCustomPostDeployers() != null) {
-      deployers = processEngineConfiguration.getCustomPostDeployers();
-    } else {
-      deployers = new ArrayList<Deployer>();
-    }
-    deployers.add(new DmnDeployer());
-    processEngineConfiguration.setCustomPostDeployers(deployers);
-  }
-  
-  @Override
-  public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    if (dmnEngineConfiguration == null) {
-      dmnEngineConfiguration = new StandaloneInMemDmnEngineConfiguration();
-    
-      if (processEngineConfiguration.getDataSource() != null) {
-        DataSource originalDatasource = processEngineConfiguration.getDataSource();
-        if (processEngineConfiguration.isTransactionsExternallyManaged()) {
-          dmnEngineConfiguration.setDataSource(originalDatasource);
+
+    protected DmnEngineConfiguration dmnEngineConfiguration;
+
+    @Override
+    public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
+
+        List<Deployer> deployers = null;
+        if (processEngineConfiguration.getCustomPostDeployers() != null) {
+            deployers = processEngineConfiguration.getCustomPostDeployers();
         } else {
-          dmnEngineConfiguration.setDataSource(new TransactionContextAwareDataSource(originalDatasource));
+            deployers = new ArrayList<Deployer>();
         }
-        
-      } else {
-        throw new FlowableException("A datasource is required for initializing the DMN engine ");
-      }
-      
-      dmnEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
-      dmnEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
-      dmnEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
-      dmnEngineConfiguration.setDatabaseTablePrefix(processEngineConfiguration.getDatabaseTablePrefix());
-      dmnEngineConfiguration.setDatabaseWildcardEscapeCharacter(processEngineConfiguration.getDatabaseWildcardEscapeCharacter());
-      
-      if (processEngineConfiguration.isTransactionsExternallyManaged()) {
-        dmnEngineConfiguration.setTransactionsExternallyManaged(true);
-      } else {
-        dmnEngineConfiguration.setTransactionFactory(
-             new TransactionContextAwareTransactionFactory<org.flowable.dmn.engine.impl.cfg.TransactionContext>(
-                   org.flowable.dmn.engine.impl.cfg.TransactionContext.class));
-      }
+        deployers.add(new DmnDeployer());
+        processEngineConfiguration.setCustomPostDeployers(deployers);
     }
-    
-    DmnEngine dmnEngine = initDmnEngine();
-    
-    processEngineConfiguration.setDmnEngineInitialized(true);
-    processEngineConfiguration.setDmnEngineRepositoryService(dmnEngine.getDmnRepositoryService());
-    processEngineConfiguration.setDmnEngineRuleService(dmnEngine.getDmnRuleService());
-  }
 
-  protected synchronized DmnEngine initDmnEngine() {
-    if (dmnEngineConfiguration == null) {
-      throw new FlowableException("DmnEngineConfiguration is required");
+    @Override
+    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        if (dmnEngineConfiguration == null) {
+            dmnEngineConfiguration = new StandaloneInMemDmnEngineConfiguration();
+
+            if (processEngineConfiguration.getDataSource() != null) {
+                DataSource originalDatasource = processEngineConfiguration.getDataSource();
+                if (processEngineConfiguration.isTransactionsExternallyManaged()) {
+                    dmnEngineConfiguration.setDataSource(originalDatasource);
+                } else {
+                    dmnEngineConfiguration.setDataSource(new TransactionContextAwareDataSource(originalDatasource));
+                }
+
+            } else {
+                throw new FlowableException("A datasource is required for initializing the DMN engine ");
+            }
+
+            dmnEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
+            dmnEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
+            dmnEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
+            dmnEngineConfiguration.setDatabaseTablePrefix(processEngineConfiguration.getDatabaseTablePrefix());
+            dmnEngineConfiguration.setDatabaseWildcardEscapeCharacter(processEngineConfiguration.getDatabaseWildcardEscapeCharacter());
+
+            if (processEngineConfiguration.isTransactionsExternallyManaged()) {
+                dmnEngineConfiguration.setTransactionsExternallyManaged(true);
+            } else {
+                dmnEngineConfiguration.setTransactionFactory(
+                        new TransactionContextAwareTransactionFactory<org.flowable.dmn.engine.impl.cfg.TransactionContext>(
+                                org.flowable.dmn.engine.impl.cfg.TransactionContext.class));
+            }
+        }
+
+        DmnEngine dmnEngine = initDmnEngine();
+
+        processEngineConfiguration.setDmnEngineInitialized(true);
+        processEngineConfiguration.setDmnEngineRepositoryService(dmnEngine.getDmnRepositoryService());
+        processEngineConfiguration.setDmnEngineRuleService(dmnEngine.getDmnRuleService());
     }
-    
-    return dmnEngineConfiguration.buildDmnEngine();
-  }
 
-  public DmnEngineConfiguration getDmnEngineConfiguration() {
-    return dmnEngineConfiguration;
-  }
+    protected synchronized DmnEngine initDmnEngine() {
+        if (dmnEngineConfiguration == null) {
+            throw new FlowableException("DmnEngineConfiguration is required");
+        }
 
-  public DmnEngineConfigurator setDmnEngineConfiguration(DmnEngineConfiguration dmnEngineConfiguration) {
-    this.dmnEngineConfiguration = dmnEngineConfiguration;
-    return this;
-  }
+        return dmnEngineConfiguration.buildDmnEngine();
+    }
+
+    public DmnEngineConfiguration getDmnEngineConfiguration() {
+        return dmnEngineConfiguration;
+    }
+
+    public DmnEngineConfigurator setDmnEngineConfiguration(DmnEngineConfiguration dmnEngineConfiguration) {
+        this.dmnEngineConfiguration = dmnEngineConfiguration;
+        return this;
+    }
 
 }

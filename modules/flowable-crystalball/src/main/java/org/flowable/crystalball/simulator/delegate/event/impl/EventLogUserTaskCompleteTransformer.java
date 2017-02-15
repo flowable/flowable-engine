@@ -30,51 +30,51 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class EventLogUserTaskCompleteTransformer extends EventLog2SimulationEventFunction {
 
-  public static final String PROCESS_INSTANCE_ID = "processInstanceId";
-  public static final String TASK_DEFINITION_KEY = "taskDefinitionKey";
-  public static final String TASK_VARIABLES = "taskVariables";
-  public static final String VARIABLES_LOCAL_SCOPE = "variablesLocalScope";
+    public static final String PROCESS_INSTANCE_ID = "processInstanceId";
+    public static final String TASK_DEFINITION_KEY = "taskDefinitionKey";
+    public static final String TASK_VARIABLES = "taskVariables";
+    public static final String VARIABLES_LOCAL_SCOPE = "variablesLocalScope";
 
-  public EventLogUserTaskCompleteTransformer(String simulationEventType) {
-    super(simulationEventType);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public SimulationEvent apply(EventLogEntry event) {
-    if (FlowableEngineEventType.TASK_COMPLETED.toString().equals(event.getType())) {
-
-      ObjectMapper objectMapper = new ObjectMapper();
-      Map<String, Object> data;
-      try {
-        data = objectMapper.readValue(event.getData(), new TypeReference<HashMap<String, Object>>() {
-        });
-      } catch (IOException e) {
-        throw new CrystalballException("unable to parse JSON string.", e);
-      }
-      String taskIdValue = (String) data.get(Fields.ACTIVITY_ID);
-      boolean localScope = false;
-      Map<String, Object> variableMap = null;
-      if (data.get(Fields.VARIABLES) != null) {
-        variableMap = (Map<String, Object>) data.get(Fields.VARIABLES);
-      } else {
-        variableMap = (Map<String, Object>) data.get(Fields.LOCAL_VARIABLES);
-        localScope = true;
-      }
-      String taskDefinitionKeyValue = (String) data.get(Fields.TASK_DEFINITION_KEY);
-
-      Map<String, Object> properties = new HashMap<String, Object>();
-      properties.put("taskId", taskIdValue);
-      properties.put(TASK_DEFINITION_KEY, taskDefinitionKeyValue);
-      properties.put(PROCESS_INSTANCE_ID, event.getProcessInstanceId());
-      if (variableMap != null) {
-        properties.put(TASK_VARIABLES, variableMap);
-        properties.put(VARIABLES_LOCAL_SCOPE, localScope);
-      }
-
-      return new SimulationEvent.Builder(this.simulationEventType).priority((int) event.getLogNumber()).properties(properties).build();
+    public EventLogUserTaskCompleteTransformer(String simulationEventType) {
+        super(simulationEventType);
     }
-    return null;
-  }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public SimulationEvent apply(EventLogEntry event) {
+        if (FlowableEngineEventType.TASK_COMPLETED.toString().equals(event.getType())) {
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            Map<String, Object> data;
+            try {
+                data = objectMapper.readValue(event.getData(), new TypeReference<HashMap<String, Object>>() {
+                });
+            } catch (IOException e) {
+                throw new CrystalballException("unable to parse JSON string.", e);
+            }
+            String taskIdValue = (String) data.get(Fields.ACTIVITY_ID);
+            boolean localScope = false;
+            Map<String, Object> variableMap = null;
+            if (data.get(Fields.VARIABLES) != null) {
+                variableMap = (Map<String, Object>) data.get(Fields.VARIABLES);
+            } else {
+                variableMap = (Map<String, Object>) data.get(Fields.LOCAL_VARIABLES);
+                localScope = true;
+            }
+            String taskDefinitionKeyValue = (String) data.get(Fields.TASK_DEFINITION_KEY);
+
+            Map<String, Object> properties = new HashMap<String, Object>();
+            properties.put("taskId", taskIdValue);
+            properties.put(TASK_DEFINITION_KEY, taskDefinitionKeyValue);
+            properties.put(PROCESS_INSTANCE_ID, event.getProcessInstanceId());
+            if (variableMap != null) {
+                properties.put(TASK_VARIABLES, variableMap);
+                properties.put(VARIABLES_LOCAL_SCOPE, localScope);
+            }
+
+            return new SimulationEvent.Builder(this.simulationEventType).priority((int) event.getLogNumber()).properties(properties).build();
+        }
+        return null;
+    }
 
 }

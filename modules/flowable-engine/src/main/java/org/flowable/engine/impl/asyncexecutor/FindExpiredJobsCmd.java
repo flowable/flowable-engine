@@ -23,16 +23,16 @@ import org.flowable.engine.impl.persistence.entity.JobEntity;
  * @author Joram Barrez
  */
 public class FindExpiredJobsCmd implements Command<List<JobEntity>> {
-  
-  protected int pageSize;
-  
-  public FindExpiredJobsCmd(int pageSize) {
-    this.pageSize = pageSize;
-  }
-  
-  @Override
-  public List<JobEntity> execute(CommandContext commandContext) {
-    return commandContext.getJobEntityManager().findExpiredJobs(new Page(0, pageSize));
-  }
+
+    protected int pageSize;
+
+    public FindExpiredJobsCmd(int pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    @Override
+    public List<JobEntity> execute(CommandContext commandContext) {
+        return commandContext.getJobEntityManager().findExpiredJobs(new Page(0, pageSize));
+    }
 
 }

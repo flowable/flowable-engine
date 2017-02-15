@@ -37,30 +37,30 @@ import java.io.InputStream;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessDefinitionImageResource extends BaseProcessDefinitionResource {
 
-  @ApiOperation(value = "Get a process definition image", tags = {"Process Definitions"})
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Indicates request was successful and the process-definitions are returned"),
-          @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
-  })
-  @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/image", method = RequestMethod.GET)
-  public ResponseEntity<byte[]> getModelResource(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId) {
-    ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
-    InputStream imageStream = repositoryService.getProcessDiagram(processDefinition.getId());
+    @ApiOperation(value = "Get a process definition image", tags = { "Process Definitions" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates request was successful and the process-definitions are returned"),
+            @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
+    })
+    @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/image", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> getModelResource(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId) {
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        InputStream imageStream = repositoryService.getProcessDiagram(processDefinition.getId());
 
-    if (imageStream != null) {
-      HttpHeaders responseHeaders = new HttpHeaders();
-      responseHeaders.set("Content-Type", "image/png");
-      try {
-        return new ResponseEntity<byte[]>(IOUtils.toByteArray(imageStream), responseHeaders, HttpStatus.OK);
-      } catch (Exception e) {
-        throw new FlowableException("Error reading image stream", e);
-      }
-    } else {
-      throw new FlowableIllegalArgumentException("Process definition with id '" + processDefinition.getId() + "' has no image.");
+        if (imageStream != null) {
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.set("Content-Type", "image/png");
+            try {
+                return new ResponseEntity<byte[]>(IOUtils.toByteArray(imageStream), responseHeaders, HttpStatus.OK);
+            } catch (Exception e) {
+                throw new FlowableException("Error reading image stream", e);
+            }
+        } else {
+            throw new FlowableIllegalArgumentException("Process definition with id '" + processDefinition.getId() + "' has no image.");
+        }
     }
-  }
 
 }

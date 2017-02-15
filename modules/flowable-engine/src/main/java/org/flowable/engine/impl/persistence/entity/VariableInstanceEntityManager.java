@@ -24,24 +24,24 @@ import org.flowable.engine.impl.variable.VariableType;
  */
 public interface VariableInstanceEntityManager extends EntityManager<VariableInstanceEntity> {
 
-  VariableInstanceEntity create(String name, VariableType type, Object value);
+    VariableInstanceEntity create(String name, VariableType type, Object value);
 
-  List<VariableInstanceEntity> findVariableInstancesByTaskId(String taskId);
-  
-  List<VariableInstanceEntity> findVariableInstancesByTaskIds(Set<String> taskIds);
+    List<VariableInstanceEntity> findVariableInstancesByTaskId(String taskId);
 
-  List<VariableInstanceEntity> findVariableInstancesByExecutionId(String executionId);
-  
-  List<VariableInstanceEntity> findVariableInstancesByExecutionIds(Set<String> executionIds);
+    List<VariableInstanceEntity> findVariableInstancesByTaskIds(Set<String> taskIds);
 
-  VariableInstanceEntity findVariableInstanceByExecutionAndName(String executionId, String variableName);
+    List<VariableInstanceEntity> findVariableInstancesByExecutionId(String executionId);
 
-  List<VariableInstanceEntity> findVariableInstancesByExecutionAndNames(String executionId, Collection<String> names);
+    List<VariableInstanceEntity> findVariableInstancesByExecutionIds(Set<String> executionIds);
 
-  VariableInstanceEntity findVariableInstanceByTaskAndName(String taskId, String variableName);
+    VariableInstanceEntity findVariableInstanceByExecutionAndName(String executionId, String variableName);
 
-  List<VariableInstanceEntity> findVariableInstancesByTaskAndNames(String taskId, Collection<String> names);
+    List<VariableInstanceEntity> findVariableInstancesByExecutionAndNames(String executionId, Collection<String> names);
 
-  void deleteVariableInstanceByTask(TaskEntity task);
+    VariableInstanceEntity findVariableInstanceByTaskAndName(String taskId, String variableName);
+
+    List<VariableInstanceEntity> findVariableInstancesByTaskAndNames(String taskId, Collection<String> names);
+
+    void deleteVariableInstanceByTask(TaskEntity task);
 
 }

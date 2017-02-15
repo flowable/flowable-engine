@@ -32,84 +32,84 @@ import org.flowable.engine.repository.ProcessDefinition;
  */
 public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
 
-  protected FlowableEventSupport eventSupport;
-  protected boolean enabled = true;
+    protected FlowableEventSupport eventSupport;
+    protected boolean enabled = true;
 
-  public FlowableEventDispatcherImpl() {
-    eventSupport = new FlowableEventSupport();
-  }
-
-  public void setEnabled(boolean enabled) {
-    this.enabled = enabled;
-  }
-
-  public boolean isEnabled() {
-    return enabled;
-  }
-
-  @Override
-  public void addEventListener(FlowableEventListener listenerToAdd) {
-    eventSupport.addEventListener(listenerToAdd);
-  }
-
-  @Override
-  public void addEventListener(FlowableEventListener listenerToAdd, FlowableEventType... types) {
-    eventSupport.addEventListener(listenerToAdd, types);
-  }
-
-  @Override
-  public void removeEventListener(FlowableEventListener listenerToRemove) {
-    eventSupport.removeEventListener(listenerToRemove);
-  }
-
-  @Override
-  public void dispatchEvent(FlowableEvent event) {
-    if (enabled) {
-      eventSupport.dispatchEvent(event);
+    public FlowableEventDispatcherImpl() {
+        eventSupport = new FlowableEventSupport();
     }
 
-    if (event.getType() == FlowableEngineEventType.ENTITY_DELETED && event instanceof FlowableEntityEvent) {
-      FlowableEntityEvent entityEvent = (FlowableEntityEvent) event;
-      if (entityEvent.getEntity() instanceof ProcessDefinition) {
-        // process definition deleted event doesn't need to be dispatched to event listeners
-        return;
-      }
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
-    
-    // Try getting hold of the Process definition, based on the process definition key, if a context is active
-    CommandContext commandContext = Context.getCommandContext();
-    if (commandContext != null) {
-      BpmnModel bpmnModel = extractBpmnModelFromEvent(event);
-      if (bpmnModel != null) {
-        ((FlowableEventSupport) bpmnModel.getEventSupport()).dispatchEvent(event);
-      }
-    }
-    
-  }
 
-  /**
-   * In case no process-context is active, this method attempts to extract a process-definition based on the event. In case it's an event related to an entity, this can be deducted by inspecting the
-   * entity, without additional queries to the database.
-   * 
-   * If not an entity-related event, the process-definition will be retrieved based on the processDefinitionId (if filled in). This requires an additional query to the database in case not already
-   * cached. However, queries will only occur when the definition is not yet in the cache, which is very unlikely to happen, unless evicted.
-   * 
-   * @param event
-   * @return
-   */
-  protected BpmnModel extractBpmnModelFromEvent(FlowableEvent event) {
-    BpmnModel result = null;
-    
-    if (result == null && event instanceof FlowableEngineEvent && ((FlowableEngineEvent) event).getProcessDefinitionId() != null) {
-      ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(
-          ((FlowableEngineEvent) event).getProcessDefinitionId(), true);
-      
-      if (processDefinition != null) {
-        result = Context.getProcessEngineConfiguration().getDeploymentManager().resolveProcessDefinition(processDefinition).getBpmnModel();
-      }
+    public boolean isEnabled() {
+        return enabled;
     }
-    
-    return result;
-  }
+
+    @Override
+    public void addEventListener(FlowableEventListener listenerToAdd) {
+        eventSupport.addEventListener(listenerToAdd);
+    }
+
+    @Override
+    public void addEventListener(FlowableEventListener listenerToAdd, FlowableEventType... types) {
+        eventSupport.addEventListener(listenerToAdd, types);
+    }
+
+    @Override
+    public void removeEventListener(FlowableEventListener listenerToRemove) {
+        eventSupport.removeEventListener(listenerToRemove);
+    }
+
+    @Override
+    public void dispatchEvent(FlowableEvent event) {
+        if (enabled) {
+            eventSupport.dispatchEvent(event);
+        }
+
+        if (event.getType() == FlowableEngineEventType.ENTITY_DELETED && event instanceof FlowableEntityEvent) {
+            FlowableEntityEvent entityEvent = (FlowableEntityEvent) event;
+            if (entityEvent.getEntity() instanceof ProcessDefinition) {
+                // process definition deleted event doesn't need to be dispatched to event listeners
+                return;
+            }
+        }
+
+        // Try getting hold of the Process definition, based on the process definition key, if a context is active
+        CommandContext commandContext = Context.getCommandContext();
+        if (commandContext != null) {
+            BpmnModel bpmnModel = extractBpmnModelFromEvent(event);
+            if (bpmnModel != null) {
+                ((FlowableEventSupport) bpmnModel.getEventSupport()).dispatchEvent(event);
+            }
+        }
+
+    }
+
+    /**
+     * In case no process-context is active, this method attempts to extract a process-definition based on the event. In case it's an event related to an entity, this can be deducted by inspecting the
+     * entity, without additional queries to the database.
+     * 
+     * If not an entity-related event, the process-definition will be retrieved based on the processDefinitionId (if filled in). This requires an additional query to the database in case not already
+     * cached. However, queries will only occur when the definition is not yet in the cache, which is very unlikely to happen, unless evicted.
+     * 
+     * @param event
+     * @return
+     */
+    protected BpmnModel extractBpmnModelFromEvent(FlowableEvent event) {
+        BpmnModel result = null;
+
+        if (result == null && event instanceof FlowableEngineEvent && ((FlowableEngineEvent) event).getProcessDefinitionId() != null) {
+            ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(
+                    ((FlowableEngineEvent) event).getProcessDefinitionId(), true);
+
+            if (processDefinition != null) {
+                result = Context.getProcessEngineConfiguration().getDeploymentManager().resolveProcessDefinition(processDefinition).getBpmnModel();
+            }
+        }
+
+        return result;
+    }
 
 }

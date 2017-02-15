@@ -24,11 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ProcessDefinitionResource {
 
-  @Autowired
-  protected FlowableProcessDefinitionService processDefinitionService;
+    @Autowired
+    protected FlowableProcessDefinitionService processDefinitionService;
 
-  @RequestMapping(value = "/rest/process-definitions/{processDefinitionId}/start-form", method = RequestMethod.GET, produces = "application/json")
-  public FormModel getProcessDefinitionStartForm(HttpServletRequest request) {
-    return processDefinitionService.getProcessDefinitionStartForm(request);
-  }
+    @RequestMapping(value = "/rest/process-definitions/{processDefinitionId}/start-form", method = RequestMethod.GET, produces = "application/json")
+    public FormModel getProcessDefinitionStartForm(HttpServletRequest request) {
+        return processDefinitionService.getProcessDefinitionStartForm(request);
+    }
 }

@@ -24,28 +24,28 @@ import org.flowable.engine.delegate.FlowableFunctionDelegate;
  * @author Tijs Rademakers
  */
 public abstract class AbstractFlowableFunctionDelegate implements FlowableFunctionDelegate {
-  
-  protected Method getNoParameterMethod() {
-    try {
-      return functionClass().getDeclaredMethod(localName());
-    } catch (Exception e) {
-      throw new FlowableException("Error getting method " + localName(), e);
+
+    protected Method getNoParameterMethod() {
+        try {
+            return functionClass().getDeclaredMethod(localName());
+        } catch (Exception e) {
+            throw new FlowableException("Error getting method " + localName(), e);
+        }
     }
-  }
-  
-  protected Method getSingleObjectParameterMethod() {
-    try {
-      return functionClass().getDeclaredMethod(localName(), Object.class);
-    } catch (Exception e) {
-      throw new FlowableException("Error getting method " + localName(), e);
+
+    protected Method getSingleObjectParameterMethod() {
+        try {
+            return functionClass().getDeclaredMethod(localName(), Object.class);
+        } catch (Exception e) {
+            throw new FlowableException("Error getting method " + localName(), e);
+        }
     }
-  }
-  
-  protected Method getTwoObjectParameterMethod() {
-    try {
-      return functionClass().getDeclaredMethod(localName(), Object.class, Object.class);
-    } catch (Exception e) {
-      throw new FlowableException("Error getting method " + localName(), e);
+
+    protected Method getTwoObjectParameterMethod() {
+        try {
+            return functionClass().getDeclaredMethod(localName(), Object.class, Object.class);
+        } catch (Exception e) {
+            throw new FlowableException("Error getting method " + localName(), e);
+        }
     }
-  }
 }

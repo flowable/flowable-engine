@@ -24,14 +24,14 @@ import org.flowable.engine.impl.cfg.TransactionContext;
  */
 public class JtaTransactionContextFactory implements TransactionContextFactory {
 
-  protected final TransactionManager transactionManager;
+    protected final TransactionManager transactionManager;
 
-  public JtaTransactionContextFactory(TransactionManager transactionManager) {
-    this.transactionManager = transactionManager;
-  }
+    public JtaTransactionContextFactory(TransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
+    }
 
-  public TransactionContext openTransactionContext(AbstractCommandContext commandContext) {
-    return new JtaTransactionContext(transactionManager);
-  }
+    public TransactionContext openTransactionContext(AbstractCommandContext commandContext) {
+        return new JtaTransactionContext(transactionManager);
+    }
 
 }

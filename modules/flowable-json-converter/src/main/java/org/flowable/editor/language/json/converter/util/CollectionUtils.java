@@ -18,14 +18,13 @@ import java.util.Collection;
  * @author Joram Barrez
  */
 public class CollectionUtils {
-	
-  public static boolean isEmpty(@SuppressWarnings("rawtypes") Collection collection) {
-      return (collection == null || collection.isEmpty());
-  }
 
-  public static boolean isNotEmpty(@SuppressWarnings("rawtypes") Collection collection) {
-      return !CollectionUtils.isEmpty(collection);
-  }
+    public static boolean isEmpty(@SuppressWarnings("rawtypes") Collection collection) {
+        return (collection == null || collection.isEmpty());
+    }
 
+    public static boolean isNotEmpty(@SuppressWarnings("rawtypes") Collection collection) {
+        return !CollectionUtils.isEmpty(collection);
+    }
 
 }

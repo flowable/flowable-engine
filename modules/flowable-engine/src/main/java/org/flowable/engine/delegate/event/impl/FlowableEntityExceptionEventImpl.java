@@ -25,25 +25,25 @@ import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
  */
 public class FlowableEntityExceptionEventImpl extends FlowableEventImpl implements FlowableEngineEntityEvent, FlowableExceptionEvent {
 
-  protected Object entity;
-  protected Throwable cause;
+    protected Object entity;
+    protected Throwable cause;
 
-  public FlowableEntityExceptionEventImpl(Object entity, FlowableEngineEventType type, Throwable cause) {
-    super(type);
-    if (entity == null) {
-      throw new FlowableIllegalArgumentException("Entity cannot be null.");
+    public FlowableEntityExceptionEventImpl(Object entity, FlowableEngineEventType type, Throwable cause) {
+        super(type);
+        if (entity == null) {
+            throw new FlowableIllegalArgumentException("Entity cannot be null.");
+        }
+        this.entity = entity;
+        this.cause = cause;
     }
-    this.entity = entity;
-    this.cause = cause;
-  }
 
-  @Override
-  public Object getEntity() {
-    return entity;
-  }
+    @Override
+    public Object getEntity() {
+        return entity;
+    }
 
-  @Override
-  public Throwable getCause() {
-    return cause;
-  }
+    @Override
+    public Throwable getCause() {
+        return cause;
+    }
 }

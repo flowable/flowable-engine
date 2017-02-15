@@ -26,14 +26,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ProcessDefinitionsResource {
 
-  @Autowired
-  protected FlowableProcessDefinitionService processDefinitionService;
+    @Autowired
+    protected FlowableProcessDefinitionService processDefinitionService;
 
-  @RequestMapping(value = "/rest/process-definitions", method = RequestMethod.GET)
-  public ResultListDataRepresentation getProcessDefinitions(@RequestParam(value = "latest", required = false) Boolean latest,
-      @RequestParam(value = "deploymentKey", required = false) String deploymentKey) {
+    @RequestMapping(value = "/rest/process-definitions", method = RequestMethod.GET)
+    public ResultListDataRepresentation getProcessDefinitions(@RequestParam(value = "latest", required = false) Boolean latest,
+            @RequestParam(value = "deploymentKey", required = false) String deploymentKey) {
 
-    return processDefinitionService.getProcessDefinitions(latest, deploymentKey);
-  }
+        return processDefinitionService.getProcessDefinitions(latest, deploymentKey);
+    }
 
 }

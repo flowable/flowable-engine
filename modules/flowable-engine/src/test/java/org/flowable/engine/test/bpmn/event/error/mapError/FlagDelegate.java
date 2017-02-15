@@ -19,20 +19,20 @@ import org.flowable.engine.delegate.JavaDelegate;
  * @author Saeid Mirzaei
  */
 public class FlagDelegate implements JavaDelegate {
-  static boolean visited;
+    static boolean visited;
 
-  public static void reset() {
-    visited = false;
-  }
+    public static void reset() {
+        visited = false;
+    }
 
-  public static boolean isVisited() {
-    return visited;
-  }
+    public static boolean isVisited() {
+        return visited;
+    }
 
-  @Override
-  public void execute(DelegateExecution execution) {
-    visited = true;
+    @Override
+    public void execute(DelegateExecution execution) {
+        visited = true;
 
-  }
+    }
 
 }

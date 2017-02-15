@@ -25,64 +25,64 @@ import org.flowable.form.engine.impl.interceptor.CommandContext;
  */
 public class Context {
 
-  protected static ThreadLocal<Stack<CommandContext>> commandContextThreadLocal = new ThreadLocal<Stack<CommandContext>>();
-  protected static ThreadLocal<Stack<FormEngineConfiguration>> formEngineConfigurationStackThreadLocal = new ThreadLocal<Stack<FormEngineConfiguration>>();
-  protected static ThreadLocal<Stack<TransactionContext>> transactionContextThreadLocal = new ThreadLocal<Stack<TransactionContext>>();
-  
-  public static CommandContext getCommandContext() {
-    Stack<CommandContext> stack = getStack(commandContextThreadLocal);
-    if (stack.isEmpty()) {
-      return null;
+    protected static ThreadLocal<Stack<CommandContext>> commandContextThreadLocal = new ThreadLocal<Stack<CommandContext>>();
+    protected static ThreadLocal<Stack<FormEngineConfiguration>> formEngineConfigurationStackThreadLocal = new ThreadLocal<Stack<FormEngineConfiguration>>();
+    protected static ThreadLocal<Stack<TransactionContext>> transactionContextThreadLocal = new ThreadLocal<Stack<TransactionContext>>();
+
+    public static CommandContext getCommandContext() {
+        Stack<CommandContext> stack = getStack(commandContextThreadLocal);
+        if (stack.isEmpty()) {
+            return null;
+        }
+        return stack.peek();
     }
-    return stack.peek();
-  }
 
-  public static void setCommandContext(CommandContext commandContext) {
-    getStack(commandContextThreadLocal).push(commandContext);
-  }
-
-  public static void removeCommandContext() {
-    getStack(commandContextThreadLocal).pop();
-  }
-
-  public static FormEngineConfiguration getFormEngineConfiguration() {
-    Stack<FormEngineConfiguration> stack = getStack(formEngineConfigurationStackThreadLocal);
-    if (stack.isEmpty()) {
-      return null;
+    public static void setCommandContext(CommandContext commandContext) {
+        getStack(commandContextThreadLocal).push(commandContext);
     }
-    return stack.peek();
-  }
 
-  public static void setFormEngineConfiguration(FormEngineConfiguration formEngineConfiguration) {
-    getStack(formEngineConfigurationStackThreadLocal).push(formEngineConfiguration);
-  }
+    public static void removeCommandContext() {
+        getStack(commandContextThreadLocal).pop();
+    }
 
-  public static void removeFormEngineConfiguration() {
-    getStack(formEngineConfigurationStackThreadLocal).pop();
-  }
-  
-  public static TransactionContext getTransactionContext() {
-    Stack<TransactionContext> stack = getStack(transactionContextThreadLocal);
-    if (stack.isEmpty()) {
-      return null;
+    public static FormEngineConfiguration getFormEngineConfiguration() {
+        Stack<FormEngineConfiguration> stack = getStack(formEngineConfigurationStackThreadLocal);
+        if (stack.isEmpty()) {
+            return null;
+        }
+        return stack.peek();
     }
-    return stack.peek();
-  }
-  
-  public static void setTransactionContext(TransactionContext transactionContext) {
-    getStack(transactionContextThreadLocal).push(transactionContext);
-  }
-  
-  public static void removeTransactionContext() {
-    getStack(transactionContextThreadLocal).pop();
-  }
-  
-  protected static <T> Stack<T> getStack(ThreadLocal<Stack<T>> threadLocal) {
-    Stack<T> stack = threadLocal.get();
-    if (stack == null) {
-      stack = new Stack<T>();
-      threadLocal.set(stack);
+
+    public static void setFormEngineConfiguration(FormEngineConfiguration formEngineConfiguration) {
+        getStack(formEngineConfigurationStackThreadLocal).push(formEngineConfiguration);
     }
-    return stack;
-  }
+
+    public static void removeFormEngineConfiguration() {
+        getStack(formEngineConfigurationStackThreadLocal).pop();
+    }
+
+    public static TransactionContext getTransactionContext() {
+        Stack<TransactionContext> stack = getStack(transactionContextThreadLocal);
+        if (stack.isEmpty()) {
+            return null;
+        }
+        return stack.peek();
+    }
+
+    public static void setTransactionContext(TransactionContext transactionContext) {
+        getStack(transactionContextThreadLocal).push(transactionContext);
+    }
+
+    public static void removeTransactionContext() {
+        getStack(transactionContextThreadLocal).pop();
+    }
+
+    protected static <T> Stack<T> getStack(ThreadLocal<Stack<T>> threadLocal) {
+        Stack<T> stack = threadLocal.get();
+        if (stack == null) {
+            stack = new Stack<T>();
+            threadLocal.set(stack);
+        }
+        return stack;
+    }
 }

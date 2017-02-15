@@ -22,16 +22,16 @@ import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity
  * @author Joram Barrez
  */
 public class SignalEventSubscriptionByProcInstAndEventNameMatcher extends CachedEntityMatcherAdapter<EventSubscriptionEntity> {
-  
-  @Override
-  public boolean isRetained(EventSubscriptionEntity eventSubscriptionEntity, Object parameter) {
-    Map<String, String> params = (Map<String, String>) parameter;
-    String processInstanceId = params.get("processInstanceId");
-    String eventName = params.get("eventName");
-    
-    return eventSubscriptionEntity.getEventType() != null && eventSubscriptionEntity.getEventType().equals(SignalEventSubscriptionEntity.EVENT_TYPE)
-        && eventSubscriptionEntity.getEventName() != null && eventSubscriptionEntity.getEventName().equals(eventName)
-        && eventSubscriptionEntity.getProcessInstanceId() != null && eventSubscriptionEntity.getProcessInstanceId().equals(processInstanceId);
-  }
-  
+
+    @Override
+    public boolean isRetained(EventSubscriptionEntity eventSubscriptionEntity, Object parameter) {
+        Map<String, String> params = (Map<String, String>) parameter;
+        String processInstanceId = params.get("processInstanceId");
+        String eventName = params.get("eventName");
+
+        return eventSubscriptionEntity.getEventType() != null && eventSubscriptionEntity.getEventType().equals(SignalEventSubscriptionEntity.EVENT_TYPE)
+                && eventSubscriptionEntity.getEventName() != null && eventSubscriptionEntity.getEventName().equals(eventName)
+                && eventSubscriptionEntity.getProcessInstanceId() != null && eventSubscriptionEntity.getProcessInstanceId().equals(processInstanceId);
+    }
+
 }

@@ -33,22 +33,22 @@ import io.swagger.annotations.Authorization;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Form Instances" }, description = "Manage Form Instances", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Form Instances" }, description = "Manage Form Instances", authorizations = { @Authorization(value = "basicAuth") })
 public class FormInstanceResource {
 
-  @Autowired
-  protected FormService formService;
+    @Autowired
+    protected FormService formService;
 
-  @Autowired
-  protected FormRestResponseFactory formRestResponseFactory;
+    @Autowired
+    protected FormRestResponseFactory formRestResponseFactory;
 
-  @ApiOperation(value = "Get a form instance", tags = {"Form Instances"}, nickname = "getFormInstance")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Indicates the form instance was found and returned."),
-      @ApiResponse(code = 404, message = "Indicates the requested form instance was not found.")
-  })
-  @RequestMapping(value = "/form/form-instance/{formInstanceId}", method = RequestMethod.GET, produces = "application/json")
-  public FormInstanceResponse getFormInstance(@ApiParam(name = "formInstanceId") @PathVariable String formInstanceId, HttpServletRequest request) {
-    return formRestResponseFactory.createFormInstanceResponse(formService.createFormInstanceQuery().id(formInstanceId).singleResult());
-  }
+    @ApiOperation(value = "Get a form instance", tags = { "Form Instances" }, nickname = "getFormInstance")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the form instance was found and returned."),
+            @ApiResponse(code = 404, message = "Indicates the requested form instance was not found.")
+    })
+    @RequestMapping(value = "/form/form-instance/{formInstanceId}", method = RequestMethod.GET, produces = "application/json")
+    public FormInstanceResponse getFormInstance(@ApiParam(name = "formInstanceId") @PathVariable String formInstanceId, HttpServletRequest request) {
+        return formRestResponseFactory.createFormInstanceResponse(formService.createFormInstanceQuery().id(formInstanceId).singleResult());
+    }
 }

@@ -22,8 +22,7 @@ import org.flowable.engine.common.api.FlowableObjectNotFoundException;
  * 
  * An instance can be obtained through {@link org.activiti.engine.RuntimeService#createProcessInstanceBuilder()}.
  * 
- * processDefinitionId or processDefinitionKey should be set before calling {@link #start()}
- * to start a process instance.
+ * processDefinitionId or processDefinitionKey should be set before calling {@link #start()} to start a process instance.
  * 
  *
  * @author Bassam Al-Sarori
@@ -31,64 +30,63 @@ import org.flowable.engine.common.api.FlowableObjectNotFoundException;
  */
 public interface ProcessInstanceBuilder {
 
-  /** 
-   * Set the id of the process definition 
-   **/
-  ProcessInstanceBuilder processDefinitionId(String processDefinitionId);
+    /**
+     * Set the id of the process definition
+     **/
+    ProcessInstanceBuilder processDefinitionId(String processDefinitionId);
 
-  /**
-   * Set the key of the process definition, latest version of the process definition with the given key. 
-   * If processDefinitionId was set this will be ignored
-   **/
-  ProcessInstanceBuilder processDefinitionKey(String processDefinitionKey);
-  
-  /**
-   * Set the message name that needs to be used to look up the process definition that needs to be used to start the process instance.
-   */
-  ProcessInstanceBuilder messageName(String messageName);
+    /**
+     * Set the key of the process definition, latest version of the process definition with the given key. If processDefinitionId was set this will be ignored
+     **/
+    ProcessInstanceBuilder processDefinitionKey(String processDefinitionKey);
 
-  /** 
-   * Set the name of process instance 
-   **/
-  ProcessInstanceBuilder name(String processInstanceName);
+    /**
+     * Set the message name that needs to be used to look up the process definition that needs to be used to start the process instance.
+     */
+    ProcessInstanceBuilder messageName(String messageName);
 
-  /** 
-   * Set the businessKey of process instance 
-   **/
-  ProcessInstanceBuilder businessKey(String businessKey);
+    /**
+     * Set the name of process instance
+     **/
+    ProcessInstanceBuilder name(String processInstanceName);
 
-  /** 
-   * Set the tenantId of process instance 
-   **/
-  ProcessInstanceBuilder tenantId(String tenantId);
+    /**
+     * Set the businessKey of process instance
+     **/
+    ProcessInstanceBuilder businessKey(String businessKey);
 
-  /**
-   * Sets the process variables
-   */
-  ProcessInstanceBuilder variables(Map<String, Object> variables);
-  
-  /** 
-   * Adds a variable to the process instance 
-   **/
-  ProcessInstanceBuilder variable(String variableName, Object value);
-  
-  /**
-   * Sets the transient variables
-   */
-  ProcessInstanceBuilder transientVariables(Map<String, Object> transientVariables);
-  
-  /**
-   * Adds a transient variable to the process instance
-   */
-  ProcessInstanceBuilder transientVariable(String variableName, Object value);
+    /**
+     * Set the tenantId of process instance
+     **/
+    ProcessInstanceBuilder tenantId(String tenantId);
 
-  /**
-   * Start the process instance
-   * 
-   * @throws FlowableIllegalArgumentException
-   *           if processDefinitionKey and processDefinitionId are null
-   * @throws FlowableObjectNotFoundException
-   *           when no process definition is deployed with the given processDefinitionKey or processDefinitionId
-   * **/
-  ProcessInstance start();
+    /**
+     * Sets the process variables
+     */
+    ProcessInstanceBuilder variables(Map<String, Object> variables);
+
+    /**
+     * Adds a variable to the process instance
+     **/
+    ProcessInstanceBuilder variable(String variableName, Object value);
+
+    /**
+     * Sets the transient variables
+     */
+    ProcessInstanceBuilder transientVariables(Map<String, Object> transientVariables);
+
+    /**
+     * Adds a transient variable to the process instance
+     */
+    ProcessInstanceBuilder transientVariable(String variableName, Object value);
+
+    /**
+     * Start the process instance
+     * 
+     * @throws FlowableIllegalArgumentException
+     *             if processDefinitionKey and processDefinitionId are null
+     * @throws FlowableObjectNotFoundException
+     *             when no process definition is deployed with the given processDefinitionKey or processDefinitionId
+     **/
+    ProcessInstance start();
 }

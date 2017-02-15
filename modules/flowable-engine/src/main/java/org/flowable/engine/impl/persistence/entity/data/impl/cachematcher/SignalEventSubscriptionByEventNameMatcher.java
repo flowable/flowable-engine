@@ -24,18 +24,19 @@ import org.flowable.engine.impl.persistence.entity.SuspensionState;
  * @author Joram Barrez
  */
 public class SignalEventSubscriptionByEventNameMatcher extends CachedEntityMatcherAdapter<EventSubscriptionEntity> {
-  
-  @Override
-  public boolean isRetained(EventSubscriptionEntity eventSubscriptionEntity, Object parameter) {
-    
-    Map<String, String> params = (Map<String, String>) parameter;
-    String eventName = params.get("eventName");
-    String tenantId = params.get("tenantId");
-    
-    return eventSubscriptionEntity.getEventType() != null && eventSubscriptionEntity.getEventType().equals(SignalEventSubscriptionEntity.EVENT_TYPE)
-        && eventSubscriptionEntity.getEventName() != null && eventSubscriptionEntity.getEventName().equals(eventName)
-        && (eventSubscriptionEntity.getExecutionId() == null || (eventSubscriptionEntity.getExecutionId() != null && eventSubscriptionEntity.getExecution() != null && eventSubscriptionEntity.getExecution().getSuspensionState() == SuspensionState.ACTIVE.getStateCode()) )
-        && ( (params.containsKey("tenantId") && tenantId.equals(eventSubscriptionEntity.getTenantId())) || (!params.containsKey("tenantId") && StringUtils.isEmpty(eventSubscriptionEntity.getTenantId())) );
-  }
-  
+
+    @Override
+    public boolean isRetained(EventSubscriptionEntity eventSubscriptionEntity, Object parameter) {
+
+        Map<String, String> params = (Map<String, String>) parameter;
+        String eventName = params.get("eventName");
+        String tenantId = params.get("tenantId");
+
+        return eventSubscriptionEntity.getEventType() != null && eventSubscriptionEntity.getEventType().equals(SignalEventSubscriptionEntity.EVENT_TYPE)
+                && eventSubscriptionEntity.getEventName() != null && eventSubscriptionEntity.getEventName().equals(eventName)
+                && (eventSubscriptionEntity.getExecutionId() == null
+                        || (eventSubscriptionEntity.getExecutionId() != null && eventSubscriptionEntity.getExecution() != null && eventSubscriptionEntity.getExecution().getSuspensionState() == SuspensionState.ACTIVE.getStateCode()))
+                && ((params.containsKey("tenantId") && tenantId.equals(eventSubscriptionEntity.getTenantId())) || (!params.containsKey("tenantId") && StringUtils.isEmpty(eventSubscriptionEntity.getTenantId())));
+    }
+
 }

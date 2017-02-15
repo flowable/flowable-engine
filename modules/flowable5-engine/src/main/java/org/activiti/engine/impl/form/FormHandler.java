@@ -22,15 +22,14 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.bpmn.model.FormProperty;
 import org.flowable.engine.repository.ProcessDefinition;
 
-
 /**
  * @author Tom Baeyens
  */
 public interface FormHandler extends Serializable {
 
-  ThreadLocal<FormHandler> current = new ThreadLocal<FormHandler>();
+    ThreadLocal<FormHandler> current = new ThreadLocal<FormHandler>();
 
-  void parseConfiguration(List<FormProperty> formProperties, String formKey, DeploymentEntity deployment, ProcessDefinition processDefinition);
+    void parseConfiguration(List<FormProperty> formProperties, String formKey, DeploymentEntity deployment, ProcessDefinition processDefinition);
 
-  void submitFormProperties(Map<String, String> properties, ExecutionEntity execution);
+    void submitFormProperties(Map<String, String> properties, ExecutionEntity execution);
 }

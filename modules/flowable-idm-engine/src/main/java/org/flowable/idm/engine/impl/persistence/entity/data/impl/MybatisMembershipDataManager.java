@@ -25,37 +25,37 @@ import org.flowable.idm.engine.impl.persistence.entity.data.MembershipDataManage
  * @author Joram Barrez
  */
 public class MybatisMembershipDataManager extends AbstractDataManager<MembershipEntity> implements MembershipDataManager {
-  
-  public MybatisMembershipDataManager(IdmEngineConfiguration idmEngineConfiguration) {
-    super(idmEngineConfiguration);
-  }
 
-  @Override
-  public Class<? extends MembershipEntity> getManagedEntityClass() {
-    return MembershipEntityImpl.class;
-  }
-  
-  @Override
-  public MembershipEntity create() {
-    return new MembershipEntityImpl();
-  }
-  
-  @Override
-  public void deleteMembership(String userId, String groupId) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
-    parameters.put("userId", userId);
-    parameters.put("groupId", groupId);
-    getDbSqlSession().delete("deleteMembership", parameters);
-  }
-  
-  @Override
-  public void deleteMembershipByGroupId(String groupId) {
-    getDbSqlSession().delete("deleteMembershipsByGroupId", groupId);
-  }
-  
-  @Override
-  public void deleteMembershipByUserId(String userId) {
-    getDbSqlSession().delete("deleteMembershipsByUserId", userId);
-  }
-  
+    public MybatisMembershipDataManager(IdmEngineConfiguration idmEngineConfiguration) {
+        super(idmEngineConfiguration);
+    }
+
+    @Override
+    public Class<? extends MembershipEntity> getManagedEntityClass() {
+        return MembershipEntityImpl.class;
+    }
+
+    @Override
+    public MembershipEntity create() {
+        return new MembershipEntityImpl();
+    }
+
+    @Override
+    public void deleteMembership(String userId, String groupId) {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("userId", userId);
+        parameters.put("groupId", groupId);
+        getDbSqlSession().delete("deleteMembership", parameters);
+    }
+
+    @Override
+    public void deleteMembershipByGroupId(String groupId) {
+        getDbSqlSession().delete("deleteMembershipsByGroupId", groupId);
+    }
+
+    @Override
+    public void deleteMembershipByUserId(String userId) {
+        getDbSqlSession().delete("deleteMembershipsByUserId", userId);
+    }
+
 }

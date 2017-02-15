@@ -24,6 +24,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 @EnableAsync
 public class ContentDispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
-  protected final Logger log = LoggerFactory.getLogger(ContentDispatcherServletConfiguration.class);
+    protected final Logger log = LoggerFactory.getLogger(ContentDispatcherServletConfiguration.class);
 
 }

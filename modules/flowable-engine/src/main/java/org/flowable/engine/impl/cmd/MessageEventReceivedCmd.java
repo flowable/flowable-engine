@@ -33,56 +33,55 @@ import org.flowable.engine.impl.util.Flowable5Util;
  */
 public class MessageEventReceivedCmd extends NeedsActiveExecutionCmd<Void> {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected final Map<String, Object> payload;
-  protected final String messageName;
-  protected final boolean async;
+    protected final Map<String, Object> payload;
+    protected final String messageName;
+    protected final boolean async;
 
-  public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables) {
-    super(executionId);
-    this.messageName = messageName;
+    public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables) {
+        super(executionId);
+        this.messageName = messageName;
 
-    if (processVariables != null) {
-      this.payload = new HashMap<String, Object>(processVariables);
+        if (processVariables != null) {
+            this.payload = new HashMap<String, Object>(processVariables);
 
-    } else {
-      this.payload = null;
-    }
-    this.async = false;
-  }
-
-  public MessageEventReceivedCmd(String messageName, String executionId, boolean async) {
-    super(executionId);
-    this.messageName = messageName;
-    this.payload = null;
-    this.async = async;
-  }
-
-  protected Void execute(CommandContext commandContext, ExecutionEntity execution) {
-    if (messageName == null) {
-      throw new FlowableIllegalArgumentException("messageName cannot be null");
-    }
-    
-    if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      compatibilityHandler.messageEventReceived(messageName, executionId, payload, async);
-      return null;
+        } else {
+            this.payload = null;
+        }
+        this.async = false;
     }
 
-    EventSubscriptionEntityManager eventSubscriptionEntityManager = commandContext.getEventSubscriptionEntityManager();
-    List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionEntityManager.
-        findEventSubscriptionsByNameAndExecution(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, executionId);
-
-    if (eventSubscriptions.isEmpty()) {
-      throw new FlowableException("Execution with id '" + executionId + "' does not have a subscription to a message event with name '" + messageName + "'");
+    public MessageEventReceivedCmd(String messageName, String executionId, boolean async) {
+        super(executionId);
+        this.messageName = messageName;
+        this.payload = null;
+        this.async = async;
     }
 
-    // there can be only one:
-    EventSubscriptionEntity eventSubscriptionEntity = eventSubscriptions.get(0);
-    eventSubscriptionEntityManager.eventReceived(eventSubscriptionEntity, payload, async);
+    protected Void execute(CommandContext commandContext, ExecutionEntity execution) {
+        if (messageName == null) {
+            throw new FlowableIllegalArgumentException("messageName cannot be null");
+        }
 
-    return null;
-  }
+        if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
+            Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+            compatibilityHandler.messageEventReceived(messageName, executionId, payload, async);
+            return null;
+        }
+
+        EventSubscriptionEntityManager eventSubscriptionEntityManager = commandContext.getEventSubscriptionEntityManager();
+        List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionEntityManager.findEventSubscriptionsByNameAndExecution(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, executionId);
+
+        if (eventSubscriptions.isEmpty()) {
+            throw new FlowableException("Execution with id '" + executionId + "' does not have a subscription to a message event with name '" + messageName + "'");
+        }
+
+        // there can be only one:
+        EventSubscriptionEntity eventSubscriptionEntity = eventSubscriptions.get(0);
+        eventSubscriptionEntityManager.eventReceived(eventSubscriptionEntity, payload, async);
+
+        return null;
+    }
 
 }

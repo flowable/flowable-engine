@@ -62,147 +62,147 @@ import org.flowable.idm.engine.impl.persistence.entity.IdentityInfoEntity;
  */
 public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentityService {
 
-  public Group newGroup(String groupId) {
-    return commandExecutor.execute(new CreateGroupCmd(groupId));
-  }
+    public Group newGroup(String groupId) {
+        return commandExecutor.execute(new CreateGroupCmd(groupId));
+    }
 
-  public User newUser(String userId) {
-    return commandExecutor.execute(new CreateUserCmd(userId));
-  }
+    public User newUser(String userId) {
+        return commandExecutor.execute(new CreateUserCmd(userId));
+    }
 
-  public void saveGroup(Group group) {
-    commandExecutor.execute(new SaveGroupCmd(group));
-  }
+    public void saveGroup(Group group) {
+        commandExecutor.execute(new SaveGroupCmd(group));
+    }
 
-  public void saveUser(User user) {
-    commandExecutor.execute(new SaveUserCmd(user));
-  }
+    public void saveUser(User user) {
+        commandExecutor.execute(new SaveUserCmd(user));
+    }
 
-  public UserQuery createUserQuery() {
-    return commandExecutor.execute(new CreateUserQueryCmd());
-  }
+    public UserQuery createUserQuery() {
+        return commandExecutor.execute(new CreateUserQueryCmd());
+    }
 
-  @Override
-  public NativeUserQuery createNativeUserQuery() {
-    return new NativeUserQueryImpl(commandExecutor);
-  }
+    @Override
+    public NativeUserQuery createNativeUserQuery() {
+        return new NativeUserQueryImpl(commandExecutor);
+    }
 
-  public GroupQuery createGroupQuery() {
-    return commandExecutor.execute(new CreateGroupQueryCmd());
-  }
+    public GroupQuery createGroupQuery() {
+        return commandExecutor.execute(new CreateGroupQueryCmd());
+    }
 
-  @Override
-  public NativeGroupQuery createNativeGroupQuery() {
-    return new NativeGroupQueryImpl(commandExecutor);
-  }
+    @Override
+    public NativeGroupQuery createNativeGroupQuery() {
+        return new NativeGroupQueryImpl(commandExecutor);
+    }
 
-  public void createMembership(String userId, String groupId) {
-    commandExecutor.execute(new CreateMembershipCmd(userId, groupId));
-  }
+    public void createMembership(String userId, String groupId) {
+        commandExecutor.execute(new CreateMembershipCmd(userId, groupId));
+    }
 
-  public void deleteGroup(String groupId) {
-    commandExecutor.execute(new DeleteGroupCmd(groupId));
-  }
+    public void deleteGroup(String groupId) {
+        commandExecutor.execute(new DeleteGroupCmd(groupId));
+    }
 
-  public void deleteMembership(String userId, String groupId) {
-    commandExecutor.execute(new DeleteMembershipCmd(userId, groupId));
-  }
+    public void deleteMembership(String userId, String groupId) {
+        commandExecutor.execute(new DeleteMembershipCmd(userId, groupId));
+    }
 
-  public boolean checkPassword(String userId, String password) {
-    return commandExecutor.execute(new CheckPassword(userId, password));
-  }
+    public boolean checkPassword(String userId, String password) {
+        return commandExecutor.execute(new CheckPassword(userId, password));
+    }
 
-  public void deleteUser(String userId) {
-    commandExecutor.execute(new DeleteUserCmd(userId));
-  }
-  
-  public Token newToken(String tokenId) {
-    return commandExecutor.execute(new CreateTokenCmd(tokenId));
-  }
-  
-  public void saveToken(Token token) {
-    commandExecutor.execute(new SaveTokenCmd(token));
-  }
-  
-  public void deleteToken(String tokenId) {
-    commandExecutor.execute(new DeleteTokenCmd(tokenId));
-  }
-  
-  public TokenQuery createTokenQuery() {
-    return commandExecutor.execute(new CreateTokenQueryCmd());
-  }
+    public void deleteUser(String userId) {
+        commandExecutor.execute(new DeleteUserCmd(userId));
+    }
 
-  public NativeTokenQuery createNativeTokenQuery() {
-    return new NativeTokenQueryImpl(commandExecutor);
-  }
+    public Token newToken(String tokenId) {
+        return commandExecutor.execute(new CreateTokenCmd(tokenId));
+    }
 
-  public void setUserPicture(String userId, Picture picture) {
-    commandExecutor.execute(new SetUserPictureCmd(userId, picture));
-  }
+    public void saveToken(Token token) {
+        commandExecutor.execute(new SaveTokenCmd(token));
+    }
 
-  public Picture getUserPicture(String userId) {
-    return commandExecutor.execute(new GetUserPictureCmd(userId));
-  }
+    public void deleteToken(String tokenId) {
+        commandExecutor.execute(new DeleteTokenCmd(tokenId));
+    }
 
-  public String getUserInfo(String userId, String key) {
-    return commandExecutor.execute(new GetUserInfoCmd(userId, key));
-  }
+    public TokenQuery createTokenQuery() {
+        return commandExecutor.execute(new CreateTokenQueryCmd());
+    }
 
-  public List<String> getUserInfoKeys(String userId) {
-    return commandExecutor.execute(new GetUserInfoKeysCmd(userId, IdentityInfoEntity.TYPE_USERINFO));
-  }
+    public NativeTokenQuery createNativeTokenQuery() {
+        return new NativeTokenQueryImpl(commandExecutor);
+    }
 
-  public void setUserInfo(String userId, String key, String value) {
-    commandExecutor.execute(new SetUserInfoCmd(userId, key, value));
-  }
+    public void setUserPicture(String userId, Picture picture) {
+        commandExecutor.execute(new SetUserPictureCmd(userId, picture));
+    }
 
-  public void deleteUserInfo(String userId, String key) {
-    commandExecutor.execute(new DeleteUserInfoCmd(userId, key));
-  }
+    public Picture getUserPicture(String userId) {
+        return commandExecutor.execute(new GetUserPictureCmd(userId));
+    }
 
-  @Override
-  public Privilege createPrivilege(String name) {
-    return commandExecutor.execute(new CreatePrivilegeCmd(name));
-  }
-  
-  @Override
-  public void addUserPrivilegeMapping(String privilegeId, String userId) {
-    commandExecutor.execute(new AddPrivilegeMappingCmd(privilegeId, userId, null));
-  }
-  
-  @Override
-  public void deleteUserPrivilegeMapping(String privilegeId, String userId) {
-    commandExecutor.execute(new DeletePrivilegeMappingCmd(privilegeId, userId, null));
-  }
-  
-  @Override
-  public void addGroupPrivilegeMapping(String privilegeId, String groupId) {
-    commandExecutor.execute(new AddPrivilegeMappingCmd(privilegeId, null, groupId));
-  }
-  
-  @Override
-  public void deleteGroupPrivilegeMapping(String privilegeId, String groupId) {
-    commandExecutor.execute(new DeletePrivilegeMappingCmd(privilegeId, null, groupId));
-  }
-  
-  @Override
-  public void deletePrivilege(String id) {
-    commandExecutor.execute(new DeletePrivilegeCmd(id));
-  }
+    public String getUserInfo(String userId, String key) {
+        return commandExecutor.execute(new GetUserInfoCmd(userId, key));
+    }
 
-  @Override
-  public PrivilegeQuery createPrivilegeQuery() {
-    return commandExecutor.execute(new CreatePrivilegeQueryCmd());
-  }
-  
-  @Override
-  public List<Group> getGroupsWithPrivilege(String name) {
-    return commandExecutor.execute(new GetGroupsWithPrivilegeCmd(name));
-  }
-  
-  @Override
-  public List<User> getUsersWithPrivilege(String name) {
-    return commandExecutor.execute(new GetUsersWithPrivilegeCmd(name));
-  }
-  
+    public List<String> getUserInfoKeys(String userId) {
+        return commandExecutor.execute(new GetUserInfoKeysCmd(userId, IdentityInfoEntity.TYPE_USERINFO));
+    }
+
+    public void setUserInfo(String userId, String key, String value) {
+        commandExecutor.execute(new SetUserInfoCmd(userId, key, value));
+    }
+
+    public void deleteUserInfo(String userId, String key) {
+        commandExecutor.execute(new DeleteUserInfoCmd(userId, key));
+    }
+
+    @Override
+    public Privilege createPrivilege(String name) {
+        return commandExecutor.execute(new CreatePrivilegeCmd(name));
+    }
+
+    @Override
+    public void addUserPrivilegeMapping(String privilegeId, String userId) {
+        commandExecutor.execute(new AddPrivilegeMappingCmd(privilegeId, userId, null));
+    }
+
+    @Override
+    public void deleteUserPrivilegeMapping(String privilegeId, String userId) {
+        commandExecutor.execute(new DeletePrivilegeMappingCmd(privilegeId, userId, null));
+    }
+
+    @Override
+    public void addGroupPrivilegeMapping(String privilegeId, String groupId) {
+        commandExecutor.execute(new AddPrivilegeMappingCmd(privilegeId, null, groupId));
+    }
+
+    @Override
+    public void deleteGroupPrivilegeMapping(String privilegeId, String groupId) {
+        commandExecutor.execute(new DeletePrivilegeMappingCmd(privilegeId, null, groupId));
+    }
+
+    @Override
+    public void deletePrivilege(String id) {
+        commandExecutor.execute(new DeletePrivilegeCmd(id));
+    }
+
+    @Override
+    public PrivilegeQuery createPrivilegeQuery() {
+        return commandExecutor.execute(new CreatePrivilegeQueryCmd());
+    }
+
+    @Override
+    public List<Group> getGroupsWithPrivilege(String name) {
+        return commandExecutor.execute(new GetGroupsWithPrivilegeCmd(name));
+    }
+
+    @Override
+    public List<User> getUsersWithPrivilege(String name) {
+        return commandExecutor.execute(new GetUsersWithPrivilegeCmd(name));
+    }
+
 }

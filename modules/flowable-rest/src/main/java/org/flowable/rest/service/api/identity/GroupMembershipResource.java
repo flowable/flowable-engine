@@ -34,27 +34,27 @@ import javax.servlet.http.HttpServletResponse;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Groups" }, description = "Manage Groups", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Groups" }, description = "Manage Groups", authorizations = { @Authorization(value = "basicAuth") })
 public class GroupMembershipResource extends BaseGroupResource {
 
-  @ApiOperation(value = "Delete a member from a group", tags = {"Groups"})
-  @ApiResponses(value = {
-          @ApiResponse(code = 204, message = "Indicates the group was found and the member has been deleted. The response body is left empty intentionally."),
-          @ApiResponse(code = 404, message = "Indicates the requested group was not found or that the user is not a member of the group. The status description contains additional information about the error.")
-  })
-  @RequestMapping(value = "/identity/groups/{groupId}/members/{userId}", method = RequestMethod.DELETE)
-  public void deleteMembership(@ApiParam(name = "groupId") @PathVariable("groupId") String groupId, @ApiParam(name = "userId") @PathVariable("userId") String userId, HttpServletRequest request, HttpServletResponse response) {
+    @ApiOperation(value = "Delete a member from a group", tags = { "Groups" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Indicates the group was found and the member has been deleted. The response body is left empty intentionally."),
+            @ApiResponse(code = 404, message = "Indicates the requested group was not found or that the user is not a member of the group. The status description contains additional information about the error.")
+    })
+    @RequestMapping(value = "/identity/groups/{groupId}/members/{userId}", method = RequestMethod.DELETE)
+    public void deleteMembership(@ApiParam(name = "groupId") @PathVariable("groupId") String groupId, @ApiParam(name = "userId") @PathVariable("userId") String userId, HttpServletRequest request, HttpServletResponse response) {
 
-    Group group = getGroupFromRequest(groupId);
+        Group group = getGroupFromRequest(groupId);
 
-    // Check if user is not a member of group since API doesn't return typed
-    // exception
-    if (identityService.createUserQuery().memberOfGroup(group.getId()).userId(userId).count() != 1) {
+        // Check if user is not a member of group since API doesn't return typed
+        // exception
+        if (identityService.createUserQuery().memberOfGroup(group.getId()).userId(userId).count() != 1) {
 
-      throw new FlowableObjectNotFoundException("User '" + userId + "' is not part of group '" + group.getId() + "'.", null);
+            throw new FlowableObjectNotFoundException("User '" + userId + "' is not part of group '" + group.getId() + "'.", null);
+        }
+
+        identityService.deleteMembership(userId, group.getId());
+        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
-
-    identityService.deleteMembership(userId, group.getId());
-    response.setStatus(HttpStatus.NO_CONTENT.value());
-  }
 }

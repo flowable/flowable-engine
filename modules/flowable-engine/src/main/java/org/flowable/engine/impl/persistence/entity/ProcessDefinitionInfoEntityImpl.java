@@ -19,43 +19,42 @@ import java.util.Map;
 
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 
-
 /**
  * @author Tijs Rademakers
  */
 public class ProcessDefinitionInfoEntityImpl extends AbstractEntity implements ProcessDefinitionInfoEntity, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  
-  protected String processDefinitionId;
-  protected String infoJsonId;
-  
-  public ProcessDefinitionInfoEntityImpl() {
-    
-  }
+    private static final long serialVersionUID = 1L;
 
-  public Object getPersistentState() {
-    Map<String, Object> persistentState = new HashMap<String, Object>();
-    persistentState.put("processDefinitionId", this.processDefinitionId);
-    persistentState.put("infoJsonId", this.infoJsonId);
-    return persistentState;
-  }
+    protected String processDefinitionId;
+    protected String infoJsonId;
 
-  // getters and setters //////////////////////////////////////////////////////
+    public ProcessDefinitionInfoEntityImpl() {
 
-  public String getProcessDefinitionId() {
-    return processDefinitionId;
-  }
+    }
 
-  public void setProcessDefinitionId(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
+    public Object getPersistentState() {
+        Map<String, Object> persistentState = new HashMap<String, Object>();
+        persistentState.put("processDefinitionId", this.processDefinitionId);
+        persistentState.put("infoJsonId", this.infoJsonId);
+        return persistentState;
+    }
 
-  public String getInfoJsonId() {
-    return infoJsonId;
-  }
+    // getters and setters //////////////////////////////////////////////////////
 
-  public void setInfoJsonId(String infoJsonId) {
-    this.infoJsonId = infoJsonId;
-  }
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
+
+    public void setProcessDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
+
+    public String getInfoJsonId() {
+        return infoJsonId;
+    }
+
+    public void setInfoJsonId(String infoJsonId) {
+        this.infoJsonId = infoJsonId;
+    }
 }

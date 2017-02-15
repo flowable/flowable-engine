@@ -15,17 +15,16 @@ package org.activiti.engine.test.bpmn.servicetask;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 
-
 /**
  * @author Joram Barrez
  */
 public class RepeatingServiceTaskTest extends PluggableFlowableTestCase {
-  
-//  @Deployment
-  public void testMultipleInvocationsInSameTransation() {
-//    ProcessInstance processInstance = 
-//        runtimeService.startProcessInstanceByKey("repeating", CollectionUtil.singletonMap("count", 0));
-//    assertTrue(processInstance.isEnded());
-  }
+
+    // @Deployment
+    public void testMultipleInvocationsInSameTransation() {
+        // ProcessInstance processInstance =
+        // runtimeService.startProcessInstanceByKey("repeating", CollectionUtil.singletonMap("count", 0));
+        // assertTrue(processInstance.isEnded());
+    }
 
 }

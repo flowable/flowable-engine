@@ -24,46 +24,46 @@ import org.flowable.form.engine.impl.context.Context;
  * @author Joram Barrez
  */
 public class TransactionContextInterceptor extends AbstractCommandInterceptor {
-  
-  protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
 
-  public TransactionContextInterceptor() {
-  }
+    protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
 
-  public TransactionContextInterceptor(TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory) {
-    this.transactionContextFactory = transactionContextFactory;
-  }
-
-  public <T> T execute(CommandConfig config, Command<T> command) {
-    
-    CommandContext commandContext = Context.getCommandContext();
-    // Storing it in a variable, to reference later (it can change during command execution)
-    boolean isReused = commandContext.isReused();
-    
-    try {
-      
-      if (transactionContextFactory != null && !isReused) {
-        TransactionContext transactionContext = (TransactionContext) transactionContextFactory.openTransactionContext(commandContext);
-        Context.setTransactionContext(transactionContext);
-        commandContext.addCloseListener(new TransactionCommandContextCloseListener(transactionContext));
-      }
-      
-      return next.execute(config, command);
-      
-    } finally {
-      if (transactionContextFactory != null && !isReused) {
-        Context.removeTransactionContext();
-      }
+    public TransactionContextInterceptor() {
     }
 
-  }
+    public TransactionContextInterceptor(TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory) {
+        this.transactionContextFactory = transactionContextFactory;
+    }
 
-  public TransactionContextFactory<TransactionListener, CommandContext> getTransactionContextFactory() {
-    return transactionContextFactory;
-  }
+    public <T> T execute(CommandConfig config, Command<T> command) {
 
-  public void setTransactionContextFactory(TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory) {
-    this.transactionContextFactory = transactionContextFactory;
-  }
+        CommandContext commandContext = Context.getCommandContext();
+        // Storing it in a variable, to reference later (it can change during command execution)
+        boolean isReused = commandContext.isReused();
+
+        try {
+
+            if (transactionContextFactory != null && !isReused) {
+                TransactionContext transactionContext = (TransactionContext) transactionContextFactory.openTransactionContext(commandContext);
+                Context.setTransactionContext(transactionContext);
+                commandContext.addCloseListener(new TransactionCommandContextCloseListener(transactionContext));
+            }
+
+            return next.execute(config, command);
+
+        } finally {
+            if (transactionContextFactory != null && !isReused) {
+                Context.removeTransactionContext();
+            }
+        }
+
+    }
+
+    public TransactionContextFactory<TransactionListener, CommandContext> getTransactionContextFactory() {
+        return transactionContextFactory;
+    }
+
+    public void setTransactionContextFactory(TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory) {
+        this.transactionContextFactory = transactionContextFactory;
+    }
 
 }

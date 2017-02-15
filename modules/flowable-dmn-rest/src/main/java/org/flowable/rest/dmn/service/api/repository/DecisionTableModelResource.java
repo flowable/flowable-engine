@@ -29,17 +29,17 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Decision Tables" }, description = "Manage Decision Tables", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Decision Tables" }, description = "Manage Decision Tables", authorizations = { @Authorization(value = "basicAuth") })
 public class DecisionTableModelResource extends BaseDecisionTableResource {
 
-  @ApiOperation(value = "Get a decision table DMN (definition) model", tags = {"Decision Tables"},  nickname = "getDmnModelResource")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Indicates the decision table was found and the model is returned."),
-      @ApiResponse(code = 404, message = "Indicates the requested decision table was not found.")
-  })
-  @RequestMapping(value = "/dmn-repository/decision-tables/{decisionTableId}/model", method = RequestMethod.GET, produces = "application/json")
-  public DmnDefinition getDmnModelResource(@ApiParam(name = "decisionTableId") @PathVariable String decisionTableId) {
-    DmnDecisionTable decisionTable = geDecisionTableFromRequest(decisionTableId);
-    return dmnRepositoryService.getDmnDefinition(decisionTable.getId());
-  }
+    @ApiOperation(value = "Get a decision table DMN (definition) model", tags = { "Decision Tables" }, nickname = "getDmnModelResource")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the decision table was found and the model is returned."),
+            @ApiResponse(code = 404, message = "Indicates the requested decision table was not found.")
+    })
+    @RequestMapping(value = "/dmn-repository/decision-tables/{decisionTableId}/model", method = RequestMethod.GET, produces = "application/json")
+    public DmnDefinition getDmnModelResource(@ApiParam(name = "decisionTableId") @PathVariable String decisionTableId) {
+        DmnDecisionTable decisionTable = geDecisionTableFromRequest(decisionTableId);
+        return dmnRepositoryService.getDmnDefinition(decisionTable.getId());
+    }
 }

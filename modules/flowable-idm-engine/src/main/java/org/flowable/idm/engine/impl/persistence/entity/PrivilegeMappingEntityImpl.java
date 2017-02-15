@@ -19,37 +19,42 @@ import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 
 public class PrivilegeMappingEntityImpl extends AbstractEntity implements PrivilegeMappingEntity {
 
-  protected String privilegeId;
-  protected String userId;
-  protected String groupId;
-  
-  @Override
-  public Object getPersistentState() {
-    Map<String, String> state = new HashMap<String, String>();
-    state.put("id", id);
-    state.put("privilegeId", privilegeId);
-    state.put("userId", userId);
-    state.put("groupId", groupId);
-    return state;
-  }
-  
-  public String getPrivilegeId() {
-    return privilegeId;
-  }
-  public void setPrivilegeId(String privilegeId) {
-    this.privilegeId = privilegeId;
-  }
-  public String getUserId() {
-    return userId;
-  }
-  public void setUserId(String userId) {
-    this.userId = userId;
-  }
-  public String getGroupId() {
-    return groupId;
-  }
-  public void setGroupId(String groupId) {
-    this.groupId = groupId;
-  }
-  
+    protected String privilegeId;
+    protected String userId;
+    protected String groupId;
+
+    @Override
+    public Object getPersistentState() {
+        Map<String, String> state = new HashMap<String, String>();
+        state.put("id", id);
+        state.put("privilegeId", privilegeId);
+        state.put("userId", userId);
+        state.put("groupId", groupId);
+        return state;
+    }
+
+    public String getPrivilegeId() {
+        return privilegeId;
+    }
+
+    public void setPrivilegeId(String privilegeId) {
+        this.privilegeId = privilegeId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
 }

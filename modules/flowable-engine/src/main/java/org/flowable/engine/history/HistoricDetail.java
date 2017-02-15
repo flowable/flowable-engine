@@ -22,23 +22,23 @@ import java.util.Date;
  */
 public interface HistoricDetail extends HistoricData {
 
-  /** The unique DB id for this historic detail */
-  String getId();
+    /** The unique DB id for this historic detail */
+    String getId();
 
-  /** The process instance reference. */
-  String getProcessInstanceId();
+    /** The process instance reference. */
+    String getProcessInstanceId();
 
-  /**
-   * The activity reference in case this detail is related to an activity instance.
-   */
-  String getActivityInstanceId();
+    /**
+     * The activity reference in case this detail is related to an activity instance.
+     */
+    String getActivityInstanceId();
 
-  /** The identifier for the path of execution. */
-  String getExecutionId();
+    /** The identifier for the path of execution. */
+    String getExecutionId();
 
-  /** The identifier for the task. */
-  String getTaskId();
+    /** The identifier for the task. */
+    String getTaskId();
 
-  /** The time when this detail occurred */
-  Date getTime();
+    /** The time when this detail occurred */
+    Date getTime();
 }

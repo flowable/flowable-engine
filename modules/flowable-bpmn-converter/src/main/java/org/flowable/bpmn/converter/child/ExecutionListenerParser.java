@@ -24,20 +24,20 @@ import org.slf4j.LoggerFactory;
  * @author Tijs Rademakers
  */
 public class ExecutionListenerParser extends FlowableListenerParser {
-  
-  private static Logger logger = LoggerFactory.getLogger(ExecutionListenerParser.class);
 
-  public String getElementName() {
-    return ELEMENT_EXECUTION_LISTENER;
-  }
+    private static Logger logger = LoggerFactory.getLogger(ExecutionListenerParser.class);
 
-  public void addListenerToParent(FlowableListener listener, BaseElement parentElement) {
-    if (parentElement instanceof HasExecutionListeners) {
-      if (StringUtils.isEmpty(listener.getEvent()) && parentElement instanceof SequenceFlow) {
-        // No event type on a sequenceflow = 'take' implied
-        listener.setEvent("take");
-      }
-      ((HasExecutionListeners) parentElement).getExecutionListeners().add(listener);
+    public String getElementName() {
+        return ELEMENT_EXECUTION_LISTENER;
     }
-  }
+
+    public void addListenerToParent(FlowableListener listener, BaseElement parentElement) {
+        if (parentElement instanceof HasExecutionListeners) {
+            if (StringUtils.isEmpty(listener.getEvent()) && parentElement instanceof SequenceFlow) {
+                // No event type on a sequenceflow = 'take' implied
+                listener.setEvent("take");
+            }
+            ((HasExecutionListeners) parentElement).getExecutionListeners().add(listener);
+        }
+    }
 }

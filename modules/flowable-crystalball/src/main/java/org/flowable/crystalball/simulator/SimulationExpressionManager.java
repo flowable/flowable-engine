@@ -33,64 +33,64 @@ import org.flowable.engine.impl.el.ExpressionManager;
  */
 public class SimulationExpressionManager extends ExpressionManager {
 
-  /**
-   */
-  public SimulationExpressionManager(Map<Object, Object> beans, ProcessEngineConfigurationImpl processEngineConfiguration) {
-    super(beans, processEngineConfiguration);
-  }
-
-  @Override
-  protected ELResolver createElResolver(VariableScope variableScope) {
-    CompositeELResolver compositeElResolver = new CompositeELResolver();
-    compositeElResolver.add(new SimulationScopeElResolver(variableScope));
-    compositeElResolver.add(super.createElResolver(variableScope));
-    return compositeElResolver;
-  }
-
-  private class SimulationScopeElResolver extends ELResolver {
-
-    public static final String EVENT_CALENDAR_KEY = "eventCalendar";
-
-    protected VariableScope variableScope;
-
-    public SimulationScopeElResolver(VariableScope variableScope) {
-      this.variableScope = variableScope;
+    /**
+     */
+    public SimulationExpressionManager(Map<Object, Object> beans, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(beans, processEngineConfiguration);
     }
 
     @Override
-    public Object getValue(ELContext context, Object base, Object property) {
-      if (base == null) {
-        if (EVENT_CALENDAR_KEY.equals(property)) {
-          context.setPropertyResolved(true);
-          return SimulationRunContext.getEventCalendar();
+    protected ELResolver createElResolver(VariableScope variableScope) {
+        CompositeELResolver compositeElResolver = new CompositeELResolver();
+        compositeElResolver.add(new SimulationScopeElResolver(variableScope));
+        compositeElResolver.add(super.createElResolver(variableScope));
+        return compositeElResolver;
+    }
+
+    private class SimulationScopeElResolver extends ELResolver {
+
+        public static final String EVENT_CALENDAR_KEY = "eventCalendar";
+
+        protected VariableScope variableScope;
+
+        public SimulationScopeElResolver(VariableScope variableScope) {
+            this.variableScope = variableScope;
         }
-      }
-      return null;
-    }
 
-    @Override
-    public boolean isReadOnly(ELContext context, Object base, Object property) {
-      return true;
-    }
+        @Override
+        public Object getValue(ELContext context, Object base, Object property) {
+            if (base == null) {
+                if (EVENT_CALENDAR_KEY.equals(property)) {
+                    context.setPropertyResolved(true);
+                    return SimulationRunContext.getEventCalendar();
+                }
+            }
+            return null;
+        }
 
-    @Override
-    public void setValue(ELContext context, Object base, Object property, Object value) {
-      throw new PropertyNotWritableException("Variable '" + property + "' is not writable");
-    }
+        @Override
+        public boolean isReadOnly(ELContext context, Object base, Object property) {
+            return true;
+        }
 
-    @Override
-    public Class<?> getCommonPropertyType(ELContext arg0, Object arg1) {
-      return Object.class;
-    }
+        @Override
+        public void setValue(ELContext context, Object base, Object property, Object value) {
+            throw new PropertyNotWritableException("Variable '" + property + "' is not writable");
+        }
 
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext arg0, Object arg1) {
-      return null;
-    }
+        @Override
+        public Class<?> getCommonPropertyType(ELContext arg0, Object arg1) {
+            return Object.class;
+        }
 
-    @Override
-    public Class<?> getType(ELContext arg0, Object arg1, Object arg2) {
-      return Object.class;
+        @Override
+        public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext arg0, Object arg1) {
+            return null;
+        }
+
+        @Override
+        public Class<?> getType(ELContext arg0, Object arg1, Object arg2) {
+            return Object.class;
+        }
     }
-  }
 }

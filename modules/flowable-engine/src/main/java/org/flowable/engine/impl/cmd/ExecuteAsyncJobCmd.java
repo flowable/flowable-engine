@@ -29,46 +29,46 @@ import org.slf4j.LoggerFactory;
  */
 public class ExecuteAsyncJobCmd implements Command<Object>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private static Logger log = LoggerFactory.getLogger(ExecuteAsyncJobCmd.class);
+    private static Logger log = LoggerFactory.getLogger(ExecuteAsyncJobCmd.class);
 
-  protected String jobId;
+    protected String jobId;
 
-  public ExecuteAsyncJobCmd(String jobId) {
-    this.jobId = jobId;
-  }
-
-  public Object execute(CommandContext commandContext) {
-
-    if (jobId == null) {
-      throw new FlowableIllegalArgumentException("jobId is null");
-    }
-    
-    // We need to refetch the job, as it could have been deleted by another concurrent job
-    // For example: an embedded subprocess with a couple of async tasks and a timer on the boundary of the subprocess
-    // when the timer fires, all executions and thus also the jobs inside of the embedded subprocess are destroyed.
-    // However, the async task jobs could already have been fetched and put in the queue.... while in reality they have been deleted. 
-    // A refetch is thus needed here to be sure that it exists for this transaction.
-    
-    Job job = commandContext.getJobEntityManager().findById(jobId);
-    if (job == null) {
-      log.debug("Job does not exist anymore and will not be executed. It has most likely been deleted "
-          + "as part of another concurrent part of the process instance.");
-      return null;
+    public ExecuteAsyncJobCmd(String jobId) {
+        this.jobId = jobId;
     }
 
-    if (log.isDebugEnabled()) {
-      log.debug("Executing async job {}", job.getId());
+    public Object execute(CommandContext commandContext) {
+
+        if (jobId == null) {
+            throw new FlowableIllegalArgumentException("jobId is null");
+        }
+
+        // We need to refetch the job, as it could have been deleted by another concurrent job
+        // For example: an embedded subprocess with a couple of async tasks and a timer on the boundary of the subprocess
+        // when the timer fires, all executions and thus also the jobs inside of the embedded subprocess are destroyed.
+        // However, the async task jobs could already have been fetched and put in the queue.... while in reality they have been deleted.
+        // A refetch is thus needed here to be sure that it exists for this transaction.
+
+        Job job = commandContext.getJobEntityManager().findById(jobId);
+        if (job == null) {
+            log.debug("Job does not exist anymore and will not be executed. It has most likely been deleted "
+                    + "as part of another concurrent part of the process instance.");
+            return null;
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Executing async job {}", job.getId());
+        }
+
+        commandContext.getJobManager().execute(job);
+
+        if (commandContext.getEventDispatcher().isEnabled()) {
+            commandContext.getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_EXECUTION_SUCCESS, job));
+        }
+
+        return null;
     }
-
-    commandContext.getJobManager().execute(job);
-
-    if (commandContext.getEventDispatcher().isEnabled()) {
-      commandContext.getEventDispatcher().dispatchEvent(
-          FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_EXECUTION_SUCCESS, job));
-    }
-
-    return null;
-  }
 }

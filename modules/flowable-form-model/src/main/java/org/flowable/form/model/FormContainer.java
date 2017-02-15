@@ -21,15 +21,15 @@ import java.util.List;
  */
 public class FormContainer extends FormField {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected List<List<FormField>> fields = new ArrayList<List<FormField>>();
+    protected List<List<FormField>> fields = new ArrayList<List<FormField>>();
 
-  public List<List<FormField>> getFields() {
-    return fields;
-  }
+    public List<List<FormField>> getFields() {
+        return fields;
+    }
 
-  public void setFields(List<List<FormField>> fields) {
-    this.fields = fields;
-  }
+    public void setFields(List<List<FormField>> fields) {
+        this.fields = fields;
+    }
 }

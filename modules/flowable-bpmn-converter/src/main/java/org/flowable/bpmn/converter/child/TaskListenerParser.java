@@ -21,13 +21,13 @@ import org.flowable.bpmn.model.UserTask;
  */
 public class TaskListenerParser extends FlowableListenerParser {
 
-  public String getElementName() {
-    return ELEMENT_TASK_LISTENER;
-  }
-
-  public void addListenerToParent(FlowableListener listener, BaseElement parentElement) {
-    if (parentElement instanceof UserTask) {
-      ((UserTask) parentElement).getTaskListeners().add(listener);
+    public String getElementName() {
+        return ELEMENT_TASK_LISTENER;
     }
-  }
+
+    public void addListenerToParent(FlowableListener listener, BaseElement parentElement) {
+        if (parentElement instanceof UserTask) {
+            ((UserTask) parentElement).getTaskListeners().add(listener);
+        }
+    }
 }

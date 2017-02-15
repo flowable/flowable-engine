@@ -21,29 +21,28 @@ import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 
-
 /**
  * @author Tom Baeyens
  */
 public class ServiceTaskJavaDelegateActivityBehavior extends TaskActivityBehavior implements ActivityBehavior, ExecutionListener {
-  
-  protected JavaDelegate javaDelegate;
-  
-  protected ServiceTaskJavaDelegateActivityBehavior() {
-  }
 
-  public ServiceTaskJavaDelegateActivityBehavior(JavaDelegate javaDelegate) {
-    this.javaDelegate = javaDelegate;
-  }
+    protected JavaDelegate javaDelegate;
 
-  public void execute(DelegateExecution execution) {
-    Context.getProcessEngineConfiguration()
-      .getDelegateInterceptor()
-      .handleInvocation(new JavaDelegateInvocation(javaDelegate, execution));
-    leave((ActivityExecution) execution);
-  }
-  
-  public void notify(DelegateExecution execution) {
-    execute(execution);
-  }
+    protected ServiceTaskJavaDelegateActivityBehavior() {
+    }
+
+    public ServiceTaskJavaDelegateActivityBehavior(JavaDelegate javaDelegate) {
+        this.javaDelegate = javaDelegate;
+    }
+
+    public void execute(DelegateExecution execution) {
+        Context.getProcessEngineConfiguration()
+                .getDelegateInterceptor()
+                .handleInvocation(new JavaDelegateInvocation(javaDelegate, execution));
+        leave((ActivityExecution) execution);
+    }
+
+    public void notify(DelegateExecution execution) {
+        execute(execution);
+    }
 }

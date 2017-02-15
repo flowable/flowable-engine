@@ -27,10 +27,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ControllerAdvice
 public class TaskRestExceptionHandlerAdvice extends BaseExceptionHandlerAdvice {
 
-  @ResponseStatus(HttpStatus.CONFLICT)  // 409
-  @ExceptionHandler(FlowableTaskAlreadyClaimedException.class)
-  @ResponseBody
-  public ErrorInfo handleTaskAlreadyClaimed(FlowableTaskAlreadyClaimedException e) {
-    return new ErrorInfo("Task was already claimed", e);
-  }
+    @ResponseStatus(HttpStatus.CONFLICT) // 409
+    @ExceptionHandler(FlowableTaskAlreadyClaimedException.class)
+    @ResponseBody
+    public ErrorInfo handleTaskAlreadyClaimed(FlowableTaskAlreadyClaimedException e) {
+        return new ErrorInfo("Task was already claimed", e);
+    }
 }

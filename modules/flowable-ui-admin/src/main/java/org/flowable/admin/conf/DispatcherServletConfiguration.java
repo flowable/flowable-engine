@@ -41,8 +41,8 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 @Configuration
 @ComponentScan(basePackages = {
-    "org.flowable.admin.app.rest",
-    "org.flowable.app.rest"})
+        "org.flowable.admin.app.rest",
+        "org.flowable.app.rest" })
 @EnableWebMvc
 public class DispatcherServletConfiguration extends WebMvcConfigurerAdapter {
 
@@ -112,7 +112,7 @@ public class DispatcherServletConfiguration extends WebMvcConfigurerAdapter {
         log.debug("Creating requestMappingHandlerMapping");
         RequestMappingHandlerMapping requestMappingHandlerMapping = new RequestMappingHandlerMapping();
         requestMappingHandlerMapping.setUseSuffixPatternMatch(false);
-        Object[] interceptors = {localeChangeInterceptor()};
+        Object[] interceptors = { localeChangeInterceptor() };
         requestMappingHandlerMapping.setInterceptors(interceptors);
         return requestMappingHandlerMapping;
     }

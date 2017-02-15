@@ -24,46 +24,45 @@ import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.form.StartFormData;
 import org.flowable.engine.repository.ProcessDefinition;
 
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
 public class GetRenderedStartFormCmd implements Command<Object>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String processDefinitionId;
-  protected String formEngineName;
-  
-  public GetRenderedStartFormCmd(String processDefinitionId, String formEngineName) {
-    this.processDefinitionId = processDefinitionId;
-    this.formEngineName = formEngineName;
-  }
+    private static final long serialVersionUID = 1L;
+    protected String processDefinitionId;
+    protected String formEngineName;
 
-  public Object execute(CommandContext commandContext) {
-    ProcessDefinition processDefinition = commandContext
-      .getProcessEngineConfiguration()
-      .getDeploymentManager()
-      .findDeployedProcessDefinitionById(processDefinitionId);
-    if (processDefinition == null) {
-      throw new ActivitiObjectNotFoundException("Process Definition '" + processDefinitionId +"' not found", ProcessDefinition.class);
+    public GetRenderedStartFormCmd(String processDefinitionId, String formEngineName) {
+        this.processDefinitionId = processDefinitionId;
+        this.formEngineName = formEngineName;
     }
-    StartFormHandler startFormHandler = ((ProcessDefinitionEntity) processDefinition).getStartFormHandler();
-    if (startFormHandler == null) {
-      return null;
+
+    public Object execute(CommandContext commandContext) {
+        ProcessDefinition processDefinition = commandContext
+                .getProcessEngineConfiguration()
+                .getDeploymentManager()
+                .findDeployedProcessDefinitionById(processDefinitionId);
+        if (processDefinition == null) {
+            throw new ActivitiObjectNotFoundException("Process Definition '" + processDefinitionId + "' not found", ProcessDefinition.class);
+        }
+        StartFormHandler startFormHandler = ((ProcessDefinitionEntity) processDefinition).getStartFormHandler();
+        if (startFormHandler == null) {
+            return null;
+        }
+
+        FormEngine formEngine = commandContext
+                .getProcessEngineConfiguration()
+                .getFormEngines()
+                .get(formEngineName);
+
+        if (formEngine == null) {
+            throw new ActivitiException("No formEngine '" + formEngineName + "' defined process engine configuration");
+        }
+
+        StartFormData startForm = startFormHandler.createStartFormData(processDefinition);
+
+        return formEngine.renderStartForm(startForm);
     }
-    
-    FormEngine formEngine = commandContext
-      .getProcessEngineConfiguration()
-      .getFormEngines()
-      .get(formEngineName);
-    
-    if (formEngine==null) {
-      throw new ActivitiException("No formEngine '" + formEngineName +"' defined process engine configuration");
-    }
-    
-    StartFormData startForm = startFormHandler.createStartFormData(processDefinition);
-    
-    return formEngine.renderStartForm(startForm);
-  }
 }

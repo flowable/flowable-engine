@@ -23,15 +23,15 @@ import org.flowable.rest.content.ContentRestResponseFactory;
  */
 public class ContentItemPaginateList extends AbstractPaginateList {
 
-  protected ContentRestResponseFactory restResponseFactory;
+    protected ContentRestResponseFactory restResponseFactory;
 
-  public ContentItemPaginateList(ContentRestResponseFactory restResponseFactory) {
-    this.restResponseFactory = restResponseFactory;
-  }
+    public ContentItemPaginateList(ContentRestResponseFactory restResponseFactory) {
+        this.restResponseFactory = restResponseFactory;
+    }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  @Override
-  protected List processList(List list) {
-    return restResponseFactory.createContentItemResponseList(list);
-  }
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
+    protected List processList(List list) {
+        return restResponseFactory.createContentItemResponseList(list);
+    }
 }

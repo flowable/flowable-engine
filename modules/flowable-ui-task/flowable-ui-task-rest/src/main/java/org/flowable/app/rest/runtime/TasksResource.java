@@ -33,24 +33,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TasksResource {
 
-  @Autowired
-  protected TaskService taskService;
+    @Autowired
+    protected TaskService taskService;
 
-  @RequestMapping(value = "/rest/tasks", method = RequestMethod.POST)
-  public TaskRepresentation createNewTask(@RequestBody CreateTaskRepresentation taskRepresentation, HttpServletRequest request) {
-    if (StringUtils.isEmpty(taskRepresentation.getName())) {
-      throw new BadRequestException("Task name is required");
-    }
+    @RequestMapping(value = "/rest/tasks", method = RequestMethod.POST)
+    public TaskRepresentation createNewTask(@RequestBody CreateTaskRepresentation taskRepresentation, HttpServletRequest request) {
+        if (StringUtils.isEmpty(taskRepresentation.getName())) {
+            throw new BadRequestException("Task name is required");
+        }
 
-    Task task = taskService.newTask();
-    task.setName(taskRepresentation.getName());
-    task.setDescription(taskRepresentation.getDescription());
-    if (StringUtils.isNotEmpty(taskRepresentation.getCategory())) {
-      task.setCategory(taskRepresentation.getCategory());
+        Task task = taskService.newTask();
+        task.setName(taskRepresentation.getName());
+        task.setDescription(taskRepresentation.getDescription());
+        if (StringUtils.isNotEmpty(taskRepresentation.getCategory())) {
+            task.setCategory(taskRepresentation.getCategory());
+        }
+        task.setAssignee(SecurityUtils.getCurrentUserId());
+        taskService.saveTask(task);
+        return new TaskRepresentation(taskService.createTaskQuery().taskId(task.getId()).singleResult());
     }
-    task.setAssignee(SecurityUtils.getCurrentUserId());
-    taskService.saveTask(task);
-    return new TaskRepresentation(taskService.createTaskQuery().taskId(task.getId()).singleResult());
-  }
 
 }

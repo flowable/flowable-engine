@@ -22,16 +22,16 @@ import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity
  * @author Joram Barrez
  */
 public class SignalEventSubscriptionByNameAndExecutionMatcher extends CachedEntityMatcherAdapter<EventSubscriptionEntity> {
-  
-  @Override
-  public boolean isRetained(EventSubscriptionEntity eventSubscriptionEntity, Object parameter) {
-    Map<String, String> params = (Map<String, String>) parameter;
-    String executionId = params.get("executionId");
-    String name = params.get("eventName");
-    
-    return eventSubscriptionEntity.getEventType() != null && eventSubscriptionEntity.getEventType().equals(SignalEventSubscriptionEntity.EVENT_TYPE)
-        && eventSubscriptionEntity.getExecutionId() != null && eventSubscriptionEntity.getExecutionId().equals(executionId)
-        && eventSubscriptionEntity.getEventName() != null && eventSubscriptionEntity.getEventName().equals(name);
-  }
- 
+
+    @Override
+    public boolean isRetained(EventSubscriptionEntity eventSubscriptionEntity, Object parameter) {
+        Map<String, String> params = (Map<String, String>) parameter;
+        String executionId = params.get("executionId");
+        String name = params.get("eventName");
+
+        return eventSubscriptionEntity.getEventType() != null && eventSubscriptionEntity.getEventType().equals(SignalEventSubscriptionEntity.EVENT_TYPE)
+                && eventSubscriptionEntity.getExecutionId() != null && eventSubscriptionEntity.getExecutionId().equals(executionId)
+                && eventSubscriptionEntity.getEventName() != null && eventSubscriptionEntity.getEventName().equals(name);
+    }
+
 }

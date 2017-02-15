@@ -30,46 +30,46 @@ import org.flowable.engine.runtime.Job;
  * @author Tijs Rademakers
  */
 public class MybatisDeadLetterJobDataManager extends AbstractDataManager<DeadLetterJobEntity> implements DeadLetterJobDataManager {
-  
-  protected CachedEntityMatcher<DeadLetterJobEntity> deadLetterByExecutionIdMatcher = new DeadLetterJobsByExecutionIdMatcher();
 
-  public MybatisDeadLetterJobDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    super(processEngineConfiguration);
-  }
+    protected CachedEntityMatcher<DeadLetterJobEntity> deadLetterByExecutionIdMatcher = new DeadLetterJobsByExecutionIdMatcher();
 
-  @Override
-  public Class<? extends DeadLetterJobEntity> getManagedEntityClass() {
-    return DeadLetterJobEntityImpl.class;
-  }
+    public MybatisDeadLetterJobDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
 
-  @Override
-  public DeadLetterJobEntity create() {
-    return new DeadLetterJobEntityImpl();
-  }
+    @Override
+    public Class<? extends DeadLetterJobEntity> getManagedEntityClass() {
+        return DeadLetterJobEntityImpl.class;
+    }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<Job> findJobsByQueryCriteria(DeadLetterJobQueryImpl jobQuery, Page page) {
-    String query = "selectDeadLetterJobByQueryCriteria";
-    return getDbSqlSession().selectList(query, jobQuery, page);
-  }
+    @Override
+    public DeadLetterJobEntity create() {
+        return new DeadLetterJobEntityImpl();
+    }
 
-  @Override
-  public long findJobCountByQueryCriteria(DeadLetterJobQueryImpl jobQuery) {
-    return (Long) getDbSqlSession().selectOne("selectDeadLetterJobCountByQueryCriteria", jobQuery);
-  }
-  
-  @Override
-  public List<DeadLetterJobEntity> findJobsByExecutionId(String executionId) {
-    return getList("selectDeadLetterJobsByExecutionId", executionId, deadLetterByExecutionIdMatcher, true);
-  }
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Job> findJobsByQueryCriteria(DeadLetterJobQueryImpl jobQuery, Page page) {
+        String query = "selectDeadLetterJobByQueryCriteria";
+        return getDbSqlSession().selectList(query, jobQuery, page);
+    }
 
-  @Override
-  public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
-    HashMap<String, Object> params = new HashMap<String, Object>();
-    params.put("deploymentId", deploymentId);
-    params.put("tenantId", newTenantId);
-    getDbSqlSession().update("updateDeadLetterJobTenantIdForDeployment", params);
-  }
+    @Override
+    public long findJobCountByQueryCriteria(DeadLetterJobQueryImpl jobQuery) {
+        return (Long) getDbSqlSession().selectOne("selectDeadLetterJobCountByQueryCriteria", jobQuery);
+    }
+
+    @Override
+    public List<DeadLetterJobEntity> findJobsByExecutionId(String executionId) {
+        return getList("selectDeadLetterJobsByExecutionId", executionId, deadLetterByExecutionIdMatcher, true);
+    }
+
+    @Override
+    public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
+        HashMap<String, Object> params = new HashMap<String, Object>();
+        params.put("deploymentId", deploymentId);
+        params.put("tenantId", newTenantId);
+        getDbSqlSession().update("updateDeadLetterJobTenantIdForDeployment", params);
+    }
 
 }

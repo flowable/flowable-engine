@@ -25,6 +25,6 @@ package org.flowable.engine.delegate;
  */
 public interface JavaDelegate {
 
-  void execute(DelegateExecution execution);
+    void execute(DelegateExecution execution);
 
 }

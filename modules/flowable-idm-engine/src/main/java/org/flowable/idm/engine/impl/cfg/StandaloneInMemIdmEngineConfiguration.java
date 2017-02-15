@@ -17,7 +17,7 @@ package org.flowable.idm.engine.impl.cfg;
  */
 public class StandaloneInMemIdmEngineConfiguration extends StandaloneIdmEngineConfiguration {
 
-  public StandaloneInMemIdmEngineConfiguration() {
-    this.jdbcUrl = "jdbc:h2:mem:flowable";
-  }
+    public StandaloneInMemIdmEngineConfiguration() {
+        this.jdbcUrl = "jdbc:h2:mem:flowable";
+    }
 }

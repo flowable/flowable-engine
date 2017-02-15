@@ -28,35 +28,35 @@ import org.flowable.content.engine.impl.cmd.SaveContentItemCmd;
  */
 public class ContentServiceImpl extends ServiceImpl implements ContentService {
 
-  public ContentItem newContentItem() {
-    return commandExecutor.execute(new CreateContentItemCmd());
-  }
-  
-  public void saveContentItem(ContentItem contentItem) {
-    commandExecutor.execute(new SaveContentItemCmd(contentItem));
-  }
-  
-  public void saveContentItem(ContentItem contentItem, InputStream inputStream) {
-    commandExecutor.execute(new SaveContentItemCmd(contentItem, inputStream));
-  }
-  
-  public InputStream getContentItemData(String contentItemId) {
-    return commandExecutor.execute(new GetContentItemStreamCmd(contentItemId));
-  }
-  
-  public void deleteContentItem(String contentItemId) {
-    commandExecutor.execute(new DeleteContentItemCmd(contentItemId));
-  }
-  
-  public void deleteContentItemsByProcessInstanceId(String processInstanceId) {
-    commandExecutor.execute(new DeleteContentItemsCmd(processInstanceId, null));
-  }
+    public ContentItem newContentItem() {
+        return commandExecutor.execute(new CreateContentItemCmd());
+    }
 
-  public void deleteContentItemsByTaskId(String taskId) {
-    commandExecutor.execute(new DeleteContentItemsCmd(null, taskId));
-  }
-  
-  public ContentItemQuery createContentItemQuery() {
-    return new ContentItemQueryImpl(commandExecutor);
-  }
+    public void saveContentItem(ContentItem contentItem) {
+        commandExecutor.execute(new SaveContentItemCmd(contentItem));
+    }
+
+    public void saveContentItem(ContentItem contentItem, InputStream inputStream) {
+        commandExecutor.execute(new SaveContentItemCmd(contentItem, inputStream));
+    }
+
+    public InputStream getContentItemData(String contentItemId) {
+        return commandExecutor.execute(new GetContentItemStreamCmd(contentItemId));
+    }
+
+    public void deleteContentItem(String contentItemId) {
+        commandExecutor.execute(new DeleteContentItemCmd(contentItemId));
+    }
+
+    public void deleteContentItemsByProcessInstanceId(String processInstanceId) {
+        commandExecutor.execute(new DeleteContentItemsCmd(processInstanceId, null));
+    }
+
+    public void deleteContentItemsByTaskId(String taskId) {
+        commandExecutor.execute(new DeleteContentItemsCmd(null, taskId));
+    }
+
+    public ContentItemQuery createContentItemQuery() {
+        return new ContentItemQueryImpl(commandExecutor);
+    }
 }

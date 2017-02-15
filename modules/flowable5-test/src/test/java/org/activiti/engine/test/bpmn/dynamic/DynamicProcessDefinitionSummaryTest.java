@@ -36,194 +36,193 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * Created by Pardo David on 1/12/2016.
  */
 public class DynamicProcessDefinitionSummaryTest extends PluggableFlowableTestCase implements DynamicBpmnConstants, PropertiesParserConstants {
-	
-  private final String TASK_ONE_SID = "sid-B94D5D22-E93E-4401-ADC5-C5C073E1EEB4";
-	private final String TASK_TWO_SID = "sid-B1C37EBE-A273-4DDE-B909-89302638526A";
-	private final String SCRIPT_TASK_SID = "sid-A403BAE0-E367-449A-90B2-48834FCAA2F9";
 
-	public void testProcessDefinitionInfoCacheIsEnabledWithPluggableActivitiTestCase() throws Exception{
-		assertThat(processEngineConfiguration.isEnableProcessDefinitionInfoCache(),is(true));
-	}
+    private final String TASK_ONE_SID = "sid-B94D5D22-E93E-4401-ADC5-C5C073E1EEB4";
+    private final String TASK_TWO_SID = "sid-B1C37EBE-A273-4DDE-B909-89302638526A";
+    private final String SCRIPT_TASK_SID = "sid-A403BAE0-E367-449A-90B2-48834FCAA2F9";
 
-	@Deployment(resources = {"org/activiti/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml"})
-	public void testIfNoProcessInfoIsAvailableTheBpmnModelIsUsed() throws Exception{
-		//setup
-		ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
-		DynamicProcessDefinitionSummary summary = dynamicBpmnService.getDynamicProcessDefinitionSummary(processInstance.getProcessDefinitionId());
-		ArrayNode candidateGroups = processEngineConfiguration.getObjectMapper().createArrayNode();
-		ArrayNode candidateUsers = processEngineConfiguration.getObjectMapper().createArrayNode();
-		candidateUsers.add("david");
+    public void testProcessDefinitionInfoCacheIsEnabledWithPluggableActivitiTestCase() throws Exception {
+        assertThat(processEngineConfiguration.isEnableProcessDefinitionInfoCache(), is(true));
+    }
 
-		//first task
-		JsonNode jsonNode = summary.getElement(TASK_ONE_SID).get(ELEMENT_PROPERTIES);
-		assertThat(jsonNode.get(USER_TASK_NAME).get(BPMN_MODEL_VALUE).asText(),is("Taak 1"));
-		assertThat(jsonNode.get(USER_TASK_NAME).get(DYNAMIC_VALUE),is(nullValue()));
+    @Deployment(resources = { "org/activiti/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml" })
+    public void testIfNoProcessInfoIsAvailableTheBpmnModelIsUsed() throws Exception {
+        // setup
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
+        DynamicProcessDefinitionSummary summary = dynamicBpmnService.getDynamicProcessDefinitionSummary(processInstance.getProcessDefinitionId());
+        ArrayNode candidateGroups = processEngineConfiguration.getObjectMapper().createArrayNode();
+        ArrayNode candidateUsers = processEngineConfiguration.getObjectMapper().createArrayNode();
+        candidateUsers.add("david");
 
-		assertThat(jsonNode.get(USER_TASK_ASSIGNEE).get(BPMN_MODEL_VALUE), is(nullValue()));
-		assertThat(jsonNode.get(USER_TASK_ASSIGNEE).get(DYNAMIC_VALUE), is(nullValue()));
+        // first task
+        JsonNode jsonNode = summary.getElement(TASK_ONE_SID).get(ELEMENT_PROPERTIES);
+        assertThat(jsonNode.get(USER_TASK_NAME).get(BPMN_MODEL_VALUE).asText(), is("Taak 1"));
+        assertThat(jsonNode.get(USER_TASK_NAME).get(DYNAMIC_VALUE), is(nullValue()));
 
-		assertThat((ArrayNode) jsonNode.get(USER_TASK_CANDIDATE_USERS).get(BPMN_MODEL_VALUE) , is(candidateUsers));
-		assertThat(jsonNode.get(USER_TASK_CANDIDATE_USERS).get(DYNAMIC_VALUE) , is(nullValue()));
+        assertThat(jsonNode.get(USER_TASK_ASSIGNEE).get(BPMN_MODEL_VALUE), is(nullValue()));
+        assertThat(jsonNode.get(USER_TASK_ASSIGNEE).get(DYNAMIC_VALUE), is(nullValue()));
 
-		assertThat((ArrayNode) jsonNode.get(USER_TASK_CANDIDATE_GROUPS).get(BPMN_MODEL_VALUE), is(candidateGroups));
-		assertThat(jsonNode.get(USER_TASK_CANDIDATE_GROUPS).get(DYNAMIC_VALUE), is(nullValue()));
+        assertThat((ArrayNode) jsonNode.get(USER_TASK_CANDIDATE_USERS).get(BPMN_MODEL_VALUE), is(candidateUsers));
+        assertThat(jsonNode.get(USER_TASK_CANDIDATE_USERS).get(DYNAMIC_VALUE), is(nullValue()));
 
-		//second tasks
-		candidateGroups = processEngineConfiguration.getObjectMapper().createArrayNode();
-		candidateGroups.add("HR");
-		candidateGroups.add("SALES");
+        assertThat((ArrayNode) jsonNode.get(USER_TASK_CANDIDATE_GROUPS).get(BPMN_MODEL_VALUE), is(candidateGroups));
+        assertThat(jsonNode.get(USER_TASK_CANDIDATE_GROUPS).get(DYNAMIC_VALUE), is(nullValue()));
 
-		jsonNode = summary.getElement(TASK_TWO_SID).get(ELEMENT_PROPERTIES);
-		assertThat(jsonNode.get(USER_TASK_ASSIGNEE).get(BPMN_MODEL_VALUE), is(nullValue()));
-		assertThat(jsonNode.get(USER_TASK_ASSIGNEE).get(DYNAMIC_VALUE), is(nullValue()));
+        // second tasks
+        candidateGroups = processEngineConfiguration.getObjectMapper().createArrayNode();
+        candidateGroups.add("HR");
+        candidateGroups.add("SALES");
 
-		assertThat((ArrayNode) jsonNode.get(USER_TASK_CANDIDATE_USERS).get(BPMN_MODEL_VALUE), is(candidateUsers));
-		assertThat((ArrayNode) jsonNode.get(USER_TASK_CANDIDATE_GROUPS).get(BPMN_MODEL_VALUE), is(candidateGroups));
+        jsonNode = summary.getElement(TASK_TWO_SID).get(ELEMENT_PROPERTIES);
+        assertThat(jsonNode.get(USER_TASK_ASSIGNEE).get(BPMN_MODEL_VALUE), is(nullValue()));
+        assertThat(jsonNode.get(USER_TASK_ASSIGNEE).get(DYNAMIC_VALUE), is(nullValue()));
 
-		//script tasks
-		jsonNode = summary.getElement(SCRIPT_TASK_SID).get(ELEMENT_PROPERTIES);
-		assertThat(jsonNode.get(SCRIPT_TASK_SCRIPT).get(BPMN_MODEL_VALUE).asText(),is("var test = \"hallo\";"));
-		assertThat(jsonNode.get(SCRIPT_TASK_SCRIPT).get(DYNAMIC_VALUE),is(nullValue()));
-	}
+        assertThat((ArrayNode) jsonNode.get(USER_TASK_CANDIDATE_USERS).get(BPMN_MODEL_VALUE), is(candidateUsers));
+        assertThat((ArrayNode) jsonNode.get(USER_TASK_CANDIDATE_GROUPS).get(BPMN_MODEL_VALUE), is(candidateGroups));
 
-	@Deployment(resources = {"org/activiti/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml"})
-	public void testTheCandidateUserOfTheFirstTasksIsChanged() throws Exception{
-		ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
-		String processDefinitionId = processInstance.getProcessDefinitionId();
+        // script tasks
+        jsonNode = summary.getElement(SCRIPT_TASK_SID).get(ELEMENT_PROPERTIES);
+        assertThat(jsonNode.get(SCRIPT_TASK_SCRIPT).get(BPMN_MODEL_VALUE).asText(), is("var test = \"hallo\";"));
+        assertThat(jsonNode.get(SCRIPT_TASK_SCRIPT).get(DYNAMIC_VALUE), is(nullValue()));
+    }
 
-		ObjectNode processInfo = dynamicBpmnService.changeUserTaskCandidateUser(TASK_ONE_SID, "bob", false);
-		dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId,processInfo);
+    @Deployment(resources = { "org/activiti/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml" })
+    public void testTheCandidateUserOfTheFirstTasksIsChanged() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
+        String processDefinitionId = processInstance.getProcessDefinitionId();
 
-		DynamicProcessDefinitionSummary summary = dynamicBpmnService.getDynamicProcessDefinitionSummary(processDefinitionId);
+        ObjectNode processInfo = dynamicBpmnService.changeUserTaskCandidateUser(TASK_ONE_SID, "bob", false);
+        dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, processInfo);
 
-		ArrayNode bpmnModelCandidateUsers = processEngineConfiguration.getObjectMapper().createArrayNode();
-		bpmnModelCandidateUsers.add("david");
+        DynamicProcessDefinitionSummary summary = dynamicBpmnService.getDynamicProcessDefinitionSummary(processDefinitionId);
 
-		ArrayNode dynamicCandidateUsers = processEngineConfiguration.getObjectMapper().createArrayNode();
-		dynamicCandidateUsers.add("bob");
+        ArrayNode bpmnModelCandidateUsers = processEngineConfiguration.getObjectMapper().createArrayNode();
+        bpmnModelCandidateUsers.add("david");
 
-		JsonNode taskOneNode = summary.getElement(TASK_ONE_SID).get(ELEMENT_PROPERTIES);
-		assertThat((ArrayNode) taskOneNode.get(USER_TASK_CANDIDATE_USERS).get(BPMN_MODEL_VALUE), is(bpmnModelCandidateUsers));
-		assertThat((ArrayNode) taskOneNode.get(USER_TASK_CANDIDATE_USERS).get(DYNAMIC_VALUE), is(dynamicCandidateUsers));
+        ArrayNode dynamicCandidateUsers = processEngineConfiguration.getObjectMapper().createArrayNode();
+        dynamicCandidateUsers.add("bob");
 
-		//verify if runtime is up to date
-		runtimeService.startProcessInstanceById(processDefinitionId);
-		//bob and david both should have a single task.
-		Task bobTask = taskService.createTaskQuery().taskCandidateUser("bob").singleResult();
-		assertThat("Bob must have one task",bobTask , is(notNullValue()));
+        JsonNode taskOneNode = summary.getElement(TASK_ONE_SID).get(ELEMENT_PROPERTIES);
+        assertThat((ArrayNode) taskOneNode.get(USER_TASK_CANDIDATE_USERS).get(BPMN_MODEL_VALUE), is(bpmnModelCandidateUsers));
+        assertThat((ArrayNode) taskOneNode.get(USER_TASK_CANDIDATE_USERS).get(DYNAMIC_VALUE), is(dynamicCandidateUsers));
 
-		Task davidTask = taskService.createTaskQuery().taskCandidateUser("david").singleResult();
-		assertThat("David must have one task",davidTask,is(not(nullValue())));
-	}
+        // verify if runtime is up to date
+        runtimeService.startProcessInstanceById(processDefinitionId);
+        // bob and david both should have a single task.
+        Task bobTask = taskService.createTaskQuery().taskCandidateUser("bob").singleResult();
+        assertThat("Bob must have one task", bobTask, is(notNullValue()));
 
+        Task davidTask = taskService.createTaskQuery().taskCandidateUser("david").singleResult();
+        assertThat("David must have one task", davidTask, is(not(nullValue())));
+    }
 
-	@Deployment(resources = {"org/activiti/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml"})
-	public void testTheCandidateUserOfTheFirstTasksIsChangedMultipleTimes() throws Exception {
-		ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
-		String processDefinitionId = processInstance.getProcessDefinitionId();
+    @Deployment(resources = { "org/activiti/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml" })
+    public void testTheCandidateUserOfTheFirstTasksIsChangedMultipleTimes() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
+        String processDefinitionId = processInstance.getProcessDefinitionId();
 
-		ObjectNode processInfo = dynamicBpmnService.changeUserTaskCandidateUser(TASK_ONE_SID, "bob", false);
-		dynamicBpmnService.changeUserTaskCandidateUser(TASK_ONE_SID,"david",false,processInfo);
-		dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId,processInfo);
+        ObjectNode processInfo = dynamicBpmnService.changeUserTaskCandidateUser(TASK_ONE_SID, "bob", false);
+        dynamicBpmnService.changeUserTaskCandidateUser(TASK_ONE_SID, "david", false, processInfo);
+        dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, processInfo);
 
-		ArrayNode bpmnModelCandidateUsers = processEngineConfiguration.getObjectMapper().createArrayNode();
-		bpmnModelCandidateUsers.add("david");
+        ArrayNode bpmnModelCandidateUsers = processEngineConfiguration.getObjectMapper().createArrayNode();
+        bpmnModelCandidateUsers.add("david");
 
-		ArrayNode dynamicCandidateUsers = processEngineConfiguration.getObjectMapper().createArrayNode();
-		dynamicCandidateUsers.add("bob");
-		dynamicCandidateUsers.add("david");
+        ArrayNode dynamicCandidateUsers = processEngineConfiguration.getObjectMapper().createArrayNode();
+        dynamicCandidateUsers.add("bob");
+        dynamicCandidateUsers.add("david");
 
-		DynamicProcessDefinitionSummary summary = dynamicBpmnService.getDynamicProcessDefinitionSummary(processDefinitionId);
+        DynamicProcessDefinitionSummary summary = dynamicBpmnService.getDynamicProcessDefinitionSummary(processDefinitionId);
 
-		JsonNode taskOneNode = summary.getElement(TASK_ONE_SID).get(ELEMENT_PROPERTIES);
-		assertThat((ArrayNode) taskOneNode.get(USER_TASK_CANDIDATE_USERS).get(BPMN_MODEL_VALUE), is(bpmnModelCandidateUsers));
-		assertThat((ArrayNode) taskOneNode.get(USER_TASK_CANDIDATE_USERS).get(DYNAMIC_VALUE), is(dynamicCandidateUsers));
+        JsonNode taskOneNode = summary.getElement(TASK_ONE_SID).get(ELEMENT_PROPERTIES);
+        assertThat((ArrayNode) taskOneNode.get(USER_TASK_CANDIDATE_USERS).get(BPMN_MODEL_VALUE), is(bpmnModelCandidateUsers));
+        assertThat((ArrayNode) taskOneNode.get(USER_TASK_CANDIDATE_USERS).get(DYNAMIC_VALUE), is(dynamicCandidateUsers));
 
-		//verify if runtime is up to date
-		runtimeService.startProcessInstanceById(processDefinitionId);
+        // verify if runtime is up to date
+        runtimeService.startProcessInstanceById(processDefinitionId);
 
-		Task bobTask = taskService.createTaskQuery().taskCandidateUser("bob").singleResult();
-		assertThat("Bob must have one task",bobTask , is(notNullValue()));
+        Task bobTask = taskService.createTaskQuery().taskCandidateUser("bob").singleResult();
+        assertThat("Bob must have one task", bobTask, is(notNullValue()));
 
-		List<Task> davidTasks = taskService.createTaskQuery().taskCandidateUser("david").list();
-		assertThat("David must have two task",davidTasks.size(),is(2));
-	}
+        List<Task> davidTasks = taskService.createTaskQuery().taskCandidateUser("david").list();
+        assertThat("David must have two task", davidTasks.size(), is(2));
+    }
 
-	@Deployment(resources = {"org/activiti/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml"})
-	public void testTheCandidateGroupOfTheFirstTasksIsChanged() throws Exception {
-		ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
-		String processDefinitionId = processInstance.getProcessDefinitionId();
+    @Deployment(resources = { "org/activiti/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml" })
+    public void testTheCandidateGroupOfTheFirstTasksIsChanged() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
+        String processDefinitionId = processInstance.getProcessDefinitionId();
 
-		ObjectNode processInfo = dynamicBpmnService.changeUserTaskCandidateGroup(TASK_ONE_SID, "HR", false);
-		dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId,processInfo);
+        ObjectNode processInfo = dynamicBpmnService.changeUserTaskCandidateGroup(TASK_ONE_SID, "HR", false);
+        dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, processInfo);
 
-		ArrayNode dynamicCandidateGroups = processEngineConfiguration.getObjectMapper().createArrayNode();
-		dynamicCandidateGroups.add("HR");
+        ArrayNode dynamicCandidateGroups = processEngineConfiguration.getObjectMapper().createArrayNode();
+        dynamicCandidateGroups.add("HR");
 
-		DynamicProcessDefinitionSummary summary = dynamicBpmnService.getDynamicProcessDefinitionSummary(processDefinitionId);
+        DynamicProcessDefinitionSummary summary = dynamicBpmnService.getDynamicProcessDefinitionSummary(processDefinitionId);
 
-		JsonNode taskOneNode = summary.getElement(TASK_ONE_SID).get(ELEMENT_PROPERTIES);
-		assertThat((ArrayNode) taskOneNode.get(USER_TASK_CANDIDATE_GROUPS).get(DYNAMIC_VALUE), is(dynamicCandidateGroups));
-	}
+        JsonNode taskOneNode = summary.getElement(TASK_ONE_SID).get(ELEMENT_PROPERTIES);
+        assertThat((ArrayNode) taskOneNode.get(USER_TASK_CANDIDATE_GROUPS).get(DYNAMIC_VALUE), is(dynamicCandidateGroups));
+    }
 
-	@Deployment(resources = {"org/activiti/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml"})
-	public void testTheCandidateGroupOfTheFirstTasksIsChangedMultipleTimes() throws Exception {
-		ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
-		String processDefinitionId = processInstance.getProcessDefinitionId();
+    @Deployment(resources = { "org/activiti/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml" })
+    public void testTheCandidateGroupOfTheFirstTasksIsChangedMultipleTimes() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
+        String processDefinitionId = processInstance.getProcessDefinitionId();
 
-		ObjectNode processInfo = dynamicBpmnService.changeUserTaskCandidateGroup(TASK_ONE_SID, "HR", false);
-		dynamicBpmnService.changeUserTaskCandidateGroup(TASK_ONE_SID,"SALES",false,processInfo);
-		dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId,processInfo);
+        ObjectNode processInfo = dynamicBpmnService.changeUserTaskCandidateGroup(TASK_ONE_SID, "HR", false);
+        dynamicBpmnService.changeUserTaskCandidateGroup(TASK_ONE_SID, "SALES", false, processInfo);
+        dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, processInfo);
 
-		ArrayNode candidateGroups = processEngineConfiguration.getObjectMapper().createArrayNode();
-		candidateGroups.add("HR");
-		candidateGroups.add("SALES");
+        ArrayNode candidateGroups = processEngineConfiguration.getObjectMapper().createArrayNode();
+        candidateGroups.add("HR");
+        candidateGroups.add("SALES");
 
-		DynamicProcessDefinitionSummary summary = dynamicBpmnService.getDynamicProcessDefinitionSummary(processDefinitionId);
-		JsonNode taskOneNode = summary.getElement(TASK_ONE_SID).get(ELEMENT_PROPERTIES);
+        DynamicProcessDefinitionSummary summary = dynamicBpmnService.getDynamicProcessDefinitionSummary(processDefinitionId);
+        JsonNode taskOneNode = summary.getElement(TASK_ONE_SID).get(ELEMENT_PROPERTIES);
 
-		assertThat((ArrayNode) taskOneNode.get(USER_TASK_CANDIDATE_GROUPS).get(DYNAMIC_VALUE), is(candidateGroups));
-	}
+        assertThat((ArrayNode) taskOneNode.get(USER_TASK_CANDIDATE_GROUPS).get(DYNAMIC_VALUE), is(candidateGroups));
+    }
 
-	@Deployment(resources = {"org/activiti/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml"})
-	public void testTheScriptOfTheScriptTasksIsChanged() throws Exception {
-		ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
-		String processDefinitionId = processInstance.getProcessDefinitionId();
+    @Deployment(resources = { "org/activiti/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml" })
+    public void testTheScriptOfTheScriptTasksIsChanged() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
+        String processDefinitionId = processInstance.getProcessDefinitionId();
 
-		ObjectNode jsonNodes = dynamicBpmnService.changeScriptTaskScript(SCRIPT_TASK_SID, "var x = \"hallo\";");
-		dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId,jsonNodes);
+        ObjectNode jsonNodes = dynamicBpmnService.changeScriptTaskScript(SCRIPT_TASK_SID, "var x = \"hallo\";");
+        dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, jsonNodes);
 
-		DynamicProcessDefinitionSummary summary = dynamicBpmnService.getDynamicProcessDefinitionSummary(processDefinitionId);
-		JsonNode scriptTaskNode = summary.getElement(SCRIPT_TASK_SID).get(ELEMENT_PROPERTIES);
+        DynamicProcessDefinitionSummary summary = dynamicBpmnService.getDynamicProcessDefinitionSummary(processDefinitionId);
+        JsonNode scriptTaskNode = summary.getElement(SCRIPT_TASK_SID).get(ELEMENT_PROPERTIES);
 
-		assertThat(scriptTaskNode.get(SCRIPT_TASK_SCRIPT).get(DYNAMIC_VALUE).asText(),is("var x = \"hallo\";"));
-	}
+        assertThat(scriptTaskNode.get(SCRIPT_TASK_SCRIPT).get(DYNAMIC_VALUE).asText(), is("var x = \"hallo\";"));
+    }
 
-	@Deployment(resources = {"org/activiti/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml"})
-	public void testItShouldBePossibleToResetDynamicCandidateUsers() throws Exception {
-		ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
-		String processDefinitionId = processInstance.getProcessDefinitionId();
+    @Deployment(resources = { "org/activiti/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml" })
+    public void testItShouldBePossibleToResetDynamicCandidateUsers() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
+        String processDefinitionId = processInstance.getProcessDefinitionId();
 
-		ObjectNode jsonNodes = dynamicBpmnService.changeUserTaskCandidateUser(TASK_ONE_SID, "bob",false);
-		dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId,jsonNodes);
+        ObjectNode jsonNodes = dynamicBpmnService.changeUserTaskCandidateUser(TASK_ONE_SID, "bob", false);
+        dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, jsonNodes);
 
-		//delete
-		jsonNodes = dynamicBpmnService.getProcessDefinitionInfo(processDefinitionId);
-		dynamicBpmnService.resetProperty(TASK_ONE_SID,USER_TASK_CANDIDATE_USERS,jsonNodes);
-		dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId,jsonNodes);
+        // delete
+        jsonNodes = dynamicBpmnService.getProcessDefinitionInfo(processDefinitionId);
+        dynamicBpmnService.resetProperty(TASK_ONE_SID, USER_TASK_CANDIDATE_USERS, jsonNodes);
+        dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, jsonNodes);
 
-		runtimeService.startProcessInstanceByKey("dynamicServiceTest");
+        runtimeService.startProcessInstanceByKey("dynamicServiceTest");
 
-		long count = taskService.createTaskQuery().taskCandidateUser("david").count();
-		assertThat(count,is(2L));
+        long count = taskService.createTaskQuery().taskCandidateUser("david").count();
+        assertThat(count, is(2L));
 
-		//additional checks of summary
-		ArrayNode candidateUsersNode = processEngineConfiguration.getObjectMapper().createArrayNode();
-		candidateUsersNode.add("david");
+        // additional checks of summary
+        ArrayNode candidateUsersNode = processEngineConfiguration.getObjectMapper().createArrayNode();
+        candidateUsersNode.add("david");
 
-		DynamicProcessDefinitionSummary summary = dynamicBpmnService.getDynamicProcessDefinitionSummary(processDefinitionId);
-		JsonNode candidateUsers = summary.getElement(TASK_ONE_SID).get(ELEMENT_PROPERTIES).get(USER_TASK_CANDIDATE_USERS);
-		assertThat((ArrayNode) candidateUsers.get(BPMN_MODEL_VALUE), is(candidateUsersNode));
-		assertThat(candidateUsers.get(DYNAMIC_VALUE), is(nullValue()));
-	}
+        DynamicProcessDefinitionSummary summary = dynamicBpmnService.getDynamicProcessDefinitionSummary(processDefinitionId);
+        JsonNode candidateUsers = summary.getElement(TASK_ONE_SID).get(ELEMENT_PROPERTIES).get(USER_TASK_CANDIDATE_USERS);
+        assertThat((ArrayNode) candidateUsers.get(BPMN_MODEL_VALUE), is(candidateUsersNode));
+        assertThat(candidateUsers.get(DYNAMIC_VALUE), is(nullValue()));
+    }
 }

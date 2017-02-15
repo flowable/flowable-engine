@@ -24,66 +24,66 @@ import org.flowable.engine.repository.ProcessDefinition;
  */
 public class ProcessDefinitionCategoryTest extends PluggableFlowableTestCase {
 
-  public void testQueryByCategoryNotEquals() {
-    Deployment deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/repository/processCategoryOne.bpmn20.xml")
-        .addClasspathResource("org/flowable/engine/test/api/repository/processCategoryTwo.bpmn20.xml").addClasspathResource("org/flowable/engine/test/api/repository/processCategoryThree.bpmn20.xml")
-        .deploy();
+    public void testQueryByCategoryNotEquals() {
+        Deployment deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/repository/processCategoryOne.bpmn20.xml")
+                .addClasspathResource("org/flowable/engine/test/api/repository/processCategoryTwo.bpmn20.xml").addClasspathResource("org/flowable/engine/test/api/repository/processCategoryThree.bpmn20.xml")
+                .deploy();
 
-    HashSet<String> processDefinitionNames = getProcessDefinitionNames(repositoryService.createProcessDefinitionQuery().processDefinitionCategoryNotEquals("one").list());
-    HashSet<String> expectedProcessDefinitionNames = new HashSet<String>();
-    expectedProcessDefinitionNames.add("processTwo");
-    expectedProcessDefinitionNames.add("processThree");
-    assertEquals(expectedProcessDefinitionNames, processDefinitionNames);
+        HashSet<String> processDefinitionNames = getProcessDefinitionNames(repositoryService.createProcessDefinitionQuery().processDefinitionCategoryNotEquals("one").list());
+        HashSet<String> expectedProcessDefinitionNames = new HashSet<String>();
+        expectedProcessDefinitionNames.add("processTwo");
+        expectedProcessDefinitionNames.add("processThree");
+        assertEquals(expectedProcessDefinitionNames, processDefinitionNames);
 
-    processDefinitionNames = getProcessDefinitionNames(repositoryService.createProcessDefinitionQuery().processDefinitionCategoryNotEquals("two").list());
-    expectedProcessDefinitionNames = new HashSet<String>();
-    expectedProcessDefinitionNames.add("processOne");
-    expectedProcessDefinitionNames.add("processThree");
-    assertEquals(expectedProcessDefinitionNames, processDefinitionNames);
+        processDefinitionNames = getProcessDefinitionNames(repositoryService.createProcessDefinitionQuery().processDefinitionCategoryNotEquals("two").list());
+        expectedProcessDefinitionNames = new HashSet<String>();
+        expectedProcessDefinitionNames.add("processOne");
+        expectedProcessDefinitionNames.add("processThree");
+        assertEquals(expectedProcessDefinitionNames, processDefinitionNames);
 
-    repositoryService.deleteDeployment(deployment.getId());
-  }
-
-  private HashSet<String> getProcessDefinitionNames(List<ProcessDefinition> processDefinitions) {
-    HashSet<String> processDefinitionNames = new HashSet<String>();
-    for (ProcessDefinition processDefinition : processDefinitions) {
-      processDefinitionNames.add(processDefinition.getKey());
+        repositoryService.deleteDeployment(deployment.getId());
     }
-    return processDefinitionNames;
-  }
 
-  @org.flowable.engine.test.Deployment
-  public void testSetProcessDefinitionCategory() {
+    private HashSet<String> getProcessDefinitionNames(List<ProcessDefinition> processDefinitions) {
+        HashSet<String> processDefinitionNames = new HashSet<String>();
+        for (ProcessDefinition processDefinition : processDefinitions) {
+            processDefinitionNames.add(processDefinition.getKey());
+        }
+        return processDefinitionNames;
+    }
 
-    // Verify category and see if we can start a process instance
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    assertEquals("testCategory", processDefinition.getCategory());
+    @org.flowable.engine.test.Deployment
+    public void testSetProcessDefinitionCategory() {
 
-    processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionCategory("testCategory").singleResult();
-    assertNotNull(processDefinition);
+        // Verify category and see if we can start a process instance
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+        assertEquals("testCategory", processDefinition.getCategory());
 
-    long count = runtimeService.createProcessInstanceQuery().count();
-    runtimeService.startProcessInstanceById(processDefinition.getId());
-    long newCount = runtimeService.createProcessInstanceQuery().count();
-    assertEquals(newCount, count + 1);
+        processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionCategory("testCategory").singleResult();
+        assertNotNull(processDefinition);
 
-    // Update category
-    repositoryService.setProcessDefinitionCategory(processDefinition.getId(), "UpdatedCategory");
+        long count = runtimeService.createProcessInstanceQuery().count();
+        runtimeService.startProcessInstanceById(processDefinition.getId());
+        long newCount = runtimeService.createProcessInstanceQuery().count();
+        assertEquals(newCount, count + 1);
 
-    assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionCategory("testCategory").count());
-    processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionCategory("UpdatedCategory").singleResult();
-    assertNotNull(processDefinition);
+        // Update category
+        repositoryService.setProcessDefinitionCategory(processDefinition.getId(), "UpdatedCategory");
 
-    // Start a process instance
-    runtimeService.startProcessInstanceById(processDefinition.getId());
-    newCount = runtimeService.createProcessInstanceQuery().count();
-    assertEquals(newCount, count + 2);
+        assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionCategory("testCategory").count());
+        processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionCategory("UpdatedCategory").singleResult();
+        assertNotNull(processDefinition);
 
-    // Set category to null
-    repositoryService.setProcessDefinitionCategory(processDefinition.getId(), null);
-    assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionCategory("testCategory").count());
-    assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionCategory("UpdatedCategory").count());
-    assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionCategoryNotEquals("UpdatedCategory").count());
-  }
+        // Start a process instance
+        runtimeService.startProcessInstanceById(processDefinition.getId());
+        newCount = runtimeService.createProcessInstanceQuery().count();
+        assertEquals(newCount, count + 2);
+
+        // Set category to null
+        repositoryService.setProcessDefinitionCategory(processDefinition.getId(), null);
+        assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionCategory("testCategory").count());
+        assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionCategory("UpdatedCategory").count());
+        assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionCategoryNotEquals("UpdatedCategory").count());
+    }
 
 }

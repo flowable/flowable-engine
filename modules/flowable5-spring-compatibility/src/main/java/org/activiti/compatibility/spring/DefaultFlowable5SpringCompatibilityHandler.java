@@ -18,29 +18,28 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.compatibility.DefaultFlowable5CompatibilityHandler;
 import org.flowable.compatibility.DefaultProcessEngineFactory;
 
-
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
 public class DefaultFlowable5SpringCompatibilityHandler extends DefaultFlowable5CompatibilityHandler {
 
-  @Override
-  public DefaultProcessEngineFactory getProcessEngineFactory() {
-    if (processEngineFactory == null) {
-      processEngineFactory = new DefaultSpringProcessEngineFactory();
-    }
-    return processEngineFactory;
-  }
-  
-  public Object getCamelContextObject(String camelContextValue) {
-    SpringProcessEngineConfiguration springConfiguration = (SpringProcessEngineConfiguration) getProcessEngine().getProcessEngineConfiguration();
-    if (StringUtils.isEmpty(camelContextValue)) {
-      camelContextValue = springConfiguration.getDefaultCamelContext();
+    @Override
+    public DefaultProcessEngineFactory getProcessEngineFactory() {
+        if (processEngineFactory == null) {
+            processEngineFactory = new DefaultSpringProcessEngineFactory();
+        }
+        return processEngineFactory;
     }
 
-    // Get the CamelContext object and set the super's member variable.
-    Object ctx = springConfiguration.getApplicationContext().getBean(camelContextValue);
-    return ctx;
-  }
+    public Object getCamelContextObject(String camelContextValue) {
+        SpringProcessEngineConfiguration springConfiguration = (SpringProcessEngineConfiguration) getProcessEngine().getProcessEngineConfiguration();
+        if (StringUtils.isEmpty(camelContextValue)) {
+            camelContextValue = springConfiguration.getDefaultCamelContext();
+        }
+
+        // Get the CamelContext object and set the super's member variable.
+        Object ctx = springConfiguration.getApplicationContext().getBean(camelContextValue);
+        return ctx;
+    }
 }

@@ -43,199 +43,199 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Transactional
 public class FlowableTaskActionService extends FlowableAbstractTaskService {
 
-  private static final Logger logger = LoggerFactory.getLogger(FlowableTaskActionService.class);
+    private static final Logger logger = LoggerFactory.getLogger(FlowableTaskActionService.class);
 
-  public void completeTask(String taskId) {
-    User currentUser = SecurityUtils.getCurrentUserObject();
-    Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+    public void completeTask(String taskId) {
+        User currentUser = SecurityUtils.getCurrentUserObject();
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 
-    if (task == null) {
-      throw new NotFoundException("Task with id: " + taskId + " does not exist");
-    }
-
-    if (!permissionService.isTaskOwnerOrAssignee(currentUser, task)) {
-      if (!permissionService.validateIfUserIsInitiatorAndCanCompleteTask(currentUser, task)) {
-        throw new NotPermittedException();
-      }
-    }
-
-    try {
-      taskService.complete(task.getId());
-    } catch (FlowableException e) {
-      logger.error("Error completing task {}", taskId, e);
-      throw new BadRequestException("Task " + taskId + " can't be completed", e);
-    }
-  }
-
-  public TaskRepresentation assignTask(String taskId, ObjectNode requestNode) {
-    User currentUser = SecurityUtils.getCurrentUserObject();
-    Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-
-    if (task == null) {
-      throw new NotFoundException("Task with id: " + taskId + " does not exist");
-    }
-
-    checkTaskPermissions(taskId, currentUser, task);
-
-    if (requestNode.get("assignee") != null) {
-
-      // This method can only be called by someone in a tenant. Check if the user is part of the tenant
-      String assigneeIdString = requestNode.get("assignee").asText();
-
-      CachedUser cachedUser = userCache.getUser(assigneeIdString);
-      if (cachedUser == null) {
-        throw new BadRequestException("Invalid assignee id");
-      }
-      assignTask(currentUser, task, assigneeIdString);
-
-    } else {
-      throw new BadRequestException("Assignee is required");
-    }
-
-    task = taskService.createTaskQuery().taskId(taskId).singleResult();
-    TaskRepresentation rep = new TaskRepresentation(task);
-    fillPermissionInformation(rep, task, currentUser);
-
-    populateAssignee(task, rep);
-    rep.setInvolvedPeople(getInvolvedUsers(taskId));
-    return rep;
-  }
-
-  public void involveUser(String taskId, ObjectNode requestNode) {
-    Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-
-    if (task == null) {
-      throw new NotFoundException("Task with id: " + taskId + " does not exist");
-    }
-
-    User currentUser = SecurityUtils.getCurrentUserObject();
-    permissionService.validateReadPermissionOnTask(currentUser, task.getId());
-
-    if (requestNode.get("userId") != null) {
-      String userId = requestNode.get("userId").asText();
-      CachedUser user = userCache.getUser(userId);
-      if (user == null) {
-        throw new BadRequestException("Invalid user id");
-      }
-      taskService.addUserIdentityLink(taskId, userId, IdentityLinkType.PARTICIPANT);
-
-    } else {
-      throw new BadRequestException("User id is required");
-    }
-
-  }
-
-  public void removeInvolvedUser(String taskId, ObjectNode requestNode) {
-    Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-
-    if (task == null) {
-      throw new NotFoundException("Task with id: " + taskId + " does not exist");
-    }
-
-    permissionService.validateReadPermissionOnTask(SecurityUtils.getCurrentUserObject(), task.getId());
-
-    String assigneeString = null;
-    if (requestNode.get("userId") != null) {
-      String userId = requestNode.get("userId").asText();
-      if (userCache.getUser(userId) == null) {
-        throw new BadRequestException("Invalid user id");
-      }
-      assigneeString = String.valueOf(userId);
-
-    } else if (requestNode.get("email") != null) {
-
-      String email = requestNode.get("email").asText();
-      assigneeString = email;
-
-    } else {
-      throw new BadRequestException("User id or email is required");
-    }
-
-    taskService.deleteUserIdentityLink(taskId, assigneeString, IdentityLinkType.PARTICIPANT);
-  }
-
-  public void claimTask(String taskId) {
-
-    User currentUser = SecurityUtils.getCurrentUserObject();
-    Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-
-    if (task == null) {
-      throw new NotFoundException("Task with id: " + taskId + " does not exist");
-    }
-
-    permissionService.validateReadPermissionOnTask(currentUser, task.getId());
-
-    try {
-      taskService.claim(task.getId(), String.valueOf(currentUser.getId()));
-    } catch (FlowableException e) {
-      throw new BadRequestException("Task " + taskId + " can't be claimed", e);
-    }
-  }
-
-  protected void checkTaskPermissions(String taskId, User currentUser, Task task) {
-    permissionService.validateReadPermissionOnTask(currentUser, task.getId());
-  }
-
-  protected String validateEmail(ObjectNode requestNode) {
-    String email = requestNode.get("email") != null ? requestNode.get("email").asText() : null;
-    if (email == null) {
-      throw new BadRequestException("Email is mandatory");
-    }
-    return email;
-  }
-
-  protected void assignTask(User currentUser, Task task, String assigneeIdString) {
-    try {
-      String oldAssignee = task.getAssignee();
-      taskService.setAssignee(task.getId(), assigneeIdString);
-
-      // If the old assignee user wasn't part of the involved users yet, make it so
-      addIdentiyLinkForUser(task, oldAssignee, IdentityLinkType.PARTICIPANT);
-
-      // If the current user wasn't part of the involved users yet, make it so
-      String currentUserIdString = String.valueOf(currentUser.getId());
-      addIdentiyLinkForUser(task, currentUserIdString, IdentityLinkType.PARTICIPANT);
-
-    } catch (FlowableException e) {
-      throw new BadRequestException("Task " + task.getId() + " can't be assigned", e);
-    }
-  }
-
-  protected void addIdentiyLinkForUser(Task task, String userId, String linkType) {
-    List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(task.getId());
-    boolean isOldUserInvolved = false;
-    for (IdentityLink identityLink : identityLinks) {
-      if (userId.equals(identityLink.getUserId()) && (identityLink.getType().equals(IdentityLinkType.PARTICIPANT) || identityLink.getType().equals(IdentityLinkType.CANDIDATE))) {
-        isOldUserInvolved = true;
-      }
-    }
-    if (!isOldUserInvolved) {
-      taskService.addUserIdentityLink(task.getId(), userId, linkType);
-    }
-  }
-  
-  protected void populateAssignee(TaskInfo task, TaskRepresentation rep) {
-    if (task.getAssignee() != null) {
-      CachedUser cachedUser = userCache.getUser(task.getAssignee());
-      if (cachedUser != null && cachedUser.getUser() != null) {
-        rep.setAssignee(new UserRepresentation(cachedUser.getUser()));
-      }
-    }
-  }
-
-  protected List<UserRepresentation> getInvolvedUsers(String taskId) {
-    List<HistoricIdentityLink> idLinks = historyService.getHistoricIdentityLinksForTask(taskId);
-    List<UserRepresentation> result = new ArrayList<UserRepresentation>(idLinks.size());
-
-    for (HistoricIdentityLink link : idLinks) {
-      // Only include users and non-assignee links
-      if (link.getUserId() != null && !IdentityLinkType.ASSIGNEE.equals(link.getType())) {
-        CachedUser cachedUser = userCache.getUser(link.getUserId());
-        if (cachedUser != null && cachedUser.getUser() != null) {
-          result.add(new UserRepresentation(cachedUser.getUser()));
+        if (task == null) {
+            throw new NotFoundException("Task with id: " + taskId + " does not exist");
         }
-      }
+
+        if (!permissionService.isTaskOwnerOrAssignee(currentUser, task)) {
+            if (!permissionService.validateIfUserIsInitiatorAndCanCompleteTask(currentUser, task)) {
+                throw new NotPermittedException();
+            }
+        }
+
+        try {
+            taskService.complete(task.getId());
+        } catch (FlowableException e) {
+            logger.error("Error completing task {}", taskId, e);
+            throw new BadRequestException("Task " + taskId + " can't be completed", e);
+        }
     }
-    return result;
-  }
+
+    public TaskRepresentation assignTask(String taskId, ObjectNode requestNode) {
+        User currentUser = SecurityUtils.getCurrentUserObject();
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+
+        if (task == null) {
+            throw new NotFoundException("Task with id: " + taskId + " does not exist");
+        }
+
+        checkTaskPermissions(taskId, currentUser, task);
+
+        if (requestNode.get("assignee") != null) {
+
+            // This method can only be called by someone in a tenant. Check if the user is part of the tenant
+            String assigneeIdString = requestNode.get("assignee").asText();
+
+            CachedUser cachedUser = userCache.getUser(assigneeIdString);
+            if (cachedUser == null) {
+                throw new BadRequestException("Invalid assignee id");
+            }
+            assignTask(currentUser, task, assigneeIdString);
+
+        } else {
+            throw new BadRequestException("Assignee is required");
+        }
+
+        task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        TaskRepresentation rep = new TaskRepresentation(task);
+        fillPermissionInformation(rep, task, currentUser);
+
+        populateAssignee(task, rep);
+        rep.setInvolvedPeople(getInvolvedUsers(taskId));
+        return rep;
+    }
+
+    public void involveUser(String taskId, ObjectNode requestNode) {
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+
+        if (task == null) {
+            throw new NotFoundException("Task with id: " + taskId + " does not exist");
+        }
+
+        User currentUser = SecurityUtils.getCurrentUserObject();
+        permissionService.validateReadPermissionOnTask(currentUser, task.getId());
+
+        if (requestNode.get("userId") != null) {
+            String userId = requestNode.get("userId").asText();
+            CachedUser user = userCache.getUser(userId);
+            if (user == null) {
+                throw new BadRequestException("Invalid user id");
+            }
+            taskService.addUserIdentityLink(taskId, userId, IdentityLinkType.PARTICIPANT);
+
+        } else {
+            throw new BadRequestException("User id is required");
+        }
+
+    }
+
+    public void removeInvolvedUser(String taskId, ObjectNode requestNode) {
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+
+        if (task == null) {
+            throw new NotFoundException("Task with id: " + taskId + " does not exist");
+        }
+
+        permissionService.validateReadPermissionOnTask(SecurityUtils.getCurrentUserObject(), task.getId());
+
+        String assigneeString = null;
+        if (requestNode.get("userId") != null) {
+            String userId = requestNode.get("userId").asText();
+            if (userCache.getUser(userId) == null) {
+                throw new BadRequestException("Invalid user id");
+            }
+            assigneeString = String.valueOf(userId);
+
+        } else if (requestNode.get("email") != null) {
+
+            String email = requestNode.get("email").asText();
+            assigneeString = email;
+
+        } else {
+            throw new BadRequestException("User id or email is required");
+        }
+
+        taskService.deleteUserIdentityLink(taskId, assigneeString, IdentityLinkType.PARTICIPANT);
+    }
+
+    public void claimTask(String taskId) {
+
+        User currentUser = SecurityUtils.getCurrentUserObject();
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+
+        if (task == null) {
+            throw new NotFoundException("Task with id: " + taskId + " does not exist");
+        }
+
+        permissionService.validateReadPermissionOnTask(currentUser, task.getId());
+
+        try {
+            taskService.claim(task.getId(), String.valueOf(currentUser.getId()));
+        } catch (FlowableException e) {
+            throw new BadRequestException("Task " + taskId + " can't be claimed", e);
+        }
+    }
+
+    protected void checkTaskPermissions(String taskId, User currentUser, Task task) {
+        permissionService.validateReadPermissionOnTask(currentUser, task.getId());
+    }
+
+    protected String validateEmail(ObjectNode requestNode) {
+        String email = requestNode.get("email") != null ? requestNode.get("email").asText() : null;
+        if (email == null) {
+            throw new BadRequestException("Email is mandatory");
+        }
+        return email;
+    }
+
+    protected void assignTask(User currentUser, Task task, String assigneeIdString) {
+        try {
+            String oldAssignee = task.getAssignee();
+            taskService.setAssignee(task.getId(), assigneeIdString);
+
+            // If the old assignee user wasn't part of the involved users yet, make it so
+            addIdentiyLinkForUser(task, oldAssignee, IdentityLinkType.PARTICIPANT);
+
+            // If the current user wasn't part of the involved users yet, make it so
+            String currentUserIdString = String.valueOf(currentUser.getId());
+            addIdentiyLinkForUser(task, currentUserIdString, IdentityLinkType.PARTICIPANT);
+
+        } catch (FlowableException e) {
+            throw new BadRequestException("Task " + task.getId() + " can't be assigned", e);
+        }
+    }
+
+    protected void addIdentiyLinkForUser(Task task, String userId, String linkType) {
+        List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(task.getId());
+        boolean isOldUserInvolved = false;
+        for (IdentityLink identityLink : identityLinks) {
+            if (userId.equals(identityLink.getUserId()) && (identityLink.getType().equals(IdentityLinkType.PARTICIPANT) || identityLink.getType().equals(IdentityLinkType.CANDIDATE))) {
+                isOldUserInvolved = true;
+            }
+        }
+        if (!isOldUserInvolved) {
+            taskService.addUserIdentityLink(task.getId(), userId, linkType);
+        }
+    }
+
+    protected void populateAssignee(TaskInfo task, TaskRepresentation rep) {
+        if (task.getAssignee() != null) {
+            CachedUser cachedUser = userCache.getUser(task.getAssignee());
+            if (cachedUser != null && cachedUser.getUser() != null) {
+                rep.setAssignee(new UserRepresentation(cachedUser.getUser()));
+            }
+        }
+    }
+
+    protected List<UserRepresentation> getInvolvedUsers(String taskId) {
+        List<HistoricIdentityLink> idLinks = historyService.getHistoricIdentityLinksForTask(taskId);
+        List<UserRepresentation> result = new ArrayList<UserRepresentation>(idLinks.size());
+
+        for (HistoricIdentityLink link : idLinks) {
+            // Only include users and non-assignee links
+            if (link.getUserId() != null && !IdentityLinkType.ASSIGNEE.equals(link.getType())) {
+                CachedUser cachedUser = userCache.getUser(link.getUserId());
+                if (cachedUser != null && cachedUser.getUser() != null) {
+                    result.add(new UserRepresentation(cachedUser.getUser()));
+                }
+            }
+        }
+        return result;
+    }
 }

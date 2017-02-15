@@ -12,14 +12,13 @@
  */
 package org.flowable.form.engine.impl.parser;
 
-
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
 public class FormDefinitionParseFactory {
 
-  public FormDefinitionParse createParse() {
-    return new FormDefinitionParse();
-  }
+    public FormDefinitionParse createParse() {
+        return new FormDefinitionParse();
+    }
 }

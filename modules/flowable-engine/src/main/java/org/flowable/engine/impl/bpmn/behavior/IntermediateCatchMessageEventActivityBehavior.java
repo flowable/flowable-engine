@@ -30,59 +30,59 @@ import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntit
 
 public class IntermediateCatchMessageEventActivityBehavior extends IntermediateCatchEventActivityBehavior {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected MessageEventDefinition messageEventDefinition;
+    protected MessageEventDefinition messageEventDefinition;
 
-  public IntermediateCatchMessageEventActivityBehavior(MessageEventDefinition messageEventDefinition) {
-    this.messageEventDefinition = messageEventDefinition;
-  }
-
-  public void execute(DelegateExecution execution) {
-    CommandContext commandContext = Context.getCommandContext();
-    ExecutionEntity executionEntity = (ExecutionEntity) execution;
-    
-    String messageName = null;
-    if (StringUtils.isNotEmpty(messageEventDefinition.getMessageRef())) {
-      messageName = messageEventDefinition.getMessageRef();
-    } else {
-      Expression messageExpression = commandContext.getProcessEngineConfiguration().getExpressionManager()
-          .createExpression(messageEventDefinition.getMessageExpression());
-      messageName = messageExpression.getValue(execution).toString();
+    public IntermediateCatchMessageEventActivityBehavior(MessageEventDefinition messageEventDefinition) {
+        this.messageEventDefinition = messageEventDefinition;
     }
-    
-    commandContext.getEventSubscriptionEntityManager().insertMessageEvent(messageName, executionEntity);
 
-    if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-      commandContext.getProcessEngineConfiguration().getEventDispatcher()
-              .dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING, executionEntity.getActivityId(), messageName,
-                      null, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()));
+    public void execute(DelegateExecution execution) {
+        CommandContext commandContext = Context.getCommandContext();
+        ExecutionEntity executionEntity = (ExecutionEntity) execution;
+
+        String messageName = null;
+        if (StringUtils.isNotEmpty(messageEventDefinition.getMessageRef())) {
+            messageName = messageEventDefinition.getMessageRef();
+        } else {
+            Expression messageExpression = commandContext.getProcessEngineConfiguration().getExpressionManager()
+                    .createExpression(messageEventDefinition.getMessageExpression());
+            messageName = messageExpression.getValue(execution).toString();
+        }
+
+        commandContext.getEventSubscriptionEntityManager().insertMessageEvent(messageName, executionEntity);
+
+        if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            commandContext.getProcessEngineConfiguration().getEventDispatcher()
+                    .dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING, executionEntity.getActivityId(), messageName,
+                            null, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()));
+        }
     }
-  }
 
-  @Override
-  public void trigger(DelegateExecution execution, String triggerName, Object triggerData) {
-    ExecutionEntity executionEntity = deleteMessageEventSubScription(execution);
-    leaveIntermediateCatchEvent(executionEntity);
-  }
-  
-  @Override
-  public void eventCancelledByEventGateway(DelegateExecution execution) {
-    deleteMessageEventSubScription(execution);
-    Context.getCommandContext().getExecutionEntityManager().deleteExecutionAndRelatedData((ExecutionEntity) execution, 
-        DeleteReason.EVENT_BASED_GATEWAY_CANCEL, false);
-  }
-
-  protected ExecutionEntity deleteMessageEventSubScription(DelegateExecution execution) {
-    ExecutionEntity executionEntity = (ExecutionEntity) execution;
-    EventSubscriptionEntityManager eventSubscriptionEntityManager = Context.getCommandContext().getEventSubscriptionEntityManager();
-    List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
-    for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
-      if (eventSubscription instanceof MessageEventSubscriptionEntity && eventSubscription.getEventName().equals(messageEventDefinition.getMessageRef())) {
-
-        eventSubscriptionEntityManager.delete(eventSubscription);
-      }
+    @Override
+    public void trigger(DelegateExecution execution, String triggerName, Object triggerData) {
+        ExecutionEntity executionEntity = deleteMessageEventSubScription(execution);
+        leaveIntermediateCatchEvent(executionEntity);
     }
-    return executionEntity;
-  }
+
+    @Override
+    public void eventCancelledByEventGateway(DelegateExecution execution) {
+        deleteMessageEventSubScription(execution);
+        Context.getCommandContext().getExecutionEntityManager().deleteExecutionAndRelatedData((ExecutionEntity) execution,
+                DeleteReason.EVENT_BASED_GATEWAY_CANCEL, false);
+    }
+
+    protected ExecutionEntity deleteMessageEventSubScription(DelegateExecution execution) {
+        ExecutionEntity executionEntity = (ExecutionEntity) execution;
+        EventSubscriptionEntityManager eventSubscriptionEntityManager = Context.getCommandContext().getEventSubscriptionEntityManager();
+        List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
+        for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
+            if (eventSubscription instanceof MessageEventSubscriptionEntity && eventSubscription.getEventName().equals(messageEventDefinition.getMessageRef())) {
+
+                eventSubscriptionEntityManager.delete(eventSubscription);
+            }
+        }
+        return executionEntity;
+    }
 }

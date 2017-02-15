@@ -24,44 +24,44 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ModelHistoryRepositoryImpl implements ModelHistoryRepository {
-  
-  private static final String NAMESPACE = "org.flowable.app.domain.editor.ModelHistory.";
-  
-  @Autowired
-  protected SqlSessionTemplate sqlSessionTemplate;
-  
-  @Autowired
-  protected UuidIdGenerator idGenerator;
-  
-  @Override
-  public ModelHistory get(String id) {
-    return sqlSessionTemplate.selectOne(NAMESPACE + "selectModelHistory", id);
-  }
 
-	public List<ModelHistory> findByModelTypAndCreatedBy(String createdBy, Integer modelType) {
-	  Map<String, Object> params = new HashMap<String, Object>();
-    params.put("modelType", modelType);
-    params.put("createdBy", createdBy);
-    return sqlSessionTemplate.selectList(NAMESPACE + "selectModelHistoryByTypeAndCreatedBy", params);
-	}
-	
-	public List<ModelHistory> findByModelId(String modelId) {
-	  return sqlSessionTemplate.selectList(NAMESPACE + "selectModelHistoryByModelId", modelId);
-	}
-	
-	@Override
-	public void save(ModelHistory modelHistory) {
-	  if (modelHistory.getId() == null) {
-	    modelHistory.setId(idGenerator.generateId());
-	    sqlSessionTemplate.insert(NAMESPACE + "insertModelHistory", modelHistory);
-    } else {
-      sqlSessionTemplate.update(NAMESPACE + "updateModelHistory", modelHistory);
+    private static final String NAMESPACE = "org.flowable.app.domain.editor.ModelHistory.";
+
+    @Autowired
+    protected SqlSessionTemplate sqlSessionTemplate;
+
+    @Autowired
+    protected UuidIdGenerator idGenerator;
+
+    @Override
+    public ModelHistory get(String id) {
+        return sqlSessionTemplate.selectOne(NAMESPACE + "selectModelHistory", id);
     }
-	}
-	
-	@Override
-	public void delete(ModelHistory modelHistory) {
-	  sqlSessionTemplate.delete(NAMESPACE + "deleteModelHistory", modelHistory);
-	}
-	
+
+    public List<ModelHistory> findByModelTypAndCreatedBy(String createdBy, Integer modelType) {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("modelType", modelType);
+        params.put("createdBy", createdBy);
+        return sqlSessionTemplate.selectList(NAMESPACE + "selectModelHistoryByTypeAndCreatedBy", params);
+    }
+
+    public List<ModelHistory> findByModelId(String modelId) {
+        return sqlSessionTemplate.selectList(NAMESPACE + "selectModelHistoryByModelId", modelId);
+    }
+
+    @Override
+    public void save(ModelHistory modelHistory) {
+        if (modelHistory.getId() == null) {
+            modelHistory.setId(idGenerator.generateId());
+            sqlSessionTemplate.insert(NAMESPACE + "insertModelHistory", modelHistory);
+        } else {
+            sqlSessionTemplate.update(NAMESPACE + "updateModelHistory", modelHistory);
+        }
+    }
+
+    @Override
+    public void delete(ModelHistory modelHistory) {
+        sqlSessionTemplate.delete(NAMESPACE + "deleteModelHistory", modelHistory);
+    }
+
 }

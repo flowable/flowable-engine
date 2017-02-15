@@ -24,22 +24,22 @@ import org.flowable.dmn.xml.converter.DmnXMLConverter;
 
 public abstract class AbstractConverterTest {
 
-  protected DmnDefinition readXMLFile() throws Exception {
-    InputStream xmlStream = this.getClass().getClassLoader().getResourceAsStream(getResource());
-    XMLInputFactory xif = XMLInputFactory.newInstance();
-    InputStreamReader in = new InputStreamReader(xmlStream, "UTF-8");
-    XMLStreamReader xtr = xif.createXMLStreamReader(in);
-    return new DmnXMLConverter().convertToDmnModel(xtr);
-  }
+    protected DmnDefinition readXMLFile() throws Exception {
+        InputStream xmlStream = this.getClass().getClassLoader().getResourceAsStream(getResource());
+        XMLInputFactory xif = XMLInputFactory.newInstance();
+        InputStreamReader in = new InputStreamReader(xmlStream, "UTF-8");
+        XMLStreamReader xtr = xif.createXMLStreamReader(in);
+        return new DmnXMLConverter().convertToDmnModel(xtr);
+    }
 
-  protected DmnDefinition exportAndReadXMLFile(DmnDefinition definition) throws Exception {
-    byte[] xml = new DmnXMLConverter().convertToXML(definition);
-    System.out.println("xml " + new String(xml, "UTF-8"));
-    XMLInputFactory xif = XMLInputFactory.newInstance();
-    InputStreamReader in = new InputStreamReader(new ByteArrayInputStream(xml), "UTF-8");
-    XMLStreamReader xtr = xif.createXMLStreamReader(in);
-    return new DmnXMLConverter().convertToDmnModel(xtr);
-  }
+    protected DmnDefinition exportAndReadXMLFile(DmnDefinition definition) throws Exception {
+        byte[] xml = new DmnXMLConverter().convertToXML(definition);
+        System.out.println("xml " + new String(xml, "UTF-8"));
+        XMLInputFactory xif = XMLInputFactory.newInstance();
+        InputStreamReader in = new InputStreamReader(new ByteArrayInputStream(xml), "UTF-8");
+        XMLStreamReader xtr = xif.createXMLStreamReader(in);
+        return new DmnXMLConverter().convertToDmnModel(xtr);
+    }
 
-  protected abstract String getResource();
+    protected abstract String getResource();
 }

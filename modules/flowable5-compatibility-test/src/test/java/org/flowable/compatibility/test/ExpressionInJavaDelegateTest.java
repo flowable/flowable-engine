@@ -21,27 +21,27 @@ import org.junit.Test;
 
 public class ExpressionInJavaDelegateTest extends AbstractFlowable6CompatibilityTest {
 
-  @Test
-  public void testFlowable5JavaDelegate() {
-    
-    // This test checks if the usage of an Expression in a JavaDelegate remains the same as in v5
-    
-    // Check data for existing process
-    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("expressionInJavaDelegate").singleResult();
-    assertNotNull(processInstance);
-    Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
-    assertEquals(1, variables.size());
-    String varValue = (String) variables.get("testVar");
-    assertEquals("helloWorld", varValue);
-    
-    // Redploying it. Note that we have a new delegate now!
-    repositoryService.createDeployment().addClasspathResource("expressionInJavaDelegateProcess.bpmn20.xml").deploy();
-    processInstance = runtimeService.startProcessInstanceByKey("expressionInJavaDelegate");
-    variables = runtimeService.getVariables(processInstance.getId());
-    assertEquals(1, variables.size());
-    assertEquals(1, variables.size());
-    String varValueV6 = (String) variables.get("testVar");
-    assertEquals("helloWorld", varValueV6);
-  }
+    @Test
+    public void testFlowable5JavaDelegate() {
+
+        // This test checks if the usage of an Expression in a JavaDelegate remains the same as in v5
+
+        // Check data for existing process
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("expressionInJavaDelegate").singleResult();
+        assertNotNull(processInstance);
+        Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
+        assertEquals(1, variables.size());
+        String varValue = (String) variables.get("testVar");
+        assertEquals("helloWorld", varValue);
+
+        // Redploying it. Note that we have a new delegate now!
+        repositoryService.createDeployment().addClasspathResource("expressionInJavaDelegateProcess.bpmn20.xml").deploy();
+        processInstance = runtimeService.startProcessInstanceByKey("expressionInJavaDelegate");
+        variables = runtimeService.getVariables(processInstance.getId());
+        assertEquals(1, variables.size());
+        assertEquals(1, variables.size());
+        String varValueV6 = (String) variables.get("testVar");
+        assertEquals("helloWorld", varValueV6);
+    }
 
 }

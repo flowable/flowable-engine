@@ -29,355 +29,355 @@ import org.flowable.form.engine.impl.interceptor.CommandExecutor;
  */
 public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, FormDefinition> implements FormDefinitionQuery {
 
-  private static final long serialVersionUID = 1L;
-  protected String id;
-  protected Set<String> ids;
-  protected String category;
-  protected String categoryLike;
-  protected String categoryNotEquals;
-  protected String name;
-  protected String nameLike;
-  protected String deploymentId;
-  protected Set<String> deploymentIds;
-  protected String parentDeploymentId;
-  protected String parentDeploymentIdLike;
-  protected String key;
-  protected String keyLike;
-  protected String resourceName;
-  protected String resourceNameLike;
-  protected Integer version;
-  protected Integer versionGt;
-  protected Integer versionGte;
-  protected Integer versionLt;
-  protected Integer versionLte;
-  protected boolean latest;
-  protected String tenantId;
-  protected String tenantIdLike;
-  protected boolean withoutTenantId;
+    private static final long serialVersionUID = 1L;
+    protected String id;
+    protected Set<String> ids;
+    protected String category;
+    protected String categoryLike;
+    protected String categoryNotEquals;
+    protected String name;
+    protected String nameLike;
+    protected String deploymentId;
+    protected Set<String> deploymentIds;
+    protected String parentDeploymentId;
+    protected String parentDeploymentIdLike;
+    protected String key;
+    protected String keyLike;
+    protected String resourceName;
+    protected String resourceNameLike;
+    protected Integer version;
+    protected Integer versionGt;
+    protected Integer versionGte;
+    protected Integer versionLt;
+    protected Integer versionLte;
+    protected boolean latest;
+    protected String tenantId;
+    protected String tenantIdLike;
+    protected boolean withoutTenantId;
 
-  public FormDefinitionQueryImpl() {
-  }
-
-  public FormDefinitionQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
-  public FormDefinitionQueryImpl(CommandExecutor commandExecutor) {
-    super(commandExecutor);
-  }
-
-  public FormDefinitionQueryImpl formId(String formId) {
-    this.id = formId;
-    return this;
-  }
-  
-  @Override
-  public FormDefinitionQuery formIds(Set<String> formIds) {
-  	this.ids = formIds;
-  	return this;
-  }
-  
-  public FormDefinitionQueryImpl formCategory(String category) {
-    if (category == null) {
-      throw new FlowableIllegalArgumentException("category is null");
+    public FormDefinitionQueryImpl() {
     }
-    this.category = category;
-    return this;
-  }
 
-  public FormDefinitionQueryImpl formCategoryLike(String categoryLike) {
-    if (categoryLike == null) {
-      throw new FlowableIllegalArgumentException("categoryLike is null");
+    public FormDefinitionQueryImpl(CommandContext commandContext) {
+        super(commandContext);
     }
-    this.categoryLike = categoryLike;
-    return this;
-  }
 
-  public FormDefinitionQueryImpl formCategoryNotEquals(String categoryNotEquals) {
-    if (categoryNotEquals == null) {
-      throw new FlowableIllegalArgumentException("categoryNotEquals is null");
+    public FormDefinitionQueryImpl(CommandExecutor commandExecutor) {
+        super(commandExecutor);
     }
-    this.categoryNotEquals = categoryNotEquals;
-    return this;
-  }
 
-  public FormDefinitionQueryImpl formName(String name) {
-    if (name == null) {
-      throw new FlowableIllegalArgumentException("name is null");
+    public FormDefinitionQueryImpl formId(String formId) {
+        this.id = formId;
+        return this;
     }
-    this.name = name;
-    return this;
-  }
 
-  public FormDefinitionQueryImpl formNameLike(String nameLike) {
-    if (nameLike == null) {
-      throw new FlowableIllegalArgumentException("nameLike is null");
+    @Override
+    public FormDefinitionQuery formIds(Set<String> formIds) {
+        this.ids = formIds;
+        return this;
     }
-    this.nameLike = nameLike;
-    return this;
-  }
 
-  public FormDefinitionQueryImpl deploymentId(String deploymentId) {
-    if (deploymentId == null) {
-      throw new FlowableIllegalArgumentException("id is null");
+    public FormDefinitionQueryImpl formCategory(String category) {
+        if (category == null) {
+            throw new FlowableIllegalArgumentException("category is null");
+        }
+        this.category = category;
+        return this;
     }
-    this.deploymentId = deploymentId;
-    return this;
-  }
 
-  public FormDefinitionQueryImpl deploymentIds(Set<String> deploymentIds) {
-    if (deploymentIds == null) {
-      throw new FlowableIllegalArgumentException("ids are null");
+    public FormDefinitionQueryImpl formCategoryLike(String categoryLike) {
+        if (categoryLike == null) {
+            throw new FlowableIllegalArgumentException("categoryLike is null");
+        }
+        this.categoryLike = categoryLike;
+        return this;
     }
-    this.deploymentIds = deploymentIds;
-    return this;
-  }
-  
-  public FormDefinitionQueryImpl parentDeploymentId(String parentDeploymentId) {
-    if (parentDeploymentId == null) {
-      throw new FlowableIllegalArgumentException("parentDeploymentId is null");
+
+    public FormDefinitionQueryImpl formCategoryNotEquals(String categoryNotEquals) {
+        if (categoryNotEquals == null) {
+            throw new FlowableIllegalArgumentException("categoryNotEquals is null");
+        }
+        this.categoryNotEquals = categoryNotEquals;
+        return this;
     }
-    this.parentDeploymentId = parentDeploymentId;
-    return this;
-  }
-  
-  public FormDefinitionQueryImpl parentDeploymentIdLike(String parentDeploymentIdLike) {
-    if (parentDeploymentIdLike == null) {
-      throw new FlowableIllegalArgumentException("parentDeploymentIdLike is null");
+
+    public FormDefinitionQueryImpl formName(String name) {
+        if (name == null) {
+            throw new FlowableIllegalArgumentException("name is null");
+        }
+        this.name = name;
+        return this;
     }
-    this.parentDeploymentIdLike = parentDeploymentIdLike;
-    return this;
-  }
 
-  public FormDefinitionQueryImpl formDefinitionKey(String key) {
-    if (key == null) {
-      throw new FlowableIllegalArgumentException("key is null");
+    public FormDefinitionQueryImpl formNameLike(String nameLike) {
+        if (nameLike == null) {
+            throw new FlowableIllegalArgumentException("nameLike is null");
+        }
+        this.nameLike = nameLike;
+        return this;
     }
-    this.key = key;
-    return this;
-  }
 
-  public FormDefinitionQueryImpl formDefinitionKeyLike(String keyLike) {
-    if (keyLike == null) {
-      throw new FlowableIllegalArgumentException("keyLike is null");
+    public FormDefinitionQueryImpl deploymentId(String deploymentId) {
+        if (deploymentId == null) {
+            throw new FlowableIllegalArgumentException("id is null");
+        }
+        this.deploymentId = deploymentId;
+        return this;
     }
-    this.keyLike = keyLike;
-    return this;
-  }
 
-  public FormDefinitionQueryImpl formResourceName(String resourceName) {
-    if (resourceName == null) {
-      throw new FlowableIllegalArgumentException("resourceName is null");
+    public FormDefinitionQueryImpl deploymentIds(Set<String> deploymentIds) {
+        if (deploymentIds == null) {
+            throw new FlowableIllegalArgumentException("ids are null");
+        }
+        this.deploymentIds = deploymentIds;
+        return this;
     }
-    this.resourceName = resourceName;
-    return this;
-  }
 
-  public FormDefinitionQueryImpl formResourceNameLike(String resourceNameLike) {
-    if (resourceNameLike == null) {
-      throw new FlowableIllegalArgumentException("resourceNameLike is null");
+    public FormDefinitionQueryImpl parentDeploymentId(String parentDeploymentId) {
+        if (parentDeploymentId == null) {
+            throw new FlowableIllegalArgumentException("parentDeploymentId is null");
+        }
+        this.parentDeploymentId = parentDeploymentId;
+        return this;
     }
-    this.resourceNameLike = resourceNameLike;
-    return this;
-  }
 
-  public FormDefinitionQueryImpl formVersion(Integer version) {
-    checkVersion(version);
-    this.version = version;
-    return this;
-  }
-
-  public FormDefinitionQuery formVersionGreaterThan(Integer formVersion) {
-    checkVersion(formVersion);
-    this.versionGt = formVersion;
-    return this;
-  }
-
-  public FormDefinitionQuery formVersionGreaterThanOrEquals(Integer formVersion) {
-    checkVersion(formVersion);
-    this.versionGte = formVersion;
-    return this;
-  }
-
-  public FormDefinitionQuery formVersionLowerThan(Integer formVersion) {
-    checkVersion(formVersion);
-    this.versionLt = formVersion;
-    return this;
-  }
-
-  public FormDefinitionQuery formVersionLowerThanOrEquals(Integer formVersion) {
-    checkVersion(formVersion);
-    this.versionLte = formVersion;
-    return this;
-  }
-  
-  protected void checkVersion(Integer version) {
-    if (version == null) {
-      throw new FlowableIllegalArgumentException("version is null");
-    } else if (version <= 0) {
-      throw new FlowableIllegalArgumentException("version must be positive");
+    public FormDefinitionQueryImpl parentDeploymentIdLike(String parentDeploymentIdLike) {
+        if (parentDeploymentIdLike == null) {
+            throw new FlowableIllegalArgumentException("parentDeploymentIdLike is null");
+        }
+        this.parentDeploymentIdLike = parentDeploymentIdLike;
+        return this;
     }
-  }
 
-  public FormDefinitionQueryImpl latestVersion() {
-    this.latest = true;
-    return this;
-  }
-
-  public FormDefinitionQuery formTenantId(String tenantId) {
-    if (tenantId == null) {
-      throw new FlowableIllegalArgumentException("form tenantId is null");
+    public FormDefinitionQueryImpl formDefinitionKey(String key) {
+        if (key == null) {
+            throw new FlowableIllegalArgumentException("key is null");
+        }
+        this.key = key;
+        return this;
     }
-    this.tenantId = tenantId;
-    return this;
-  }
 
-  public FormDefinitionQuery formTenantIdLike(String tenantIdLike) {
-    if (tenantIdLike == null) {
-      throw new FlowableIllegalArgumentException("form tenantId is null");
+    public FormDefinitionQueryImpl formDefinitionKeyLike(String keyLike) {
+        if (keyLike == null) {
+            throw new FlowableIllegalArgumentException("keyLike is null");
+        }
+        this.keyLike = keyLike;
+        return this;
     }
-    this.tenantIdLike = tenantIdLike;
-    return this;
-  }
 
-  public FormDefinitionQuery formWithoutTenantId() {
-    this.withoutTenantId = true;
-    return this;
-  }
+    public FormDefinitionQueryImpl formResourceName(String resourceName) {
+        if (resourceName == null) {
+            throw new FlowableIllegalArgumentException("resourceName is null");
+        }
+        this.resourceName = resourceName;
+        return this;
+    }
 
-  // sorting ////////////////////////////////////////////
+    public FormDefinitionQueryImpl formResourceNameLike(String resourceNameLike) {
+        if (resourceNameLike == null) {
+            throw new FlowableIllegalArgumentException("resourceNameLike is null");
+        }
+        this.resourceNameLike = resourceNameLike;
+        return this;
+    }
 
-  public FormDefinitionQuery orderByDeploymentId() {
-    return orderBy(FormQueryProperty.DEPLOYMENT_ID);
-  }
+    public FormDefinitionQueryImpl formVersion(Integer version) {
+        checkVersion(version);
+        this.version = version;
+        return this;
+    }
 
-  public FormDefinitionQuery orderByFormDefinitionKey() {
-    return orderBy(FormQueryProperty.FORM_DEFINITION_KEY);
-  }
+    public FormDefinitionQuery formVersionGreaterThan(Integer formVersion) {
+        checkVersion(formVersion);
+        this.versionGt = formVersion;
+        return this;
+    }
 
-  public FormDefinitionQuery orderByFormCategory() {
-    return orderBy(FormQueryProperty.FORM_CATEGORY);
-  }
+    public FormDefinitionQuery formVersionGreaterThanOrEquals(Integer formVersion) {
+        checkVersion(formVersion);
+        this.versionGte = formVersion;
+        return this;
+    }
 
-  public FormDefinitionQuery orderByFormId() {
-    return orderBy(FormQueryProperty.FORM_ID);
-  }
+    public FormDefinitionQuery formVersionLowerThan(Integer formVersion) {
+        checkVersion(formVersion);
+        this.versionLt = formVersion;
+        return this;
+    }
 
-  public FormDefinitionQuery orderByFormVersion() {
-    return orderBy(FormQueryProperty.FORM_VERSION);
-  }
+    public FormDefinitionQuery formVersionLowerThanOrEquals(Integer formVersion) {
+        checkVersion(formVersion);
+        this.versionLte = formVersion;
+        return this;
+    }
 
-  public FormDefinitionQuery orderByFormName() {
-    return orderBy(FormQueryProperty.FORM_NAME);
-  }
+    protected void checkVersion(Integer version) {
+        if (version == null) {
+            throw new FlowableIllegalArgumentException("version is null");
+        } else if (version <= 0) {
+            throw new FlowableIllegalArgumentException("version must be positive");
+        }
+    }
 
-  public FormDefinitionQuery orderByTenantId() {
-    return orderBy(FormQueryProperty.FORM_TENANT_ID);
-  }
+    public FormDefinitionQueryImpl latestVersion() {
+        this.latest = true;
+        return this;
+    }
 
-  // results ////////////////////////////////////////////
+    public FormDefinitionQuery formTenantId(String tenantId) {
+        if (tenantId == null) {
+            throw new FlowableIllegalArgumentException("form tenantId is null");
+        }
+        this.tenantId = tenantId;
+        return this;
+    }
 
-  public long executeCount(CommandContext commandContext) {
-    checkQueryOk();
-    return commandContext.getFormDefinitionEntityManager().findFormDefinitionCountByQueryCriteria(this);
-  }
+    public FormDefinitionQuery formTenantIdLike(String tenantIdLike) {
+        if (tenantIdLike == null) {
+            throw new FlowableIllegalArgumentException("form tenantId is null");
+        }
+        this.tenantIdLike = tenantIdLike;
+        return this;
+    }
 
-  public List<FormDefinition> executeList(CommandContext commandContext, Page page) {
-    checkQueryOk();
-    return commandContext.getFormDefinitionEntityManager().findFormDefinitionsByQueryCriteria(this, page);
-  }
+    public FormDefinitionQuery formWithoutTenantId() {
+        this.withoutTenantId = true;
+        return this;
+    }
 
-  public void checkQueryOk() {
-    super.checkQueryOk();
-  }
+    // sorting ////////////////////////////////////////////
 
-  // getters ////////////////////////////////////////////
+    public FormDefinitionQuery orderByDeploymentId() {
+        return orderBy(FormQueryProperty.DEPLOYMENT_ID);
+    }
 
-  public String getDeploymentId() {
-    return deploymentId;
-  }
+    public FormDefinitionQuery orderByFormDefinitionKey() {
+        return orderBy(FormQueryProperty.FORM_DEFINITION_KEY);
+    }
 
-  public Set<String> getDeploymentIds() {
-    return deploymentIds;
-  }
+    public FormDefinitionQuery orderByFormCategory() {
+        return orderBy(FormQueryProperty.FORM_CATEGORY);
+    }
 
-  public String getId() {
-    return id;
-  }
+    public FormDefinitionQuery orderByFormId() {
+        return orderBy(FormQueryProperty.FORM_ID);
+    }
 
-  public Set<String> getIds() {
-    return ids;
-  }
+    public FormDefinitionQuery orderByFormVersion() {
+        return orderBy(FormQueryProperty.FORM_VERSION);
+    }
 
-  public String getName() {
-    return name;
-  }
+    public FormDefinitionQuery orderByFormName() {
+        return orderBy(FormQueryProperty.FORM_NAME);
+    }
 
-  public String getNameLike() {
-    return nameLike;
-  }
+    public FormDefinitionQuery orderByTenantId() {
+        return orderBy(FormQueryProperty.FORM_TENANT_ID);
+    }
 
-  public String getKey() {
-    return key;
-  }
+    // results ////////////////////////////////////////////
 
-  public String getKeyLike() {
-    return keyLike;
-  }
+    public long executeCount(CommandContext commandContext) {
+        checkQueryOk();
+        return commandContext.getFormDefinitionEntityManager().findFormDefinitionCountByQueryCriteria(this);
+    }
 
-  public Integer getVersion() {
-    return version;
-  }
-  
-  public Integer getVersionGt() {
-    return versionGt;
-  }
-  
-  public Integer getVersionGte() {
-    return versionGte;
-  }
-  
-  public Integer getVersionLt() {
-    return versionLt;
-  }
-  
-  public Integer getVersionLte() {
-    return versionLte;
-  }
+    public List<FormDefinition> executeList(CommandContext commandContext, Page page) {
+        checkQueryOk();
+        return commandContext.getFormDefinitionEntityManager().findFormDefinitionsByQueryCriteria(this, page);
+    }
 
-  public boolean isLatest() {
-    return latest;
-  }
+    public void checkQueryOk() {
+        super.checkQueryOk();
+    }
 
-  public String getCategory() {
-    return category;
-  }
+    // getters ////////////////////////////////////////////
 
-  public String getCategoryLike() {
-    return categoryLike;
-  }
+    public String getDeploymentId() {
+        return deploymentId;
+    }
 
-  public String getResourceName() {
-    return resourceName;
-  }
+    public Set<String> getDeploymentIds() {
+        return deploymentIds;
+    }
 
-  public String getResourceNameLike() {
-    return resourceNameLike;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public String getCategoryNotEquals() {
-    return categoryNotEquals;
-  }
+    public Set<String> getIds() {
+        return ids;
+    }
 
-  public String getTenantId() {
-    return tenantId;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public String getTenantIdLike() {
-    return tenantIdLike;
-  }
+    public String getNameLike() {
+        return nameLike;
+    }
 
-  public boolean isWithoutTenantId() {
-    return withoutTenantId;
-  }
+    public String getKey() {
+        return key;
+    }
+
+    public String getKeyLike() {
+        return keyLike;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public Integer getVersionGt() {
+        return versionGt;
+    }
+
+    public Integer getVersionGte() {
+        return versionGte;
+    }
+
+    public Integer getVersionLt() {
+        return versionLt;
+    }
+
+    public Integer getVersionLte() {
+        return versionLte;
+    }
+
+    public boolean isLatest() {
+        return latest;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public String getCategoryLike() {
+        return categoryLike;
+    }
+
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    public String getResourceNameLike() {
+        return resourceNameLike;
+    }
+
+    public String getCategoryNotEquals() {
+        return categoryNotEquals;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public String getTenantIdLike() {
+        return tenantIdLike;
+    }
+
+    public boolean isWithoutTenantId() {
+        return withoutTenantId;
+    }
 }

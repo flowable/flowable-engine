@@ -51,149 +51,134 @@ import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
  * Maintains a list of all the entities in order of dependency.
  */
 public class EntityDependencyOrder {
-	
-	public static List<Class<? extends PersistentObject>> DELETE_ORDER = new ArrayList<Class<? extends PersistentObject>>();
-	public static List<Class<? extends PersistentObject>> INSERT_ORDER = new ArrayList<Class<? extends PersistentObject>>();
-	
-	static {
-		
-		/*
-		 * In the comments below:
-		 * 
-		 * 'FK to X' : X should be BELOW the entity
-		 * 
-		 * 'FK from X': X should be ABOVE the entity
-		 * 
-		 */
-	
-		/* No FK */
-		DELETE_ORDER.add(PropertyEntity.class);
-		
-		/* No FK */
-		DELETE_ORDER.add(AttachmentEntity.class);
-		
-		/* No FK */
-		DELETE_ORDER.add(CommentEntity.class);
-		
-		/* No FK */
-		DELETE_ORDER.add(EventLogEntryEntity.class);
-		
-		/*
-		 * FK to Deployment
-		 * FK to ByteArray 
-		 */
-		DELETE_ORDER.add(ModelEntity.class); 
-		
-		/* Subclass of TimerEntity */
-		DELETE_ORDER.add(TimerJobEntity.class);
-		
-		/*
-		 * FK to ByteArray
-		 */
-		DELETE_ORDER.add(JobEntity.class);
-		
-		/*
-		 * FK to ByteArray
-		 * FK to Exeution
-		 */
-		DELETE_ORDER.add(VariableInstanceEntity.class);
-		
-		/*
-		 * FK from ModelEntity
-		 * FK from JobEntity
-		 * FK from VariableInstanceEntity
-		 * 
-		 * FK to DeploymentEntity
-		 */
-		DELETE_ORDER.add(ByteArrayEntity.class);
-		
-		/*
-		 * FK from ModelEntity
-		 * FK from JobEntity
-		 * FK from VariableInstanceEntity
-		 * 
-		 * FK to DeploymentEntity
-		 */
-		DELETE_ORDER.add(ResourceEntity.class);
-		
-		/*
-		 * FK from ByteArray
-		 */
-		DELETE_ORDER.add(DeploymentEntity.class);
-		
-		/*
-		 * FK to Execution
-		 */
-		DELETE_ORDER.add(EventSubscriptionEntity.class);
-		
-		/*
-		 * FK to Execution
-		 */
-		DELETE_ORDER.add(CompensateEventSubscriptionEntity.class);
-		
-		/*
-		 * FK to Execution
-		 */
-		DELETE_ORDER.add(MessageEventSubscriptionEntity.class);
-		
-		/*
-		 * FK to Execution
-		 */
-		DELETE_ORDER.add(SignalEventSubscriptionEntity.class);
-		
-		
-		/*
-		 * FK to process definition
-		 * FK to Execution
-		 * FK to Task
-		 */
-		DELETE_ORDER.add(IdentityLinkEntity.class);
-		
-		/*
-		 * FK from IdentityLink
-		 * 
-		 * FK to Execution
-		 * FK to process definition
-		 */
-		DELETE_ORDER.add(TaskEntity.class);
-		
-		/*
-		 * FK from VariableInstance 
-		 * FK from EventSubscription
-		 * FK from IdentityLink
-		 * FK from Task
-		 * 
-		 * FK to ProcessDefinition
-		 */
-		DELETE_ORDER.add(ExecutionEntity.class);
-		
-		/*
-		 * FK from Task
-		 * FK from IdentityLink
-		 * FK from execution
-		 */
-		DELETE_ORDER.add(ProcessDefinitionEntity.class);
-	  
-	  // History entities have no FK's
-	  
-		DELETE_ORDER.add(HistoricIdentityLinkEntity.class);
-	  
-		DELETE_ORDER.add(HistoricActivityInstanceEntity.class);
-		DELETE_ORDER.add(HistoricProcessInstanceEntity.class);
-		DELETE_ORDER.add(HistoricTaskInstanceEntity.class);
-		DELETE_ORDER.add(HistoricScopeInstanceEntity.class);
-	  
-		DELETE_ORDER.add(HistoricVariableInstanceEntity.class);
-	  
-		DELETE_ORDER.add(HistoricDetailAssignmentEntity.class);
-		DELETE_ORDER.add(HistoricDetailTransitionInstanceEntity.class);
-		DELETE_ORDER.add(HistoricDetailVariableInstanceUpdateEntity.class);
-		DELETE_ORDER.add(HistoricFormPropertyEntity.class);
-		DELETE_ORDER.add(HistoricDetailEntity.class);
-		
-		INSERT_ORDER = new ArrayList<Class<? extends PersistentObject>>(DELETE_ORDER);
-		Collections.reverse(INSERT_ORDER);
 
-	}
+    public static List<Class<? extends PersistentObject>> DELETE_ORDER = new ArrayList<Class<? extends PersistentObject>>();
+    public static List<Class<? extends PersistentObject>> INSERT_ORDER = new ArrayList<Class<? extends PersistentObject>>();
+
+    static {
+
+        /*
+         * In the comments below:
+         * 
+         * 'FK to X' : X should be BELOW the entity
+         * 
+         * 'FK from X': X should be ABOVE the entity
+         * 
+         */
+
+        /* No FK */
+        DELETE_ORDER.add(PropertyEntity.class);
+
+        /* No FK */
+        DELETE_ORDER.add(AttachmentEntity.class);
+
+        /* No FK */
+        DELETE_ORDER.add(CommentEntity.class);
+
+        /* No FK */
+        DELETE_ORDER.add(EventLogEntryEntity.class);
+
+        /*
+         * FK to Deployment FK to ByteArray
+         */
+        DELETE_ORDER.add(ModelEntity.class);
+
+        /* Subclass of TimerEntity */
+        DELETE_ORDER.add(TimerJobEntity.class);
+
+        /*
+         * FK to ByteArray
+         */
+        DELETE_ORDER.add(JobEntity.class);
+
+        /*
+         * FK to ByteArray FK to Exeution
+         */
+        DELETE_ORDER.add(VariableInstanceEntity.class);
+
+        /*
+         * FK from ModelEntity FK from JobEntity FK from VariableInstanceEntity
+         * 
+         * FK to DeploymentEntity
+         */
+        DELETE_ORDER.add(ByteArrayEntity.class);
+
+        /*
+         * FK from ModelEntity FK from JobEntity FK from VariableInstanceEntity
+         * 
+         * FK to DeploymentEntity
+         */
+        DELETE_ORDER.add(ResourceEntity.class);
+
+        /*
+         * FK from ByteArray
+         */
+        DELETE_ORDER.add(DeploymentEntity.class);
+
+        /*
+         * FK to Execution
+         */
+        DELETE_ORDER.add(EventSubscriptionEntity.class);
+
+        /*
+         * FK to Execution
+         */
+        DELETE_ORDER.add(CompensateEventSubscriptionEntity.class);
+
+        /*
+         * FK to Execution
+         */
+        DELETE_ORDER.add(MessageEventSubscriptionEntity.class);
+
+        /*
+         * FK to Execution
+         */
+        DELETE_ORDER.add(SignalEventSubscriptionEntity.class);
+
+        /*
+         * FK to process definition FK to Execution FK to Task
+         */
+        DELETE_ORDER.add(IdentityLinkEntity.class);
+
+        /*
+         * FK from IdentityLink
+         * 
+         * FK to Execution FK to process definition
+         */
+        DELETE_ORDER.add(TaskEntity.class);
+
+        /*
+         * FK from VariableInstance FK from EventSubscription FK from IdentityLink FK from Task
+         * 
+         * FK to ProcessDefinition
+         */
+        DELETE_ORDER.add(ExecutionEntity.class);
+
+        /*
+         * FK from Task FK from IdentityLink FK from execution
+         */
+        DELETE_ORDER.add(ProcessDefinitionEntity.class);
+
+        // History entities have no FK's
+
+        DELETE_ORDER.add(HistoricIdentityLinkEntity.class);
+
+        DELETE_ORDER.add(HistoricActivityInstanceEntity.class);
+        DELETE_ORDER.add(HistoricProcessInstanceEntity.class);
+        DELETE_ORDER.add(HistoricTaskInstanceEntity.class);
+        DELETE_ORDER.add(HistoricScopeInstanceEntity.class);
+
+        DELETE_ORDER.add(HistoricVariableInstanceEntity.class);
+
+        DELETE_ORDER.add(HistoricDetailAssignmentEntity.class);
+        DELETE_ORDER.add(HistoricDetailTransitionInstanceEntity.class);
+        DELETE_ORDER.add(HistoricDetailVariableInstanceUpdateEntity.class);
+        DELETE_ORDER.add(HistoricFormPropertyEntity.class);
+        DELETE_ORDER.add(HistoricDetailEntity.class);
+
+        INSERT_ORDER = new ArrayList<Class<? extends PersistentObject>>(DELETE_ORDER);
+        Collections.reverse(INSERT_ORDER);
+
+    }
 
 }

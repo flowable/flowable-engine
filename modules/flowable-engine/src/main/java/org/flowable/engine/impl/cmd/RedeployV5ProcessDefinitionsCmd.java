@@ -33,76 +33,76 @@ import org.slf4j.LoggerFactory;
  * @author Tijs Rademakers
  */
 public class RedeployV5ProcessDefinitionsCmd implements Command<Void> {
-  
-  private static final Logger logger = LoggerFactory.getLogger(RedeployV5ProcessDefinitionsCmd.class);
-  
-  @Override
-  public Void execute(CommandContext commandContext) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-    
-    RepositoryService repositoryService = processEngineConfiguration.getRepositoryService();
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
-        .latestVersion()
-        .processDefinitionEngineVersion(Flowable5Util.V5_ENGINE_TAG)
-        .list();
-        
-    if (!processDefinitions.isEmpty()) {
-      
-      List<String> deploymentIds = new ArrayList<>();
-      Map<String, List<ProcessDefinition>> deploymentMap = new HashMap<>();
-      for (ProcessDefinition processDefinition : processDefinitions) {
-        
-        if (!deploymentIds.contains(processDefinition.getDeploymentId())) {
-          deploymentIds.add(processDefinition.getDeploymentId());
+
+    private static final Logger logger = LoggerFactory.getLogger(RedeployV5ProcessDefinitionsCmd.class);
+
+    @Override
+    public Void execute(CommandContext commandContext) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+
+        RepositoryService repositoryService = processEngineConfiguration.getRepositoryService();
+        List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+                .latestVersion()
+                .processDefinitionEngineVersion(Flowable5Util.V5_ENGINE_TAG)
+                .list();
+
+        if (!processDefinitions.isEmpty()) {
+
+            List<String> deploymentIds = new ArrayList<>();
+            Map<String, List<ProcessDefinition>> deploymentMap = new HashMap<>();
+            for (ProcessDefinition processDefinition : processDefinitions) {
+
+                if (!deploymentIds.contains(processDefinition.getDeploymentId())) {
+                    deploymentIds.add(processDefinition.getDeploymentId());
+                }
+
+                List<ProcessDefinition> groupedProcessDefinitions = null;
+                if (deploymentMap.containsKey(processDefinition.getDeploymentId())) {
+                    groupedProcessDefinitions = deploymentMap.get(processDefinition.getDeploymentId());
+                } else {
+                    groupedProcessDefinitions = new ArrayList<>();
+                }
+                groupedProcessDefinitions.add(processDefinition);
+
+                deploymentMap.put(processDefinition.getDeploymentId(), groupedProcessDefinitions);
+            }
+
+            List<Deployment> deployments = repositoryService.createDeploymentQuery()
+                    .deploymentIds(deploymentIds)
+                    .list();
+
+            for (Deployment deployment : deployments) {
+                DeploymentBuilder deploymentBuilder = repositoryService.createDeployment();
+                if (deployment.getName() != null) {
+                    deploymentBuilder.name(deployment.getName());
+                }
+
+                if (deployment.getCategory() != null) {
+                    deploymentBuilder.category(deployment.getCategory());
+                }
+
+                if (deployment.getKey() != null) {
+                    deploymentBuilder.key(deployment.getKey());
+                }
+
+                if (deployment.getTenantId() != null) {
+                    deploymentBuilder.tenantId(deployment.getTenantId());
+                }
+
+                List<ProcessDefinition> groupedProcessDefinitions = deploymentMap.get(deployment.getId());
+                for (ProcessDefinition processDefinition : groupedProcessDefinitions) {
+                    logger.info("adding v5 process definition with id: {} and key: {} for redeployment",
+                            processDefinition.getId(), processDefinition.getKey());
+
+                    InputStream definitionStream = repositoryService.getResourceAsStream(deployment.getId(), processDefinition.getResourceName());
+                    deploymentBuilder.addInputStream(processDefinition.getResourceName(), definitionStream);
+                }
+
+                deploymentBuilder.deploy();
+            }
         }
-        
-        List<ProcessDefinition> groupedProcessDefinitions = null;
-        if (deploymentMap.containsKey(processDefinition.getDeploymentId())) {
-          groupedProcessDefinitions = deploymentMap.get(processDefinition.getDeploymentId());
-        } else {
-          groupedProcessDefinitions = new ArrayList<>();
-        }
-        groupedProcessDefinitions.add(processDefinition);
-        
-        deploymentMap.put(processDefinition.getDeploymentId(), groupedProcessDefinitions);
-      }
-      
-      List<Deployment> deployments = repositoryService.createDeploymentQuery()
-          .deploymentIds(deploymentIds)
-          .list();
-      
-      for (Deployment deployment : deployments) {
-        DeploymentBuilder deploymentBuilder = repositoryService.createDeployment();
-        if (deployment.getName() != null) {
-          deploymentBuilder.name(deployment.getName());
-        }
-        
-        if (deployment.getCategory() != null) {
-          deploymentBuilder.category(deployment.getCategory());
-        }
-        
-        if (deployment.getKey() != null) {
-          deploymentBuilder.key(deployment.getKey());
-        }
-        
-        if (deployment.getTenantId() != null) {
-          deploymentBuilder.tenantId(deployment.getTenantId());
-        }
-        
-        List<ProcessDefinition> groupedProcessDefinitions = deploymentMap.get(deployment.getId());
-        for (ProcessDefinition processDefinition : groupedProcessDefinitions) {
-          logger.info("adding v5 process definition with id: {} and key: {} for redeployment", 
-              processDefinition.getId(), processDefinition.getKey());
-          
-          InputStream definitionStream = repositoryService.getResourceAsStream(deployment.getId(), processDefinition.getResourceName());
-          deploymentBuilder.addInputStream(processDefinition.getResourceName(), definitionStream); 
-        }
-        
-        deploymentBuilder.deploy();
-      }
+
+        return null;
     }
-    
-    return null;
-  }
 
 }

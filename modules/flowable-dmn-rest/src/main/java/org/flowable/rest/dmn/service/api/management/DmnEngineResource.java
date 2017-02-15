@@ -30,34 +30,34 @@ import io.swagger.annotations.Authorization;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Engine" }, description = "Manage DMN Engine", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Engine" }, description = "Manage DMN Engine", authorizations = { @Authorization(value = "basicAuth") })
 public class DmnEngineResource {
 
-  @ApiOperation(value = "Get DMN engine info", tags = {"Engine"})
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message =  "Indicates the engine info is returned."),
-  })
-  @RequestMapping(value = "/dmn-management/engine", method = RequestMethod.GET, produces = "application/json")
-  public DmnEngineInfoResponse getEngineInfo() {
-    DmnEngineInfoResponse response = new DmnEngineInfoResponse();
+    @ApiOperation(value = "Get DMN engine info", tags = { "Engine" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the engine info is returned."),
+    })
+    @RequestMapping(value = "/dmn-management/engine", method = RequestMethod.GET, produces = "application/json")
+    public DmnEngineInfoResponse getEngineInfo() {
+        DmnEngineInfoResponse response = new DmnEngineInfoResponse();
 
-    try {
-      EngineInfo dmnEngineInfo = DmnEngines.getDmnEngineInfo(DmnEngines.getDefaultDmnEngine().getName());
-      if (dmnEngineInfo != null) {
-        response.setName(dmnEngineInfo.getName());
-        response.setResourceUrl(dmnEngineInfo.getResourceUrl());
-        response.setException(dmnEngineInfo.getException());
-      } else {
-        response.setName(DmnEngines.getDefaultDmnEngine().getName());
-      }
-      
-    } catch (Exception e) {
-      throw new FlowableException("Error retrieving DMN engine info", e);
+        try {
+            EngineInfo dmnEngineInfo = DmnEngines.getDmnEngineInfo(DmnEngines.getDefaultDmnEngine().getName());
+            if (dmnEngineInfo != null) {
+                response.setName(dmnEngineInfo.getName());
+                response.setResourceUrl(dmnEngineInfo.getResourceUrl());
+                response.setException(dmnEngineInfo.getException());
+            } else {
+                response.setName(DmnEngines.getDefaultDmnEngine().getName());
+            }
+
+        } catch (Exception e) {
+            throw new FlowableException("Error retrieving DMN engine info", e);
+        }
+
+        response.setVersion(DmnEngine.VERSION);
+
+        return response;
     }
-
-    response.setVersion(DmnEngine.VERSION);
-
-    return response;
-  }
 
 }

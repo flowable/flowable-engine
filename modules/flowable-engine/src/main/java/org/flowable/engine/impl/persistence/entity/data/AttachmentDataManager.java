@@ -21,9 +21,9 @@ import org.flowable.engine.impl.persistence.entity.AttachmentEntity;
  * @author Joram Barrez
  */
 public interface AttachmentDataManager extends DataManager<AttachmentEntity> {
-  
-  List<AttachmentEntity> findAttachmentsByProcessInstanceId(String processInstanceId);
-  
-  List<AttachmentEntity> findAttachmentsByTaskId(String taskId);
-  
+
+    List<AttachmentEntity> findAttachmentsByProcessInstanceId(String processInstanceId);
+
+    List<AttachmentEntity> findAttachmentsByTaskId(String taskId);
+
 }

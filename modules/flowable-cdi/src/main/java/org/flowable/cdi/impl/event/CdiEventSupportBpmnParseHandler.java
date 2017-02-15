@@ -56,113 +56,112 @@ import org.flowable.engine.parse.BpmnParseHandler;
  */
 public class CdiEventSupportBpmnParseHandler implements BpmnParseHandler {
 
-  protected static final Set<Class<? extends BaseElement>> supportedTypes = new HashSet<Class<? extends BaseElement>>();
+    protected static final Set<Class<? extends BaseElement>> supportedTypes = new HashSet<Class<? extends BaseElement>>();
 
-  static {
-    supportedTypes.add(StartEvent.class);
-    supportedTypes.add(EndEvent.class);
-    supportedTypes.add(ExclusiveGateway.class);
-    supportedTypes.add(InclusiveGateway.class);
-    supportedTypes.add(ParallelGateway.class);
-    supportedTypes.add(ScriptTask.class);
-    supportedTypes.add(ServiceTask.class);
-    supportedTypes.add(BusinessRuleTask.class);
-    supportedTypes.add(Task.class);
-    supportedTypes.add(ManualTask.class);
-    supportedTypes.add(UserTask.class);
-    supportedTypes.add(EndEvent.class);
-    supportedTypes.add(SubProcess.class);
-    supportedTypes.add(EventSubProcess.class);
-    supportedTypes.add(CallActivity.class);
-    supportedTypes.add(SendTask.class);
-    supportedTypes.add(ReceiveTask.class);
-    supportedTypes.add(EventGateway.class);
-    supportedTypes.add(Transaction.class);
-    supportedTypes.add(ThrowEvent.class);
+    static {
+        supportedTypes.add(StartEvent.class);
+        supportedTypes.add(EndEvent.class);
+        supportedTypes.add(ExclusiveGateway.class);
+        supportedTypes.add(InclusiveGateway.class);
+        supportedTypes.add(ParallelGateway.class);
+        supportedTypes.add(ScriptTask.class);
+        supportedTypes.add(ServiceTask.class);
+        supportedTypes.add(BusinessRuleTask.class);
+        supportedTypes.add(Task.class);
+        supportedTypes.add(ManualTask.class);
+        supportedTypes.add(UserTask.class);
+        supportedTypes.add(EndEvent.class);
+        supportedTypes.add(SubProcess.class);
+        supportedTypes.add(EventSubProcess.class);
+        supportedTypes.add(CallActivity.class);
+        supportedTypes.add(SendTask.class);
+        supportedTypes.add(ReceiveTask.class);
+        supportedTypes.add(EventGateway.class);
+        supportedTypes.add(Transaction.class);
+        supportedTypes.add(ThrowEvent.class);
 
-    supportedTypes.add(TimerEventDefinition.class);
-    supportedTypes.add(ErrorEventDefinition.class);
-    supportedTypes.add(SignalEventDefinition.class);
+        supportedTypes.add(TimerEventDefinition.class);
+        supportedTypes.add(ErrorEventDefinition.class);
+        supportedTypes.add(SignalEventDefinition.class);
 
-    supportedTypes.add(SequenceFlow.class);
-  }
-
-  public Set<Class<? extends BaseElement>> getHandledTypes() {
-    return supportedTypes;
-  }
-
-  public void parse(BpmnParse bpmnParse, BaseElement element) {
-    
-    if (element instanceof SequenceFlow) {
-      
-      SequenceFlow sequenceFlow = (SequenceFlow) element;
-      CdiExecutionListener listener = new CdiExecutionListener(sequenceFlow.getId());
-      addListenerToElement(sequenceFlow, ExecutionListener.EVENTNAME_TAKE, listener);
-      
-    } else {
-      
-      if (element instanceof UserTask) {
-        
-        UserTask userTask = (UserTask) element;
-        
-        addCreateListener(userTask);
-        addAssignListener(userTask);
-        addCompleteListener(userTask);
-        addDeleteListener(userTask);
-      }
-      
-
-      if (element instanceof FlowElement) {
-        
-        FlowElement flowElement = (FlowElement) element;
-        
-        addStartEventListener(flowElement);
-        addEndEventListener(flowElement);
-      }
-      
+        supportedTypes.add(SequenceFlow.class);
     }
-  }
 
-  private void addCompleteListener(UserTask userTask) {
-    addListenerToUserTask(userTask, TaskListener.EVENTNAME_COMPLETE, new CdiTaskListener(userTask.getId(), BusinessProcessEventType.COMPLETE_TASK));
-  }
+    public Set<Class<? extends BaseElement>> getHandledTypes() {
+        return supportedTypes;
+    }
 
-  private void addAssignListener(UserTask userTask) {
-    addListenerToUserTask(userTask, TaskListener.EVENTNAME_ASSIGNMENT, new CdiTaskListener(userTask.getId(), BusinessProcessEventType.ASSIGN_TASK));
-  }
+    public void parse(BpmnParse bpmnParse, BaseElement element) {
 
-  private void addCreateListener(UserTask userTask) {
-    addListenerToUserTask(userTask, TaskListener.EVENTNAME_CREATE, new CdiTaskListener(userTask.getId(), BusinessProcessEventType.CREATE_TASK));
-  }
+        if (element instanceof SequenceFlow) {
 
-  protected void addDeleteListener(UserTask userTask) {
-    addListenerToUserTask(userTask, TaskListener.EVENTNAME_DELETE, new CdiTaskListener(userTask.getId(), BusinessProcessEventType.DELETE_TASK));
-  }
-  
-  protected void addStartEventListener(FlowElement flowElement) {
-    CdiExecutionListener listener = new CdiExecutionListener(flowElement.getId(), BusinessProcessEventType.START_ACTIVITY);
-    addListenerToElement(flowElement, ExecutionListener.EVENTNAME_START, listener);
-  }
+            SequenceFlow sequenceFlow = (SequenceFlow) element;
+            CdiExecutionListener listener = new CdiExecutionListener(sequenceFlow.getId());
+            addListenerToElement(sequenceFlow, ExecutionListener.EVENTNAME_TAKE, listener);
 
-  protected void addEndEventListener(FlowElement flowElement) {
-    CdiExecutionListener listener = new CdiExecutionListener(flowElement.getId(), BusinessProcessEventType.END_ACTIVITY);
-    addListenerToElement(flowElement, ExecutionListener.EVENTNAME_END, listener);
-  }
+        } else {
 
-  protected void addListenerToElement(FlowElement flowElement, String event, Object instance) {
-    FlowableListener listener = new FlowableListener();
-    listener.setEvent(event);
-    listener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_INSTANCE);
-    listener.setInstance(instance);
-    flowElement.getExecutionListeners().add(listener);
-  }
-  
-  protected void addListenerToUserTask(UserTask userTask, String event, Object instance) {
-    FlowableListener listener = new FlowableListener();
-    listener.setEvent(event);
-    listener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_INSTANCE);
-    listener.setInstance(instance);
-    userTask.getTaskListeners().add(listener);
-  }
-  
+            if (element instanceof UserTask) {
+
+                UserTask userTask = (UserTask) element;
+
+                addCreateListener(userTask);
+                addAssignListener(userTask);
+                addCompleteListener(userTask);
+                addDeleteListener(userTask);
+            }
+
+            if (element instanceof FlowElement) {
+
+                FlowElement flowElement = (FlowElement) element;
+
+                addStartEventListener(flowElement);
+                addEndEventListener(flowElement);
+            }
+
+        }
+    }
+
+    private void addCompleteListener(UserTask userTask) {
+        addListenerToUserTask(userTask, TaskListener.EVENTNAME_COMPLETE, new CdiTaskListener(userTask.getId(), BusinessProcessEventType.COMPLETE_TASK));
+    }
+
+    private void addAssignListener(UserTask userTask) {
+        addListenerToUserTask(userTask, TaskListener.EVENTNAME_ASSIGNMENT, new CdiTaskListener(userTask.getId(), BusinessProcessEventType.ASSIGN_TASK));
+    }
+
+    private void addCreateListener(UserTask userTask) {
+        addListenerToUserTask(userTask, TaskListener.EVENTNAME_CREATE, new CdiTaskListener(userTask.getId(), BusinessProcessEventType.CREATE_TASK));
+    }
+
+    protected void addDeleteListener(UserTask userTask) {
+        addListenerToUserTask(userTask, TaskListener.EVENTNAME_DELETE, new CdiTaskListener(userTask.getId(), BusinessProcessEventType.DELETE_TASK));
+    }
+
+    protected void addStartEventListener(FlowElement flowElement) {
+        CdiExecutionListener listener = new CdiExecutionListener(flowElement.getId(), BusinessProcessEventType.START_ACTIVITY);
+        addListenerToElement(flowElement, ExecutionListener.EVENTNAME_START, listener);
+    }
+
+    protected void addEndEventListener(FlowElement flowElement) {
+        CdiExecutionListener listener = new CdiExecutionListener(flowElement.getId(), BusinessProcessEventType.END_ACTIVITY);
+        addListenerToElement(flowElement, ExecutionListener.EVENTNAME_END, listener);
+    }
+
+    protected void addListenerToElement(FlowElement flowElement, String event, Object instance) {
+        FlowableListener listener = new FlowableListener();
+        listener.setEvent(event);
+        listener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_INSTANCE);
+        listener.setInstance(instance);
+        flowElement.getExecutionListeners().add(listener);
+    }
+
+    protected void addListenerToUserTask(UserTask userTask, String event, Object instance) {
+        FlowableListener listener = new FlowableListener();
+        listener.setEvent(event);
+        listener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_INSTANCE);
+        listener.setInstance(instance);
+        userTask.getTaskListeners().add(listener);
+    }
+
 }

@@ -26,40 +26,40 @@ import org.flowable.engine.task.Task;
  */
 public class TestFlowableEntityEventTaskListener extends TestFlowableEntityEventListener {
 
-	private List<Task> tasks;
+    private List<Task> tasks;
 
-	public TestFlowableEntityEventTaskListener(Class<?> entityClass) {
-		super(entityClass);
-		tasks = new ArrayList<Task>();
-	}
+    public TestFlowableEntityEventTaskListener(Class<?> entityClass) {
+        super(entityClass);
+        tasks = new ArrayList<Task>();
+    }
 
-	@Override
-	public void clearEventsReceived() {
-		super.clearEventsReceived();
-		tasks.clear();
-	}
-	
-	@Override
-	public void onEvent(FlowableEvent event) {
-		super.onEvent(event);
-		if (event instanceof FlowableEntityEvent && Task.class.isAssignableFrom(((FlowableEntityEvent) event).getEntity().getClass())) {
-			tasks.add(copy((Task) ((FlowableEntityEvent) event).getEntity()));
-		}
-	}
+    @Override
+    public void clearEventsReceived() {
+        super.clearEventsReceived();
+        tasks.clear();
+    }
 
-	protected Task copy(Task aTask) {
-	  TaskEntity ent = Context.getCommandContext().getTaskEntityManager().create();
-		ent.setId(aTask.getId());
-		ent.setName(aTask.getName());
-		ent.setDescription(aTask.getDescription());
-		ent.setOwner(aTask.getOwner());
-		ent.setDueDate(aTask.getDueDate());
-		ent.setAssignee(aTask.getAssignee());
-		ent.setPriority(aTask.getPriority());
-		return ent;
-	}
+    @Override
+    public void onEvent(FlowableEvent event) {
+        super.onEvent(event);
+        if (event instanceof FlowableEntityEvent && Task.class.isAssignableFrom(((FlowableEntityEvent) event).getEntity().getClass())) {
+            tasks.add(copy((Task) ((FlowableEntityEvent) event).getEntity()));
+        }
+    }
 
-	public List<Task> getTasks() {
-		return tasks;
-	}
+    protected Task copy(Task aTask) {
+        TaskEntity ent = Context.getCommandContext().getTaskEntityManager().create();
+        ent.setId(aTask.getId());
+        ent.setName(aTask.getName());
+        ent.setDescription(aTask.getDescription());
+        ent.setOwner(aTask.getOwner());
+        ent.setDueDate(aTask.getDueDate());
+        ent.setAssignee(aTask.getAssignee());
+        ent.setPriority(aTask.getPriority());
+        return ent;
+    }
+
+    public List<Task> getTasks() {
+        return tasks;
+    }
 }

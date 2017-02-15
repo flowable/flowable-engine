@@ -26,54 +26,54 @@ import org.slf4j.LoggerFactory;
  */
 public class IdmEngineImpl implements IdmEngine {
 
-  private static Logger log = LoggerFactory.getLogger(IdmEngineImpl.class);
+    private static Logger log = LoggerFactory.getLogger(IdmEngineImpl.class);
 
-  protected String name;
-  protected IdmIdentityService identityService;
-  protected IdmManagementService managementService;
-  protected IdmEngineConfiguration engineConfiguration;
-  protected CommandExecutor commandExecutor;
+    protected String name;
+    protected IdmIdentityService identityService;
+    protected IdmManagementService managementService;
+    protected IdmEngineConfiguration engineConfiguration;
+    protected CommandExecutor commandExecutor;
 
-  public IdmEngineImpl(IdmEngineConfiguration engineConfiguration) {
-    this.engineConfiguration = engineConfiguration;
-    this.name = engineConfiguration.getEngineName();
-    this.identityService = engineConfiguration.getIdmIdentityService();
-    this.managementService = engineConfiguration.getIdmManagementService();
-    this.commandExecutor = engineConfiguration.getCommandExecutor();
-    
-    if (engineConfiguration.isUsingRelationalDatabase() && engineConfiguration.getDatabaseSchemaUpdate() != null) {
-      commandExecutor.execute(engineConfiguration.getSchemaCommandConfig(), new SchemaOperationsIdmEngineBuild());
+    public IdmEngineImpl(IdmEngineConfiguration engineConfiguration) {
+        this.engineConfiguration = engineConfiguration;
+        this.name = engineConfiguration.getEngineName();
+        this.identityService = engineConfiguration.getIdmIdentityService();
+        this.managementService = engineConfiguration.getIdmManagementService();
+        this.commandExecutor = engineConfiguration.getCommandExecutor();
+
+        if (engineConfiguration.isUsingRelationalDatabase() && engineConfiguration.getDatabaseSchemaUpdate() != null) {
+            commandExecutor.execute(engineConfiguration.getSchemaCommandConfig(), new SchemaOperationsIdmEngineBuild());
+        }
+
+        if (name == null) {
+            log.info("default flowable IdmEngine created");
+        } else {
+            log.info("IdmEngine {} created", name);
+        }
+
+        IdmEngines.registerIdmEngine(this);
     }
 
-    if (name == null) {
-      log.info("default flowable IdmEngine created");
-    } else {
-      log.info("IdmEngine {} created", name);
+    public void close() {
+        IdmEngines.unregister(this);
     }
 
-    IdmEngines.registerIdmEngine(this);
-  }
+    // getters and setters
+    // //////////////////////////////////////////////////////
 
-  public void close() {
-    IdmEngines.unregister(this);
-  }
+    public String getName() {
+        return name;
+    }
 
-  // getters and setters
-  // //////////////////////////////////////////////////////
+    public IdmIdentityService getIdmIdentityService() {
+        return identityService;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public IdmManagementService getIdmManagementService() {
+        return managementService;
+    }
 
-  public IdmIdentityService getIdmIdentityService() {
-    return identityService;
-  }
-  
-  public IdmManagementService getIdmManagementService() {
-    return managementService;
-  }
-
-  public IdmEngineConfiguration getIdmEngineConfiguration() {
-    return engineConfiguration;
-  }
+    public IdmEngineConfiguration getIdmEngineConfiguration() {
+        return engineConfiguration;
+    }
 }

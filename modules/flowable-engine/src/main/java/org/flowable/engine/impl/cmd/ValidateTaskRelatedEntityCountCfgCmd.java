@@ -23,49 +23,49 @@ import org.slf4j.LoggerFactory;
  * @author Joram Barrez
  */
 public class ValidateTaskRelatedEntityCountCfgCmd implements Command<Void> {
-  
-  private static final Logger logger = LoggerFactory.getLogger(ValidateTaskRelatedEntityCountCfgCmd.class);
-  
-  public static String PROPERTY_TASK_RELATED_ENTITY_COUNT = "cfg.task-related-entities-count";
-  
-  @Override
-  public Void execute(CommandContext commandContext) {
 
-    PropertyEntityManager propertyEntityManager = commandContext.getPropertyEntityManager();
-    
-    boolean configProperty = commandContext.getProcessEngineConfiguration().getPerformanceSettings().isEnableTaskRelationshipCounts();
-    PropertyEntity propertyEntity = propertyEntityManager.findById(PROPERTY_TASK_RELATED_ENTITY_COUNT);
-    
-    if (propertyEntity == null) {      
-      // 'not there' case in the table above: easy, simply insert the value
-      
-      PropertyEntity newPropertyEntity = propertyEntityManager.create();
-      newPropertyEntity.setName(PROPERTY_TASK_RELATED_ENTITY_COUNT);
-      newPropertyEntity.setValue(Boolean.toString(configProperty));
-      propertyEntityManager.insert(newPropertyEntity);
-      
-    } else {
-      
-      boolean propertyValue = Boolean.valueOf(propertyEntity.getValue().toLowerCase());
-      //TODO: is this required since we check the global "task count" flag each time we read/update?
-      // might have a serious performance impact when thousands of tasks are present.
-      if (!configProperty && propertyValue) {
-        if (logger.isInfoEnabled()) {
-          logger.info("Configuration change: task related entity counting feature was enabled before, but now disabled. "
-              + "Updating all task entities.");
+    private static final Logger logger = LoggerFactory.getLogger(ValidateTaskRelatedEntityCountCfgCmd.class);
+
+    public static String PROPERTY_TASK_RELATED_ENTITY_COUNT = "cfg.task-related-entities-count";
+
+    @Override
+    public Void execute(CommandContext commandContext) {
+
+        PropertyEntityManager propertyEntityManager = commandContext.getPropertyEntityManager();
+
+        boolean configProperty = commandContext.getProcessEngineConfiguration().getPerformanceSettings().isEnableTaskRelationshipCounts();
+        PropertyEntity propertyEntity = propertyEntityManager.findById(PROPERTY_TASK_RELATED_ENTITY_COUNT);
+
+        if (propertyEntity == null) {
+            // 'not there' case in the table above: easy, simply insert the value
+
+            PropertyEntity newPropertyEntity = propertyEntityManager.create();
+            newPropertyEntity.setName(PROPERTY_TASK_RELATED_ENTITY_COUNT);
+            newPropertyEntity.setValue(Boolean.toString(configProperty));
+            propertyEntityManager.insert(newPropertyEntity);
+
+        } else {
+
+            boolean propertyValue = Boolean.valueOf(propertyEntity.getValue().toLowerCase());
+            // TODO: is this required since we check the global "task count" flag each time we read/update?
+            // might have a serious performance impact when thousands of tasks are present.
+            if (!configProperty && propertyValue) {
+                if (logger.isInfoEnabled()) {
+                    logger.info("Configuration change: task related entity counting feature was enabled before, but now disabled. "
+                            + "Updating all task entities.");
+                }
+                commandContext.getProcessEngineConfiguration().getTaskDataManager().updateAllTaskRelatedEntityCountFlags(configProperty);
+            }
+
+            // Update property
+            if (configProperty != propertyValue) {
+                propertyEntity.setValue(Boolean.toString(configProperty));
+                propertyEntityManager.update(propertyEntity);
+            }
+
         }
-        commandContext.getProcessEngineConfiguration().getTaskDataManager().updateAllTaskRelatedEntityCountFlags(configProperty);
-      }
-      
-      // Update property
-      if (configProperty != propertyValue) {
-        propertyEntity.setValue(Boolean.toString(configProperty));
-        propertyEntityManager.update(propertyEntity);
-      }
-      
+
+        return null;
     }
-    
-    return null;
-  }
 
 }

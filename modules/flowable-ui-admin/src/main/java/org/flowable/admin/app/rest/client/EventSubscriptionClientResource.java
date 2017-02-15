@@ -37,72 +37,72 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @RestController
 public class EventSubscriptionClientResource extends AbstractClientResource {
 
-  private static final Logger logger = LoggerFactory.getLogger(EventSubscriptionClientResource.class);
+    private static final Logger logger = LoggerFactory.getLogger(EventSubscriptionClientResource.class);
 
-	@Autowired
-	protected EventSubscriptionService eventSubscriptionService;
+    @Autowired
+    protected EventSubscriptionService eventSubscriptionService;
 
-	/**
-	 * GET /rest/admin/event-subscriptions/{eventSubscriptionId} -> return event subscription data
-	 */
-	@RequestMapping(value = "/rest/admin/event-subscriptions/{eventSubscriptionId}", method = RequestMethod.GET, produces = "application/json")
-	public JsonNode getEventSubscription(@PathVariable String eventSubscriptionId) throws BadRequestException {
+    /**
+     * GET /rest/admin/event-subscriptions/{eventSubscriptionId} -> return event subscription data
+     */
+    @RequestMapping(value = "/rest/admin/event-subscriptions/{eventSubscriptionId}", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getEventSubscription(@PathVariable String eventSubscriptionId) throws BadRequestException {
 
-		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-		try {
-			return eventSubscriptionService.getEventSubscription(serverConfig, eventSubscriptionId);
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            return eventSubscriptionService.getEventSubscription(serverConfig, eventSubscriptionId);
 
-		} catch (FlowableServiceException e) {
-		  logger.error("Error getting event subscription {}", eventSubscriptionId, e);
-			throw new BadRequestException(e.getMessage());
-		}
-	}
-
-	/**
-	 * POST /rest/admin/event-subscriptions/{eventSubscriptionId} -> trigger event
-	 */
-	@RequestMapping(value = "/rest/admin/event-subscriptions/{eventSubscriptionId}", method = RequestMethod.POST, produces = "application/json")
-	@ResponseStatus(value = HttpStatus.OK)
-	public void triggerEvent(@PathVariable String eventSubscriptionId, @RequestBody ObjectNode eventBody) throws BadRequestException {
-
-		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-		String eventType = eventBody.get("eventType").asText();
-		String eventName = eventBody.get("eventName").asText();
-
-		if (eventBody.has("executionId") && !eventBody.get("executionId").isNull()) {
-		  try {
-	       eventSubscriptionService.triggerExecutionEvent(serverConfig, eventType, eventName,
-	           eventBody.get("executionId").asText());
-
-	    } catch (FlowableServiceException e) {
-	      logger.error("Error triggering execution event for event subscription {}", eventSubscriptionId, e);
-	      throw new BadRequestException(e.getMessage());
-	    }
-
-		} else if ("message".equals(eventType)) {
-		  try {
-		    String tenantId = null;
-		    if (eventBody.has("tenantId") && !eventBody.get("tenantId").isNull()) {
-		      tenantId = eventBody.get("tenantId").asText();
-		    }
-        eventSubscriptionService.triggerMessageEvent(serverConfig, eventName, tenantId);
-
-		  } catch (FlowableServiceException e) {
-		    logger.error("Error triggering message event for event subscription {}", eventSubscriptionId, e);
-		    throw new BadRequestException(e.getMessage());
-		  }
-
-    } else if ("signal".equals(eventType)) {
-      try {
-        eventSubscriptionService.triggerSignalEvent(serverConfig, eventName);
-
-      } catch (FlowableServiceException e) {
-        logger.error("Error triggering signal event for event subscription {}", eventSubscriptionId, e);
-        throw new BadRequestException(e.getMessage());
-      }
-
-    } else {
-      throw new FlowableServiceException("Unsupported event type " + eventType);
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting event subscription {}", eventSubscriptionId, e);
+            throw new BadRequestException(e.getMessage());
+        }
     }
-	}
+
+    /**
+     * POST /rest/admin/event-subscriptions/{eventSubscriptionId} -> trigger event
+     */
+    @RequestMapping(value = "/rest/admin/event-subscriptions/{eventSubscriptionId}", method = RequestMethod.POST, produces = "application/json")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void triggerEvent(@PathVariable String eventSubscriptionId, @RequestBody ObjectNode eventBody) throws BadRequestException {
+
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        String eventType = eventBody.get("eventType").asText();
+        String eventName = eventBody.get("eventName").asText();
+
+        if (eventBody.has("executionId") && !eventBody.get("executionId").isNull()) {
+            try {
+                eventSubscriptionService.triggerExecutionEvent(serverConfig, eventType, eventName,
+                        eventBody.get("executionId").asText());
+
+            } catch (FlowableServiceException e) {
+                logger.error("Error triggering execution event for event subscription {}", eventSubscriptionId, e);
+                throw new BadRequestException(e.getMessage());
+            }
+
+        } else if ("message".equals(eventType)) {
+            try {
+                String tenantId = null;
+                if (eventBody.has("tenantId") && !eventBody.get("tenantId").isNull()) {
+                    tenantId = eventBody.get("tenantId").asText();
+                }
+                eventSubscriptionService.triggerMessageEvent(serverConfig, eventName, tenantId);
+
+            } catch (FlowableServiceException e) {
+                logger.error("Error triggering message event for event subscription {}", eventSubscriptionId, e);
+                throw new BadRequestException(e.getMessage());
+            }
+
+        } else if ("signal".equals(eventType)) {
+            try {
+                eventSubscriptionService.triggerSignalEvent(serverConfig, eventName);
+
+            } catch (FlowableServiceException e) {
+                logger.error("Error triggering signal event for event subscription {}", eventSubscriptionId, e);
+                throw new BadRequestException(e.getMessage());
+            }
+
+        } else {
+            throw new FlowableServiceException("Unsupported event type " + eventType);
+        }
+    }
 }

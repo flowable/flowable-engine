@@ -15,15 +15,14 @@ package org.activiti.engine.impl.bpmn.behavior;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.flowable.engine.delegate.DelegateExecution;
 
-
 /**
  * @author Joram Barrez
  */
 public class NoneEndEventActivityBehavior extends FlowNodeActivityBehavior {
-  
-  public void execute(DelegateExecution execution) {
-    ActivityExecution activityExecution = (ActivityExecution) execution;
-    activityExecution.end();
-  }
+
+    public void execute(DelegateExecution execution) {
+        ActivityExecution activityExecution = (ActivityExecution) execution;
+        activityExecution.end();
+    }
 
 }

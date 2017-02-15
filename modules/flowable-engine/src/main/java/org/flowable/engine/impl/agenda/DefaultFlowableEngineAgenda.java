@@ -26,12 +26,10 @@ import org.slf4j.LoggerFactory;
 import java.util.LinkedList;
 
 /**
- * For each API call (and thus {@link Command}) being executed, a new agenda instance is created.
- * On this agenda, operations are put, which the {@link CommandExecutor} will keep executing until
- * all are executed.
+ * For each API call (and thus {@link Command}) being executed, a new agenda instance is created. On this agenda, operations are put, which the {@link CommandExecutor} will keep executing until all
+ * are executed.
  *
- * The agenda also gives easy access to methods to plan new operations when writing
- * {@link ActivityBehavior} implementations.
+ * The agenda also gives easy access to methods to plan new operations when writing {@link ActivityBehavior} implementations.
  *
  * During a {@link Command} execution, the agenda can always be fetched using {@link Context#getAgenda()}.
  *
@@ -39,103 +37,103 @@ import java.util.LinkedList;
  */
 public class DefaultFlowableEngineAgenda implements FlowableEngineAgenda {
 
-  private static final Logger logger = LoggerFactory.getLogger(DefaultFlowableEngineAgenda.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultFlowableEngineAgenda.class);
 
-  protected CommandContext commandContext;
+    protected CommandContext commandContext;
 
-  protected LinkedList<Runnable> operations = new LinkedList<Runnable>();
+    protected LinkedList<Runnable> operations = new LinkedList<Runnable>();
 
-  public DefaultFlowableEngineAgenda(CommandContext commandContext) {
-    this.commandContext = commandContext;
-  }
-
-  public boolean isEmpty() {
-    return operations.isEmpty();
-  }
-
-  public Runnable getNextOperation() {
-    assertOperationsNotEmpty();
-    return operations.poll();
-  }
-
-  public Runnable peekOperation() {
-    assertOperationsNotEmpty();
-    return operations.peek();
-  }
-
-  private void assertOperationsNotEmpty() {
-    if (operations.isEmpty()) {
-      throw new FlowableException("Unable to peek empty agenda.");
+    public DefaultFlowableEngineAgenda(CommandContext commandContext) {
+        this.commandContext = commandContext;
     }
-  }
 
-  /**
-   * Generic method to plan a {@link Runnable}.
-   */
-  public void planOperation(Runnable operation) {
-    planOperation(operation, null);
-  }
-
-  /**
-   * Generic method to plan a {@link Runnable}.
-   */
-  public void planOperation(Runnable operation, ExecutionEntity executionEntity) {
-    operations.add(operation);
-    logger.debug("Operation {} added to agenda", operation.getClass());
-
-    if (executionEntity != null) {
-      commandContext.addInvolvedExecution(executionEntity);
+    public boolean isEmpty() {
+        return operations.isEmpty();
     }
-  }
 
-  /* SPECIFIC operations */
+    public Runnable getNextOperation() {
+        assertOperationsNotEmpty();
+        return operations.poll();
+    }
 
-  public void planContinueProcessOperation(ExecutionEntity execution) {
-    planOperation(new ContinueProcessOperation(commandContext, execution), execution);
-  }
+    public Runnable peekOperation() {
+        assertOperationsNotEmpty();
+        return operations.peek();
+    }
 
-  public void planContinueProcessSynchronousOperation(ExecutionEntity execution) {
-    planOperation(new ContinueProcessOperation(commandContext, execution, true, false), execution);
-  }
+    private void assertOperationsNotEmpty() {
+        if (operations.isEmpty()) {
+            throw new FlowableException("Unable to peek empty agenda.");
+        }
+    }
 
-  public void planContinueProcessInCompensation(ExecutionEntity execution) {
-    planOperation(new ContinueProcessOperation(commandContext, execution, false, true), execution);
-  }
+    /**
+     * Generic method to plan a {@link Runnable}.
+     */
+    public void planOperation(Runnable operation) {
+        planOperation(operation, null);
+    }
 
-  public void planContinueMultiInstanceOperation(ExecutionEntity execution) {
-    planOperation(new ContinueMultiInstanceOperation(commandContext, execution), execution);
-  }
+    /**
+     * Generic method to plan a {@link Runnable}.
+     */
+    public void planOperation(Runnable operation, ExecutionEntity executionEntity) {
+        operations.add(operation);
+        logger.debug("Operation {} added to agenda", operation.getClass());
 
-  public void planTakeOutgoingSequenceFlowsOperation(ExecutionEntity execution, boolean evaluateConditions) {
-    planOperation(new TakeOutgoingSequenceFlowsOperation(commandContext, execution, evaluateConditions), execution);
-  }
+        if (executionEntity != null) {
+            commandContext.addInvolvedExecution(executionEntity);
+        }
+    }
 
-  public void planEndExecutionOperation(ExecutionEntity execution) {
-    planOperation(new EndExecutionOperation(commandContext, execution), execution);
-  }
+    /* SPECIFIC operations */
 
-  public void planTriggerExecutionOperation(ExecutionEntity execution) {
-    planOperation(new TriggerExecutionOperation(commandContext, execution), execution);
-  }
+    public void planContinueProcessOperation(ExecutionEntity execution) {
+        planOperation(new ContinueProcessOperation(commandContext, execution), execution);
+    }
 
-  public void planDestroyScopeOperation(ExecutionEntity execution) {
-    planOperation(new DestroyScopeOperation(commandContext, execution), execution);
-  }
+    public void planContinueProcessSynchronousOperation(ExecutionEntity execution) {
+        planOperation(new ContinueProcessOperation(commandContext, execution, true, false), execution);
+    }
 
-  public void planExecuteInactiveBehaviorsOperation() {
-    planOperation(new ExecuteInactiveBehaviorsOperation(commandContext));
-  }
+    public void planContinueProcessInCompensation(ExecutionEntity execution) {
+        planOperation(new ContinueProcessOperation(commandContext, execution, false, true), execution);
+    }
 
-  public CommandContext getCommandContext() {
-    return commandContext;
-  }
+    public void planContinueMultiInstanceOperation(ExecutionEntity execution) {
+        planOperation(new ContinueMultiInstanceOperation(commandContext, execution), execution);
+    }
 
-  public void setCommandContext(CommandContext commandContext) {
-    this.commandContext = commandContext;
-  }
+    public void planTakeOutgoingSequenceFlowsOperation(ExecutionEntity execution, boolean evaluateConditions) {
+        planOperation(new TakeOutgoingSequenceFlowsOperation(commandContext, execution, evaluateConditions), execution);
+    }
 
-  public LinkedList<Runnable> getOperations() {
-    return operations;
-  }
+    public void planEndExecutionOperation(ExecutionEntity execution) {
+        planOperation(new EndExecutionOperation(commandContext, execution), execution);
+    }
+
+    public void planTriggerExecutionOperation(ExecutionEntity execution) {
+        planOperation(new TriggerExecutionOperation(commandContext, execution), execution);
+    }
+
+    public void planDestroyScopeOperation(ExecutionEntity execution) {
+        planOperation(new DestroyScopeOperation(commandContext, execution), execution);
+    }
+
+    public void planExecuteInactiveBehaviorsOperation() {
+        planOperation(new ExecuteInactiveBehaviorsOperation(commandContext));
+    }
+
+    public CommandContext getCommandContext() {
+        return commandContext;
+    }
+
+    public void setCommandContext(CommandContext commandContext) {
+        this.commandContext = commandContext;
+    }
+
+    public LinkedList<Runnable> getOperations() {
+        return operations;
+    }
 
 }

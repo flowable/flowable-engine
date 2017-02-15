@@ -24,37 +24,37 @@ import java.util.Comparator;
  */
 public class SimpleEventCalendarFactory implements FactoryBean<EventCalendar> {
 
-  protected final Collection<SimulationEvent> simulationEvents;
-  protected Comparator<SimulationEvent> eventComparator;
-  protected final ClockReader clockReader;
+    protected final Collection<SimulationEvent> simulationEvents;
+    protected Comparator<SimulationEvent> eventComparator;
+    protected final ClockReader clockReader;
 
-  public SimpleEventCalendarFactory(ClockReader clockReader, Comparator<SimulationEvent> eventComparator, Collection<SimulationEvent> simulationEvents) {
-    this.clockReader = clockReader;
-    this.eventComparator = eventComparator;
-    this.simulationEvents = simulationEvents;
-  }
+    public SimpleEventCalendarFactory(ClockReader clockReader, Comparator<SimulationEvent> eventComparator, Collection<SimulationEvent> simulationEvents) {
+        this.clockReader = clockReader;
+        this.eventComparator = eventComparator;
+        this.simulationEvents = simulationEvents;
+    }
 
-  public SimpleEventCalendarFactory(ClockReader clockReader, Comparator<SimulationEvent> eventComparator) {
-    this.eventComparator = eventComparator;
-    this.clockReader = clockReader;
-    this.simulationEvents = Collections.emptyList();
-  }
+    public SimpleEventCalendarFactory(ClockReader clockReader, Comparator<SimulationEvent> eventComparator) {
+        this.eventComparator = eventComparator;
+        this.clockReader = clockReader;
+        this.simulationEvents = Collections.emptyList();
+    }
 
-  @Override
-  public SimpleEventCalendar getObject() {
-    SimpleEventCalendar simpleEventCalendar = new SimpleEventCalendar(clockReader, eventComparator);
-    simpleEventCalendar.addEvents(simulationEvents);
-    return simpleEventCalendar;
-  }
+    @Override
+    public SimpleEventCalendar getObject() {
+        SimpleEventCalendar simpleEventCalendar = new SimpleEventCalendar(clockReader, eventComparator);
+        simpleEventCalendar.addEvents(simulationEvents);
+        return simpleEventCalendar;
+    }
 
-  @Override
-  public Class<?> getObjectType() {
-    return SimpleEventCalendar.class;
-  }
+    @Override
+    public Class<?> getObjectType() {
+        return SimpleEventCalendar.class;
+    }
 
-  @Override
-  public boolean isSingleton() {
-    return false;
-  }
+    @Override
+    public boolean isSingleton() {
+        return false;
+    }
 
 }

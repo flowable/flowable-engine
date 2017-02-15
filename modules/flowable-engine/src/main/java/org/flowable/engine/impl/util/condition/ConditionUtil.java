@@ -30,39 +30,39 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class ConditionUtil {
 
-  public static boolean hasTrueCondition(SequenceFlow sequenceFlow, DelegateExecution execution) {
-    String conditionExpression = null;
-    if (Context.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
-      ObjectNode elementProperties = Context.getBpmnOverrideElementProperties(sequenceFlow.getId(), execution.getProcessDefinitionId());
-      conditionExpression = getActiveValue(sequenceFlow.getConditionExpression(), DynamicBpmnConstants.SEQUENCE_FLOW_CONDITION, elementProperties);
-    } else {
-      conditionExpression = sequenceFlow.getConditionExpression();
-    }
-    
-    if (StringUtils.isNotEmpty(conditionExpression)) {
-
-      Expression expression = Context.getProcessEngineConfiguration().getExpressionManager().createExpression(conditionExpression);
-      Condition condition = new UelExpressionCondition(expression);
-      return condition.evaluate(sequenceFlow.getId(), execution);
-    } else {
-      return true;
-    }
-
-  }
-    
-  protected static String getActiveValue(String originalValue, String propertyName, ObjectNode elementProperties) {
-    String activeValue = originalValue;
-    if (elementProperties != null) {
-      JsonNode overrideValueNode = elementProperties.get(propertyName);
-      if (overrideValueNode != null) {
-        if (overrideValueNode.isNull()) {
-          activeValue = null;
+    public static boolean hasTrueCondition(SequenceFlow sequenceFlow, DelegateExecution execution) {
+        String conditionExpression = null;
+        if (Context.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
+            ObjectNode elementProperties = Context.getBpmnOverrideElementProperties(sequenceFlow.getId(), execution.getProcessDefinitionId());
+            conditionExpression = getActiveValue(sequenceFlow.getConditionExpression(), DynamicBpmnConstants.SEQUENCE_FLOW_CONDITION, elementProperties);
         } else {
-          activeValue = overrideValueNode.asText();
+            conditionExpression = sequenceFlow.getConditionExpression();
         }
-      }
+
+        if (StringUtils.isNotEmpty(conditionExpression)) {
+
+            Expression expression = Context.getProcessEngineConfiguration().getExpressionManager().createExpression(conditionExpression);
+            Condition condition = new UelExpressionCondition(expression);
+            return condition.evaluate(sequenceFlow.getId(), execution);
+        } else {
+            return true;
+        }
+
     }
-    return activeValue;
-  }
+
+    protected static String getActiveValue(String originalValue, String propertyName, ObjectNode elementProperties) {
+        String activeValue = originalValue;
+        if (elementProperties != null) {
+            JsonNode overrideValueNode = elementProperties.get(propertyName);
+            if (overrideValueNode != null) {
+                if (overrideValueNode.isNull()) {
+                    activeValue = null;
+                } else {
+                    activeValue = overrideValueNode.asText();
+                }
+            }
+        }
+        return activeValue;
+    }
 
 }

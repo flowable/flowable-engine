@@ -19,10 +19,10 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
  * @author Joram Barrez
  */
 public class ProcessInstancesByProcessDefinitionMatcher extends CachedEntityMatcherAdapter<ExecutionEntity> {
-  
-  @Override
-  public boolean isRetained(ExecutionEntity entity, Object parameter) {
-    return entity.getParentId() == null && entity.getProcessDefinitionId() != null && entity.getProcessDefinitionId().equals(parameter);
-  }
-  
+
+    @Override
+    public boolean isRetained(ExecutionEntity entity, Object parameter) {
+        return entity.getParentId() == null && entity.getProcessDefinitionId() != null && entity.getProcessDefinitionId().equals(parameter);
+    }
+
 }

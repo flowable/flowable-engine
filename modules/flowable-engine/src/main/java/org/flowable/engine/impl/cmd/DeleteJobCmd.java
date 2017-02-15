@@ -36,56 +36,56 @@ import org.slf4j.LoggerFactory;
 
 public class DeleteJobCmd implements Command<Object>, Serializable {
 
-  private static final Logger log = LoggerFactory.getLogger(DeleteJobCmd.class);
-  private static final long serialVersionUID = 1L;
+    private static final Logger log = LoggerFactory.getLogger(DeleteJobCmd.class);
+    private static final long serialVersionUID = 1L;
 
-  protected String jobId;
+    protected String jobId;
 
-  public DeleteJobCmd(String jobId) {
-    this.jobId = jobId;
-  }
-
-  public Object execute(CommandContext commandContext) {
-    JobEntity jobToDelete = getJobToDelete(commandContext);
-    
-    if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, jobToDelete.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      compatibilityHandler.deleteJob(jobToDelete.getId());
-      return null;
+    public DeleteJobCmd(String jobId) {
+        this.jobId = jobId;
     }
 
-    sendCancelEvent(jobToDelete);
+    public Object execute(CommandContext commandContext) {
+        JobEntity jobToDelete = getJobToDelete(commandContext);
 
-    commandContext.getJobEntityManager().delete(jobToDelete);
-    return null;
-  }
+        if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, jobToDelete.getProcessDefinitionId())) {
+            Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+            compatibilityHandler.deleteJob(jobToDelete.getId());
+            return null;
+        }
 
-  protected void sendCancelEvent(JobEntity jobToDelete) {
-    if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-      Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
-    }
-  }
+        sendCancelEvent(jobToDelete);
 
-  protected JobEntity getJobToDelete(CommandContext commandContext) {
-    if (jobId == null) {
-      throw new FlowableIllegalArgumentException("jobId is null");
-    }
-    if (log.isDebugEnabled()) {
-      log.debug("Deleting job {}", jobId);
+        commandContext.getJobEntityManager().delete(jobToDelete);
+        return null;
     }
 
-    JobEntity job = commandContext.getJobEntityManager().findById(jobId);
-    if (job == null) {
-      throw new FlowableObjectNotFoundException("No job found with id '" + jobId + "'", Job.class);
+    protected void sendCancelEvent(JobEntity jobToDelete) {
+        if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
+        }
     }
 
-    // We need to check if the job was locked, ie acquired by the job acquisition thread
-    // This happens if the the job was already acquired, but not yet executed.
-    // In that case, we can't allow to delete the job.
-    if (job.getLockOwner() != null) {
-      throw new FlowableException("Cannot delete job when the job is being executed. Try again later.");
+    protected JobEntity getJobToDelete(CommandContext commandContext) {
+        if (jobId == null) {
+            throw new FlowableIllegalArgumentException("jobId is null");
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting job {}", jobId);
+        }
+
+        JobEntity job = commandContext.getJobEntityManager().findById(jobId);
+        if (job == null) {
+            throw new FlowableObjectNotFoundException("No job found with id '" + jobId + "'", Job.class);
+        }
+
+        // We need to check if the job was locked, ie acquired by the job acquisition thread
+        // This happens if the the job was already acquired, but not yet executed.
+        // In that case, we can't allow to delete the job.
+        if (job.getLockOwner() != null) {
+            throw new FlowableException("Cannot delete job when the job is being executed. Try again later.");
+        }
+        return job;
     }
-    return job;
-  }
 
 }

@@ -33,93 +33,93 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Joram Barrez
  */
 public abstract class AbstractDatabaseEventLoggerEventHandler implements EventLoggerEventHandler {
-	
-	private static final Logger logger = LoggerFactory.getLogger(AbstractDatabaseEventLoggerEventHandler.class);
 
-	protected FlowableEvent event;
-	protected Date timeStamp;
-	protected ObjectMapper objectMapper;
-	
-	public AbstractDatabaseEventLoggerEventHandler() {
-	}
-	
-	protected EventLogEntryEntity createEventLogEntry(Map<String, Object> data) {
-		return createEventLogEntry(null, null, null, null, data);
-	}
-	
-	protected EventLogEntryEntity createEventLogEntry(String processDefinitionId, String processInstanceId, 
-			String executionId, String taskId, Map<String, Object> data) {
-		return createEventLogEntry(event.getType().name(), processDefinitionId, processInstanceId, executionId, taskId, data);
-	}
-	
-	protected EventLogEntryEntity createEventLogEntry(String type,
-	    String processDefinitionId, String processInstanceId, String executionId,
-	    String taskId, Map<String, Object> data) {
+    private static final Logger logger = LoggerFactory.getLogger(AbstractDatabaseEventLoggerEventHandler.class);
 
-		EventLogEntryEntity eventLogEntry = new EventLogEntryEntity();
-		eventLogEntry.setProcessDefinitionId(processDefinitionId);
-		eventLogEntry.setProcessInstanceId(processInstanceId);
-		eventLogEntry.setExecutionId(executionId);
-		eventLogEntry.setTaskId(taskId);
-		eventLogEntry.setType(type);
-		eventLogEntry.setTimeStamp(timeStamp);
-		putInMapIfNotNull(data, Fields.TIMESTAMP, timeStamp);
+    protected FlowableEvent event;
+    protected Date timeStamp;
+    protected ObjectMapper objectMapper;
 
-		// Current user
-		String userId = Authentication.getAuthenticatedUserId();
-		if (userId != null) {
-			eventLogEntry.setUserId(userId);
-			putInMapIfNotNull(data, "userId", userId);
-		}
-		
-		// Current tenant
-		if (!data.containsKey(Fields.TENANT_ID) && processDefinitionId != null) {
-			DeploymentCache<ProcessDefinitionCacheEntry> processDefinitionCache = Context.getProcessEngineConfiguration().getProcessDefinitionCache();
-			if (processDefinitionCache != null) {
-				ProcessDefinition processDefinition = processDefinitionCache.get(processDefinitionId).getProcessDefinition();
-				if (processDefinition != null 
-						&& !ProcessEngineConfigurationImpl.NO_TENANT_ID.equals(processDefinition.getTenantId())) {
-					putInMapIfNotNull(data, Fields.TENANT_ID, processDefinition.getTenantId());
-				}
-			}
-		}
+    public AbstractDatabaseEventLoggerEventHandler() {
+    }
 
-		try {
-			eventLogEntry.setData(objectMapper.writeValueAsBytes(data));
-		} catch (Exception e) {
-			logger.warn("Could not serialize event data. Data will not be written to the database", e);
-		}
+    protected EventLogEntryEntity createEventLogEntry(Map<String, Object> data) {
+        return createEventLogEntry(null, null, null, null, data);
+    }
 
-		return eventLogEntry;
+    protected EventLogEntryEntity createEventLogEntry(String processDefinitionId, String processInstanceId,
+            String executionId, String taskId, Map<String, Object> data) {
+        return createEventLogEntry(event.getType().name(), processDefinitionId, processInstanceId, executionId, taskId, data);
+    }
 
-	}
+    protected EventLogEntryEntity createEventLogEntry(String type,
+            String processDefinitionId, String processInstanceId, String executionId,
+            String taskId, Map<String, Object> data) {
 
-	@Override
-	public void setEvent(FlowableEvent event) {
-		this.event = event;
-	}
-	
-	@Override
-	public void setTimeStamp(Date timeStamp) {
-		this.timeStamp = timeStamp;
-	}
-	
-	@Override
-  public void setObjectMapper(ObjectMapper objectMapper) {
-		this.objectMapper = objectMapper;
-  }
-	
-	// Helper methods //////////////////////////////////////////////////////
-	
-	@SuppressWarnings("unchecked")
-  public <T> T getEntityFromEvent() {
-		return (T) ((FlowableEntityEvent) event).getEntity();
-	}
-	
-	public void putInMapIfNotNull(Map<String, Object> map, String key, Object value) {
-		if (value != null) {
-			map.put(key, value);
-		}
-	}
-	
+        EventLogEntryEntity eventLogEntry = new EventLogEntryEntity();
+        eventLogEntry.setProcessDefinitionId(processDefinitionId);
+        eventLogEntry.setProcessInstanceId(processInstanceId);
+        eventLogEntry.setExecutionId(executionId);
+        eventLogEntry.setTaskId(taskId);
+        eventLogEntry.setType(type);
+        eventLogEntry.setTimeStamp(timeStamp);
+        putInMapIfNotNull(data, Fields.TIMESTAMP, timeStamp);
+
+        // Current user
+        String userId = Authentication.getAuthenticatedUserId();
+        if (userId != null) {
+            eventLogEntry.setUserId(userId);
+            putInMapIfNotNull(data, "userId", userId);
+        }
+
+        // Current tenant
+        if (!data.containsKey(Fields.TENANT_ID) && processDefinitionId != null) {
+            DeploymentCache<ProcessDefinitionCacheEntry> processDefinitionCache = Context.getProcessEngineConfiguration().getProcessDefinitionCache();
+            if (processDefinitionCache != null) {
+                ProcessDefinition processDefinition = processDefinitionCache.get(processDefinitionId).getProcessDefinition();
+                if (processDefinition != null
+                        && !ProcessEngineConfigurationImpl.NO_TENANT_ID.equals(processDefinition.getTenantId())) {
+                    putInMapIfNotNull(data, Fields.TENANT_ID, processDefinition.getTenantId());
+                }
+            }
+        }
+
+        try {
+            eventLogEntry.setData(objectMapper.writeValueAsBytes(data));
+        } catch (Exception e) {
+            logger.warn("Could not serialize event data. Data will not be written to the database", e);
+        }
+
+        return eventLogEntry;
+
+    }
+
+    @Override
+    public void setEvent(FlowableEvent event) {
+        this.event = event;
+    }
+
+    @Override
+    public void setTimeStamp(Date timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    @Override
+    public void setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
+    // Helper methods //////////////////////////////////////////////////////
+
+    @SuppressWarnings("unchecked")
+    public <T> T getEntityFromEvent() {
+        return (T) ((FlowableEntityEvent) event).getEntity();
+    }
+
+    public void putInMapIfNotNull(Map<String, Object> map, String key, Object value) {
+        if (value != null) {
+            map.put(key, value);
+        }
+    }
+
 }

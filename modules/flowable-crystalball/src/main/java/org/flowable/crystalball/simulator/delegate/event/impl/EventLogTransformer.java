@@ -24,28 +24,28 @@ import java.util.List;
  * This class transforms event log events into simulation events
  */
 public class EventLogTransformer {
-  protected List<Function<EventLogEntry, SimulationEvent>> transformers;
+    protected List<Function<EventLogEntry, SimulationEvent>> transformers;
 
-  public EventLogTransformer(List<Function<EventLogEntry, SimulationEvent>> transformers) {
-    this.transformers = transformers;
-  }
-
-  public List<SimulationEvent> transform(List<EventLogEntry> eventLog) {
-    List<SimulationEvent> simulationEvents = new ArrayList<SimulationEvent>();
-    for (EventLogEntry logEntry : eventLog) {
-      simulationEvents.addAll(transformEntry(logEntry));
+    public EventLogTransformer(List<Function<EventLogEntry, SimulationEvent>> transformers) {
+        this.transformers = transformers;
     }
-    return simulationEvents;
-  }
 
-  protected Collection<SimulationEvent> transformEntry(EventLogEntry event) {
-    List<SimulationEvent> simEvents = new ArrayList<SimulationEvent>();
-    for (Function<EventLogEntry, SimulationEvent> t : transformers) {
-      SimulationEvent simEvent = t.apply(event);
-      if (simEvent != null)
-        simEvents.add(simEvent);
+    public List<SimulationEvent> transform(List<EventLogEntry> eventLog) {
+        List<SimulationEvent> simulationEvents = new ArrayList<SimulationEvent>();
+        for (EventLogEntry logEntry : eventLog) {
+            simulationEvents.addAll(transformEntry(logEntry));
+        }
+        return simulationEvents;
     }
-    return simEvents;
-  }
+
+    protected Collection<SimulationEvent> transformEntry(EventLogEntry event) {
+        List<SimulationEvent> simEvents = new ArrayList<SimulationEvent>();
+        for (Function<EventLogEntry, SimulationEvent> t : transformers) {
+            SimulationEvent simEvent = t.apply(event);
+            if (simEvent != null)
+                simEvents.add(simEvent);
+        }
+        return simEvents;
+    }
 
 }

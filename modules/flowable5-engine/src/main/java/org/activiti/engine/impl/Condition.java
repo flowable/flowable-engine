@@ -16,12 +16,10 @@ import java.io.Serializable;
 
 import org.flowable.engine.delegate.DelegateExecution;
 
-
-
 /**
  * @author Tom Baeyens
  */
 public interface Condition extends Serializable {
 
-  boolean evaluate(String sequenceFlowId, DelegateExecution execution);
+    boolean evaluate(String sequenceFlowId, DelegateExecution execution);
 }

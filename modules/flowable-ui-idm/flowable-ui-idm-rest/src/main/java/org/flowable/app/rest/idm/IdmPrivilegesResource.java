@@ -37,76 +37,76 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class IdmPrivilegesResource {
-  
-  @Autowired
-  protected PrivilegeService privilegeService;
-  
-  @RequestMapping(value = "/rest/admin/privileges", method = RequestMethod.GET)
-  public List<PrivilegeRepresentation> getPrivileges() {
-    List<Privilege> privileges = privilegeService.findPrivileges();
-    List<PrivilegeRepresentation> representations = new ArrayList<PrivilegeRepresentation>(privileges.size());
-    for (Privilege privilege : privileges) {
-      representations.add(new PrivilegeRepresentation(privilege.getId(), privilege.getName()));
+
+    @Autowired
+    protected PrivilegeService privilegeService;
+
+    @RequestMapping(value = "/rest/admin/privileges", method = RequestMethod.GET)
+    public List<PrivilegeRepresentation> getPrivileges() {
+        List<Privilege> privileges = privilegeService.findPrivileges();
+        List<PrivilegeRepresentation> representations = new ArrayList<PrivilegeRepresentation>(privileges.size());
+        for (Privilege privilege : privileges) {
+            representations.add(new PrivilegeRepresentation(privilege.getId(), privilege.getName()));
+        }
+        return representations;
     }
-    return representations;
-  }
-  
-  @RequestMapping(value = "/rest/admin/privileges/{privilegeId}", method = RequestMethod.GET)
-  public PrivilegeRepresentation getPrivilege(@PathVariable String privilegeId) {
-    
-    Privilege privilege = privilegeService.findPrivilege(privilegeId);
-    
-    if (privilege != null) {
-      PrivilegeRepresentation privilegeRepresentation = new PrivilegeRepresentation();
-      privilegeRepresentation.setId(privilege.getId());
-      privilegeRepresentation.setName(privilege.getName());
-      
-      List<User> users = privilegeService.findUsersWithPrivilege(privilegeId);
-      for (User user : users) {
-        privilegeRepresentation.addUser(new UserRepresentation(user));
-      }
-      
-      List<Group> groups = privilegeService.findGroupsWithPrivilege(privilegeId);
-      for (Group group : groups) {
-        privilegeRepresentation.addGroup(new GroupRepresentation(group));
-      }
-      
-      return privilegeRepresentation;
-    } else {
-      throw new NotFoundException();
+
+    @RequestMapping(value = "/rest/admin/privileges/{privilegeId}", method = RequestMethod.GET)
+    public PrivilegeRepresentation getPrivilege(@PathVariable String privilegeId) {
+
+        Privilege privilege = privilegeService.findPrivilege(privilegeId);
+
+        if (privilege != null) {
+            PrivilegeRepresentation privilegeRepresentation = new PrivilegeRepresentation();
+            privilegeRepresentation.setId(privilege.getId());
+            privilegeRepresentation.setName(privilege.getName());
+
+            List<User> users = privilegeService.findUsersWithPrivilege(privilegeId);
+            for (User user : users) {
+                privilegeRepresentation.addUser(new UserRepresentation(user));
+            }
+
+            List<Group> groups = privilegeService.findGroupsWithPrivilege(privilegeId);
+            for (Group group : groups) {
+                privilegeRepresentation.addGroup(new GroupRepresentation(group));
+            }
+
+            return privilegeRepresentation;
+        } else {
+            throw new NotFoundException();
+        }
     }
-  }
-  
-  @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/users", method = RequestMethod.GET)
-  public List<UserRepresentation> getUsers(@PathVariable String privilegeId) {
-    return getPrivilege(privilegeId).getUsers();
-  }
-  
-  @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/users", method = RequestMethod.POST)
-  public void addUserPrivilege(@PathVariable String privilegeId, 
-      @RequestBody AddUserPrivilegeRepresentation representation) {
-    privilegeService.addUserPrivilege(privilegeId, representation.getUserId());
-  }
-  
-  @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/users/{userId}", method = RequestMethod.DELETE)
-  public void deleteUserPrivilege(@PathVariable String privilegeId, @PathVariable String userId) {
-    privilegeService.deleteUserPrivilege(privilegeId, userId);
-  }
-  
-  @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/groups", method = RequestMethod.GET)
-  public List<GroupRepresentation> getGroups(@PathVariable String privilegeId) {
-    return getPrivilege(privilegeId).getGroups();
-  }
-  
-  @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/groups", method = RequestMethod.POST)
-  public void addGroupPrivilege(@PathVariable String privilegeId, 
-      @RequestBody AddGroupPrivilegeRepresentation representation) {
-    privilegeService.addGroupPrivilege(privilegeId, representation.getGroupId());
-  }
-  
-  @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/groups/{groupId}", method = RequestMethod.DELETE)
-  public void deleteGroupPrivilege(@PathVariable String privilegeId, @PathVariable String groupId) {
-    privilegeService.deleteGroupPrivilege(privilegeId, groupId);
-  }
+
+    @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/users", method = RequestMethod.GET)
+    public List<UserRepresentation> getUsers(@PathVariable String privilegeId) {
+        return getPrivilege(privilegeId).getUsers();
+    }
+
+    @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/users", method = RequestMethod.POST)
+    public void addUserPrivilege(@PathVariable String privilegeId,
+            @RequestBody AddUserPrivilegeRepresentation representation) {
+        privilegeService.addUserPrivilege(privilegeId, representation.getUserId());
+    }
+
+    @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/users/{userId}", method = RequestMethod.DELETE)
+    public void deleteUserPrivilege(@PathVariable String privilegeId, @PathVariable String userId) {
+        privilegeService.deleteUserPrivilege(privilegeId, userId);
+    }
+
+    @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/groups", method = RequestMethod.GET)
+    public List<GroupRepresentation> getGroups(@PathVariable String privilegeId) {
+        return getPrivilege(privilegeId).getGroups();
+    }
+
+    @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/groups", method = RequestMethod.POST)
+    public void addGroupPrivilege(@PathVariable String privilegeId,
+            @RequestBody AddGroupPrivilegeRepresentation representation) {
+        privilegeService.addGroupPrivilege(privilegeId, representation.getGroupId());
+    }
+
+    @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/groups/{groupId}", method = RequestMethod.DELETE)
+    public void deleteGroupPrivilege(@PathVariable String privilegeId, @PathVariable String groupId) {
+        privilegeService.deleteGroupPrivilege(privilegeId, groupId);
+    }
 
 }

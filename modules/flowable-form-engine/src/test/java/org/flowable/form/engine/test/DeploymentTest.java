@@ -24,61 +24,61 @@ import org.junit.Test;
 
 public class DeploymentTest extends AbstractFlowableFormTest {
 
-  @Test
-  @FormDeploymentAnnotation(resources = "org/flowable/form/engine/test/deployment/simple.form")
-  public void deploySingleForm() {
-    FormDefinition formDefinition = repositoryService.createFormDefinitionQuery()
-        .latestVersion()
-        .formDefinitionKey("form1")
-        .singleResult();
-    assertNotNull(formDefinition);
-    assertEquals("form1", formDefinition.getKey());
-  }
-  
-  @Test
-  @FormDeploymentAnnotation(resources = "org/flowable/form/engine/test/deployment/simple.form")
-  public void redeploySingleForm() {
-    FormDefinition formDefinition = repositoryService.createFormDefinitionQuery()
-        .latestVersion()
-        .formDefinitionKey("form1")
-        .singleResult();
-    assertNotNull(formDefinition);
-    assertEquals("form1", formDefinition.getKey());
-    assertEquals(1, formDefinition.getVersion());
-    
-    FormModel formModel = repositoryService.getFormModelByKey("form1");
-    assertEquals(1, formModel.getFields().size());
-    assertEquals("input1", formModel.getFields().get(0).getId());
-    assertEquals("Input1", formModel.getFields().get(0).getName());
-    
-    FormDeployment redeployment = repositoryService.createDeployment()
-        .addClasspathResource("org/flowable/form/engine/test/deployment/simple2.form")
-        .deploy();
-    
-    formDefinition = repositoryService.createFormDefinitionQuery()
-        .latestVersion()
-        .formDefinitionKey("form1")
-        .singleResult();
-    assertNotNull(formDefinition);
-    assertEquals("form1", formDefinition.getKey());
-    assertEquals(2, formDefinition.getVersion());
-    
-    formModel = repositoryService.getFormModelByKey("form1");
-    assertEquals(1, formModel.getFields().size());
-    assertEquals("input2", formModel.getFields().get(0).getId());
-    assertEquals("Input2", formModel.getFields().get(0).getName());
-    
-    repositoryService.deleteDeployment(redeployment.getId());
-  }
-  
-  @Test
-  @FormDeploymentAnnotation(resources = {"org/flowable/form/engine/test/deployment/simple.form", 
-      "org/flowable/form/engine/test/deployment/form_with_dates.form"})
-  public void deploy2Forms() {
-    List<FormDefinition> formDefinitions = repositoryService.createFormDefinitionQuery().orderByFormName().asc().list();
-    assertEquals(2, formDefinitions.size());
-    
-    assertEquals("My date form", formDefinitions.get(0).getName());
-    assertEquals("My first form", formDefinitions.get(1).getName());
-  }
+    @Test
+    @FormDeploymentAnnotation(resources = "org/flowable/form/engine/test/deployment/simple.form")
+    public void deploySingleForm() {
+        FormDefinition formDefinition = repositoryService.createFormDefinitionQuery()
+                .latestVersion()
+                .formDefinitionKey("form1")
+                .singleResult();
+        assertNotNull(formDefinition);
+        assertEquals("form1", formDefinition.getKey());
+    }
+
+    @Test
+    @FormDeploymentAnnotation(resources = "org/flowable/form/engine/test/deployment/simple.form")
+    public void redeploySingleForm() {
+        FormDefinition formDefinition = repositoryService.createFormDefinitionQuery()
+                .latestVersion()
+                .formDefinitionKey("form1")
+                .singleResult();
+        assertNotNull(formDefinition);
+        assertEquals("form1", formDefinition.getKey());
+        assertEquals(1, formDefinition.getVersion());
+
+        FormModel formModel = repositoryService.getFormModelByKey("form1");
+        assertEquals(1, formModel.getFields().size());
+        assertEquals("input1", formModel.getFields().get(0).getId());
+        assertEquals("Input1", formModel.getFields().get(0).getName());
+
+        FormDeployment redeployment = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/form/engine/test/deployment/simple2.form")
+                .deploy();
+
+        formDefinition = repositoryService.createFormDefinitionQuery()
+                .latestVersion()
+                .formDefinitionKey("form1")
+                .singleResult();
+        assertNotNull(formDefinition);
+        assertEquals("form1", formDefinition.getKey());
+        assertEquals(2, formDefinition.getVersion());
+
+        formModel = repositoryService.getFormModelByKey("form1");
+        assertEquals(1, formModel.getFields().size());
+        assertEquals("input2", formModel.getFields().get(0).getId());
+        assertEquals("Input2", formModel.getFields().get(0).getName());
+
+        repositoryService.deleteDeployment(redeployment.getId());
+    }
+
+    @Test
+    @FormDeploymentAnnotation(resources = { "org/flowable/form/engine/test/deployment/simple.form",
+            "org/flowable/form/engine/test/deployment/form_with_dates.form" })
+    public void deploy2Forms() {
+        List<FormDefinition> formDefinitions = repositoryService.createFormDefinitionQuery().orderByFormName().asc().list();
+        assertEquals(2, formDefinitions.size());
+
+        assertEquals("My date form", formDefinitions.get(0).getName());
+        assertEquals("My first form", formDefinitions.get(1).getName());
+    }
 }

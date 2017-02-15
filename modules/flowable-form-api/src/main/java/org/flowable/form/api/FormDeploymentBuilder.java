@@ -30,44 +30,44 @@ import org.flowable.form.model.FormModel;
  */
 public interface FormDeploymentBuilder {
 
-  FormDeploymentBuilder addInputStream(String resourceName, InputStream inputStream);
+    FormDeploymentBuilder addInputStream(String resourceName, InputStream inputStream);
 
-  FormDeploymentBuilder addClasspathResource(String resource);
+    FormDeploymentBuilder addClasspathResource(String resource);
 
-  FormDeploymentBuilder addString(String resourceName, String text);
-  
-  FormDeploymentBuilder addFormBytes(String resourceName, byte[] formBytes);
+    FormDeploymentBuilder addString(String resourceName, String text);
 
-  FormDeploymentBuilder addFormDefinition(String resourceName, FormModel formDefinition);
+    FormDeploymentBuilder addFormBytes(String resourceName, byte[] formBytes);
 
-  /**
-   * Gives the deployment the given name.
-   */
-  FormDeploymentBuilder name(String name);
+    FormDeploymentBuilder addFormDefinition(String resourceName, FormModel formDefinition);
 
-  /**
-   * Gives the deployment the given category.
-   */
-  FormDeploymentBuilder category(String category);
+    /**
+     * Gives the deployment the given name.
+     */
+    FormDeploymentBuilder name(String name);
 
-  /**
-   * Gives the deployment the given tenant id.
-   */
-  FormDeploymentBuilder tenantId(String tenantId);
-  
-  /**
-   * Gives the deployment the given parent deployment id.
-   */
-  FormDeploymentBuilder parentDeploymentId(String parentDeploymentId);
-  
-  /**
-   * Allows to add a property to the deployment builder that influences the deployment.
-   */
-  FormDeploymentBuilder enableDuplicateFiltering();
+    /**
+     * Gives the deployment the given category.
+     */
+    FormDeploymentBuilder category(String category);
 
-  /**
-   * Deploys all provided sources to the Flowable engine.
-   */
-  FormDeployment deploy();
+    /**
+     * Gives the deployment the given tenant id.
+     */
+    FormDeploymentBuilder tenantId(String tenantId);
+
+    /**
+     * Gives the deployment the given parent deployment id.
+     */
+    FormDeploymentBuilder parentDeploymentId(String parentDeploymentId);
+
+    /**
+     * Allows to add a property to the deployment builder that influences the deployment.
+     */
+    FormDeploymentBuilder enableDuplicateFiltering();
+
+    /**
+     * Deploys all provided sources to the Flowable engine.
+     */
+    FormDeployment deploy();
 
 }

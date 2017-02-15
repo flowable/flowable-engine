@@ -20,37 +20,37 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
  */
 public class ShortRestVariableConverter implements RestVariableConverter {
 
-  @Override
-  public String getRestTypeName() {
-    return "short";
-  }
-
-  @Override
-  public Class<?> getVariableType() {
-    return Short.class;
-  }
-
-  @Override
-  public Object getVariableValue(EngineRestVariable result) {
-    if (result.getValue() != null) {
-      if (!(result.getValue() instanceof Number)) {
-        throw new FlowableIllegalArgumentException("Converter can only convert shorts");
-      }
-      return ((Number) result.getValue()).shortValue();
+    @Override
+    public String getRestTypeName() {
+        return "short";
     }
-    return null;
-  }
 
-  @Override
-  public void convertVariableValue(Object variableValue, EngineRestVariable result) {
-    if (variableValue != null) {
-      if (!(variableValue instanceof Short)) {
-        throw new FlowableIllegalArgumentException("Converter can only convert shorts");
-      }
-      result.setValue(variableValue);
-    } else {
-      result.setValue(null);
+    @Override
+    public Class<?> getVariableType() {
+        return Short.class;
     }
-  }
+
+    @Override
+    public Object getVariableValue(EngineRestVariable result) {
+        if (result.getValue() != null) {
+            if (!(result.getValue() instanceof Number)) {
+                throw new FlowableIllegalArgumentException("Converter can only convert shorts");
+            }
+            return ((Number) result.getValue()).shortValue();
+        }
+        return null;
+    }
+
+    @Override
+    public void convertVariableValue(Object variableValue, EngineRestVariable result) {
+        if (variableValue != null) {
+            if (!(variableValue instanceof Short)) {
+                throw new FlowableIllegalArgumentException("Converter can only convert shorts");
+            }
+            result.setValue(variableValue);
+        } else {
+            result.setValue(null);
+        }
+    }
 
 }

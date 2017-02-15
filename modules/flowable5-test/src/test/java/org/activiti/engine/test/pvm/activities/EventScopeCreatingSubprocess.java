@@ -25,67 +25,64 @@ import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.flowable.engine.delegate.DelegateExecution;
 
-
 /**
  * @author Daniel Meyer
  */
 public class EventScopeCreatingSubprocess implements CompositeActivityBehavior {
 
-  public void execute(DelegateExecution execution) {
-    ActivityExecution activityExecution = (ActivityExecution) execution;
-    List<PvmActivity> startActivities = new ArrayList<PvmActivity>();
-    for (PvmActivity activity: activityExecution.getActivity().getActivities()) {
-      if (activity.getIncomingTransitions().isEmpty()) {
-        startActivities.add(activity);
-      }
-    }
-    
-    for (PvmActivity startActivity: startActivities) {
-      activityExecution.executeActivity(startActivity);
-    }
-  }
+    public void execute(DelegateExecution execution) {
+        ActivityExecution activityExecution = (ActivityExecution) execution;
+        List<PvmActivity> startActivities = new ArrayList<PvmActivity>();
+        for (PvmActivity activity : activityExecution.getActivity().getActivities()) {
+            if (activity.getIncomingTransitions().isEmpty()) {
+                startActivities.add(activity);
+            }
+        }
 
-  /*
-   * Incoming execution is transformed into an event scope, 
-   * new, non-concurrent execution leaves activity 
-   */
-  @SuppressWarnings("unchecked")
-  public void lastExecutionEnded(ActivityExecution execution) {
-    
-    ActivityExecution outgoingExecution = execution.getParent().createExecution();
-    outgoingExecution.setConcurrent(false);
-    ((InterpretableExecution)outgoingExecution).setActivity((ActivityImpl) execution.getActivity());
-        
-    // eventscope execution
-    execution.setConcurrent(false);
-    execution.setActive(false);
-    ((InterpretableExecution)execution).setEventScope(true);
-        
-    List<PvmTransition> outgoingTransitions = execution.getActivity().getOutgoingTransitions();
-    if(outgoingTransitions.isEmpty()) {
-      outgoingExecution.end();
-    }else {
-      outgoingExecution.takeAll(outgoingTransitions, Collections.EMPTY_LIST);
+        for (PvmActivity startActivity : startActivities) {
+            activityExecution.executeActivity(startActivity);
+        }
     }
-  }
 
+    /*
+     * Incoming execution is transformed into an event scope, new, non-concurrent execution leaves activity
+     */
+    @SuppressWarnings("unchecked")
+    public void lastExecutionEnded(ActivityExecution execution) {
 
-  // used by timers
-  @SuppressWarnings("unchecked")
-  public void timerFires(ActivityExecution execution, String signalName, Object signalData) throws Exception {
-    PvmActivity timerActivity = execution.getActivity();
-    boolean isInterrupting = (Boolean) timerActivity.getProperty("isInterrupting");
-    List<ActivityExecution> recyclableExecutions;
-    if (isInterrupting) {
-      recyclableExecutions = removeAllExecutions(execution);
-    } else {
-      recyclableExecutions = Collections.EMPTY_LIST;
+        ActivityExecution outgoingExecution = execution.getParent().createExecution();
+        outgoingExecution.setConcurrent(false);
+        ((InterpretableExecution) outgoingExecution).setActivity((ActivityImpl) execution.getActivity());
+
+        // eventscope execution
+        execution.setConcurrent(false);
+        execution.setActive(false);
+        ((InterpretableExecution) execution).setEventScope(true);
+
+        List<PvmTransition> outgoingTransitions = execution.getActivity().getOutgoingTransitions();
+        if (outgoingTransitions.isEmpty()) {
+            outgoingExecution.end();
+        } else {
+            outgoingExecution.takeAll(outgoingTransitions, Collections.EMPTY_LIST);
+        }
     }
-    execution.takeAll(timerActivity.getOutgoingTransitions(), recyclableExecutions);
-  }
 
-  private List<ActivityExecution> removeAllExecutions(ActivityExecution execution) {
-    return null;
-  }
+    // used by timers
+    @SuppressWarnings("unchecked")
+    public void timerFires(ActivityExecution execution, String signalName, Object signalData) throws Exception {
+        PvmActivity timerActivity = execution.getActivity();
+        boolean isInterrupting = (Boolean) timerActivity.getProperty("isInterrupting");
+        List<ActivityExecution> recyclableExecutions;
+        if (isInterrupting) {
+            recyclableExecutions = removeAllExecutions(execution);
+        } else {
+            recyclableExecutions = Collections.EMPTY_LIST;
+        }
+        execution.takeAll(timerActivity.getOutgoingTransitions(), recyclableExecutions);
+    }
+
+    private List<ActivityExecution> removeAllExecutions(ActivityExecution execution) {
+        return null;
+    }
 
 }

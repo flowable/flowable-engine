@@ -17,13 +17,13 @@ package org.flowable.dmn.xml.exception;
  */
 public class DmnXMLException extends RuntimeException {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public DmnXMLException(String message) {
-    super(message);
-  }
+    public DmnXMLException(String message) {
+        super(message);
+    }
 
-  public DmnXMLException(String message, Throwable t) {
-    super(message, t);
-  }
+    public DmnXMLException(String message, Throwable t) {
+        super(message, t);
+    }
 }

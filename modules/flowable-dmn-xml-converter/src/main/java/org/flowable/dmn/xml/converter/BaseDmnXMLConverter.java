@@ -45,8 +45,8 @@ public abstract class BaseDmnXMLConverter implements DmnXMLConstants {
         String elementName = xtr.getAttributeValue(null, ATTRIBUTE_NAME);
 
         DmnElement parsedElement = convertXMLToElement(xtr, model, decisionTable);
-//    parsedElement.setId(elementId);
-//    parsedElement.setName(elementName);
+        // parsedElement.setId(elementId);
+        // parsedElement.setName(elementName);
 
         if (parsedElement instanceof InputClause) {
             decisionTable.addInput((InputClause) parsedElement);

@@ -27,70 +27,67 @@ import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.flowable.engine.common.impl.cfg.BaseTransactionContext;
 
 /**
- * A {@link TransactionFactory} implementation for 'dependent' engine
- * (so not the process engine, but the IDM/DMN/Form/... engine).
+ * A {@link TransactionFactory} implementation for 'dependent' engine (so not the process engine, but the IDM/DMN/Form/... engine).
  * 
  * This implementation will switch depending on the current context:
  * 
- * If a transaction context is active, the dependent engine does not
- * need to create a transaction, and a regular {@link JdbcTransaction} is used.
- * Otherwise, the engine simply need to participate in the existing transaction,
- * and a {@link ManagedTransaction} is used. 
+ * If a transaction context is active, the dependent engine does not need to create a transaction, and a regular {@link JdbcTransaction} is used. Otherwise, the engine simply need to participate in
+ * the existing transaction, and a {@link ManagedTransaction} is used.
  * 
  * @author Joram Barrez
  */
 public class TransactionContextAwareTransactionFactory<T> implements TransactionFactory {
-  
-  protected Class<T> transactionContextClass; // sadly, needed because of generics and type erasure ...
-  
-  protected ManagedTransactionFactory managedTransactionFactory;
-  protected JdbcTransactionFactory jdbcTransactionFactory;
-  
-  public TransactionContextAwareTransactionFactory(Class<T> transactionContextClass) {
-    this.transactionContextClass = transactionContextClass;
 
-    this.jdbcTransactionFactory = new JdbcTransactionFactory();
-    
-    this.managedTransactionFactory = new ManagedTransactionFactory();
-    Properties properties = new Properties();
-    properties.put("closeConnection", "false");
-    this.managedTransactionFactory.setProperties(properties);
-  }
+    protected Class<T> transactionContextClass; // sadly, needed because of generics and type erasure ...
 
-  @Override
-  public void setProperties(Properties props) {
-    if (isNonIdmTransactionContextActive()) {
-      managedTransactionFactory.setProperties(props);
-    } else {
-      jdbcTransactionFactory.setProperties(props);
+    protected ManagedTransactionFactory managedTransactionFactory;
+    protected JdbcTransactionFactory jdbcTransactionFactory;
+
+    public TransactionContextAwareTransactionFactory(Class<T> transactionContextClass) {
+        this.transactionContextClass = transactionContextClass;
+
+        this.jdbcTransactionFactory = new JdbcTransactionFactory();
+
+        this.managedTransactionFactory = new ManagedTransactionFactory();
+        Properties properties = new Properties();
+        properties.put("closeConnection", "false");
+        this.managedTransactionFactory.setProperties(properties);
     }
-  }
 
-  @Override
-  public Transaction newTransaction(Connection conn) {
-    if (isNonIdmTransactionContextActive()) {
-      return managedTransactionFactory.newTransaction(conn);
-    } else {
-      return jdbcTransactionFactory.newTransaction(conn);
+    @Override
+    public void setProperties(Properties props) {
+        if (isNonIdmTransactionContextActive()) {
+            managedTransactionFactory.setProperties(props);
+        } else {
+            jdbcTransactionFactory.setProperties(props);
+        }
     }
-  }
 
-  @Override
-  public Transaction newTransaction(DataSource dataSource, TransactionIsolationLevel level, boolean autoCommit) {
-    if (isNonIdmTransactionContextActive()) {
-      return managedTransactionFactory.newTransaction(dataSource, level, autoCommit);
-    } else {
-      return jdbcTransactionFactory.newTransaction(dataSource, level, autoCommit);
+    @Override
+    public Transaction newTransaction(Connection conn) {
+        if (isNonIdmTransactionContextActive()) {
+            return managedTransactionFactory.newTransaction(conn);
+        } else {
+            return jdbcTransactionFactory.newTransaction(conn);
+        }
     }
-  }
-  
-  @SuppressWarnings("rawtypes")
-  protected boolean isNonIdmTransactionContextActive() {
-    BaseTransactionContext transactionContext = TransactionContextHolder.getTransactionContext();
-    if (transactionContext != null) {
-      return !transactionContextClass.isInstance(transactionContext);
-    } 
-    return false;
-  }
+
+    @Override
+    public Transaction newTransaction(DataSource dataSource, TransactionIsolationLevel level, boolean autoCommit) {
+        if (isNonIdmTransactionContextActive()) {
+            return managedTransactionFactory.newTransaction(dataSource, level, autoCommit);
+        } else {
+            return jdbcTransactionFactory.newTransaction(dataSource, level, autoCommit);
+        }
+    }
+
+    @SuppressWarnings("rawtypes")
+    protected boolean isNonIdmTransactionContextActive() {
+        BaseTransactionContext transactionContext = TransactionContextHolder.getTransactionContext();
+        if (transactionContext != null) {
+            return !transactionContextClass.isInstance(transactionContext);
+        }
+        return false;
+    }
 
 }

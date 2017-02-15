@@ -31,31 +31,30 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @RestController
 public class ProcessInstancesClientResource extends AbstractClientResource {
 
-  private final Logger logger = LoggerFactory.getLogger(ProcessInstancesClientResource.class);
+    private final Logger logger = LoggerFactory.getLogger(ProcessInstancesClientResource.class);
 
-  @Autowired
-  protected ProcessInstanceService clientService;
+    @Autowired
+    protected ProcessInstanceService clientService;
 
-  protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectMapper objectMapper = new ObjectMapper();
 
-  /**
-   * GET /rest/authenticate -> check if the user is authenticated, and return
-   * its login.
-   */
-  @RequestMapping(value = "/rest/admin/process-instances", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
-  public JsonNode listProcessInstances(@RequestBody ObjectNode bodyNode) {
-    logger.debug("REST request to get a list of process instances");
+    /**
+     * GET /rest/authenticate -> check if the user is authenticated, and return its login.
+     */
+    @RequestMapping(value = "/rest/admin/process-instances", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+    public JsonNode listProcessInstances(@RequestBody ObjectNode bodyNode) {
+        logger.debug("REST request to get a list of process instances");
 
-    JsonNode resultNode = null;
-    try {
-      ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-      resultNode = clientService.listProcesInstances(bodyNode, serverConfig);
+        JsonNode resultNode = null;
+        try {
+            ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+            resultNode = clientService.listProcesInstances(bodyNode, serverConfig);
 
-    } catch (Exception e) {
-      logger.error("Error processing process instance list request", e);
-      throw new BadRequestException(e.getMessage());
+        } catch (Exception e) {
+            logger.error("Error processing process instance list request", e);
+            throw new BadRequestException(e.getMessage());
+        }
+
+        return resultNode;
     }
-
-    return resultNode;
-  }
 }

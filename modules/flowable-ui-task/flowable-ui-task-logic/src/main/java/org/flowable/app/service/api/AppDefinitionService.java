@@ -18,8 +18,8 @@ import org.flowable.idm.api.User;
 
 public interface AppDefinitionService {
 
-  List<AppDefinitionServiceRepresentation> getAppDefinitions();
-	
-	List<AppDefinitionServiceRepresentation> getDeployableAppDefinitions(User user);
+    List<AppDefinitionServiceRepresentation> getAppDefinitions();
+
+    List<AppDefinitionServiceRepresentation> getDeployableAppDefinitions(User user);
 
 }

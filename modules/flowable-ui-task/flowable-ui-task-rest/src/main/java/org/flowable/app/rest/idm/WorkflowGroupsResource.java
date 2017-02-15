@@ -28,18 +28,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class WorkflowGroupsResource {
 
-  @Autowired
-  private RemoteIdmService remoteIdmService;
+    @Autowired
+    private RemoteIdmService remoteIdmService;
 
-  @RequestMapping(value = "/rest/workflow-groups", method = RequestMethod.GET)
-  public ResultListDataRepresentation getGroups(@RequestParam(value = "filter", required = false) String filter) {
-    
-    List<? extends Group> matchingGroups = remoteIdmService.findGroupsByNameFilter(filter);
-    List<GroupRepresentation> groupRepresentations = new ArrayList<GroupRepresentation>();
-    for (Group group : matchingGroups) {
-      groupRepresentations.add(new GroupRepresentation(group));
+    @RequestMapping(value = "/rest/workflow-groups", method = RequestMethod.GET)
+    public ResultListDataRepresentation getGroups(@RequestParam(value = "filter", required = false) String filter) {
+
+        List<? extends Group> matchingGroups = remoteIdmService.findGroupsByNameFilter(filter);
+        List<GroupRepresentation> groupRepresentations = new ArrayList<GroupRepresentation>();
+        for (Group group : matchingGroups) {
+            groupRepresentations.add(new GroupRepresentation(group));
+        }
+        return new ResultListDataRepresentation(groupRepresentations);
     }
-    return new ResultListDataRepresentation(groupRepresentations);
-  }
-  
+
 }

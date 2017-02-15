@@ -21,32 +21,32 @@ import java.util.List;
  */
 public class ExecuteDecisionRequest {
 
-  protected String decisionKey;
-  protected String tenantId;
-  protected List<EngineRestVariable> inputVariables;
+    protected String decisionKey;
+    protected String tenantId;
+    protected List<EngineRestVariable> inputVariables;
 
-  public String getDecisionKey() {
-    return decisionKey;
-  }
+    public String getDecisionKey() {
+        return decisionKey;
+    }
 
-  public void setDecisionKey(String decisionKey) {
-    this.decisionKey = decisionKey;
-  }
+    public void setDecisionKey(String decisionKey) {
+        this.decisionKey = decisionKey;
+    }
 
-  public String getTenantId() {
-    return tenantId;
-  }
+    public String getTenantId() {
+        return tenantId;
+    }
 
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
-  }
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
 
-  public List<EngineRestVariable> getInputVariables() {
-    return inputVariables;
-  }
+    public List<EngineRestVariable> getInputVariables() {
+        return inputVariables;
+    }
 
-  public void setInputVariables(List<EngineRestVariable> variables) {
-    this.inputVariables = variables;
-  }
+    public void setInputVariables(List<EngineRestVariable> variables) {
+        this.inputVariables = variables;
+    }
 
 }

@@ -22,23 +22,23 @@ import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionInfoDat
  * @author Tijs Rademakers
  */
 public class MybatisProcessDefinitionInfoDataManager extends AbstractDataManager<ProcessDefinitionInfoEntity> implements ProcessDefinitionInfoDataManager {
-  
-  public MybatisProcessDefinitionInfoDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    super(processEngineConfiguration);
-  }
 
-  @Override
-  public Class<? extends ProcessDefinitionInfoEntity> getManagedEntityClass() {
-    return ProcessDefinitionInfoEntityImpl.class;
-  }
-  
-  @Override
-  public ProcessDefinitionInfoEntity create() {
-    return new ProcessDefinitionInfoEntityImpl();
-  }
+    public MybatisProcessDefinitionInfoDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
 
-  @Override
-  public ProcessDefinitionInfoEntity findProcessDefinitionInfoByProcessDefinitionId(String processDefinitionId) {
-    return (ProcessDefinitionInfoEntity) getDbSqlSession().selectOne("selectProcessDefinitionInfoByProcessDefinitionId", processDefinitionId);
-  }
+    @Override
+    public Class<? extends ProcessDefinitionInfoEntity> getManagedEntityClass() {
+        return ProcessDefinitionInfoEntityImpl.class;
+    }
+
+    @Override
+    public ProcessDefinitionInfoEntity create() {
+        return new ProcessDefinitionInfoEntityImpl();
+    }
+
+    @Override
+    public ProcessDefinitionInfoEntity findProcessDefinitionInfoByProcessDefinitionId(String processDefinitionId) {
+        return (ProcessDefinitionInfoEntity) getDbSqlSession().selectOne("selectProcessDefinitionInfoByProcessDefinitionId", processDefinitionId);
+    }
 }

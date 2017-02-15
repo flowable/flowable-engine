@@ -14,34 +14,33 @@ package org.flowable.image.util;
 
 import java.net.URL;
 
-
 /**
  * @author Tijs Rademakers
  */
 public abstract class ReflectUtil {
 
-  public static URL getResource(String name) {
-    return getResource(name, null);
-  }
-  
-  public static URL getResource(String name, ClassLoader customClassLoader) {
-    URL resourceURL = null;
-    if (customClassLoader != null) {
-      resourceURL = customClassLoader.getResource(name);
+    public static URL getResource(String name) {
+        return getResource(name, null);
     }
-    
-    if (resourceURL == null) {
-      // Try the current Thread context classloader
-      ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-      if (classLoader != null) {
-        resourceURL = classLoader.getResource(name);
-      }
-      
-      if (resourceURL == null) {
-        classLoader = ReflectUtil.class.getClassLoader();
-        resourceURL = classLoader.getResource(name);
-      }
+
+    public static URL getResource(String name, ClassLoader customClassLoader) {
+        URL resourceURL = null;
+        if (customClassLoader != null) {
+            resourceURL = customClassLoader.getResource(name);
+        }
+
+        if (resourceURL == null) {
+            // Try the current Thread context classloader
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            if (classLoader != null) {
+                resourceURL = classLoader.getResource(name);
+            }
+
+            if (resourceURL == null) {
+                classLoader = ReflectUtil.class.getClassLoader();
+                resourceURL = classLoader.getResource(name);
+            }
+        }
+        return resourceURL;
     }
-    return resourceURL;
-   }
 }

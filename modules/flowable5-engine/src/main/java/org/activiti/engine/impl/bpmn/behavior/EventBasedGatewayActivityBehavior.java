@@ -15,16 +15,15 @@ package org.activiti.engine.impl.bpmn.behavior;
 
 import org.flowable.engine.delegate.DelegateExecution;
 
-
 /**
  * @author Daniel Meyer
  */
 public class EventBasedGatewayActivityBehavior extends FlowNodeActivityBehavior {
-  
-  @Override
-  public void execute(DelegateExecution execution) {
-    // the event based gateway doesn't really do anything
-    // ignoring outgoing sequence flows (they're only parsed for the diagram)
-  }
-  
+
+    @Override
+    public void execute(DelegateExecution execution) {
+        // the event based gateway doesn't really do anything
+        // ignoring outgoing sequence flows (they're only parsed for the diagram)
+    }
+
 }

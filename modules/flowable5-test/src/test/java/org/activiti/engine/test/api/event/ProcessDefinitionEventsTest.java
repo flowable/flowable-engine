@@ -28,135 +28,132 @@ import org.flowable.engine.test.Deployment;
  */
 public class ProcessDefinitionEventsTest extends PluggableFlowableTestCase {
 
-	private TestMultipleFlowableEventListener listener;
-	
-	/**
-	 * Test create, update and delete events of process definitions.
-	 */
-	@Deployment(resources= {"org/activiti/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
-	public void testProcessDefinitionEvents() throws Exception {
-			ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-					.processDefinitionKey("oneTaskProcess")
-					.singleResult();
-			
-			assertNotNull(processDefinition);
-			
-			// Check create-event
-			assertEquals(2, listener.getEventsReceived().size());
-			assertTrue(listener.getEventsReceived().get(0) instanceof FlowableEntityEvent);
-			
-			FlowableEntityEvent event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
-			assertEquals(processDefinition.getId(), ((ProcessDefinition) event.getEntity()).getId());
-			
-			event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
-			assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
-			assertEquals(processDefinition.getId(), ((ProcessDefinition) event.getEntity()).getId());
-			listener.clearEventsReceived();
-			
-			// Check update event when category is updated
-			repositoryService.setProcessDefinitionCategory(processDefinition.getId(), "test");
-			assertEquals(1, listener.getEventsReceived().size());
-			assertTrue(listener.getEventsReceived().get(0) instanceof FlowableEntityEvent);
-			
-			event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
-			assertEquals(processDefinition.getId(), ((ProcessDefinition) event.getEntity()).getId());
-			assertEquals("test", ((ProcessDefinition) event.getEntity()).getCategory());
-			listener.clearEventsReceived();
-			
-			// Check update event when suspended/activated
-			repositoryService.suspendProcessDefinitionById(processDefinition.getId());
-			repositoryService.activateProcessDefinitionById(processDefinition.getId());
-			
-			assertEquals(2, listener.getEventsReceived().size());
-			event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(processDefinition.getId(), ((ProcessDefinition) event.getEntity()).getId());
-			assertEquals(FlowableEngineEventType.ENTITY_SUSPENDED, event.getType());
-			event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
-			assertEquals(FlowableEngineEventType.ENTITY_ACTIVATED, event.getType());
-			assertEquals(processDefinition.getId(), ((ProcessDefinition) event.getEntity()).getId());
-			listener.clearEventsReceived();
-			
-		  // Check delete event when category is updated
-			repositoryService.deleteDeployment(processDefinition.getDeploymentId(), true);
-			deploymentIdFromDeploymentAnnotation = null;
-			
-			assertEquals(1, listener.getEventsReceived().size());
-			assertTrue(listener.getEventsReceived().get(0) instanceof FlowableEntityEvent);
-			
-			event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
-			assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
-			assertEquals(processDefinition.getId(), ((ProcessDefinition) event.getEntity()).getId());
-			listener.clearEventsReceived();
-	}
+    private TestMultipleFlowableEventListener listener;
 
-  /**
-   * test sequence of events for process definition with timer start event
-   */
-  @Deployment(resources= {"org/activiti/engine/test/bpmn/event/timer/StartTimerEventTest.testDurationStartTimerEvent.bpmn20.xml"})
-  public void testTimerStartEventDeployment() {
-    org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl) 
-        processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
-    
-    ProcessDefinition processDefinition = activiti5ProcessConfig.getRepositoryService().
-        createProcessDefinitionQuery().processDefinitionKey("startTimerEventExample").singleResult();
-    FlowableEntityEvent processDefinitionCreated = ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processDefinition);
+    /**
+     * Test create, update and delete events of process definitions.
+     */
+    @Deployment(resources = { "org/activiti/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testProcessDefinitionEvents() throws Exception {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey("oneTaskProcess")
+                .singleResult();
 
-    Job timer = activiti5ProcessConfig.getManagementService().createTimerJobQuery().singleResult();
-    FlowableEntityEvent timerCreated = ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, timer);
-    assertSequence(processDefinitionCreated, timerCreated);
-    listener.clearEventsReceived();
-  }
+        assertNotNull(processDefinition);
 
-  private void assertSequence(FlowableEntityEvent before, FlowableEntityEvent after) {
-    int beforeIndex = 0;
-    int afterIndex = 0;
-    for (int index = 0; index < listener.getEventsReceived().size(); index++) {
-      FlowableEvent activitiEvent = listener.getEventsReceived().get(index);
+        // Check create-event
+        assertEquals(2, listener.getEventsReceived().size());
+        assertTrue(listener.getEventsReceived().get(0) instanceof FlowableEntityEvent);
 
-      if (isEqual(before, activitiEvent)) {
-        beforeIndex = index;
-      }
-      if (isEqual(after, activitiEvent)) {
-        afterIndex = index;
-      }
+        FlowableEntityEvent event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+        assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
+        assertEquals(processDefinition.getId(), ((ProcessDefinition) event.getEntity()).getId());
+
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
+        assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+        assertEquals(processDefinition.getId(), ((ProcessDefinition) event.getEntity()).getId());
+        listener.clearEventsReceived();
+
+        // Check update event when category is updated
+        repositoryService.setProcessDefinitionCategory(processDefinition.getId(), "test");
+        assertEquals(1, listener.getEventsReceived().size());
+        assertTrue(listener.getEventsReceived().get(0) instanceof FlowableEntityEvent);
+
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+        assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
+        assertEquals(processDefinition.getId(), ((ProcessDefinition) event.getEntity()).getId());
+        assertEquals("test", ((ProcessDefinition) event.getEntity()).getCategory());
+        listener.clearEventsReceived();
+
+        // Check update event when suspended/activated
+        repositoryService.suspendProcessDefinitionById(processDefinition.getId());
+        repositoryService.activateProcessDefinitionById(processDefinition.getId());
+
+        assertEquals(2, listener.getEventsReceived().size());
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+        assertEquals(processDefinition.getId(), ((ProcessDefinition) event.getEntity()).getId());
+        assertEquals(FlowableEngineEventType.ENTITY_SUSPENDED, event.getType());
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
+        assertEquals(FlowableEngineEventType.ENTITY_ACTIVATED, event.getType());
+        assertEquals(processDefinition.getId(), ((ProcessDefinition) event.getEntity()).getId());
+        listener.clearEventsReceived();
+
+        // Check delete event when category is updated
+        repositoryService.deleteDeployment(processDefinition.getDeploymentId(), true);
+        deploymentIdFromDeploymentAnnotation = null;
+
+        assertEquals(1, listener.getEventsReceived().size());
+        assertTrue(listener.getEventsReceived().get(0) instanceof FlowableEntityEvent);
+
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+        assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
+        assertEquals(processDefinition.getId(), ((ProcessDefinition) event.getEntity()).getId());
+        listener.clearEventsReceived();
     }
-    assertTrue(beforeIndex < afterIndex);
-  }
 
-  /**
-   * equals is not implemented.
-   */
-  private boolean isEqual(FlowableEntityEvent event1, FlowableEvent activitiEvent) {
-    if (activitiEvent instanceof FlowableEntityEvent && event1.getType().equals(activitiEvent.getType())) {
-      FlowableEntityEvent activitiEntityEvent = (FlowableEntityEvent) activitiEvent;
-      if (activitiEntityEvent.getEntity().getClass().equals(event1.getEntity().getClass())) {
-        return true;
-      }
+    /**
+     * test sequence of events for process definition with timer start event
+     */
+    @Deployment(resources = { "org/activiti/engine/test/bpmn/event/timer/StartTimerEventTest.testDurationStartTimerEvent.bpmn20.xml" })
+    public void testTimerStartEventDeployment() {
+        org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
+
+        ProcessDefinition processDefinition = activiti5ProcessConfig.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey("startTimerEventExample").singleResult();
+        FlowableEntityEvent processDefinitionCreated = ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processDefinition);
+
+        Job timer = activiti5ProcessConfig.getManagementService().createTimerJobQuery().singleResult();
+        FlowableEntityEvent timerCreated = ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, timer);
+        assertSequence(processDefinitionCreated, timerCreated);
+        listener.clearEventsReceived();
     }
-    return false;
-  }
 
+    private void assertSequence(FlowableEntityEvent before, FlowableEntityEvent after) {
+        int beforeIndex = 0;
+        int afterIndex = 0;
+        for (int index = 0; index < listener.getEventsReceived().size(); index++) {
+            FlowableEvent activitiEvent = listener.getEventsReceived().get(index);
 
-  @Override
-	protected void initializeServices() {
-	  super.initializeServices();
+            if (isEqual(before, activitiEvent)) {
+                beforeIndex = index;
+            }
+            if (isEqual(after, activitiEvent)) {
+                afterIndex = index;
+            }
+        }
+        assertTrue(beforeIndex < afterIndex);
+    }
 
-	  listener = new TestMultipleFlowableEventListener();
-    listener.setEventClasses(FlowableEntityEvent.class);
-    listener.setEntityClasses(ProcessDefinition.class, org.activiti.engine.impl.persistence.entity.TimerJobEntity.class);
+    /**
+     * equals is not implemented.
+     */
+    private boolean isEqual(FlowableEntityEvent event1, FlowableEvent activitiEvent) {
+        if (activitiEvent instanceof FlowableEntityEvent && event1.getType().equals(activitiEvent.getType())) {
+            FlowableEntityEvent activitiEntityEvent = (FlowableEntityEvent) activitiEvent;
+            if (activitiEntityEvent.getEntity().getClass().equals(event1.getEntity().getClass())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-    processEngineConfiguration.getEventDispatcher().addEventListener(listener);
-	}
-	
-	@Override
-	protected void tearDown() throws Exception {
-	  super.tearDown();
-	  
-	  if (listener != null) {
-	    listener.clearEventsReceived();
-	    processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
-	  }
-	}
+    @Override
+    protected void initializeServices() {
+        super.initializeServices();
+
+        listener = new TestMultipleFlowableEventListener();
+        listener.setEventClasses(FlowableEntityEvent.class);
+        listener.setEntityClasses(ProcessDefinition.class, org.activiti.engine.impl.persistence.entity.TimerJobEntity.class);
+
+        processEngineConfiguration.getEventDispatcher().addEventListener(listener);
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+
+        if (listener != null) {
+            listener.clearEventsReceived();
+            processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
+        }
+    }
 }

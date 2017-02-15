@@ -22,17 +22,17 @@ import org.flowable.engine.impl.EventSubscriptionQueryProperty;
  * @author Tijs Rademakers
  */
 public class EventSubscriptionQueryProperties {
-  
-  public static Map<String, QueryProperty> PROPERTIES;
 
-  static {
-    PROPERTIES = new HashMap<String, QueryProperty>();
-    PROPERTIES.put("id", EventSubscriptionQueryProperty.ID);
-    PROPERTIES.put("created", EventSubscriptionQueryProperty.CREATED);
-    PROPERTIES.put("executionId", EventSubscriptionQueryProperty.EXECUTION_ID);
-    PROPERTIES.put("processInstanceId", EventSubscriptionQueryProperty.PROCESS_INSTANCE_ID);
-    PROPERTIES.put("processDefinitionId", EventSubscriptionQueryProperty.PROCESS_DEFINITION_ID);
-    PROPERTIES.put("tenantId", EventSubscriptionQueryProperty.TENANT_ID);
-  }
+    public static Map<String, QueryProperty> PROPERTIES;
+
+    static {
+        PROPERTIES = new HashMap<String, QueryProperty>();
+        PROPERTIES.put("id", EventSubscriptionQueryProperty.ID);
+        PROPERTIES.put("created", EventSubscriptionQueryProperty.CREATED);
+        PROPERTIES.put("executionId", EventSubscriptionQueryProperty.EXECUTION_ID);
+        PROPERTIES.put("processInstanceId", EventSubscriptionQueryProperty.PROCESS_INSTANCE_ID);
+        PROPERTIES.put("processDefinitionId", EventSubscriptionQueryProperty.PROCESS_DEFINITION_ID);
+        PROPERTIES.put("tenantId", EventSubscriptionQueryProperty.TENANT_ID);
+    }
 
 }
