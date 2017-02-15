@@ -38,9 +38,9 @@ public class DmnDeploymentResourceDataResource extends BaseDmnDeploymentResource
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates both deployment and resource have been found and the resource data has been returned."),
             @ApiResponse(code = 404, message = "Indicates the requested deployment was not found or there is no resource with the given id present in the deployment. The status-description contains additional information.") })
-    @RequestMapping(value = "/dmn-repository/deployments/{deploymentId}/resourcedata/{resourceId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/dmn-repository/deployments/{deploymentId}/resourcedata/{resourceName}", method = RequestMethod.GET)
     @ResponseBody
-    public byte[] getDmnDeploymentResource(@ApiParam(name = "deploymentId") @PathVariable("deploymentId") String deploymentId, @PathVariable("resourceId") String resourceId, HttpServletResponse response) {
-        return getDmnDeploymentResourceData(deploymentId, resourceId, response);
+    public byte[] getDmnDeploymentResource(@ApiParam(name = "deploymentId") @PathVariable("deploymentId") String deploymentId, @PathVariable("resourceName") String resourceName, HttpServletResponse response) {
+        return getDmnDeploymentResourceData(deploymentId, resourceName, response);
     }
 }

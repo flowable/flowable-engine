@@ -24,6 +24,7 @@ import org.flowable.dmn.api.DmnDecisionTable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -39,6 +40,7 @@ public class DecisionTableResourceDataResource extends BaseDecisionTableResource
             @ApiResponse(code = 404, message = "Indicates the requested decision table was not found or there is no resource with the given id present in the decision table. The status-description contains additional information.")
     })
     @RequestMapping(value = "/dmn-repository/decision-tables/{decisionTableId}/resourcedata", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
     public byte[] getDecisionTableResource(@ApiParam(name = "decisionTableId") @PathVariable String decisionTableId, HttpServletResponse response) {
         DmnDecisionTable decisionTable = geDecisionTableFromRequest(decisionTableId);
         return getDeploymentResourceData(decisionTable.getDeploymentId(), decisionTable.getResourceName(), response);

@@ -100,26 +100,26 @@ To make the Process engine aware of the DMN engine the *org.flowable.dmn.engine.
 
 [source,xml,linenums]
 ----
+<bean id="dmnEngineConfiguration" class="org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration">
+    <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000" />
+    <property name="jdbcDriver" value="org.h2.Driver" />
+    <property name="jdbcUsername" value="sa" />
+    <property name="jdbcPassword" value="" />
+    ...
+</bean>
+
+<bean id="dmnEngineConfigurator" class="org.flowable.dmn.engine.configurator.DmnEngineConfigurator">
+    <property name="dmnEngineConfiguration" ref="dmnEngineConfiguration" />
+</bean>
+
 <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
-
-    <bean id="dmnEngineConfiguration" class="org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration">
-        <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000" />
-        <property name="jdbcDriver" value="org.h2.Driver" />
-        <property name="jdbcUsername" value="sa" />
-        <property name="jdbcPassword" value="" />
-    </bean>
-
-    <bean id="dmnEngineConfigurator" class="org.flowable.dmn.engine.configurator.DmnEngineConfigurator">
-        <property name="dmnEngineConfiguration" ref="dmnEngineConfiguration" />
-    </bean>
-
     <property name="configurators">
       <list>
         <ref bean="dmnEngineConfigurator" />
       </list>
     </property>
     ...
-
+</bean>
 ----
 
 
