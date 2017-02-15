@@ -193,6 +193,10 @@ angular.module("activitiModeler").factory("editorManager", ["$http", function ($
             this.canvasTracker = new Hash();
 
             var config = jQuery.extend(true, {}, response.data); //avoid a reference to the original object.
+            if(!config.model.childShapes){
+                config.model.childShapes = [];
+            }
+
             this.findAndRegisterCanvas(config.model.childShapes); //this will remove any childshapes of a collapseable subprocess.
             this.canvasTracker.set(config.modelId, JSON.stringify(config.model.childShapes)); //this will be overwritten almost instantly.
 

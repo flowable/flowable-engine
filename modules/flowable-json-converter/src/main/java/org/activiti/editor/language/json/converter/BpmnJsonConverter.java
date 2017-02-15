@@ -162,6 +162,8 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         DI_RECTANGLES.add(STENCIL_CALL_ACTIVITY);
         DI_RECTANGLES.add(STENCIL_SUB_PROCESS);
         DI_RECTANGLES.add(STENCIL_EVENT_SUB_PROCESS);
+        DI_RECTANGLES.add(STENCIL_COLLAPSED_SUB_PROCESS);
+
         DI_RECTANGLES.add(STENCIL_TASK_BUSINESS_RULE);
         DI_RECTANGLES.add(STENCIL_TASK_MAIL);
         DI_RECTANGLES.add(STENCIL_TASK_MANUAL);
@@ -747,7 +749,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                     ObjectNode lowerRightNode = (ObjectNode) boundsNode.get(EDITOR_BOUNDS_LOWER_RIGHT);
 
                     //a lane is a childshape of a pool but the bounds of the lane are the correct x,y
-                    //we @amaron have a fix for lanes in a pool not correctly formated back to json but its not approved by tijs yet.
+                    //we have a pull-request-fix for lanes in a pool not correctly formated back to json but its not approved by tijs yet.
                     //see unmerged pull request... https://github.com/Activiti/Activiti/pull/982
                     graphicInfo.setX(upperLeftNode.get(EDITOR_BOUNDS_X).asDouble() + parentX);
                     graphicInfo.setY(upperLeftNode.get(EDITOR_BOUNDS_Y).asDouble() + parentY);
