@@ -10,7 +10,7 @@
       <groupId>org.flowable</groupId>
       <artifactId>flowable-root</artifactId>
       <relativePath>../..</relativePath>
-      <version>6.0.0</version>
+      <version>6.0.1-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -19,7 +19,7 @@
   		<java.version>1.7</java.version>
 
   		<!-- Libraries versions -->
-  		<flowable.version>6.0.0</flowable.version>
+  		<flowable.version>6.0.1-SNAPSHOT</flowable.version>
   	    <spring.version>4.1.6.RELEASE</spring.version>
   		<spring.security.version>4.0.1.RELEASE</spring.security.version>
   		<jackson.version>2.3.3</jackson.version>
