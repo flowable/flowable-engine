@@ -35,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 public class DeploymentResourceDataResource extends BaseDeploymentResourceDataResource {
 
     @ResponseBody
-    @RequestMapping(value = "/repository/deployments/{deploymentId}/resourcedata/{resourceId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/repository/deployments/{deploymentId}/resourcedata/{resourceName}", method = RequestMethod.GET)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates both deployment and resource have been found and the resource data has been returned."),
             @ApiResponse(code = 404, message = "Indicates the requested deployment was not found or there is no resource with the given id present in the deployment. The status-description contains additional information.") })
